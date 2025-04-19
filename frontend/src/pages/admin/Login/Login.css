@@ -1,0 +1,54 @@
+input{
+    border-color: #e1e1e1;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    outline: none;
+}
+.fa-solid{
+    color: #6f757e;
+    font-size: 15px;
+}
+
+label{
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    color: #6f757e;
+}
+.fa-eye, .fa-eye-slash{
+    color: #6f757e !important;
+    font-size: 13px;
+    cursor: pointer;
+}
+.error-label{
+    color: red !important;
+}
+h2{
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 22px;
+}
+.forgot-password{
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    color: #ff8e29;
+}
+#welcome-text{
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+.dec-circle{
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(to right, #ffb26d, #ff8e29);
+
+}
+.dec-circle-top-1{
+    width: 180px;
+    height: 180px;
+    background:linear-gradient(to right, #ffbe85, #fa7c0b);
+}
+.dec-circle-top-2{
+    width: 180px;
+    height: 180px;
+    background:linear-gradient(to right, #ffbe85, #fa7c0b);
+}
