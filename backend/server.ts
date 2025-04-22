@@ -6,6 +6,7 @@ import candidateRouter from './src/presentation/routes/candidate/candidateRouter
 
 const app = express()
 
+dotenv.config()
 app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))

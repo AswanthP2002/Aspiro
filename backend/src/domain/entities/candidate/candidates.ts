@@ -32,4 +32,7 @@ export default interface Candidate {
     isBlocked : boolean
     socialLinks : SocialLinks[]
     currentSubscription : string
+    isVerified:boolean
+    verificationToken:string
+    otpExpiresAt?:Date
 }

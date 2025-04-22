@@ -4,6 +4,7 @@ import LoginPage from './pages/admin/Login/Login'
 import CandidateRegister from './pages/candidate/Register/Register'
 import Home from './pages/common/Home/Home'
 import Layouts from './pages/common/Layouts'
+import VerificationPage from './pages/common/Verification/Verification'
 
 function App() {
   return(
@@ -22,6 +23,7 @@ function App() {
         </Route>
         <Route path='/register' element={<CandidateRegister />} />
         <Route path='/admin/login' element={<LoginPage />} />
+        <Route path='/verify/:email' element={<VerificationPage />} />
       </Routes>
     </BrowserRouter>
   )

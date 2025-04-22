@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './Register.css'
 import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
@@ -24,6 +24,8 @@ export default function CandidateRegister(){
     const [usernameerror, setusernameerror] = useState("")
     const [fullnameerror, setfullnameerror] = useState("")
     const [passwordconfirmationerror, setpasswordconfirmationerror] = useState("")
+
+    const navigator = useNavigate()
 
     function togglePasswordVisibility(){
         setshowpassword(prev => !prev)
@@ -70,11 +72,8 @@ export default function CandidateRegister(){
             .then((result) => {
                 if(result.success){
                     setloading(false)
-                    Swal.fire({
-                        title:"Account Created",
-                        icon:"success",
-                        text:"Account created successfully, everything is fine"
-                    })
+                    navigator(`/verify/${result.candidate}`)
+                    
                 }else{
                     setloading(false)
                     setvalidationerror(true)

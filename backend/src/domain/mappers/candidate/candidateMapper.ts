@@ -22,5 +22,8 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
         profilePicture:"",
         resume:[],
         socialLinks:[],
+        isVerified:false,
+        verificationToken:"",
+        otpExpiresAt:new Date(Date.now() + 2 * 60 * 1000)
     }
 }
