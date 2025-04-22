@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import './Login.css'
 import { useState } from 'react'
-import Loader from '../../../components/common/Loader'
+import Loader from '../../../components/admin/Loader'
 
 export default function LoginPage(){
     const [email, setEmail] = useState("")

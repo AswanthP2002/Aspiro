@@ -1,0 +1,40 @@
+#login-switch{
+    font-weight: 500;
+    color: gray;
+}
+#login-switch .link{
+    font-weight: 600;
+    color: #0d64fe;
+}
+.switch-role{
+    background-color: #dbdde1;
+}
+.switch-role .candidate, .switch-role .recruiter{
+    font-size: 13px;
+    font-weight:500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.switch-role .fa-user{
+    color: white;
+    font-size: 13px;
+}
+#terms-service-wrapper label{
+    color: black;
+    font-weight: 300;
+}
+#terms-service-wrapper .link{
+    color: #0d64fe;
+    font-weight: 500;
+}
+#register-button{
+    background-color: #0d64fe;
+    color: white;
+    font-weight: 500;
+}
+.social-auth img{
+    width: 20px;
+    height: 20px;
+}
