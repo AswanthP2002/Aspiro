@@ -5,6 +5,7 @@ import CandidateRegister from './pages/candidate/Register/Register'
 import Home from './pages/common/Home/Home'
 import Layouts from './pages/common/Layouts'
 import VerificationPage from './pages/common/Verification/Verification'
+import CandidateLogin from './pages/candidate/Login/Login'
 
 function App() {
   return(
@@ -22,6 +23,7 @@ function App() {
           {/* Admin related routes */}
         </Route>
         <Route path='/register' element={<CandidateRegister />} />
+        <Route path='/login' element={<CandidateLogin />} />
         <Route path='/admin/login' element={<LoginPage />} />
         <Route path='/verify/:email' element={<VerificationPage />} />
       </Routes>

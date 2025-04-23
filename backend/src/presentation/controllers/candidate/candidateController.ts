@@ -4,6 +4,7 @@ import RegisterCandidate from "../../../application/usecases/candidate/registerC
 import { RegisterCandidateSchema } from "../dtos/candidate/registerCandidateDTOs"
 import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candidateMapper"
 import VerifyUser from "../../../application/usecases/candidate/verifyUser"
+import { LoginCandidate } from "../../../application/usecases/candidate/loginCandidate"
 
 
 export const registerCandidate = async (req : Request , res : Response) : Promise<Response> => {
@@ -48,6 +49,27 @@ export const verifyUser = async (req : Request, res : Response) : Promise<Respon
         }else if(error.message === "Wrong") {
             return res.status(400).json({success:false, message:"Incorrect otp, please enter the correct otp"})
         }else {
+            return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+        }
+    }
+}
+
+export const loginUser = async (req : Request, res : Response) : Promise<Response> => {
+    try {
+        console.log('Incoming request', req.body)
+        const {email, password} = req.body
+
+        const cRepo = new CandidateRepository()
+        const cLoginUsecase = new LoginCandidate(cRepo)
+        const result = await cLoginUsecase.execute(email, password)
+        return res.status(201).json({success:true, message:"User logined successfully", result})
+    } catch (error : any) {
+        console.log('Error occured while user login', error.message)
+        if(error.message === "Not Found"){
+            return res.status(404).json({success:false, message:"User not found"})
+        }else if(error.message === "Wrong Password"){
+            return res.status(400).json({success:false, message:"Invalid password, please enter correct password"})
+        }else{
             return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
         }
     }

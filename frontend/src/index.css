@@ -25,10 +25,25 @@
 .bg-gray{
   background-color: var(--admin-gray-theme);
 }
+.bg-cluttered{
+  background-color: var(--aspiro-cluttered);
+}
 .bg-aspiro-main{
   background-color: var(--aspiro-main-blue);
 }
 .color-aspiro-main{
   background-color: var(--aspiro-main-blue);
 }
-
+.brand-text{
+  font-size: 2rem;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+.text-poppins{
+  font-family: "Poppins", sans-serif;
+}
+.text-ibm-plex-sans{
+  font-family: "IBM Plex Sans", sans-serif;
+}
+.color-aspiro-secondary{
+  color: var(--aspiro-secondary-blue);
+}
