@@ -10,9 +10,12 @@ export default interface Candidate {
     _id? : ObjectId
     name : string
     username : string
-    password : string
+    password? : string
+    role : string
     phone : string
     email : string
+    googleid? : string
+    facebookid? : string
     experience : Experience[]
     education : Education[]
     location : {

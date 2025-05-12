@@ -1,13 +1,22 @@
 import landingPageImage from '/Illustration.png'
 import './Home.css'
 import datas from '../../../assets/data/dummyintrodata'
+import jobVacancies from '../../../assets/data/dummyjobvacancies'
 import { useState } from 'react'
 import Tile from '../../../components/common/Tile'
+import TileGuide from '../../../components/common/TileGuide'
+import { guideData } from '../../../assets/data/guideData'
+import arrowupdown from '/Arrows-up-down.png'
+import arrowdownup from '/Arrows-down-up.png'
+
 
 export default function Home(){
     const [tileData, setTiledata] = useState(datas)
+    const [jobvacancies, setjobvacancies] = useState(jobVacancies)
+    const [tileguideData, settileguideData] = useState(guideData)
     return(
-        <div className="w-full landing-section-wrapper bg-cluttered" id="landing-section">
+        <>
+            <div className="w-full landing-section-wrapper bg-cluttered" id="landing-section">
             <div className="container w-full px-2 md:px-20 py-5">
                 <div className="flex flex-col md:flex-row gap-10 py-20">
                     <div className="left text w-1/2">
@@ -49,5 +58,40 @@ export default function Home(){
                 </div>
             </div>
         </div>
+
+        <div className="w-full pt-3">
+            <div className='container w-full px-2 md:px-20 py-5'>
+                <p className="text-xl section-title poppins-font mt-5">Most popular vacancies</p>
+                <div className="grid grid-cols-4 gap-y-8 gap-x-4 mt-10">
+                    {
+                        jobvacancies.map((job) => {
+                            return <div>
+                                <p className="poppins-font section-content">{job.jobRole}</p>
+                                <label htmlFor="">Vacancies {job.vacancies}</label>
+                            </div>
+                        })
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div className="w-full pt-5 pb-20 bg-cluttered">
+            <div className="container w-full px-2 md:px-20 py-5">
+                <p className="text-xl section-title poppins-font mt-5 text-center">How Aspiro Works</p>
+                <div className="w-full mt-10 flex justify-between gap-10 relative">
+                    {
+                        tileguideData.map((data) => {
+                            return <TileGuide data={data} />
+                        })
+                    }
+
+                    <img src={arrowupdown} alt="" className='absolute left-60' />
+                    <img src={arrowdownup} alt="" className='absolute left-145 top-20' />
+                    <img src={arrowupdown} alt="" className='absolute right-60' />
+
+                </div>
+            </div>
+        </div>
+        </>
     )
 }

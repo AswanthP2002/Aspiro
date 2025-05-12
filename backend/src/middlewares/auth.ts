@@ -8,9 +8,9 @@ export const candidateAuth = async (req : Auth, res : Response, next : NextFunct
     try {
         const token = req.headers.authorization
         console.log('Token reached here', token)
-        if(!token) return res.status(401).json({success:false, redirect:'/login'})
+        if(!token) throw new Error('Token invalid')
         
-        const decoded = verifyToken(token.split(" ")[1])
+        const decoded = await verifyToken(token.split(" ")[1])
         if(!decoded) return res.status(400).json({success:false, message:"Your session has expired, please re login"})
         req.user = decoded
         next()

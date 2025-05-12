@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../../components/candidate/Loader";
@@ -8,6 +8,30 @@ export default function VerificationPage(){
     const [otpError, setotpError] = useState(false)
     const [otpErrorText, setOtpErrorText] = useState("")
     const [loading, setloading] = useState(false)
+    const [remainingtime, setreminingtime] = useState(60)
+    const [resendenabled, setresendenabled] = useState(false)
+
+    useEffect(() => {
+        if(remainingtime <= 0){
+            setresendenabled(true)
+            return
+        }
+
+        let countDown = setTimeout(() => {
+            setreminingtime(prev => prev - 1)
+        }, 1000)
+
+        return () => clearInterval(countDown)
+    }, [remainingtime])
+
+    const getMinute = (time : number) : number => {
+        return Math.floor(time / 60)
+    }
+
+    const getSecond = (time : number) : number => {
+        return Math.round(time % 60)
+    }
+    
 
     const {email} = useParams()
 
@@ -41,13 +65,13 @@ export default function VerificationPage(){
                     Swal.fire({
                         title:"Success",
                         icon:"success",
-                        text:result.message,
+                        text:'Registration completed. Please login to continue',
                         showConfirmButton:true,
                         showCancelButton:true,
                         confirmButtonText:"Login"
                     }).then((result) => {
                         if(result.isConfirmed){
-                            navigator('/login')
+                            navigator(`/login`)
                         }
                     })
                 }else{
@@ -76,8 +100,10 @@ export default function VerificationPage(){
                 <input value={otp} onChange={(event) => setotp(event.target.value)} type="number" name="otp" id="otp" className="mt-4 w-full max-w-2xl border border-gray-500 rounded-sm p-2" placeholder="Enter the otp" />
                 <button type="submit" className="mt-3 text-white font-bold p-2 w-full max-w-2xl bg-blue-500 rounded-sm">Verify Email</button>
                 </form>
-                <p className="text-center text-sm mt-2">OTP will expire in 2:00</p>
-                <p className="text-center text-sm mt-2">Didin't recieved any code <Link to={'/resent-otp'}>Resend</Link></p>
+                <p className="text-center text-sm mt-2">OTP will expire in {getMinute(remainingtime)}:{getSecond(remainingtime)}</p>
+                <div className="resend-otp">
+                    <p className="text-center text-sm mt-2">Didin't recieved any code <button onClick={() => alert('I ve got clicked')} disabled={resendenabled ? false : true} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
+                </div>
             </div>
         </div>
     )

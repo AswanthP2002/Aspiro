@@ -92,6 +92,11 @@ export default function CandidateRegister(){
         }
     }
 
+    //google authentication
+    async function googleAuth(){
+        window.location.assign('http://localhost:5000/google')
+    }
+
     return(
         <div className="flex items-center justify-center w-full h-screen">
             {loading ? <Loader /> : null}
@@ -159,7 +164,7 @@ export default function CandidateRegister(){
                 </div>
                 <div className="social-auth w-full flex justify-between mt-2 gap-3">
                     <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={facebookIcon} className="inline-block" alt="" /> Sign In with facebook</button>
-                    <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button>
+                    <button onClick={googleAuth} type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button>
                 </div>
             </div>
         </div>

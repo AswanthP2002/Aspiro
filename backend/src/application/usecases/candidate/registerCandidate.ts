@@ -1,5 +1,5 @@
 import Candidate from "../../../domain/entities/candidate/candidates";
-import CandidateRepo from "../../../domain/interfaces/candidate/candidateRepo";
+import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import bcrypt from 'bcrypt'
 import { generateCode } from "../../../utilities/generateCode";
 import { sendEmail } from "../../../utilities/sendmail";
@@ -15,8 +15,11 @@ export default class RegisterCandidate {
         //check if username is already taken
         const existingUsername = await this.candidateRep.findByUsername(candidate.username)
         if(existingUsername) throw  new Error('duplicate username')
-
-        const hashedPassword = await bcrypt.hash(candidate.password, 10)
+        let hashedPassword
+        if(candidate.password){
+            hashedPassword = await bcrypt.hash(candidate.password, 10)   
+        }
+            
 
         candidate.password = hashedPassword
         
@@ -39,6 +42,7 @@ export default class RegisterCandidate {
         candidate.resume = []
         candidate.socialLinks = []
         candidate.isVerified = false
+        candidate.googleid = ""
         
         const otp : string = generateCode()
         const otpExpiresAt : Date = new Date(Date.now() + 2 * 60 * 1000)

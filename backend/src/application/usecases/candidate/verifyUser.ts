@@ -1,5 +1,5 @@
 import { join } from "path";
-import CandidateRepo from "../../../domain/interfaces/candidate/candidateRepo";
+import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 
 export default class VerifyUser {
     constructor(private candidateRepo : CandidateRepo){}

@@ -58,8 +58,14 @@ export default function CandidateLogin(){
             })
             .then((result) => {
                 if(result.success){
-                    dispatcher(loginSucess({user:result.user, token:result.token}))
+                    console.log('testing full result ', result)
+                    console.log('testing incoming data', result?.result?.token, result?.result?.user)
+                    dispatcher(loginSucess({user:result?.result?.user, token:result?.result?.token}))
                     setloading(false)
+                    // Swal.fire({
+                    //     icon:'info',
+                    //     text:'Testing data'
+                    // })
                     navigator('/')
                 }else{
                     setloading(false)

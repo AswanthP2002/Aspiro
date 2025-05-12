@@ -47,3 +47,19 @@
 .color-aspiro-secondary{
   color: var(--aspiro-secondary-blue);
 }
+
+button:disabled{
+  cursor: not-allowed;
+}
+button{
+  cursor: pointer;
+}
+.aspiro-guide-tile:hover{
+  background: white;
+}
+.aspiro-guide-tile:hover .icon-wrapper{
+  background: #0d64fe;
+}
+.aspiro-guide-tile:hover .fa-solid{
+  color: white;
+}

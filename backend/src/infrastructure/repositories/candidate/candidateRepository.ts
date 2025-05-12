@@ -1,17 +1,20 @@
-import CandidateRepo from "../../../domain/interfaces/candidate/candidateRepo";
+import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import Candidate from "../../../domain/entities/candidate/candidates";
 import { connectDb } from "../../database/connection";
-import { ObjectId } from "mongodb";
+import { Db, ObjectId } from "mongodb";
 import mongoose, { Mongoose } from "mongoose";
 import { after } from "node:test";
+import { SaveCandidate } from "../../../domain/interfaces/candidate/createCandidateRequest";
 
 export default class CandidateRepository implements CandidateRepo {
     private collection = "candidate"
 
-    async create(candidate: Candidate): Promise<string> {
+    async create(candidate: Candidate): Promise<SaveCandidate> {
         const db = await connectDb()
         const result = await db.collection(this.collection).insertOne(candidate)
-        return `Candidate created with verification pending status with id : ${(await result).insertedId.toHexString()}`
+        console.log('Candidate repo.ts :: ', result)
+        console.log('Candidate repo.ts :: ', typeof result.insertedId)
+        return result
     }
     
     async findByEmail(email: string): Promise<Candidate | null> {
@@ -32,6 +35,11 @@ export default class CandidateRepository implements CandidateRepo {
         return await db.collection<Candidate>(this.collection).findOne({_id:new ObjectId(id)})
     }
 
+    async findByGoogleId(googleId: string): Promise<Candidate | null> {
+        const db = await connectDb()
+        return await db.collection<Candidate>(this.collection).findOne({googleId:googleId})
+    }
+
     async findByToken(token: string): Promise<Candidate | null> {
         const db = await connectDb()
         const candidate = await db.collection<Candidate>(this.collection).findOne({verificationToken:token})
@@ -47,5 +55,44 @@ export default class CandidateRepository implements CandidateRepo {
         )
 
         return result
+    }
+
+    async updateIntroDetails(id: string, role: string, city: string, district: string, state: string, country: string, pincode: string, summary: string): Promise<Candidate | null> {
+        const db = await connectDb()
+        const result = await db.collection<Candidate>(this.collection).findOneAndUpdate(
+            {_id:new ObjectId(id)},
+            {$set:{
+                role:role,
+                "location.city":city,
+                "location.district":district,
+                "location.state":state,
+                "location.country":country,
+                "location.pincode":pincode,
+                about:summary
+            }},
+            {returnDocument:'after'}
+        )
+
+        return result
+
+        
+    }
+
+    async editProfile(id: string, name: string, role: string, city: string, district: string, state: string, country: string): Promise<Candidate | null> {
+        const db = await connectDb()
+        const doc = await db.collection<Candidate>(this.collection).findOneAndUpdate(
+            {_id:new ObjectId(id)},
+            {$set:{
+                name:name,
+                role:role,
+                "location.city":city,
+                "location.district":district,
+                "location.state":state,
+                "location.country":country
+            }},
+            {returnDocument:'after'}
+        )
+
+        return doc
     }
 }

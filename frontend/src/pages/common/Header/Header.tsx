@@ -25,19 +25,19 @@ export default function Header(){
                         <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
                     </div>
                     <div className="nav-actions flex justify-between w-full items-center">
-                    <ul className="nav-links flex gap-3">
-                        <li className="nav-link active">Home</li>
-                        <li className="nav-link">Find Jobs</li>
-                        <li className="nav-link">Candidates</li>
-                        <li className="nav-link">Companies</li>
-                        <li className="nav-link">Network</li>
+                    <ul className="nav-links flex gap-10">
+                        <li className="nav-link active hover:text-blue-500 cursor-pointer">Home</li>
+                        <li className="nav-link cursor-pointer hover:text-blue-500">Find Jobs</li>
+                        <li className="nav-link cursor-pointer hover:text-blue-500">Candidates</li>
+                        <li className="nav-link cursor-pointer hover:text-blue-500">Companies</li>
+                        <li className="nav-link cursor-pointer hover:text-blue-500">Network</li>
                     </ul>
                     <div className="actions flex gap-5 items-center">
                         {
                             logedUser
-                                ? <><Link to={'/profile'}><img src={defaultUser} style={{width:'50px', height:'50px'}} alt="" /></Link>
+                                ? <><Link to={'/profile/personal'}><img src={defaultUser} style={{width:'50px', height:'50px'}} alt="" /></Link>
                                     <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i></>
-                                : <button onClick={() => navigator('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer">Sign In</button>
+                                : <button onClick={() => navigator('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                         }
                     </div>
                     </div>
