@@ -1,0 +1,21 @@
+.description-landing-page{
+    line-height: 1.75;
+}
+.search-options .fa-solid{
+    color: #a8d4f9;
+    font-size: .8rem;
+}
+.search-options input{
+    font-size: .75rem;
+}
+.section-title{
+    font-size: 2rem;
+    font-weight: 500;
+}
+.section-content{
+    font-weight: 600;
+}
+.aspiro-guide-tile i{
+    color: #0d64fe;
+    font-size: 1.4rem;
+}

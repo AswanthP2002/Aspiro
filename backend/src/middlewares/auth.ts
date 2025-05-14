@@ -19,3 +19,20 @@ export const candidateAuth = async (req : Auth, res : Response, next : NextFunct
         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
     }
 }
+
+export const recruiterAuth = async (req : Auth, res : Response, next : NextFunction) => {
+    try {
+        const token = req.headers.authorization
+        console.log('token reached here form recruiter side', token)
+        if(!token) throw new Error('Token invalid')
+
+        const decode = await verifyToken(token.split(" ")[1])
+        if(!decode) return res.status(400).json({success:false, message:'Your session has expired, please re login'})
+        req.user = decode
+        next()
+    } catch (error) {
+        console.log('Error occured while authentication recruiter', error)
+        return res.status(500).json({success:false, message:'Internal server error, please try again after some time'})
+        
+    }
+}

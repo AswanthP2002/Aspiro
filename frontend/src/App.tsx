@@ -10,6 +10,16 @@ import ProfileLayout from './pages/candidate/Profile-Layout'
 import ProfilePersonal from './pages/candidate/Profile-Personal/Personal'
 import StoreDetails from './pages/candidate/Basic Details Storing Page/StoreDetails'
 import AuthSuccess from './components/common/AuthSuccessGoogle'
+import RecruiterLogin from './pages/recruiter/Login/Login'
+import RecruiterRegister from './pages/recruiter/Register/Register'
+import RecruiterVerificationPage from './pages/recruiter/Verification'
+import RecruiterLayouts from './pages/recruiter/Layouts'
+import RecruiterHome from './pages/recruiter/Home/Home'
+import RecruiterProfileLayout from './pages/recruiter/ProfileLayout'
+import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Personal'
+import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute'
+import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form'
+import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob'
 
 function App() {
   return(
@@ -24,15 +34,35 @@ function App() {
 
     </Route>
 
+    <Route path='/recruiter' element={<RecruiterLayouts />}>
+      <Route index element={<RecruiterHome />} />
+
+      <Route element={<RecruiterProtectedRoutes />}>
+        <Route path='profile' element={<RecruiterProfileLayout />}>
+          <Route path='overview' index element={<RecruiterProfilePersonal />} />
+          <Route path='post-a-job' element={<PostAJobForm />} />
+        </Route>
+      </Route>
+    </Route>
+
     <Route path="/register" element={<CandidateRegister />} />
     <Route path="/login" element={<CandidateLogin />} />
     <Route path="/admin/login" element={<LoginPage />} />
     <Route path="/verify/:email" element={<VerificationPage />} />
+    <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
     <Route path='/store/details' element={<StoreDetails />} />
     <Route path='/auth-success' element={<AuthSuccess />} />
 
+    <Route path='/recruiter/login' element={<RecruiterLogin />} />
+    <Route path='/recruiter/register' element={<RecruiterRegister />} />
+    <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
+
+    {/* <Route element={<RecruiterProtectedRoutes />}>
+      <Route path='/recruiter/profile/overview' element={<RecruiterProfilePersonal />} />
+    </Route> */}
+
     {/* Testing routes */}
-    <Route path='/test' element={<StoreDetails />} />
+    <Route path='/test' element={<RecruiterProfilePersonal />} />
   </Routes>
     </BrowserRouter>
   )

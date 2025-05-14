@@ -1,10 +1,10 @@
-import express from 'express'
+import express, { NextFunction } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 import candidateRouter from './src/presentation/routes/candidate/candidateRouter'
 import authRouter from './src/presentation/routes/candidate/authRouter'
-import session from 'express-session'
+import recruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
 import passport from 'passport'
 import './src/config/passport'
 
@@ -28,6 +28,7 @@ const port = process.env.PORT || 5000
 
 app.use('/', candidateRouter)
 app.use('/', authRouter)
+app.use('/', recruiterRouter)
 
 app.listen(port, () => {
     console.log(`Server started running on port ${port}`)
