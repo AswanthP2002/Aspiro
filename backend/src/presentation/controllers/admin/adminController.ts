@@ -14,6 +14,12 @@ import LoadCompanyDetailsUseCase from "../../../application/usecases/admin/loadC
 import BlockCompanyUseCase from "../../../application/usecases/admin/blockCompanyUseCase"
 import UnblockCompanyUseCase from "../../../application/usecases/admin/unblockCompanyUseCase"
 import CloseCompanyUseCase from "../../../application/usecases/admin/closeCompanyUseCase"
+import LoadJobsUseCase from "../../../application/usecases/admin/loadJobs"
+import { LoadJobDetailsUseCase } from "../../../application/usecases/admin/loadJobDetailsUseCase"
+import { BlockJobUseCase } from "../../../application/usecases/admin/blockJobUseCase"
+import { UnblockJobUseCase } from "../../../application/usecases/admin/unBlockJobUseCase"
+import { RejectJobUseCase } from "../../../application/usecases/admin/rejectJobUseCase"
+import { UnRejectJobUseCase } from "../../../application/usecases/admin/unRejectJobUseCase"
 
 export class AdminController {
     constructor(
@@ -26,7 +32,13 @@ export class AdminController {
         private _loadCompanyDetailsUC : LoadCompanyDetailsUseCase,
         private _blockCompanyUC : BlockCompanyUseCase,
         private _unblockCompanyUC : UnblockCompanyUseCase,
-        private _closeCompanyUC : CloseCompanyUseCase
+        private _closeCompanyUC : CloseCompanyUseCase,
+        private _loadJobsUC : LoadJobsUseCase,
+        private _loadJobDetails : LoadJobDetailsUseCase,
+        private _blockJobUC : BlockJobUseCase,
+        private _unblockJobUC : UnblockJobUseCase,
+        private _rejectJobUC : RejectJobUseCase,
+        private _unrejectJobUC : UnRejectJobUseCase
     ){}
 
     async adminLogin(req : Request, res : Response) : Promise<Response> { //login controller for admin
@@ -205,6 +217,103 @@ export class AdminController {
                 res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
             }
 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async loadJobs(req : AdminAuth, res : Response) : Promise<Response> {
+        try {
+            const jobs = await this._loadJobsUC.execute()
+            return res.status(StatusCodes.OK).json({success:true, message:'Job fetched successfully', jobs})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while fetching the jobs')
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async loadJObDetails(req : AdminAuth, res : Response) : Promise<Response> {
+        try {
+            const {jobId} = req.params
+            const result = await this._loadJobDetails.execute(jobId)
+            const jobDetails = result[0]
+            return res.status(StatusCodes.OK).json({success:true, message:'Job details fetched successfully', jobDetails})
+        } catch (error : unknown) {
+            console.log('Error occured while fetching job details', error)
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async blockJob(req :AdminAuth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+
+        try {
+            const blockResult = await this._blockJobUC.execute(jobId)
+            if(!blockResult) throw new Error('Can not block job')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'job blocked successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while blocking job')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async unblockJob(req :AdminAuth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+
+        try {
+            const blockResult = await this._unblockJobUC.execute(jobId)
+            if(!blockResult) throw new Error('Can not unblock job')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'job unblocked successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while unblocking job')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async rejectJob(req :AdminAuth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+
+        try {
+            const blockResult = await this._rejectJobUC.execute(jobId)
+            if(!blockResult) throw new Error('Can not block job')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'job rejected successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while rejecting job')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async unrejectJob(req :AdminAuth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+
+        try {
+            const blockResult = await this._unrejectJobUC.execute(jobId)
+            if(!blockResult) throw new Error('Can not unreject job')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'job unrejected successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while unrejecting job')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
         }
     }

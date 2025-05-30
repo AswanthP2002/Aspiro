@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Input, InputLabel, Modal, OutlinedInput, TextField, Typography } from '@mui/material'
 import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candidateAuthSlice'
 import useRefreshToken from '../../../hooks/refreshToken'
+import { candidateLogout } from '../../../hooks/Logouts'
 
 interface Candidate {
     name : string
@@ -155,6 +156,18 @@ export default function ProfilePersonal(){
                     const accessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
                     dispatcher(tokenRefresh({token:accessToken}))
                     fetchResponse = await makeRequest(accessToken)
+                }
+                
+                if(fetchResponse.status === 403){
+                    Swal.fire({
+                        icon:'warning',
+                        title:'Blocked',
+                        text:'Your account has been blocked by the admin. You will logout shortly..',
+                        showConfirmButton:false,
+                        showCancelButton:false,
+                        allowOutsideClick:false,
+                        timer:4000
+                    }).then(() => candidateLogout(token))
                 }
 
                 const result = await fetchResponse.json()

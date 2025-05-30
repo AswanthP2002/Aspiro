@@ -26,6 +26,8 @@ import Companies from './pages/admin/Company-list/Companies'
 import Candidates from './pages/admin/Candidate-list/Candidate-list'
 import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails'
 import CompanyDetails from './pages/admin/company-details/ComapnyDetails'
+import Jobs from './pages/admin/Job-list/JobList'
+import JobDetails from './pages/admin/JobDetails/JobDetails'
 
 function App() {
   return(
@@ -55,8 +57,10 @@ function App() {
       <Route path='dashboard' element={<Dashboard />} />
       <Route path='companies' element={<Companies /> } />
       <Route path='candidates' element={<Candidates />} />
+      <Route path='jobs' element={<Jobs />} />
       <Route path='candidate/details/:id' element={<CandidateDetails />} />
       <Route path='company/details/:id' element={<CompanyDetails />} />
+      <Route path='job/details/:id' element={<JobDetails />} />
     </Route>
 
     <Route path="/register" element={<CandidateRegister />} />

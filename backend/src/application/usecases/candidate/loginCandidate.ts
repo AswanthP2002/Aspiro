@@ -9,6 +9,8 @@ export class LoginCandidateUseCase {
         const candidate = await this.candidateRepo.findByEmail(email)
         if(!candidate) throw new Error('Not Found')
         
+        if(candidate.isBlocked) throw new Error('Blocked')
+        
         if(candidate.password){
             const isPasswordMatch = await bcrypt.compare(password, candidate.password)
             if(!isPasswordMatch) throw new Error('Wrong Password')

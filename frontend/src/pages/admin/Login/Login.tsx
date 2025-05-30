@@ -40,7 +40,8 @@ export default function LoginPage(){
             headers:{
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({email, password})
+            body:JSON.stringify({email, password}),
+            credentials:'include'
         })
         .then((response) => {
             if(response.status === 500) throw new Error('Internal server error, please try again after some time')

@@ -1,6 +1,12 @@
+import CheckCandidateBlockStatusUseCase from "../application/usecases/candidate/CheckCandidateBlockStatusUseCase";
+import CandidateRepository from "../infrastructure/repositories/candidate/candidateRepository";
 import { StatusCodes } from "../presentation/statusCodes";
 import { generateToken, verifyToken } from "../services/jwt";
 import { Request, Response, NextFunction } from "express";
+
+
+const candidateRepo = new CandidateRepository()
+const checkCandidateBlockStatusUC = new CheckCandidateBlockStatusUseCase(candidateRepo)
 
 export interface Auth extends Request {
     user : any 
@@ -13,6 +19,7 @@ export interface AdminAuth extends Request {
 export const candidateAuth = async (req : Auth, res : Response, next : NextFunction) => {
 
     try {
+        //check candidate blocked or not??
         const authHeader = req.headers.authorization
         
         if(!authHeader || !authHeader.startsWith('Bearer ')){
@@ -22,7 +29,9 @@ export const candidateAuth = async (req : Auth, res : Response, next : NextFunct
 
         const token = authHeader.split(" ")[1]
         try {
-            const decod = await verifyToken(token)
+            const decod : any = await verifyToken(token)
+            const isBlocked = await checkCandidateBlockStatusUC.execute(decod.id)
+            if(isBlocked) return res.status(StatusCodes.FORBIDEN).json({success:false, message:'Your account has been blocked by the admin, you will logout shortly..'})
             req.user = decod
             next()
         } catch (error : any) {
