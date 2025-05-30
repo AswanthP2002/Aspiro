@@ -4,6 +4,7 @@ import defaultUser from '/default-img-instagram.png'
 import { logout, tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice"
 import useRefreshToken from "../../../hooks/refreshToken"
 import Swal from "sweetalert2"
+import { candidateLogout } from "../../../hooks/Logouts"
 
 export default function Header(){
     const dispatch = useDispatch()
@@ -17,70 +18,7 @@ export default function Header(){
     })
     console.log('This is loged user', logedUser)
 
-    async function candidateLogout(){
-        //request for logout
-        
-        const makeRequest = async (accessToken : string) => {
-            return fetch('http://localhost:5000/candidate/logout', {
-                method:'POST',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-
-        try {
-            console.log('Token before sending', token)
-            let logoutResponse = await makeRequest(token)
-            if(logoutResponse.status === 401){
-                const refreshToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                dispatch(tokenRefresh({token:refreshToken}))
-                logoutResponse = await makeRequest(refreshToken)
-            }
-
-            const result = await logoutResponse.json()
-
-            if(result?.success){
-                dispatch(logout())
-                Swal.fire({
-                    icon:'success',
-                    title:'User logout successfull',
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:2000
-                }).then(() => {
-                    navigator('/')
-                    window.location.reload()
-                })
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops!',
-                    text:result.message,
-                    confirmButtonText:'Home'
-                }).then((result) => {
-                    if(result.isConfirmed){
-                        navigator('/')
-                    }
-                })
-            }
-        } catch (error : any) {
-            console.log('Error occured while candidate logout', error)
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:error.message,
-                confirmButtonText:'Home',
-                showCancelButton:false
-            }).then((result) => {
-                if(result.isConfirmed){
-                    navigator('/')
-                }
-            })
-        }
-    }
-
+    
     return(
         <div className="w-full">
             <div className="w-full px-2 md:px-20 py-3 shadow-sm">
@@ -107,7 +45,7 @@ export default function Header(){
                                                 <Link to={'/profile/personal'}><p className="text-sm">Profile</p> </Link>
                                             </div>
                                             <div className="mt-2">
-                                                <span onClick={() => candidateLogout()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
+                                                <span onClick={() => candidateLogout(token)} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
                                             </div>
                                         </div>
                                         {/* <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i> */}

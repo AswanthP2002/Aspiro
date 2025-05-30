@@ -14,4 +14,5 @@ export default interface CandidateRepo {
     findCandidates(search? : string, page? : number, limit? : number) : Promise<Candidate[] | null>
     blockCandidate(id : string) : Promise<boolean>
     unblockCandidate(id : string) : Promise<boolean>
+    isCandidateBlocked(id : string) : Promise<boolean | undefined>
 }

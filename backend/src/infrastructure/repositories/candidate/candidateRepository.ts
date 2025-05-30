@@ -123,4 +123,10 @@ export default class CandidateRepository implements CandidateRepo {
 
         return result.acknowledged
     }
+
+    async isCandidateBlocked(id: string): Promise<boolean | undefined> {
+        const db = await connectDb()
+        const result = await db.collection<Candidate>(this.collection).findOne({_id:new ObjectId(id)})
+        return result?.isBlocked
+    }
 }

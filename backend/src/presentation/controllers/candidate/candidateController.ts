@@ -131,6 +131,11 @@ export class CandidateController {
                             success:false, 
                             message:"Invalid password, please enter correct password"
                         })
+                    case 'Blocked' :
+                        return res.status(StatusCodes.NOT_ACCEPTABLE).json({
+                            success:false,
+                            message:'Your account has been blocked by the admin'
+                        })
                     default :
                         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                             success:false, 

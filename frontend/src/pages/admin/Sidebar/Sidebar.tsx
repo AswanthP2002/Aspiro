@@ -22,7 +22,7 @@ export default function Sidebar(){
         <nav className="space-y-3 mt-15">
             <ul>
               <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/dashboard"><i className="fa-solid fa-house group-hover:!text-orange-400 me-3"></i>Home</Link></li>
-              <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/job-posts"><i className="fa-solid fa-briefcase group-hover:!text-orange-400 me-3"></i>Job Posts</Link></li>
+              <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/jobs"><i className="fa-solid fa-briefcase group-hover:!text-orange-400 me-3"></i>Job Posts</Link></li>
               <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/companies"><i className="fa-solid fa-building group-hover:!text-orange-400 me-3"></i>Companies</Link></li>
               <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/candidates"><i className="fa-solid fa-users group-hover:!text-orange-400 me-3"></i>Candidates</Link></li>
               <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/analytics"><i className="fa-solid fa-magnifying-glass-chart group-hover:!text-orange-400 me-3"></i>Analytics</Link></li>
