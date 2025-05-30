@@ -36,6 +36,9 @@ export default interface Candidate {
     socialLinks : SocialLinks[]
     currentSubscription : string
     isVerified:boolean
+    isAdmin : boolean
     verificationToken:string
-    otpExpiresAt?:Date
+    otpExpiresAt?:Date,
+    createdAt:Date,
+    updatedAt:Date
 }

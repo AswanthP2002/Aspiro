@@ -8,7 +8,7 @@ export default function VerificationPage(){
     const [otpError, setotpError] = useState(false)
     const [otpErrorText, setOtpErrorText] = useState("")
     const [loading, setloading] = useState(false)
-    const [remainingtime, setreminingtime] = useState(60)
+    const [remainingtime, setreminingtime] = useState(120)
     const [resendenabled, setresendenabled] = useState(false)
 
     useEffect(() => {

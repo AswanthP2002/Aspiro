@@ -1,38 +1,162 @@
-import { verifyToken } from "../services/jwt";
+import { StatusCodes } from "../presentation/statusCodes";
+import { generateToken, verifyToken } from "../services/jwt";
 import { Request, Response, NextFunction } from "express";
 
 export interface Auth extends Request {
-    user : any
+    user : any 
+}
+
+export interface AdminAuth extends Request {
+    admin : any
+    candidateId?:string
 }
 export const candidateAuth = async (req : Auth, res : Response, next : NextFunction) => {
+
     try {
-        const token = req.headers.authorization
-        console.log('Token reached here', token)
-        if(!token) throw new Error('Token invalid')
+        const authHeader = req.headers.authorization
         
-        const decoded = await verifyToken(token.split(" ")[1])
-        if(!decoded) return res.status(400).json({success:false, message:"Your session has expired, please re login"})
-        req.user = decoded
-        next()
-    } catch (error) {
+        if(!authHeader || !authHeader.startsWith('Bearer ')){
+            console.log('Token is missing or malformed')
+            return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Authorization token is missing or malformed'})
+        }
+
+        const token = authHeader.split(" ")[1]
+        try {
+            const decod = await verifyToken(token)
+            req.user = decod
+            next()
+        } catch (error : any) {
+                switch(error.name){
+                    case 'TokenExpiredError' :
+                        console.log(error.message)
+                        return res.status(StatusCodes.UNAUTHORIZED).json({success:false, message:'Session expired, please login again'})
+                    case 'JsonWebTokenError' :
+                        console.log(error.message)
+                        return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Invalid Token, please login again'})
+                    default :
+                        console.log('Token verification failed', error)
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong while verifying the token'})
+                    }
+        }
+        
+    } catch (error : any) {
         console.log('Error occured while authenticating candidate', error)
-        return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"Internal server error, please try again after some time"})
     }
 }
 
 export const recruiterAuth = async (req : Auth, res : Response, next : NextFunction) => {
-    try {
-        const token = req.headers.authorization
-        console.log('token reached here form recruiter side', token)
-        if(!token) throw new Error('Token invalid')
 
-        const decode = await verifyToken(token.split(" ")[1])
-        if(!decode) return res.status(400).json({success:false, message:'Your session has expired, please re login'})
-        req.user = decode
+    const token = req.headers.authorization
+
+    if(!token){
+        return res.status(StatusCodes.NOT_ACCEPTABLE).json({success:false, message:'Access denied, no token provided or token malformed'})
+    }
+
+    try {
+        const decoded = await verifyToken(token.split(" ")[1])
+        req.user = decoded
         next()
-    } catch (error) {
-        console.log('Error occured while authentication recruiter', error)
-        return res.status(500).json({success:false, message:'Internal server error, please try again after some time'})
-        
+    } catch (error : unknown) {
+        if(error instanceof Error){
+            switch(error.name){
+                case 'TokenExpiredError' :
+                    return res.status(StatusCodes.UNAUTHORIZED).json({success:false, message:'Your session has expired, please re login'})
+                case 'JsonWebTokenError' :
+                    return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Invalid token, please re login'})
+                default :
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong, please try again after some time'})
+            }
+        }
+    }
+}
+
+export const adminAuth = async (req : AdminAuth, res : Response, next : NextFunction) => {
+
+    //get token from authorization
+    const token = req.headers.authorization
+
+    //check token existance
+    if(!token){
+        return res.status(StatusCodes.NOT_ACCEPTABLE).json({success:false, message:'Access denied, No token provided or token malformed'})
+    }
+
+    //decode token
+    try {
+        const decoded = await verifyToken(token.split(" ")[1])
+        req.admin = decoded
+        next()
+
+    } catch (error : unknown) {
+        if(error instanceof Error){
+            console.log('Error occured while authenticating admin', error)
+            switch(error.name){
+                case 'TokenExiredError' :
+                    return res.status(StatusCodes.UNAUTHORIZED).json({success:false, message:'Your session has expired, please login'})
+                case 'JsonWebTokenError' :
+                    return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Invalid token, please login'})
+                default :
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong, please try again after some time'})
+            }
+        }
+    }
+}
+
+
+export const refreshAccessToken = async (req : Request, res : Response) => {
+    const candidateRefreshToken = req.cookies?.refreshToken
+    const recruiterRefreshToken = req.cookies?.recruiterRefreshToken
+    const adminRefreshToken = req.cookies?.adminRefreshToken
+
+    let refreshToken = ''
+    let role = ''
+    let accessToken = ''
+
+    if(candidateRefreshToken){
+        refreshToken = candidateRefreshToken
+        role = 'Candidate'
+    }else if(recruiterRefreshToken){
+        refreshToken = recruiterRefreshToken
+        role = 'Recruiter'
+    }else if(adminRefreshToken){
+        refreshToken = adminRefreshToken
+        role = 'Admin'
+    }else {
+        return res.status(StatusCodes.NOT_ACCEPTABLE).json({success:false, message:'Access denied, no token provided'})
+    }
+
+
+    try {
+        const decoded : any = await verifyToken(refreshToken)
+
+        switch (decoded.role){
+            case 'Candidate' :
+                accessToken = await generateToken({id:decoded?.id, email:decoded?.email, name:decoded?.name, role:role})
+                break
+            case 'Recruiter' :
+                accessToken = await generateToken({id:decoded?.id, email:decoded?.email, username:decoded?.username, role:role})
+                break
+            case 'Admin' :
+                accessToken = await generateToken({id:decoded?.id, email:decoded?.email, role:role})
+                break
+            default :
+                throw new Error('Unknown Error')
+        }
+
+        return res.status(StatusCodes.OK).json({success:true, message:'New Access Token issued', accessToken})
+
+    } catch (error : unknown) {
+        if(error instanceof Error){
+            console.log('Error occured  while issuing new access token', error)
+            switch(error.name){
+                case 'TokenExpiredError' :
+                    return res.status(StatusCodes.UNAUTHORIZED).json({success:false, message:'Your session has expired, please login to continue'})
+                case 'JsonWebTokenError' :
+                    return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Invalid Token, please login again'})
+                default :
+                    console.log('token validation failed')
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong, please try again after some time'})
+            }
+        }
     }
 }

@@ -38,6 +38,9 @@ export default function IntroDetailsPageForm(){
     const [countryError, setcountryerror] = useState("")
     const [mobileError, setMobileError] = useState("")
     const [emailError, setEmailError] = useState("")
+    const [companyTypeError, setcompanytypeerror] = useState("")
+    const [industryError, setindustryerror] = useState("")
+    const [teamStrengthError, setteamstreangtherror] = useState("")
 
     const [logogpreview, setlogopreview] = useState("")
     const [logo, setlogo] = useState<File | null>(null)
@@ -96,7 +99,16 @@ export default function IntroDetailsPageForm(){
         if(step === 3) isValidated = validateStepThree()
 
         if(step === 3 && isValidated){
+            console.log('Datas before sending to the backend', details)
+            // Swal.fire({
+            //     icon:'info',
+            //     title:'Testing Flow',
+            //     text:'Data send successfully',
+            //     showConfirmButton:true
+            // })
 
+            // return 
+            
             try {
                 if(logo){
                     const logoFormData = new FormData()
@@ -241,12 +253,18 @@ export default function IntroDetailsPageForm(){
         const yearofestablishmenterror = !details.yearOfEstablishment || !/^(18|19|20)\d{2}$/.test(details.yearOfEstablishment) || false
         const websiteerror = !/^$|^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/[^\s]*)?$/.test(details.website) || false
         const visionerror = !details.vision || !/^[A-Za-z0-9.,!?'"():;\- \n\r]{10,1000}$/.test(details.vision) || false
+        const companyTypeerror = !details.companyType || false
+        const industryerror = !details.industryType || false
+        const teamstrengtherror = !details.teamStrength || false
 
         yearofestablishmenterror ? setestablishmenterror("Enter valid year") : setestablishmenterror("")
         websiteerror ? setwebsiteerror("Enter valid url") : setwebsiteerror("")
         visionerror ? setvisionerror('Enter company vision') : setvisionerror("")
+        companyTypeerror ? setcompanytypeerror('Select Company Type') : setcompanytypeerror("")
+        industryerror ? setindustryerror('Select Industry') : setindustryerror("") 
+        teamstrengtherror ? setteamstreangtherror('Select team strength') : setteamstreangtherror("")
 
-        if(yearofestablishmenterror || websiteError || visionerror){
+        if(yearofestablishmenterror || websiteError || visionerror || companyTypeerror || industryerror || teamstrengtherror){
             return false
         }
 
@@ -341,32 +359,38 @@ export default function IntroDetailsPageForm(){
                                     <div className="div mt-3">
                                         <label htmlFor="" className="text-xs">Company Type <span className="text-red-400">*</span></label>
                                         <select name="companyType" id="companyType" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.companyType} onChange={(event) => handleData(event)}>
+                                            <option value="">--Select Company Type--</option>
                                             {
                                                 companyType.map((value, index) => {
                                                     return <option key={index} value={value}>{value}</option>
                                                 })
                                             }
                                         </select>
+                                        <label htmlFor="" className="error-label">{companyTypeError}</label>
                                     </div>
                                     <div className="div mt-3">
                                         <label htmlFor="" className="text-xs">Industry <span className="text-red-400">*</span></label>
                                         <select name="industryType" id="industryType" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.industryType} onChange={(event) => handleData(event)}>
+                                            <option value="">--Select Industry--</option>
                                             {
                                                 industryTypes.map((industry, index) => {
                                                     return <option key={index} value={industry}>{industry}</option>
                                                 })
                                             }
                                         </select>
+                                        <label htmlFor="" className="error-label">{industryError}</label>
                                     </div>
                                     <div className="div mt-3">
                                         <label htmlFor="" className="text-xs">Team Strength(Employees) <span className="text-red-400">*</span></label>
                                         <select name="teamStrength" id="teamStrength" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.teamStrength} onChange={(event) => handleData(event)}>
+                                                <option value="">--Select team strength--</option>
                                             {
                                                 strength.map((count, index) => {
                                                     return <option key={index} value={count}>{count}</option>
                                                 })
                                             }
                                         </select>
+                                        <label htmlFor="" className="error-label">{teamStrengthError}</label>
                                     </div>
                                     <div className="flex justify-between gap-5 mt-3">
                                         <div>

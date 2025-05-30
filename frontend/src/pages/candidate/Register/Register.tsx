@@ -4,7 +4,7 @@ import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 
 export default function CandidateRegister(){
@@ -25,10 +25,50 @@ export default function CandidateRegister(){
     const [fullnameerror, setfullnameerror] = useState("")
     const [passwordconfirmationerror, setpasswordconfirmationerror] = useState("")
 
+    const [onelowercasevalidation, setonelowercasevalidation] = useState(false)
+    const [oneuppercasevalidation, setoneuppercasevalidation] = useState(false)
+    const [onenumbervalidation, setonenumbervalidation] = useState(false)
+    const [onespecialcharvalidation, setonespecialcharvalidation] = useState(false)
+    const [minlength8validation, setminlength8validation] = useState(false)
+
+
     const navigator = useNavigate()
 
     function togglePasswordVisibility(){
         setshowpassword(prev => !prev)
+    }
+
+    function passwordGuideValidation(event : any){
+        const passwordValue = event.target.value
+        if(/[0-9]/.test(passwordValue)){
+            setonenumbervalidation(true)
+        }else{
+            setonenumbervalidation(false)
+        }
+
+        if(/[a-z]/.test(passwordValue)){
+            setonelowercasevalidation(true)
+        }else{
+            setonelowercasevalidation(false)
+        }
+
+        if(/[A-Z]/.test(passwordValue)){
+            setoneuppercasevalidation(true)
+        }else{
+            setoneuppercasevalidation(false)
+        }
+
+        if(/[@$!%*#?&]/.test(passwordValue)){
+            setonespecialcharvalidation(true)
+        }else{
+            setonespecialcharvalidation(false)
+        }
+
+        if(passwordValue.length >= 8){
+            setminlength8validation(true)
+        }else{
+            setminlength8validation(false)
+        }
     }
 
     function validateRegister(event : any) : void{
@@ -139,7 +179,7 @@ export default function CandidateRegister(){
                         <span className="field-error text-xs text-red-500">{phonerror}</span>
                     </div>
                     <div className="mt-3 relative">
-                        <input value={password} onChange={(event) => setpassword(event.target.value)} className="border w-full p-2 rounded-sm" type={showpassword ? "text" : "password"} name="password" id="password" placeholder="Password" />
+                        <input onKeyUp={(event) => passwordGuideValidation(event)} value={password} onChange={(event) => setpassword(event.target.value)} className="border w-full p-2 rounded-sm" type={showpassword ? "text" : "password"} name="password" id="password" placeholder="Password" />
                         <i onClick={togglePasswordVisibility}
                             className={showpassword ? "fa-regular fa-eye-slash absolute bottom-3 right-4" : "fa-regular fa-eye absolute bottom-3 right-4"}
                         ></i>
@@ -149,7 +189,12 @@ export default function CandidateRegister(){
                         <input value={confirmpassword} onChange={(event) => setconfirmpassword(event.target.value)} className="border w-full p-2 rounded-sm" type="password" name="password-confirm" id="password-confirm" placeholder="Confirm password" />
                         <div className="field-error text-xs text-red-500">{passwordconfirmationerror}</div>
                     </div>
-                    <div className="tooltip-password">
+                    <div className="tooltip-password py-1">
+                        <p className={oneuppercasevalidation ? "text-xs text-green-500 text-shadow" : "text-xs text-gray-500"}><i className="fa-solid fa-check !text-xs text-gray-400 me-1"></i>One uppercase letter</p>
+                        <p className={onelowercasevalidation ? "text-xs text-green-500 text-shadow" : "text-xs text-gray-500"}><i className="fa-solid fa-check !text-xs text-gray-400 me-1"></i>One lowercase letter</p>
+                        <p className={onespecialcharvalidation ? "text-xs text-green-500 text-shadow" : "text-xs text-gray-500"}><i className="fa-solid fa-check !text-xs text-gray-400 me-1"></i>One special charecter</p>
+                        <p className={onenumbervalidation ? "text-xs text-green-500 text-shadow" : "text-xs text-gray-500"}><i className="fa-solid fa-check !text-xs text-gray-400 me-1"></i>One number</p>
+                        <p className={minlength8validation ? "text-xs text-green-500 text-shadow" : "text-xs text-gray-500"}><i className="fa-solid fa-check !text-xs text-gray-400 me-1"></i>Minimum length 8</p>
                     </div>
                     <div className="flex items-center justify-start gap-2 mt-3" id="terms-service-wrapper">
                         <input type="checkbox" name="terms" id="terms" required />

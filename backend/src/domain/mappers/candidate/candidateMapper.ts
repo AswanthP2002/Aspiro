@@ -26,7 +26,10 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
         socialLinks:[],
         isVerified:false,
         verificationToken:"",
-        otpExpiresAt:new Date(Date.now() + 2 * 60 * 1000)
+        isAdmin:false,
+        otpExpiresAt:new Date(Date.now() + 2 * 60 * 1000),
+        createdAt:new Date(),
+        updatedAt:new Date()
     }
 }
 
@@ -56,7 +59,10 @@ export function createGoogleAutCandidatefromDTO(dto : RegisterGoogleAuthCandidat
         verificationToken:"",
         otpExpiresAt:new Date(Date.now() + 2 * 60 * 1000),
         phone:"",
+        isAdmin:false,
         username:"",
         password:"",
+        createdAt:new Date(),
+        updatedAt : new Date()
     }
 }

@@ -20,6 +20,12 @@ export default class RecruiterRespository implements IRecruiterRepo{
         return result
     }
 
+    async findRecruiters(): Promise<Recruiter[]> {
+        const db = await connectDb()
+        const result = await db.collection<Recruiter>(this.collection).find().toArray()
+        return result
+    }
+
     async findById(id: string): Promise<Recruiter | null> {
         const db = await connectDb()
         const result = await db.collection<Recruiter>(this.collection).findOne({_id:new ObjectId(id)})
@@ -83,6 +89,37 @@ export default class RecruiterRespository implements IRecruiterRepo{
         )
         
         return result
+    }
+
+    async blockRecruiter(id: string): Promise<boolean> {
+        const db = await connectDb()
+        const blockResult = await db.collection<Recruiter>(this.collection).updateOne(
+            {_id:new ObjectId(id)},
+            {$set:{
+                isBlocked:true
+            }}
+        )
+
+        return blockResult.acknowledged
+
+    }
+
+    async unblockRecruiter(id: string): Promise<boolean> {
+        const db = await connectDb()
+        const unblockResult = await db.collection<Recruiter>(this.collection).updateOne(
+            {_id:new ObjectId(id)},
+            {$set:{
+                isBlocked:false
+            }}
+        )
+
+        return unblockResult.acknowledged
+    }
+
+    async deleteRecruiter(id: string): Promise<boolean> {
+        const db = await connectDb()
+        const deleteResult = await db.collection<Recruiter>(this.collection).deleteOne({_id:new ObjectId(id)})
+        return deleteResult.acknowledged
     }
 
 }

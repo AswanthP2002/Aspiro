@@ -18,11 +18,15 @@ const candidateAuthrSlice = createSlice({
             state.token = null
             localStorage.removeItem("logedCandidate")
             localStorage.removeItem("candidateToken")
+        },
+        tokenRefresh:(state, action) => {
+            state.token = action.payload.token
+            localStorage.setItem('candidateToken', action.payload.token)
         }
     }
 
 
 })
 
-export const {loginSucess, logout} = candidateAuthrSlice.actions
+export const {loginSucess, logout, tokenRefresh} = candidateAuthrSlice.actions
 export default candidateAuthrSlice.reducer

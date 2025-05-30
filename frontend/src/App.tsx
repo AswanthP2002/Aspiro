@@ -20,6 +20,12 @@ import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Persona
 import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute'
 import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form'
 import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob'
+import AdminLayout from './pages/admin/AdminLayout'
+import Dashboard from './pages/admin/Dashboard/Dashboard'
+import Companies from './pages/admin/Company-list/Companies'
+import Candidates from './pages/admin/Candidate-list/Candidate-list'
+import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails'
+import CompanyDetails from './pages/admin/company-details/ComapnyDetails'
 
 function App() {
   return(
@@ -45,9 +51,19 @@ function App() {
       </Route>
     </Route>
 
+    <Route path='/admin' element={<AdminLayout />}>
+      <Route path='dashboard' element={<Dashboard />} />
+      <Route path='companies' element={<Companies /> } />
+      <Route path='candidates' element={<Candidates />} />
+      <Route path='candidate/details/:id' element={<CandidateDetails />} />
+      <Route path='company/details/:id' element={<CompanyDetails />} />
+    </Route>
+
     <Route path="/register" element={<CandidateRegister />} />
     <Route path="/login" element={<CandidateLogin />} />
+
     <Route path="/admin/login" element={<LoginPage />} />
+
     <Route path="/verify/:email" element={<VerificationPage />} />
     <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
     <Route path='/store/details' element={<StoreDetails />} />

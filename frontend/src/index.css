@@ -16,6 +16,10 @@
 
 }
 
+*{
+  font-family: 'Poppins', sans-serif;
+}
+
 .bg-main{
   background-color: var(--admin-main-theme);
 }
@@ -62,4 +66,14 @@ button{
 }
 .aspiro-guide-tile:hover .fa-solid{
   color: white;
+}
+.cluttered-text {
+  color: var(--aspiro-cluttered-text);
+}
+.aspiro-container{
+  padding-left: 120px;
+  padding-right: 120px;
+}
+.ring-shadow{
+  box-shadow: 0 0 6px 12px rgba(0, 0, 0, 0.6);
 }

@@ -1,6 +1,6 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
 import bcrypt from 'bcrypt'
-import { generateToken } from "../../../services/jwt";
+import { generateRefreshToken, generateToken } from "../../../services/jwt";
 
 
 export class LoginRecruiter {
@@ -17,9 +17,10 @@ export class LoginRecruiter {
             throw new Error('No password found')
         }
 
-        const token = await generateToken({id:recruiter._id, email:recruiter.email, username:recruiter.username})
+        const token = await generateToken({id:recruiter._id, email:recruiter.email, username:recruiter.username, role:'Recruiter'})
+        const refreshToken = await generateRefreshToken({id:recruiter._id, email:recruiter.email, username:recruiter.username, role:'Recruiter'})
         console.log('Data before sending to the frontend ::: loginRecruiter.ts', token)
-        return {token, recruiter:{id:recruiter._id, email:recruiter.email}}
+        return {token, refreshToken, recruiter:{id:recruiter._id, email:recruiter.email}}
     }
 
     

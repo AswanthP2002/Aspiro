@@ -28,6 +28,7 @@ export default interface Recruiter {
     updatedAt:Date
     currentSubscription?:ObjectId
     isVerified : boolean
+    isBlocked : boolean
     verificationToken : number | string
     otpExpiresAt : Date
 }

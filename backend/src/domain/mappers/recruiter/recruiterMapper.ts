@@ -26,6 +26,7 @@ export function createRecruiterFromDTO(dto : RegisterRecruiterDTO) : Recruiter {
         vision:"",
         website:"",
         isVerified : false,
+        isBlocked : false,
         verificationToken:"",
         otpExpiresAt:new Date(Date.now() + 2 * 60 * 1000 )
     }

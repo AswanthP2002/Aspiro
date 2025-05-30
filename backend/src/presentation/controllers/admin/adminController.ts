@@ -1,0 +1,211 @@
+import { Admin, Auth } from "mongodb"
+import { AdminLoginUseCase } from "../../../application/usecases/admin/adminLogin"
+import CandidateRepository from "../../../infrastructure/repositories/candidate/candidateRepository"
+import { Request, Response } from "express"
+import { AdminAuth } from "../../../middlewares/auth"
+import RecruiterRespository from "../../../infrastructure/repositories/recruiter/recruiterRepository"
+import { LoadCompaniesUseCase } from "../../../application/usecases/admin/loadCompanies"
+import { LoadCandidatesUseCase } from "../../../application/usecases/admin/loadCandidates"
+import { StatusCodes } from "../../statusCodes"
+import { LoadCandidateDetailsUseCase } from "../../../application/usecases/admin/loadCandidateDetails"
+import { BlockCandidateUseCase } from "../../../application/usecases/admin/blockCandidateUseCase"
+import { UnblockCandidateUseCase } from "../../../application/usecases/admin/unblockCandidateUseCase"
+import LoadCompanyDetailsUseCase from "../../../application/usecases/admin/loadComapnyDetailsUseCase"
+import BlockCompanyUseCase from "../../../application/usecases/admin/blockCompanyUseCase"
+import UnblockCompanyUseCase from "../../../application/usecases/admin/unblockCompanyUseCase"
+import CloseCompanyUseCase from "../../../application/usecases/admin/closeCompanyUseCase"
+
+export class AdminController {
+    constructor(
+        private _adminLoginUC : AdminLoginUseCase,
+        private _loadCandidatesUC : LoadCandidatesUseCase,
+        private _loadCompaniesUC : LoadCompaniesUseCase,
+        private _loadCandidateDetailsUC : LoadCandidateDetailsUseCase,
+        private _blockCandidateUC : BlockCandidateUseCase,
+        private _unblockCandidateUC : UnblockCandidateUseCase,
+        private _loadCompanyDetailsUC : LoadCompanyDetailsUseCase,
+        private _blockCompanyUC : BlockCompanyUseCase,
+        private _unblockCompanyUC : UnblockCompanyUseCase,
+        private _closeCompanyUC : CloseCompanyUseCase
+    ){}
+
+    async adminLogin(req : Request, res : Response) : Promise<Response> { //login controller for admin
+        const {email, password} = req.body 
+        try {
+            const result : any = await this._adminLoginUC.execute(email, password)
+            const {refreshToken} = result
+            return res.status(StatusCodes.OK)
+            .cookie('adminRefreshToken', refreshToken, {
+                httpOnly:true,
+                secure:false,
+                sameSite:'lax'
+            })
+            .json({
+                success:true, 
+                message:'Admin loged in successfully', 
+                result
+            })
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                switch(error.message){
+                    case 'Not Found' :
+                        return res.status(StatusCodes.NOT_FOUND).json({success:false, message:"User not found"})
+                    case 'Wrong Password' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Invalid password, please enter correct password"})
+                    default :
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"Internal server error, please try again after some time"})
+                    }
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"An unknown error occured"})
+        }
+    }
+
+    async loadCandidates(req : AdminAuth, res : Response) : Promise<Response> { //list of candidates
+        const search = req.query.search as string || ""
+        const page = parseInt(req?.query?.page as string) || 1
+        const limit = parseInt(req?.query?.limit as string) || 10
+        try {
+            const candidates = await this._loadCandidatesUC.execute(search, page, limit)
+
+            return res.status(StatusCodes.OK).json({
+                success:true,
+                message:'Candidates details fetched successfully',
+                candidates,
+                pagination:{page, limit}
+            })
+        } catch (error : unknown) {
+            console.log('Error occured while fethcing the candidate details adminController.ts :::', error)
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                    success:false,
+                    message:'Internal server error, please try agaiain after some time'
+                })
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'An unknown error occured'
+            })
+        }
+    }
+
+    async loadCandidateDetails(req : AdminAuth, res : Response) : Promise<Response> { //individual candidate details
+        const {candidateId} = req.query
+        console.log(`candidate id reached here`, candidateId)
+        try {
+            if(typeof candidateId !== 'string'){
+                throw new Error('undefined data')
+            }
+            const result = await this._loadCandidateDetailsUC.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Candidate Details fetched successfully', candidateDetails:result})
+        } catch (error : any) {
+            console.log('error occured while fetching the details of candidate', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error'})
+        }
+    }
+
+    async loadCompanies(req : AdminAuth, res : Response) : Promise<Response> { //company list
+        try {
+            const result = await this._loadCompaniesUC.execute()
+
+            return res.status(201).json({success:true, result})
+        } catch (error : unknown) {
+             if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+             }
+             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"An unknown error occured"})
+        }
+    }
+
+    async blockCandidate(req : AdminAuth, res : Response) : Promise<Response> { //block individual candidate
+        try {
+            const {id} = req.body
+
+            const result = await this._blockCandidateUC.execute(id)
+            if(!result) throw new Error('Can not block candidate')
+            return res.status(StatusCodes.OK).json({success:true, message:'Candidate blocked successfully'})
+        } catch (error : any) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error'})
+        }
+    }
+
+    async unblockCandidate(req : AdminAuth, res : Response) : Promise<Response> { //unblock individual candidates
+        try {
+            const {id} = req.body
+
+            const result = await this._unblockCandidateUC.execute(id)
+            if(!result) throw new Error('Can not unblock candidate')
+            return res.status(StatusCodes.OK).json({success:true, message:'Candidate unblocked successfully'})
+        } catch (error : any) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error'})
+        }
+    }
+
+    async loadCompanyDetails(req : AdminAuth, res : Response) : Promise<Response> {
+        const {companyId} = req.params
+        if(!companyId) return res.status(StatusCodes.NOT_ACCEPTABLE).json({success:false, message:'Company id not provided'})
+        
+        try {
+            const companyDetails = await this._loadCompanyDetailsUC.execute(companyId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Company details fetched successfully', companyDetails})
+        } catch (error : unknown) {
+            console.log('Error occured while fetching comapny details', error)
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async blockRecruiter(req : AdminAuth, res : Response) : Promise<Response> {
+        const {companyId} = req.params
+
+        try {
+            const blockResult = await this._blockCompanyUC.execute(companyId)
+            if(!blockResult) throw new Error('Can not block company')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'Company blocked successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while blocking company')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async unblockRecruiter(req : AdminAuth, res : Response) : Promise<Response> {
+        const {companyId} = req.params
+
+        try {
+            const unblockResult = await this._unblockCompanyUC.execute(companyId)
+            if(!unblockResult) throw new Error('Can not unlblock company')
+
+            return res.status(StatusCodes.OK).json({success:true, message:'Company unblocked successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while unblocking company')
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+
+    async closeCompany(req : AdminAuth, res : Response) : Promise<Response> {
+        const {companyId} = req.params
+        console.log('Company id for closing the company', companyId, typeof companyId)
+
+        try {
+            const closeCompanyResult = await this._closeCompanyUC.execute(companyId)
+            if(!closeCompanyResult) throw new Error('Can not close company' )
+                return res.status(StatusCodes.OK).json({success:true, message:'Company closed successfully'})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while closing the company', error)
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured, please try again after some time'})
+        }
+    }
+}

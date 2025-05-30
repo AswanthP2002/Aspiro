@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import useRefreshToken from "../../../hooks/refreshToken";
+import { tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice";
 
 export default function StoreDetails(){
     const [jobRole, setjobrole] = useState("")
@@ -80,11 +82,25 @@ export default function StoreDetails(){
       ];
 
       const navigator = useNavigate()
+      const dispatch = useDispatch() 
+
       const token = useSelector((state : any) => {
         return state?.candidateAuth?.token
       })
 
-      function validateStore(event : any){
+      async function makeRequest(accessToken : string){
+       return fetch('http://localhost:5000/personal/details/save', {
+                method:'POST',
+                headers:{
+                    authorization:`Bearer ${accessToken}`,
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({jobRole, city, district, state, country, pincode, summary}),
+                credentials:'include'
+            })
+      }
+
+      async function validateStore(event : any){
         event.preventDefault()
 
         const typedCityError = !/^[a-zA-Z\s\-]{2,50}$/.test(city) || !city || false
@@ -107,19 +123,19 @@ export default function StoreDetails(){
             console.log('data before sending to confirm',
                 jobRole, city, districiterror, state, country, pinCodeError, summary
             )
-            fetch('http://localhost:5000/personal/details/save', {
-                method:'POST',
-                headers:{
-                    authorization:`Bearer ${token}`,
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({jobRole, city, district, state, country, pincode, summary})
-            })
-            .then((response) => {
-                if(response.status === 500) throw new Error('Internal server error, plese try again after some time')
-                    return response.json()
-            })
-            .then((result) => {
+            //testing the flow
+            // alert('Details saved successfully')
+            // return
+            try {
+                let saveResponse = await makeRequest(token)
+                if(saveResponse.status === 401){
+                    const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
+                    dispatch(tokenRefresh({token:newAccessToken}))
+                    saveResponse = await makeRequest(newAccessToken)
+                }
+
+                const result = await saveResponse.json()
+
                 if(result.success){
                     Swal.fire({
                         icon:"success",
@@ -127,23 +143,34 @@ export default function StoreDetails(){
                         text:'Thank you for providing your basic details, you can add more details from the profile',
                         showCancelButton:false,
                         showConfirmButton:true,
-                        confirmButtonText:"Continue"
+                        confirmButtonText:"Continue",
+                        allowOutsideClick:false,
                     }).then((result) => {
                         if(result.isConfirmed){
                             navigator('/profile/personal')
                         }
                     })
+                }else{
+                    Swal.fire({
+                        icon:'error',
+                        text:result.message,
+                    })
                 }
-            })
-            .catch((error) => {
-                console.log('Error occured while saving details', error)
-                Swal.fire({
-                    icon:'error',
-                    title:"Oops",
-                    text:error.message,
-                    showCancelButton:false
-                })
-            })
+
+            } catch (error : unknown) {
+                if(error instanceof Error){
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text:error.message,
+                        showConfirmButton:true,
+                        confirmButtonText:'Home',
+                        showCancelButton:false
+                    }).then((result) => {
+                        if(result.isConfirmed) navigator('/')
+                    })
+                }
+            }
         }
       }
 

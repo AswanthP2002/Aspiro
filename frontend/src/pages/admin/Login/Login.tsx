@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './Login.css'
 import { useState } from 'react'
 import Loader from '../../../components/admin/Loader'
+import Swal from 'sweetalert2'
+import { adminLoginSuccess } from '../../../redux-toolkit/adminAuthSlice'
+import { useDispatch } from 'react-redux'
 
 export default function LoginPage(){
     const [email, setEmail] = useState("")
@@ -15,6 +18,10 @@ export default function LoginPage(){
         setshowpassword(prev => !prev)
     }
 
+    const navigator = useNavigate()
+    const dispatcher = useDispatch()
+    
+
     function validateForm(event : any) : void{
         setloading(true)
         event.preventDefault() //prevent event from submitting without validations
@@ -25,17 +32,43 @@ export default function LoginPage(){
             setLoginError(true)
             setLoginErrorText("Please enter full credentials")
             return
-        }else{
-            setLoginError(false)
-            setLoginErrorText("")
         }
+        setLoginErrorText("")
 
-        console.log('Email', email)
-        console.log('Password', password)
-        setTimeout(() => {
+        fetch('http://localhost:5000/admin/login', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({email, password})
+        })
+        .then((response) => {
+            if(response.status === 500) throw new Error('Internal server error, please try again after some time')
+            return response.json()
+        })
+        .then((result) => {
+            if(result.success){
+                console.log('result form backend admin side', result)
+                dispatcher(adminLoginSuccess({admin:result?.result?.admin, token:result?.result?.token}))
+                setloading(false)
+                navigator('/admin/dashboard')
+            }else{
+                setloading(false)
+                Swal.fire({
+                    icon:'error',
+                    text:'Something went wrong'
+                })
+            }
+        })
+        .catch((error : any) => {
             setloading(false)
-            alert('Hi, logined successfully')
-        }, 2000)
+            console.log('error occured while admin login', error)
+            Swal.fire({
+                icon:'error',
+                title:'Oops!',
+                text:"Internal server error, please try again after some time"
+            })
+        })
     }
 
     return(

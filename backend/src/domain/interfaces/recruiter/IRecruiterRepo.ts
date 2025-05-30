@@ -6,6 +6,7 @@ export default interface IRecruiterRepo {
     findByEmail(email : string) : Promise<Recruiter | null>
     findById(id : string) : Promise<Recruiter | null>
     findByUserName(username : string) : Promise<Recruiter | null>
+    findRecruiters() : Promise<Recruiter[]>
     verifyRecruiter(email : string, field : string, update : Boolean) : Promise<Boolean>
     updateIntroDetails(
         id : string,
@@ -25,4 +26,8 @@ export default interface IRecruiterRepo {
         logo : string,
         coverphoto : string
     ) : Promise<Recruiter | null>
+    blockRecruiter(id : string) : Promise<boolean>
+    unblockRecruiter(id : string) : Promise<boolean>
+    deleteRecruiter(id : string) : Promise<boolean>
+
 }

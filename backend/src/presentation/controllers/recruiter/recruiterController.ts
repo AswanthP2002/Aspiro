@@ -16,6 +16,7 @@ import { createJobFromDTO } from '../../../domain/mappers/jobMapper'
 import CreateJob from '../../../application/usecases/createJob'
 import { LoadCompanyPostedJobs } from '../../../application/usecases/recruiter/loadJobs'
 
+
 export const registerRecruiter = async (req : Request, res : Response) : Promise<Response> => {
     try {
         const validateRecruiter = RegisterRecruiterSchema.parse(req.body)
@@ -86,7 +87,8 @@ export const loginRecruiter = async (req : Request, res : Response) : Promise<Re
 export const saveIntroDetailsRecruiter = async (req : Auth, res : Response) : Promise<Response> => {
     try {
         const id = req.user?.id
-        const {companyName, about, benefits, companyType, industryType, teamStrength, yearOfEstablishment, website, vision, country, state, city, mobile} = req?.body?.details
+        const {companyName, about, benefits, companyType, industryType, teamStrength, 
+            yearOfEstablishment, website, vision, country, state, city, mobile} = req?.body?.details
         const {logourl, coverphotourl} = req.body
         const rRepo = new RecruiterRespository()
         const saveBasicsUseCase = new SaveBasics(rRepo)

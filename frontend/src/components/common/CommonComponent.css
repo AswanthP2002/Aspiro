@@ -1,0 +1,15 @@
+.candidate-register-tile {
+    background: url(../../../public/candidate-tile.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+.recruiter-register-tile {
+    background: url(../../../public/recruiter-tile.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+.overlay{
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.79), rgba(12, 12, 12, 0.133));
+}

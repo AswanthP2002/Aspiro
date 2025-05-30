@@ -1,7 +1,7 @@
 import Candidate from "../../../domain/entities/candidate/candidates";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 
-export class LoadPersonalData {
+export class LoadCandidatePersonalDataUC {
     constructor(private cRepo : CandidateRepo){}
 
     async execute(id : string) : Promise<Candidate>{

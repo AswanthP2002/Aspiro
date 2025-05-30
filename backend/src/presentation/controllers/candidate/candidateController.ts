@@ -1,114 +1,213 @@
 import { Request, Response } from "express"
 import CandidateRepository from "../../../infrastructure/repositories/candidate/candidateRepository"
-import RegisterCandidate from "../../../application/usecases/candidate/registerCandidate"
+import RegisterCandidateUseCase from "../../../application/usecases/candidate/registerCandidate"
 import { RegisterCandidateSchema } from "../dtos/candidate/registerCandidateDTOs"
 import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candidateMapper"
 import VerifyUser from "../../../application/usecases/candidate/verifyUser"
-import { LoginCandidate } from "../../../application/usecases/candidate/loginCandidate"
+import { LoginCandidateUseCase } from "../../../application/usecases/candidate/loginCandidate"
 import SaveBasics from "../../../application/usecases/candidate/saveBasiscs"
 import { Auth } from "../../../middlewares/auth"
-import { LoadPersonalData } from "../../../application/usecases/candidate/loadPersonalDatas"
+import { LoadCandidatePersonalDataUC} from "../../../application/usecases/candidate/loadPersonalDatas"
 import GetAuthUserUseCase from "../../../application/usecases/getPasspoartUser"
 import EditProfileUseCase from "../../../application/usecases/candidate/editProfile"
+import { StatusCodes } from "../../statusCodes"
+import VerifyUserUseCase from "../../../application/usecases/candidate/verifyUser"
+import SaveIntroDetailsUseCase from "../../../application/usecases/candidate/saveBasiscs"
+import CandidateLoginResult from "../dtos/candidate/loginResultDTO"
 
+export class CandidateController {
+    constructor(
+        private _registerCandidateUC : RegisterCandidateUseCase,
+        private _verifyUserUC : VerifyUserUseCase,
+        private _loginCandidateUC : LoginCandidateUseCase,
+        private _saveDetailsUC : SaveIntroDetailsUseCase,
+        private _loadCandidatePersonalDataUC : LoadCandidatePersonalDataUC
+    ){}
 
-export const registerCandidate = async (req : Request , res : Response) : Promise<Response> => {
-    try {
-        console.log('Incoming user data', req.body)
-        const validateCandidate = RegisterCandidateSchema.parse(req.body)
-        const candidateModel = createCandidatefromDTO(validateCandidate)
-        const cRepo = new CandidateRepository()
-        const cRegUsecase = new RegisterCandidate(cRepo)
-        const createUser = await cRegUsecase.execute(candidateModel)
-
-        console.log('registered candidate is here!', createUser)
-
-        return res.status(201).json({success:true, message:"Candidate created - need to verify before continue", candidate:req.body.email})
-    } catch (error : any) {
-        console.log('Error occured while registering the user', error)
-        if(error.message === "duplicate email"){
-            return res.status(409).json({success:false, message:"This email id already registered with another user, please choose another one"})
-        }else if(error.message === "duplicate username"){
-            return res.status(409).json({success:false, message:"Username already taken, choose new one"})
-        }
-
-        return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+    //register candidate
+    async registerCandidate(req : Request, res : Response) : Promise<Response> { //create account
+        console.log('Account registering request reached here', req.body)
+        const {name, email, phone, password, username} = req.body
+        try {
+            console.log('testing regCandidate usecase ', this._registerCandidateUC)
+            const createUser = await this._registerCandidateUC.execute({name, email, phone, password, username})
+            console.log(`Registered Candidate is here ${createUser}`)
+            return res.status(StatusCodes.OK).json({success:true, message:'Candidate created need to verify before continue', candidate:email})
         
-    }
-}
+        } catch (error : unknown) {
+            console.log(`Error occured while registering the user ::candidateController.ts ${error}`)
+            if(error instanceof Error){
+                switch (error.message) {
+                    case 'duplicate email':
+                        return res.status(StatusCodes.CONFLICT).json({
+                            success:false, 
+                            message:"This email id already registered with another user, please choose another one"
+                        })
+                    case 'duplicate username':
+                        return res.status(StatusCodes.CONFLICT).json({
+                            success:false, 
+                            message:"Username already taken, choose new one"
+                        })
+                    default:
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                            success:false, 
+                            message:"Internal server error, please try again after some time"
+                        })
+                }
+            }
 
-export const verifyUser = async (req : Request, res : Response) : Promise<Response> =>{
-    try {
-        console.log('Incoming request from the user', req.body)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'An unknown error occured, please try again'
+            })
+        
+        }
+    }
+
+    async verifyUser(req : Request, res : Response) : Promise<Response> { //email verification for candidate
         const {otp, email} = req.body
-        
-        const cRepo = new CandidateRepository()
-        const cVerifyUseCase = new VerifyUser(cRepo)
-        const isUserVerified = await cVerifyUseCase.execute(email, otp)
+        try {
+            const isVerified = await this._verifyUserUC.execute(email, otp)
 
-        return res.status(201).json({success:isUserVerified, message:"Email verifed successfully, please login to continue"})
-    } catch (error : any) {
-        console.log("Error occured while verfiying the user email", error)
-        if(error.message === "Expired"){
-            return res.status(400).json({success:false, message:"OTP has been expired, please resend otp or try again after some time"})
-        }else if(error.message === "Wrong") {
-            return res.status(400).json({success:false, message:"Incorrect otp, please enter the correct otp"})
-        }else {
-            return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+            return res.status(StatusCodes.OK).json({
+                success:isVerified, 
+                message:"Email verifed successfully, please login to continue"
+            })
+        } catch (error : unknown) {
+            console.log(`Error occured while verifying the user ${error}`)
+            if(error instanceof Error){
+                switch (error.message){
+                    case 'Wrong' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({
+                            success:false, 
+                            message:"Incorrect otp, please enter the correct otp"
+                        })
+                    case 'Expired' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({
+                            success:false, 
+                            message:"OTP has been expired, please resend otp or try again after some time"
+                        })
+                    default :
+                        return res.status(StatusCodes.BAD_REQUEST).json({
+                            success:false, 
+                            message:"Internal server error, please try again after some time"
+                        })
+                }
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'An unknown error occured'
+            })
         }
     }
-}
 
-export const loginUser = async (req : Request, res : Response) : Promise<Response> => {
-    try {
-        console.log('Incoming request', req.body)
+    async loginCandidate(req : Request, res : Response) : Promise<Response> { //candidate  login
         const {email, password} = req.body
+        try {
+            const result : any = await this._loginCandidateUC.execute(email, password)
+            const {refreshToken} = result
 
-        const cRepo = new CandidateRepository()
-        const cLoginUsecase = new LoginCandidate(cRepo)
-        const result = await cLoginUsecase.execute(email, password)
-        console.log('candidate controller.ts ::: token before sending', result)
-        return res.status(201).json({success:true, message:"User logined successfully", result})
-    } catch (error : any) {
-        console.log('Error occured while user login', error.message)
-        if(error.message === "Not Found"){
-            return res.status(404).json({success:false, message:"User not found"})
-        }else if(error.message === "Wrong Password"){
-            return res.status(400).json({success:false, message:"Invalid password, please enter correct password"})
-        }else{
-            return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+            console.log('Refresh token before sending to the frontend :: candidateController.ts', refreshToken)
+
+            return res.status(StatusCodes.OK)
+            .cookie('refreshToken', refreshToken, {httpOnly:true, secure:false, sameSite:'lax'})
+            .json({
+                success:true,
+                message:'Candidate login successfull',
+                result
+            })
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while user login', error.message)
+                switch(error.message){
+                    case 'Not Found' :
+                        return res.status(StatusCodes.NOT_FOUND).json({
+                            success:false, 
+                            message:"User not found"
+                        })
+                    case 'Wrong Password' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({
+                            success:false, 
+                            message:"Invalid password, please enter correct password"
+                        })
+                    default :
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                            success:false, 
+                            message:"Internal server error, please try again after some time"
+                        })       
+                }
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'An unknown error occured'
+            })
         }
     }
-}
 
-export const saveIntroDetailsUser = async (req : Auth, res : Response) : Promise<Response> => {
-    try {
-        console.log('Incoming request', req.body)
+    async saveIntroDetailsCandidate(req : Auth, res : Response) : Promise<Response> { //save 
         const id = req?.user?.id
         const {city, jobRole, summary, district, country, state, pincode} = req.body
-        const cRepo = new CandidateRepository()
-        const SaveBasicuseCase = new SaveBasics(cRepo)
-        const isSaved = await SaveBasicuseCase.execute(id, jobRole, city, district, state, country, pincode, summary)
-        return res.status(201).json({success:true, message:'Basic details saved, login to your profile to continue'})
-    } catch (error) {
-        console.log('Error occured while updating the user', error)
-        return res.status(500).json({success:false, message:'Intenal server error, please try again after some time'})
-    }
-}
+        try {
+            const isSaved = await this._saveDetailsUC.execute({id, city, role:jobRole, summary, district, country, state, pincode})
 
-export const loadCandidatePersonalData = async (req : Auth, res : Response) : Promise<Response> => {
-    try {
+            return res.status(StatusCodes.OK).json({
+                success:true, 
+                message:'Basic details saved, login to your profile to continue'
+            })
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while updating the user', error)
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                    success:false, 
+                    message:'Intenal server error, please try again after some time'
+                })
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'An unknown error occured'
+            })
+            
+        }
+    }
+
+    async loadCandidatePersonalData(req : Auth, res : Response) : Promise<Response> {
         const id = req.user.id
-        console.log('incoming req from auth ', req.user)
-        console.log('incoming id from auth', id)
-        const cRepo = new CandidateRepository()
-        const loadDetailsUsecase = new LoadPersonalData(cRepo)
-        const userDetails = await loadDetailsUsecase.execute(id)
-        console.log('fetched user deails ', userDetails)
-        return res.status(201).json({success:true, message:"User details fetched successfully", userDetails})
-    } catch (error) {
-        console.log('Error occured while fetching the user details', error)
-        return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+        try {
+            const userDetails = await this._loadCandidatePersonalDataUC.execute(id)
+
+            return res.status(StatusCodes.OK).json({
+                success:true, 
+                message:'User details fetched successfully',
+                userDetails
+            })
+        } catch (error : unknown) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success:false,
+                message:'Internal server error, please re try again after some time'
+            })
+        }
+
+    }
+
+    async candidateLogout(req : Request, res : Response) : Promise<Response> {
+        try {
+            res.clearCookie('refreshToken', {
+                httpOnly:true,
+                secure:false,
+                sameSite:'lax'
+            })
+
+            return res.status(StatusCodes.OK).json({success:true, message:'User logout successfull'})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while logout', error)
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
     }
 }
 
@@ -141,3 +240,5 @@ export const editCandidateProfile = async (req : Auth, res : Response) : Promise
         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
     }
 }
+
+

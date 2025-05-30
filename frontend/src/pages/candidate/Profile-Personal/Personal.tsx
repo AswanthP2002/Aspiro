@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import defaultProfile from '/default-img-instagram.png'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import Loader from '../../../components/candidate/Loader'
 import { useNavigate } from 'react-router-dom'
 import { Box, Input, InputLabel, Modal, OutlinedInput, TextField, Typography } from '@mui/material'
+import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candidateAuthSlice'
+import useRefreshToken from '../../../hooks/refreshToken'
 
 interface Candidate {
     name : string
@@ -38,6 +40,8 @@ export default function ProfilePersonal(){
     const [countryerror, setcountryerror] = useState("")
     const [abouterror, setabouterror] = useState("")
 
+    const dispatcher = useDispatch()
+    
     
 
     const handleOpenProfileEdit = () => setopenprofileedit(true)
@@ -131,47 +135,75 @@ export default function ProfilePersonal(){
     };
 
     useEffect(() => {
-        setloading(true)
+        const fetchCandidateData = async () => {
+            setloading(true)
 
-        fetch('http://localhost:5000/profile/personal/datas', {
-            method:'GET',
-            headers:{
-                authorization:`Bearer ${token}`
-            }
-        })
-        .then((response) => {
-            if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-            return response.json()
-        })
-        .then((result : any) => {
-            if(result?.success){
-                setTimeout(() => {
-                    if(!result?.userDetails?.role){
-                        navigator('/store/details')
-                        return
-                    }
-                    setcandidate(result?.userDetails)
-                    console.log('Result from the backend', result?.userDetails)
-                    setloading(false)
-                }, 2000)
-            }else{
-                setloading(false)
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:"Something went wrong, please try again after some time"
+            async function makeRequest(accessToken : string){
+                return fetch('http://localhost:5000/profile/personal/datas', {
+                    method:'GET',
+                    headers:{
+                        authorization:`Bearer ${accessToken}`
+                    },
+                    credentials:'include'
                 })
             }
-        })
-        .catch((error : Error) => {
-            setloading(false)
-            console.log('Error occured while fetching the candidate data', error.message)
-            Swal.fire({
-                icon:'error',
-                text:error.message
-            })
-        })
 
+            try {
+                let fetchResponse = await makeRequest(token)
+                
+                if(fetchResponse.status === 401){
+                    const accessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
+                    dispatcher(tokenRefresh({token:accessToken}))
+                    fetchResponse = await makeRequest(accessToken)
+                }
+
+                const result = await fetchResponse.json()
+
+                if(result?.success){
+                    setTimeout(() => {
+                        if(!result?.userDetails?.role){
+                            navigator('/store/details')
+                            return
+                        }
+                        setcandidate(result?.userDetails)
+                        console.log('Result from the backend', result?.userDetails)
+                        setloading(false)
+                    }, 2000)
+                }else{
+                    setloading(false)
+                    Swal.fire({
+                        icon:'error',
+                        title:'Oops',
+                        text:result.message
+                    }).then((result) => {
+                        if(result.isConfirmed){
+                            dispatcher(logout())
+                            navigator('/')
+
+                        }
+                    })
+                }
+
+            } catch (error : any) {
+                console.log('Error occured while fetching candidate profile data', error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text:error.message,
+                    showConfirmButton:true,
+                    confirmButtonText:'Home',
+                    showCancelButton:false
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        dispatcher(logout())
+                        navigator('/')
+                    }
+                })
+            }
+
+        }
+
+        fetchCandidateData()
 
     }, [])
 
@@ -198,7 +230,7 @@ export default function ProfilePersonal(){
                     <img src={defaultCoverPhoto} className='w-full h-[220px]' alt="" />
                 </div>
                 <div className="absolute bottom-2 left-2 w-fit h-fit">
-                    <img src={defaultProfile} alt="" className="profile-photo rounded-full w-[100px] h-[100px]" />
+                    <img src={candidate?.profilePicture ? candidate?.profilePicture : defaultProfile} alt="" className="profile-photo rounded-full w-[100px] h-[100px]" />
                     <i onClick={handleOpenPhotoEdit} className="fa-solid fa-pen-to-square absolute bottom-2"></i>
                 </div>
                 </div>

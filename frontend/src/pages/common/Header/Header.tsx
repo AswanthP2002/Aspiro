@@ -1,7 +1,9 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
-import defaultUser from '/default-user-aspiro-removebg-preview.png'
-import { logout } from "../../../redux-toolkit/candidateAuthSlice"
+import defaultUser from '/default-img-instagram.png'
+import { logout, tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice"
+import useRefreshToken from "../../../hooks/refreshToken"
+import Swal from "sweetalert2"
 
 export default function Header(){
     const dispatch = useDispatch()
@@ -9,12 +11,74 @@ export default function Header(){
     const logedUser = useSelector((state : any) => {
         return state.candidateAuth.user
     })
+
+    const token = useSelector((state : any) => {
+        return state.candidateAuth.token
+    })
     console.log('This is loged user', logedUser)
 
-    function candidateLogout(){
-        alert('logout triggered')
-        dispatch(logout())
-        window.location.reload()
+    async function candidateLogout(){
+        //request for logout
+        
+        const makeRequest = async (accessToken : string) => {
+            return fetch('http://localhost:5000/candidate/logout', {
+                method:'POST',
+                headers:{
+                    authorization:`Bearer ${accessToken}`
+                },
+                credentials:'include'
+            })
+        }
+
+        try {
+            console.log('Token before sending', token)
+            let logoutResponse = await makeRequest(token)
+            if(logoutResponse.status === 401){
+                const refreshToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
+                dispatch(tokenRefresh({token:refreshToken}))
+                logoutResponse = await makeRequest(refreshToken)
+            }
+
+            const result = await logoutResponse.json()
+
+            if(result?.success){
+                dispatch(logout())
+                Swal.fire({
+                    icon:'success',
+                    title:'User logout successfull',
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:2000
+                }).then(() => {
+                    navigator('/')
+                    window.location.reload()
+                })
+            }else{
+                Swal.fire({
+                    icon:'error',
+                    title:'Oops!',
+                    text:result.message,
+                    confirmButtonText:'Home'
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        navigator('/')
+                    }
+                })
+            }
+        } catch (error : any) {
+            console.log('Error occured while candidate logout', error)
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:error.message,
+                confirmButtonText:'Home',
+                showCancelButton:false
+            }).then((result) => {
+                if(result.isConfirmed){
+                    navigator('/')
+                }
+            })
+        }
     }
 
     return(
@@ -35,8 +99,20 @@ export default function Header(){
                     <div className="actions flex gap-5 items-center">
                         {
                             logedUser
-                                ? <><Link to={'/profile/personal'}><img src={defaultUser} style={{width:'50px', height:'50px'}} alt="" /></Link>
-                                    <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i></>
+                                ? <>
+                                    <div className="relative account-action-wrapper group cursor-pointer">
+                                        <img src={defaultUser} style={{width:'48px', height:'50px'}} alt="" />
+                                        <div className="action-details hidden group-hover:block absolute bg-white shadow w-[150px] right-0 p-2">
+                                            <div>
+                                                <Link to={'/profile/personal'}><p className="text-sm">Profile</p> </Link>
+                                            </div>
+                                            <div className="mt-2">
+                                                <span onClick={() => candidateLogout()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
+                                            </div>
+                                        </div>
+                                        {/* <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i> */}
+                                    </div>
+                                  </>
                                 : <button onClick={() => navigator('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                         }
                     </div>

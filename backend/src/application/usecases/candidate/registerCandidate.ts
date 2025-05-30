@@ -3,18 +3,23 @@ import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import bcrypt from 'bcrypt'
 import { generateCode } from "../../../utilities/generateCode";
 import { sendEmail } from "../../../utilities/sendmail";
+import { RegisterCandidateDTO, RegisterCandidateSchema } from "../../../presentation/controllers/dtos/candidate/registerCandidateDTOs";
+import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candidateMapper";
 
-export default class RegisterCandidate {
+export default class RegisterCandidateUseCase {
     constructor(private candidateRep : CandidateRepo){}
     
-    async execute(candidate : Candidate) : Promise<string>{
-        //check if email id already exist
+    async execute(candidatedto : RegisterCandidateDTO) : Promise<string>{ //changed to registerCandidateDTO from Candidate schema ::  swtiching the validation logic to usecase from candidate controller
+        
+        const parsedCandidate = RegisterCandidateSchema.parse(candidatedto)
+        const candidate = createCandidatefromDTO(parsedCandidate)
+
         const existingEmail = await this.candidateRep.findByEmail(candidate.email)
         if(existingEmail) throw new Error('duplicate email')
         
-        //check if username is already taken
         const existingUsername = await this.candidateRep.findByUsername(candidate.username)
         if(existingUsername) throw  new Error('duplicate username')
+            
         let hashedPassword
         if(candidate.password){
             hashedPassword = await bcrypt.hash(candidate.password, 10)   
