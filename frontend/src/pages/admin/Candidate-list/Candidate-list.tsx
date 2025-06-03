@@ -5,16 +5,18 @@ import Swal from 'sweetalert2';
 import { adminLogout } from '../../../redux-toolkit/adminAuthSlice';
 import defaultUser from '../../../../public/default-img-instagram.png'
 import defaultUserAspiro from '../../../../public/default-user-aspiro-removebg-preview.png'
+import useRefreshToken from '../../../hooks/refreshToken';
 
 
 
 export default function Candidates() {
   
   const [candidates, setCandidates] = useState<any[]>([])
-  // const [page, setpage] = useState(1)
-  // const [limit, setlimit] = useState(10)
-  // const [totalPage, settotalpage] = useState(1)
-  // const [search, setsearch] = useState("")
+  const [page, setpage] = useState(1)
+  const [limit, setlimit] = useState(10)
+  const [totalPage, settotalpage] = useState(0)
+  const [search, setsearch] = useState("")
+  const [pagination, setpagination] = useState<any[]>([])
   const [selectedCandidate, setselectedcandidate] = useState<any>({})
 
   const dispatcher = useDispatch()
@@ -25,20 +27,34 @@ export default function Candidates() {
   })
 
   useEffect(() => {
-    fetch('http://localhost:5000/admin/candidates/data', {
-        method:'GET',
-        headers:{
-            authorization:`Bearer ${token}`
+    async function fetchCandidateLists(){
+      async function makeRequest(accessToken : string, searchValue : string, page : number) {
+          return fetch(`http://localhost:5000/admin/candidates/data?search=${searchValue}&page=${page}`, {
+                method:'GET',
+                headers:{
+                    authorization:`Bearer ${accessToken}`,
+                },
+                credentials:'include'
+          })
+      }
+
+      try {
+        let response = await makeRequest(token, search, page)
+
+        if(response.status === 401){
+          const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
+          response = await makeRequest(newAccessToken, search, page)
         }
-    })
-    .then((response) => {
-        return response.json()
-    })
-    .then((result) => {
+
+        const result = await response.json()
+
         if(result.success){
-            console.log('candidate data from the backend data from the backend', result.candidates)
-            setCandidates(result.candidates)
-            setselectedcandidate(result?.candidates[0])
+            console.log('candidate data from the backend data from the backend', result.result)
+            setCandidates(result.result?.candidates)
+            setpage(result.result?.currentPage)
+            settotalpage(result?.result?.totalPages)
+            setpagination(new Array(result?.result?.totalPages).fill(result?.result?.totalPages))
+            setselectedcandidate(result?.result?.candidates[0])
         }else{
             Swal.fire({
               icon:'error',
@@ -46,32 +62,61 @@ export default function Candidates() {
               text:result.message
             })
         }
-    })
-    .catch((error : any) => {
-        Swal.fire({
-            icon:'error',
-            title:'Oops',
-            text:error.message
-        }).then((result) => {
-          if(result.isConfirmed) {
-            dispatcher(adminLogout())
-            navigator('/admin/login')
-          }
-        })
-    })
-  }, [])
+
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops',
+            text: error.message
+          }).then((result) => {
+            if (result.isConfirmed) {
+              dispatcher(adminLogout())
+              navigator('/admin/login')
+            }
+          })
+        }
+      }
+    }
+
+    fetchCandidateLists()
+      
+  }, [search, page])
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
     return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
   }
 
+  function changePage(pageNumber : number){
+    setpage(pageNumber)
+  }
+
+  const nextPage = () => setpage(prev => prev + 1)
+  const previousPage = () => setpage(prev => prev - 1)
+
+  function searchCandidates(event : any) {
+    setsearch(event.target.value)
+  }
+
+  function debouncedSearch(fn : Function, delay : number) : Function {
+      let timer : number
+      return function(...args : any){
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          fn(...args)
+        }, delay)
+      }
+  }
+
+  const dSearch = debouncedSearch(searchCandidates, 1500)
+
   return (
     <>
     <div className="px-6 flex gap-20">
       <h2 className='font-bold'>Candidates</h2>
       <div className="bg-white search-wrapper rounded-full w-[400px] relative">
-        <input type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search candidates' />
+        <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search candidates' />
         <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
       </div>
     </div>
@@ -126,17 +171,25 @@ export default function Candidates() {
 
         
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing 1 to 10 jobs</span>
+          <span>Showing {page} of {totalPage} jobs</span>
           <div className="flex gap-2">
-            <button className="px-2 py-1 bg-gray-100 rounded">Prev</button>
-            <button className="px-3 py-1 bg-orange-500 text-white rounded">1</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">2</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">Next</button>
+            {
+              page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
+            }
+            {
+              pagination.map((_, index) => {
+                return(
+                    <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
+                )
+              })
+            }
+            {
+              page < totalPage ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
+            }
           </div>
         </div>
       </div>
 
-    vv
       <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
         <div className="text-sm text-center text-gray-400">{selectedCandidate?.role ? selectedCandidate.role : "Not Specified" }</div>
         <img src={selectedCandidate.profilePicture ? selectedCandidate.profilePicture : defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />

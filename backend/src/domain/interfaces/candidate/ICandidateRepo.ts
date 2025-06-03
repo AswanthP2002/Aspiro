@@ -11,7 +11,7 @@ export default interface CandidateRepo {
     updateCandidate(otp : string, field : string, value : boolean) : Promise<Candidate | null>
     updateIntroDetails(id : string, role : string, city : string, district : string, state : string, country : string, pincode : string, summary : string) : Promise<Candidate | null>
     editProfile(id : string, name : string, role : string, city : string, district : string, state : string, country : string) : Promise<Candidate | null>
-    findCandidates(search? : string, page? : number, limit? : number) : Promise<Candidate[] | null>
+    findCandidates(search? : string, page? : number, limit? : number) : Promise<any | null>
     blockCandidate(id : string) : Promise<boolean>
     unblockCandidate(id : string) : Promise<boolean>
     isCandidateBlocked(id : string) : Promise<boolean | undefined>
