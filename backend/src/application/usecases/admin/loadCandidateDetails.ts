@@ -5,7 +5,8 @@ export class LoadCandidateDetailsUseCase {
     constructor(private _candidateRepo : CandidateRepo){}
 
     async execute(id : string) : Promise<Candidate | null> {
-        const candidate = await this._candidateRepo.findById(id)
+        const candidate = await this._candidateRepo.candidateAggregatedData(id)
+        console.log('Candidate details loading useCase', candidate)
         return candidate
     }
 }

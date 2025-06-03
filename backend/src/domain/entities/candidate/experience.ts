@@ -1,10 +1,17 @@
+import mongoose from "mongoose"
+
+
 export default interface Experience {
-    _id? : string
+    _id? : mongoose.Types.ObjectId
+    candidateId? : mongoose.Types.ObjectId
     role : string
-    company : string
-    start : Date
-    isPresent : boolean
-    end? : Date
+    jobtype : string
+    organization : string
+    startdate : Date
+    ispresent : boolean
+    enddate? : any //for checking
+    location : string
+    locationtype : string
     createdAt : Date
     updatedAt : Date
 }

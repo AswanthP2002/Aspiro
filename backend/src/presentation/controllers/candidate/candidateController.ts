@@ -14,6 +14,11 @@ import { StatusCodes } from "../../statusCodes"
 import VerifyUserUseCase from "../../../application/usecases/candidate/verifyUser"
 import SaveIntroDetailsUseCase from "../../../application/usecases/candidate/saveBasiscs"
 import CandidateLoginResult from "../dtos/candidate/loginResultDTO"
+import AddExperienceUseCase from "../../../application/usecases/candidate/addExperience"
+import getExperienceUseCase from "../../../application/usecases/candidate/getExperienceUseCase"
+import deleteExperience from "../../../application/usecases/candidate/deleteExperienceUseCase"
+import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
+import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
 
 export class CandidateController {
     constructor(
@@ -21,7 +26,11 @@ export class CandidateController {
         private _verifyUserUC : VerifyUserUseCase,
         private _loginCandidateUC : LoginCandidateUseCase,
         private _saveDetailsUC : SaveIntroDetailsUseCase,
-        private _loadCandidatePersonalDataUC : LoadCandidatePersonalDataUC
+        private _loadCandidatePersonalDataUC : LoadCandidatePersonalDataUC,
+        private _addExperienceUC : AddExperienceUseCase,
+        private _getExperiencesUC : getExperienceUseCase,
+        private _deleteExperienceUC : DeleteExperienceUseCase,
+        private _editExperienceUC : EditExperienceUseCase
     ){}
 
     //register candidate
@@ -111,7 +120,7 @@ export class CandidateController {
             console.log('Refresh token before sending to the frontend :: candidateController.ts', refreshToken)
 
             return res.status(StatusCodes.OK)
-            .cookie('refreshToken', refreshToken, {httpOnly:true, secure:false, sameSite:'lax'})
+            .cookie('refreshToken', refreshToken, {httpOnly:true, secure:false, sameSite:'lax', maxAge:24 * 60 * 60 * 1000})
             .json({
                 success:true,
                 message:'Candidate login successfull',
@@ -212,6 +221,60 @@ export class CandidateController {
             }
 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async addExperience(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user?.id
+        try {
+            const addExperienceResult = await this._addExperienceUC.execute(req.body, candidateId)
+            if(!addExperienceResult) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add experience'})
+            
+            return res.status(StatusCodes.OK).json({success:true, message:'Experience added successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while adding candidate experience', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async deleteExperience(req : Auth, res : Response) : Promise<Response> {
+        const {experienceId} = req.params
+
+        try {
+            const result = await this._deleteExperienceUC.execute(experienceId)
+            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete experience'})
+
+            return res.status(StatusCodes.OK).json({success:true, message:'Experience deleted'})
+        } catch (error : unknown) {
+            console.log('Error occured while deleting experience', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async getExperiences(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req?.user?.id
+        try {
+            const experience = await this._getExperiencesUC.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Experience details fetched successfully', experience})
+        } catch (error : unknown) {
+            console.log('Error occured while geting the candidate experience', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+
+    }
+
+    async editExperience(req : Auth, res : Response) : Promise<Response> {
+        const {experienceId} = req.params
+
+        try {
+            const result = await this._editExperienceUC.execute(experienceId, req.body)
+            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Can not edit experience"})
+
+            return res.status(StatusCodes.OK).json({success:true})
+        } catch (error : unknown) {
+            console.log('Error occured while editing the experience')
+            
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }
 }

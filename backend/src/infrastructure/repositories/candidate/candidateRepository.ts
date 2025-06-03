@@ -4,7 +4,7 @@ import { connectDb } from "../../database/connection";
 import { Db, ObjectId } from "mongodb";
 import mongoose, { Mongoose } from "mongoose";
 import { after } from "node:test";
-import { SaveCandidate } from "../../../domain/interfaces/candidate/createCandidateRequest";
+import { SaveCandidate } from "../../../domain/interfaces/candidate/saveResponses";
 
 export default class CandidateRepository implements CandidateRepo {
     private collection = "candidate"
@@ -128,5 +128,20 @@ export default class CandidateRepository implements CandidateRepo {
         const db = await connectDb()
         const result = await db.collection<Candidate>(this.collection).findOne({_id:new ObjectId(id)})
         return result?.isBlocked
+    }
+
+    async candidateAggregatedData(candidateId: string): Promise<any> {
+        const db = await connectDb()
+        const result = await db.collection<Candidate>(this.collection).aggregate([
+            {$match:{_id:new ObjectId(candidateId)}},
+            {$lookup:{
+                from:'experience',
+                foreignField:'candidateId',
+                localField:'_id',
+                as:'experience'
+            }}
+        ]).toArray()
+
+        return result[0]
     }
 }

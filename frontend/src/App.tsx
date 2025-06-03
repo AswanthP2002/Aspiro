@@ -28,6 +28,7 @@ import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails'
 import CompanyDetails from './pages/admin/company-details/ComapnyDetails'
 import Jobs from './pages/admin/Job-list/JobList'
 import JobDetails from './pages/admin/JobDetails/JobDetails'
+import ExperiencePage from './pages/candidate/Skills & Experience/SkillsExperience'
 
 function App() {
   return(
@@ -38,6 +39,7 @@ function App() {
 
       <Route path="profile" element={<ProfileLayout />}>
         <Route path="personal" index element={<ProfilePersonal />} />
+        <Route path='experience' element={<ExperiencePage />} />
       </Route>
 
     </Route>

@@ -1,5 +1,5 @@
 import Candidate from "../../entities/candidate/candidates";
-import { SaveCandidate } from "./createCandidateRequest";
+import { SaveCandidate } from "./saveResponses";
 
 export default interface CandidateRepo {
     create(candidate : Candidate) : Promise<SaveCandidate>
@@ -15,4 +15,5 @@ export default interface CandidateRepo {
     blockCandidate(id : string) : Promise<boolean>
     unblockCandidate(id : string) : Promise<boolean>
     isCandidateBlocked(id : string) : Promise<boolean | undefined>
+    candidateAggregatedData(candidateId : string) : Promise<any>
 }
