@@ -3,47 +3,96 @@ import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
+import useRefreshToken from '../../../hooks/refreshToken';
 
 
 export default function Companies() {
   
   const [company, setcompany] = useState<any[]>([])
   const [selectedcompany, setselectedcompany] = useState<any>({})
+  const [page, setpage] = useState(1)
+  const [totalPage, settotalpage] = useState(0)
+  const [search, setsearch] = useState("")
+  const [limit, setlimit] = useState(10)
+  const [pagination, setpagination] = useState<any[]>([])
 
   const token = useSelector((state : any) => {
     return state.adminAuth.adminToken
   })
 
+  const nextPage = () => setpage(prev => prev + 1)
+  const previousPage = () => setpage(prev => prev - 1)
+
+  const changePage = (pageNumber : number) => {
+    setpage(pageNumber)
+  }
+
   const navigator = useNavigate()
 
   useEffect(() => {
-    fetch('http://localhost:5000/admin/companies/data', {
-        method:'GET',
-        headers:{
-            authorization:`Bearer ${token}`
-        }
-    })
-    .then((response) => {
-        if(response.status === 500) throw new Error('Internal srever error, please try again after some time')
-        return response.json()
-    })
-    .then((result) => {
-        if(result.success){
-            console.log('data from the backend', result.result)
-            setcompany(result.result)
-            setselectedcompany(result?.result[0])
-        }else{
-            throw new Error('no data')
-        }
-    })
-    .catch((error : any) => {
-        Swal.fire({
-            icon:'error',
-            title:'Oops',
-            text:error.message
+    async function fetchCompanyList(){
+      async function makeRequest(accessToken : string, search : string, page : number){
+        return fetch(`http://localhost:5000/admin/companies/data?search${search}&page=${page}`, {
+          method:'GET',
+          headers:{
+            authorization:`bearer ${accessToken}`
+          },
+          credentials:'include'
         })
-    })
-  }, [])
+      }
+
+      try {
+        let response = await makeRequest(token, search, page)
+
+        if(response.status === 401){
+          const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
+          response = await makeRequest(newAccessToken, search, page)
+        }
+
+        const result = await response.json()
+
+        if(result.success){
+          console.log('Data from the backend company list fetch result', result?.result)
+          setcompany(result.result?.recruiters)
+          setselectedcompany(result?.result?.recruiters[0])
+          setpage(result?.result?.page)
+          settotalpage(result?.result?.totalPages)
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'Oops!',
+            text:result?.message
+          })
+        }
+      } catch (error : unknown) {
+        if(error instanceof Error){
+          Swal.fire({
+            icon:'error',
+            title:'Error',
+            text:error?.message
+          })
+        }
+      }
+    }
+
+    fetchCompanyList()
+  }, [search, page])
+
+  function searchCompany(event : any){
+    setsearch(event.target.value)
+  }
+
+  function debouncedSearch(fn : Function, delay : number){
+    let timer : number
+    return function(...args : any){
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        fn(...args)
+      }, delay)
+    }
+  }
+
+  const dSearch = debouncedSearch(searchCompany, 1000)
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -64,7 +113,7 @@ export default function Companies() {
     <div className="px-6 flex gap-20">
       <h2 className='font-bold'>Comapnies</h2>
       <div className="bg-white search-wrapper rounded-full w-[400px] relative">
-        <input type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
+        <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
         <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
       </div>
     </div>
@@ -118,10 +167,19 @@ export default function Companies() {
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
           <span>Showing 1 to 10 jobs</span>
           <div className="flex gap-2">
-            <button className="px-2 py-1 bg-gray-100 rounded">Prev</button>
-            <button className="px-3 py-1 bg-orange-500 text-white rounded">1</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">2</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">Next</button>
+            {
+              page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
+            }
+            {
+              pagination.map((_, index) => {
+                return(
+                    <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
+                )
+              })
+            }
+            {
+              page < totalPage ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
+            }
           </div>
         </div>
       </div>

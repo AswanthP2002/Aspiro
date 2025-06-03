@@ -20,10 +20,14 @@ export default class RecruiterRespository implements IRecruiterRepo{
         return result
     }
 
-    async findRecruiters(): Promise<Recruiter[]> {
+    async findRecruiters(search : string = "", page : number = 1, limit : number = 1): Promise<any | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).find().toArray()
-        return result
+        const skip = (page - 1) * limit
+        const query = search ? {companyName : {$regex:new RegExp(search, 'i')}} : {}
+        const recruiters = await db.collection<Recruiter>(this.collection).find(query).skip(skip).limit(limit).toArray()
+        const totalRecruiters = await db.collection<Recruiter>(this.collection).countDocuments(query)
+        const totalPages = Math.ceil(totalRecruiters / limit)
+        return {recruiters, page, totalPages}
     }
 
     async findById(id: string): Promise<Recruiter | null> {

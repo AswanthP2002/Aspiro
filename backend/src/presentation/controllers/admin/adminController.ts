@@ -119,10 +119,17 @@ export class AdminController {
     }
 
     async loadCompanies(req : AdminAuth, res : Response) : Promise<Response> { //company list
+        const search = req.query.search as string || ""
+        const page = parseInt(req.query.page as string) || 1
+        const limit = parseInt(req.query.limit as string) || 3
         try {
-            const result = await this._loadCompaniesUC.execute()
+            const result = await this._loadCompaniesUC.execute(search, page, limit)
 
-            return res.status(201).json({success:true, result})
+            return res.status(201).json({
+                success:true, 
+                message:'Company list fetched successfully',
+                result
+            })
         } catch (error : unknown) {
              if(error instanceof Error){
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
