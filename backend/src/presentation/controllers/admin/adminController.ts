@@ -50,7 +50,8 @@ export class AdminController {
             .cookie('adminRefreshToken', refreshToken, {
                 httpOnly:true,
                 secure:false,
-                sameSite:'lax'
+                sameSite:'lax',
+                maxAge:24 * 60 * 60 * 1000
             })
             .json({
                 success:true, 

@@ -9,16 +9,29 @@ import { LoginCandidateUseCase } from "../../../application/usecases/candidate/l
 import SaveBasics from "../../../application/usecases/recruiter/saveBasics"
 import SaveIntroDetailsUseCase from "../../../application/usecases/candidate/saveBasiscs"
 import { LoadCandidatePersonalDataUC } from "../../../application/usecases/candidate/loadPersonalDatas"
+import ExperienceRepository from "../../../infrastructure/repositories/candidate/experienceRepository"
+import AddExperienceUseCase from "../../../application/usecases/candidate/addExperience"
+import { StatusCodes } from "../../statusCodes"
+import getExperienceUseCase from "../../../application/usecases/candidate/getExperienceUseCase"
+import GetExperienceUseCase from "../../../application/usecases/candidate/getExperienceUseCase"
+import deleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
+import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
+import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
 
 const candidateRouter = express.Router()
 
 const candidateRepo = new CandidateRepository()
+const experienceRepo = new ExperienceRepository()
 
 const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
 const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
 const loginCandidateUC = new LoginCandidateUseCase(candidateRepo)
 const saveCandidateBasicUC = new SaveIntroDetailsUseCase(candidateRepo)
 const loadCandidatePersonalDataUC = new LoadCandidatePersonalDataUC(candidateRepo)
+const addExperienceUC = new AddExperienceUseCase(experienceRepo)
+const getExperiencesUC = new GetExperienceUseCase(experienceRepo)
+const deleteExperienceUC = new DeleteExperienceUseCase(experienceRepo)
+const editExperienceUC = new EditExperienceUseCase(experienceRepo)
 
 
 const candidateController = new CandidateController(
@@ -26,7 +39,11 @@ const candidateController = new CandidateController(
     verifyCandidateUC,
     loginCandidateUC,
     saveCandidateBasicUC,
-    loadCandidatePersonalDataUC
+    loadCandidatePersonalDataUC,
+    addExperienceUC,
+    getExperiencesUC,
+    deleteExperienceUC,
+    editExperienceUC
 )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
@@ -34,7 +51,13 @@ candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateCon
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
 candidateRouter.post('/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
 candidateRouter.get('/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
-candidateRouter.put('/candidate/profile',  candidateAuth, editCandidateProfile)
+candidateRouter.post('/candidate/experience/add', candidateAuth, candidateController.addExperience.bind(candidateController))
+candidateRouter.get('/candidate/experience', candidateAuth, candidateController.getExperiences.bind(candidateController))
+candidateRouter.delete('/candidate/experience/:experienceId', candidateAuth, candidateController.deleteExperience.bind(candidateController))
+candidateRouter.put('/candidate/experience/edit/:experienceId', candidateAuth, candidateController.editExperience.bind(candidateController))
+
+
+candidateRouter.put('/candidate/profile',  candidateAuth, editCandidateProfile) //need updation
 
 candidateRouter.get('/candidate/token/refresh', refreshAccessToken) //only checking refresh token
 candidateRouter.post('/candidate/logout', candidateAuth, candidateController.candidateLogout.bind(candidateController))
@@ -42,9 +65,8 @@ candidateRouter.post('/candidate/logout', candidateAuth, candidateController.can
 candidateRouter.get('/get/user/:id', getAuthUserData)
 
 function testMiddleWare(req : Request, res : Response, next : NextFunction) {
-    console.log('Testing middleware :: candidateRouter.ts')
-    console.log('Refresh token saved in cookie', req.cookies?.refreshToken)
-    next()
+    console.log('Testing flow details from the client side', req.body)
+    return res.status(StatusCodes.OK).json({success:true, message:'Maintanance purpose'})
 }
 
 
