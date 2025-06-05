@@ -11,7 +11,7 @@ const recruiterAuthSlice = createSlice({
             state.recruiter = action.payload.recruiter
             state.recruiterToken = action.payload.token
             localStorage.setItem('logedRecruiter', JSON.stringify(action.payload.recruiter))
-            localStorage.setItem('recruiterToken', JSON.stringify(action.payload.token))
+            localStorage.setItem('recruiterToken', action.payload.token)
         },
         recruiterLogout:(state) => {
             state.recruiter = null

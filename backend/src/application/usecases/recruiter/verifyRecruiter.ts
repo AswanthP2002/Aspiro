@@ -1,12 +1,10 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
 
-export default class VerifyRecruiter {
+export default class VerifyRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo){}
 
     async execute(email : string, otp : string) : Promise<Boolean>{
-        console.log('email for finding :: recruiterRepository.ts', email)
         const recruiter = await this.recruiterRepo.findByEmail(email)
-        console.log('founded recruiter', recruiter)
 
         if(!recruiter || !recruiter.otpExpiresAt) throw new Error('Invalid')
         

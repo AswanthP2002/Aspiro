@@ -57,8 +57,10 @@ export const candidateAuth = async (req : Auth, res : Response, next : NextFunct
 export const recruiterAuth = async (req : Auth, res : Response, next : NextFunction) => {
 
     const token = req.headers.authorization
+    console.log('recruiter token before decoding', token)
 
     if(!token){
+        console.log('NO token')
         return res.status(StatusCodes.NOT_ACCEPTABLE).json({success:false, message:'Access denied, no token provided or token malformed'})
     }
 

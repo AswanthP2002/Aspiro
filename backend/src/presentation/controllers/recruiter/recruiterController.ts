@@ -1,136 +1,131 @@
-import express from 'express'
 import { Request, Response } from 'express'
-import RegisterRecruiter from '../../../application/usecases/recruiter/registerRecruiter'
-import { RegisterRecruiterSchema } from '../dtos/recruiter/registerRecruiterDTO'
-import { createRecruiterFromDTO } from '../../../domain/mappers/recruiter/recruiterMapper'
-import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository'
-import VerifyRecruiter from '../../../application/usecases/recruiter/verifyRecruiter'
-import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository'
-import { LoginRecruiter } from '../../../application/usecases/recruiter/loginRecruiter'
 import { Auth } from '../../../middlewares/auth'
-import SaveBasics from '../../../application/usecases/recruiter/saveBasics'
-import { LoadProfileData } from '../../../application/usecases/recruiter/loadProfile'
-import JobRepository from '../../../infrastructure/repositories/jobRepository'
-import { CreateJobSchema } from '../dtos/jobDTO'
-import { createJobFromDTO } from '../../../domain/mappers/jobMapper'
-import CreateJob from '../../../application/usecases/createJob'
-import { LoadCompanyPostedJobs } from '../../../application/usecases/recruiter/loadJobs'
+import RegisterRecruiterUseCase from '../../../application/usecases/recruiter/registerRecruiter'
+import { StatusCodes } from '../../statusCodes'
+import VerifyRecruiterUseCase from '../../../application/usecases/recruiter/verifyRecruiter'
+import { LoginRecruiterUseCase } from '../../../application/usecases/recruiter/loginRecruiter'
+import SaveBasicsUseCase from '../../../application/usecases/recruiter/saveBasics'
+import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/loadProfile'
+import CreateJobUseCase from '../../../application/usecases/createJob'
 
 
-export const registerRecruiter = async (req : Request, res : Response) : Promise<Response> => {
-    try {
-        const validateRecruiter = RegisterRecruiterSchema.parse(req.body)
-        const recruiterModel = createRecruiterFromDTO(validateRecruiter)
-        const rRepo = new RecruiterRespository()
-        const cRepo = new CandidateRepository()
-        const rRegUsecase = new RegisterRecruiter(rRepo, cRepo)
-        const createREcruiter = await rRegUsecase.execute(recruiterModel)
+export default class RecruiterController {
+    constructor(
+        private _registerRecruiterUC : RegisterRecruiterUseCase,
+        private _verifyRecruiterUC : VerifyRecruiterUseCase,
+        private _loginRecruiterUC : LoginRecruiterUseCase,
+        private _saveBasicsUC : SaveBasicsUseCase,
+        private _loadCompanyProfileUseCase : LoadRecruiterProfileDataUseCase,
+        private _createJobUseCase : CreateJobUseCase
+    ){}
 
-        console.log('Registered recruiter is here', createREcruiter)
-        return res.status(201).json({success:true, message:'recruiter created - proceed to email verification', recruiter:req.body.email})
-    } catch (error : any) {
-        console.log('error occured while registering the recruiter', error)
-        if(error.message === 'duplicate email'){
-            return res.status(409).json({success:false, message:'This email is already reigstered with another user please try new one'})
-        }else if(error.message === 'duplicate username'){
-            return res.status(409).json({success:false, message:'Username already taken please choose new one'})
+    async registerRecruiter(req : Request, res : Response) : Promise<Response> {
+        try {
+            const createRecruiter = await this._registerRecruiterUC.execute(req.body)
+            return res.status(StatusCodes.OK).json({success:true, message:'Recruiter created', recruiter:req.body.email})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while registering recruiter', error)
+                switch(error.message){
+                    case 'DuplicateEmail' :
+                        return res.status(StatusCodes.CONFLICT).json({success:false, message:'This email is already reigstered with another user please try new one'})
+                    case 'DuplicateUserName' : 
+                        return res.status(StatusCodes.CONFLICT).json({success:false, message:'Username already taken please choose new one'})
+                    default :
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})   
+                }
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
         }
-        return res.status(500).json({success:false, message:'Internal server error, please try again after some time'})
     }
 
-}
-
-export const verifyRecruiter = async (req : Request, res : Response) : Promise<Response> => {
-    try {
-        console.log('recruiter verification request reached :: recruitercontroller.ts')
+    async verifyRecruiter(req : Request, res : Response) : Promise<Response> {
         const {otp, email} = req.body
 
-        const rRepo = new RecruiterRespository()
-        const cVerifyRecruiterUC = new VerifyRecruiter(rRepo)
-        const isRecruiterVerified = await cVerifyRecruiterUC.execute(email, otp)
+        try {
+            const isRecruiterVerified = await this._verifyRecruiterUC.execute(email, otp)
+            return res.status(StatusCodes.OK).json({success:isRecruiterVerified, message:'Email verified successfully, please login to continue'})
+        } catch (error : unknown) {
+            console.log('Erro occured while verifying the recruiter', error)
+            if(error instanceof Error){
+                switch(error.message){
+                    case 'Expired' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"OTP has been expired, please resend otp or try again after some time"})
+                    case 'Wrong' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Incorrect otp, please enter the correct otp"})
+                    default :
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"Internal server error, please try again after some time"})
+                }
+            }
 
-        return res.status(201).json({success:isRecruiterVerified, message:'Email verified successfully, please login to continue'})
-
-    } catch (error : any) {
-        console.log('Error occured while verifying the user email', error)
-        if(error.message === "Expired"){
-            return res.status(400).json({success:false, message:"OTP has been expired, please resend otp or try again after some time"})
-        }else if(error.message === "Wrong") {
-            return res.status(400).json({success:false, message:"Incorrect otp, please enter the correct otp"})
-        }else {
-            return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error'})
         }
     }
-}
 
-export const loginRecruiter = async (req : Request, res : Response) : Promise<Response> => {
-    try {
+    async loginRecruiter(req : Request, res : Response) : Promise<Response> {
         const {email, password} = req.body
 
-        const rRepo = new RecruiterRespository()
-        const rLoginUC = new LoginRecruiter(rRepo)
-        const result = await rLoginUC.execute(email, password)
-        return res.status(201).json({success:true, message:'Recruiter loged in successfully', result})
-    } catch (error : any) {
-        console.log('Error occured while recruiter login', error.message)
-        if(error.message === "Not Found"){
-            return res.status(404).json({success:false, message:"User not found"})
-        }else if(error.message === "Wrong Password"){
-            return res.status(400).json({success:false, message:"Invalid password, please enter correct password"})
-        }else{
-            return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+        try {
+            const result : any = await this._loginRecruiterUC.execute(email, password)
+            const {refreshToken} = result
+            return res.status(StatusCodes.OK)
+                      .cookie('recruiterRefreshToken', refreshToken,{httpOnly:true, secure:false, sameSite:'lax', maxAge:24 * 60 * 60 * 1000})
+                      .json({success:true, message:'Recruiter loged in successfully', result})
+        } catch (error : unknown) {
+            console.log('Error occured while recruiter login', error)
+            if(error instanceof Error){
+                switch(error.message){
+                    case 'Not Found' :
+                        return res.status(StatusCodes.NOT_FOUND).json({success:false, message:"User not found"})
+                    case 'Wrong Password' :
+                        return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Invalid password, please enter correct password"})
+                    default :
+                        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"Internal server error, please try again after some time"})
+                }
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
         }
     }
 
-}
-
-export const saveIntroDetailsRecruiter = async (req : Auth, res : Response) : Promise<Response> => {
-    try {
+    async saveIntroDetailsRecruiter(req : Auth, res : Response) : Promise<Response> {
         const id = req.user?.id
         const {companyName, about, benefits, companyType, industryType, teamStrength, 
             yearOfEstablishment, website, vision, country, state, city, mobile} = req?.body?.details
-        const {logourl, coverphotourl} = req.body
-        const rRepo = new RecruiterRespository()
-        const saveBasicsUseCase = new SaveBasics(rRepo)
-        const isSaved = await saveBasicsUseCase.execute(id, companyName, about, benefits, companyType, industryType, teamStrength, yearOfEstablishment, website, vision, country, state, city, mobile, logourl, coverphotourl)
-        return res.status(201).json({success:true, message:'Basic details saved'})
-    } catch (error) {
-        console.log('Error occured while updating the basic details of the recruiter', error)
-        return res.status(500).json({success:false, message:'Internal server error please try again after some time'})
-    }
-}
-
-export const loadRecruiterData = async (req : Auth, res : Response) : Promise<Response> => {
-    try {
-        const id = req.user.id
-        const rRepo = new RecruiterRespository()
-        const jRepo = new JobRepository()
-
-        const loadRecruiterPrfileUC = new LoadProfileData(rRepo)
-        const loadCompanyJobsUC = new LoadCompanyPostedJobs(jRepo)
-
-        const recruiterDetails = await loadRecruiterPrfileUC.execute(id)
-        const jobs = await loadCompanyJobsUC.execute(id)
-        return res.status(201).json({success:true, message:'Recruiter details fetched successfully', recruiterDetails, jobs})
         
-    } catch (error) {
-        console.log('Error occured while fetching recruiter profile details', error)
-        return res.status(500).json({success:false, message:'Internal server error, please try again after some time'})
+        const {logourl, coverphotourl} = req.body
+
+        try {
+            const isSaved = await this._saveBasicsUC.execute(id, companyName, about, benefits, companyType, industryType, teamStrength, yearOfEstablishment, website, vision, country, state, city, mobile, logourl, coverphotourl)
+            return res.status(StatusCodes.OK).json({success:true, message:'Basic details saved'})
+        } catch (error : unknown) {
+            console.log('Error occured while saving basics details', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error please try again after some time'})
+        }
     }
-}
 
-export const createJob = async (req : Auth, res : Response) : Promise<Response> => {
-    try {
+    async loadRecruiterProfileData (req : Auth, res : Response) : Promise<Response> {
         const id = req.user.id
-        const validateJob = CreateJobSchema.parse(req.body)
-        const jobModel = createJobFromDTO(validateJob)
-        const jRepo = new JobRepository()
-        const createJobUC = new CreateJob(jRepo)
-        const createJob = createJobUC.execute(id, jobModel)
+        try {
+            const recruiterDetails = await this._loadCompanyProfileUseCase.execute(id)
+            return res.status(StatusCodes.OK).json({success:true, message:'Recruiter details fetched successfully', recruiterDetails})
+        } catch (error : unknown) {
+            console.log('Error occured while geting recruiter profile data', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
 
-        return res.status(201).json({success:true, message:'', job:createJob})
-    } catch (error) {
-        console.log('Error occued while creating the job', error)
-        return res.status(500).json({success:false, message:'Internal server error, please try agaian after some time'})
+    async createJob (req : Auth, res : Response) : Promise<Response> {
+        const id = req.user.id
+        try {
+            const createdJob = await this._createJobUseCase.execute(id, req.body)
+
+            return res.status(StatusCodes.OK).json({success:true, message:'job created', job:createdJob})
+        } catch (error : unknown) {
+            console.log('Error occured while creating the job', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+
     }
 }

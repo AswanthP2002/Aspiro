@@ -6,7 +6,7 @@ export interface SaveJob {
 export default interface IJobRepo {
     create(job : Job) : Promise<SaveJob>
     findCompanyJobsById(id : string) : Promise<Job[]>
-    getJobs() : Promise<any[]>
+    getJobs(search : string, page : number, limit : number) : Promise<any> //change strict later
     getJobDetails(id : string) : Promise<any[]>
     blockJob(id : string) : Promise<boolean>
     unblockJob(id : string) : Promise<boolean>

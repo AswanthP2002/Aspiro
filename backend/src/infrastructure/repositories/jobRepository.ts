@@ -19,18 +19,26 @@ export default class JobRepository implements IJobRepo {
         return result
     }
 
-    async getJobs(): Promise<any[]> {
+    async getJobs(search : string = '', page : number = 1, limit : number = 3): Promise<any> { //change strict to later
         const db = await connectDb()
-        const result = await db.collection<Job>(this.collection).aggregate([
+        const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}
+        const skip = (page - 1) * limit
+        const jobs = await db.collection<Job>(this.collection).aggregate([
+                             match,
                              {$lookup: {
                                  from: 'recruiter',
                                  localField: 'companyId',
                                  foreignField: '_id',
                                  as: 'companyDetails'
                              }},
-                             {$unwind:'$companyDetails'}
+                             {$unwind:'$companyDetails'},
+                             {$skip:skip},
+                             {$limit:limit}
                              ]).toArray()
-        return result
+        const totalDocumentsArray = await db.collection<Job>(this.collection).aggregate([match, {$count:'count'}]).toArray()
+        const totalDocumentsCount = totalDocumentsArray[0].count
+        const totalPages = totalDocumentsArray.length > 0 ? Math.ceil(totalDocumentsCount / limit) : 0
+        return {jobs, page, totalPages}
     }
 
     async getJobDetails(id: string): Promise<any[]> {

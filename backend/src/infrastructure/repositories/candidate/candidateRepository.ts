@@ -96,12 +96,14 @@ export default class CandidateRepository implements CandidateRepo {
         return doc
     }
 
-    async findCandidates(search : string = "", page : number = 1, limit : number = 1): Promise<Candidate[] | null> {
+    async findCandidates(search : string = "", page : number = 1, limit : number = 1): Promise<any | null> {
         const db = await connectDb()
         const skip = (page - 1) * limit
         const query = search ? { name: { $regex: new RegExp(search, 'i') }, isAdmin:false } : {isAdmin:false}
         const candidates = await db.collection<Candidate>(this.collection).find(query).skip(skip).limit(limit).toArray()
-        return candidates
+        const totalDocuments = await db.collection<Candidate>(this.collection).countDocuments(query)
+        const totalPages = Math.ceil(totalDocuments / limit)
+        return {candidates, currentPage:page, totalPages}
     }
 
     async blockCandidate(id: string): Promise<boolean> {

@@ -20,10 +20,14 @@ export default class RecruiterRespository implements IRecruiterRepo{
         return result
     }
 
-    async findRecruiters(): Promise<Recruiter[]> {
+    async findRecruiters(search : string = "", page : number = 1, limit : number = 1): Promise<any | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).find().toArray()
-        return result
+        const skip = (page - 1) * limit
+        const query = search ? {companyName : {$regex:new RegExp(search, 'i')}} : {}
+        const recruiters = await db.collection<Recruiter>(this.collection).find(query).skip(skip).limit(limit).toArray()
+        const totalRecruiters = await db.collection<Recruiter>(this.collection).countDocuments(query)
+        const totalPages = Math.ceil(totalRecruiters / limit)
+        return {recruiters, page, totalPages}
     }
 
     async findById(id: string): Promise<Recruiter | null> {
@@ -120,6 +124,21 @@ export default class RecruiterRespository implements IRecruiterRepo{
         const db = await connectDb()
         const deleteResult = await db.collection<Recruiter>(this.collection).deleteOne({_id:new ObjectId(id)})
         return deleteResult.acknowledged
+    }
+
+    async aggregateRecruiterProfile(id: string): Promise<any> {
+        const db = await connectDb()
+        const result = await db.collection<Recruiter>(this.collection).aggregate([
+            {$match:{_id:new ObjectId(id)}},
+            {$lookup:{
+                from:'job',
+                localField:'_id',
+                foreignField:'companyId',
+                as:'jobs'
+            }}
+        ]).toArray()
+
+        return result[0]
     }
 
 }

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import { generateRefreshToken, generateToken } from "../../../services/jwt";
 
 
-export class LoginRecruiter {
+export class LoginRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo){}
 
     async execute(email : string, password : string) : Promise<object>{

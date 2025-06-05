@@ -75,15 +75,16 @@ export class AdminController {
 
     async loadCandidates(req : AdminAuth, res : Response) : Promise<Response> { //list of candidates
         const search = req.query.search as string || ""
+        console.log('Search query reached here', req.query.search)
         const page = parseInt(req?.query?.page as string) || 1
-        const limit = parseInt(req?.query?.limit as string) || 10
+        const limit = parseInt(req?.query?.limit as string) || 3
         try {
-            const candidates = await this._loadCandidatesUC.execute(search, page, limit)
+            const result = await this._loadCandidatesUC.execute(search, page, limit)
 
             return res.status(StatusCodes.OK).json({
                 success:true,
                 message:'Candidates details fetched successfully',
-                candidates,
+                result,
                 pagination:{page, limit}
             })
         } catch (error : unknown) {
@@ -118,10 +119,17 @@ export class AdminController {
     }
 
     async loadCompanies(req : AdminAuth, res : Response) : Promise<Response> { //company list
+        const search = req.query.search as string || ""
+        const page = parseInt(req.query.page as string) || 1
+        const limit = parseInt(req.query.limit as string) || 3
         try {
-            const result = await this._loadCompaniesUC.execute()
+            const result = await this._loadCompaniesUC.execute(search, page, limit)
 
-            return res.status(201).json({success:true, result})
+            return res.status(201).json({
+                success:true, 
+                message:'Company list fetched successfully',
+                result
+            })
         } catch (error : unknown) {
              if(error instanceof Error){
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
@@ -223,12 +231,15 @@ export class AdminController {
     }
 
     async loadJobs(req : AdminAuth, res : Response) : Promise<Response> {
+        const search = req.query.search as string || ""
+        const page = parseInt(req.query.page as string) || 1
+        const limit = parseInt(req.query.limit as string) || 3
         try {
-            const jobs = await this._loadJobsUC.execute()
-            return res.status(StatusCodes.OK).json({success:true, message:'Job fetched successfully', jobs})
+            const jobList = await this._loadJobsUC.execute(search, page, limit)
+            return res.status(StatusCodes.OK).json({success:true, message:'Job fetched successfully', jobList})
         } catch (error : unknown) {
             if(error instanceof Error){
-                console.log('Error occured while fetching the jobs')
+                console.log('Error occured while fetching the jobs', error)
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})

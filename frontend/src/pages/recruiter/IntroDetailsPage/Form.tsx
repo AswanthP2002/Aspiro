@@ -147,7 +147,8 @@ export default function IntroDetailsPageForm(){
                         authorization:`Bearer ${token}`,
                         'Content-Type':'application/json'
                     },
-                    body:JSON.stringify({details, logourl, coverphotourl})
+                    body:JSON.stringify({details, logourl, coverphotourl}),
+                    credentials:'include'
                 })
                 
                 if(saveResponse.status === 500) throw new Error('Internal server error, please try again after some time')
@@ -236,8 +237,8 @@ export default function IntroDetailsPageForm(){
 
     function validateStepOne() : boolean {
         const nameerror = !details.companyName || !/^[A-Za-z0-9&.,' -]{2,100}$/.test(details.companyName) || false
-        const abouterror = !details.about || !/^[A-Za-z0-9.,!?'"():;\- \n\r]{10,1000}$/.test(details.about) || false
-        const benefitserror = !details.benefits || !/^[A-Za-z0-9.,!?'"():;\- \n\r]{10,1000}$/.test(details.benefits) || false
+        const abouterror = !details.about || !/^[\w\s.,!?'"():;\/\-–—’]{10,1000}$/.test(details.about) || false
+        const benefitserror = !details.benefits || !/^[\w\s.,!?'"():;\/\-–—’]{10,1000}$/.test(details.benefits) || false
 
         nameerror ? setnamerror("Enter valid company name") : setnamerror("")
         abouterror ? setabouterror("Enter valid summary") : setabouterror("")

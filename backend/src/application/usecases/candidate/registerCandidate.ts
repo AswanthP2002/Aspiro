@@ -15,10 +15,10 @@ export default class RegisterCandidateUseCase {
         const candidate = createCandidatefromDTO(parsedCandidate)
 
         const existingEmail = await this.candidateRep.findByEmail(candidate.email)
-        if(existingEmail) throw new Error('duplicate email')
+        if(existingEmail) throw new Error('DuplicateEmail')
         
         const existingUsername = await this.candidateRep.findByUsername(candidate.username)
-        if(existingUsername) throw  new Error('duplicate username')
+        if(existingUsername) throw  new Error('DuplicateUserName')
             
         let hashedPassword
         if(candidate.password){

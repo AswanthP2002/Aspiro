@@ -4,26 +4,30 @@ import bcrypt from 'bcrypt'
 import { generateCode } from "../../../utilities/generateCode";
 import { sendEmail } from "../../../utilities/sendmail";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import { RegisterRecruiterDTO, RegisterRecruiterSchema } from "../../../presentation/controllers/dtos/recruiter/registerRecruiterDTO";
+import { createRecruiterFromDTO } from "../../../domain/mappers/recruiter/recruiterMapper";
 
 
-export default class RegisterRecruiter {
+export default class RegisterRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo, private crepo : CandidateRepo){}
 
-    async execute(recruiter : Recruiter) : Promise<string>{
-        const existingEmail = await this.recruiterRepo.findByEmail(recruiter?.email)
-        const existinCandidate = await this.crepo.findByEmail(recruiter?.email)
+    async execute(recruiterDTO : RegisterRecruiterDTO) : Promise<string>{
+        const validateRecruiter = RegisterRecruiterSchema.parse(recruiterDTO)
+        const recruiterModel = createRecruiterFromDTO(validateRecruiter)
+        const existingEmail = await this.recruiterRepo.findByEmail(recruiterModel?.email)
+        const existinCandidate = await this.crepo.findByEmail(recruiterModel?.email)
         if(existingEmail || existinCandidate) throw new Error('duplicate email')
         
-        const existingUsername = await this.recruiterRepo.findByUserName(recruiter?.username)
-        const existingUserrnameCandidate = await this.crepo.findByUsername(recruiter?.username)
+        const existingUsername = await this.recruiterRepo.findByUserName(recruiterModel?.username)
+        const existingUserrnameCandidate = await this.crepo.findByUsername(recruiterModel?.username)
 
         if(existingUsername || existingUserrnameCandidate) throw new Error('duplicate username')
         let hashedPassword
-        if(recruiter?.password){
-            hashedPassword = await bcrypt.hash(recruiter.password, 10)
+        if(recruiterModel?.password){
+            hashedPassword = await bcrypt.hash(recruiterModel.password, 10)
         }
 
-        recruiter.password = hashedPassword
+        recruiterModel.password = hashedPassword
 
         const otp = generateCode()
         const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000)
@@ -40,14 +44,14 @@ export default class RegisterRecruiter {
 </div>
         `
 
-        recruiter.isVerified = false
-        recruiter.verificationToken = otp
-        recruiter.otpExpiresAt = otpExpiresAt
+        recruiterModel.isVerified = false
+        recruiterModel.verificationToken = otp
+        recruiterModel.otpExpiresAt = otpExpiresAt
 
-        const info = await sendEmail(recruiter.email, subject, content)
+        const info = await sendEmail(recruiterModel.email, subject, content)
         console.log('otp send to the user', otp)
 
-        const createRecruiter = await this.recruiterRepo.create(recruiter)
+        const createRecruiter = await this.recruiterRepo.create(recruiterModel)
         return `${createRecruiter} - ${info}`
     }
 }
