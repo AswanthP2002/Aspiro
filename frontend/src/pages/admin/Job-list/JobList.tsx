@@ -10,6 +10,11 @@ export default function Jobs() {
   
   const [jobs, setjobs] = useState<any[]>([])
   const [selectedjob, setselectedjob] = useState<any>({})
+  const [search, setsearch] = useState("")
+  const [limit, setlimit] = useState(3)
+  const [page, setpage] = useState(1)
+  const [totalPages, settotalpages] = useState(0)
+  const [pagination, setpagination] = useState<any[]>([])
 
   const token = useSelector((state : any) => {
     return state.adminAuth.adminToken
@@ -21,7 +26,7 @@ export default function Jobs() {
 
     async function fetchJobDetails(){
         async function makeRequest(accessToken : string){
-            return fetch('http://localhost:5000/admin/jobs/data', {
+            return fetch(`http://localhost:5000/admin/jobs/data?search=${search}&page=${page}`, {
                         method:'GET',
                         headers:{
                             authorization:`Bearer ${accessToken}`
@@ -41,13 +46,12 @@ export default function Jobs() {
             const result = await response.json()
 
             if(result.success){
-                console.log('job result from the backend', result.jobs)
-                Swal.fire({
-                    icon:'success',
-                    title:'Done check console'
-                })
-                setjobs(result.jobs)
-                setselectedjob(result.jobs[0])
+                console.log('job result from the backend', result.jobList.jobs)
+                setjobs(result.jobList.jobs)
+                setselectedjob(result.jobList.jobs[0])
+                setpage(result.jobList.page)
+                settotalpages(result.jobList.totalPages)
+                setpagination(new Array(result.jobList.totalPages).fill(0))
             }else{
                 Swal.fire({
                     icon:'error',
@@ -68,7 +72,7 @@ export default function Jobs() {
     }
 
     fetchJobDetails()
-  }, [])
+  }, [search, page])
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -84,12 +88,35 @@ export default function Jobs() {
     navigator(`/admin/job/details/${jobId}`)
   }
 
+  function searchJobs(event : any){
+    setsearch(event.target.value)
+  }
+
+  function debouncedSearchJobs(fn : Function, delay : number){
+    let timer : number
+    return function(...args : any){
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        fn(...args)
+      }, delay);
+    }
+  }
+
+  const dSearch = debouncedSearchJobs(searchJobs, 600)
+
+  const changePage = (pagenumber : number) => {
+    setpage(pagenumber)
+  }
+
+  const nextPage = () => setpage(prev => prev + 1)
+  const previousPage = () => setpage(prev => prev - 1)
+
   return (
     <>
     <div className="px-6 flex gap-20">
       <h2 className='font-bold'>Listed Jobs</h2>
       <div className="bg-white search-wrapper rounded-full w-[400px] relative">
-        <input type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
+        <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
         <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
       </div>
     </div>
@@ -142,12 +169,21 @@ export default function Jobs() {
 
         
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing 1 to 10 jobs</span>
+          <span>Showing {page} of {totalPages} pages</span>
           <div className="flex gap-2">
-            <button className="px-2 py-1 bg-gray-100 rounded">Prev</button>
-            <button className="px-3 py-1 bg-orange-500 text-white rounded">1</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">2</button>
-            <button className="px-2 py-1 bg-gray-100 rounded">Next</button>
+            {
+              page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
+            }
+            {
+              pagination.map((_, index) => {
+                return(
+                    <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
+                )
+              })
+            }
+            {
+              page < totalPages ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
+            }
           </div>
         </div>
       </div>
@@ -201,7 +237,7 @@ export default function Jobs() {
         <button onClick={() => viewJobDetails(selectedjob?._id)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
       </div>
     </div>
-      : <p>No Jobs created</p>
+      : <p className='text-center mt-10 font-normal text-sm'>No Jobs found</p>
     }
     </>
   );

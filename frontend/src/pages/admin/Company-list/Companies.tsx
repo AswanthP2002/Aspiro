@@ -32,7 +32,7 @@ export default function Companies() {
   useEffect(() => {
     async function fetchCompanyList(){
       async function makeRequest(accessToken : string, search : string, page : number){
-        return fetch(`http://localhost:5000/admin/companies/data?search${search}&page=${page}`, {
+        return fetch(`http://localhost:5000/admin/companies/data?search=${search}&page=${page}`, {
           method:'GET',
           headers:{
             authorization:`bearer ${accessToken}`
@@ -57,6 +57,7 @@ export default function Companies() {
           setselectedcompany(result?.result?.recruiters[0])
           setpage(result?.result?.page)
           settotalpage(result?.result?.totalPages)
+          setpagination(new Array(result?.result?.totalPages).fill(0))
         }else{
           Swal.fire({
             icon:'error',
@@ -92,7 +93,7 @@ export default function Companies() {
     }
   }
 
-  const dSearch = debouncedSearch(searchCompany, 1000)
+  const dSearch = debouncedSearch(searchCompany, 600)
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -165,7 +166,7 @@ export default function Companies() {
 
         
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing 1 to 10 jobs</span>
+          <span>Showing {page} of {totalPage} pages</span>
           <div className="flex gap-2">
             {
               page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
@@ -233,7 +234,7 @@ export default function Companies() {
         <button onClick={() => viewCompanyDetails(selectedcompany?._id)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
       </div>
     </div>
-      : <p>No Companies Registered</p>
+      : <p className='text-center mt-10 font-normal text-sm'>No Companies found</p>
     }
     </>
   );

@@ -109,7 +109,7 @@ export default function Candidates() {
       }
   }
 
-  const dSearch = debouncedSearch(searchCandidates, 1500)
+  const dSearch = debouncedSearch(searchCandidates, 600)
 
   return (
     <>

@@ -23,7 +23,9 @@ export default function PostAJobForm(){
         responsibilities:""
     })
     const [titleError, settitlerror] = useState("")
+    const [jobTypeError, setjobtyperror] = useState("")
     const [locationError, setlocationerror] = useState("")
+    const [locationTypeError, setlocationtypeerror] = useState("")
     const [minsalaryError, setminsalaryerror] = useState("")
     const [maxsalaryError, setmaxsalaryerror] = useState("")
     const [vacanicesError, setvacancieserror] = useState("")
@@ -53,12 +55,14 @@ export default function PostAJobForm(){
         event?.preventDefault()
 
         const titlerror = !details.jobTitle || !/^[A-Za-z0-9\s\-.,]{2,100}$/.test(details.jobTitle) || false
+        const jobtyperror = !details.jobType || false
         const locationerror = !details.location || !/^[A-Za-z\s,.-]{2,100}$/.test(details.location) || false
+        const locationtyperror = !details.locationType || false
         const minsalaryerror = !details.minSalary || !/^\d{1,7}$/.test(details.minSalary)  || false
         const maxsalaryerror = !details.maxSalary || !/^\d{1,7}$/.test(details.maxSalary) || false
         const vacancyerror = !details.vacancies || !/^\d{1,3}$/.test(details.vacancies) || false
         const qualificationerror = !details.qualification || !/^[A-Za-z0-9\s,'-]{2,100}$/.test(details.qualification) || false
-        const experienceerror = !details.experience || !/^\d{1,2}\s?(-\s?\d{1,2})?\s?(years?|year)?$/.test(details.experience) || false
+        const experienceerror = !details.experience || !/^\d{1,2}\s?(-\s?\d{1,2})?\s?(years?|year)?$/i.test(details.experience) || false
         const descriptionerror = !details.description || !/^.{10,1000}$/.test(details.description) || false
         const requirementserror = !details.requirements || !/^.{10,1000}$/.test(details.requirements) || false
         const responsibilitieserror = !details.responsibilities || !/^.{10,1000}$/.test(details.responsibilities) || false
@@ -75,9 +79,11 @@ export default function PostAJobForm(){
         requirementserror ? setrequirementserror('Enter valid requirements') : setrequirementserror('')
         responsibilitieserror ? setresponsibilitieserror('Enter valid responsiblities') : setresponsibilitieserror("")
         expiresaterror ? setexpiresaterror('Enter expiry date') : setexpiresaterror("")
+        jobtyperror ? setjobtyperror('Select Job type') : setjobtyperror("")
+        locationtyperror ? setlocationtypeerror('select location type') : setlocationtypeerror("")
 
 
-        if(expiresaterror || titlerror || locationerror || minsalaryerror || maxsalaryerror || vacancyerror || qualificationerror || experienceerror || descriptionerror ||requirementserror|| responsibilitieserror){
+        if(expiresaterror || jobtyperror || locationtyperror || titlerror || locationerror || minsalaryerror || maxsalaryerror || vacancyerror || qualificationerror || experienceerror || descriptionerror ||requirementserror|| responsibilitieserror){
             return
         }
 
@@ -87,7 +93,8 @@ export default function PostAJobForm(){
                 authorization:`Bearer ${token}`,
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify(details)
+            body:JSON.stringify(details),
+            credentials:'include'
         })
         .then((response) => {
             if(response.status === 500) throw new Error('Internal server error, please try again after some time')
@@ -141,10 +148,12 @@ export default function PostAJobForm(){
                 <div className="mt-2">
                     <label htmlFor="">Job Type</label>
                     <select  name="jobType" id="" className="w-full p-2 rounded-sm border border-gray-400" value={details.jobType} onChange={(event) => handleData(event)}>
+                        <option value="">--Select Job Type--</option>
                         <option value="Full-Time">Full-Time</option>
                         <option value="Part-Time">Part-Time</option>
                         <option value="Internship">Internship</option>
                     </select>
+                    <label htmlFor="" className="error-label">{jobTypeError}</label>
                 </div>
                 <div className="mt-2 flex justify-between gap-20">
                     <div className="w-full">
@@ -155,6 +164,7 @@ export default function PostAJobForm(){
                     <div className="w-full">
                         <label htmlFor="">Location Type</label>
                         <select name="locationType" id="" className="w-full p-2 rounded-sm border border-gray-400" value={details.locationType} onChange={(event) => handleData(event)}>
+                            <option value="">--Select Location Type--</option>
                             <option value="In-Office">In-Office</option>
                             <option value="Remote">Remote</option>
                         </select>

@@ -126,4 +126,19 @@ export default class RecruiterRespository implements IRecruiterRepo{
         return deleteResult.acknowledged
     }
 
+    async aggregateRecruiterProfile(id: string): Promise<any> {
+        const db = await connectDb()
+        const result = await db.collection<Recruiter>(this.collection).aggregate([
+            {$match:{_id:new ObjectId(id)}},
+            {$lookup:{
+                from:'job',
+                localField:'_id',
+                foreignField:'companyId',
+                as:'jobs'
+            }}
+        ]).toArray()
+
+        return result[0]
+    }
+
 }

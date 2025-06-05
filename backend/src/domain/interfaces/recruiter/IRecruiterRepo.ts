@@ -29,5 +29,6 @@ export default interface IRecruiterRepo {
     blockRecruiter(id : string) : Promise<boolean>
     unblockRecruiter(id : string) : Promise<boolean>
     deleteRecruiter(id : string) : Promise<boolean>
+    aggregateRecruiterProfile(id : string) : Promise<any> //change strict later
 
 }

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
+import defaultProfile from '/default-img-instagram.png'
 import Swal from "sweetalert2"
+import useRefreshToken from "../../../hooks/refreshToken"
 
 
 export default function RecruiterProfilePersonal(){
@@ -15,46 +17,63 @@ export default function RecruiterProfilePersonal(){
 
     const navigator = useNavigate()
 
+    console.log('Token before sending recruiter ::: ', token)
+
     useEffect(() => {
-        setloading(true)
-        fetch('http://localhost:5000/recruiter/profile/overview', {
-            method:'GET',
-            headers:{
-                authorization:`Bearer ${token}`
-            }
-        })
-        .then((response) => {
-            if(response.status === 500) throw new Error('Internal server Error')
-            return response.json()
-        })
-        .then((result) => {
-            if(result.success){
-                if(!result.recruiterDetails.companyName){
-                    setloading(false)
-                    navigator('/recruiter/introdetails')  
-                }else{
-                    setrecruiter(result.recruiterDetails)
-                    setjobs(result.jobs)
-                    console.log('result from the backend', result)
-                    setloading(false)
-                }
-            }else{
-                setloading(false)
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops!',
-                    text:'Something went wrong, please try again after some time'
+        async function fetchRecruiterProfileData(){
+            setloading(true)
+            async function makeRequest(accessToken : string){
+                return fetch(`http://localhost:5000/recruiter/profile/overview`, {
+                    method: 'GET',
+                    headers: {
+                        authorization: `Bearer ${accessToken}`
+                    },
+                    credentials: 'include'
                 })
             }
-        })
-        .catch((error : any) => {
-            setloading(false)
-            console.log('Error occured while fetching recruiter data', error)
-            Swal.fire({
-                icon:'error',
-                text:error.message
-            })
-        })
+
+            try {
+                let response = await makeRequest(token)
+
+                if(response.status === 401){
+                    const newAccesstoken = await useRefreshToken('http://localhost:5000/recruiter/token/refresh')
+                    response = await makeRequest(newAccesstoken)
+                }
+
+                const result = await response.json()
+
+                if(result.success){
+                    if (!result.recruiterDetails.companyName) {
+                        setloading(false)
+                        navigator('/recruiter/introdetails')
+                    } else {
+                        setrecruiter(result.recruiterDetails)
+                        setjobs(result.recruiterDetails.jobs)
+                        console.log('result from the backend', result)
+                        setloading(false)
+                    }
+                }else{
+                    setloading(false)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Something went wrong, please try again after some time'
+                    })
+                }
+            } catch (error : unknown) {
+                console.log('Error occured while fetching recruiter profile data', error)
+                if(error instanceof Error){
+                    setloading(false)
+                    console.log('Error occured while fetching recruiter data', error)
+                    Swal.fire({
+                        icon: 'error',
+                        text: error.message
+                    })
+                }
+            }
+        }
+
+        fetchRecruiterProfileData()
     }, [])
 
     function getReminingDays(expDate : Date | string) : number {
@@ -108,15 +127,15 @@ export default function RecruiterProfilePersonal(){
 
                     <div className="space-y-4">
                         {
-                            jobs.map((job : any, index : number) => {
+                            jobs.length > 0 ? jobs.map((job : any, index : number) => {
                                 return <>
                                     <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                             <div className="flex items-center gap-4">
-                                <img src={job.logo} className="w-10 h-10 rounded-full" />
+                                <img src={job.logo ? job?.logo : defaultProfile} className="w-10 h-10 rounded-full" />
                                 <div>
                                     <p className="font-medium">{job.jobTitle}</p>
                                     <div className="flex items-center text-sm text-gray-500 gap-2">
-                                        <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded">{job.locationType}</span>
+                                        <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-xs">{job.locationType}</span>
                                         <span>{getReminingDays(job.expiresAt)} days remaining</span>
                                     </div>
                                 </div>
@@ -141,6 +160,7 @@ export default function RecruiterProfilePersonal(){
                         </div>
                                 </>
                             })
+                        : <p className="text-center text-sm mt-10">No Jobs Created</p>
                         }
                     </div>
                 </div>
