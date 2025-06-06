@@ -29,6 +29,7 @@ import CompanyDetails from './pages/admin/company-details/ComapnyDetails'
 import Jobs from './pages/admin/Job-list/JobList'
 import JobDetails from './pages/admin/JobDetails/JobDetails'
 import ExperiencePage from './pages/candidate/Skills & Experience/SkillsExperience'
+import JobListing from './pages/candidate/Job-list-details/JobList'
 
 function App() {
   return(
@@ -36,6 +37,7 @@ function App() {
       <Routes>
     <Route path="/" element={<Layouts />}>
       <Route index element={<Home />} />
+      <Route path='jobs' element={<JobListing />} />
 
       <Route path="profile" element={<ProfileLayout />}>
         <Route path="personal" index element={<ProfilePersonal />} />
