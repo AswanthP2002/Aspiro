@@ -19,6 +19,7 @@ import getExperienceUseCase from "../../../application/usecases/candidate/getExp
 import deleteExperience from "../../../application/usecases/candidate/deleteExperienceUseCase"
 import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
 import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
+import LoadJobsCandidateSideUseCase from "../../../application/usecases/candidate/loadJobLists"
 
 export class CandidateController {
     constructor(
@@ -30,7 +31,8 @@ export class CandidateController {
         private _addExperienceUC : AddExperienceUseCase,
         private _getExperiencesUC : getExperienceUseCase,
         private _deleteExperienceUC : DeleteExperienceUseCase,
-        private _editExperienceUC : EditExperienceUseCase
+        private _editExperienceUC : EditExperienceUseCase,
+        private _loadJobsUC : LoadJobsCandidateSideUseCase
     ){}
 
     //register candidate
@@ -275,6 +277,22 @@ export class CandidateController {
             console.log('Error occured while editing the experience')
             
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async loadJobs(req : Request, res : Response) : Promise<Response> {
+        const search = req.query.search as string || ""
+        const page = parseInt(req.query.page as string) || 1
+        const limit = parseInt(req.query.limit as string) || 3
+        try {
+            const result = await this._loadJobsUC.execute(search, page, limit)
+            return res.status(StatusCodes.OK).json({success:true, message:'Jobs fetched successfully', result})
+        } catch (error : unknown) {
+            console.log('Error occured while fetching the job details', error)
+            if(error instanceof Error){
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Intenal server error, please try again after some time'})
+            }
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
         }
     }
 }

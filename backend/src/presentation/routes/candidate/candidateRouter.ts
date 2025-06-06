@@ -17,11 +17,14 @@ import GetExperienceUseCase from "../../../application/usecases/candidate/getExp
 import deleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
 import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
 import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
+import JobRepository from "../../../infrastructure/repositories/jobRepository"
+import LoadJobsCandidateSideUseCase from "../../../application/usecases/candidate/loadJobLists"
 
 const candidateRouter = express.Router()
 
 const candidateRepo = new CandidateRepository()
 const experienceRepo = new ExperienceRepository()
+const jobRepo = new JobRepository()
 
 const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
 const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
@@ -32,6 +35,7 @@ const addExperienceUC = new AddExperienceUseCase(experienceRepo)
 const getExperiencesUC = new GetExperienceUseCase(experienceRepo)
 const deleteExperienceUC = new DeleteExperienceUseCase(experienceRepo)
 const editExperienceUC = new EditExperienceUseCase(experienceRepo)
+const loadJobsUC = new LoadJobsCandidateSideUseCase(jobRepo)
 
 
 const candidateController = new CandidateController(
@@ -43,12 +47,14 @@ const candidateController = new CandidateController(
     addExperienceUC,
     getExperiencesUC,
     deleteExperienceUC,
-    editExperienceUC
+    editExperienceUC,
+    loadJobsUC
 )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
 candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateController))
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
+candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))
 candidateRouter.post('/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
 candidateRouter.get('/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
 candidateRouter.post('/candidate/experience/add', candidateAuth, candidateController.addExperience.bind(candidateController))
