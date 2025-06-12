@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../../components/candidate/Loader";
+import { candidateService } from "../../../services/apiServices";
 
 export default function VerificationPage(){
     const [otp, setotp] = useState("")
@@ -37,7 +38,7 @@ export default function VerificationPage(){
 
     const navigator = useNavigate()
 
-    function submitOtp(event : any) : void {
+    async function submitOtp(event : any) {
         setloading(true)
         event.preventDefault()
         const typedOtpError = !otp || false
@@ -49,18 +50,11 @@ export default function VerificationPage(){
             return
         }else{
             setloading(false)
-            fetch('http://localhost:5000/verify', {
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({otp, email})
-            })
-            .then((response) => {
-                if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-                return response.json()
-            })
-            .then((result) => {
+            
+            try {
+                const response = await candidateService.verify(otp, email)
+                const result = await response.json()
+
                 if(result.success){
                     Swal.fire({
                         title:"Success",
@@ -78,14 +72,17 @@ export default function VerificationPage(){
                     setotpError(true)
                     setOtpErrorText(result.message)
                 }
-            })
-            .catch((error) => {
-                Swal.fire({
-                    title:"Oops",
-                    icon:"error",
-                    text:error.message
-                })
-            })
+
+            } catch (error : unknown) {
+                if(error instanceof Error){
+                    Swal.fire({
+                        title:"Oops",
+                        icon:"error",
+                        text:error.message
+                    })
+                }
+            }
+
         }
     }
 

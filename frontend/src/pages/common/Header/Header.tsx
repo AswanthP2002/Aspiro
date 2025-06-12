@@ -28,7 +28,7 @@ export default function Header(){
                     </div>
                     <div className="nav-actions flex justify-between w-full items-center">
                     <ul className="nav-links flex gap-10">
-                        <li className="nav-link active hover:text-blue-500 cursor-pointer">Home</li>
+                        <li className="nav-link active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
                         <li className="nav-link cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
                         <li className="nav-link cursor-pointer hover:text-blue-500">Candidates</li>
                         <li className="nav-link cursor-pointer hover:text-blue-500">Companies</li>

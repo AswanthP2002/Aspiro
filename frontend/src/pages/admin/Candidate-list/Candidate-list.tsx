@@ -6,6 +6,7 @@ import { adminLogout } from '../../../redux-toolkit/adminAuthSlice';
 import defaultUser from '../../../../public/default-img-instagram.png'
 import defaultUserAspiro from '../../../../public/default-user-aspiro-removebg-preview.png'
 import useRefreshToken from '../../../hooks/refreshToken';
+import { adminServices } from '../../../services/apiServices';
 
 
 
@@ -28,22 +29,13 @@ export default function Candidates() {
 
   useEffect(() => {
     async function fetchCandidateLists(){
-      async function makeRequest(accessToken : string, searchValue : string, page : number) {
-          return fetch(`http://localhost:5000/admin/candidates/data?search=${searchValue}&page=${page}`, {
-                method:'GET',
-                headers:{
-                    authorization:`Bearer ${accessToken}`,
-                },
-                credentials:'include'
-          })
-      }
-
+      
       try {
-        let response = await makeRequest(token, search, page)
+        let response = await adminServices.getCandidates(token, search, page)
 
         if(response.status === 401){
-          const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-          response = await makeRequest(newAccessToken, search, page)
+          const newAccessToken = await adminServices.refreshToken()
+          response = await adminServices.getCandidates(newAccessToken, search, page)
         }
 
         const result = await response.json()

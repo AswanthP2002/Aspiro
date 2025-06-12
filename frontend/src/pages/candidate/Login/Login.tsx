@@ -13,6 +13,7 @@ import Loader from "../../../components/candidate/Loader";
 import { loginSucess } from "../../../redux-toolkit/candidateAuthSlice";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
+import { candidateService } from "../../../services/apiServices";
 
 export default function CandidateLogin(){
     const [showpassword, setshowpassword] = useState(false)
@@ -31,7 +32,7 @@ export default function CandidateLogin(){
         setshowpassword(prev => !prev)
     }
 
-    function login(event : any) : void{
+    async function login(event : any) {
         setloading(true)
         event.preventDefault()
         const typedEmailerror = !email || false
@@ -47,44 +48,33 @@ export default function CandidateLogin(){
             return
         }else{
             //login
-            fetch('http://localhost:5000/login', {
-                method:"POST",
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({email, password}),
-                credentials:'include'
-            })
-            .then((response) => {
-                if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-                console.log('Response details before converting to json :: ', response)
-                return response.json()
-            })
-            .then((result) => {
-                if(result.success){
-                    console.log('testing full result ', result)
-                    console.log('testing incoming data', result?.result?.token, result?.result?.user)
+            try {
+                const response = await candidateService.loginCandidate(email, password)
+
+                const result = await response.json()
+
+                if(result?.success){
                     dispatcher(loginSucess({user:result?.result?.user, token:result?.result?.token}))
                     setloading(false)
-                    // Swal.fire({
-                    //     icon:'info',
-                    //     text:'Testing data'
-                    // })
                     navigator('/')
                 }else{
                     setloading(false)
                     setvalidationerror(true)
                     setvalidationerrortext(result.message)
                 }
-            })
-            .catch((error : any) => {
-                setloading(false)
-                Swal.fire({
-                    title:'Oops!',
-                    icon:'error',
-                    text:error.message,
-                    showConfirmButton:true,
-                    showCancelButton:false
-                })
-            })
+                
+            } catch (error : unknown) {
+                if (error instanceof Error) {
+                    setloading(false)
+                    Swal.fire({
+                        title: 'Oops!',
+                        icon: 'error',
+                        text: error.message,
+                        showConfirmButton: true,
+                        showCancelButton: false
+                    })
+                }
+            }
         }
     }
 

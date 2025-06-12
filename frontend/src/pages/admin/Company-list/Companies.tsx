@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import useRefreshToken from '../../../hooks/refreshToken';
+import { adminServices } from '../../../services/apiServices';
 
 
 export default function Companies() {
@@ -31,22 +32,12 @@ export default function Companies() {
 
   useEffect(() => {
     async function fetchCompanyList(){
-      async function makeRequest(accessToken : string, search : string, page : number){
-        return fetch(`http://localhost:5000/admin/companies/data?search=${search}&page=${page}`, {
-          method:'GET',
-          headers:{
-            authorization:`bearer ${accessToken}`
-          },
-          credentials:'include'
-        })
-      }
-
       try {
-        let response = await makeRequest(token, search, page)
+        let response = await adminServices.getCompanies(token, search, page)
 
         if(response.status === 401){
-          const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-          response = await makeRequest(newAccessToken, search, page)
+          const newAccessToken = await adminServices.refreshToken()
+          response = await adminServices.getCompanies(newAccessToken, search, page)
         }
 
         const result = await response.json()

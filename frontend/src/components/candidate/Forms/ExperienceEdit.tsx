@@ -2,6 +2,7 @@ import { Box, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
+import { candidateService } from "../../../services/apiServices";
 
 export default function EditExperienceForm({ experience, editExperienceModalOpen, closeExpEditModal, token }: any) {
 
@@ -90,25 +91,14 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
     }
 
     async function editExperience(experienceId : string) {
-        alert('sending function started')
-        async function makeRequest(accessToken : string){
-            return fetch(`http://localhost:5000/candidate/experience/edit/${experienceId}`, {
-                method:'PUT',
-                headers:{
-                    authorization:`Bearer ${accessToken}`,
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType}),
-                credentials:'include'
-            })
-        }
-
+        
         try {
-            alert('Ready to call the sendig fetch function')
-            let response = await makeRequest(token)
+            
+            let response = await candidateService.editExperience(token, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
+
             if(response.status === 401){
-                const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                response = await makeRequest(newAccessToken)
+                const newAccessToken = await candidateService.refreshToken()
+                response = await candidateService.editExperience(newAccessToken, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
             }
 
             const result = await response.json()

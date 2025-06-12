@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import useRefreshToken from "../../../hooks/refreshToken";
 import { tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice";
+import { candidateService } from "../../../services/apiServices";
 
 export default function StoreDetails(){
     const [jobRole, setjobrole] = useState("")
@@ -88,18 +89,6 @@ export default function StoreDetails(){
         return state?.candidateAuth?.token
       })
 
-      async function makeRequest(accessToken : string){
-       return fetch('http://localhost:5000/personal/details/save', {
-                method:'POST',
-                headers:{
-                    authorization:`Bearer ${accessToken}`,
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({jobRole, city, district, state, country, pincode, summary}),
-                credentials:'include'
-            })
-      }
-
       async function validateStore(event : any){
         event.preventDefault()
 
@@ -127,11 +116,10 @@ export default function StoreDetails(){
             // alert('Details saved successfully')
             // return
             try {
-                let saveResponse = await makeRequest(token)
+                let saveResponse = await candidateService.saveBasicDetails(token, jobRole, city, district, state, country, pincode, summary)
                 if(saveResponse.status === 401){
                     const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                    dispatch(tokenRefresh({token:newAccessToken}))
-                    saveResponse = await makeRequest(newAccessToken)
+                    saveResponse = await candidateService.saveBasicDetails(newAccessToken, jobRole, city, district, state, country, pincode, summary)
                 }
 
                 const result = await saveResponse.json()

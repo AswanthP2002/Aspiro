@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import useRefreshToken from '../../../hooks/refreshToken';
+import { adminServices } from '../../../services/apiServices';
 
 
 export default function Jobs() {
@@ -25,50 +26,40 @@ export default function Jobs() {
   useEffect(() => {
 
     async function fetchJobDetails(){
-        async function makeRequest(accessToken : string){
-            return fetch(`http://localhost:5000/admin/jobs/data?search=${search}&page=${page}`, {
-                        method:'GET',
-                        headers:{
-                            authorization:`Bearer ${accessToken}`
-                        },
-                        credentials:'include'
-                    })
+      try {
+        let response = await adminServices.getJobs(token, search, page)
+
+        if(response.status === 401){
+            const newAccessToken = await adminServices.refreshToken()
+            response = await adminServices.getJobs(newAccessToken, search, page)
         }
 
-        try {
-            let response = await makeRequest(token)
+        const result = await response.json()
 
-            if(response.status === 401){
-                const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                response = await makeRequest(newAccessToken)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
-                console.log('job result from the backend', result.jobList.jobs)
-                setjobs(result.jobList.jobs)
-                setselectedjob(result.jobList.jobs[0])
-                setpage(result.jobList.page)
-                settotalpages(result.jobList.totalPages)
-                setpagination(new Array(result.jobList.totalPages).fill(0))
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:result.message
-                })
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while geting jobs', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message
-                })
-            }
-        }
+        if(result.success){
+              console.log('job result from the backend', result.jobList.jobs)
+              setjobs(result.jobList.jobs)
+              setselectedjob(result.jobList.jobs[0])
+              setpage(result.jobList.page)
+              settotalpages(result.jobList.totalPages)
+              setpagination(new Array(result.jobList.totalPages).fill(0))
+          }else{
+              Swal.fire({
+                  icon:'error',
+                  title:'Oops',
+                  text:result.message
+              })
+            }  
+      } catch (error : unknown) {
+          console.log('Error occured while geting jobs', error)
+          if(error instanceof Error){
+              Swal.fire({
+                  icon:'error',
+                  title:'Error',
+                  text:error.message
+              })
+          }
+      }
     }
 
     fetchJobDetails()

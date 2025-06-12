@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
+import { recruiterService } from "../../../services/apiServices"
 
 export default function IntroDetailsPageForm(){
     const token = useSelector((state : any) => {
@@ -99,15 +100,6 @@ export default function IntroDetailsPageForm(){
         if(step === 3) isValidated = validateStepThree()
 
         if(step === 3 && isValidated){
-            console.log('Datas before sending to the backend', details)
-            // Swal.fire({
-            //     icon:'info',
-            //     title:'Testing Flow',
-            //     text:'Data send successfully',
-            //     showConfirmButton:true
-            // })
-
-            // return 
             
             try {
                 if(logo){
@@ -116,10 +108,7 @@ export default function IntroDetailsPageForm(){
                     logoFormData.append('upload_preset', 'recruiter_profile_images')
                     logoFormData.append('folder', 'profile')
 
-                    const logoResponse = await fetch('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', {
-                        method:'POST',
-                        body:logoFormData
-                    })
+                    const logoResponse = await recruiterService.addLogoCloudinary(logoFormData)
 
                     const logoResult = await logoResponse.json()
                     setlogourl(logoResult.secure_url)
@@ -131,25 +120,14 @@ export default function IntroDetailsPageForm(){
                     coverFormData.append('upload_preset', 'recruiter_profile_images')
                     coverFormData.append('folder', 'profile')
 
-                    const coverPhotoResponse = await fetch('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', {
-                        method:'POST',
-                        body:coverFormData
-                    })
+                    const coverPhotoResponse = await recruiterService.addCoverPhotoCloudinary(coverFormData)
 
                     const coverPhotoResult = await coverPhotoResponse.json()
                     setcoverphotourl(coverPhotoResult.secure_url)
                 }
 
                 //save details in the database
-                const saveResponse = await fetch('http://localhost:5000/recruiter/intro/details', {
-                    method:'POST',
-                    headers:{
-                        authorization:`Bearer ${token}`,
-                        'Content-Type':'application/json'
-                    },
-                    body:JSON.stringify({details, logourl, coverphotourl}),
-                    credentials:'include'
-                })
+                const saveResponse = await recruiterService.saveIntroDetails(token, details, logourl, coverphotourl)
                 
                 if(saveResponse.status === 500) throw new Error('Internal server error, please try again after some time')
                 

@@ -2,6 +2,7 @@ import { Modal, Box, Typography } from "@mui/material";
 import { useState } from "react";
 import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
+import { candidateService } from "../../../services/apiServices";
 
 export default function AddExperienceForm({token, experiencemodalopen, closeModal} : any){
     const [role, setrole] = useState("")
@@ -57,25 +58,13 @@ export default function AddExperienceForm({token, experiencemodalopen, closeModa
     }
     
         async function addExperience(){
-            console.log('datas', ispresent, role, locationtype, jobtype)
-            async function makeRequest(accessToken : string){
-                return fetch('http://localhost:5000/candidate/experience/add', {
-                    method:'POST',
-                    headers:{
-                        authorization:`Bearer ${accessToken}`,
-                        'Content-Type':'application/json'
-                    },
-                    body:JSON.stringify({role, jobtype, location, locationtype, organization, ispresent, startdate, enddate}),
-                    credentials:'include'
-                })
-            }
     
             try {
-                let response = await makeRequest(token)
+                let response = await candidateService.addExperience(token, role, jobtype, location, locationtype, organization, ispresent, startdate, enddate)
     
                 if(response.status === 401){
-                    const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                    response = await makeRequest(newAccessToken)
+                    const newAccessToken = await candidateService.refreshToken()
+                    response = await candidateService.addExperience(newAccessToken, role, jobtype, location, locationtype, organization, ispresent, startdate, enddate)
                 }
     
                 const result = await response.json()

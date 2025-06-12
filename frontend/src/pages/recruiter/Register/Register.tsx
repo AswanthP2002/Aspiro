@@ -6,6 +6,7 @@ import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
+import { recruiterService } from "../../../services/apiServices";
 
 export default function RecruiterRegister(){
 
@@ -28,7 +29,7 @@ export default function RecruiterRegister(){
         setshowpassword(prev => !prev)
     }
 
-    function validateRegister(event : any) : void{
+    async function validateRegister(event : any) {
         setloading(true)
         event.preventDefault()
         const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false
@@ -53,16 +54,10 @@ export default function RecruiterRegister(){
             setvalidationerror(false)
             setvalidationerrortext("")
             //send data to the backend
-            fetch('http://localhost:5000/recruiter/register', {
-                method:"POST",
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({email, username, password})
-            })
-            .then((response) => {
-                if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-                return response.json()
-            })
-            .then((result) => {
+
+            try {
+                const response = await recruiterService.recruiterRegister(email, username, password)
+                const result = await response.json()
                 if(result.success){
                     setloading(false)
                     navigator(`/verify/recruiter/${result.recruiter}`)
@@ -72,16 +67,17 @@ export default function RecruiterRegister(){
                     setvalidationerror(true)
                     setvalidationerrortext(result.message)
                 }
-            })
-            .catch((error) => {
-                setloading(false)
-                console.log('Error occured while user registering')
-                Swal.fire({
-                    title:"Oops!",
-                    icon:"error",
-                    text:error.message
-                })
-            })
+            } catch (error : unknown) {
+                if (error instanceof Error) {
+                    setloading(false)
+                    console.log('Error occured while user registering')
+                    Swal.fire({
+                        title: "Oops!",
+                        icon: "error",
+                        text: error.message
+                    })
+                }
+            }
         }
     }
 
