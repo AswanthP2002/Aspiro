@@ -9,6 +9,7 @@ import { Box, Input, InputLabel, Modal, OutlinedInput, TextField, Typography } f
 import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candidateAuthSlice'
 import useRefreshToken from '../../../hooks/refreshToken'
 import { candidateLogout } from '../../../hooks/Logouts'
+import { candidateService } from '../../../services/apiServices'
 
 interface Candidate {
     name : string
@@ -58,7 +59,7 @@ export default function ProfilePersonal(){
     console.log('state token before sending', token)
 
 
-    function editProfile(){
+    async function editProfile(){
         const nameError = !name || !/^[A-Za-z\s.'-]{2,50}$/.test(name) || false
         const roleError = !role || !/^[A-Za-z\s.'-]{2,50}$/.test(role) || false
         const cityError = !city || !/^[A-Za-z\s.'-]{2,50}$/.test(city) || false
@@ -80,19 +81,29 @@ export default function ProfilePersonal(){
         }
         setloading(true)
         handCloseProfileEdit()
-        fetch('http://localhost:5000/candidate/profile', {
-            method:'PUT',
-            headers:{
-                authorization:`Bearer ${token}`,
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({name, role, city, district, state, country, about})
-        })
-        .then((response) => {
-            if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-            return response.json()
-        })
-        .then((result) => {
+
+        try {
+            let response = await candidateService.editProfile(token, name, role, city, district, state, country, about)
+            
+            if(response.status === 401){
+                const newAccessToken = await candidateService.refreshToken()
+                response = await candidateService.editProfile(newAccessToken, name, role, city, district, state, country, about)
+            }
+
+            if (response.status === 403) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Blocked',
+                    text: 'Your account has been blocked by the admin. You will logout shortly..',
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    timer: 4000
+                }).then(() => candidateLogout(token))
+            }
+
+            const result = await response.json()
+
             if(result.success){
                 setloading(false)
                 Swal.fire({
@@ -110,15 +121,18 @@ export default function ProfilePersonal(){
                     title:'Something went wrong'
                 })
             }
-        })
-        .catch((error : any) => {
-            setloading(false)
-            Swal.fire({
-                icon:'error',
-                title:'Oops!',
-                text:error.message
-            })
-        })
+
+        } catch (error : unknown) {
+            console.log('error occured while saving candidate personal details')
+            if (error instanceof Error) {
+                setloading(false)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: error.message
+                })
+            }
+        }
 
     }
 
@@ -139,23 +153,13 @@ export default function ProfilePersonal(){
         const fetchCandidateData = async () => {
             setloading(true)
 
-            async function makeRequest(accessToken : string){
-                return fetch('http://localhost:5000/profile/personal/datas', {
-                    method:'GET',
-                    headers:{
-                        authorization:`Bearer ${accessToken}`
-                    },
-                    credentials:'include'
-                })
-            }
-
             try {
-                let fetchResponse = await makeRequest(token)
+                let fetchResponse = await candidateService.getCandidateProfileData(token)
                 
                 if(fetchResponse.status === 401){
-                    const accessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
+                    const accessToken = await candidateService.refreshToken()
                     dispatcher(tokenRefresh({token:accessToken}))
-                    fetchResponse = await makeRequest(accessToken)
+                    fetchResponse = await candidateService.getCandidateProfileData(accessToken)
                 }
                 
                 if(fetchResponse.status === 403){
@@ -197,21 +201,23 @@ export default function ProfilePersonal(){
                     })
                 }
 
-            } catch (error : any) {
+            } catch (error : unknown) {
                 console.log('Error occured while fetching candidate profile data', error)
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message,
-                    showConfirmButton:true,
-                    confirmButtonText:'Home',
-                    showCancelButton:false
-                }).then((result) => {
-                    if(result.isConfirmed){
-                        dispatcher(logout())
-                        navigator('/')
-                    }
-                })
+                if (error instanceof Error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message,
+                        showConfirmButton: true,
+                        confirmButtonText: 'Home',
+                        showCancelButton: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            dispatcher(logout())
+                            navigator('/')
+                        }
+                    })
+                }
             }
 
         }

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
+import { adminServices } from '../../../services/apiServices'
 
 
 export default function CompanyDetails(){
@@ -19,23 +20,13 @@ export default function CompanyDetails(){
     useEffect(() => {
 
         async function fetchCompanyDetails(){
-            async function makeRequest(accessToken : string, companyId : string){
-                return fetch(`http://localhost:5000/admin/company/details/${companyId}`, {
-                    method:'GET',
-                    headers:{
-                        authorization:`Bearer ${accessToken}`
-                    },
-                    credentials:'include'
-                })
-            }
-
+            
             try {
-                let fetchResponse = await makeRequest(token, companyId)
+                let fetchResponse = await adminServices.getCompanyDetails(token, companyId)
 
                 if(fetchResponse.status === 401){
-                    //refresh token request
-                    const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                    fetchResponse = await makeRequest(newAccessToken, companyId)
+                    const newAccessToken = await adminServices.refreshToken()
+                    fetchResponse = await adminServices.getCompanyDetails(newAccessToken, companyId)
                 }
 
                 const result = await fetchResponse.json()
@@ -83,30 +74,13 @@ export default function CompanyDetails(){
     }
 
     async function blockUnblockCompany(companyId : any, operation : string){
-        async function makeRequest(accessToken : string, url : string){
-            return fetch(url, {
-                method:'PUT',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-        let url = ''
-
-        if(operation === 'Block'){
-            url = `http://localhost:5000/admin/company/block/${companyId}`
-        }else{
-            url = `http://localhost:5000/admin/company/unblock/${companyId}`
-        }
-
-
+        
         try {
-            let response = await makeRequest(token, url)
+            let response = await adminServices.blockUnblockCompany(token, companyId, operation)
 
             if(response.status === 401){
-                const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                response = await makeRequest(newAccessToken, url)
+                const newAccessToken = await adminServices.refreshToken()
+                response = await adminServices.blockUnblockCompany(newAccessToken, companyId, operation)
             }
 
             const result = await response.json()
@@ -136,17 +110,7 @@ export default function CompanyDetails(){
     }
 
     async function closeCompany(companyId : string){
-        async function makeRequest(accessToken : string){
-            return fetch(`http://localhost:5000/admin/company/close/${companyId}`, {
-                method:'DELETE',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-
-        //confirmation need before closing
+        
 
         Swal.fire({
             icon:'warning',
@@ -159,11 +123,11 @@ export default function CompanyDetails(){
         }).then(async (result) => {
             if(result.isConfirmed){
                 try {
-                    let response = await makeRequest(token)
+                    let response = await adminServices.closeCompany(token, companyId)
 
                     if(response.status === 401){
-                        const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                        response = await makeRequest(newAccessToken)
+                        const newAccessToken = await adminServices.refreshToken()
+                        response = await adminServices.closeCompany(newAccessToken, companyId)
                     }
 
                     const result = await response.json()

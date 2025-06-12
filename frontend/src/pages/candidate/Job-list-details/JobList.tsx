@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import Swal from "sweetalert2"
 import JobListTile from "../../../components/common/JobListTile"
+import { useNavigate } from "react-router-dom"
 
 export default function JobListing() {
 
@@ -10,6 +11,12 @@ export default function JobListing() {
     const [page, setpage] = useState(1)
     const [totalPages, settotalpages] = useState(0)
     const [pagination, setpagination] = useState<any[]>([])
+
+    const navigator = useNavigate()
+
+    function viewJobDetails(id : any){
+        navigator(`${id}`)
+    }
 
     useEffect(() => {
         async function fetchJobs(){
@@ -103,7 +110,9 @@ export default function JobListing() {
                                         jobs.map((job : any, index : number) => {
                                             return(
                                                 <>
-                                                    <JobListTile key={index} data={job} />
+                                                    <button onClick={() => viewJobDetails(job?._id)}>
+                                                        <JobListTile key={index} data={job} />
+                                                    </button>
                                                 </>
                                             )
                                         })

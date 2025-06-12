@@ -13,6 +13,7 @@ import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { recruiterLogedIn } from "../../../redux-toolkit/recruiterAuthSlice";
+import { recruiterService } from "../../../services/apiServices";
 
 export default function RecruiterLogin(){
     const [showpassword, setshowpassword] = useState(false)
@@ -31,7 +32,7 @@ export default function RecruiterLogin(){
         setshowpassword(prev => !prev)
     }
 
-    function login(event : any) : void{
+    async function login(event : any) {
         setloading(true)
         event.preventDefault()
         const typedEmailerror = !email || false
@@ -46,45 +47,34 @@ export default function RecruiterLogin(){
             setvalidationerrortext("Please fill the credentials")
             return
         }else{
-            //login
-            alert('going to the backend from recruiter login')
-            fetch('http://localhost:5000/recruiter/login', {
-                method:"POST",
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({email, password}),
-                credentials:'include'
-            })
-            .then((response) => {
-                if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-                return response.json()
-            })
-            .then((result) => {
+                       
+            try {
+                const loginResponse = await recruiterService.recruiterLogin(email, password)
+                const result = await loginResponse.json()
+
                 if(result.success){
                     console.log('testing full result ', result)
                     console.log('testing incoming data', result?.result?.token, result?.result?.user)
                     dispatcher(recruiterLogedIn({recruiter:result?.result?.recruiter, token:result?.result?.token}))
                     setloading(false)
-                    // Swal.fire({
-                    //     icon:'info',
-                    //     text:'Testing data'
-                    // })
                     navigator('/recruiter')
                 }else{
                     setloading(false)
                     setvalidationerror(true)
                     setvalidationerrortext(result.message)
                 }
-            })
-            .catch((error : any) => {
-                setloading(false)
-                Swal.fire({
-                    title:'Oops!',
-                    icon:'error',
-                    text:error.message,
-                    showConfirmButton:true,
-                    showCancelButton:false
-                })
-            })
+            } catch (error : unknown) {
+                if(error instanceof Error){
+                    setloading(false)
+                    Swal.fire({
+                        title:'Oops!',
+                        icon:'error',
+                        text:error.message,
+                        showConfirmButton:true,
+                        showCancelButton:false
+                    })  
+                }
+            }
         }
     }
 

@@ -6,16 +6,22 @@ import useRefreshToken from "../../../hooks/refreshToken";
 import AddExperienceForm from "../../../components/candidate/Forms/ExperienceAdd";
 import Swal from "sweetalert2";
 import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEdit";
+import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
+import { candidateService } from "../../../services/apiServices";
+import { candidateLogout } from "../../../hooks/Logouts";
 
 export default function ExperiencePage(){
 
     const [experiences, setexperiences] = useState<any[]>([])
     const [education, seteducation] = useState<any[]>([])
+    const [skills, setskills] = useState<any[]>([])
 
     const [selectedExperience, setSelectedExperience] = useState<any>({})
 
     const [experiencemodalopen, setexperiencemodalopen] = useState(false)
     const [editExperienceModalOpen, seteditexperiencemodalopen] = useState(false)
+
+    const [skillsModalOpen, setskillsmodalopen] = useState(false)
 
     const token = useSelector((state : any) => {
         return state.candidateAuth.token
@@ -44,21 +50,24 @@ export default function ExperiencePage(){
     }
 
     async function deleteExperience(expId : string) {
-        async function makeRequest(accessToken : string){
-            return fetch(`http://localhost:5000/candidate/experience/${expId}`, {
-                method:'DELETE',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-
+        
         try {
-            let response = await makeRequest(token)
+            let response = await candidateService.deleteExperience(token, expId)
             if (response.status === 401) {
-                const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                response = await makeRequest(newAccessToken)
+                const newAccessToken = await candidateService.refreshToken()
+                response = await candidateService.deleteExperience(newAccessToken, expId)
+            }
+
+            if (response.status === 403) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Blocked',
+                    text: 'Your account has been blocked by the admin. You will logout shortly..',
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    timer: 4000
+                }).then(() => candidateLogout(token))
             }
 
             const result = await response.json()
@@ -89,46 +98,81 @@ export default function ExperiencePage(){
         }
     }
 
-    useEffect(() => {
-        async function fetchExperiences(){
-           async function makeRequest(accessToken : string){
-                 return fetch('http://localhost:5000/candidate/experience', {
-                    method:'GET',
-                    headers:{
-                        authorization:`Bearer ${accessToken}`
-                    },
-                    credentials:'include'
-                })
-           }
+    async function deleteSkill(skillId : string) {
+        try {
+            let response = await candidateService.deleteSkil(token, skillId)
 
-           try {
-            let response = await makeRequest(token)
             if(response.status === 401){
-                const newAccesstoken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                response = await makeRequest(newAccesstoken)
+                const newAccesstoken = await candidateService.refreshToken()
+                response = await candidateService.deleteSkil(newAccesstoken, skillId)
             }
 
             const result = await response.json()
 
-            if(result?.success){
-                console.log('experience data from the frontend', result?.experience)
-                setexperiences(result?.experience)
+            if(result.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Deleted',
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:1500
+                }).then(() => window.location.reload())
+            }
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text:error?.message
+                })
+            }
+        }
+    }
+
+    useEffect(() => {
+        async function fetchExperiences(){
+           
+           try {
+            let experiencePromise = await candidateService.getExperiences(token)
+            let skillsPromise = await candidateService.getSkills(token)
+            if(experiencePromise.status === 401){
+                const newAccesstoken = await candidateService.refreshToken()
+                experiencePromise = await candidateService.getExperiences(newAccesstoken)
+            }
+
+            if(skillsPromise.status === 401){
+                const newAccessToken = await candidateService.refreshToken()
+                skillsPromise = await candidateService.getSkills(newAccessToken)
+            }
+
+            const [experienceResponse, skillsResponse] = await Promise.all([experiencePromise, skillsPromise])
+            
+            const experienceResult = await experienceResponse.json()
+            const skillResult = await skillsResponse.json()
+
+            
+            if(experienceResult?.success && skillResult?.success){
+                console.log('experience data from the frontend', experienceResult)
+                console.log('skills from the backend the', skillResult?.skills)
+                setexperiences(experienceResult?.experience)
+                setskills(skillResult?.skills)
             }else{
                 Swal.fire({
                     icon:'error',
                     title:'Oops',
-                    text:result?.message
+                    text:'Something went wrong'
                 })
             }
            } catch (error : unknown) {
                 console.log('Error occured while geting experiencd', error)
-                Swal.fire({
+                if(error instanceof Error){
+                    Swal.fire({
                     icon:'error',
-                    title:'Error'
+                    title:'Error',
+                    text:error?.message
                 })
+                }
            }
-
-
         }
 
         fetchExperiences()
@@ -140,6 +184,9 @@ export default function ExperiencePage(){
 
     const openExpEditModal = () => seteditexperiencemodalopen(true)
     const closeExpEditModal = () => seteditexperiencemodalopen(false)
+
+    const openSkillModal = () => setskillsmodalopen(true)
+    const closeSkillsModal = () => setskillsmodalopen(false)
 
     return(
         <>
@@ -215,7 +262,31 @@ export default function ExperiencePage(){
             <section className="skills mt-10">
                 <div className="w-full flex justify-between">
                     <div><p className="font-bold">Skills</p></div>
-                    <div><button type="button" className="btn font-normal text-sm">Add skills <i className="fa-solid fa-circle-plus"></i></button></div>
+                    <div><button onClick={openSkillModal} type="button" className="btn font-normal text-sm">Add skills <i className="fa-solid fa-circle-plus"></i></button></div>
+                </div>
+                <div className="mt-5">
+                    {
+                        skills.length > 0
+                            ? <>
+                                <div className="flex flex-wrap gap-5">
+                                    {
+                                        skills?.map((skill : any, index : number) => {
+                                        return(
+                                            <>
+                                             <div key={index} className="">
+                                                 <div className="skill rounded-full px-3 py-2 flex items-center gap-2 border border-gray-300">
+                                                     <p className="text-xs skill-name">{skill?.skill}</p>
+                                                     <i onClick={() => deleteSkill(skill._id)} className="cursor-pointer fa-regular fa-circle-xmark"></i>
+                                                 </div>
+                                             </div>
+                                            </>
+                                        )
+                                    })
+                                    }
+                                </div>
+                              </>
+                            : <p className="text-center mt-5">No Skills added</p>
+                    }
                 </div>
             </section>
         </div>
@@ -223,7 +294,7 @@ export default function ExperiencePage(){
 
         <AddExperienceForm token={token} experiencemodalopen={experiencemodalopen} closeModal={closeModal} />
         <EditExperienceForm experience={selectedExperience} token={token} editExperienceModalOpen={editExperienceModalOpen} closeExpEditModal={closeExpEditModal} />
-
+        <AddSkillsForm token={token} skillsModalOpen={skillsModalOpen} closeSkillsModal={closeSkillsModal} />
         </>
     )
 }

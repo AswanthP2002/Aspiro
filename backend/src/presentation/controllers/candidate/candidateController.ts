@@ -20,6 +20,10 @@ import deleteExperience from "../../../application/usecases/candidate/deleteExpe
 import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
 import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
 import LoadJobsCandidateSideUseCase from "../../../application/usecases/candidate/loadJobLists"
+import LoadJobDetailsCandidateSide from "../../../application/usecases/candidate/loadJobDetails"
+import AddSkill from "../../../application/usecases/candidate/addSkill"
+import GetSkillsUseCase from "../../../application/usecases/candidate/getSkills"
+import DeleteSkillUseCase from "../../../application/usecases/candidate/deleteSkill"
 
 export class CandidateController {
     constructor(
@@ -32,7 +36,11 @@ export class CandidateController {
         private _getExperiencesUC : getExperienceUseCase,
         private _deleteExperienceUC : DeleteExperienceUseCase,
         private _editExperienceUC : EditExperienceUseCase,
-        private _loadJobsUC : LoadJobsCandidateSideUseCase
+        private _loadJobsUC : LoadJobsCandidateSideUseCase,
+        private _loadJobDetailsUC : LoadJobDetailsCandidateSide,
+        private _addSkillsUC : AddSkill,
+        private _getSkillsUC : GetSkillsUseCase,
+        private _deleteSkillUC : DeleteSkillUseCase
     ){}
 
     //register candidate
@@ -293,6 +301,64 @@ export class CandidateController {
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Intenal server error, please try again after some time'})
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async loadJobDetails(req : Request, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+
+        try {
+            const jobDetails = await this._loadJobDetailsUC.execute(jobId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Job details fetched', jobDetails})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while fetching the job details', error)
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async addSkill(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+        try {
+            const result = await this._addSkillsUC.execute(candidateId, req.body)
+            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add skill'})
+            
+            return res.status(StatusCodes.OK).json({success:true, message:'added'})
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('error occured while adding the experience', error)
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server erorr, please try again after some time'})
+            }
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, mesage:'An unknown error occured'})
+        }
+    }
+
+    async getSkills(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+        console.log('Candidate id for geting skills', candidateId)
+        try {
+            const skills = await this._getSkillsUC.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Skills fetched successfully', skills})
+        } catch (error : unknown) {
+            console.log('Error occured while geting the skills')
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error occured, please try again after some time'})
+        }
+    }
+
+    async deleteSkill(req : Auth, res : Response) : Promise<Response> {
+        const {skillId} = req.params
+
+        try {
+            const deleteResult = await this._deleteSkillUC.execute(skillId)
+            if(!deleteResult) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete skill'})
+            return res.status(StatusCodes.OK).json({success:true, message:'Skill removed'})
+        } catch (error : unknown) {
+            console.log('Error occured while deleting the skill', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }
 }

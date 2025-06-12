@@ -1,0 +1,186 @@
+import { useEffect, useState } from "react"
+import defaultImage from '../../../../public/default-img-instagram.png'
+import { useParams } from "react-router-dom"
+import Swal from "sweetalert2"
+import { commonService } from "../../../services/apiServices"
+
+export default function JObDetailsCandidateSide() {
+    const [jobDetails, setjobDetails] = useState<any>({})
+    const params = useParams()
+    const jobId = params?.id
+
+    console.log('params is here', jobId)
+
+    useEffect(() => {
+        async function fetchJobDetails(){
+            
+            try {
+                const response = await commonService.loadJobDetails(jobId)
+
+                const result = await response.json()
+
+                if(result.success){
+                    console.log('job details fetched', result)
+                    setjobDetails(result?.jobDetails)
+                }else{
+                    Swal.fire({
+                        icon:'error',
+                        title:'Oops',
+                        text:result?.message
+                    })
+                }
+
+            } catch (error : unknown) {
+                if(error instanceof Error){
+                    console.log('error occured while geting job details', error)
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text:error?.message,
+                    })
+                }
+            }
+        }
+
+        fetchJobDetails()
+        
+    }, [])
+
+    function formatDate(createdAt: Date | string): string {
+        const joined = new Date(createdAt)
+        return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
+    }
+    return (
+        <>
+            <div className="job-listing-container w-full">
+                <div className="breadcrumbs-header bg-gray-100 w-full">
+                    <div className="aspiro-container">
+                        <div className="flex justify-between py-3">
+                            <div className="left"><p className="text-sm">Job Details</p></div>
+                            <div className="right"><p className="text-sm">Home / Jobs / Job Details</p></div>
+                        </div>
+                    </div>
+                </div>
+                <section className="jobs mt-5">
+                    <div className="aspiro-container">
+                        <div className="header w-full flex justify-between items-center">
+                            <div className="company flex gap-4 items-center">
+                                <img src={defaultImage} style={{width:'50px', height:'52px'}} alt="" />
+                                <div>
+                                    <p className="font-semibold">{jobDetails.jobTitle}</p>
+                                    <p className="text-xs mt-2 text-gray-300">{jobDetails?.CompanyDetails?.companyName}
+                                        <span className="ms-2 bg-green-100 text-green-400 text-xs rounded-sm px-2">{jobDetails?.jobType}</span>
+                                        <span className="ms-2 bg-blue-100 text-blue-400 text-xs rounded-sm px-2">{jobDetails?.locationType}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="actions flex gap-2">
+                                <button type="button" className="btn bg-0"><i className="fa-solid fa-bookmark !text-2xl !text-gray-300"></i></button>
+                                <button type="button" className="btn bg-blue-500 text-white rounded-sm px-3 py-2 text-sm">Apply now</button>
+                            </div>
+                        </div>
+                        <div className="details w-full">
+                            <div className="flex flex-col md:flex-row w-full">
+                                <div className="col w-1/2">
+                                    <div className="mt-10">
+                                        <p className="font-semibold">Description</p>
+                                        <p className="text-sm text-gray-400">{jobDetails?.description}</p>
+                                    </div>
+
+                                    <div className="mt-10">
+                                        <p className="font-semibold">Requirements</p>
+                                        <p className="text-sm text-gray-400">{jobDetails?.requirements}</p>
+                                    </div>
+
+                                    <div className="mt-10">
+                                        <p className="font-semibold">Responsibilities</p>
+                                        <p className="text-sm text-gray-400">{jobDetails?.responsibilities}</p>
+                                    </div>
+
+                                    <div className="mt-10">
+                                        <p className="font-semibold">Why work with us? </p>
+                                        <p className="text-sm text-gray-400">{jobDetails?.CompanyDetails?.benefit}</p>
+                                    </div>
+                                </div>
+                                <div className="col w-1/2">
+                                    <div className="border border-blue-100 rounded-sm flex items-center gap-5 p-5">
+                                        <div className="w-1/2">
+                                            <p className="text-center text-sm font-semibold">Salary (Monthly)</p>
+                                            <p className="mt-3 text-center font-bold text-green-400">Rs.{jobDetails?.minSalary} - Rs.{jobDetails?.maxSalary}</p>
+                                        </div>
+                                        <div className="w-1/2 flex flex-col justify-center items-center">
+                                            <i className="fa-solid fa-location-dot"></i>
+                                            <p className="text-sm text-gray-300 font-semibold">Job Location</p>
+                                            <p className="font-bold">{jobDetails?.location}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-blue-100 rounded-sm mt-5 p-5">
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <i className="fa-solid fa-calendar"></i>
+                                                <p className="text-gray-400 text-xs">Job Posted</p>
+                                                <p>{formatDate(jobDetails?.createdAt)}</p>
+                                            </div>
+                                            <div>
+                                                <i className="fa-solid fa-hourglass-end"></i>
+                                                <p className="text-gray-400 text-xs">Valid Untill</p>
+                                                <p>{formatDate(jobDetails?.expiresAt)}</p>
+                                            </div>
+                                            <div>
+                                                <i className="fa-solid fa-layer-group"></i>
+                                                <p className="text-gray-400 text-xs">Job level</p>
+                                                <p>{jobDetails?.jobLevel}</p>
+                                            </div>
+                                        </div>
+                                        <hr className="mt-5" />
+                                        <div className="flex mt-5 gap-20">
+                                            <div>
+                                                <i className="fa-solid fa-wallet"></i>
+                                                <p className="text-gray-400 text-xs">Experience</p>
+                                                <p>{jobDetails?.experience}</p>
+                                            </div>
+                                            <div>
+                                                <i className="fa-solid fa-school"></i>
+                                                <p className="text-gray-400 text-xs">Education</p>
+                                                <p>{jobDetails?.qualification}</p>
+                                            </div>
+                                            
+                                        </div>
+
+                                        <div className="mt-5">
+                                            <p className="font-semibold">Share this job</p>
+                                            <div className="flex gap-2">
+                                                <button type="button" className="btn bg-blue-100 rounded py-1 px-2 text-xs"><i className="fa-solid fa-link"></i>Copy Link</button>
+                                                <button type="button" className="btn bg-blue-100 rounded px-2 py-1"><i className="fa-brands fa-linkedin"></i></button>
+                                                <button type="button" className="btn bg-blue-100 rounded px-2 py-1"><i className="fa-brands fa-facebook"></i></button>
+                                                <button type="button" className="btn bg-blue-100 rounded px-2 py-1"><i className="fa-solid fa-envelope"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5 mb-5">
+                                <div className="w-full border border-blue-100 rounded-sm p-5">
+                                    <div className="flex items-center gap-10">
+                                        <img src={defaultImage} style={{width:'60px', height:'63px'}} alt="" />
+                                        <div>
+                                            <p className="font-bold">{jobDetails?.CompanyDetails?.companyName}</p>
+                                            <p className="text-sm font-normal">{jobDetails?.CompanyDetails?.industry}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-5">
+                                        <p className="font-semibold">Found In : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.foundIn}</span></p>
+                                        <p className="font-semibold">Organization Type : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.companyType}</span></p>
+                                        <p className="font-semibold">Strength : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.teamStrength}</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </>
+    )
+}

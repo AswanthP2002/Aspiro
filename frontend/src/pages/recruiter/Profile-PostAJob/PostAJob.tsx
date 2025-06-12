@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
+import { recruiterService } from "../../../services/apiServices"
 
 
 export default function PostAJobForm(){
@@ -51,7 +52,7 @@ export default function PostAJobForm(){
         })
     }
 
-    function submitJob(event : any){
+    async function submitJob(event : any){
         event?.preventDefault()
 
         const titlerror = !details.jobTitle || !/^[A-Za-z0-9\s\-.,]{2,100}$/.test(details.jobTitle) || false
@@ -87,20 +88,16 @@ export default function PostAJobForm(){
             return
         }
 
-        fetch('http://localhost:5000/recruiter/job/create', {
-            method:'POST',
-            headers:{
-                authorization:`Bearer ${token}`,
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify(details),
-            credentials:'include'
-        })
-        .then((response) => {
-            if(response.status === 500) throw new Error('Internal server error, please try again after some time')
-            return response.json()
-        })
-        .then((result) => {
+        try {
+            let response = await recruiterService.postJob(token, details)
+
+            if(response.status === 401){
+                const newAccessToken = await recruiterService.refreshToken()
+                response = await recruiterService.postJob(newAccessToken, details)
+            }
+
+            const result = await response.json()
+
             if(result.success){
                 Swal.fire({
                     icon:'success',
@@ -110,7 +107,7 @@ export default function PostAJobForm(){
                     confirmButtonText:'Jobs'
                 }).then((result) => {
                     if(result.isConfirmed){
-                        navigator('/recruiter/profile/overview')
+                        navigator('/recruiter/profile/overview') 
                     }
                 })
             }else{
@@ -119,18 +116,18 @@ export default function PostAJobForm(){
                     text:'Something went wrong'
                 })
             }
-        })
-        .catch((error : any) => {
-            console.log('Error occured while creating the job', error)
-            Swal.fire({
-                icon:'error',
-                title:'!Oops',
-                text:'Internal server error, please try again after some time',
-                showConfirmButton:true
-            }).then((result) => {
-                if(result.isConfirmed) navigator('/recruiter')
-            })
-        })
+        } catch (error : unknown) {
+            if (error instanceof Error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '!Oops',
+                    text: error.message,
+                    showConfirmButton: true
+                }).then((result) => {
+                    if (result.isConfirmed) navigator('/recruiter')
+                })
+            }
+        }
     
     }
 

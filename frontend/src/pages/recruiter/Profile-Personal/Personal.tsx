@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import defaultProfile from '/default-img-instagram.png'
 import Swal from "sweetalert2"
 import useRefreshToken from "../../../hooks/refreshToken"
+import { recruiterService } from "../../../services/apiServices"
 
 
 export default function RecruiterProfilePersonal(){
@@ -22,22 +23,13 @@ export default function RecruiterProfilePersonal(){
     useEffect(() => {
         async function fetchRecruiterProfileData(){
             setloading(true)
-            async function makeRequest(accessToken : string){
-                return fetch(`http://localhost:5000/recruiter/profile/overview`, {
-                    method: 'GET',
-                    headers: {
-                        authorization: `Bearer ${accessToken}`
-                    },
-                    credentials: 'include'
-                })
-            }
-
+            
             try {
-                let response = await makeRequest(token)
+                let response = await recruiterService.getProfileOverview(token)
 
                 if(response.status === 401){
-                    const newAccesstoken = await useRefreshToken('http://localhost:5000/recruiter/token/refresh')
-                    response = await makeRequest(newAccesstoken)
+                    const newAccesstoken = await recruiterService.refreshToken()
+                    response = await recruiterService.getProfileOverview(newAccesstoken)
                 }
 
                 const result = await response.json()
@@ -61,7 +53,7 @@ export default function RecruiterProfilePersonal(){
                     })
                 }
             } catch (error : unknown) {
-                console.log('Error occured while fetching recruiter profile data', error)
+                
                 if(error instanceof Error){
                     setloading(false)
                     console.log('Error occured while fetching recruiter data', error)

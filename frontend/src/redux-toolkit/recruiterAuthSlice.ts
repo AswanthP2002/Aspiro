@@ -18,9 +18,13 @@ const recruiterAuthSlice = createSlice({
             state.recruiterToken = null
             localStorage.removeItem('logedRecruiter')
             localStorage.removeItem('recruiterToken')
+        },
+        recruiterTokenRefresh:(state, action) => {
+            state.recruiterToken = action.payload.token
+            localStorage.setItem('recruiterToken', action.payload.token)
         }
     }
 })
 
-export const {recruiterLogedIn, recruiterLogout} = recruiterAuthSlice.actions
+export const {recruiterLogedIn, recruiterLogout, recruiterTokenRefresh} = recruiterAuthSlice.actions
 export default recruiterAuthSlice.reducer

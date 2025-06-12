@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
+import { adminServices } from '../../../services/apiServices'
 
 
 export default function JobDetails(){
@@ -19,23 +20,13 @@ export default function JobDetails(){
     useEffect(() => {
 
         async function fetchJobDetails(){
-            async function makeRequest(accessToken : string, jobId : string){
-                return fetch(`http://localhost:5000/admin/job/details/${jobId}`, {
-                    method:'GET',
-                    headers:{
-                        authorization:`Bearer ${accessToken}`
-                    },
-                    credentials:'include'
-                })
-            }
 
             try {
-                let fetchResponse = await makeRequest(token, jobId)
+                let fetchResponse = await adminServices.getJobDetails(token, jobId)
 
                 if(fetchResponse.status === 401){
-                    //refresh token request
-                    const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                    fetchResponse = await makeRequest(newAccessToken, jobId)
+                    const newAccessToken = await adminServices.refreshToken()
+                    fetchResponse = await adminServices.getJobDetails(newAccessToken, jobId)
                 }
 
                 const result = await fetchResponse.json()
@@ -83,30 +74,13 @@ export default function JobDetails(){
     }
 
     async function blockUnblockJob(jobId : any, operation : string){
-        async function makeRequest(accessToken : string, url : string){
-            return fetch(url, {
-                method:'PUT',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-        let url = ''
-
-        if(operation === 'Block'){
-            url = `http://localhost:5000/admin/job/block/${jobId}`
-        }else{
-            url = `http://localhost:5000/admin/job/unblock/${jobId}`
-        }
-
-
+        
         try {
-            let response = await makeRequest(token, url)
+            let response = await adminServices.blockUnblockJob(token, jobId, operation)
 
             if(response.status === 401){
-                const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                response = await makeRequest(newAccessToken, url)
+                const newAccessToken = await adminServices.refreshToken()
+                response = await adminServices.blockUnblockJob(newAccessToken, jobId, operation)
             }
 
             const result = await response.json()
@@ -136,30 +110,12 @@ export default function JobDetails(){
     }
 
     async function rejectUnRejectJob(jobId : any, operation : string){
-        async function makeRequest(accessToken : string, url : string){
-            return fetch(url, {
-                method:'PUT',
-                headers:{
-                    authorization:`Bearer ${accessToken}`
-                },
-                credentials:'include'
-            })
-        }
-        let url = ''
-
-        if(operation === 'Reject'){
-            url = `http://localhost:5000/admin/job/reject/${jobId}`
-        }else{
-            url = `http://localhost:5000/admin/job/unreject/${jobId}`
-        }
-
-
         try {
-            let response = await makeRequest(token, url)
+            let response = await adminServices.rejectUnrejectJob(token, jobId, operation)
 
             if(response.status === 401){
-                const newAccessToken = await useRefreshToken('http://localhost:5000/admin/token/refresh')
-                response = await makeRequest(newAccessToken, url)
+                const newAccessToken = await adminServices.refreshToken()
+                response = await adminServices.rejectUnrejectJob(newAccessToken, jobId, operation)
             }
 
             const result = await response.json()
