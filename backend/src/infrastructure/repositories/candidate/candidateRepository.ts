@@ -147,6 +147,12 @@ export default class CandidateRepository implements CandidateRepo {
                 foreignField:'candidateID',
                 localField:'_id',
                 as:'skills'
+            }},
+            {$lookup:{
+                from:'education',
+                foreignField:'candidateId',
+                localField:'_id',
+                as:'education'
             }}
         ]).toArray()
 

@@ -285,6 +285,47 @@ export const candidateService = {
             },
             credentials:'include'
         })
+    },
+    addEducation: async function (accessToken : string, level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) {
+        return fetch('http://localhost:5000/candidate/education/add', {
+            method:'POST',
+            headers:{
+                authorization:`Bearer ${accessToken}`,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({level, stream, organization, isPresent, startYear, endYear, location}),
+            credentials:'include'
+        })
+    },
+    getEducations: async function (accessToken : string) {
+        return fetch('http://localhost:5000/candidate/education', {
+            method:'GET',
+            headers:{
+                authorization:`Bearer ${accessToken}`,
+                'Content-Type':'application/json'
+            },
+            credentials:'include'
+        })
+    },
+    deleteEducation: async function (accessToken : string, educationId : string) {
+        return fetch(`http://localhost:5000/candidate/education/${educationId}`, {
+            method:'DELETE',
+            headers:{
+                authorization:`Bearer ${accessToken}`
+            },
+            credentials:'include'
+        })
+    },
+    editEducation: async function (accessToken : string, educationId : string, level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) {
+        return fetch(`http://localhost:5000/candidate/education/${educationId}`, {
+            method:'PUT',
+            headers:{
+                authorization:`Bearer ${accessToken}`,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({level, stream, organization, isPresent, startYear, endYear, location}),
+            credentials:'include'
+        })
     }
 }
 

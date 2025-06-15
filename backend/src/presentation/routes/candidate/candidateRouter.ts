@@ -24,6 +24,11 @@ import SkillRepsitory from "../../../infrastructure/repositories/candidate/skill
 import AddSkill from "../../../application/usecases/candidate/addSkill"
 import GetSkillsUseCase from "../../../application/usecases/candidate/getSkills"
 import DeleteSkillUseCase from "../../../application/usecases/candidate/deleteSkill"
+import EducationRepository from "../../../infrastructure/repositories/candidate/educationRepository"
+import AddEducationUseCase from "../../../application/usecases/candidate/addEducation"
+import GetEducationsUseCase from "../../../application/usecases/candidate/getEducationsUseCase"
+import DeleteEducationUseCase from "../../../application/usecases/candidate/deleteEducationUseCase"
+import EditEducationUseCase from "../../../application/usecases/candidate/editEducationUseCase"
 
 const candidateRouter = express.Router()
 
@@ -31,6 +36,7 @@ const candidateRepo = new CandidateRepository()
 const experienceRepo = new ExperienceRepository()
 const jobRepo = new JobRepository()
 const skillRepo = new SkillRepsitory()
+const educationRepo = new EducationRepository()
 
 const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
 const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
@@ -46,6 +52,10 @@ const loadJobDetailsUC = new LoadJobDetailsCandidateSide(jobRepo)
 const addSkillUC = new AddSkill(skillRepo)
 const getSkillsUC = new GetSkillsUseCase(skillRepo)
 const deleteSkillUC = new DeleteSkillUseCase(skillRepo)
+const addEducationUC = new AddEducationUseCase(educationRepo)
+const getEducationsUC = new GetEducationsUseCase(educationRepo)
+const deleteEducationUC = new DeleteEducationUseCase(educationRepo)
+const editEducationUC = new EditEducationUseCase(educationRepo)
 
 
 const candidateController = new CandidateController(
@@ -62,7 +72,11 @@ const candidateController = new CandidateController(
     loadJobDetailsUC,
     addSkillUC,
     getSkillsUC,
-    deleteSkillUC
+    deleteSkillUC,
+    addEducationUC,
+    getEducationsUC,
+    deleteEducationUC,
+    editEducationUC
 )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
@@ -79,6 +93,11 @@ candidateRouter.put('/candidate/experience/edit/:experienceId', candidateAuth, c
 candidateRouter.post('/candidate/skills/add', candidateAuth, candidateController.addSkill.bind(candidateController))
 candidateRouter.get('/candidate/skills', candidateAuth, candidateController.getSkills.bind(candidateController))
 candidateRouter.delete('/candidate/skills/:skillId', candidateAuth, candidateController.deleteSkill.bind(candidateController))
+candidateRouter.post('/candidate/education/add', candidateAuth, candidateController.addEducation.bind(candidateController))
+candidateRouter.get('/candidate/education', candidateAuth, candidateController.getEducations.bind(candidateController))
+candidateRouter.delete('/candidate/education/:educationId', candidateAuth, candidateController.deleteEducation.bind(candidateController))
+candidateRouter.put('/candidate/education/:educationId', candidateAuth, candidateController.editEducation.bind(candidateController))
+
 
 candidateRouter.put('/candidate/profile',  candidateAuth, editCandidateProfile) //need updation
 
