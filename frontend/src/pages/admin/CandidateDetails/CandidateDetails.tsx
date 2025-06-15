@@ -9,6 +9,7 @@ export default function CandidateDetails(){
 
     const [candidateDetails, setcandidatedetails] = useState<any>({})
     const [experiences, setexperience] = useState<any[]>([])
+    const [education, setEducation] = useState<any[]>([])
     const [skills, setskills] = useState<any[]>([])
 
     const {id} = useParams()
@@ -32,6 +33,7 @@ export default function CandidateDetails(){
                     setcandidatedetails(result.candidateDetails)
                     setexperience(result?.candidateDetails?.experience)
                     setskills(result?.candidateDetails?.skills)
+                    setEducation(result?.candidateDetails?.education)
                     console.log('candidate details', result.candidateDetails)
                 }else{
                     Swal.fire({
@@ -243,6 +245,50 @@ export default function CandidateDetails(){
                                                                         : getExperienceDuration(new Date(exp?.startdate), "")
                                                                 } Months
                                                             </td>
+                                                        </tr>
+                                                    </>
+                                                })
+                                            }
+                                        </tbody>
+                                    </table>
+                                </>
+                                : <p className="text-center text-gray-300">No Experience provided</p>
+                        }
+                    </div>
+                </section>
+                
+                <section className="education mt-7">
+                    <div className="w-full">
+                        <div><p className="font-bold">Education</p></div>
+                    </div>
+                    <div className="mt-5">
+                        {
+                            education.length > 0
+                                ? <>
+                                    <table className="table w-full">
+                                        <thead className="w-full">
+                                            <tr className="bg-gray-300">
+                                                <th className="text-sm font-semibold py-1">Role</th>
+                                                <th className="text-sm font-semibold py-1">From</th>
+                                                <th className="text-sm font-semibold py-1">To</th>
+                                                
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {
+                                                education.map((edu: any, index: number) => {
+                                                    return <>
+                                                        <tr className="">
+                                                            <td className="flex items-center gap-3">
+                                                                <div><i className="fa-solid fa-school !text-3xl !text-gray-400"></i></div>
+                                                                <div className="">
+                                                                    <p className="font-semibold text-sm">{edu?.stream}</p>
+                                                                    <p className="mt-3 text-gray-400 text-xs">{edu.level} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{edu.organization}</span></p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="text-sm">{edu?.startYear}</td>
+                                                            <td className="text-sm">{edu?.endYear ? edu?.endYear : "Studying"}</td>
                                                         </tr>
                                                     </>
                                                 })

@@ -24,6 +24,10 @@ import LoadJobDetailsCandidateSide from "../../../application/usecases/candidate
 import AddSkill from "../../../application/usecases/candidate/addSkill"
 import GetSkillsUseCase from "../../../application/usecases/candidate/getSkills"
 import DeleteSkillUseCase from "../../../application/usecases/candidate/deleteSkill"
+import AddEducationUseCase from "../../../application/usecases/candidate/addEducation"
+import GetEducationsUseCase from "../../../application/usecases/candidate/getEducationsUseCase"
+import DeleteEducationUseCase from "../../../application/usecases/candidate/deleteEducationUseCase"
+import EditEducationUseCase from "../../../application/usecases/candidate/editEducationUseCase"
 
 export class CandidateController {
     constructor(
@@ -40,7 +44,11 @@ export class CandidateController {
         private _loadJobDetailsUC : LoadJobDetailsCandidateSide,
         private _addSkillsUC : AddSkill,
         private _getSkillsUC : GetSkillsUseCase,
-        private _deleteSkillUC : DeleteSkillUseCase
+        private _deleteSkillUC : DeleteSkillUseCase,
+        private _addEducationUC : AddEducationUseCase,
+        private _getEducationsUC : GetEducationsUseCase,
+        private _deleteEducationUC : DeleteEducationUseCase,
+        private _editEducationUC : EditEducationUseCase
     ){}
 
     //register candidate
@@ -358,6 +366,57 @@ export class CandidateController {
             return res.status(StatusCodes.OK).json({success:true, message:'Skill removed'})
         } catch (error : unknown) {
             console.log('Error occured while deleting the skill', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async addEducation(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+
+        try {
+            const saveEducationResult = await this._addEducationUC.execute(req.body, candidateId)
+            return res.status(StatusCodes.OK).json({success:saveEducationResult, message:'Education added successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while adding education', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+
+    }
+
+    async getEducations(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+
+        try {
+            const result = await this._getEducationsUC.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Educations fetched successfully', educations:result})
+        } catch (error : unknown) {
+            console.log('Error occured while geting the educations', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async deleteEducation(req : Auth, res : Response) : Promise<Response> {
+        const {educationId} = req.params
+        try {
+            const deleteResult = await this._deleteEducationUC.execute(educationId)
+            if(!deleteResult) return res.status(StatusCodes.BAD_REQUEST).json({success:deleteResult, message:'Can not delete education'})
+            
+            return res.status(StatusCodes.OK).json({success:deleteResult, message:'Deleted'})
+        } catch (error : unknown) {
+            console.log('Error occured while deleting the education', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async editEducation(req : Auth, res : Response) : Promise<Response> {
+        const {educationId} = req.params
+
+        try {
+            const result = await this._editEducationUC.execute(educationId, req.body)
+            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not edit education'})
+            return res.status(StatusCodes.OK).json({success:true, message:'Education edited'})
+        } catch (error : unknown) {
+            console.log('Error occured while editing the education details', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }

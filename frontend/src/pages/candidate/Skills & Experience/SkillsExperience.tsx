@@ -9,6 +9,8 @@ import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEd
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
 import { candidateService } from "../../../services/apiServices";
 import { candidateLogout } from "../../../hooks/Logouts";
+import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
+import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
 
 export default function ExperiencePage(){
 
@@ -17,11 +19,15 @@ export default function ExperiencePage(){
     const [skills, setskills] = useState<any[]>([])
 
     const [selectedExperience, setSelectedExperience] = useState<any>({})
+    const [selectedEducation, setSelecteEducation] = useState<any>({})
 
     const [experiencemodalopen, setexperiencemodalopen] = useState(false)
     const [editExperienceModalOpen, seteditexperiencemodalopen] = useState(false)
 
     const [skillsModalOpen, setskillsmodalopen] = useState(false)
+
+    const [educationModalOpen, setEducationModalOpen] = useState(false)
+    const [editEducationModalOpen, setEditEducationModalOpen] = useState(false)
 
     const token = useSelector((state : any) => {
         return state.candidateAuth.token
@@ -47,6 +53,11 @@ export default function ExperiencePage(){
     function selecteEditableExperience(expIndex : number){
         setSelectedExperience(experiences[expIndex])
         openExpEditModal()        
+    }
+
+    function selecteEditableEducation(eduIndex : number) {
+        setSelecteEducation(education[eduIndex])
+        openEditEducationModal()
     }
 
     async function deleteExperience(expId : string) {
@@ -129,12 +140,51 @@ export default function ExperiencePage(){
         }
     }
 
+    async function deleteEducation(educationId : string) {
+        try {
+            let response = await candidateService.deleteEducation(token, educationId)
+
+            if(response.status === 401){
+                const newAccessToken = await candidateService.refreshToken()
+                response = await candidateService.deleteEducation(newAccessToken, educationId)
+            }
+
+            const result = await response.json()
+
+            if(result?.success){
+                Swal.fire({
+                    icon:'success',
+                    title:'Deleted',
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:1500
+                }).then(() => window.location.reload())
+            }else{
+                Swal.fire({
+                    icon:'error',
+                    title:'Oops!',
+                    text:result?.message
+                })
+            }
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.log('Error occured while deleting the education client side::', error)
+                Swal.fire({
+                    icon:'error',
+                    title:'Error',
+                    text:error?.message
+                })
+            }
+        }
+    }
+
     useEffect(() => {
         async function fetchExperiences(){
            
            try {
             let experiencePromise = await candidateService.getExperiences(token)
             let skillsPromise = await candidateService.getSkills(token)
+            let educationPromise = await candidateService.getEducations(token)
             if(experiencePromise.status === 401){
                 const newAccesstoken = await candidateService.refreshToken()
                 experiencePromise = await candidateService.getExperiences(newAccesstoken)
@@ -145,17 +195,25 @@ export default function ExperiencePage(){
                 skillsPromise = await candidateService.getSkills(newAccessToken)
             }
 
-            const [experienceResponse, skillsResponse] = await Promise.all([experiencePromise, skillsPromise])
+            if(educationPromise.status === 401){
+                const newAccessToken = await candidateService.refreshToken()
+                educationPromise = await candidateService.getEducations(newAccessToken)
+            }
+
+            const [experienceResponse, skillsResponse, educationResponse] = await Promise.all([experiencePromise, skillsPromise, educationPromise])
             
             const experienceResult = await experienceResponse.json()
             const skillResult = await skillsResponse.json()
+            const educationResult = await educationResponse.json()
 
             
-            if(experienceResult?.success && skillResult?.success){
+            if(experienceResult?.success && skillResult?.success && educationResult?.success){
                 console.log('experience data from the frontend', experienceResult)
                 console.log('skills from the backend the', skillResult?.skills)
+                console.log('education from the backend', educationResult?.educations)
                 setexperiences(experienceResult?.experience)
                 setskills(skillResult?.skills)
+                seteducation(educationResult?.educations)
             }else{
                 Swal.fire({
                     icon:'error',
@@ -187,6 +245,12 @@ export default function ExperiencePage(){
 
     const openSkillModal = () => setskillsmodalopen(true)
     const closeSkillsModal = () => setskillsmodalopen(false)
+
+    const openEducationModal = () => setEducationModalOpen(true)
+    const closeEducationModal = () => setEducationModalOpen(false)
+
+    const openEditEducationModal = () => setEditEducationModalOpen(true)
+    const closeEditEducationModal = () => setEditEducationModalOpen(false)
 
     return(
         <>
@@ -253,8 +317,50 @@ export default function ExperiencePage(){
             <section className="education mt-10">
                 <div className="w-full flex justify-between">
                     <div><p className="font-bold">Education</p></div>
-                    <div><button type="button" className="btn font-normal text-sm">Add education <i className="fa-solid fa-circle-plus"></i></button></div>
+                    <div><button onClick={openEducationModal} type="button" className="btn font-normal text-sm">Add education <i className="fa-solid fa-circle-plus"></i></button></div>
                 </div>
+                    <div className="mt-5">
+                        {
+                            education.length > 0
+                                ? <>
+                                    <table className="table w-full">
+                                        <thead className="w-full">
+                                            <tr className="bg-gray-300">
+                                                <th className="text-sm font-semibold py-1">Education</th>
+                                                <th className="text-sm font-semibold py-1">From</th>
+                                                <th className="text-sm font-semibold py-1">To</th>
+                                                <th className="text-sm font-semibold py-1">Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {
+                                                education.map((ed: any, index: number) => {
+                                                    return <>
+                                                        <tr className="">
+                                                            <td className="flex items-center gap-3">
+                                                                <div><i className="fa-solid fa-school !text-3xl !text-gray-400"></i></div>
+                                                                <div className="">
+                                                                    <p className="font-semibold text-sm">{ed?.stream}</p>
+                                                                    <p className="mt-3 text-gray-400 text-xs">{ed?.level} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{ed?.organization}</span></p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="text-sm">{ed?.startYear}</td>
+                                                            <td className="text-sm">{ed?.endYear ? ed?.endYear : "Studying"}</td>
+                                                            <td className="flex justify-end">
+                                                                <button className="btn text-xs border p-2 me-3" onClick={() => selecteEditableEducation(index)}>Edit <i className="fa-solid fa-pencil !text-xs"></i></button>
+                                                                <button className="btn text-xs border p-2" onClick={() => deleteEducation(ed?._id)}>Remove <i className="fa-solid fa-trash !text-xs"></i></button>
+                                                            </td>
+                                                        </tr>
+                                                    </>
+                                                })
+                                            }
+                                        </tbody>
+                                    </table>
+                                </>
+                                : <p className="text-center text-gray-300">No Education provided</p>
+                        }
+                    </div>
             </section>
 
             <hr className="mt-5" />
@@ -294,6 +400,10 @@ export default function ExperiencePage(){
 
         <AddExperienceForm token={token} experiencemodalopen={experiencemodalopen} closeModal={closeModal} />
         <EditExperienceForm experience={selectedExperience} token={token} editExperienceModalOpen={editExperienceModalOpen} closeExpEditModal={closeExpEditModal} />
+        
+        <AddEducationForm token={token} educationModalOpen={educationModalOpen} closeEducationModal={closeEducationModal} />
+        <EditEducationForm selectedEducation={selectedEducation} token={token} editEducationModalOpen={editEducationModalOpen} closeEditEducationModal={closeEditEducationModal} />
+        
         <AddSkillsForm token={token} skillsModalOpen={skillsModalOpen} closeSkillsModal={closeSkillsModal} />
         </>
     )
