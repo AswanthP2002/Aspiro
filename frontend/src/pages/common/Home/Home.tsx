@@ -11,6 +11,9 @@ import arrowupdown from '/Arrows-up-down.png'
 import arrowdownup from '/Arrows-down-up.png'
 import Testimonial from '../../../components/common/testimonials'
 import { TileRegisterAsCandidate, TileRegisterAsRecruiter } from '../../../components/common/AccountInfoTile'
+import { commonService } from '../../../services/apiServices'
+import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function Home(){
@@ -18,6 +21,49 @@ export default function Home(){
     const [jobvacancies, setjobvacancies] = useState(jobVacancies)
     const [tileguideData, settileguideData] = useState(guideData)
     const [reviewData, setreviews] = useState(reviews)
+    const [jobKeywordSearch, setJobKeywordSearch] = useState('')
+    const [searchedJobs, setSearchedJobs] = useState<any[]>([])
+
+    const navigator = useNavigate()
+
+    async function searchJob(event : any){
+        console.log('search value for everykeyup', event.target.value)
+        try {
+            const searchResponse = await commonService.homePageSearch(event.target.value)
+            const result = await searchResponse.json()
+            
+            if(result?.success && event.target.value){
+                setSearchedJobs(result?.jobs)
+            }else{
+                setSearchedJobs([])
+            }
+        } catch (error : unknown) {
+            console.log('Error occured while searching the job from the homepage', error)
+            if(error instanceof Error){
+                Swal.fire({
+                    icon:'error',
+                    title:'CAUTION',
+                    text:error?.message
+                })
+            }
+        }
+    }
+
+    function debouncedSearch(fn : Function, delay : number){
+        let timer : any
+        return function(...args : any) {
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                fn(...args)
+            }, delay)
+        }
+    }
+
+    function goToJobDetails(jobId : string) : void {
+        navigator(`jobs/${jobId}`)
+    }
+
+    const dSearch = debouncedSearch(searchJob, 600)
 
     return(
         <>
@@ -33,7 +79,7 @@ export default function Home(){
                         <div className="search-options-wrapper relative">
                         <div className="search-options border border-gray-200 bg-white w-full max-w-[550px] mt-5 px-2 py-2 flex items-center justify-between">
                             <div className="item relative">
-                               <input className='pl-6' type="text" name="search-keywords" id="search-keywords" placeholder='Opportunity title...' /> 
+                               <input onKeyUp={(event) => dSearch(event)} className='pl-6' type="text" name="search-keywords" id="search-keywords" placeholder='Opportunity title...' /> 
                                 <i className="fa-solid fa-search absolute left-0 top-2"></i>
                             </div>
                             
@@ -46,9 +92,25 @@ export default function Home(){
                             </div>
                             
                         </div>
-                        <div className="search-results bg-white shadow w-[550px] p-2 text-sm">
-                            test
-                        </div>
+                        {
+                            searchedJobs.length > 0
+                                        ? <div className="search-results bg-white shadow w-[550px] p-2 text-sm">
+                                            {
+                                                searchedJobs.map((job : any, index : number) => {
+                                                    return(
+                                                        <div onClick={() => goToJobDetails(job?._id)} key={index} className='cursor-pointer flex items-center gap-4 w-full p-2 hover:bg-blue-100'>
+                                                            <i className="fa-solid fa-building"></i>
+                                                            <div className=''>
+                                                                <p className="text-xs font-semibold">{job.jobTitle}</p>
+                                                                <p className="text-xs">{job.companyDetails.companyName} <span className='ms-2'><i className="fa-solid fa-location-dot me-2"></i>{job?.location}</span></p>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                          </div>
+                                        : null
+                        }
                         </div>
                         <div>
                         <p className="suggestions text-gray-400 mt-3 text-xs">Suggestions <span className="text-black">Designer, Programming, Digital Marketing..</span></p>

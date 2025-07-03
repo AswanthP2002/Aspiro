@@ -75,7 +75,7 @@ export default function Companies() {
   }
 
   function debouncedSearch(fn : Function, delay : number){
-    let timer : number
+    let timer : any
     return function(...args : any){
       clearTimeout(timer)
       timer = setTimeout(() => {

@@ -7,6 +7,13 @@ import defaultUser from '../../../../public/default-img-instagram.png'
 import defaultUserAspiro from '../../../../public/default-user-aspiro-removebg-preview.png'
 import useRefreshToken from '../../../hooks/refreshToken';
 import { adminServices } from '../../../services/apiServices';
+import { jobRoles } from '../../../assets/data/dummyJobRole';
+import FilterComponent from '../../../components/common/FilterComponent';
+
+interface FilterType {
+  status:boolean[]
+  jobRole:string[]
+}
 
 
 
@@ -20,6 +27,45 @@ export default function Candidates() {
   const [pagination, setpagination] = useState<any[]>([])
   const [selectedCandidate, setselectedcandidate] = useState<any>({})
 
+  const [sortVisible, setSortVisible] = useState(false)
+  const [sort, setsort] = useState('joined-latest')
+  const [currentSort, setCurrentSort] = useState('joined-latest')
+
+  const [filterVisible, setFilterVisible] = useState(false)
+  const [filter, setFilter] = useState<FilterType>({
+    status:[],
+    jobRole:[]
+  })
+
+  function handleCandidateStatusSelect(status : boolean, isChecked : boolean) {
+    setFilter((prevState : any) => {
+      if(isChecked){
+        return {...prevState, status:[...prevState.status, status]}
+      }else {
+        return {...prevState, status:prevState.status.filter((sts : boolean) => status !== sts)}
+      }
+    })
+  }
+
+  function handleJobRoleSelect(jobRole : string, isChecked : boolean) {
+    setFilter((prevState : any) => {
+      if(isChecked){
+        return {...prevState, jobRole:[...prevState.jobRole, jobRole]}
+      }else {
+        return {...prevState, jobRole:prevState.jobRole.filter((role : string) => role !== jobRole)}
+      }
+    })
+  }
+
+  // Testing filter values
+  console.log('FilterValues', filter)
+
+  const openSort = () => setSortVisible(true)
+  const closeSort = () => setSortVisible(false)
+
+  const openFilter = () => setFilterVisible(true)
+  const closeFilter = () => setFilterVisible(false)
+
   const dispatcher = useDispatch()
   const navigator = useNavigate()
 
@@ -31,11 +77,11 @@ export default function Candidates() {
     async function fetchCandidateLists(){
       
       try {
-        let response = await adminServices.getCandidates(token, search, page)
+        let response = await adminServices.getCandidates(token, search, page, sort, filter)
 
         if(response.status === 401){
           const newAccessToken = await adminServices.refreshToken()
-          response = await adminServices.getCandidates(newAccessToken, search, page)
+          response = await adminServices.getCandidates(newAccessToken, search, page, sort, filter)
         }
 
         const result = await response.json()
@@ -46,7 +92,10 @@ export default function Candidates() {
             setpage(result.result?.currentPage)
             settotalpage(result?.result?.totalPages)
             setpagination(new Array(result?.result?.totalPages).fill(result?.result?.totalPages))
-            setselectedcandidate(result?.result?.candidates[0])
+            if(result?.result?.candidates.length > 0){
+              setselectedcandidate(result?.result?.candidates[0])
+            }
+            setCurrentSort(result?.result?.currentSort)
         }else{
             Swal.fire({
               icon:'error',
@@ -73,7 +122,7 @@ export default function Candidates() {
 
     fetchCandidateLists()
       
-  }, [search, page])
+  }, [search, page, sort, filter])
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -92,7 +141,7 @@ export default function Candidates() {
   }
 
   function debouncedSearch(fn : Function, delay : number) : Function {
-      let timer : number
+      let timer : any
       return function(...args : any){
         clearTimeout(timer)
         timer = setTimeout(() => {
@@ -105,6 +154,16 @@ export default function Candidates() {
 
   return (
     <>
+    {
+      filterVisible && ( <FilterComponent 
+        handleCandidateStatusSelect={handleCandidateStatusSelect}
+        handleJobRoleSelect={handleJobRoleSelect}
+        candidateFilter={filter}
+        closeFilter={closeFilter} 
+        filterType={'candidate'} 
+        jobRole={jobRoles} 
+      />)
+    }
     <div className="px-6 flex gap-20">
       <h2 className='font-bold'>Candidates</h2>
       <div className="bg-white search-wrapper rounded-full w-[400px] relative">
@@ -112,21 +171,36 @@ export default function Candidates() {
         <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
       </div>
     </div>
-
+    <>
+    {
+      candidates?.length > 0
+        ?
     <div className="flex gap-6 p-6 bg-[#fff7f1] min-h-screen">
       {/* Company List Section */}
       <div className="flex-1 bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-end items-center mb-4">
+        <div className="flex justify-end items-center mb-4 relative">
           <div className="flex gap-3">
-            <button className="text-sm text-gray-500">Filter</button>
-            <button className="text-sm text-gray-500">Sort</button>
+            <button onClick={openFilter} className="text-sm text-gray-500">Filter</button>
+            <button onClick={openSort} className="text-sm text-gray-500">Sort</button>
+            {/* Sort */}
+            {sortVisible && (
+                <div className="absolute sort bg-white shadow p-3 right-0">
+                  <div className="flex justify-end"><i onClick={closeSort} className="cursor-pointer fa-solid fa-circle-xmark"></i></div>
+                  <ul>
+                    <li className="list-none"><input onChange={() => setsort('joined-latest')} type="radio" checked={currentSort === 'joined-latest' ? true : false} name="sort-group" id="" /> <label htmlFor="">Joined Latest</label></li>
+                    <li className="list-none"><input onChange={() => setsort('joined-oldest')} type="radio" checked={currentSort === 'joined-oldest'} name="sort-group" id="" /> <label htmlFor="">Joined Oldest</label></li>
+                    <li className="list-none"><input onChange={() => setsort('name-a-z')} type="radio" checked={currentSort === 'name-a-z'} name="sort-group" id="" /> <label htmlFor="">Name A - Z</label></li>
+                    <li className="list-none"><input onChange={() => setsort('name-z-a')} type="radio" checked={currentSort === 'name-z-a'} name="sort-group" id="" /> <label htmlFor="">Name Z - A</label></li>
+                  </ul>
+                </div>
+            )}
           </div>
         </div>
 
         <div className="overflow-auto max-h-[400px]">
           <table className="w-full text-sm text-left">
             <thead className="text-gray-500 font-medium border-t">
-              <tr>
+              <tr> 
                 <th className="p-3">Name</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -163,7 +237,7 @@ export default function Candidates() {
 
         
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing {page} of {totalPage} jobs</span>
+          <span>Showing {page} of {totalPage} Page</span>
           <div className="flex gap-2">
             {
               page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
@@ -230,6 +304,9 @@ export default function Candidates() {
         <button onClick={() => navigator(`/admin/candidate/details/${selectedCandidate._id}`)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
       </div>
     </div>
+    : <p className='text-center font-gray-400 mt-3'>No Candidates</p>
+    }
+    </>
     </>
   );
 }

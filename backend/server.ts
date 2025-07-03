@@ -1,4 +1,4 @@
-import express, { NextFunction } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
@@ -33,6 +33,11 @@ app.use('/', candidateRouter)
 app.use('/', authRouter)
 app.use('/', recruiterRouter)
 app.use('/', adminRouter)
+app.use((err : unknown, req : Request, res : Response, next : NextFunction) => {
+    if(err instanceof Error){
+        console.error('Something went rong', err)
+    }
+})
 
 try {
     app.listen(port, () => {

@@ -24,8 +24,8 @@ export const adminServices = {
             credentials: 'include'
         })
     },
-    getJobs: async function (accessToken: string, search: string, page: number) {
-        return fetch(`http://localhost:5000/admin/jobs/data?search=${search}&page=${page}`, {
+    getJobs: async function (accessToken: string, search: string, page: number, sort : string, filter : any) {
+        return fetch(`http://localhost:5000/admin/jobs/data?search=${search}&page=${page}&sort=${sort}&filter=${encodeURIComponent(JSON.stringify(filter))}`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${accessToken}`
@@ -112,8 +112,8 @@ export const adminServices = {
             credentials: 'include'
         })
     },
-    getCandidates: async function (accessToken: string, searchValue: string, page: number) {
-        return fetch(`http://localhost:5000/admin/candidates/data?search=${searchValue}&page=${page}`, {
+    getCandidates: async function (accessToken: string, searchValue: string, page: number, sort : string, filter : any) {
+        return fetch(`http://localhost:5000/admin/candidates/data?search=${searchValue}&page=${page}&sort=${sort}&filter=${encodeURIComponent(JSON.stringify(filter))}`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${accessToken}`,
@@ -326,7 +326,56 @@ export const candidateService = {
             body:JSON.stringify({level, stream, organization, isPresent, startYear, endYear, location}),
             credentials:'include'
         })
-    }
+    },
+    loadResumes: async function (accesstoken : string) {
+        return fetch('http://localhost:5000/candidate/resumes', {
+            method:'GET',
+            headers:{
+                authorization:`Bearer ${accesstoken}`
+            },
+            credentials:'include'
+        })
+    },
+    deleteResume: async function (accessToken : string, resumeId : string, publicId : string) {
+        return fetch(`http://localhost:5000/candidate/resume/${resumeId}`, {
+            method:'DELETE',
+            headers:{
+                authorization:`Bearer ${accessToken}`,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({cloudinaryPublicId:publicId}),
+            credentials:'include'
+        })
+    },
+    addCertificate: async function (accessToken : string, formData : any) {
+        return fetch('http://localhost:5000/candidate/certificate', {
+            method:'POST',
+            headers:{
+                authorization:`Bearer ${accessToken}`
+            },
+            body:formData,
+            credentials:'include'
+        })
+    },
+    loadCertificates: async function (accessToken : string) {
+        return fetch('http://localhost:5000/candidate/certificate', {
+            method:'GET',
+            headers:{
+                authorization:`Bearer ${accessToken}`
+            },
+            credentials:'include'
+        })
+    },
+    applyJob: async function (accessToken : string, jobId : string, formData : any) {
+        return fetch(`http://localhost:5000/candidate/job/${jobId}/apply`, {
+            method:'POST',
+            headers:{
+                authorization:`Bearer ${accessToken}`
+            },
+            body:formData,
+            credentials:'include'
+        })
+    },
 }
 
 export const recruiterService = {
@@ -398,6 +447,15 @@ export const recruiterService = {
             body: JSON.stringify(details),
             credentials: 'include'
         })
+    },
+    getApplicationDetails: async function (accesstoken : string, jobId : string) {
+        return fetch(`http://localhost:5000/recruiter/job/${jobId}/application/details`, {
+            method:'GET',
+            headers:{
+                authorization:`Bearer ${accesstoken}`
+            },
+            credentials:'include'
+        })
     }
 }
 
@@ -405,6 +463,20 @@ export const commonService = {
     loadJobDetails: async function (jobId: any) {
         return fetch(`http://localhost:5000/jobs/details/${jobId}`, {
             method: 'GET'
+        })
+    },
+    parsePdf: async function (accessToken : string, formData : any) {
+        return fetch('http://localhost:5000/candidate/resume/upload', {
+            method:'POST',
+            headers:{
+                authorization:`Bearer ${accessToken}`
+            },
+            body:formData
+        })
+    },
+    homePageSearch: async function (searchValue : string) {
+        return fetch(`http://localhost:5000/home/jobs?search=${searchValue}`, {
+            method:'GET'
         })
     }
 }

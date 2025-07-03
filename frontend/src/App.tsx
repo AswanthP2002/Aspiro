@@ -31,6 +31,9 @@ import JobDetails from './pages/admin/JobDetails/JobDetails'
 import ExperiencePage from './pages/candidate/Skills & Experience/SkillsExperience'
 import JobListing from './pages/candidate/Job-list-details/JobList'
 import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails'
+import DocumentsPage from './pages/candidate/Documents Page/Documents'
+import JobApplyPage from './pages/candidate/Job-apply/Apply'
+import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsManage'
 
 function App() {
   return(
@@ -41,12 +44,14 @@ function App() {
       <Route path='jobs'>
           <Route index element={<JobListing />} />
           <Route path=':id' element={<JObDetailsCandidateSide />} />
+          <Route path=':id/apply' element={<JobApplyPage />} />
       </Route>
       
 
       <Route path="profile" element={<ProfileLayout />}>
         <Route path="personal" index element={<ProfilePersonal />} />
         <Route path='experience' element={<ExperiencePage />} />
+        <Route path='documents' element={<DocumentsPage />} />
       </Route>
 
     </Route>
@@ -58,6 +63,7 @@ function App() {
         <Route path='profile' element={<RecruiterProfileLayout />}>
           <Route path='overview' index element={<RecruiterProfilePersonal />} />
           <Route path='post-a-job' element={<PostAJobForm />} />
+          <Route path='applications/:jobId' element={<ApplicantManagePage />} />
         </Route>
       </Route>
     </Route>

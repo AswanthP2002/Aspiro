@@ -1,4 +1,6 @@
 const express = require('express')
+import { upload } from "../../../utilities/multer"
+import pdf from 'pdf-parse'
 import { NextFunction, Request, Response } from "express"
 import { CandidateController, editCandidateProfile, getAuthUserData } from "../../controllers/candidate/candidateController"
 import { candidateAuth, refreshAccessToken } from "../../../middlewares/auth"
@@ -29,6 +31,17 @@ import AddEducationUseCase from "../../../application/usecases/candidate/addEduc
 import GetEducationsUseCase from "../../../application/usecases/candidate/getEducationsUseCase"
 import DeleteEducationUseCase from "../../../application/usecases/candidate/deleteEducationUseCase"
 import EditEducationUseCase from "../../../application/usecases/candidate/editEducationUseCase"
+import ResumeRepository from "../../../infrastructure/repositories/candidate/resumeRepository"
+import AddResumeUseCase from "../../../application/usecases/candidate/addResumeUseCase"
+import LoadResumesUseCase from "../../../application/usecases/candidate/loadResumesUseCase"
+import DeleteResumeUseCase from "../../../application/usecases/candidate/deleteResumeUseCase"
+import CertificateRepository from "../../../infrastructure/repositories/candidate/certificateRepository"
+import AddCertificateUseCase from "../../../application/usecases/candidate/addCertificateUseCase"
+import GetCertificatesUseCase from "../../../application/usecases/candidate/getCertificatesUseCase"
+import JObApplicationRepository from "../../../infrastructure/repositories/JobApplicationRepository"
+import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
+import parsePdf from "../../../middlewares/parsePdf"
+import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
 
 const candidateRouter = express.Router()
 
@@ -37,6 +50,10 @@ const experienceRepo = new ExperienceRepository()
 const jobRepo = new JobRepository()
 const skillRepo = new SkillRepsitory()
 const educationRepo = new EducationRepository()
+const resumeRepo = new ResumeRepository()
+const certificateRepo = new CertificateRepository()
+const jobApplicationRepo = new JObApplicationRepository()
+
 
 const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
 const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
@@ -56,6 +73,13 @@ const addEducationUC = new AddEducationUseCase(educationRepo)
 const getEducationsUC = new GetEducationsUseCase(educationRepo)
 const deleteEducationUC = new DeleteEducationUseCase(educationRepo)
 const editEducationUC = new EditEducationUseCase(educationRepo)
+const addResumeUC = new AddResumeUseCase(resumeRepo)
+const loadResumeUC = new LoadResumesUseCase(resumeRepo)
+const deleteResumeUC = new DeleteResumeUseCase(resumeRepo)
+const addCertificateUC = new AddCertificateUseCase(certificateRepo)
+const loadCertificatesUC = new GetCertificatesUseCase(certificateRepo)
+const applyJobUC = new SaveJobApplicationUseCase(jobApplicationRepo)
+const searchJobsHomePageUC = new SearchJobsFromHomeUseCase(jobRepo)
 
 
 const candidateController = new CandidateController(
@@ -76,7 +100,14 @@ const candidateController = new CandidateController(
     addEducationUC,
     getEducationsUC,
     deleteEducationUC,
-    editEducationUC
+    editEducationUC,
+    addResumeUC,
+    loadResumeUC,
+    deleteResumeUC,
+    addCertificateUC,
+    loadCertificatesUC,
+    applyJobUC,
+    searchJobsHomePageUC
 )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
@@ -97,9 +128,19 @@ candidateRouter.post('/candidate/education/add', candidateAuth, candidateControl
 candidateRouter.get('/candidate/education', candidateAuth, candidateController.getEducations.bind(candidateController))
 candidateRouter.delete('/candidate/education/:educationId', candidateAuth, candidateController.deleteEducation.bind(candidateController))
 candidateRouter.put('/candidate/education/:educationId', candidateAuth, candidateController.editEducation.bind(candidateController))
+candidateRouter.delete('/candidate/resume/:resumeId', candidateAuth, candidateController.deleteResume.bind(candidateController))
+candidateRouter.post('/candidate/certificate',upload.single('certificate'), candidateAuth, candidateController.addCertificate.bind(candidateController))
+candidateRouter.get('/candidate/certificate', candidateAuth, candidateController.getCertificates.bind(candidateController))
 
+candidateRouter.get('/home/jobs', testMiddleWare, candidateController.searchJobFromHomePage.bind(candidateController))
+
+candidateRouter.post('/candidate/resume/upload', candidateAuth, upload.single('resume'), parsePdf, candidateController.addResume.bind(candidateController))
+
+candidateRouter.get('/candidate/resumes', candidateAuth, candidateController.loadResume.bind(candidateController))
 
 candidateRouter.put('/candidate/profile',  candidateAuth, editCandidateProfile) //need updation
+
+candidateRouter.post('/candidate/job/:jobId/apply', candidateAuth, upload.single('resume'), parsePdf, candidateController.saveJobApplication.bind(candidateController))
 
 candidateRouter.get('/candidate/token/refresh', refreshAccessToken) //only checking refresh token
 candidateRouter.post('/candidate/logout', candidateAuth, candidateController.candidateLogout.bind(candidateController))
@@ -107,8 +148,9 @@ candidateRouter.post('/candidate/logout', candidateAuth, candidateController.can
 candidateRouter.get('/get/user/:id', getAuthUserData)
 
 function testMiddleWare(req : Request, res : Response, next : NextFunction) {
-    console.log('Testing flow details from the client side', req.body)
-    return res.status(StatusCodes.OK).json({success:true, message:'Maintanance purpose'})
+    console.log('Testing flow details from the client side, full query :: ', req.query)
+    next()
+    // return res.status(StatusCodes.OK).json({success:true, message:'Maintanance purpose'})
 }
 
 

@@ -78,8 +78,11 @@ export class AdminController {
         console.log('Search query reached here', req.query.search)
         const page = parseInt(req?.query?.page as string) || 1
         const limit = parseInt(req?.query?.limit as string) || 3
+        const sort = req.query.sort as string
+        const filter = JSON.parse(req.query.filter as string) || {}
+
         try {
-            const result = await this._loadCandidatesUC.execute(search, page, limit)
+            const result = await this._loadCandidatesUC.execute(search, page, limit, sort, filter)
 
             return res.status(StatusCodes.OK).json({
                 success:true,
@@ -234,11 +237,13 @@ export class AdminController {
         const search = req.query.search as string || ""
         const page = parseInt(req.query.page as string) || 1
         const limit = parseInt(req.query.limit as string) || 3
+        const sort = req.query.sort as string || 'Name A - Z'
+        const filter = JSON.parse(req.query.filter as string) || {}
         try {
-            const jobList = await this._loadJobsUC.execute(search, page, limit)
+            const jobList = await this._loadJobsUC.execute(search, page, limit, sort, filter)
             return res.status(StatusCodes.OK).json({success:true, message:'Job fetched successfully', jobList})
         } catch (error : unknown) {
-            if(error instanceof Error){
+            if(error instanceof Error){ 
                 console.log('Error occured while fetching the jobs', error)
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
             }

@@ -6,29 +6,29 @@ import { connectDb } from "../../database/connection";
 const {ObjectId} = mongoose.Types
 
 export default class ExperienceRepository implements IExperienceRepo {
-    private collection = "experience"
+    private _collection = "experience"
 
     async addExperience(experience: Experience): Promise<SaveExperience> {
         const db = await connectDb()
-        const result = await db.collection<Experience>(this.collection).insertOne(experience)
+        const result = await db.collection<Experience>(this._collection).insertOne(experience)
         return result
     }
 
     async getExperiences(candidateIdd: string): Promise<Experience[]> {
         const db = await connectDb()
-        const result = await db.collection<Experience>(this.collection).find({ candidateId: new ObjectId(candidateIdd) }).sort({startdate:-1}).toArray()
+        const result = await db.collection<Experience>(this._collection).find({ candidateId: new ObjectId(candidateIdd) }).sort({startdate:-1}).toArray()
         return result
     }
 
     async deleteExperience(experienceId: string): Promise<boolean> {
         const db = await connectDb()
-        const result = await db.collection<Experience>(this.collection).deleteOne({_id:new ObjectId(experienceId)})
+        const result = await db.collection<Experience>(this._collection).deleteOne({_id:new ObjectId(experienceId)})
         return result.acknowledged
     }
 
     async editExperience(experienceId: string, editData : any): Promise<boolean> {
         const db = await connectDb()
-        const result = await db.collection<Experience>(this.collection).updateOne(
+        const result = await db.collection<Experience>(this._collection).updateOne(
             {_id:new ObjectId(experienceId)},
             {$set:{
                 role:editData.role,
