@@ -3,7 +3,7 @@ import Certificates from "./certificates"
 import Education from "./educations"
 import Experience from "./experience"
 import Favorites from "./favorites"
-import Resume from "./resumes"
+import Resume from "./resume"
 import SocialLinks from "./socialLinks"
 
 export default interface Candidate {

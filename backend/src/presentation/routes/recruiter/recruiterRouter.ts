@@ -12,12 +12,15 @@ import SaveBasicsUseCase from '../../../application/usecases/recruiter/saveBasic
 import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/loadProfile'
 import CreateJobUseCase from '../../../application/usecases/createJob'
 import JobRepository from '../../../infrastructure/repositories/jobRepository'
+import JObApplicationRepository from '../../../infrastructure/repositories/JobApplicationRepository'
+import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/getApplicationDetailsUseCase'
 
 const recruiterRouter = express.Router()
 
 const recruiterRepo = new RecruiterRespository()
 const candiateRepo = new CandidateRepository()
 const jobRepo = new JobRepository()
+const jobApplicationRepo = new JObApplicationRepository()
 
 const registerRecruiterUC = new RegisterRecruiterUseCase(recruiterRepo, candiateRepo)
 const verifyRecruiterUC = new VerifyRecruiterUseCase(recruiterRepo)
@@ -25,6 +28,7 @@ const loginRecruiterUC = new LoginRecruiterUseCase(recruiterRepo)
 const saveBasicsUC = new SaveBasicsUseCase(recruiterRepo)
 const loadRecruiterProfileDataUC = new LoadRecruiterProfileDataUseCase(recruiterRepo)
 const createJobUC = new CreateJobUseCase(jobRepo)
+const getJobApplicationDetails = new GetJobApplicationDetailsUseCase(jobApplicationRepo)
 
 const recruiterController = new RecruiterController(
     registerRecruiterUC,
@@ -32,7 +36,8 @@ const recruiterController = new RecruiterController(
     loginRecruiterUC,
     saveBasicsUC,
     loadRecruiterProfileDataUC,
-    createJobUC
+    createJobUC,
+    getJobApplicationDetails
 )
 
 recruiterRouter.post('/recruiter/register',  recruiterController.registerRecruiter.bind(recruiterController))
@@ -41,6 +46,7 @@ recruiterRouter.post('/recruiter/login',  recruiterController.loginRecruiter.bin
 recruiterRouter.post('/recruiter/intro/details', recruiterAuth, recruiterController.saveIntroDetailsRecruiter.bind(recruiterController))
 recruiterRouter.get('/recruiter/profile/overview', recruiterAuth, recruiterController.loadRecruiterProfileData.bind(recruiterController))
 recruiterRouter.post('/recruiter/job/create', recruiterAuth, recruiterController.createJob.bind(recruiterController))
+recruiterRouter.get('/recruiter/job/:jobId/application/details', recruiterController.getJobApplicationDetails.bind(recruiterController))
 
 recruiterRouter.get('/recruiter/token/refresh', refreshAccessToken)
 

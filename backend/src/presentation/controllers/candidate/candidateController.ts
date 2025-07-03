@@ -28,6 +28,13 @@ import AddEducationUseCase from "../../../application/usecases/candidate/addEduc
 import GetEducationsUseCase from "../../../application/usecases/candidate/getEducationsUseCase"
 import DeleteEducationUseCase from "../../../application/usecases/candidate/deleteEducationUseCase"
 import EditEducationUseCase from "../../../application/usecases/candidate/editEducationUseCase"
+import AddResumeUseCase from "../../../application/usecases/candidate/addResumeUseCase"
+import LoadResumesUseCase from "../../../application/usecases/candidate/loadResumesUseCase"
+import DeleteResumeUseCase from "../../../application/usecases/candidate/deleteResumeUseCase"
+import AddCertificateUseCase from "../../../application/usecases/candidate/addCertificateUseCase"
+import GetCertificatesUseCase from "../../../application/usecases/candidate/getCertificatesUseCase"
+import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
+import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
 
 export class CandidateController {
     constructor(
@@ -48,7 +55,14 @@ export class CandidateController {
         private _addEducationUC : AddEducationUseCase,
         private _getEducationsUC : GetEducationsUseCase,
         private _deleteEducationUC : DeleteEducationUseCase,
-        private _editEducationUC : EditEducationUseCase
+        private _editEducationUC : EditEducationUseCase,
+        private _addResumeUC : AddResumeUseCase,
+        private _loadResumeUC : LoadResumesUseCase,
+        private _deleteResumeUC : DeleteResumeUseCase,
+        private _addCertificate : AddCertificateUseCase,
+        private _getCertificates : GetCertificatesUseCase,
+        private _saveJobApplicationUC : SaveJobApplicationUseCase,
+        private _searchJobFromHomeUC : SearchJobsFromHomeUseCase
     ){}
 
     //register candidate
@@ -300,8 +314,13 @@ export class CandidateController {
         const search = req.query.search as string || ""
         const page = parseInt(req.query.page as string) || 1
         const limit = parseInt(req.query.limit as string) || 3
+        const sortvalue = req.query.sort as string || 'job-latest'
+        console.log('filter before parsing', req.query.filter)
+        const filters = JSON.parse(req.query.filter as string) || {}
+        console.log('filter after parsing', filters)
+
         try {
-            const result = await this._loadJobsUC.execute(search, page, limit)
+            const result = await this._loadJobsUC.execute(search, page, limit, sortvalue, filters)
             return res.status(StatusCodes.OK).json({success:true, message:'Jobs fetched successfully', result})
         } catch (error : unknown) {
             console.log('Error occured while fetching the job details', error)
@@ -420,8 +439,114 @@ export class CandidateController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }
-}
 
+    async addResume( req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+        //testing file
+        try {
+            if(req.file){
+                const resume = req.file.buffer
+                const result = await this._addResumeUC.execute(resume, req.file.originalname, candidateId)
+                if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add resume'})
+                return res.status(StatusCodes.OK).json({success:true, message:'Resume added successfully'})
+            }
+            return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add resume'})
+        } catch (error : unknown) {
+            console.log('Errro occured while adding the resume', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async loadResume(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+
+        try {
+            const resumes = await this._loadResumeUC.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Resumes fetched successfully', resumes})
+        } catch (error : unknown) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async deleteResume(req : Auth, res : Response) : Promise<Response> {
+        const {resumeId} = req.params
+        const {cloudinaryPublicId} = req.body
+
+        try {
+            const deleteResult = await this._deleteResumeUC.execute(resumeId, cloudinaryPublicId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Deleted'})
+        } catch (error : unknown) {
+            console.log('Error occured while deleting the resume', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server'})
+        }
+    }
+
+    async addCertificate(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+
+        try {
+            if(req.file){
+                const arrayBuffer = req.file.buffer
+                const filePathName = req.file.originalname.split('.')[0]
+                const {issuedOrganization, issuedDate, id} = req.body
+
+                const result = await this._addCertificate.execute(
+                    {issuedOrganization:issuedOrganization, issuedDate:new Date(issuedDate), certificateId:id}, 
+                    arrayBuffer, 
+                    filePathName, 
+                    candidateId
+                )
+                return res.status(StatusCodes.OK).json({success:true, message:'Certificate added successfully'})
+            }
+
+            return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        } catch (error : unknown) {
+            console.log('Error occured while adding the certificate', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async getCertificates(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+
+        try {
+            const result = await this._getCertificates.execute(candidateId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Certificates fetched successfully', certificates:result})
+        } catch (error : unknown) {
+            console.log('Error occured while geting certificates', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async saveJobApplication(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user.id
+        const {jobId} = req.params
+
+        try {
+            const result = await this._saveJobApplicationUC.execute({coverLetterContent:req.body.coverLetterContent}, jobId, candidateId)
+            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong, can not apply job right now'})
+            
+            return res.status(StatusCodes.OK).json({success:true, message:'success'})
+        } catch (error : unknown) {
+            console.log('Error occured while applying the job', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async searchJobFromHomePage(req : Request, res : Response) : Promise<Response> {
+        const search = req.query.search as string || ''
+        console.log('search query from the controller', search)
+
+        try {
+            const jobs = await this._searchJobFromHomeUC.execute(search)
+
+            return res.status(StatusCodes.OK).json({success:true, message:'success', jobs})
+        } catch (error : unknown) {
+            console.log('Error occured while searching the jobs', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+}
 
 export const getAuthUserData = async (req : Request, res : Response) : Promise<Response> => {
     try {

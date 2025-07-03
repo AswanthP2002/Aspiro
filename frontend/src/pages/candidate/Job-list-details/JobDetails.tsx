@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import defaultImage from '../../../../public/default-img-instagram.png'
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { commonService } from "../../../services/apiServices"
 
@@ -10,6 +10,7 @@ export default function JObDetailsCandidateSide() {
     const jobId = params?.id
 
     console.log('params is here', jobId)
+    const navigator = useNavigate()
 
     useEffect(() => {
         async function fetchJobDetails(){
@@ -50,6 +51,10 @@ export default function JObDetailsCandidateSide() {
         const joined = new Date(createdAt)
         return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
     }
+
+    function goToApplyPage(jobId : string) {
+        navigator(`apply`, {state:{jobDetails}})
+    }
     return (
         <>
             <div className="job-listing-container w-full">
@@ -68,7 +73,7 @@ export default function JObDetailsCandidateSide() {
                                 <img src={defaultImage} style={{width:'50px', height:'52px'}} alt="" />
                                 <div>
                                     <p className="font-semibold">{jobDetails.jobTitle}</p>
-                                    <p className="text-xs mt-2 text-gray-300">{jobDetails?.CompanyDetails?.companyName}
+                                    <p className="text-xs mt-2 text-gray-300">{jobDetails?.companyDetails?.companyName}
                                         <span className="ms-2 bg-green-100 text-green-400 text-xs rounded-sm px-2">{jobDetails?.jobType}</span>
                                         <span className="ms-2 bg-blue-100 text-blue-400 text-xs rounded-sm px-2">{jobDetails?.locationType}</span>
                                     </p>
@@ -76,7 +81,7 @@ export default function JObDetailsCandidateSide() {
                             </div>
                             <div className="actions flex gap-2">
                                 <button type="button" className="btn bg-0"><i className="fa-solid fa-bookmark !text-2xl !text-gray-300"></i></button>
-                                <button type="button" className="btn bg-blue-500 text-white rounded-sm px-3 py-2 text-sm">Apply now</button>
+                                <button onClick={() => goToApplyPage(jobDetails?._id)} type="button" className="btn bg-blue-500 text-white rounded-sm px-3 py-2 text-sm">Apply now</button>
                             </div>
                         </div>
                         <div className="details w-full">
@@ -99,7 +104,7 @@ export default function JObDetailsCandidateSide() {
 
                                     <div className="mt-10">
                                         <p className="font-semibold">Why work with us? </p>
-                                        <p className="text-sm text-gray-400">{jobDetails?.CompanyDetails?.benefit}</p>
+                                        <p className="text-sm text-gray-400">{jobDetails?.companyDetails?.benefit}</p>
                                     </div>
                                 </div>
                                 <div className="col w-1/2">
@@ -165,15 +170,15 @@ export default function JObDetailsCandidateSide() {
                                     <div className="flex items-center gap-10">
                                         <img src={defaultImage} style={{width:'60px', height:'63px'}} alt="" />
                                         <div>
-                                            <p className="font-bold">{jobDetails?.CompanyDetails?.companyName}</p>
-                                            <p className="text-sm font-normal">{jobDetails?.CompanyDetails?.industry}</p>
+                                            <p className="font-bold">{jobDetails?.companyDetails?.companyName}</p>
+                                            <p className="text-sm font-normal">{jobDetails?.companyDetails?.industry}</p>
                                         </div>
                                     </div>
 
                                     <div className="mt-5">
-                                        <p className="font-semibold">Found In : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.foundIn}</span></p>
-                                        <p className="font-semibold">Organization Type : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.companyType}</span></p>
-                                        <p className="font-semibold">Strength : <span className="font-normal text-gray-400">{jobDetails?.CompanyDetails?.teamStrength}</span></p>
+                                        <p className="font-semibold">Found In : <span className="font-normal text-gray-400">{jobDetails?.companyDetails?.foundIn}</span></p>
+                                        <p className="font-semibold">Organization Type : <span className="font-normal text-gray-400">{jobDetails?.companyDetails?.companyType}</span></p>
+                                        <p className="font-semibold">Strength : <span className="font-normal text-gray-400">{jobDetails?.companyDetails?.teamStrength}</span></p>
                                     </div>
                                 </div>
                             </div>

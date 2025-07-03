@@ -68,6 +68,10 @@ export default function RecruiterProfilePersonal(){
         fetchRecruiterProfileData()
     }, [])
 
+    function getApplicantDetailsPage(jobId : string){
+        navigator(`/recruiter/profile/applications/${jobId}`)
+    }
+
     function getReminingDays(expDate : Date | string) : number {
         const expiryDate = new Date(expDate)
         const currentDate = new Date()
@@ -88,7 +92,7 @@ export default function RecruiterProfilePersonal(){
             <div className="mt-4 metrics flex gap-10">
                 <div className="bg-blue-400 w-full card p-3 flex gap-5 justify-between items-center shadow rounded-sm">
                     <div className="data">
-                        <p className="font-bold">0</p>
+                        <p className="font-bold">{recruiter?.jobs?.length}</p>
                         <p>Provided Opportunities</p>
                     </div>
                     <div className="icon bg-white p-5 flex justify-center items-center"><i className="fa-solid fa-briefcase"></i></div>
@@ -146,9 +150,9 @@ export default function RecruiterProfilePersonal(){
                             </div>
                             <div className="text-gray-600 text-sm flex items-center gap-1">
                                 <i className="fa-solid fa-user"></i>
-                                0 Applicants
+                                {job?.applicantCount} Applicants
                             </div>
-                            <button className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded hover:bg-blue-700">View Details</button>
+                            <button onClick={() => getApplicantDetailsPage(job?._id)} className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded hover:bg-blue-700">View Details</button>
                         </div>
                                 </>
                             })

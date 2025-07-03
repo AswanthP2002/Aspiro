@@ -5,17 +5,17 @@ import { connectDb } from "../../database/connection";
 import { ObjectId } from "mongodb";
 
 export default class RecruiterRespository implements IRecruiterRepo{
-   private collection = 'recruiter'
+   private _collection = 'recruiter'
    
    async create(recruiter: Recruiter): Promise<SaveRecruiter> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).insertOne(recruiter)
+        const result = await db.collection<Recruiter>(this._collection).insertOne(recruiter)
         return result
     }
 
     async findByEmail(email: string): Promise<Recruiter | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).findOne({email:email})
+        const result = await db.collection<Recruiter>(this._collection).findOne({email:email})
         console.log('recruiter find request reached here, from recruiter repository side', result)
         return result
     }
@@ -24,27 +24,27 @@ export default class RecruiterRespository implements IRecruiterRepo{
         const db = await connectDb()
         const skip = (page - 1) * limit
         const query = search ? {companyName : {$regex:new RegExp(search, 'i')}} : {}
-        const recruiters = await db.collection<Recruiter>(this.collection).find(query).skip(skip).limit(limit).toArray()
-        const totalRecruiters = await db.collection<Recruiter>(this.collection).countDocuments(query)
+        const recruiters = await db.collection<Recruiter>(this._collection).find(query).skip(skip).limit(limit).toArray()
+        const totalRecruiters = await db.collection<Recruiter>(this._collection).countDocuments(query)
         const totalPages = Math.ceil(totalRecruiters / limit)
         return {recruiters, page, totalPages}
     }
 
     async findById(id: string): Promise<Recruiter | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).findOne({_id:new ObjectId(id)})
+        const result = await db.collection<Recruiter>(this._collection).findOne({_id:new ObjectId(id)})
         return result
     }
 
     async findByUserName(username: string): Promise<Recruiter | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).findOne({username:username})
+        const result = await db.collection<Recruiter>(this._collection).findOne({username:username})
         return result
     }
 
     async verifyRecruiter(email: string, field: string, update: boolean): Promise<boolean> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).updateOne(
+        const result = await db.collection<Recruiter>(this._collection).updateOne(
             {email:email},
             {$set:{isVerified:update}}
         )
@@ -70,7 +70,7 @@ export default class RecruiterRespository implements IRecruiterRepo{
         logo : string, 
         coverphoto : string): Promise<Recruiter | null> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).findOneAndUpdate(
+        const result = await db.collection<Recruiter>(this._collection).findOneAndUpdate(
             {_id:new ObjectId(id)},
             {$set:{
                 companyName:companyName,
@@ -97,7 +97,7 @@ export default class RecruiterRespository implements IRecruiterRepo{
 
     async blockRecruiter(id: string): Promise<boolean> {
         const db = await connectDb()
-        const blockResult = await db.collection<Recruiter>(this.collection).updateOne(
+        const blockResult = await db.collection<Recruiter>(this._collection).updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:true
@@ -110,7 +110,7 @@ export default class RecruiterRespository implements IRecruiterRepo{
 
     async unblockRecruiter(id: string): Promise<boolean> {
         const db = await connectDb()
-        const unblockResult = await db.collection<Recruiter>(this.collection).updateOne(
+        const unblockResult = await db.collection<Recruiter>(this._collection).updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:false
@@ -122,21 +122,58 @@ export default class RecruiterRespository implements IRecruiterRepo{
 
     async deleteRecruiter(id: string): Promise<boolean> {
         const db = await connectDb()
-        const deleteResult = await db.collection<Recruiter>(this.collection).deleteOne({_id:new ObjectId(id)})
+        const deleteResult = await db.collection<Recruiter>(this._collection).deleteOne({_id:new ObjectId(id)})
         return deleteResult.acknowledged
     }
 
     async aggregateRecruiterProfile(id: string): Promise<any> {
         const db = await connectDb()
-        const result = await db.collection<Recruiter>(this.collection).aggregate([
-            {$match:{_id:new ObjectId(id)}},
-            {$lookup:{
-                from:'job',
-                localField:'_id',
-                foreignField:'companyId',
-                as:'jobs'
-            }}
-        ]).toArray()
+        const result = await db.collection<Recruiter>(this._collection).aggregate([
+            {
+                $match: {
+                    _id:new ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'job',
+                    let: { recruiterId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$companyId', '$$recruiterId'] }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'jobApplication',
+                                let: { jobId: '$_id' },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: { $eq: ['$jobId', '$$jobId'] }
+                                        }
+                                    }
+                                ],
+                                as: 'applications'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                applicantCount: { $size: '$applications' }
+                            }
+                        },
+                        {
+                            $project: {
+                                applications: 0 // remove full application data if not needed
+                            }
+                        }
+                    ],
+                    as: 'jobs'
+                }
+            }
+        ]
+        ).toArray()
 
         return result[0]
     }

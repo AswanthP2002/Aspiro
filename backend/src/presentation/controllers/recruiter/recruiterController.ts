@@ -7,6 +7,7 @@ import { LoginRecruiterUseCase } from '../../../application/usecases/recruiter/l
 import SaveBasicsUseCase from '../../../application/usecases/recruiter/saveBasics'
 import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/loadProfile'
 import CreateJobUseCase from '../../../application/usecases/createJob'
+import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/getApplicationDetailsUseCase'
 
 
 export default class RecruiterController {
@@ -16,7 +17,8 @@ export default class RecruiterController {
         private _loginRecruiterUC : LoginRecruiterUseCase,
         private _saveBasicsUC : SaveBasicsUseCase,
         private _loadCompanyProfileUseCase : LoadRecruiterProfileDataUseCase,
-        private _createJobUseCase : CreateJobUseCase
+        private _createJobUseCase : CreateJobUseCase,
+        private _getJobApplicationDetails : GetJobApplicationDetailsUseCase
     ){}
 
     async registerRecruiter(req : Request, res : Response) : Promise<Response> {
@@ -127,5 +129,18 @@ export default class RecruiterController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
 
+    }
+
+    async getJobApplicationDetails(req : Request, res : Response) : Promise<Response> {
+        const jobId = req.params.jobId
+
+        try {
+            const result = await this._getJobApplicationDetails.execute(jobId)
+            return res.status(StatusCodes.OK).json({success:true, message:'success', result})
+
+        } catch (error : unknown) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'internal server error'})
+        }
     }
 }

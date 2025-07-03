@@ -4,8 +4,15 @@ import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import useRefreshToken from '../../../hooks/refreshToken';
+import { industryTypes } from '../../../assets/data/companyDetailsArrayData';
 import { adminServices } from '../../../services/apiServices';
-
+interface filterType {
+  industry:string[]
+  jobType:string[]
+  locationType:string[]
+  minSalary: string
+  maxSalary: string
+}
 
 export default function Jobs() {
   
@@ -16,6 +23,71 @@ export default function Jobs() {
   const [page, setpage] = useState(1)
   const [totalPages, settotalpages] = useState(0)
   const [pagination, setpagination] = useState<any[]>([])
+  
+  const [sort, setsort] = useState('job-latest')
+  const [sortVisibility, setSortVisibility] = useState(false)
+  const [currentSort, setCurrentSort] = useState('job-latest')
+  
+  const [filter, setFilter] = useState<filterType>({
+    industry:[],
+    locationType:[],
+    jobType:[],
+    minSalary:'',
+    maxSalary:''
+  })
+
+  const [filterVisibility, setFilterVisibility] = useState(false)
+
+  const openFilter = () => setFilterVisibility(true)
+  const closeFilter = () => setFilterVisibility(false)
+
+  function handleIndustrySelect(industry : string, isChecked : boolean){
+    setFilter((prevState : any) => {
+      if(isChecked){
+        return {...prevState, industry:[...prevState.industry, industry]}
+      }else {
+        return {...prevState, industry:prevState.industry.filter((ind : string) => industry !== ind)}
+      }
+    })
+  }
+
+  function handleJobTypeSelect(jobType : string, isChecked : boolean) {
+    setFilter((prevState : any) => {
+      if(isChecked){
+        return {...prevState, jobType:[...prevState.jobType, jobType]}
+      }else {
+        return {...prevState, jobType:prevState.jobType.filter((jt : string) => jt !== jobType)}
+      }
+    })
+  }
+
+  function handleLocationTypeSelect(locationType : string, isChecked : boolean) {
+    setFilter((prevState : any) => {
+      if(isChecked){
+        return {...prevState, locationType:[...prevState.locationType, locationType]}
+      }else{
+        return {...prevState, locationType:prevState.locationType.filter((location : string) => location !== locationType)}
+      }
+    })
+  }
+
+  function handleMinSalary(salary : string){
+    setFilter((prevState : any) => {
+      return {...prevState, minSalary:salary}
+    })
+  }
+
+  function handleMaxSalary(salary : string) {
+    setFilter((prevState : any) => {
+      return {...prevState, maxSalary:salary}
+    })
+  }
+
+  console.log('This is updated state', filter)
+
+  function toggleSortVisibility(){
+    setSortVisibility(prev => !prev)
+  }
 
   const token = useSelector((state : any) => {
     return state.adminAuth.adminToken
@@ -27,11 +99,11 @@ export default function Jobs() {
 
     async function fetchJobDetails(){
       try {
-        let response = await adminServices.getJobs(token, search, page)
+        let response = await adminServices.getJobs(token, search, page, sort, filter)
 
         if(response.status === 401){
             const newAccessToken = await adminServices.refreshToken()
-            response = await adminServices.getJobs(newAccessToken, search, page)
+            response = await adminServices.getJobs(newAccessToken, search, page, sort, filter)
         }
 
         const result = await response.json()
@@ -42,6 +114,7 @@ export default function Jobs() {
               setselectedjob(result.jobList.jobs[0])
               setpage(result.jobList.page)
               settotalpages(result.jobList.totalPages)
+              setCurrentSort(result?.jobList.currentSort)
               setpagination(new Array(result.jobList.totalPages).fill(0))
           }else{
               Swal.fire({
@@ -63,7 +136,7 @@ export default function Jobs() {
     }
 
     fetchJobDetails()
-  }, [search, page])
+  }, [search, page, sort, filter])
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -84,7 +157,7 @@ export default function Jobs() {
   }
 
   function debouncedSearchJobs(fn : Function, delay : number){
-    let timer : number
+    let timer : any
     return function(...args : any){
       clearTimeout(timer)
       timer = setTimeout(() => {
@@ -104,6 +177,60 @@ export default function Jobs() {
 
   return (
     <>
+    {
+      filterVisibility && (
+          <div className="filter absolute bg-white shadow h-screen top-0 left-0 w-[270px]">
+            <div className="flex justify-between p-3 items-center">
+              <p className="text-blue-500">Filter</p>
+              <i onClick={closeFilter} className="fa-solid fa-circle-xmark cursor-pointer"></i>
+            </div>
+            <div className="industries p-3 max-h-[300px] overflow-y-scroll">
+              <p className="text-sm font-normal-text-gray-500">Industry</p>
+              <ul>
+                {
+                  industryTypes.map((industry : string, index : number) => {
+                    return(
+                      <li key={index}><input checked={filter?.industry.includes(industry) ? true : false} onChange={(event) => handleIndustrySelect(industry, event.target.checked)} type="checkbox" /><label htmlFor="" className="ms-2 text-xs">{industry}</label></li>
+                    )
+                  })
+                }
+              </ul>
+            </div>
+
+            <div className="job-type p-3">
+              <p className="text-sm font-normal text-gray-500">Job Type</p>
+              <div>
+                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Full-Time')} onChange={(event) => handleJobTypeSelect('Full-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Full-Time</label></li>
+                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Part-Time')} onChange={(event) => handleJobTypeSelect('Part-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Part-Time</label></li>
+                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Internship')} onChange={(event) => handleJobTypeSelect('Internship', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Internship</label></li>
+              </div>
+            </div>
+
+            <div className="lcoation-type p-3">
+              <p className="text-sm font-normal text-gray-500">Location Type</p>
+              <div>
+                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('In-Office')} onChange={(event) => handleLocationTypeSelect('In-Office', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">In-Office</label></li>
+                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('Remote')} onChange={(event) => handleLocationTypeSelect('Remote', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Remote</label></li>
+              </div>
+            </div>
+
+            <div className="salary p-3">
+              <p className="text-sm font-normal text-gray-500">Salary (Monthly)</p>
+              <div className="flex gap-2">
+                <div className="w-1/2">
+                  <label htmlFor="" className="!text-xs">Min Salary</label>
+                  <input value={filter.minSalary} onChange={(event) => handleMinSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
+                </div>
+
+                <div className="w-1/2">
+                  <label htmlFor="" className="!text-xs">Max Salary</label>
+                  <input value={filter.maxSalary} onChange={(event) => handleMaxSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
+                </div>
+              </div>
+            </div>
+          </div>
+      )
+    }
     <div className="px-6 flex gap-20">
       <h2 className='font-bold'>Listed Jobs</h2>
       <div className="bg-white search-wrapper rounded-full w-[400px] relative">
@@ -117,9 +244,25 @@ export default function Jobs() {
       {/* Company List Section */}
       <div className="flex-1 bg-white p-6 rounded-xl shadow">
         <div className="flex justify-end items-center mb-4">
-          <div className="flex gap-3">
-            <button className="text-sm text-gray-500">Filter</button>
-            <button className="text-sm text-gray-500">Sort</button>
+          <div className="flex gap-3 relative">
+            <button onClick={openFilter} className="text-sm text-gray-500">Filter</button>
+            <button onClick={toggleSortVisibility} className="text-sm text-gray-500">Sort</button>
+
+            {
+              sortVisibility
+                      ? <div className="sort shadow absolute w-[200px] bg-white p-3">
+                        <div className="flex justify-end p-2">
+                          <i onClick={toggleSortVisibility} className="cursor-pointer fa-solid fa-circle-xmark"></i>
+                        </div>
+                        <ul>
+                          <li><input checked={currentSort === 'job-latest' ? true : false} onChange={() => setsort('job-latest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job latest</label></li>
+                          <li><input checked={currentSort === 'job-oldest' ? true : false} onChange={() => setsort('job-oldest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job oldest</label></li>
+                          <li><input checked={currentSort === 'salary-high' ? true : false} onChange={() => setsort('salary-high')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Highest Paying</label></li>
+                          <li><input checked={currentSort === 'salary-low' ? true : false} onChange={() => setsort('salary-low')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Lowest Paying</label></li>
+                        </ul>
+                      </div>
+                      : null
+            }
           </div>
         </div>
 

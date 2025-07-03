@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express"
 import { AdminLoginUseCase } from "../../../application/usecases/admin/adminLogin"
 import { BlockCandidateUseCase } from "../../../application/usecases/admin/blockCandidateUseCase"
 import BlockCompanyUseCase from "../../../application/usecases/admin/blockCompanyUseCase"
@@ -66,7 +67,7 @@ const adminController = new AdminController(
 )
 
 adminRouter.post('/admin/login', adminController.adminLogin.bind(adminController))
-adminRouter.get('/admin/candidates/data', adminAuth, adminController.loadCandidates.bind(adminController))
+adminRouter.get('/admin/candidates/data',  adminAuth, adminController.loadCandidates.bind(adminController))
 adminRouter.get('/admin/companies/data', adminAuth, adminController.loadCompanies.bind(adminController))
 adminRouter.get('/admin/candidate/details', adminAuth, adminController.loadCandidateDetails.bind(adminController))
 adminRouter.post('/admin/candidate/block', adminAuth, adminController.blockCandidate.bind(adminController))
@@ -75,7 +76,10 @@ adminRouter.get('/admin/company/details/:companyId', adminAuth, adminController.
 adminRouter.put('/admin/company/block/:companyId', adminAuth, adminController.blockRecruiter.bind(adminController))
 adminRouter.put('/admin/company/unblock/:companyId', adminAuth, adminController.unblockRecruiter.bind(adminController))
 adminRouter.delete('/admin/company/close/:companyId', adminAuth, adminController.closeCompany.bind(adminController))
-adminRouter.get('/admin/jobs/data', adminAuth, adminController.loadJobs.bind(adminController))
+adminRouter.get('/admin/jobs/data', adminAuth,(req : Request, res : Response, next : NextFunction) => {
+    console.log('request quey', req?.query)
+    next()
+}, adminController.loadJobs.bind(adminController))
 adminRouter.get('/admin/job/details/:jobId', adminAuth, adminController.loadJObDetails.bind(adminController))
 adminRouter.put('/admin/job/block/:jobId', adminAuth, adminController.blockJob.bind(adminController))
 adminRouter.put('/admin/job/unblock/:jobId', adminAuth, adminController.unblockJob.bind(adminController))
