@@ -16,6 +16,13 @@ export default function Companies() {
   const [search, setsearch] = useState("")
   const [limit, setlimit] = useState(10)
   const [pagination, setpagination] = useState<any[]>([])
+  const [sortVisibility, setSortVisibility] = useState(false)
+  const [sort, setSort] = useState('')
+  const [currentSort, setCurrentSort] = useState('joined-latest')
+
+  const openSort = () => setSortVisibility(true)
+  const closeSort = () => setSortVisibility(false)
+
 
   const token = useSelector((state : any) => {
     return state.adminAuth.adminToken
@@ -33,11 +40,11 @@ export default function Companies() {
   useEffect(() => {
     async function fetchCompanyList(){
       try {
-        let response = await adminServices.getCompanies(token, search, page)
+        let response = await adminServices.getCompanies(token, search, page, sort)
 
         if(response.status === 401){
           const newAccessToken = await adminServices.refreshToken()
-          response = await adminServices.getCompanies(newAccessToken, search, page)
+          response = await adminServices.getCompanies(newAccessToken, search, page, sort)
         }
 
         const result = await response.json()
@@ -49,6 +56,7 @@ export default function Companies() {
           setpage(result?.result?.page)
           settotalpage(result?.result?.totalPages)
           setpagination(new Array(result?.result?.totalPages).fill(0))
+          setCurrentSort(result?.result?.currentSort)
         }else{
           Swal.fire({
             icon:'error',
@@ -68,7 +76,7 @@ export default function Companies() {
     }
 
     fetchCompanyList()
-  }, [search, page])
+  }, [search, page, sort])
 
   function searchCompany(event : any){
     setsearch(event.target.value)
@@ -114,11 +122,26 @@ export default function Companies() {
           ? <div className="flex gap-6 p-6 bg-[#fff7f1] min-h-screen">
       {/* Company List Section */}
       <div className="flex-1 bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-end items-center mb-4">
+        <div className="flex justify-end items-center mb-4 relative">
           <div className="flex gap-3">
             <button className="text-sm text-gray-500">Filter</button>
-            <button className="text-sm text-gray-500">Sort</button>
+            <button onClick={openSort} className="text-sm text-gray-500">Sort</button>
           </div>
+          {
+            sortVisibility && (
+              <div className="absolute sort !p-3 shadow rounded right-0 top-0 bg-white w-[200px]">
+                <div className='flex justify-end'>
+                  <i onClick={closeSort} className="fa-solid fa-circle-xmark cursor-pointer"></i>
+                </div>
+                <ul>
+                  <li><input type="radio" onChange={() => setSort('name-a-z')} name="sort" id="" checked={currentSort === 'name-a-z' ? true : false} /><label htmlFor="" className="ms-2">Name A - Z</label></li>
+                  <li><input type="radio" onChange={() => setSort('name-z-a')} name="sort" id="" checked={currentSort === 'name-z-a' ? true : false} /><label htmlFor="" className="ms-2">Name Z - A</label></li>
+                  <li><input type="radio" onChange={() => setSort('joined-latest')} name="sort" id="" checked={currentSort === 'joined-latest' ? true : false} /><label htmlFor="" className="ms-2">Joined latest</label></li>
+                  <li><input type="radio" onChange={() => setSort('joined-oldest')} name="sort" id="" checked={currentSort === 'joined-oldest' ? true : false} /><label htmlFor="" className="ms-2">Joined oldest</label></li>
+                </ul>
+              </div>
+            )
+          }
         </div>
 
         <div className="overflow-auto max-h-[400px]">

@@ -71,8 +71,8 @@ export const adminServices = {
         })
 
     },
-    getCompanies: async function (accessToken: string, search: string, page: number) {
-        return fetch(`http://localhost:5000/admin/companies/data?search=${search}&page=${page}`, {
+    getCompanies: async function (accessToken: string, search: string, page: number, sort : string) {
+        return fetch(`http://localhost:5000/admin/companies/data?search=${search}&page=${page}&sort=${sort}`, {
             method: 'GET',
             headers: {
                 authorization: `bearer ${accessToken}`
