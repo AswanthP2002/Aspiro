@@ -5,8 +5,8 @@ export default interface IRecruiterRepo {
     create(recruiter : Recruiter) : Promise<SaveRecruiter>
     findByEmail(email : string) : Promise<Recruiter | null>
     findById(id : string) : Promise<Recruiter | null>
-    findByUserName(username : string) : Promise<Recruiter | null>
-    findRecruiters(search? : string, page? : number, limit? : number) : Promise<any> //change for strict later
+    findByUserName(username : string) : Promise<Recruiter | null> 
+    findRecruiters(search? : string, page? : number, limit? : number, sort? : string) : Promise<any> //change for strict later
     verifyRecruiter(email : string, field : string, update : Boolean) : Promise<Boolean>
     updateIntroDetails(
         id : string,

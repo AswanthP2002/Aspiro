@@ -125,8 +125,9 @@ export class AdminController {
         const search = req.query.search as string || ""
         const page = parseInt(req.query.page as string) || 1
         const limit = parseInt(req.query.limit as string) || 3
+        const sort = req.query.sort as string || 'joined-latest'
         try {
-            const result = await this._loadCompaniesUC.execute(search, page, limit)
+            const result = await this._loadCompaniesUC.execute(search, page, limit, sort)
 
             return res.status(201).json({
                 success:true, 

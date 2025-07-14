@@ -20,14 +20,37 @@ export default class RecruiterRespository implements IRecruiterRepo{
         return result
     }
 
-    async findRecruiters(search : string = "", page : number = 1, limit : number = 1): Promise<any | null> {
+    async findRecruiters(search : string = "", page : number = 1, limit : number = 1, sort : string): Promise<any | null> {
         const db = await connectDb()
         const skip = (page - 1) * limit
         const query = search ? {companyName : {$regex:new RegExp(search, 'i')}} : {}
-        const recruiters = await db.collection<Recruiter>(this._collection).find(query).skip(skip).limit(limit).toArray()
+        let currentSort : string = sort
+        const sortOptions : any = {}
+
+        switch(sort){
+            case 'joined-latest' :
+                sortOptions.createdAt = -1
+                currentSort = 'joined-latest'
+                break
+            case 'joined-oldest' :
+                sortOptions.createdAt = 1
+                currentSort = 'joined-oldest'
+                break
+            case  'name-a-z' : 
+                sortOptions.companyName = 1
+                currentSort = 'name-a-z'
+                break
+            case 'name-z-a' :
+                sortOptions.companyName = -1
+                currentSort = 'name-z-a'
+                break
+            default :
+                sortOptions.createdAt = -1
+        }
+        const recruiters = await db.collection<Recruiter>(this._collection).find(query).sort(sortOptions).skip(skip).limit(limit).toArray()
         const totalRecruiters = await db.collection<Recruiter>(this._collection).countDocuments(query)
         const totalPages = Math.ceil(totalRecruiters / limit)
-        return {recruiters, page, totalPages}
+        return {recruiters, page, totalPages, currentSort}
     }
 
     async findById(id: string): Promise<Recruiter | null> {

@@ -68,7 +68,7 @@ const adminController = new AdminController(
 
 adminRouter.post('/admin/login', adminController.adminLogin.bind(adminController))
 adminRouter.get('/admin/candidates/data',  adminAuth, adminController.loadCandidates.bind(adminController))
-adminRouter.get('/admin/companies/data', adminAuth, adminController.loadCompanies.bind(adminController))
+adminRouter.get('/admin/companies/data', adminAuth, testMiddleware, adminController.loadCompanies.bind(adminController))
 adminRouter.get('/admin/candidate/details', adminAuth, adminController.loadCandidateDetails.bind(adminController))
 adminRouter.post('/admin/candidate/block', adminAuth, adminController.blockCandidate.bind(adminController))
 adminRouter.post('/admin/candidate/unblock', adminAuth, adminController.unblockCandidate.bind(adminController))
@@ -89,5 +89,10 @@ adminRouter.put('/admin/job/unreject/:jobId', adminAuth, adminController.unrejec
 
 adminRouter.post('/admin/token/refresh', refreshAccessToken)
 
+function testMiddleware(req : Request, res : Response, next : NextFunction){
+    console.log('Testing request from the client')
+    console.log('Sort query', req.query.sort)
+    next()
+}
 
 export default adminRouter

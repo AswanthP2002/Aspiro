@@ -1,8 +1,9 @@
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import bcrypt from 'bcrypt'
 import { generateRefreshToken, generateToken } from "../../../services/jwt";
+import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 export class AdminLoginUseCase {
-    constructor(private candidateRepo : CandidateRepo) {}
+    constructor(private candidateRepo : ICandidateRepo) {}
 
     async execute(email : string, password : string) : Promise<Object>{
         const admin = await this.candidateRepo.findByEmail(email)
