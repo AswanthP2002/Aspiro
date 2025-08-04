@@ -1,12 +1,19 @@
 import CheckCandidateBlockStatusUseCase from "../application/usecases/candidate/CheckCandidateBlockStatusUseCase";
+import { connectDb } from "../infrastructure/database/connection";
 import CandidateRepository from "../infrastructure/repositories/candidate/candidateRepository";
 import { StatusCodes } from "../presentation/statusCodes";
 import { generateToken, verifyToken } from "../services/jwt";
 import { Request, Response, NextFunction } from "express";
 
 
-const candidateRepo = new CandidateRepository()
-const checkCandidateBlockStatusUC = new CheckCandidateBlockStatusUseCase(candidateRepo)
+let candidateRepo
+let checkCandidateBlockStatusUC : any
+
+(async function(){
+    const db = await connectDb()
+    candidateRepo = new CandidateRepository(db)
+    checkCandidateBlockStatusUC = new CheckCandidateBlockStatusUseCase(candidateRepo)
+})()
 
 export interface Auth extends Request {
     user : any 
@@ -83,7 +90,7 @@ export const recruiterAuth = async (req : Auth, res : Response, next : NextFunct
 }
 
 export const adminAuth = async (req : AdminAuth, res : Response, next : NextFunction) => {
-
+    console.log('Admin logout request reached admin auth')
     //get token from authorization
     const token = req.headers.authorization
 

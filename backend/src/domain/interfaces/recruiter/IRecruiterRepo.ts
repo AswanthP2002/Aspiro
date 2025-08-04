@@ -1,8 +1,9 @@
 import Recruiter from "../../entities/recruiter/recruiter";
+import IBaseRepo from "../IBaseRepo";
 import { SaveRecruiter } from "./createRecruiterRequest";
 
-export default interface IRecruiterRepo {
-    create(recruiter : Recruiter) : Promise<SaveRecruiter>
+export default interface IRecruiterRepo extends IBaseRepo<Recruiter> {
+    //create(recruiter : Recruiter) : Promise<SaveRecruiter>
     findByEmail(email : string) : Promise<Recruiter | null>
     findById(id : string) : Promise<Recruiter | null>
     findByUserName(username : string) : Promise<Recruiter | null> 

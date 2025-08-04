@@ -3,6 +3,7 @@ import { useLocation, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { candidateService } from "../../../services/apiServices"
 import { useSelector } from "react-redux"
+import { candidateApplyJob } from "../../../services/candidateServices"
 
 export default function JobApplyPage() {
     
@@ -67,17 +68,17 @@ export default function JobApplyPage() {
             formData.append('resume', resume)
             formData.append('coverLetterContent', coverLetterContent)
 
-            try {
-                let response = await candidateService.applyJob(token, jobId || jobDetails._id, formData)
+            //try {
+                // let response = await candidateService.applyJob(token, jobId || jobDetails._id, formData)
 
-                if(response.status === 401){
-                    const newAccesstoken = await candidateService.refreshToken()
-                    response = await candidateService.applyJob(newAccesstoken, jobId || jobDetails?._id, formData)
-                }
+                // if(response.status === 401){
+                //     const newAccesstoken = await candidateService.refreshToken()
+                //     response = await candidateService.applyJob(newAccesstoken, jobId || jobDetails?._id, formData)
+                // }
 
-                const result = await response.json()
+                await candidateApplyJob(jobId || jobDetails?._id, formData)
 
-                if (result?.success) {
+                //if (result?.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Applied',
@@ -85,23 +86,23 @@ export default function JobApplyPage() {
                         showConfirmButton:false,
                         timer:1300
                     }).then(() => window.location.reload())
-                }else{
-                    Swal.fire({
-                        icon:'error',
-                        title:'Oops!',
-                        text:result?.message
-                    })
-                }
-            } catch (error : unknown) {
-                console.log('Error occured while applying the job', error)
-                if(error instanceof Error){
-                    Swal.fire({
-                    icon:'error',
-                    title:'error',
-                    text:error?.message
-                })
-                }
-            }
+                // }else{
+                //     Swal.fire({
+                //         icon:'error',
+                //         title:'Oops!',
+                //         text:result?.message
+                //     })
+                // }
+            // } catch (error : unknown) {
+            //     console.log('Error occured while applying the job', error)
+            //     if(error instanceof Error){
+            //         Swal.fire({
+            //         icon:'error',
+            //         title:'error',
+            //         text:error?.message
+            //     })
+            //     }
+            // }
         }
     }
 

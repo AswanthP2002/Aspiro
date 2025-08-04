@@ -1,6 +1,7 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
+import IUnblockCompanyUseCase from "./interfaces/IUnblockCompanyUseCase";
 
-export default class UnblockCompanyUseCase {
+export default class UnblockCompanyUseCase implements IUnblockCompanyUseCase {
     constructor(private _recruiterRepo : IRecruiterRepo){}
 
     async execute(id : string) : Promise<boolean> {

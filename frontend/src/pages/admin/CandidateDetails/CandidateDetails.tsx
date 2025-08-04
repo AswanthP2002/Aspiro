@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import defaultImage from '../../../../public/default-img-instagram.png'
 import { adminServices } from "../../../services/apiServices"
+import { candidateBlock, candidateUnblock, getCandidateDetails } from "../../../services/adminServices"
 
 export default function CandidateDetails(){
 
@@ -19,38 +20,15 @@ export default function CandidateDetails(){
 
     useEffect(() => {
         async function fetchCandidateDetails(){
-            try {
-                let response  = await adminServices.getCandidateDetails(token, id)
-    
-                if(response.status === 401){
-                    const newAccesstoken = await adminServices.refreshToken()
-                    response = await adminServices.getCandidateDetails(newAccesstoken, id)
-                }
-    
-                const result = await response.json()
-    
-                if(result?.success){
+            
+                const result = await getCandidateDetails(id)
+                
                     setcandidatedetails(result.candidateDetails)
                     setexperience(result?.candidateDetails?.experience)
                     setskills(result?.candidateDetails?.skills)
                     setEducation(result?.candidateDetails?.education)
                     console.log('candidate details', result.candidateDetails)
-                }else{
-                    Swal.fire({
-                        icon:'error',
-                        title:'oops',
-                        text:result.message
-                    })
-                }
-            } catch (error: unknown) {
-                if(error instanceof Error){
-                        Swal.fire({
-                        icon: 'error',
-                        title: 'oops',
-                        text: error.message
-                    })
-                }
-            }
+                
         }
         
         fetchCandidateDetails()
@@ -62,74 +40,32 @@ export default function CandidateDetails(){
     }
 
     async function blockCandidate(candidateId : string){
-        try {
-            let response = await adminServices.blockCandidate(token, candidateId)
-
-            if(response.status === 401){
-                const newAccessToken = await adminServices.refreshToken()
-                response = await adminServices.blockCandidate(newAccessToken, candidateId)
-            }
-
-            const result = await response.json()
-            if(result.success){
+       
+            const result = await candidateBlock(candidateId)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Blocked',
-                    text:result.message
+                    text:result.message,
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:2000
                 }).then(() => window.location.reload())
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:result.message
-                })
-            }
-        } catch (error : unknown) {
-            if(error instanceof Error){
-                console.log('error occured block', error),
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:error.message
-                })
-            }
-        }
     }
 
     async function unblockCandidate(candidateId : string){
-        try {
-            let response = await adminServices.unblockCandidate(token, candidateId)
-
-            if(response.status === 401){
-                const newAccessToken = await adminServices.refreshToken()
-                response = await adminServices.unblockCandidate(newAccessToken, candidateId)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
+       
+            const result = await candidateUnblock(candidateId)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Blocked',
-                    text:result.message
+                    text:result.message,
+                    showCancelButton:false,
+                    showConfirmButton:false,
+                    timer:2000
                 }).then(() => window.location.reload())
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:result.message
-                })
-            }
-        } catch (error : unknown) {
-            if (error instanceof Error) {
-                console.log('error occured block', error),
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops',
-                        text: error.message
-                    })
-            }
-        }
+            
     }
 
     function getExperienceDuration(startDate : Date, endDate : any) : number {

@@ -2,14 +2,27 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminLogout } from '../../../redux-toolkit/adminAuthSlice';
+import { logoutAdmin } from '../../../services/adminServices';
+import Swal from 'sweetalert2';
 
 export default function Sidebar(){
   const dispatcher = useDispatch()
   const navigator = useNavigate()
 
-  function triggerAdminLogout(){
-    dispatcher(adminLogout())
-    navigator('/admin/login')
+  async function triggerAdminLogout(){
+    const logoutResult = await logoutAdmin()
+    if(logoutResult?.success){
+      dispatcher(adminLogout())
+      Swal.fire({
+        icon:'success',
+        title:'Logout Successful',
+        showConfirmButton:false,
+        showCancelButton:false,
+        timer:2000
+      }).then(() =>  navigator('/admin/login'))
+     
+    }
+    
   }
 
   const token = useSelector((state : any) => {

@@ -1,6 +1,7 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
+import IBlockCompanyUseCase from "./interfaces/IBlockCompanyUseCase";
 
-export default class BlockCompanyUseCase {
+export default class BlockCompanyUseCase implements IBlockCompanyUseCase {
     constructor(private _recruiterRepo : IRecruiterRepo){}
 
     async execute(id : string) : Promise<boolean> {

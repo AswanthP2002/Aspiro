@@ -2,22 +2,25 @@ import mongoose from "mongoose";
 import Certificates from "../../../domain/entities/candidate/certificates";
 import ICertificateRepo from "../../../domain/interfaces/candidate/ICertificateRepo";
 import { connectDb } from "../../database/connection";
+import BaseRepository from "../baseRepository";
+import { Db } from "mongodb";
 
-export default class CertificateRepository implements ICertificateRepo {
+export default class CertificateRepository extends BaseRepository<Certificates> implements ICertificateRepo {
     private _collection : string
-    constructor(){
+    constructor(db : Db){
+        super(db, 'certificate')
         this._collection = 'certificate'
     }
 
-    async addCertificate(certificate: Certificates): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Certificates>(this._collection).insertOne(certificate)
-        return result.acknowledged
-    }
+    // async addCertificate(certificate: Certificates): Promise<boolean> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Certificates>(this._collection).insertOne(certificate)
+    //     return result.acknowledged
+    // }
 
-    async loadCertificates(candidateId: string): Promise<Certificates[] | null> {
-        const db = await connectDb()
-        const result = await db.collection<Certificates>(this._collection).find({candidateId:new mongoose.Types.ObjectId(candidateId)}).toArray()
-        return result
-    }
+    // async loadCertificates(candidateId: string): Promise<Certificates[] | null> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Certificates>(this._collection).find({candidateId:new mongoose.Types.ObjectId(candidateId)}).toArray()
+    //     return result
+    // }
 }

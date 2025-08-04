@@ -5,19 +5,22 @@ import { generateCode } from "../../../utilities/generateCode";
 import { sendEmail } from "../../../utilities/sendmail";
 import { RegisterCandidateDTO, RegisterCandidateSchema } from "../../../presentation/controllers/dtos/candidate/registerCandidateDTOs";
 import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candidateMapper";
+import IRegisterCandidateUseCase from "./interface/IRegisterCandidateUseCase";
+import IBaseRepo from "../../../domain/interfaces/IBaseRepo";
+import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 
-export default class RegisterCandidateUseCase {
-    constructor(private candidateRep : CandidateRepo){}
+export default class RegisterCandidateUseCase implements IRegisterCandidateUseCase {
+    constructor(private _candidateRepo : ICandidateRepo){}
     
-    async execute(candidatedto : RegisterCandidateDTO) : Promise<string>{ //changed to registerCandidateDTO from Candidate schema ::  swtiching the validation logic to usecase from candidate controller
+    async execute(candidatedto : RegisterCandidateDTO) : Promise<string>{ 
         
         const parsedCandidate = RegisterCandidateSchema.parse(candidatedto)
         const candidate = createCandidatefromDTO(parsedCandidate)
 
-        const existingEmail = await this.candidateRep.findByEmail(candidate.email)
+        const existingEmail = await this._candidateRepo.findByEmail(candidate.email)
         if(existingEmail) throw new Error('DuplicateEmail')
         
-        const existingUsername = await this.candidateRep.findByUsername(candidate.username)
+        const existingUsername = await this._candidateRepo.findByUsername(candidate.username)
         if(existingUsername) throw  new Error('DuplicateUserName')
             
         let hashedPassword
@@ -70,7 +73,7 @@ export default class RegisterCandidateUseCase {
         const info = await sendEmail(candidate.email, subject, content)
         console.log("otp send to the user ", otp)
 
-        const createdCandidate = await this.candidateRep.create(candidate)
+        const createdCandidate = await this._candidateRepo.create(candidate)
         return `${createdCandidate} - ${info}`
     }
 }

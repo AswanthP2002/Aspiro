@@ -3,9 +3,10 @@ import IJobRepo from "../../domain/interfaces/IJobRepo";
 import { ObjectId } from "mongodb";
 import { CreateJobDTO, CreateJobSchema } from "../../presentation/controllers/dtos/jobDTO";
 import { createJobFromDTO } from "../../domain/mappers/jobMapper";
+import ICreateJobUseCase from "./recruiter/interface/ICreateJobUseCase";
 
 
-export default class CreateJobUseCase {
+export default class CreateJobUseCase implements ICreateJobUseCase {
     constructor(private jobRepo : IJobRepo){}
 
     async execute(id : string, job : CreateJobDTO) : Promise<string> {
@@ -26,6 +27,6 @@ export default class CreateJobUseCase {
         console.log('job modal before creating the job', jobModel)
         
         const result = await this.jobRepo.create(jobModel)
-        return `Job created successfully ${result.insertedId}`
+        return `Job created successfully ${result}`
     }
 }

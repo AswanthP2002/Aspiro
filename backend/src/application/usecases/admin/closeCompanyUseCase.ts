@@ -1,6 +1,7 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
+import ICloseCompanyUseCase from "./interfaces/ICloseCompanyUseCase";
 
-export default class CloseCompanyUseCase {
+export default class CloseCompanyUseCase implements ICloseCompanyUseCase {
     constructor(private _recruiterRepo : IRecruiterRepo){}
 
     async execute(id : string) : Promise<boolean> {

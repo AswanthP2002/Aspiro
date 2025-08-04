@@ -2,10 +2,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import './Login.css'
 import { useState } from 'react'
 import Loader from '../../../components/admin/Loader'
-import Swal from 'sweetalert2'
 import { adminLoginSuccess } from '../../../redux-toolkit/adminAuthSlice'
 import { useDispatch } from 'react-redux'
-import { adminServices } from '../../../services/apiServices'
+import { adminLogin} from '../../../services/adminServices'
 
 export default function LoginPage(){
     const [email, setEmail] = useState("")
@@ -25,7 +24,7 @@ export default function LoginPage(){
 
     async function validateForm(event : any) {
         setloading(true)
-        event.preventDefault() //prevent event from submitting without validations
+        event.preventDefault()
         let typedEmail = email || false
         let typedPassword = password || false
         if(!typedEmail || !typedPassword){
@@ -35,27 +34,16 @@ export default function LoginPage(){
             return
         }
         setLoginErrorText("")
-        try {
-            const loginResponse = await adminServices.login(email, password)
-            const result = await loginResponse.json()
+        const loginResult = await adminLogin(email, password)
 
-            if(result.success){
-                dispatcher(adminLoginSuccess({admin:result?.result?.admin, token:result?.result?.token}))
-                setloading(false)
-                navigator('/admin/dashboard')
-            }else{
-                setloading(false)
-                setLoginError(true)
-                setLoginErrorText(result?.message)
-            }
-        } catch (error : unknown) {
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error?.message
-                })
-            }
+        if(loginResult?.success){
+            dispatcher(adminLoginSuccess({admin:loginResult?.result?.admin, token:loginResult?.result?.token}))
+            setloading(false)
+            navigator('/admin/dashboard')
+        }else{
+            setloading(false)
+            setLoginError(true)
+            setLoginErrorText(loginResult?.message)
         }
     }
 

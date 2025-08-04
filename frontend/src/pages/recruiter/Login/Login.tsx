@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { recruiterLogedIn } from "../../../redux-toolkit/recruiterAuthSlice";
 import { recruiterService } from "../../../services/apiServices";
+import { recruiterLogin } from "../../../services/recruiterServices";
 
 export default function RecruiterLogin(){
     const [showpassword, setshowpassword] = useState(false)
@@ -48,9 +49,9 @@ export default function RecruiterLogin(){
             return
         }else{
                        
-            try {
-                const loginResponse = await recruiterService.recruiterLogin(email, password)
-                const result = await loginResponse.json()
+            
+                const result = await recruiterLogin(email, password)
+                
 
                 if(result.success){
                     console.log('testing full result ', result)
@@ -63,18 +64,7 @@ export default function RecruiterLogin(){
                     setvalidationerror(true)
                     setvalidationerrortext(result.message)
                 }
-            } catch (error : unknown) {
-                if(error instanceof Error){
-                    setloading(false)
-                    Swal.fire({
-                        title:'Oops!',
-                        icon:'error',
-                        text:error.message,
-                        showConfirmButton:true,
-                        showCancelButton:false
-                    })  
-                }
-            }
+            
         }
     }
 

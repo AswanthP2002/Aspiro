@@ -14,13 +14,17 @@ import CreateJobUseCase from '../../../application/usecases/createJob'
 import JobRepository from '../../../infrastructure/repositories/jobRepository'
 import JObApplicationRepository from '../../../infrastructure/repositories/JobApplicationRepository'
 import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/getApplicationDetailsUseCase'
+import { Db } from 'mongodb'
+
+async function createRecruiterRouter(db : Db){
+
 
 const recruiterRouter = express.Router()
 
-const recruiterRepo = new RecruiterRespository()
-const candiateRepo = new CandidateRepository()
-const jobRepo = new JobRepository()
-const jobApplicationRepo = new JObApplicationRepository()
+const recruiterRepo = new RecruiterRespository(db)
+const candiateRepo = new CandidateRepository(db)
+const jobRepo = new JobRepository(db)
+const jobApplicationRepo = new JObApplicationRepository(db)
 
 const registerRecruiterUC = new RegisterRecruiterUseCase(recruiterRepo, candiateRepo)
 const verifyRecruiterUC = new VerifyRecruiterUseCase(recruiterRepo)
@@ -47,7 +51,14 @@ recruiterRouter.post('/recruiter/intro/details', recruiterAuth, recruiterControl
 recruiterRouter.get('/recruiter/profile/overview', recruiterAuth, recruiterController.loadRecruiterProfileData.bind(recruiterController))
 recruiterRouter.post('/recruiter/job/create', recruiterAuth, recruiterController.createJob.bind(recruiterController))
 recruiterRouter.get('/recruiter/job/:jobId/application/details', recruiterController.getJobApplicationDetails.bind(recruiterController))
+recruiterRouter.post('/recruiter/logout', (req : Request, res : Response, next : NextFunction) => {
+    console.log('Logout request reached at test middleware', req.headers)
+    next()
+}, recruiterAuth, recruiterController.recruiterLogout.bind(recruiterController))
 
 recruiterRouter.get('/recruiter/token/refresh', refreshAccessToken)
 
-export default recruiterRouter
+return recruiterRouter
+}
+
+export default createRecruiterRouter

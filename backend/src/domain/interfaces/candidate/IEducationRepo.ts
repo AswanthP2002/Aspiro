@@ -1,8 +1,9 @@
 import Education from "../../entities/candidate/educations";
+import IBaseRepo from "../IBaseRepo";
 
-export default interface IEducationRepo {
-    addEducation(education : Education) : Promise<boolean>
-    getEducations(candidateID : string) : Promise<Education[]>
-    deleteEducation(educationId : string) : Promise<boolean>
+export default interface IEducationRepo extends IBaseRepo<Education> {
+    //addEducation(education : Education) : Promise<boolean>
+    //getEducations(candidateID : string) : Promise<Education[]>
+    //deleteEducation(educationId : string) : Promise<boolean>
     editEducation(educationId : string, education : Education) : Promise<boolean>
 }

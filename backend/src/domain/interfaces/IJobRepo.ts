@@ -1,10 +1,11 @@
 import Job from "../entities/job";
+import IBaseRepo from "./IBaseRepo";
 export interface SaveJob {
     acknowledged : boolean
     insertedId : Object
 }
-export default interface IJobRepo {
-    create(job : Job) : Promise<SaveJob>
+export default interface IJobRepo extends IBaseRepo<Job>{
+    //create(job : Job) : Promise<SaveJob>
     findCompanyJobsById(id : string) : Promise<Job[]>
     getJobs(search : string, page : number, limit : number, sort? : string, filters? : any) : Promise<any> //change strict later
     searchJobsFromHome(search : string) : Promise<Job[]>

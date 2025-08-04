@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { adminLogout } from '../../../redux-toolkit/adminAuthSlice';
 import defaultUser from '../../../../public/default-img-instagram.png'
-import defaultUserAspiro from '../../../../public/default-user-aspiro-removebg-preview.png'
-import useRefreshToken from '../../../hooks/refreshToken';
-import { adminServices } from '../../../services/apiServices';
 import { jobRoles } from '../../../assets/data/dummyJobRole';
 import FilterComponent from '../../../components/common/FilterComponent';
+import { getCandidates } from '../../../services/adminServices';
 
 interface FilterType {
   status:boolean[]
@@ -76,17 +72,9 @@ export default function Candidates() {
   useEffect(() => {
     async function fetchCandidateLists(){
       
-      try {
-        let response = await adminServices.getCandidates(token, search, page, sort, filter)
-
-        if(response.status === 401){
-          const newAccessToken = await adminServices.refreshToken()
-          response = await adminServices.getCandidates(newAccessToken, search, page, sort, filter)
-        }
-
-        const result = await response.json()
-
-        if(result.success){
+      
+        const result = await getCandidates(search, page, sort, filter)
+       
             console.log('candidate data from the backend data from the backend', result.result)
             setCandidates(result.result?.candidates)
             setpage(result.result?.currentPage)
@@ -96,28 +84,7 @@ export default function Candidates() {
               setselectedcandidate(result?.result?.candidates[0])
             }
             setCurrentSort(result?.result?.currentSort)
-        }else{
-            Swal.fire({
-              icon:'error',
-              title:'Error',
-              text:result.message
-            })
-        }
-
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops',
-            text: error.message
-          }).then((result) => {
-            if (result.isConfirmed) {
-              dispatcher(adminLogout())
-              navigator('/admin/login')
-            }
-          })
-        }
-      }
+       
     }
 
     fetchCandidateLists()

@@ -20,25 +20,41 @@ import { BlockJobUseCase } from "../../../application/usecases/admin/blockJobUse
 import { UnblockJobUseCase } from "../../../application/usecases/admin/unBlockJobUseCase"
 import { RejectJobUseCase } from "../../../application/usecases/admin/rejectJobUseCase"
 import { UnRejectJobUseCase } from "../../../application/usecases/admin/unRejectJobUseCase"
+import IAdminLoginUseCase from "../../../application/usecases/admin/interfaces/IAdmiLoginUseCase"
+import IBlockCandidateUseCase from "../../../application/usecases/admin/interfaces/IBlockCandidateUseCase"
+import IBlockCompanyUseCase from "../../../application/usecases/admin/interfaces/IBlockCompanyUseCase"
+import IBlockJobUseCase from "../../../application/usecases/admin/interfaces/IBlockJobUseCase"
+import ICloseCompanyUseCase from "../../../application/usecases/admin/interfaces/ICloseCompanyUseCase"
+import ILoadCandidateDetailsUseCase from "../../../application/usecases/admin/interfaces/ILoadCandidateDetailsUseCase"
+import ILoadCandidateUseCase from "../../../application/usecases/admin/interfaces/ILoadCandidateUseCase"
+import ILoadCompanyDetailsUseCase from "../../../application/usecases/admin/interfaces/ILoadCompanyDetailsUseCase"
+import ILoadCompaniesUseCase from "../../../application/usecases/admin/interfaces/ILoadCompaniesUseCase"
+import ILoadJobsUseCase from "../../../application/usecases/admin/interfaces/ILoadJobsUseCase"
+import ILoadJobDetailsUseCase from "../../../application/usecases/admin/interfaces/ILoadJobDetailsUseCase"
+import IRejectJobUseCase from "../../../application/usecases/admin/interfaces/IRejectJobUseCase"
+import IUnblockCompanyUseCase from "../../../application/usecases/admin/interfaces/IUnblockCompanyUseCase"
+import IUnblockCandidateUseCase from "../../../application/usecases/admin/interfaces/IUnblockCandidateUseCase"
+import IUnblockJobUseCase from "../../../application/usecases/admin/interfaces/IUnblockJobUseCase"
+import IUnrejectJobUseCase from "../../../application/usecases/admin/interfaces/IUnrejectJobUseCase"
 
 export class AdminController {
     constructor(
-        private _adminLoginUC : AdminLoginUseCase,
-        private _loadCandidatesUC : LoadCandidatesUseCase,
-        private _loadCompaniesUC : LoadCompaniesUseCase,
-        private _loadCandidateDetailsUC : LoadCandidateDetailsUseCase,
-        private _blockCandidateUC : BlockCandidateUseCase,
-        private _unblockCandidateUC : UnblockCandidateUseCase,
-        private _loadCompanyDetailsUC : LoadCompanyDetailsUseCase,
-        private _blockCompanyUC : BlockCompanyUseCase,
-        private _unblockCompanyUC : UnblockCompanyUseCase,
-        private _closeCompanyUC : CloseCompanyUseCase,
-        private _loadJobsUC : LoadJobsUseCase,
-        private _loadJobDetails : LoadJobDetailsUseCase,
-        private _blockJobUC : BlockJobUseCase,
-        private _unblockJobUC : UnblockJobUseCase,
-        private _rejectJobUC : RejectJobUseCase,
-        private _unrejectJobUC : UnRejectJobUseCase
+        private _adminLoginUC : IAdminLoginUseCase, //usecase interface
+        private _loadCandidatesUC : ILoadCandidateUseCase, //usecase interface
+        private _loadCompaniesUC : ILoadCompaniesUseCase, //usecase interface
+        private _loadCandidateDetailsUC : ILoadCandidateDetailsUseCase, //usecase interface
+        private _blockCandidateUC : IBlockCandidateUseCase, //usecase interface
+        private _unblockCandidateUC : IUnblockCandidateUseCase, //usecase interface
+        private _loadCompanyDetailsUC : ILoadCompanyDetailsUseCase, //usecase interface
+        private _blockCompanyUC : IBlockCompanyUseCase, //usecase interface
+        private _unblockCompanyUC : IUnblockCompanyUseCase, //usecase interface
+        private _closeCompanyUC : ICloseCompanyUseCase, //usecase interface
+        private _loadJobsUC : ILoadJobsUseCase, //usecase interface
+        private _loadJobDetails : ILoadJobDetailsUseCase, //usecase interface
+        private _blockJobUC : IBlockJobUseCase, //usecase interface
+        private _unblockJobUC : IUnblockJobUseCase, //usecase interface
+        private _rejectJobUC : IRejectJobUseCase, //usecase interface
+        private _unrejectJobUC : IUnrejectJobUseCase //usecase interface
     ){}
 
     async adminLogin(req : Request, res : Response) : Promise<Response> { //login controller for admin
@@ -70,6 +86,23 @@ export class AdminController {
                     }
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:"An unknown error occured"})
+        }
+    }
+
+    async logoutAdmin(req : AdminAuth, res : Response) : Promise<Response> {
+        console.log('Admin logout request reached router level')
+        console.log('Ready to clear the cookie')
+        try {
+            res.clearCookie('adminRefreshToken', {
+                httpOnly:true,
+                secure:false,
+                sameSite:'lax'
+            })
+
+            return res.status(StatusCodes.OK).json({success:true, message:'Admin logout successfull'})
+        } catch (error : unknown) {
+            console.log('Error occured while clearing the cookie', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong, please try again after some time'})
         }
     }
 
@@ -144,9 +177,9 @@ export class AdminController {
 
     async blockCandidate(req : AdminAuth, res : Response) : Promise<Response> { //block individual candidate
         try {
-            const {id} = req.body
+            const {candidateId} = req.params
 
-            const result = await this._blockCandidateUC.execute(id)
+            const result = await this._blockCandidateUC.execute(candidateId)
             if(!result) throw new Error('Can not block candidate')
             return res.status(StatusCodes.OK).json({success:true, message:'Candidate blocked successfully'})
         } catch (error : any) {
@@ -156,9 +189,9 @@ export class AdminController {
 
     async unblockCandidate(req : AdminAuth, res : Response) : Promise<Response> { //unblock individual candidates
         try {
-            const {id} = req.body
+            const {candidateId} = req.params
 
-            const result = await this._unblockCandidateUC.execute(id)
+            const result = await this._unblockCandidateUC.execute(candidateId)
             if(!result) throw new Error('Can not unblock candidate')
             return res.status(StatusCodes.OK).json({success:true, message:'Candidate unblocked successfully'})
         } catch (error : any) {

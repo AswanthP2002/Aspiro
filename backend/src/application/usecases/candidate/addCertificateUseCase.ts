@@ -6,11 +6,12 @@ import { CertificateSchema } from "../../../presentation/controllers/dtos/candid
 import streamifier from 'streamifier'
 import cloudinary from "../../../utilities/cloudinary";
 import { v4 } from "uuid";
+import IAddCertificateUseCase from "./interface/IAddCertificateUseCase";
 
-export default class AddCertificateUseCase {
+export default class AddCertificateUseCase implements IAddCertificateUseCase {
     constructor(private _iCertificateRepo : ICertificateRepo) {}
 
-    async execute(certificate : Certificates, fileBuffer : any,  path : string, candidateId : string) : Promise<boolean> {
+    async execute(certificate : Certificates, fileBuffer : any,  path : string, candidateId : string) : Promise<string | null> {
         const parsedCertificate = CertificateSchema.parse(certificate)
         const certificateModal = createCertificatefromDTO(parsedCertificate)
         certificateModal.candidateId = new mongoose.Types.ObjectId(candidateId)
@@ -34,10 +35,10 @@ export default class AddCertificateUseCase {
             certificateModal.certificateUrl = secure_url
             certificateModal.certificatePublicId = public_id
 
-            return await this._iCertificateRepo.addCertificate(certificateModal)
+            return await this._iCertificateRepo.create(certificateModal)
         }
 
-        return false
+        return null
 
     }
 }

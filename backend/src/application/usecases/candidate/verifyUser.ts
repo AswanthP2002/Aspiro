@@ -1,7 +1,8 @@
 import { join } from "path";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import IVerifyUserUseCase from "./interface/IVerifyUserUseCase";
 
-export default class VerifyUserUseCase {
+export default class VerifyUserUseCase implements IVerifyUserUseCase {
     constructor(private candidateRepo : CandidateRepo){}
 
     async execute(email : string, otp : string) : Promise<boolean> {

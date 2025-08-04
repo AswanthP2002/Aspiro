@@ -2,7 +2,7 @@ const express = require('express')
 import { upload } from "../../../utilities/multer"
 import pdf from 'pdf-parse'
 import { NextFunction, Request, Response } from "express"
-import { CandidateController, editCandidateProfile, getAuthUserData } from "../../controllers/candidate/candidateController"
+import { CandidateController, getAuthUserData } from "../../controllers/candidate/candidateController"
 import { candidateAuth, refreshAccessToken } from "../../../middlewares/auth"
 import CandidateRepository from "../../../infrastructure/repositories/candidate/candidateRepository"
 import RegisterCandidateUseCase from "../../../application/usecases/candidate/registerCandidate"
@@ -42,81 +42,88 @@ import JObApplicationRepository from "../../../infrastructure/repositories/JobAp
 import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
 import parsePdf from "../../../middlewares/parsePdf"
 import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
+import { connectDb } from "../../../infrastructure/database/connection"
+import { Db } from "mongodb"
+import EditProfileUseCase from "../../../application/usecases/candidate/editProfile"
 
-const candidateRouter = express.Router()
+async function createCandidateRouter(db : Db){
+    const candidateRouter = express.Router()
+    //const candidateRouter = express.Router()
 
-const candidateRepo = new CandidateRepository()
-const experienceRepo = new ExperienceRepository()
-const jobRepo = new JobRepository()
-const skillRepo = new SkillRepsitory()
-const educationRepo = new EducationRepository()
-const resumeRepo = new ResumeRepository()
-const certificateRepo = new CertificateRepository()
-const jobApplicationRepo = new JObApplicationRepository()
-
-
-const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
-const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
-const loginCandidateUC = new LoginCandidateUseCase(candidateRepo)
-const saveCandidateBasicUC = new SaveIntroDetailsUseCase(candidateRepo)
-const loadCandidatePersonalDataUC = new LoadCandidatePersonalDataUC(candidateRepo)
-const addExperienceUC = new AddExperienceUseCase(experienceRepo)
-const getExperiencesUC = new GetExperienceUseCase(experienceRepo)
-const deleteExperienceUC = new DeleteExperienceUseCase(experienceRepo)
-const editExperienceUC = new EditExperienceUseCase(experienceRepo)
-const loadJobsUC = new LoadJobsCandidateSideUseCase(jobRepo)
-const loadJobDetailsUC = new LoadJobDetailsCandidateSide(jobRepo)
-const addSkillUC = new AddSkill(skillRepo)
-const getSkillsUC = new GetSkillsUseCase(skillRepo)
-const deleteSkillUC = new DeleteSkillUseCase(skillRepo)
-const addEducationUC = new AddEducationUseCase(educationRepo)
-const getEducationsUC = new GetEducationsUseCase(educationRepo)
-const deleteEducationUC = new DeleteEducationUseCase(educationRepo)
-const editEducationUC = new EditEducationUseCase(educationRepo)
-const addResumeUC = new AddResumeUseCase(resumeRepo)
-const loadResumeUC = new LoadResumesUseCase(resumeRepo)
-const deleteResumeUC = new DeleteResumeUseCase(resumeRepo)
-const addCertificateUC = new AddCertificateUseCase(certificateRepo)
-const loadCertificatesUC = new GetCertificatesUseCase(certificateRepo)
-const applyJobUC = new SaveJobApplicationUseCase(jobApplicationRepo)
-const searchJobsHomePageUC = new SearchJobsFromHomeUseCase(jobRepo)
+    const candidateRepo = new CandidateRepository(db)
+    const experienceRepo = new ExperienceRepository(db)
+    const jobRepo = new JobRepository(db)
+    const skillRepo = new SkillRepsitory(db)
+    const educationRepo = new EducationRepository(db)
+    const resumeRepo = new ResumeRepository(db)
+    const certificateRepo = new CertificateRepository(db)
+    const jobApplicationRepo = new JObApplicationRepository(db)
 
 
-const candidateController = new CandidateController(
-    registerCandidateUC,
-    verifyCandidateUC,
-    loginCandidateUC,
-    saveCandidateBasicUC,
-    loadCandidatePersonalDataUC,
-    addExperienceUC,
-    getExperiencesUC,
-    deleteExperienceUC,
-    editExperienceUC,
-    loadJobsUC,
-    loadJobDetailsUC,
-    addSkillUC,
-    getSkillsUC,
-    deleteSkillUC,
-    addEducationUC,
-    getEducationsUC,
-    deleteEducationUC,
-    editEducationUC,
-    addResumeUC,
-    loadResumeUC,
-    deleteResumeUC,
-    addCertificateUC,
-    loadCertificatesUC,
-    applyJobUC,
-    searchJobsHomePageUC
-)
+    const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
+    const verifyCandidateUC = new VerifyUserUseCase(candidateRepo)
+    const loginCandidateUC = new LoginCandidateUseCase(candidateRepo)
+    const saveCandidateBasicUC = new SaveIntroDetailsUseCase(candidateRepo)
+    const loadCandidatePersonalDataUC = new LoadCandidatePersonalDataUC(candidateRepo)
+    const addExperienceUC = new AddExperienceUseCase(experienceRepo)
+    const getExperiencesUC = new GetExperienceUseCase(experienceRepo)
+    const deleteExperienceUC = new DeleteExperienceUseCase(experienceRepo)
+    const editExperienceUC = new EditExperienceUseCase(experienceRepo)
+    const loadJobsUC = new LoadJobsCandidateSideUseCase(jobRepo)
+    const loadJobDetailsUC = new LoadJobDetailsCandidateSide(jobRepo)
+    const addSkillUC = new AddSkill(skillRepo)
+    const getSkillsUC = new GetSkillsUseCase(skillRepo)
+    const deleteSkillUC = new DeleteSkillUseCase(skillRepo)
+    const addEducationUC = new AddEducationUseCase(educationRepo)
+    const getEducationsUC = new GetEducationsUseCase(educationRepo)
+    const deleteEducationUC = new DeleteEducationUseCase(educationRepo)
+    const editEducationUC = new EditEducationUseCase(educationRepo)
+    const addResumeUC = new AddResumeUseCase(resumeRepo)
+    const loadResumeUC = new LoadResumesUseCase(resumeRepo)
+    const deleteResumeUC = new DeleteResumeUseCase(resumeRepo)
+    const addCertificateUC = new AddCertificateUseCase(certificateRepo)
+    const loadCertificatesUC = new GetCertificatesUseCase(certificateRepo)
+    const applyJobUC = new SaveJobApplicationUseCase(jobApplicationRepo)
+    const searchJobsHomePageUC = new SearchJobsFromHomeUseCase(jobRepo)
+    const editCandidateProfileUC = new EditProfileUseCase(candidateRepo)
+
+
+    const candidateController = new CandidateController(
+        registerCandidateUC,
+        verifyCandidateUC,
+        loginCandidateUC,
+        saveCandidateBasicUC,
+        loadCandidatePersonalDataUC,
+        addExperienceUC,
+        getExperiencesUC,
+        deleteExperienceUC,
+        editExperienceUC,
+        loadJobsUC,
+        loadJobDetailsUC,
+        addSkillUC,
+        getSkillsUC,
+        deleteSkillUC,
+        addEducationUC,
+        getEducationsUC,
+        deleteEducationUC,
+        editEducationUC,
+        addResumeUC,
+        loadResumeUC,
+        deleteResumeUC,
+        addCertificateUC,
+        loadCertificatesUC,
+        applyJobUC,
+        searchJobsHomePageUC,
+        editCandidateProfileUC
+    )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
 candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateController))
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
 candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))
 candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
-candidateRouter.post('/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
-candidateRouter.get('/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
+candidateRouter.post('candidate/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
+candidateRouter.get('candidate/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
 candidateRouter.post('/candidate/experience/add', candidateAuth, candidateController.addExperience.bind(candidateController))
 candidateRouter.get('/candidate/experience', candidateAuth, candidateController.getExperiences.bind(candidateController))
 candidateRouter.delete('/candidate/experience/:experienceId', candidateAuth, candidateController.deleteExperience.bind(candidateController))
@@ -138,7 +145,7 @@ candidateRouter.post('/candidate/resume/upload', candidateAuth, upload.single('r
 
 candidateRouter.get('/candidate/resumes', candidateAuth, candidateController.loadResume.bind(candidateController))
 
-candidateRouter.put('/candidate/profile',  candidateAuth, editCandidateProfile) //need updation
+candidateRouter.patch('/candidate/profile',  candidateAuth, candidateController.editCandidateProfile.bind(candidateController)) //need updation
 
 candidateRouter.post('/candidate/job/:jobId/apply', candidateAuth, upload.single('resume'), parsePdf, candidateController.saveJobApplication.bind(candidateController))
 
@@ -153,5 +160,7 @@ function testMiddleWare(req : Request, res : Response, next : NextFunction) {
     // return res.status(StatusCodes.OK).json({success:true, message:'Maintanance purpose'})
 }
 
+ return candidateRouter
+}
 
-export default candidateRouter
+export default createCandidateRouter

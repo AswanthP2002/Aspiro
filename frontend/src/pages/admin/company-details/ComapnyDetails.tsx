@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
 import { adminServices } from '../../../services/apiServices'
+import { blockCompanyUnblockCompany, deleteCompany, getCompanyDetails } from '../../../services/adminServices'
 
 
 export default function CompanyDetails(){
@@ -21,46 +22,10 @@ export default function CompanyDetails(){
 
         async function fetchCompanyDetails(){
             
-            try {
-                let fetchResponse = await adminServices.getCompanyDetails(token, companyId)
-
-                if(fetchResponse.status === 401){
-                    const newAccessToken = await adminServices.refreshToken()
-                    fetchResponse = await adminServices.getCompanyDetails(newAccessToken, companyId)
-                }
-
-                const result = await fetchResponse.json()
-
-                if(result?.success){
-                    setcompanydetails(result?.companyDetails)
-                    console.log('Company details from the server', result?.companyDetails)
-                }else{
-                    Swal.fire({
-                        icon:'error',
-                        title:'Oops!',
-                        text:result.message,
-                        showCancelButton:false,
-                        showConfirmButton:true,
-                        confirmButtonText:'Home',
-                    }).then((result) => {
-                        if(result.isConfirmed) navigator('/admin/dashboard')
-                    })
-                }
-            } catch (error : unknown) {
-                console.log('Erorr occured while fetching company details', error)
-                if(error instanceof Error){
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:error.message,
-                        showConfirmButton:true,
-                        confirmButtonText:'Ok',
-                        showCancelButton:false
-                    }).then((result) => {
-                        if(result.isConfirmed) navigator('/admin/dashboard')
-                    })
-                }
-            }
+            const result = await getCompanyDetails(companyId)
+                
+            setcompanydetails(result?.companyDetails)
+            console.log('Company details from the server', result?.companyDetails)
         }
         console.log('Received company id', companyId)
         
@@ -75,17 +40,8 @@ export default function CompanyDetails(){
 
     async function blockUnblockCompany(companyId : any, operation : string){
         
-        try {
-            let response = await adminServices.blockUnblockCompany(token, companyId, operation)
-
-            if(response.status === 401){
-                const newAccessToken = await adminServices.refreshToken()
-                response = await adminServices.blockUnblockCompany(newAccessToken, companyId, operation)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
+        const result = await blockCompanyUnblockCompany(companyId, operation)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Success',
@@ -94,19 +50,7 @@ export default function CompanyDetails(){
                     showCancelButton:false,
                     timer:2000
                 }).then(() => window.location.reload())
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while blocking / unblocking', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message,
-                    showCancelButton:false,
-                    confirmButtonText:'Ok'
-                })
-            }
-        }
+        
     }
 
     async function closeCompany(companyId : string){
@@ -122,17 +66,9 @@ export default function CompanyDetails(){
             allowOutsideClick:false
         }).then(async (result) => {
             if(result.isConfirmed){
-                try {
-                    let response = await adminServices.closeCompany(token, companyId)
-
-                    if(response.status === 401){
-                        const newAccessToken = await adminServices.refreshToken()
-                        response = await adminServices.closeCompany(newAccessToken, companyId)
-                    }
-
-                    const result = await response.json()
-
-                    if(result.success){
+                
+                    const result = await deleteCompany(companyId)
+                    
                         Swal.fire({
                             icon:'success',
                             title:'Success',
@@ -142,23 +78,6 @@ export default function CompanyDetails(){
                             allowOutsideClick:false,
                             timer:3500
                         }).then(() => navigator('/admin/companies'))
-                    }else{
-                        Swal.fire({
-                            icon:'error',
-                            title:'Oops!',
-                            text:result.message
-                        })
-                    }
-                } catch (error : unknown) {
-                    console.log('Error occured while closing the company', error)
-                    if(error instanceof Error){
-                        Swal.fire({
-                            icon:'error',
-                            title:'Error',
-                            text:error.message
-                        })
-                    }
-                }
             }else{
                 return
             }

@@ -1,7 +1,8 @@
 import IResumeRepo from "../../../domain/interfaces/candidate/IResumeRepo";
 import cloudinary from "../../../utilities/cloudinary";
+import IDeleteResumeUseCase from "./interface/IDeleteResumeUseCase";
 
-export default class DeleteResumeUseCase {
+export default class DeleteResumeUseCase implements IDeleteResumeUseCase{
     constructor(private _iResumeRepo : IResumeRepo) {}
 
     async execute(resumeId : string, cloudinaryPublicId : string) : Promise<boolean> {
@@ -15,7 +16,7 @@ export default class DeleteResumeUseCase {
         })
 
         if(promiseResult){
-            const result = await this._iResumeRepo.deleteResume(resumeId)
+            const result = await this._iResumeRepo.delete(resumeId)
             return result
         }
 

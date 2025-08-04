@@ -1,9 +1,10 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
 import bcrypt from 'bcrypt'
 import { generateRefreshToken, generateToken } from "../../../services/jwt";
+import ILoginRecruiterrUseCase from "./interface/ILoginRecruiterUseCase";
 
 
-export class LoginRecruiterUseCase {
+export class LoginRecruiterUseCase implements ILoginRecruiterrUseCase {
     constructor(private recruiterRepo : IRecruiterRepo){}
 
     async execute(email : string, password : string) : Promise<object>{

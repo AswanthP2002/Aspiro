@@ -1,7 +1,8 @@
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import { CandidateDetails } from "../../../presentation/controllers/dtos/candidate/userDetailsDTO";
+import ISaveIntroDetailsUseCase from "./interface/ISaveIntroDetailsUseCase";
 
-export default class SaveIntroDetailsUseCase {
+export default class SaveIntroDetailsUseCase implements ISaveIntroDetailsUseCase {
     constructor(private candidateRepo : CandidateRepo){}
 
     async execute(candidate : CandidateDetails) : Promise<boolean>{

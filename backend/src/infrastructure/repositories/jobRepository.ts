@@ -2,16 +2,21 @@ import Job from "../../domain/entities/job";
 import IJobRepo from "../../domain/interfaces/IJobRepo";
 import { connectDb } from "../database/connection";
 import { SaveJob } from "../../domain/interfaces/IJobRepo";
-import { ObjectId } from "mongodb";
+import { Db, ObjectId } from "mongodb";
+import BaseRepository from "./baseRepository";
 
-export default class JobRepository implements IJobRepo {
+export default class JobRepository extends BaseRepository<Job> implements IJobRepo {
     private _collection = 'job'
-    
-    async create(job: Job): Promise<SaveJob> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).insertOne(job)
-        return result
+
+    constructor(db : Db){
+        super(db, 'job')
     }
+    
+    // async create(job: Job): Promise<SaveJob> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Job>(this._collection).insertOne(job)
+    //     return result
+    // }
 
     async findCompanyJobsById(id: string): Promise<Job[]> {
         const db = await connectDb()

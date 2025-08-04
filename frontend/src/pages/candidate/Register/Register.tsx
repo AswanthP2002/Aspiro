@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useRef, useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { candidateService } from "../../../services/apiServices";
+import { registerCandiate } from "../../../services/candidateServices";
 
 export default function CandidateRegister(){
     const [name, setfullname] = useState("")
@@ -102,10 +103,7 @@ export default function CandidateRegister(){
             setvalidationerrortext("")
             //send data to the backend
 
-            try {
-                const response = await candidateService.registerCandidate(name, email, phone, username, password)
-
-                const result = await response.json()
+                const result = await registerCandiate(name, email, phone, username, password)
 
                 if(result.success){
                     setloading(false)
@@ -114,19 +112,8 @@ export default function CandidateRegister(){
                 }else{
                     setloading(false)
                     setvalidationerror(true)
-                    setvalidationerrortext(result.message)
+                    setvalidationerrortext(result.message) 
                 }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    setloading(false)
-                    console.log('Error occured while user registering')
-                    Swal.fire({
-                        title: "Oops!",
-                        icon: "error",
-                        text: error.message
-                    })
-                }
-            }
 
         }
     }

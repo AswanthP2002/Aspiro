@@ -2,6 +2,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import defaultUser from '/default-user-aspiro-removebg-preview.png'
 import { recruiterLogout } from "../../../redux-toolkit/recruiterAuthSlice"
+import { logoutRecruiter } from "../../../services/recruiterServices"
+import Swal from "sweetalert2"
 
 
 export default function RecruiterHeader(){
@@ -12,10 +14,18 @@ export default function RecruiterHeader(){
     })
     console.log('This is loged user', logedRecruiter)
 
-    function logout(){
-        alert(' recruiter logout triggered')
+   async function logout(){
+        //alert(' recruiter logout triggered')
+        const result = await logoutRecruiter()
         dispatch(recruiterLogout())
-        window.location.reload()
+        Swal.fire({
+            icon:'success',
+            title:result.message,
+            showConfirmButton:false,
+            showCancelButton:false,
+            timer:2000
+        }).then(() => window.location.reload())
+        
     }
 
     return(

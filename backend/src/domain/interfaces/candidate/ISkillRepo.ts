@@ -1,7 +1,8 @@
 import Skills from "../../entities/candidate/skills";
+import IBaseRepo from "../IBaseRepo";
 
-export default interface ISkillRepo {
-    saveSkill(skill : Skills) : Promise<boolean>
-    getSkills(candidateId : string) : Promise<Skills[]>
-    deleteSkill(skillId : string) : Promise<boolean>
+export default interface ISkillRepo extends IBaseRepo<Skills> {
+    //saveSkill(skill : Skills) : Promise<boolean>
+    //getSkills(candidateId : string) : Promise<Skills[]>
+    //deleteSkill(skillId : string) : Promise<boolean>
 }

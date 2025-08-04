@@ -1,7 +1,8 @@
 import Job from "../../../domain/entities/job";
 import IJobRepo from "../../../domain/interfaces/IJobRepo";
+import ILoadJobsUseCase from "./interfaces/ILoadJobsUseCase";
 
-export default class LoadJobsUseCase {
+export default class LoadJobsUseCase implements ILoadJobsUseCase {
     constructor(private _jobRepo : IJobRepo){}
 
     async execute(search : string, page : number, limit : number, sort : string, filter : any) : Promise<any> { //change strict later
