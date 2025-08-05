@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { recruiterService } from "../../../services/apiServices"
+import { postJob } from "../../../services/recruiterServices"
 
 
 export default function PostAJobForm(){
@@ -88,17 +89,9 @@ export default function PostAJobForm(){
             return
         }
 
-        try {
-            let response = await recruiterService.postJob(token, details)
-
-            if(response.status === 401){
-                const newAccessToken = await recruiterService.refreshToken()
-                response = await recruiterService.postJob(newAccessToken, details)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
+       
+            const result = await postJob(details)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Posted',
@@ -110,24 +103,6 @@ export default function PostAJobForm(){
                         navigator('/recruiter/profile/overview') 
                     }
                 })
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    text:'Something went wrong'
-                })
-            }
-        } catch (error : unknown) {
-            if (error instanceof Error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: '!Oops',
-                    text: error.message,
-                    showConfirmButton: true
-                }).then((result) => {
-                    if (result.isConfirmed) navigator('/recruiter')
-                })
-            }
-        }
     
     }
 

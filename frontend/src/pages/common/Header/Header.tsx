@@ -4,7 +4,8 @@ import defaultUser from '/default-img-instagram.png'
 import { logout, tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice"
 import useRefreshToken from "../../../hooks/refreshToken"
 import Swal from "sweetalert2"
-import { candidateLogout } from "../../../hooks/Logouts"
+import { candidateLogout } from "../../../services/candidateServices"
+//import { candidateLogout } from "../../../hooks/Logouts"
 
 export default function Header(){
     const dispatch = useDispatch()
@@ -17,6 +18,18 @@ export default function Header(){
         return state.candidateAuth.token
     })
     console.log('This is loged user', logedUser)
+
+    async function logoutCandidate(){
+        const logoutResult = await candidateLogout()
+        dispatch(logout())
+        Swal.fire({
+            icon:'success',
+            title:logoutResult.message,
+            showConfirmButton:false,
+            showCancelButton:false,
+            timer:2000
+        }).then(() => navigator('/login'))
+    }
 
     
     return(
@@ -45,7 +58,7 @@ export default function Header(){
                                                 <Link to={'/profile/personal'}><p className="text-sm">Profile</p> </Link>
                                             </div>
                                             <div className="mt-2">
-                                                <span onClick={() => candidateLogout(token)} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
+                                                <span onClick={() => logoutCandidate()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
                                             </div>
                                         </div>
                                         {/* <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i> */}

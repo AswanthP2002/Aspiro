@@ -1,7 +1,8 @@
 import Experience from "../../../domain/entities/candidate/experience";
 import IExperienceRepo from "../../../domain/interfaces/candidate/IExperienceRepo";
+import IEditExperienceUseCase from "./interface/IEditExperienceUseCase";
 
-interface EditableExperience {
+export interface EditableExperience {
     editableRole : string
     editableJobType : string
     editableOrganization : string
@@ -12,7 +13,7 @@ interface EditableExperience {
     editableLocationType : string
 }
 
-export default class EditExperienceUseCase {
+export default class EditExperienceUseCase implements IEditExperienceUseCase {
     constructor(private _experienceRepo : IExperienceRepo){}
 
     async execute(experienceId : string, experience : EditableExperience) : Promise<boolean> {

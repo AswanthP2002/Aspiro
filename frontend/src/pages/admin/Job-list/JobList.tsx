@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
-import useRefreshToken from '../../../hooks/refreshToken';
 import { industryTypes } from '../../../assets/data/companyDetailsArrayData';
-import { adminServices } from '../../../services/apiServices';
+import { getJobs } from '../../../services/adminServices';
+
 interface filterType {
   industry:string[]
   jobType:string[]
@@ -98,41 +97,16 @@ export default function Jobs() {
   useEffect(() => {
 
     async function fetchJobDetails(){
-      try {
-        let response = await adminServices.getJobs(token, search, page, sort, filter)
+      
+        const result = await getJobs(search, page, sort, filter)
 
-        if(response.status === 401){
-            const newAccessToken = await adminServices.refreshToken()
-            response = await adminServices.getJobs(newAccessToken, search, page, sort, filter)
-        }
-
-        const result = await response.json()
-
-        if(result.success){
-              console.log('job result from the backend', result.jobList.jobs)
-              setjobs(result.jobList.jobs)
-              setselectedjob(result.jobList.jobs[0])
-              setpage(result.jobList.page)
-              settotalpages(result.jobList.totalPages)
-              setCurrentSort(result?.jobList.currentSort)
-              setpagination(new Array(result.jobList.totalPages).fill(0))
-          }else{
-              Swal.fire({
-                  icon:'error',
-                  title:'Oops',
-                  text:result.message
-              })
-            }  
-      } catch (error : unknown) {
-          console.log('Error occured while geting jobs', error)
-          if(error instanceof Error){
-              Swal.fire({
-                  icon:'error',
-                  title:'Error',
-                  text:error.message
-              })
-          }
-      }
+        setjobs(result.jobList.jobs)
+        setselectedjob(result.jobList.jobs[0])
+        setpage(result.jobList.page)
+        settotalpages(result.jobList.totalPages)
+        setCurrentSort(result?.jobList.currentSort)
+        setpagination(new Array(result.jobList.totalPages).fill(0))
+          
     }
 
     fetchJobDetails()

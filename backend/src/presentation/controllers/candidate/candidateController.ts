@@ -35,34 +35,62 @@ import AddCertificateUseCase from "../../../application/usecases/candidate/addCe
 import GetCertificatesUseCase from "../../../application/usecases/candidate/getCertificatesUseCase"
 import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
 import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
+import IRegisterCandidateUseCase from "../../../application/usecases/candidate/interface/IRegisterCandidateUseCase"
+import { connectDb } from "../../../infrastructure/database/connection"
+import IAddCertificateUseCase from "../../../application/usecases/candidate/interface/IAddCertificateUseCase"
+import IAddEducationUseCase from "../../../application/usecases/candidate/interface/IAddEducationUseCase"
+import IAddExperience from "../../../application/usecases/candidate/interface/IAddExperienceUseCase"
+import IAddResumeUseCase from "../../../application/usecases/candidate/interface/IAddResumeUseCase"
+import IAddSkillsUseCase from "../../../application/usecases/candidate/interface/IAddSkillUseCase"
+import ISaveJobApplicationUseCase from "../../../application/usecases/candidate/interface/ISaveJobApplicationUseCase"
+import ILoadCertificateUseCase from "../../../application/usecases/candidate/interface/ILoadCertificatesUseCase"
+import IDeleteExperienceUseCase from "../../../application/usecases/candidate/interface/IDeleteExperienceUseCase"
+import IDeleteSkillsUseCase from "../../../application/usecases/candidate/interface/IDeleteSkillsUseCase"
+import IDeleteEducationUseCase from "../../../application/usecases/candidate/interface/IDeleteEducationUseCase"
+import IDeleteResumeUseCase from "../../../application/usecases/candidate/interface/IDeleteResumeUseCase"
+import ILoadResumeUseCase from "../../../application/usecases/candidate/interface/ILoadResumesUseCase"
+import ILoadExperiencesUseCase from "../../../application/usecases/candidate/interface/ILoadExperiencesUseCase"
+import ILoadSkillsUseCase from "../../../application/usecases/candidate/interface/ILoadSkillsUseCase"
+import ILoadEducationsUseCase from "../../../application/usecases/candidate/interface/ILoadEducationsUseCase"
+import IVerifyUserUseCase from "../../../application/usecases/candidate/interface/IVerifyUserUseCase"
+import ISaveIntroDetailsUseCase from "../../../application/usecases/candidate/interface/ISaveIntroDetailsUseCase"
+import ILoginCandidateUseCase from "../../../application/usecases/candidate/interface/ILoginCandidateUseCase"
+import ILoadCandidatePersonalDataUseCase from "../../../application/usecases/candidate/interface/ILoadCandidatePersonalDataUseCase"
+import ILoadJobCandidateSideUseCase from "../../../application/usecases/candidate/interface/ILoadJobCandidateSideUseCase"
+import ILoadJobDetailsCandidateSideUseCase from "../../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSideUseCase"
+import IEditExperienceUseCase from "../../../application/usecases/candidate/interface/IEditExperienceUseCase"
+import IEditEducationUseCase from "../../../application/usecases/candidate/interface/IEditEducationUseCase"
+import ISearchJobsFromHomeUseCase from "../../../application/usecases/candidate/interface/ISearchJobsFromHomeUseCase"
+import IEditProfileUseCase from "../../../application/usecases/candidate/interface/IEditProfileUseCase"
 
 export class CandidateController {
     constructor(
-        private _registerCandidateUC : RegisterCandidateUseCase,
-        private _verifyUserUC : VerifyUserUseCase,
-        private _loginCandidateUC : LoginCandidateUseCase,
-        private _saveDetailsUC : SaveIntroDetailsUseCase,
-        private _loadCandidatePersonalDataUC : LoadCandidatePersonalDataUC,
-        private _addExperienceUC : AddExperienceUseCase,
-        private _getExperiencesUC : getExperienceUseCase,
-        private _deleteExperienceUC : DeleteExperienceUseCase,
-        private _editExperienceUC : EditExperienceUseCase,
-        private _loadJobsUC : LoadJobsCandidateSideUseCase,
-        private _loadJobDetailsUC : LoadJobDetailsCandidateSide,
-        private _addSkillsUC : AddSkill,
-        private _getSkillsUC : GetSkillsUseCase,
-        private _deleteSkillUC : DeleteSkillUseCase,
-        private _addEducationUC : AddEducationUseCase,
-        private _getEducationsUC : GetEducationsUseCase,
-        private _deleteEducationUC : DeleteEducationUseCase,
-        private _editEducationUC : EditEducationUseCase,
-        private _addResumeUC : AddResumeUseCase,
-        private _loadResumeUC : LoadResumesUseCase,
-        private _deleteResumeUC : DeleteResumeUseCase,
-        private _addCertificate : AddCertificateUseCase,
-        private _getCertificates : GetCertificatesUseCase,
-        private _saveJobApplicationUC : SaveJobApplicationUseCase,
-        private _searchJobFromHomeUC : SearchJobsFromHomeUseCase
+        private _registerCandidateUC : IRegisterCandidateUseCase, //usecase interface
+        private _verifyUserUC : IVerifyUserUseCase, //usecase interface
+        private _loginCandidateUC : ILoginCandidateUseCase, //usecase interface
+        private _saveDetailsUC : ISaveIntroDetailsUseCase, //usecase interface
+        private _loadCandidatePersonalDataUC : ILoadCandidatePersonalDataUseCase, //usecase interface
+        private _addExperienceUC : IAddExperience, //usecase interface
+        private _getExperiencesUC : ILoadExperiencesUseCase, //usecase interface
+        private _deleteExperienceUC : IDeleteExperienceUseCase, //usecase interface
+        private _editExperienceUC : IEditExperienceUseCase, //usecase interface
+        private _loadJobsUC : ILoadJobCandidateSideUseCase, //usecase interface
+        private _loadJobDetailsUC : ILoadJobDetailsCandidateSideUseCase, //usecase interface
+        private _addSkillsUC : IAddSkillsUseCase, //usecase interface
+        private _getSkillsUC : ILoadSkillsUseCase, //usecase interface
+        private _deleteSkillUC : IDeleteSkillsUseCase, //usecase interface
+        private _addEducationUC : IAddEducationUseCase, //usecase interface
+        private _getEducationsUC : ILoadEducationsUseCase, //usecase interface
+        private _deleteEducationUC : IDeleteEducationUseCase, //usecase interface
+        private _editEducationUC : IEditEducationUseCase, //usecase interface
+        private _addResumeUC : IAddResumeUseCase, //usecase interface
+        private _loadResumeUC : ILoadResumeUseCase, //usecase interface
+        private _deleteResumeUC : IDeleteResumeUseCase, //usecase interface
+        private _addCertificate : IAddCertificateUseCase, //usecase interface
+        private _getCertificates : ILoadCertificateUseCase, //usecase interface
+        private _saveJobApplicationUC : ISaveJobApplicationUseCase, //usecase interface
+        private _searchJobFromHomeUC : ISearchJobsFromHomeUseCase, //usecase interface,
+        private _editCandidateProfileUC : IEditProfileUseCase //usecase interface
     ){}
 
     //register candidate
@@ -470,7 +498,7 @@ export class CandidateController {
 
     async deleteResume(req : Auth, res : Response) : Promise<Response> {
         const {resumeId} = req.params
-        const {cloudinaryPublicId} = req.body
+        const cloudinaryPublicId = req.query?.cloudinaryPublicId as string
 
         try {
             const deleteResult = await this._deleteResumeUC.execute(resumeId, cloudinaryPublicId)
@@ -546,12 +574,27 @@ export class CandidateController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }
+
+    async editCandidateProfile(req : Auth, res : Response) : Promise<Response> {
+        const userId = req.user.id
+        const {name, role, city, district, state, country, about} = req.body
+        
+        try {
+            const result = await this._editCandidateProfileUC.execute(userId, name, role, city, district, state, country, about)
+            return res.status(StatusCodes.OK).json({success:true, message:'Profile details updated successfully'})
+        } catch (error : unknown) {
+            console.log('Erro occured while editing candidate profile', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+
+    }
 }
 
 export const getAuthUserData = async (req : Request, res : Response) : Promise<Response> => {
     try {
+        const db = await connectDb()
         const {id} = req.params
-        const cRepo = new CandidateRepository()
+        const cRepo = new CandidateRepository(db)
         const getAuthUseCase = new GetAuthUserUseCase(cRepo)
         const data = await getAuthUseCase.execute(id)
         return res.status(200).json({success:true, message:'user details fetched successfully', user:data})
@@ -562,19 +605,20 @@ export const getAuthUserData = async (req : Request, res : Response) : Promise<R
 }
 
 
-export const editCandidateProfile = async (req : Auth, res : Response) : Promise<Response> => {
-    console.log('Candidate edit request reached here', req.body)
-    try {
-        const id = req.user?.id
-        const {name, role, city, district, state, country} = req.body
-        const cRepo = new CandidateRepository()
-        const editProfileUseCase = new EditProfileUseCase(cRepo)
-        const result = await editProfileUseCase.execute(id, name, role, city, district, state, country)
-        return res.status(200).json({success:true, message:'Profile details updated successfully', data:result})
-    } catch (error) {
-        console.log('Error occured while updating the candidate profile', error)
-        return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
-    }
-}
+// export const editCandidateProfile = async (req : Auth, res : Response) : Promise<Response> => {
+//     console.log('Candidate edit request reached here', req.body)
+//     try {
+//         const db = await connectDb()
+//         const id = req.user?.id
+//         const {name, role, city, district, state, country} = req.body
+//         const cRepo = new CandidateRepository(db)
+//         const editProfileUseCase = new EditProfileUseCase(cRepo)
+//         const result = await editProfileUseCase.execute(id, name, role, city, district, state, country)
+//         return res.status(200).json({success:true, message:'Profile details updated successfully', data:result}) // ?? why data.result ???
+//     } catch (error) {
+//         console.log('Error occured while updating the candidate profile', error)
+//         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+//     }
+// }
 
 

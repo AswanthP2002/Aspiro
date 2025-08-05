@@ -2,16 +2,21 @@ import Recruiter from "../../../domain/entities/recruiter/recruiter";
 import { SaveRecruiter } from "../../../domain/interfaces/recruiter/createRecruiterRequest";
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
 import { connectDb } from "../../database/connection";
-import { ObjectId } from "mongodb";
+import { Db, ObjectId } from "mongodb";
+import BaseRepository from "../baseRepository";
 
-export default class RecruiterRespository implements IRecruiterRepo{
+export default class RecruiterRespository extends BaseRepository<Recruiter> implements IRecruiterRepo{
    private _collection = 'recruiter'
    
-   async create(recruiter: Recruiter): Promise<SaveRecruiter> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).insertOne(recruiter)
-        return result
-    }
+   constructor(db : Db){
+    super(db, 'recruiter')
+   }
+
+//    async create(recruiter: Recruiter): Promise<SaveRecruiter> {
+//         const db = await connectDb()
+//         const result = await db.collection<Recruiter>(this._collection).insertOne(recruiter)
+//         return result
+//     }
 
     async findByEmail(email: string): Promise<Recruiter | null> {
         const db = await connectDb()

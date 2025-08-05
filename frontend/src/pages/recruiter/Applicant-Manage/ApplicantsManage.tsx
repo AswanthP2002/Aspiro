@@ -4,6 +4,7 @@ import { recruiterService } from "../../../services/apiServices"
 import { useSelector } from "react-redux"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'
+import { getApplicationDetails } from "../../../services/recruiterServices"
 
 export default function ApplicantManagePage(){
     const params : any = useParams()
@@ -19,24 +20,13 @@ export default function ApplicantManagePage(){
 
     useEffect(() => {
         (async () => {
-            try {
-                let response = await recruiterService.getApplicationDetails(token, jobId)
-
-                if(response.status === 401){
-                    const newAccessToken = await recruiterService.refreshToken()
-                    response = await recruiterService.getApplicationDetails(newAccessToken, jobId)
-                }
-
-                const result = await response.json()
-
-                if(result?.success){
+          
+                const result = await getApplicationDetails(jobId)
+                
                     console.log('Application details from the backen', result?.result)
                     setApplications(result?.result)
                     setApplicants(result.result[0].candidateDetails)
-                }
-            } catch (error) {
                 
-            }
         })()
     }, [])
     return(

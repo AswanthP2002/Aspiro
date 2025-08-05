@@ -18,9 +18,13 @@ const adminAuthSlice = createSlice({
             state.adminToken = null
             localStorage.removeItem('admin')
             localStorage.removeItem('adminToken')
+        },
+        adminTokenRefresh:(state, action) => {
+            state.adminToken = action.payload.token
+            localStorage.setItem('adminToken', action.payload.token)
         }
     }
 })
 
-export const {adminLoginSuccess, adminLogout} = adminAuthSlice.actions
+export const {adminLoginSuccess, adminLogout, adminTokenRefresh} = adminAuthSlice.actions
 export default adminAuthSlice.reducer

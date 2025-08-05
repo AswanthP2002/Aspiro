@@ -8,17 +8,24 @@ import SaveBasicsUseCase from '../../../application/usecases/recruiter/saveBasic
 import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/loadProfile'
 import CreateJobUseCase from '../../../application/usecases/createJob'
 import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/getApplicationDetailsUseCase'
+import IRegisterRecruiterUseCase from '../../../application/usecases/recruiter/interface/IRegisterRecruiterUseCase'
+import ICreateJobUseCase from '../../../application/usecases/recruiter/interface/ICreateJobUseCase'
+import IGetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/interface/IGetJobApplicationDetailsUseCase'
+import IVerifyRecruiterUseCase from '../../../application/usecases/recruiter/interface/IVerifyRecruiterUseCase'
+import ILoginRecruiterrUseCase from '../../../application/usecases/recruiter/interface/ILoginRecruiterUseCase'
+import ISaveBasicsUseCase from '../../../application/usecases/recruiter/interface/ISaveBasicsUseCase'
+import ILoadRecruiterProfileUseCase from '../../../application/usecases/recruiter/interface/ILoadRecruiterProfileUseCase'
 
 
 export default class RecruiterController {
     constructor(
-        private _registerRecruiterUC : RegisterRecruiterUseCase,
-        private _verifyRecruiterUC : VerifyRecruiterUseCase,
-        private _loginRecruiterUC : LoginRecruiterUseCase,
-        private _saveBasicsUC : SaveBasicsUseCase,
-        private _loadCompanyProfileUseCase : LoadRecruiterProfileDataUseCase,
-        private _createJobUseCase : CreateJobUseCase,
-        private _getJobApplicationDetails : GetJobApplicationDetailsUseCase
+        private _registerRecruiterUC : IRegisterRecruiterUseCase, //usecase interface
+        private _verifyRecruiterUC : IVerifyRecruiterUseCase, //usecase interface
+        private _loginRecruiterUC : ILoginRecruiterrUseCase, //usecase interface
+        private _saveBasicsUC : ISaveBasicsUseCase, //usecase interface
+        private _loadCompanyProfileUseCase : ILoadRecruiterProfileUseCase, //usecase interface
+        private _createJobUseCase : ICreateJobUseCase, //usecase interface
+        private _getJobApplicationDetails : IGetJobApplicationDetailsUseCase //usecase interface
     ){}
 
     async registerRecruiter(req : Request, res : Response) : Promise<Response> {
@@ -88,6 +95,21 @@ export default class RecruiterController {
             }
 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
+        }
+    }
+
+    async recruiterLogout(req : Auth, res : Response) : Promise<Response> {
+        try {
+            res.clearCookie('recruiterRefreshToken', {
+                httpOnly:true,
+                secure:false,
+                sameSite:'lax'
+            })
+
+            return res.status(StatusCodes.OK).json({success:true, message:'Logouted successfully'})
+        } catch (error : unknown) {
+            console.log('Error occured while recruiter logout', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Something went wrong, please try again after some time'})
         }
     }
 

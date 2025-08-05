@@ -20,14 +20,18 @@ import JobRepository from "../../../infrastructure/repositories/jobRepository"
 import RecruiterRespository from "../../../infrastructure/repositories/recruiter/recruiterRepository"
 import { adminAuth, refreshAccessToken } from "../../../middlewares/auth"
 import { AdminController } from "../../controllers/admin/adminController"
+import { Db } from "mongodb"
 
 const express = require('express')
 
+async function createAdminRouter(db : Db){
+
+
 const adminRouter = express.Router()
 
-const candidateRepo = new CandidateRepository()
-const recruiterRepo = new RecruiterRespository()
-const jobRepo = new JobRepository()
+const candidateRepo = new CandidateRepository(db)
+const recruiterRepo = new RecruiterRespository(db)
+const jobRepo = new JobRepository(db)
 
 const adminLoginUC = new AdminLoginUseCase(candidateRepo)
 const loadCandidatesUC = new LoadCandidatesUseCase(candidateRepo)
@@ -70,8 +74,8 @@ adminRouter.post('/admin/login', adminController.adminLogin.bind(adminController
 adminRouter.get('/admin/candidates/data',  adminAuth, adminController.loadCandidates.bind(adminController))
 adminRouter.get('/admin/companies/data', adminAuth, testMiddleware, adminController.loadCompanies.bind(adminController))
 adminRouter.get('/admin/candidate/details', adminAuth, adminController.loadCandidateDetails.bind(adminController))
-adminRouter.post('/admin/candidate/block', adminAuth, adminController.blockCandidate.bind(adminController))
-adminRouter.post('/admin/candidate/unblock', adminAuth, adminController.unblockCandidate.bind(adminController))
+adminRouter.patch('/admin/candidate/block/:candidateId', adminAuth, adminController.blockCandidate.bind(adminController))
+adminRouter.patch('/admin/candidate/unblock/:candidateId', adminAuth, adminController.unblockCandidate.bind(adminController))
 adminRouter.get('/admin/company/details/:companyId', adminAuth, adminController.loadCompanyDetails.bind(adminController))
 adminRouter.put('/admin/company/block/:companyId', adminAuth, adminController.blockRecruiter.bind(adminController))
 adminRouter.put('/admin/company/unblock/:companyId', adminAuth, adminController.unblockRecruiter.bind(adminController))
@@ -88,11 +92,16 @@ adminRouter.put('/admin/job/unreject/:jobId', adminAuth, adminController.unrejec
 
 
 adminRouter.post('/admin/token/refresh', refreshAccessToken)
+adminRouter.post('/admin/logout', testMiddleware, adminAuth, adminController.logoutAdmin)
 
 function testMiddleware(req : Request, res : Response, next : NextFunction){
-    console.log('Testing request from the client')
-    console.log('Sort query', req.query.sort)
+    console.log('Request for logout reached here', req.url)
+    console.log('Request headers', req.headers.authorization)
+   
     next()
 }
 
-export default adminRouter
+return adminRouter
+}
+
+export default createAdminRouter

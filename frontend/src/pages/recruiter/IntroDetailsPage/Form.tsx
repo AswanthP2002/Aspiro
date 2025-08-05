@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
 import { recruiterService } from "../../../services/apiServices"
+import { addCoverPhotoCloudinary, addLogoCloudinary, saveIntroDetails } from "../../../services/recruiterServices"
 
 export default function IntroDetailsPageForm(){
     const token = useSelector((state : any) => {
@@ -108,9 +109,9 @@ export default function IntroDetailsPageForm(){
                     logoFormData.append('upload_preset', 'recruiter_profile_images')
                     logoFormData.append('folder', 'profile')
 
-                    const logoResponse = await recruiterService.addLogoCloudinary(logoFormData)
+                    //const logoResponse = await recruiterService.addLogoCloudinary(logoFormData)
 
-                    const logoResult = await logoResponse.json()
+                    const logoResult = await addLogoCloudinary(logoFormData)
                     setlogourl(logoResult.secure_url)
                 }
 
@@ -120,24 +121,25 @@ export default function IntroDetailsPageForm(){
                     coverFormData.append('upload_preset', 'recruiter_profile_images')
                     coverFormData.append('folder', 'profile')
 
-                    const coverPhotoResponse = await recruiterService.addCoverPhotoCloudinary(coverFormData)
+                    //const coverPhotoResponse = await recruiterService.addCoverPhotoCloudinary(coverFormData)
 
-                    const coverPhotoResult = await coverPhotoResponse.json()
+                    const coverPhotoResult = await addCoverPhotoCloudinary(coverFormData)
                     setcoverphotourl(coverPhotoResult.secure_url)
                 }
 
                 //save details in the database
-                const saveResponse = await recruiterService.saveIntroDetails(token, details, logourl, coverphotourl)
+                const result = await saveIntroDetails(details, logourl, coverphotourl)
+                //const saveResponse = await recruiterService.saveIntroDetails(token, details, logourl, coverphotourl)
                 
-                if(saveResponse.status === 500) throw new Error('Internal server error, please try again after some time')
+                //if(saveResponse.status === 500) throw new Error('Internal server error, please try again after some time')
                 
-                const saveResult = await saveResponse.json()
+                //const saveResult = await saveResponse.json()
 
-                if(saveResult.success){
+                if(result.success){
                     Swal.fire({
                         icon:'success',
                         title:'Saved',
-                        text:saveResult.message,
+                        text:result.message,
                         showConfirmButton:true,
                         confirmButtonText:'Continue'
                     })

@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { recruiterService } from "../../../services/apiServices";
+import { recruiterRegister } from "../../../services/recruiterServices";
 
 export default function RecruiterRegister(){
 
@@ -55,9 +56,8 @@ export default function RecruiterRegister(){
             setvalidationerrortext("")
             //send data to the backend
 
-            try {
-                const response = await recruiterService.recruiterRegister(email, username, password)
-                const result = await response.json()
+           
+                const result = await recruiterRegister(email, username, password)
                 if(result.success){
                     setloading(false)
                     navigator(`/verify/recruiter/${result.recruiter}`)
@@ -67,17 +67,7 @@ export default function RecruiterRegister(){
                     setvalidationerror(true)
                     setvalidationerrortext(result.message)
                 }
-            } catch (error : unknown) {
-                if (error instanceof Error) {
-                    setloading(false)
-                    console.log('Error occured while user registering')
-                    Swal.fire({
-                        title: "Oops!",
-                        icon: "error",
-                        text: error.message
-                    })
-                }
-            }
+            
         }
     }
 

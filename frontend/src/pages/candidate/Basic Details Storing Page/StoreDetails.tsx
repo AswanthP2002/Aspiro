@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import useRefreshToken from "../../../hooks/refreshToken";
 import { tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice";
 import { candidateService } from "../../../services/apiServices";
+import { saveBasicDetails } from "../../../services/candidateServices";
 
 export default function StoreDetails(){
     const [jobRole, setjobrole] = useState("")
@@ -112,19 +113,18 @@ export default function StoreDetails(){
             console.log('data before sending to confirm',
                 jobRole, city, districiterror, state, country, pinCodeError, summary
             )
-            //testing the flow
-            // alert('Details saved successfully')
-            // return
-            try {
-                let saveResponse = await candidateService.saveBasicDetails(token, jobRole, city, district, state, country, pincode, summary)
-                if(saveResponse.status === 401){
-                    const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
-                    saveResponse = await candidateService.saveBasicDetails(newAccessToken, jobRole, city, district, state, country, pincode, summary)
-                }
+            
+            //try {
+            const result = await saveBasicDetails(jobRole, city, district, state, country, pincode, summary)
+                // let saveResponse = await candidateService.saveBasicDetails(token, jobRole, city, district, state, country, pincode, summary)
+                // if(saveResponse.status === 401){
+                //     const newAccessToken = await useRefreshToken('http://localhost:5000/candidate/token/refresh')
+                //     saveResponse = await candidateService.saveBasicDetails(newAccessToken, jobRole, city, district, state, country, pincode, summary)
+                // }
 
-                const result = await saveResponse.json()
+                // const result = await saveResponse.json()
 
-                if(result.success){
+                //if(result.success){
                     Swal.fire({
                         icon:"success",
                         title:"Saved",
@@ -138,27 +138,27 @@ export default function StoreDetails(){
                             navigator('/profile/personal')
                         }
                     })
-                }else{
-                    Swal.fire({
-                        icon:'error',
-                        text:result.message,
-                    })
-                }
+                // }else{
+                //     Swal.fire({
+                //         icon:'error',
+                //         text:result.message,
+                //     })
+                // }
 
-            } catch (error : unknown) {
-                if(error instanceof Error){
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:error.message,
-                        showConfirmButton:true,
-                        confirmButtonText:'Home',
-                        showCancelButton:false
-                    }).then((result) => {
-                        if(result.isConfirmed) navigator('/')
-                    })
-                }
-            }
+            // } catch (error : unknown) {
+            //     if(error instanceof Error){
+            //         Swal.fire({
+            //             icon:'error',
+            //             title:'Error',
+            //             text:error.message,
+            //             showConfirmButton:true,
+            //             confirmButtonText:'Home',
+            //             showCancelButton:false
+            //         }).then((result) => {
+            //             if(result.isConfirmed) navigator('/')
+            //         })
+            //     }
+            // }
         }
       }
 

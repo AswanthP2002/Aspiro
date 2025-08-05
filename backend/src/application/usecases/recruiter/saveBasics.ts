@@ -1,6 +1,7 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
+import ISaveBasicsUseCase from "./interface/ISaveBasicsUseCase";
 
-export default class SaveBasicsUseCase {
+export default class SaveBasicsUseCase implements ISaveBasicsUseCase {
     constructor(private recruiterRepo : IRecruiterRepo){}
 
     async execute(

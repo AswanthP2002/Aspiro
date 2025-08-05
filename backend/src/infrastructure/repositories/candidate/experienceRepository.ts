@@ -3,28 +3,34 @@ import Experience from "../../../domain/entities/candidate/experience";
 import IExperienceRepo from "../../../domain/interfaces/candidate/IExperienceRepo";
 import { SaveExperience } from "../../../domain/interfaces/candidate/saveResponses";
 import { connectDb } from "../../database/connection";
+import BaseRepository from "../baseRepository";
+import { Db } from "mongodb";
 const {ObjectId} = mongoose.Types
 
-export default class ExperienceRepository implements IExperienceRepo {
+export default class ExperienceRepository extends BaseRepository<Experience> implements IExperienceRepo {
     private _collection = "experience"
 
-    async addExperience(experience: Experience): Promise<SaveExperience> {
-        const db = await connectDb()
-        const result = await db.collection<Experience>(this._collection).insertOne(experience)
-        return result
+    constructor(db : Db){
+        super(db, 'experience')
     }
 
-    async getExperiences(candidateIdd: string): Promise<Experience[]> {
-        const db = await connectDb()
-        const result = await db.collection<Experience>(this._collection).find({ candidateId: new ObjectId(candidateIdd) }).sort({startdate:-1}).toArray()
-        return result
-    }
+    // async addExperience(experience: Experience): Promise<SaveExperience> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Experience>(this._collection).insertOne(experience)
+    //     return result
+    // }
 
-    async deleteExperience(experienceId: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Experience>(this._collection).deleteOne({_id:new ObjectId(experienceId)})
-        return result.acknowledged
-    }
+    // async getExperiences(candidateIdd: string): Promise<Experience[]> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Experience>(this._collection).find({ candidateId: new ObjectId(candidateIdd) }).sort({startdate:-1}).toArray()
+    //     return result
+    // }
+
+    // async deleteExperience(experienceId: string): Promise<boolean> {
+    //     const db = await connectDb()
+    //     const result = await db.collection<Experience>(this._collection).deleteOne({_id:new ObjectId(experienceId)})
+    //     return result.acknowledged
+    // }
 
     async editExperience(experienceId: string, editData : any): Promise<boolean> {
         const db = await connectDb()

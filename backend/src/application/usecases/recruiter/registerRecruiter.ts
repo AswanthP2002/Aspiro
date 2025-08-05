@@ -6,9 +6,10 @@ import { sendEmail } from "../../../utilities/sendmail";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import { RegisterRecruiterDTO, RegisterRecruiterSchema } from "../../../presentation/controllers/dtos/recruiter/registerRecruiterDTO";
 import { createRecruiterFromDTO } from "../../../domain/mappers/recruiter/recruiterMapper";
+import IRegisterRecruiterUseCase from "./interface/IRegisterRecruiterUseCase";
 
 
-export default class RegisterRecruiterUseCase {
+export default class RegisterRecruiterUseCase implements IRegisterRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo, private crepo : CandidateRepo){}
 
     async execute(recruiterDTO : RegisterRecruiterDTO) : Promise<string>{

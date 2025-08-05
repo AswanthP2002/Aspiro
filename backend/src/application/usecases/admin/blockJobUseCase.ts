@@ -1,6 +1,7 @@
 import IJobRepo from "../../../domain/interfaces/IJobRepo";
+import IBlockJobUseCase from "./interfaces/IBlockJobUseCase";
 
-export class BlockJobUseCase {
+export class BlockJobUseCase implements IBlockJobUseCase {
     constructor(private _jobRepo : IJobRepo){}
 
     async execute(id : string) : Promise<boolean> {

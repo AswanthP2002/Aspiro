@@ -6,17 +6,22 @@ import mongoose, { Mongoose } from "mongoose";
 import { after } from "node:test";
 import { SaveCandidate } from "../../../domain/interfaces/candidate/saveResponses";
 import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import BaseRepository from "../baseRepository";
 
-export default class CandidateRepository implements ICandidateRepo {
+export default class CandidateRepository extends BaseRepository<Candidate> implements ICandidateRepo {
     private _collection = "candidate"
 
-    async create(candidate: Candidate): Promise<SaveCandidate> {
-        const db = await connectDb()
-        const result = await db.collection(this._collection).insertOne(candidate)
-        console.log('Candidate repo.ts :: ', result)
-        console.log('Candidate repo.ts :: ', typeof result.insertedId)
-        return result
+    constructor(db : Db){
+        super(db, 'candidate')
     }
+
+    // async create(candidate: Candidate): Promise<SaveCandidate | null> {
+    //     const db = await connectDb()
+    //     const result = await db.collection(this._collection).insertOne(candidate)
+    //     console.log('Candidate repo.ts :: ', result)
+    //     console.log('Candidate repo.ts :: ', typeof result.insertedId)
+    //     return result
+    // }
     
     async findByEmail(email: string): Promise<Candidate | null> {
         console.log('Requested mail id in the repository side', email)
@@ -79,7 +84,7 @@ export default class CandidateRepository implements ICandidateRepo {
         
     }
 
-    async editProfile(id: string, name: string, role: string, city: string, district: string, state: string, country: string): Promise<Candidate | null> {
+    async editProfile(id: string, name: string, role: string, city: string, district: string, state: string, country: string, about : string): Promise<Candidate | null> {
         const db = await connectDb()
         const doc = await db.collection<Candidate>(this._collection).findOneAndUpdate(
             {_id:new ObjectId(id)},
@@ -89,7 +94,8 @@ export default class CandidateRepository implements ICandidateRepo {
                 "location.city":city,
                 "location.district":district,
                 "location.state":state,
-                "location.country":country
+                "location.country":country,
+                about:about
             }},
             {returnDocument:'after'}
         )

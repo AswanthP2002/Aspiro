@@ -2,7 +2,8 @@ import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import bcrypt from 'bcrypt'
 import { generateRefreshToken, generateToken } from "../../../services/jwt";
 import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
-export class AdminLoginUseCase {
+import IAdminLoginUseCase from "./interfaces/IAdmiLoginUseCase";
+export class AdminLoginUseCase implements IAdminLoginUseCase {
     constructor(private candidateRepo : ICandidateRepo) {}
 
     async execute(email : string, password : string) : Promise<Object>{

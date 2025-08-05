@@ -5,6 +5,7 @@ import defaultProfile from '/default-img-instagram.png'
 import Swal from "sweetalert2"
 import useRefreshToken from "../../../hooks/refreshToken"
 import { recruiterService } from "../../../services/apiServices"
+import { getProfileOverview } from "../../../services/recruiterServices"
 
 
 export default function RecruiterProfilePersonal(){
@@ -24,17 +25,9 @@ export default function RecruiterProfilePersonal(){
         async function fetchRecruiterProfileData(){
             setloading(true)
             
-            try {
-                let response = await recruiterService.getProfileOverview(token)
-
-                if(response.status === 401){
-                    const newAccesstoken = await recruiterService.refreshToken()
-                    response = await recruiterService.getProfileOverview(newAccesstoken)
-                }
-
-                const result = await response.json()
-
-                if(result.success){
+    
+                const result = await getProfileOverview()
+                
                     if (!result.recruiterDetails.companyName) {
                         setloading(false)
                         navigator('/recruiter/introdetails')
@@ -44,25 +37,7 @@ export default function RecruiterProfilePersonal(){
                         console.log('result from the backend', result)
                         setloading(false)
                     }
-                }else{
-                    setloading(false)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Something went wrong, please try again after some time'
-                    })
-                }
-            } catch (error : unknown) {
                 
-                if(error instanceof Error){
-                    setloading(false)
-                    console.log('Error occured while fetching recruiter data', error)
-                    Swal.fire({
-                        icon: 'error',
-                        text: error.message
-                    })
-                }
-            }
         }
 
         fetchRecruiterProfileData()

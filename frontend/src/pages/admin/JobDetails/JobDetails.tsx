@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
 import { adminServices } from '../../../services/apiServices'
+import { blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
 
 
 export default function JobDetails(){
@@ -21,46 +22,12 @@ export default function JobDetails(){
 
         async function fetchJobDetails(){
 
-            try {
-                let fetchResponse = await adminServices.getJobDetails(token, jobId)
-
-                if(fetchResponse.status === 401){
-                    const newAccessToken = await adminServices.refreshToken()
-                    fetchResponse = await adminServices.getJobDetails(newAccessToken, jobId)
-                }
-
-                const result = await fetchResponse.json()
-
-                if(result?.success){
+            
+                const result = await getJobDetails(jobId)
+                
                     setjobdetails(result?.jobDetails)
                     console.log('job details from the server', result?.jobDetails)
-                }else{
-                    Swal.fire({
-                        icon:'error',
-                        title:'Oops!',
-                        text:result.message,
-                        showCancelButton:false,
-                        showConfirmButton:true,
-                        confirmButtonText:'Home',
-                    }).then((result) => {
-                        if(result.isConfirmed) navigator('/admin/dashboard')
-                    })
-                }
-            } catch (error : unknown) {
-                console.log('Erorr occured while fetching job details', error)
-                if(error instanceof Error){
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:error.message,
-                        showConfirmButton:true,
-                        confirmButtonText:'Ok',
-                        showCancelButton:false
-                    }).then((result) => {
-                        if(result.isConfirmed) navigator('/admin/dashboard')
-                    })
-                }
-            }
+                
         }
         console.log('Received company id', jobId)
         
@@ -75,17 +42,9 @@ export default function JobDetails(){
 
     async function blockUnblockJob(jobId : any, operation : string){
         
-        try {
-            let response = await adminServices.blockUnblockJob(token, jobId, operation)
-
-            if(response.status === 401){
-                const newAccessToken = await adminServices.refreshToken()
-                response = await adminServices.blockUnblockJob(newAccessToken, jobId, operation)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
+        
+            const result = await blockJobUnblockJob(jobId, operation)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Success',
@@ -94,33 +53,13 @@ export default function JobDetails(){
                     showCancelButton:false,
                     timer:2000
                 }).then(() => window.location.reload())
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while blocking / unblocking job', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message,
-                    showCancelButton:false,
-                    confirmButtonText:'Ok'
-                })
-            }
-        }
+           
     }
 
     async function rejectUnRejectJob(jobId : any, operation : string){
-        try {
-            let response = await adminServices.rejectUnrejectJob(token, jobId, operation)
-
-            if(response.status === 401){
-                const newAccessToken = await adminServices.refreshToken()
-                response = await adminServices.rejectUnrejectJob(newAccessToken, jobId, operation)
-            }
-
-            const result = await response.json()
-
-            if(result.success){
+    
+        const result = await rejectJobUnrejectJob(jobId, operation)
+            
                 Swal.fire({
                     icon:'success',
                     title:'Success',
@@ -129,19 +68,6 @@ export default function JobDetails(){
                     showCancelButton:false,
                     timer:2000
                 }).then(() => window.location.reload())
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while rejecting / unrejecting job', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message,
-                    showCancelButton:false,
-                    confirmButtonText:'Ok'
-                })
-            }
-        }
     }
 
 

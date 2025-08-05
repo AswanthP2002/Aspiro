@@ -34,6 +34,9 @@ import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetai
 import DocumentsPage from './pages/candidate/Documents Page/Documents'
 import JobApplyPage from './pages/candidate/Job-apply/Apply'
 import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsManage'
+import AdminProtectedRoutes from './components/admin/AdminProtectedRoutes'
+import AdminLogedIn from './components/admin/AdminLogedInRoute'
+import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn'
 
 function App() {
   return(
@@ -69,33 +72,41 @@ function App() {
     </Route>
 
     <Route path='/admin' element={<AdminLayout />}>
-      <Route path='dashboard' element={<Dashboard />} />
-      <Route path='companies' element={<Companies /> } />
-      <Route path='candidates' element={<Candidates />} />
-      <Route path='jobs' element={<Jobs />} />
-      <Route path='candidate/details/:id' element={<CandidateDetails />} />
-      <Route path='company/details/:id' element={<CompanyDetails />} />
-      <Route path='job/details/:id' element={<JobDetails />} />
+      <Route element={<AdminProtectedRoutes />}>
+        <Route path='dashboard' element={<Dashboard />} />
+        <Route path='companies' element={<Companies /> } />
+        <Route path='candidates' element={<Candidates />} />
+        <Route path='jobs' element={<Jobs />} /> 
+        <Route path='candidate/details/:id' element={<CandidateDetails />} />
+        <Route path='company/details/:id' element={<CompanyDetails />} />
+        <Route path='job/details/:id' element={<JobDetails />} />
+      </Route> 
     </Route>
 
     <Route path="/register" element={<CandidateRegister />} />
     <Route path="/login" element={<CandidateLogin />} />
 
-    <Route path="/admin/login" element={<LoginPage />} />
+    <Route path='/admin/login' element={<AdminLogedIn />}>
+      <Route index element={<LoginPage />} />
+    </Route>
+    {/* <Route path="/admin/login" element={<LoginPage />} /> */}
 
     <Route path="/verify/:email" element={<VerificationPage />} />
     <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
     <Route path='/store/details' element={<StoreDetails />} />
     <Route path='/auth-success' element={<AuthSuccess />} />
 
-    <Route path='/recruiter/login' element={<RecruiterLogin />} />
+    {/* <Route path='/recruiter/login' element={<RecruiterLogin />} /> */}
+    <Route path='/recruiter/login' element={<RecruiterLogedInRoutes />}>
+      <Route index element={<RecruiterLogin />} />
+    </Route>
     <Route path='/recruiter/register' element={<RecruiterRegister />} />
     <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
-
+    
     {/* <Route element={<RecruiterProtectedRoutes />}>
       <Route path='/recruiter/profile/overview' element={<RecruiterProfilePersonal />} />
     </Route> */}
-
+    
     {/* Testing routes */}
     <Route path='/test' element={<RecruiterProfilePersonal />} />
   </Routes>

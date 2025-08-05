@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
 import { candidateService } from "../../../services/apiServices";
+import { editCandidateExperience } from "../../../services/candidateServices";
 
 export default function EditExperienceForm({ experience, editExperienceModalOpen, closeExpEditModal, token }: any) {
 
@@ -92,19 +93,19 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
 
     async function editExperience(experienceId : string) {
         
-        try {
+        //try {
             
-            let response = await candidateService.editExperience(token, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
+            // let response = await candidateService.editExperience(token, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
 
-            if(response.status === 401){
-                const newAccessToken = await candidateService.refreshToken()
-                response = await candidateService.editExperience(newAccessToken, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
-            }
+            // if(response.status === 401){
+            //     const newAccessToken = await candidateService.refreshToken()
+            //     response = await candidateService.editExperience(newAccessToken, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
+            // }
 
-            const result = await response.json()
+            const result = await editCandidateExperience(experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
             closeExpEditModal()
             
-            if(result.success){
+            //if(result.success){
                 Swal.fire({
                     icon:'success',
                     title:'Edited',
@@ -112,23 +113,23 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
                     showCancelButton:false,
                     timer:2000
                 }).then(() => window.location.reload())
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:"Oops!",
-                    text:result?.message
-                })
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while editing the experience', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error.message
-                })
-            }
-        }
+            // //}else{
+            //     Swal.fire({
+            //         icon:'error',
+            //         title:"Oops!",
+            //         text:result?.message
+            //     })
+            // }
+        //} catch (error : unknown) {
+            // console.log('Error occured while editing the experience', error)
+            // if(error instanceof Error){
+            //     Swal.fire({
+            //         icon:'error',
+            //         title:'Error',
+            //         text:error.message
+            //     })
+            // }
+        //}
     }
 
 

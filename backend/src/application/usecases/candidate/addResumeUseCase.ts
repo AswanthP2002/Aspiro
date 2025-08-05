@@ -6,11 +6,12 @@ import { ResumeSchema } from "../../../presentation/controllers/dtos/candidate/r
 import cloudinary from "../../../utilities/cloudinary";
 import streamifier from 'streamifier'
 import {v4} from 'uuid'
+import IAddResumeUseCase from "./interface/IAddResumeUseCase";
 
-export default class AddResumeUseCase {
+export default class AddResumeUseCase implements IAddResumeUseCase {
     constructor(private _iResumeRepo : IResumeRepo) {}
 
-    async execute(file : any, path : string, candidateId : string) : Promise<boolean> {
+    async execute(file : any, path : string, candidateId : string) : Promise<string | null> {
         
         const result : any = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({
@@ -28,7 +29,7 @@ export default class AddResumeUseCase {
 
         if(result){
             //save the resume
-            const addResumeResult = await this._iResumeRepo.addResume(
+            const addResumeResult = await this._iResumeRepo.create(
                 {
                     candidateId:new mongoose.Types.ObjectId(candidateId),
                     resumeUrlCoudinary:result?.secure_url,
@@ -40,6 +41,6 @@ export default class AddResumeUseCase {
             console.log('Resume saved successfully')
             return addResumeResult
         }
-        return false
+        return null
     }
 }

@@ -14,6 +14,7 @@ import { loginSucess } from "../../../redux-toolkit/candidateAuthSlice";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { candidateService } from "../../../services/apiServices";
+import { candidateLogin } from "../../../services/candidateServices";
 
 export default function CandidateLogin(){
     const [showpassword, setshowpassword] = useState(false)
@@ -48,10 +49,8 @@ export default function CandidateLogin(){
             return
         }else{
             //login
-            try {
-                const response = await candidateService.loginCandidate(email, password)
-
-                const result = await response.json()
+            
+                const result = await candidateLogin(email, password)
 
                 if(result?.success){
                     dispatcher(loginSucess({user:result?.result?.user, token:result?.result?.token}))
@@ -63,18 +62,6 @@ export default function CandidateLogin(){
                     setvalidationerrortext(result.message)
                 }
                 
-            } catch (error : unknown) {
-                if (error instanceof Error) {
-                    setloading(false)
-                    Swal.fire({
-                        title: 'Oops!',
-                        icon: 'error',
-                        text: error.message,
-                        showConfirmButton: true,
-                        showCancelButton: false
-                    })
-                }
-            }
         }
     }
 

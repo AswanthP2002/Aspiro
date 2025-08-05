@@ -10,6 +10,8 @@ import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candid
 import useRefreshToken from '../../../hooks/refreshToken'
 import { candidateLogout } from '../../../hooks/Logouts'
 import { candidateService } from '../../../services/apiServices'
+import { editCandidateProfile, getCandidateProfileData } from '../../../services/candidateServices'
+import useCandidateLogout from '../../../hooks/useLogout'
 
 interface Candidate {
     name : string
@@ -21,6 +23,7 @@ interface Candidate {
 //profile edit modal
 
 export default function ProfilePersonal(){
+    const candidateLogout = useCandidateLogout()
     const [candidate, setcandidate] = useState<any>({})
     const [loading, setloading] = useState(false)
     const [openprofileedit, setopenprofileedit] = useState(false)
@@ -79,33 +82,35 @@ export default function ProfilePersonal(){
         if(nameError || roleError || cityError || districtError || stateError || countryError || aboutError){
             return
         }
-        setloading(true)
+        //setloading(true)
         handCloseProfileEdit()
 
-        try {
-            let response = await candidateService.editProfile(token, name, role, city, district, state, country, about)
+        //try {
+            const result = await editCandidateProfile(name, role, city, district, state, country, about)
+            // let response = await candidateService.editProfile(token, name, role, city, district, state, country, about)
             
-            if(response.status === 401){
-                const newAccessToken = await candidateService.refreshToken()
-                response = await candidateService.editProfile(newAccessToken, name, role, city, district, state, country, about)
-            }
+            // if(response.status === 401){
+            //     const newAccessToken = await candidateService.refreshToken()
+            //     response = await candidateService.editProfile(newAccessToken, name, role, city, district, state, country, about)
+            // }
 
-            if (response.status === 403) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Blocked',
-                    text: 'Your account has been blocked by the admin. You will logout shortly..',
-                    showConfirmButton: false,
-                    showCancelButton: false,
-                    allowOutsideClick: false,
-                    timer: 4000
-                }).then(() => candidateLogout(token))
-            }
+            // if (!result.success) {
+            //     Swal.fire({
+            //         icon: 'warning',
+            //         title: 'Blocked',
+            //         text: 'Your account has been blocked by the admin. You will logout shortly..',
+            //         showConfirmButton: true,
+            //         confirmButtonText:'Ok',
+            //         showCancelButton: false,
+            //         allowOutsideClick: false
+            //     }).then(() => candidateLogout())
+            //     return
+            // }
 
-            const result = await response.json()
+            //const result = await response.json()
 
             if(result.success){
-                setloading(false)
+                //setloading(false)
                 Swal.fire({
                     icon:'success',
                     title:'Updated',
@@ -115,24 +120,24 @@ export default function ProfilePersonal(){
                     timer:3000
                 }).then(() => window.location.reload())
             }else{
-                setloading(false)
-                Swal.fire({
+            //     setloading(false)
+                 Swal.fire({
                     icon:'warning',
                     title:'Something went wrong'
-                })
+                 })
             }
 
-        } catch (error : unknown) {
-            console.log('error occured while saving candidate personal details')
-            if (error instanceof Error) {
-                setloading(false)
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops!',
-                    text: error.message
-                })
-            }
-        }
+        // } catch (error : unknown) {
+        //     console.log('error occured while saving candidate personal details')
+        //     if (error instanceof Error) {
+        //         setloading(false)
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Oops!',
+        //             text: error.message
+        //         })
+        //     }
+        // }
 
     }
 
@@ -153,31 +158,33 @@ export default function ProfilePersonal(){
         const fetchCandidateData = async () => {
             setloading(true)
 
-            try {
-                let fetchResponse = await candidateService.getCandidateProfileData(token)
+           // try {
+                const result = await getCandidateProfileData()
+                // let fetchResponse = await candidateService.getCandidateProfileData(token)
                 
-                if(fetchResponse.status === 401){
-                    const accessToken = await candidateService.refreshToken()
-                    dispatcher(tokenRefresh({token:accessToken}))
-                    fetchResponse = await candidateService.getCandidateProfileData(accessToken)
-                }
+                // if(fetchResponse.status === 401){
+                //     const accessToken = await candidateService.refreshToken()
+                //     dispatcher(tokenRefresh({token:accessToken}))
+                //     fetchResponse = await candidateService.getCandidateProfileData(accessToken)
+                // }
                 
-                if(fetchResponse.status === 403){
-                    Swal.fire({
-                        icon:'warning',
-                        title:'Blocked',
-                        text:'Your account has been blocked by the admin. You will logout shortly..',
-                        showConfirmButton:false,
-                        showCancelButton:false,
-                        allowOutsideClick:false,
-                        timer:4000
-                    }).then(() => candidateLogout(token))
-                }
+                // if(!result.success){
+                //     Swal.fire({
+                //         icon:'warning',
+                //         title:'Blocked',
+                //         text:'Your account has been blocked. You will logout shortly..',
+                //         showConfirmButton:true,
+                //         confirmButtonText:'Ok',
+                //         showCancelButton:false,
+                //         allowOutsideClick:false
+                //     }).then(() => candidateLogout())
+                //     return
+                // }
 
-                const result = await fetchResponse.json()
+                // const result = await fetchResponse.json()
 
                 if(result?.success){
-                    setTimeout(() => {
+                    //setTimeout(() => {
                         if(!result?.userDetails?.role){
                             navigator('/store/details')
                             return
@@ -185,7 +192,7 @@ export default function ProfilePersonal(){
                         setcandidate(result?.userDetails)
                         console.log('Result from the backend', result?.userDetails)
                         setloading(false)
-                    }, 2000)
+                    //}, 2000)
                 }else{
                     setloading(false)
                     Swal.fire({
@@ -201,24 +208,24 @@ export default function ProfilePersonal(){
                     })
                 }
 
-            } catch (error : unknown) {
-                console.log('Error occured while fetching candidate profile data', error)
-                if (error instanceof Error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.message,
-                        showConfirmButton: true,
-                        confirmButtonText: 'Home',
-                        showCancelButton: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            dispatcher(logout())
-                            navigator('/')
-                        }
-                    })
-                }
-            }
+            // } catch (error : unknown) {
+            //     console.log('Error occured while fetching candidate profile data', error)
+            //     if (error instanceof Error) {
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Error',
+            //             text: error.message,
+            //             showConfirmButton: true,
+            //             confirmButtonText: 'Home',
+            //             showCancelButton: false
+            //         }).then((result) => {
+            //             if (result.isConfirmed) {
+            //                 dispatcher(logout())
+            //                 navigator('/')
+            //             }
+            //         })
+            //     }
+            // }
 
         }
 

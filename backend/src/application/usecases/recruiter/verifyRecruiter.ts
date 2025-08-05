@@ -1,6 +1,7 @@
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
+import IVerifyRecruiterUseCase from "./interface/IVerifyRecruiterUseCase";
 
-export default class VerifyRecruiterUseCase {
+export default class VerifyRecruiterUseCase implements IVerifyRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo){}
 
     async execute(email : string, otp : string) : Promise<Boolean>{

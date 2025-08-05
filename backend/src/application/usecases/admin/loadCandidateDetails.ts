@@ -1,7 +1,8 @@
 import Candidate from "../../../domain/entities/candidate/candidates";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import ILoadCandidateDetailsUseCase from "./interfaces/ILoadCandidateDetailsUseCase";
 
-export class LoadCandidateDetailsUseCase {
+export class LoadCandidateDetailsUseCase implements ILoadCandidateDetailsUseCase {
     constructor(private _candidateRepo : CandidateRepo){}
 
     async execute(id : string) : Promise<Candidate | null> {

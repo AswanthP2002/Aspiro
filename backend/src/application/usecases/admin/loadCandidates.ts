@@ -1,7 +1,8 @@
 import Candidate from "../../../domain/entities/candidate/candidates";
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import ILoadCandidateUseCase from "./interfaces/ILoadCandidateUseCase";
 
-export class LoadCandidatesUseCase {
+export class LoadCandidatesUseCase implements ILoadCandidateUseCase {
     constructor(private _candidateRepo : CandidateRepo) {}
 
     async execute(search? : string, page : number = 1, limit : number = 1, sort : string = 'joined-latest', filter? : any) : Promise<any | null> { //change the return type to strict later

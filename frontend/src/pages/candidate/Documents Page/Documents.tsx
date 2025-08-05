@@ -5,6 +5,7 @@ import Loader from "../../../components/candidate/Loader"
 import { candidateService, commonService } from "../../../services/apiServices"
 import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
+import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"
 
 export default function DocumentsPage(){
     const [resumes, setResumes] = useState<any[]>([])
@@ -27,28 +28,28 @@ export default function DocumentsPage(){
         } 
     }
 
-    async function uploadFile(event : any){
+    async function uploadResume(event : any){
         setloading(true)
         const file = event.target?.files[0]
         setpdffile(file)
         const formData = new FormData()
         formData.append('resume', pdfile || file)
-        try {
-            let response = await commonService.parsePdf(token, formData)
-            if(response.status === 401){
-                const newAccessToken = await candidateService.refreshToken()
-                response = await commonService.parsePdf(newAccessToken, formData)
-            }
-            const result = await response.json()
+        //try {
+            // let response = await commonService.parsePdf(token, formData)
+            // if(response.status === 401){
+            //     const newAccessToken = await candidateService.refreshToken()
+            //     response = await commonService.parsePdf(newAccessToken, formData)
+            // }
+            const result = await addCandidateResume(formData)
             setloading(false)
             if(result?.success){
                 Swal.fire({
                     icon:'success',
-                    title:'Parsed',
-                    text:'Your resume parsed successfully',
-                    showConfirmButton:true,
+                    title:'Added',
+                    text:'Resume uploaded successfully',
+                    showConfirmButton:false,
                     showCancelButton:false
-                })
+                }).then(() => window.location.reload())
             }else{
                 Swal.fire({
                     icon:'warning',
@@ -58,33 +59,25 @@ export default function DocumentsPage(){
                     showCancelButton:false
                 })
             }
-        } catch (error : unknown) {
-            if(error instanceof Error){
-                console.log('Error occured while parsing the file', error)
-                Swal.fire({
-                    icon:'error',
-                    text:error?.message,
-                    showConfirmButton:true,
-                    showCancelButton:false
-                })
-            }
-        } finally{
+        //} catch (error : unknown) {
+            
+        //} finally{
             fileFieldRef.current.value = ''
-        }
+        //}
     }
 
     async function deleteResume(resumeId : string, publicId : string) {
-        try {
-            let response = await candidateService.deleteResume(token, resumeId, publicId)
+        //try {
+            // let response = await candidateService.deleteResume(token, resumeId, publicId)
 
-            if(response.status === 401){
-                const newAccessToken = await candidateService.refreshToken()
-                response = await candidateService.deleteResume(newAccessToken, resumeId, publicId)
-            }
+            // if(response.status === 401){
+            //     const newAccessToken = await candidateService.refreshToken()
+            //     response = await candidateService.deleteResume(newAccessToken, resumeId, publicId)
+            // }
 
-            const result = await response.json()
+            await deleteCandidateResume(resumeId, publicId)
 
-            if(result?.success){
+            //if(result?.success){
                 Swal.fire({
                     icon:'success',
                     title:'Deleted',
@@ -92,17 +85,17 @@ export default function DocumentsPage(){
                     showCancelButton:false,
                     timer:1300
                 }).then(() => window.location.reload())
-            }
-        } catch (error : unknown) {
-            if(error instanceof Error){
-                console.log('Error occured while deleting resume', error)
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error?.message
-                })
-            }
-        }
+            //}
+        // } catch (error : unknown) {
+        //     if(error instanceof Error){
+        //         console.log('Error occured while deleting resume', error)
+        //         Swal.fire({
+        //             icon:'error',
+        //             title:'Error',
+        //             text:error?.message
+        //         })
+        //     }
+        // }
     }
 
     function makeInlinePdfUrl(originalUrl: string): string {
@@ -114,22 +107,22 @@ export default function DocumentsPage(){
     
     useEffect(() => {
        (async function(){
-           try {
-               let resumeResponse = await candidateService.loadResumes(token)
-               let certificateResponse = await candidateService.loadCertificates(token)
+          // try {
+            //    let resumeResponse = await candidateService.loadResumes(token)
+            //    let certificateResponse = await candidateService.loadCertificates(token)
 
-               if (resumeResponse.status === 401) {
-                   const newAccessToken = await candidateService.refreshToken()
-                   resumeResponse = await candidateService.loadResumes(newAccessToken)
-               }
+            //    if (resumeResponse.status === 401) {
+            //        const newAccessToken = await candidateService.refreshToken()
+            //        resumeResponse = await candidateService.loadResumes(newAccessToken)
+            //    }
 
-               if(certificateResponse.status === 401) {
-                    const newAccessToken = await candidateService.refreshToken()
-                    certificateResponse = await candidateService.loadCertificates(newAccessToken)
-               }
+            //    if(certificateResponse.status === 401) {
+            //         const newAccessToken = await candidateService.refreshToken()
+            //         certificateResponse = await candidateService.loadCertificates(newAccessToken)
+            //    }
 
-               const resumeResult = await resumeResponse.json()
-               const certificateResult = await certificateResponse.json()
+               const resumeResult = await loadCandidateResumes()
+               const certificateResult = await loadCandidateCertificates()
 
                if (resumeResult?.success && certificateResult?.success) {
                 
@@ -142,16 +135,16 @@ export default function DocumentsPage(){
                        text: 'Sorry!, something went wrong'
                    })
                }
-           } catch (error : unknown) {
-                if(error instanceof Error) {
-                    console.log('Error occured while geting resumes', error)
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:error?.message
-                    })
-                }
-           }
+        //    } catch (error : unknown) {
+        //         if(error instanceof Error) {
+        //             console.log('Error occured while geting resumes', error)
+        //             Swal.fire({
+        //                 icon:'error',
+        //                 title:'Error',
+        //                 text:error?.message
+        //             })
+        //         }
+        //    }
        })()
     }, [])
 
@@ -191,7 +184,7 @@ export default function DocumentsPage(){
                     }
                 </div>
                 <div>
-                    <input ref={fileFieldRef} onChange={(event : any) => uploadFile(event)} type="file" accept="application/pdf" className="hidden" name="" id="" />
+                    <input ref={fileFieldRef} onChange={(event : any) => uploadResume(event)} type="file" accept="application/pdf" className="hidden" name="" id="" />
                     <button onClick={clickUpload} type="button" className="btn-add-resume border border-2 border-gray-400 flex items-center justify-center gap-2 px-4 py-2">
                         <i className="fa-solid fa-circle-plus"></i>
                         <div>

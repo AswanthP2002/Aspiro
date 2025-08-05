@@ -3,6 +3,7 @@ import { useState } from "react";
 import { higherSecondaryEducation, bachelorsDegree, mastersDegree, diploma } from "../../../assets/data/educationalStreamsData";
 import { candidateService } from "../../../services/apiServices";
 import Swal from "sweetalert2";
+import { addCandidateEducation } from "../../../services/candidateServices";
 
 export default function AddEducationForm({educationModalOpen, closeEducationModal, token} : any){
 
@@ -46,7 +47,7 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
         if(endYear){
             enddaterror = !endYear || false
         }
-        const locationerror = !location || /^[A-Za-z .'-]{2,50}(, [A-Za-z .'-]{2,50})?$/.test(location) || false
+        const locationerror = !location || !/^[A-Za-z .'-]{2,50}(, [A-Za-z .'-]{2,50})?$/.test(location) || false
 
         educationlevelerror ? setEducationLevelError('Please select education level') : setEducationLevelError('')
         educationstreamerror ? setEducationStreamError('Please provide education stream') : setEducationStreamError('')
@@ -63,21 +64,22 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
     }
 
     async function addEducation(){
+        //alert(location)
         const isValidated = validateForm()
         if(!isValidated) return
         closeEducationModal()
 
-        try {
-            let response = await candidateService.addEducation(token, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
+        //try {
+            // let response = await candidateService.addEducation(token, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
         
-            if(response.status === 401){
-                const newAccessToken = await candidateService.refreshToken()
-                response = await candidateService.addEducation(newAccessToken, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-            }
+            // if(response.status === 401){
+            //     const newAccessToken = await candidateService.refreshToken()
+            //     response = await candidateService.addEducation(newAccessToken, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
+            // }
 
-            const result = await response.json()
+            await addCandidateEducation(educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
 
-            if(result?.success){
+            //if(result?.success){
                 Swal.fire({
                     icon:'success',
                     title:'Added',
@@ -85,23 +87,23 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
                     showCancelButton:false,
                     timer:1500
                 }).then(() => window.location.reload())
-            }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oop!',
-                    text:result?.message
-                })
-            }
-        } catch (error : unknown) {
-            if(error instanceof Error){
-                console.log('Error occured while adding education', error)
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:error?.message
-                })
-            }
-        }
+            // }else{
+            //     Swal.fire({
+            //         icon:'error',
+            //         title:'Oop!',
+            //         text:result?.message
+            //     })
+            // }
+       // } catch (error : unknown) {
+            // if(error instanceof Error){
+            //     console.log('Error occured while adding education', error)
+            //     Swal.fire({
+            //         icon:'error',
+            //         title:'Error',
+            //         text:error?.message
+            //     })
+            // }
+       // }
     }
 
     return(
@@ -182,13 +184,13 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
           <Box sx={{width:'100%', display:'flex', justifyContent:'between', gap:'100px'}}>
             <div className="w-full">
                 <label htmlFor="">Start Date</label>
-                <input value={startYear} onChange={(event) => setStartDate(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
+                <input value={startYear} onChange={(event) => setStartDate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
                 <label className='error-label'>{startDateError}</label>
             </div>
 
             <div className="w-full">
                 <label htmlFor="">End Date</label>
-                <input disabled={isPresent ? true : false} value={endYear} onChange={(event) => setEndDate(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
+                <input disabled={isPresent ? true : false} value={endYear} onChange={(event) => setEndDate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
                 <label className='error-label'>{endDateError}</label>
             </div>
           </Box>

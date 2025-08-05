@@ -5,6 +5,7 @@ import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import useRefreshToken from '../../../hooks/refreshToken';
 import { adminServices } from '../../../services/apiServices';
+import { getCompanies } from '../../../services/adminServices';
 
 
 export default function Companies() {
@@ -39,17 +40,9 @@ export default function Companies() {
 
   useEffect(() => {
     async function fetchCompanyList(){
-      try {
-        let response = await adminServices.getCompanies(token, search, page, sort)
 
-        if(response.status === 401){
-          const newAccessToken = await adminServices.refreshToken()
-          response = await adminServices.getCompanies(newAccessToken, search, page, sort)
-        }
-
-        const result = await response.json()
-
-        if(result.success){
+        const result = await getCompanies(search, page, sort)
+        
           console.log('Data from the backend company list fetch result', result?.result)
           setcompany(result.result?.recruiters)
           setselectedcompany(result?.result?.recruiters[0])
@@ -57,22 +50,7 @@ export default function Companies() {
           settotalpage(result?.result?.totalPages)
           setpagination(new Array(result?.result?.totalPages).fill(0))
           setCurrentSort(result?.result?.currentSort)
-        }else{
-          Swal.fire({
-            icon:'error',
-            title:'Oops!',
-            text:result?.message
-          })
-        }
-      } catch (error : unknown) {
-        if(error instanceof Error){
-          Swal.fire({
-            icon:'error',
-            title:'Error',
-            text:error?.message
-          })
-        }
-      }
+        
     }
 
     fetchCompanyList()
