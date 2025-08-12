@@ -7,7 +7,7 @@ export default class GetExperienceUseCase implements ILoadExperiencesUseCase {
     constructor(private _experienceRepo : IExperienceRepo){}
 
     async execute(candidateId : string) : Promise<Experience[] | null> {
-        const result = await this._experienceRepo.findAll(candidateId)
+        const result = await this._experienceRepo.findWithCandidateId(candidateId)
         return result
     }
 }

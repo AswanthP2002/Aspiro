@@ -6,6 +6,7 @@ import { candidateService, commonService } from "../../../services/apiServices"
 import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
 import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"
+import ResumeCard from "../../../components/candidate/ResumeCard"
 
 export default function DocumentsPage(){
     const [resumes, setResumes] = useState<any[]>([])
@@ -48,7 +49,8 @@ export default function DocumentsPage(){
                     title:'Added',
                     text:'Resume uploaded successfully',
                     showConfirmButton:false,
-                    showCancelButton:false
+                    showCancelButton:false,
+                    timer:3000
                 }).then(() => window.location.reload())
             }else{
                 Swal.fire({
@@ -162,8 +164,9 @@ export default function DocumentsPage(){
                             ? <div className="grid grid-cols-5">
                                 {
                                     resumes?.map((resume, index) => {
-                                        return <>
-                                            <div key={index} className="col bg-gray-100 p-5 flex justify-between items-center">
+                                        return <ResumeCard key={index} resumeData={resume} deleteResume={deleteResume} />
+
+                                            {/* <div key={index} className="col bg-gray-100 p-5 flex justify-between items-center">
                                                 <div className="item flex gap-3 items-center">
                                                     <i className="fa-solid fa-file"></i>
                                                     <p className="text-sm">Resume</p>
@@ -175,8 +178,7 @@ export default function DocumentsPage(){
                                                         <div className="px-5 py-2"><p onClick={() => deleteResume(resume?._id, resume?. resumePublicIdCloudinary)} className="text-xs">Delete</p></div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </>
+                                            </div> */}
                                     })
                                 }
                               </div>

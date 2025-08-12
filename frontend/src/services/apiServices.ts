@@ -488,6 +488,17 @@ export const recruiterService = {
  * Refresh token is implemented through axios interceptors
  */
 
+export const loadJobDetails = async (jobId : string) => {
+    try {
+        const response = await axiosInstance.get(`/jobs/details/${jobId}`)
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        console.log('Error occured while geting job details')
+    }
+}
 export const commonService = {
     loadJobDetails: async function (jobId: any) {
         return fetch(`http://localhost:5000/jobs/details/${jobId}`, {

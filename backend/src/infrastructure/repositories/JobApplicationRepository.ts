@@ -22,25 +22,35 @@ export default class JObApplicationRepository extends BaseRepository<JobApplicat
     async getApplicationsByJobId(jobId: string): Promise<JobApplication[] | any> {
         const db = await connectDb()
         const result = await db.collection<JobApplication>(this._collection).aggregate([
+            {$match:{jobId:new mongoose.Types.ObjectId(jobId)}},
+            {$lookup: {
+                from: 'candidate',
+                localField: 'candidateId',
+                foreignField: '_id',
+                as: 'applicantDetails'
+            }},
             {
                 $lookup: {
-                    from: 'candidate',
-                    localField: 'candidateId',
-                    foreignField: '_id',
-                    as: 'candidateDetails'
+                from: 'resume',
+                localField: 'resumeId',
+                foreignField: '_id',
+                as: 'resume'
                 }
             },
-            {
-                $lookup: {
-                    from: 'job',
-                    localField: 'jobId',
-                    foreignField: '_id',
-                    as: 'jobDetails'
-                }
-            },
-            {$unwind:'$jobDetails'}
+            {$unwind:'$applicantDetails'},
+            {$unwind:'$resume'}
         ]).toArray()
 
         return result
+    }
+
+    async rejectJobApplication(applicationId: string): Promise<boolean> {
+        const db = await connectDb()
+        const updateResult = await db.collection<JobApplication>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(applicationId)},
+            {$set:{status:'rejected'}}
+        )
+
+        return updateResult.modifiedCount === 1
     }
 }

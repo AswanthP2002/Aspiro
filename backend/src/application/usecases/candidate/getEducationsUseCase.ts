@@ -6,7 +6,7 @@ export default class GetEducationsUseCase implements ILoadEducationsUseCase {
     constructor(private _iEducationRepo : IEducationRepo){}
 
     async execute(candidateId : string) : Promise<Education[] | null> {
-        const result = await this._iEducationRepo.findAll(candidateId)
+        const result = await this._iEducationRepo.findWithCandidateId(candidateId)
         return result
     }
 }

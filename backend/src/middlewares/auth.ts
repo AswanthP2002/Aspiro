@@ -24,7 +24,7 @@ export interface AdminAuth extends Request {
     candidateId?:string
 }
 export const candidateAuth = async (req : Auth, res : Response, next : NextFunction) => {
-
+    console.log('resume upload request reached at candidateAuth.ts')
     try {
         //check candidate blocked or not??
         const authHeader = req.headers.authorization
@@ -40,14 +40,15 @@ export const candidateAuth = async (req : Auth, res : Response, next : NextFunct
             const isBlocked = await checkCandidateBlockStatusUC.execute(decod.id)
             if(isBlocked) return res.status(StatusCodes.FORBIDEN).json({success:false, message:'Your account has been blocked by the admin, you will logout shortly..'})
             req.user = decod
+            console.log('Authentication success, transfering control to next parsePdf function')
             next()
         } catch (error : any) {
                 switch(error.name){
                     case 'TokenExpiredError' :
-                        console.log(error.message)
+                        console.log('error occured',error.message)
                         return res.status(StatusCodes.UNAUTHORIZED).json({success:false, message:'Session expired, please login again'})
                     case 'JsonWebTokenError' :
-                        console.log(error.message)
+                        console.log('error occured', error.message)
                         return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Invalid Token, please login again'})
                     default :
                         console.log('Token verification failed', error)

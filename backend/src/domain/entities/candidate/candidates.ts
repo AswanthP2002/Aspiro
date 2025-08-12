@@ -4,7 +4,7 @@ import Education from "./educations"
 import Experience from "./experience"
 import Favorites from "./favorites"
 import Resume from "./resume"
-import SocialLinks from "./socialLinks"
+import SocialLinks from "../socialLinks"
 
 export default interface Candidate {
     _id? : ObjectId
@@ -25,8 +25,14 @@ export default interface Candidate {
         pincode : string
         country : string
     }
-    profilePicture : string
-    coverPhoto : string
+    profilePicture : {
+        cloudinaryPublicId : string,
+        cloudinarySecureUrl : string
+    }
+    coverPhoto : {
+        cloudinaryPublicId : string,
+        cloudinarySecureUrl : string
+    }
     favorites : Favorites[]
     resume : Resume[]
     certificates : Certificates[]

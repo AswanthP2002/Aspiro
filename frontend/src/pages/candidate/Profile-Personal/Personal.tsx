@@ -1,17 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import defaultProfile from '/default-img-instagram.png'
 import { useDispatch, useSelector } from 'react-redux'
+import { Notify } from 'notiflix'
 import Swal from 'sweetalert2'
 import Loader from '../../../components/candidate/Loader'
 import { useNavigate } from 'react-router-dom'
 import { Box, Input, InputLabel, Modal, OutlinedInput, TextField, Typography } from '@mui/material'
 import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candidateAuthSlice'
-import useRefreshToken from '../../../hooks/refreshToken'
-import { candidateLogout } from '../../../hooks/Logouts'
-import { candidateService } from '../../../services/apiServices'
-import { editCandidateProfile, getCandidateProfileData } from '../../../services/candidateServices'
+import { addSocialmediaLinks, editCandidateProfile, getCandidateProfileData, removeSocialLink } from '../../../services/candidateServices'
 import useCandidateLogout from '../../../hooks/useLogout'
+import socialMediaLinks from '../../../assets/data/dummySocialMediaLinks'
+import SocialmediaLinks from '../../../components/candidate/SocialmediaLinksCard'
+import CropComponent from '../../../components/common/CropComponent'
+import GeneralModal from '../../../components/common/Modal'
+import EditProfilePictureComponent from '../../../components/candidate/EditProfilePhotoComponent'
+import EditCoverphotoComponent from '../../../components/candidate/EditCoverPhotoComponent'
 
 interface Candidate {
     name : string
@@ -23,11 +27,25 @@ interface Candidate {
 //profile edit modal
 
 export default function ProfilePersonal(){
-    const candidateLogout = useCandidateLogout()
     const [candidate, setcandidate] = useState<any>({})
     const [loading, setloading] = useState(false)
     const [openprofileedit, setopenprofileedit] = useState(false)
-    const [openphotedit, setopenphotoedit] = useState(false)
+
+    const [openProfilePhotoModal, setOpenProfilePhotoModal] = useState(false)
+    const openProfilePhoto = () => setOpenProfilePhotoModal(true)
+    const closeProfilePhoto = () => setOpenProfilePhotoModal(false)
+
+    const [openCoverphotoModal, setOpenCoverphotoModal] = useState(false)
+    const openCoverphoto = () => setOpenCoverphotoModal(true)
+    const closeCoverphoto = () => setOpenCoverphotoModal(false)
+
+    const [zoom, setZoom] = useState(1)
+    const [crop, setCrop] = useState({x:0, y:0})
+    const [image, setImage] = useState(null)
+
+    const [isAddLinkButtonClicked, setIsAddLinkButtonClicked] = useState(false)
+    const [socialmediaurl, setsocialmediaurl] = useState("")
+    const [socialmediaurlerror, setsocialmediaurlerror] = useState("")
 
     const [name, setname] = useState("")
     const [role, setrole] = useState("")
@@ -51,9 +69,6 @@ export default function ProfilePersonal(){
 
     const handleOpenProfileEdit = () => setopenprofileedit(true)
     const handCloseProfileEdit = () => setopenprofileedit(false)
-
-    const handleOpenPhotoEdit = () => setopenphotoedit(true)
-    const handleClosePhotoEdit = () => setopenphotoedit(false)
  
     const token = useSelector((state : any) => {
         return state?.candidateAuth?.token
@@ -85,29 +100,8 @@ export default function ProfilePersonal(){
         //setloading(true)
         handCloseProfileEdit()
 
-        //try {
+        
             const result = await editCandidateProfile(name, role, city, district, state, country, about)
-            // let response = await candidateService.editProfile(token, name, role, city, district, state, country, about)
-            
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.editProfile(newAccessToken, name, role, city, district, state, country, about)
-            // }
-
-            // if (!result.success) {
-            //     Swal.fire({
-            //         icon: 'warning',
-            //         title: 'Blocked',
-            //         text: 'Your account has been blocked by the admin. You will logout shortly..',
-            //         showConfirmButton: true,
-            //         confirmButtonText:'Ok',
-            //         showCancelButton: false,
-            //         allowOutsideClick: false
-            //     }).then(() => candidateLogout())
-            //     return
-            // }
-
-            //const result = await response.json()
 
             if(result.success){
                 //setloading(false)
@@ -126,18 +120,6 @@ export default function ProfilePersonal(){
                     title:'Something went wrong'
                  })
             }
-
-        // } catch (error : unknown) {
-        //     console.log('error occured while saving candidate personal details')
-        //     if (error instanceof Error) {
-        //         setloading(false)
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'Oops!',
-        //             text: error.message
-        //         })
-        //     }
-        // }
 
     }
 
@@ -158,30 +140,8 @@ export default function ProfilePersonal(){
         const fetchCandidateData = async () => {
             setloading(true)
 
-           // try {
+           
                 const result = await getCandidateProfileData()
-                // let fetchResponse = await candidateService.getCandidateProfileData(token)
-                
-                // if(fetchResponse.status === 401){
-                //     const accessToken = await candidateService.refreshToken()
-                //     dispatcher(tokenRefresh({token:accessToken}))
-                //     fetchResponse = await candidateService.getCandidateProfileData(accessToken)
-                // }
-                
-                // if(!result.success){
-                //     Swal.fire({
-                //         icon:'warning',
-                //         title:'Blocked',
-                //         text:'Your account has been blocked. You will logout shortly..',
-                //         showConfirmButton:true,
-                //         confirmButtonText:'Ok',
-                //         showCancelButton:false,
-                //         allowOutsideClick:false
-                //     }).then(() => candidateLogout())
-                //     return
-                // }
-
-                // const result = await fetchResponse.json()
 
                 if(result?.success){
                     //setTimeout(() => {
@@ -208,25 +168,6 @@ export default function ProfilePersonal(){
                     })
                 }
 
-            // } catch (error : unknown) {
-            //     console.log('Error occured while fetching candidate profile data', error)
-            //     if (error instanceof Error) {
-            //         Swal.fire({
-            //             icon: 'error',
-            //             title: 'Error',
-            //             text: error.message,
-            //             showConfirmButton: true,
-            //             confirmButtonText: 'Home',
-            //             showCancelButton: false
-            //         }).then((result) => {
-            //             if (result.isConfirmed) {
-            //                 dispatcher(logout())
-            //                 navigator('/')
-            //             }
-            //         })
-            //     }
-            // }
-
         }
 
         fetchCandidateData()
@@ -243,6 +184,50 @@ export default function ProfilePersonal(){
         setabout(candidate?.about)
     }, [candidate])
 
+    async function addSocialMedialink(){
+        if(!/https?:\/\/(www\.)?(linkedin\.com|twitter\.com|facebook\.com|instagram\.com|github\.com|t\.me|youtube\.com|behance\.net|dribbble\.com)\/[a-zA-Z0-9._\-\/]+/.test(socialmediaurl)){
+            setsocialmediaurlerror('This url is not valid')
+            return
+        }else{
+            setsocialmediaurlerror("")
+        }
+
+        if(socialmediaurl.includes('<script>') || socialmediaurl.includes('</script>') || !socialmediaurl){
+            setsocialmediaurl('Invalid url')
+            return
+        }else{
+            setsocialmediaurlerror("")
+        }
+
+        const result = await addSocialmediaLinks(socialmediaurl)
+
+        if(result.success){
+            Notify.success(result?.message, {timeout:1000})
+            setTimeout(() => window.location.reload(), 1000)
+        }else{
+            Swal.fire({
+                icon:'warning',
+                title:'Oops!',
+                text:result?.message
+            })
+        }
+    }
+
+    async function deleteSocialLink(domain : string) {
+        const result = await removeSocialLink(domain)
+
+        if(result?.success){
+            Notify.success(result?.message, {timeout:1000})
+            setTimeout(() => window.location.reload(), 1000)
+        }else{
+            Swal.fire({
+                icon:'warning',
+                title:'Oops',
+                text:result?.message
+            })
+        }
+    }
+
     return(
         <>
         {
@@ -250,50 +235,84 @@ export default function ProfilePersonal(){
         }
         <div className="container px-10 py-5">
             
-            <div className="profile-card relative height-fit border border-gray-400">
+            <div className="profile-card relative height-fit border border-gray-300">
                 <div className="relative">
                     <div className="cover-photo">
-                    <img src={defaultCoverPhoto} className='w-full h-[220px]' alt="" />
+                    <img style={{objectFit:'cover'}} src={candidate?.coverPhoto?.cloudinarySecureUrl ? candidate?.coverPhoto?.cloudinarySecureUrl : defaultCoverPhoto} className='w-full h-[220px]' alt="" />
+                    <i onClick={openCoverphoto} className="fa-solid fa-pen-to-square cursor-pointer absolute right-2 bottom-2"></i>
                 </div>
+                <CropComponent crop={crop} zoom={zoom} setCrop={setCrop} setZoom={setZoom} image={image} />
                 <div className="absolute bottom-2 left-2 w-fit h-fit">
-                    <img src={candidate?.profilePicture ? candidate?.profilePicture : defaultProfile} alt="" className="profile-photo rounded-full w-[100px] h-[100px]" />
-                    <i onClick={handleOpenPhotoEdit} className="fa-solid fa-pen-to-square absolute bottom-2"></i>
+                    <div className="relative">
+                        <img style={{objectFit:'cover'}} src={candidate?.profilePicture?.cloudinarySecureUrl ? candidate?.profilePicture?.cloudinarySecureUrl : defaultProfile} alt="" className="profile-photo rounded-full w-[100px] h-[105px]" />
+                        <i onClick={openProfilePhoto} className="cursor-pointer fa-solid fa-pen-to-square absolute bottom-1 left-10"></i>
+                    </div>
                 </div>
                 </div>
-                <div className='mt-4 px-5'>
-                    <p className="text-bold text-xl">{candidate?.name}</p>
-                    <p>{candidate?.role}</p>
-                    <p className="text-gray-400"><span><i className="fa-solid fa-location text-gray-400 me-3"></i>{candidate?.location?.district}, {candidate?.location?.state}</span></p>
-                    <div className="w-full flex justify-end pb-5">
-                        <button onClick={handleOpenProfileEdit} className='border border-gray-400'>Edit profile <i className="fa-solid fa-pencil"></i></button>
+                <div className='mt-4 px-5 flex justify-between pb-4'>
+                    <div className='w-full'>
+                        <p className="font-semibold text-xl">{candidate?.name}</p>
+                        <p className='mt-3'><span><i className="fa-solid fa-briefcase me-3"></i></span>{candidate?.role}</p>
+                        <p className="text-gray-400 text-sm mt-1"><span><i className="fa-solid fa-location-dot !text-sm !text-gray-400 me-3"></i>{candidate?.location?.district}, {candidate?.location?.state}</span></p>
+                    </div>
+                    <div className="w-full flex justify-end items-end pb-5">
+                        <button onClick={handleOpenProfileEdit} className='border rounded border-gray-300 text-sm px-2 py-1'>Edit profile <i className="!text-sm fa-solid fa-pen-to-square"></i></button>
                     </div>
                 </div>
             </div>
+            <section className='mt-8'>
             <div>
-                <p className="title text-xl">About</p>
-                <p>{candidate?.about}</p>
+                <p className="title font-semibold">About</p>
+                <p className='mt-3 text-sm text-gray-500'>{candidate?.about}</p>
             </div>
-            <div className='flex gap-10'>
+            <div className='flex gap-20 mt-5'>
                 <div>
                     <p className="text-bold">Email</p>
-                    <p>{candidate?.email}</p>
+                    <p className='text-sm text-gray-500 mt-1'>{candidate?.email}</p>
                 </div>
                 <div>
                     <p className="text-bold">Phone</p>
-                    <p>{candidate?.phone}</p>
+                    <p className='text-sm text-gray-500 mt-1'>{candidate?.phone}</p>
                 </div>
                 <div>
                     <p className="text-bold">Location</p>
-                    <p>{candidate?.location?.district}, {candidate?.location?.state}, {candidate?.location?.country}</p>
+                    <p className='text-sm text-gray-500 mt-1'>{candidate?.location?.district}, {candidate?.location?.state}, {candidate?.location?.country}</p>
                 </div>
             </div>
-            <hr />
+            </section>
+            <hr className='mt-5' />
             <div>
-                <p className="text-bold">Social Links</p>
-                <div className="social-links"></div>
-                <button type="button" className="border bg-gray-300 w-full p-2 border-dark-gray-400">Add Social links <span><i className="fa-solid fa-plus-circle"></i></span></button>
+                <p className="font-semibold mt-3">Social Links</p>
+                <div className="social-links">
+                    {
+                        candidate?.socialLinks?.length > 0
+                            ?
+                            candidate?.socialLinks?.map((links : any, index : number) => {
+                                return <SocialmediaLinks key={index} removeLink={() => deleteSocialLink(links?.domain)} data={links} />
+                            })
+                            : <>
+                                {isAddLinkButtonClicked === false && (
+                                    <p className='text-center text-xs text-gray-400 mt-3'>No links added</p>
+                                )}
+                                
+                              </>
+                    }
+                    {
+                        isAddLinkButtonClicked && (
+                            <div className='mt-2 mb-2 flex items-center'>
+                                <div className='relative'>
+                                <input value={socialmediaurl} onChange={(event) => setsocialmediaurl(event.target.value)} type="text" placeholder='enter url' className='border w-[400px] border-gray-300 rounded p-1' />
+                                <label htmlFor="" className="absolute error-label text-xs text-red block">{socialmediaurlerror}</label>
+                                </div>
+                                <button onClick={addSocialMedialink} className='text-sm bg-black text-white rounded px-2 py-1 ms-1'>Add</button>
+                                <button onClick={() => setIsAddLinkButtonClicked(false)} className='text-sm border border-gray-300 rounded ms-1 py-1 px-2'><i className="fa-solid fa-xmark-circle"></i></button>
+                            </div>
+                        )
+                    }
+                </div>
+                <button onClick={() => setIsAddLinkButtonClicked(true)} type="button" className="mt-2 border border-gray-400 rounded bg-gray-300 w-full p-2 border-dark-gray-400 text-xs">Add Social links <span><i className="fa-solid fa-plus-circle"></i></span></button>
             </div>
-        </div>
+        </div> 
 
         {/* Prfile edit modal */}
         <Modal open={openprofileedit} onClose={handCloseProfileEdit}>
@@ -350,13 +369,26 @@ export default function ProfilePersonal(){
         {/* ================= */}
 
         {/* Profile photo edit modal */}
-        <Modal open={openphotedit} onClose={handleClosePhotoEdit}>
+        {/* <Modal open={openphotedit} onClose={handleClosePhotoEdit}>
             <Box sx={style}>
                 <div className="flex justify-end"><i className="fa-solid fa-close" onClick={handleClosePhotoEdit}></i></div>
                 <h2>Edit profile</h2>
             </Box>
-        </Modal>
+        </Modal> */}
         {/* ================ */}
+            <GeneralModal 
+                openModal={openProfilePhotoModal} 
+                closeModal={closeProfilePhoto}
+                children={<EditProfilePictureComponent profilePicture={candidate?.profilePicture} />}
+            />
+        {/* =================== */}
+        {/*  */}
+        {/* =============== */}
+            <GeneralModal 
+                openModal={openCoverphotoModal}
+                closeModal={closeCoverphoto}
+                children={<EditCoverphotoComponent coverPhoto={candidate?.coverPhoto} />}
+            />
         </>
     )
 }

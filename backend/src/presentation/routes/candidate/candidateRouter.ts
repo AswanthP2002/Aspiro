@@ -1,4 +1,5 @@
 const express = require('express')
+import url from 'url'
 import { upload } from "../../../utilities/multer"
 import pdf from 'pdf-parse'
 import { NextFunction, Request, Response } from "express"
@@ -45,6 +46,19 @@ import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsF
 import { connectDb } from "../../../infrastructure/database/connection"
 import { Db } from "mongodb"
 import EditProfileUseCase from "../../../application/usecases/candidate/editProfile"
+import GetNotificationsUseCase from "../../../application/usecases/candidate/GetNotificationsUseCase"
+import NotificationRepository from "../../../infrastructure/repositories/notificationRepository"
+import FavoriteJobsRepsitory from "../../../infrastructure/repositories/candidate/favoriteJobsRepository"
+import SaveFavoriteJobUseCase from "../../../application/usecases/candidate/SaveFavoriteJobUseCase"
+import CheckIsJobSavedUseCase from "../../../application/usecases/candidate/checkIsJobSavedUseCase"
+import GetFavoriteJobUseCase from "../../../application/usecases/candidate/GetFavoriteJobsUseCase"
+import UnsaveJobUseCase from "../../../application/usecases/candidate/unsaveJobUseCase"
+import AddSocialLinkUseCase from '../../../application/usecases/candidate/AddSocialLinkUseCase'
+import DeleteSocialLinkUseCase from '../../../application/usecases/candidate/DeleteSocialLinkUseCase'
+import UploadProfilePictureUseCase from '../../../application/usecases/candidate/UploadProfilePictureUseCase'
+import RemoveProfilePictureUseCase from '../../../application/usecases/candidate/RemoveProfilePictureUseCase'
+import UploadCoverphotoUseCase from '../../../application/usecases/candidate/UploadCoverphotoUseCase'
+import RemoveCoverphotoUseCase from '../../../application/usecases/candidate/RemoveCoverphotoUseCase'
 
 async function createCandidateRouter(db : Db){
     const candidateRouter = express.Router()
@@ -58,6 +72,8 @@ async function createCandidateRouter(db : Db){
     const resumeRepo = new ResumeRepository(db)
     const certificateRepo = new CertificateRepository(db)
     const jobApplicationRepo = new JObApplicationRepository(db)
+    const notificationRepo = new NotificationRepository(db)
+    const favoriteJobsRepo = new FavoriteJobsRepsitory(db)
 
 
     const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
@@ -86,6 +102,17 @@ async function createCandidateRouter(db : Db){
     const applyJobUC = new SaveJobApplicationUseCase(jobApplicationRepo)
     const searchJobsHomePageUC = new SearchJobsFromHomeUseCase(jobRepo)
     const editCandidateProfileUC = new EditProfileUseCase(candidateRepo)
+    const getNotificationsUC = new GetNotificationsUseCase(notificationRepo)
+    const saveJobUC = new SaveFavoriteJobUseCase(favoriteJobsRepo)
+    const checkIsJobSavedUC = new CheckIsJobSavedUseCase(favoriteJobsRepo)
+    const getFavoriteJobsUC = new GetFavoriteJobUseCase(favoriteJobsRepo)
+    const unsaveJobUC = new UnsaveJobUseCase(favoriteJobsRepo)
+    const addSocialLinkUC = new AddSocialLinkUseCase(candidateRepo)
+    const deleteSocialLinkUC = new DeleteSocialLinkUseCase(candidateRepo)
+    const uploadProfilePictureUC = new UploadProfilePictureUseCase(candidateRepo)
+    const removeProfilePictureUC = new RemoveProfilePictureUseCase(candidateRepo)
+    const uploadCoverPhotoUC = new UploadCoverphotoUseCase(candidateRepo) 
+    const removeCoverPhotoUC = new RemoveCoverphotoUseCase(candidateRepo)
 
 
     const candidateController = new CandidateController(
@@ -114,7 +141,18 @@ async function createCandidateRouter(db : Db){
         loadCertificatesUC,
         applyJobUC,
         searchJobsHomePageUC,
-        editCandidateProfileUC
+        editCandidateProfileUC,
+        getNotificationsUC,
+        saveJobUC,
+        checkIsJobSavedUC,
+        getFavoriteJobsUC,
+        unsaveJobUC,
+        addSocialLinkUC,
+        deleteSocialLinkUC,
+        uploadProfilePictureUC,
+        removeProfilePictureUC,
+        uploadCoverPhotoUC,
+        removeCoverPhotoUC
     )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
@@ -122,8 +160,8 @@ candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateCon
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
 candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))
 candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
-candidateRouter.post('candidate/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
-candidateRouter.get('candidate/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
+candidateRouter.post('/candidate/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
+candidateRouter.get('/candidate/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
 candidateRouter.post('/candidate/experience/add', candidateAuth, candidateController.addExperience.bind(candidateController))
 candidateRouter.get('/candidate/experience', candidateAuth, candidateController.getExperiences.bind(candidateController))
 candidateRouter.delete('/candidate/experience/:experienceId', candidateAuth, candidateController.deleteExperience.bind(candidateController))
@@ -147,17 +185,30 @@ candidateRouter.get('/candidate/resumes', candidateAuth, candidateController.loa
 
 candidateRouter.patch('/candidate/profile',  candidateAuth, candidateController.editCandidateProfile.bind(candidateController)) //need updation
 
-candidateRouter.post('/candidate/job/:jobId/apply', candidateAuth, upload.single('resume'), parsePdf, candidateController.saveJobApplication.bind(candidateController))
+candidateRouter.post('/candidate/job/:jobId/apply', candidateAuth, candidateController.saveJobApplication.bind(candidateController))
 
 candidateRouter.get('/candidate/token/refresh', refreshAccessToken) //only checking refresh token
 candidateRouter.post('/candidate/logout', candidateAuth, candidateController.candidateLogout.bind(candidateController))
 
+candidateRouter.get('/candidate/notifications', candidateAuth, candidateController.getNotifications.bind(candidateController))
+candidateRouter.post('/candidate/job/:jobId/save', candidateAuth, candidateController.saveJob.bind(candidateController))
+candidateRouter.get('/candidate/job/saved/check', candidateAuth, candidateController.checkIsJobSaved.bind(candidateController))
+candidateRouter.get('/candidate/job/saved', candidateAuth, candidateController.getFavoriteJobs.bind(candidateController))
+candidateRouter.delete('/candidate/job/:jobId/unsave/:id', candidateAuth, candidateController.unsaveJob.bind(candidateController))
+candidateRouter.patch('/candidate/profile/links', candidateAuth, candidateController.addSocialLink.bind(candidateController))
+candidateRouter.patch('/candidate/profile/links/remove', candidateAuth, candidateController.deleteSocialLink.bind(candidateController))
+candidateRouter.patch('/candidate/profile/picture/update', candidateAuth, upload.single('profilePicture'), candidateController.uploadProfilePicture.bind(candidateController))
+candidateRouter.patch('/candidate/profile/picture/remove', candidateAuth, candidateController.removeProfilePicture.bind(candidateController))
+candidateRouter.patch('/candidate/profile/coverphoto/update', candidateAuth, upload.single('coverPhoto'), candidateController.uploadCoverphoto.bind(candidateController))
+candidateRouter.patch('/candidate/profile/coverphoto/remove', candidateAuth, candidateController.removeCoverphoto.bind(candidateController))
+
 candidateRouter.get('/get/user/:id', getAuthUserData)
 
+
+
 function testMiddleWare(req : Request, res : Response, next : NextFunction) {
-    console.log('Testing flow details from the client side, full query :: ', req.query)
-    next()
-    // return res.status(StatusCodes.OK).json({success:true, message:'Maintanance purpose'})
+    console.log('Testing request ', req.url)
+    return res.status(StatusCodes.ACCEPTED).json({success:true, message:'Testing flow'})
 }
 
  return candidateRouter
