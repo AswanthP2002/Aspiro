@@ -15,6 +15,11 @@ import IVerifyRecruiterUseCase from '../../../application/usecases/recruiter/int
 import ILoginRecruiterrUseCase from '../../../application/usecases/recruiter/interface/ILoginRecruiterUseCase'
 import ISaveBasicsUseCase from '../../../application/usecases/recruiter/interface/ISaveBasicsUseCase'
 import ILoadRecruiterProfileUseCase from '../../../application/usecases/recruiter/interface/ILoadRecruiterProfileUseCase'
+import IRejectCandidate from '../../../application/usecases/recruiter/interface/IRejectCandidateUseCase'
+import IRejectCandidateUseCase from '../../../application/usecases/recruiter/interface/IRejectCandidateUseCase'
+import ICreateNotification from '../../../application/usecases/common/interface/ICreateNotificationUseCase'
+import IFinalizeShortlist from '../../../application/usecases/recruiter/interface/IFinalizeShortlist'
+import IGetFinalizedShortlistData from '../../../application/usecases/recruiter/interface/IGetFinalizedDataUseCase'
 
 
 export default class RecruiterController {
@@ -25,7 +30,11 @@ export default class RecruiterController {
         private _saveBasicsUC : ISaveBasicsUseCase, //usecase interface
         private _loadCompanyProfileUseCase : ILoadRecruiterProfileUseCase, //usecase interface
         private _createJobUseCase : ICreateJobUseCase, //usecase interface
-        private _getJobApplicationDetails : IGetJobApplicationDetailsUseCase //usecase interface
+        private _getJobApplicationDetails : IGetJobApplicationDetailsUseCase, //usecase interface
+        private _rejectCandidateJobApplicationUseCase : IRejectCandidateUseCase,
+        private _createNotificationUseCase : ICreateNotification,
+        private _saveShortlistUseCase : IFinalizeShortlist,
+        private _getFinalizedShortlistDataUC : IGetFinalizedShortlistData
     ){}
 
     async registerRecruiter(req : Request, res : Response) : Promise<Response> {
@@ -163,6 +172,55 @@ export default class RecruiterController {
         } catch (error : unknown) {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'internal server error'})
+        }
+    }
+
+    async rejectCandidateJobApplication(req : Auth, res : Response) : Promise<Response> {
+        const {applicationId, candidateId} = req.params
+        const message = req.body.message as string
+        const reason = req.body.reason as string
+
+        try {
+            const rejectResult = await this._rejectCandidateJobApplicationUseCase.execute(applicationId, candidateId)
+            
+            if(!rejectResult) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not reject request right now, please try again after some time'})
+            
+            const createNotificationResult = await this._createNotificationUseCase.execute({title:'Rejected', message:`Your application is rejected due to ${reason}`}, candidateId)
+
+            if(createNotificationResult){
+                return res.status(StatusCodes.OK).json({success:true, message:'Application rejected successfully'})
+            }
+            return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+            
+        } catch (error : unknown) {
+            console.log('error occured while rejecting the candidate application', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async finalizeShortlist(req : Auth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+        const applications = req.body.applications
+        const recruiterId = req.user?.id
+
+        try {
+            const result = await this._saveShortlistUseCase.execute(jobId, recruiterId, applications)
+            return res.status(StatusCodes.OK).json({success:true, message:'Shortlist finalized'})
+        } catch (error : unknown) {
+            console.log('Error occured while saving shortlist', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    async getFinalizedShortlistData(req : Auth, res : Response) : Promise<Response> {
+        const {jobId} = req.params
+        console.log('jobid before fetching', jobId)
+        try {
+            const result = await this._getFinalizedShortlistDataUC.execute(jobId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Data fetched successfully', result})
+        } catch (error : unknown) {
+            console.log('error occured while fetching finalized list', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
     }
 }

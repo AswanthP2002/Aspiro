@@ -1,4 +1,4 @@
-interface Resume {
-    _id? : string
-    file : string
-}
+// interface Resume {
+//     _id? : string
+//     file : string
+// }

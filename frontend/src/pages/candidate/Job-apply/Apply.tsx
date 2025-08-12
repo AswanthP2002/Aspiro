@@ -3,11 +3,12 @@ import { useLocation, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { candidateService } from "../../../services/apiServices"
 import { useSelector } from "react-redux"
-import { candidateApplyJob } from "../../../services/candidateServices"
+import { addCandidateResume, candidateApplyJob } from "../../../services/candidateServices"
 
 export default function JobApplyPage() {
     
     const [resume, setResume] = useState<any>(null)
+    const [savedResumeId, setSavedResumeId] = useState("")
     const [filename, setFilename] = useState('')
     const [resumeNillError, setResumeNillError] = useState('') 
     const [jobDetails, setJobDetails] = useState<any>({})
@@ -66,17 +67,20 @@ export default function JobApplyPage() {
         }else{
             const formData = new FormData()
             formData.append('resume', resume)
-            formData.append('coverLetterContent', coverLetterContent)
+            //formData.append('coverLetterContent', coverLetterContent)
+                if(resume){
+                    //if resume uploaded through that input, upload that resume first then return it reference send along with the jobApplication as resume
+                    //alert('going to add reusme first')
+                    const result = await addCandidateResume(formData)
+                    //alert(`Resume added, this is resumeid ${result?.resumeId}`)
+                    //console.log('This is the result after uploaidng resume', result)
+                    //console.log('safe to set resume id to the state', result.resumeId)
+                    //setSavedResumeId(result?.resumeId)
+                    await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, result?.resumeId)
 
-            //try {
-                // let response = await candidateService.applyJob(token, jobId || jobDetails._id, formData)
+                }
 
-                // if(response.status === 401){
-                //     const newAccesstoken = await candidateService.refreshToken()
-                //     response = await candidateService.applyJob(newAccesstoken, jobId || jobDetails?._id, formData)
-                // }
-
-                await candidateApplyJob(jobId || jobDetails?._id, formData)
+                // await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, resume)
 
                 //if (result?.success) {
                     Swal.fire({
@@ -86,23 +90,6 @@ export default function JobApplyPage() {
                         showConfirmButton:false,
                         timer:1300
                     }).then(() => window.location.reload())
-                // }else{
-                //     Swal.fire({
-                //         icon:'error',
-                //         title:'Oops!',
-                //         text:result?.message
-                //     })
-                // }
-            // } catch (error : unknown) {
-            //     console.log('Error occured while applying the job', error)
-            //     if(error instanceof Error){
-            //         Swal.fire({
-            //         icon:'error',
-            //         title:'error',
-            //         text:error?.message
-            //     })
-            //     }
-            // }
         }
     }
 

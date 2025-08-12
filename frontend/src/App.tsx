@@ -37,6 +37,9 @@ import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsMa
 import AdminProtectedRoutes from './components/admin/AdminProtectedRoutes'
 import AdminLogedIn from './components/admin/AdminLogedInRoute'
 import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn'
+import CandidateProtectedRoute from './components/candidate/CandidateProtectedRoutes'
+import SavedJobs from './pages/SavedJobs/SavedJobs'
+import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList'
 
 function App() {
   return(
@@ -47,7 +50,10 @@ function App() {
       <Route path='jobs'>
           <Route index element={<JobListing />} />
           <Route path=':id' element={<JObDetailsCandidateSide />} />
-          <Route path=':id/apply' element={<JobApplyPage />} />
+          <Route path=':id/apply' element={<CandidateProtectedRoute />}>
+            <Route index element={<JobApplyPage />} />
+          </Route>
+          {/* <Route path=':id/apply' element={<JobApplyPage />} /> */}
       </Route>
       
 
@@ -55,6 +61,7 @@ function App() {
         <Route path="personal" index element={<ProfilePersonal />} />
         <Route path='experience' element={<ExperiencePage />} />
         <Route path='documents' element={<DocumentsPage />} />
+        <Route path='favorites' element={<SavedJobs />} />
       </Route>
 
     </Route>
@@ -67,6 +74,7 @@ function App() {
           <Route path='overview' index element={<RecruiterProfilePersonal />} />
           <Route path='post-a-job' element={<PostAJobForm />} />
           <Route path='applications/:jobId' element={<ApplicantManagePage />} />
+          <Route path='applications/:jobId/finalized' element={<FinalizedList />} />
         </Route>
       </Route>
     </Route>

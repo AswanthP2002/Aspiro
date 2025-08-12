@@ -7,7 +7,10 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
         ...dto,
         about:"",
         certificates:[],
-        coverPhoto:"",
+        coverPhoto:{
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        },
         currentSubscription:"",
         education:[],
         experience:[],
@@ -21,7 +24,10 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
             pincode:"",
             country:""
         },
-        profilePicture:"",
+        profilePicture:{
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        },
         resume:[],
         socialLinks:[],
         isVerified:false,
@@ -38,7 +44,10 @@ export function createGoogleAutCandidatefromDTO(dto : RegisterGoogleAuthCandidat
         ...dto,
         about:"",
         certificates:[],
-        coverPhoto:"",
+        coverPhoto:{
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        },
         currentSubscription:"",
         education:[],
         experience:[],
@@ -52,7 +61,10 @@ export function createGoogleAutCandidatefromDTO(dto : RegisterGoogleAuthCandidat
             pincode:"",
             country:""
         },
-        profilePicture:"",
+        profilePicture:{
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        },
         resume:[],
         socialLinks:[],
         isVerified:false,

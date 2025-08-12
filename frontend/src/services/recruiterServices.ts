@@ -208,3 +208,57 @@ export const refreshRecruiterToken = async () => {
         console.log('Error occured while refreshig tokene', error)
     }
 }
+
+export const rejectJobApplication = async (candidateId : string, applicationId : string, rejectReason : string, message : string = "") => {
+    try {
+        const response = await axiosInstance.put(`/recruiter/reject/application/${applicationId}/${candidateId}`,
+            {reason:rejectReason, message:message},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenRecruiter:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        console.log('Error occured while rejecting application', error instanceof Error ? error.message : null)
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+
+        console.log('Error occured while rejecting application', err)
+    }
+}
+
+export const finalizeShortList = async (jobId : string, applications : any) => {
+    try {
+        const response = await axiosInstance.post(`/recruiter/applications/finalize/${jobId}`,
+            {applications},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenRecruiter:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error) {
+        
+    }
+}
+
+export const getFinalizedShortlistData = async (jobId : string) => {
+    try {
+        const response = await axiosInstance.get(`/recruiter/applications/finalize/${jobId}`,
+            {
+                sendAuthTokenRecruiter:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        console.log(err)
+    }
+}

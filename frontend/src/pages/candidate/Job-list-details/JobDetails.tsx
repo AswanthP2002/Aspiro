@@ -2,12 +2,19 @@ import { useEffect, useState } from "react"
 import defaultImage from '../../../../public/default-img-instagram.png'
 import { useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
-import { commonService } from "../../../services/apiServices"
+import { commonService, loadJobDetails } from "../../../services/apiServices"
+import { checkIsSaved, saveJob, unsaveJob } from "../../../services/candidateServices"
+import { useSelector } from "react-redux"
 
 export default function JObDetailsCandidateSide() {
     const [jobDetails, setjobDetails] = useState<any>({})
+    const [isJobSaved, setIsJobSaved] = useState(false)
+    
     const params = useParams()
-    const jobId = params?.id
+    const jobId  = params?.id as string
+    const logedCandidate = useSelector((state : any) => {
+        return state.candidateAuth.token
+    })
 
     console.log('params is here', jobId)
     const navigator = useNavigate()
@@ -16,12 +23,14 @@ export default function JObDetailsCandidateSide() {
         async function fetchJobDetails(){
             
             try {
-                const response = await commonService.loadJobDetails(jobId)
+                //const response = await commonService.loadJobDetails(jobId)
 
-                const result = await response.json()
+                const result = await loadJobDetails(jobId)
+                
 
                 if(result.success){
                     console.log('job details fetched', result)
+                    
                     setjobDetails(result?.jobDetails)
                 }else{
                     Swal.fire({
@@ -29,6 +38,11 @@ export default function JObDetailsCandidateSide() {
                         title:'Oops',
                         text:result?.message
                     })
+                }
+
+                if(logedCandidate){
+                    const isSaved = await checkIsSaved(jobId)
+                    setIsJobSaved(isSaved)
                 }
 
             } catch (error : unknown) {
@@ -55,6 +69,48 @@ export default function JObDetailsCandidateSide() {
     function goToApplyPage(jobId : string) {
         navigator(`apply`, {state:{jobDetails}})
     }
+    async function addJobToFavorites(jobId : string) {
+        const result = await saveJob(jobId)
+
+        if(result?.success){
+            Swal.fire({
+                icon:'success',
+                title:'Saved',
+                showConfirmButton:false,
+                showCancelButton:false,
+                timer:2400
+            }).then(() => window.location.reload())
+        }else{
+            Swal.fire({
+                icon:'error',
+                title:'Oops',
+                text:result?.message,
+                showCancelButton:false,
+            })
+        }
+    }
+
+    async function jobUnsave(jobId : string, id : string) {
+        const result = await unsaveJob(jobId, id)
+
+        if(result?.success){
+            Swal.fire({
+                icon:'success',
+                title:'Unsaved',
+                showConfirmButton:false,
+                showCancelButton:false,
+                timer:2400
+            }).then(() => window.location.reload())
+        }else{
+            Swal.fire({
+                icon:'error',
+                title:'Oops',
+                text:result?.message,
+                showCancelButton:false,
+            })
+        }
+    }
+
     return (
         <>
             <div className="job-listing-container w-full">
@@ -80,7 +136,12 @@ export default function JObDetailsCandidateSide() {
                                 </div>
                             </div>
                             <div className="actions flex gap-2">
-                                <button type="button" className="btn bg-0"><i className="fa-solid fa-bookmark !text-2xl !text-gray-300"></i></button>
+                                {
+                                    isJobSaved
+                                        ? <button type="button" className="save-button btn"><i className={`fa-solid fa-bookmark !text-2xl !text-black"`}></i></button>
+                                        : <button onClick={() => addJobToFavorites(jobDetails?._id)} type="button" className="save-button btn"><i className={`fa-solid fa-bookmark !text-2xl !text-gray-300`}></i></button>
+                                    }
+                                
                                 <button onClick={() => goToApplyPage(jobDetails?._id)} type="button" className="btn bg-blue-500 text-white rounded-sm px-3 py-2 text-sm">Apply now</button>
                             </div>
                         </div>

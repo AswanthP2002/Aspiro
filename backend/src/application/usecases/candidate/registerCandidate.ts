@@ -33,7 +33,10 @@ export default class RegisterCandidateUseCase implements IRegisterCandidateUseCa
         
         candidate.about = ""
         candidate.certificates = []
-        candidate.coverPhoto = ""
+        candidate.coverPhoto = {
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        }
         candidate.currentSubscription = ""
         candidate.education = []
         candidate.experience = []
@@ -46,7 +49,10 @@ export default class RegisterCandidateUseCase implements IRegisterCandidateUseCa
             pincode:"",
             country:""
         }
-        candidate.profilePicture = ""
+        candidate.profilePicture = {
+            cloudinaryPublicId:"",
+            cloudinarySecureUrl:""
+        }
         candidate.resume = []
         candidate.socialLinks = []
         candidate.isVerified = false

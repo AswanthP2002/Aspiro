@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
 import { logout } from "../redux-toolkit/candidateAuthSlice";
@@ -341,6 +341,7 @@ export const addCandidateResume = async (formData : any) => {
 
         return response.data
     } catch (error : unknown) {
+        console.log('Error occured while uploading candidate resume candidateServices.ts', error instanceof Error ? error.message : null)
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
@@ -428,9 +429,11 @@ export const refreshCandidateToken = async () => {
     }
 }
 
-export const candidateApplyJob = async (jobId : string, formData : any) => {
+export const candidateApplyJob = async (jobId : string, coverLetterContent : string, resumeId : string) => {
     try {
-        const response = await axiosInstance.post(`/candidate/job/${jobId}/apply`, formData, 
+        alert(`Inside the candidateService going to call the applyjob ${resumeId}`)
+        const response = await axiosInstance.post(`/candidate/job/${jobId}/apply`,
+            {coverLetterContent, resumeId}, 
             {
                 sendAuthTokenCandidate:true
             } as AxiosRequest
@@ -442,5 +445,232 @@ export const candidateApplyJob = async (jobId : string, formData : any) => {
         const err = error as AxiosError
 
         console.log('Error occured while applying for job', err)
+    }
+}
+
+export const getNotifications = async () => {
+    try {
+        const response = await axiosInstance.get('/candidate/notifications',
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        console.log('Error occured while geting candidate notifications', error)
+
+        
+    }
+}
+
+export const getCandidateFavoriteJobs = async () => {
+    try {
+        const response = await axiosInstance.get('/candidate/favorites',
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('error occured while geting candidate favorite jobs')
+    }
+}
+
+export const saveJob = async (jobId : string) => {
+    try {
+        const response = await axiosInstance.post(`/candidate/job/${jobId}/save`, null,
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+
+        console.log('Error occured while saving the job')
+    }
+}
+
+export const unsaveJob = async (jobId : string, id : string) => {
+    try {
+        const response = await axiosInstance.delete(`/candidate/job/${jobId}/unsave/${id}`,
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+         if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+    }
+}
+
+export const getSavedJobs = async () => {
+    try {
+        const response = await axiosInstance.get('/candidate/job/saved',
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('Error occured while geting the favorite jobs', err)
+    }
+}
+
+export const checkIsSaved = async (jobId : string) => {
+    try {
+        const response = await axiosInstance.get('/candidate/job/saved/check',
+            {
+                params:{jobId},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data.isSaved
+    } catch (error : unknown) {
+        const  err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('Error occured while checking if job is saved or not', err)
+    }
+}
+
+export const addSocialmediaLinks = async (url : string) => {
+    try {
+        const response = await axiosInstance.patch('/candidate/profile/links',
+            {url},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('Error occured while adding social media links')
+    }
+}
+
+export const removeSocialLink = async (domain : string) => {
+    try {
+        const response = await axiosInstance.patch('/candidate/profile/links/remove',
+            {domain},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('Error occured while deleting the social link', err)
+    }
+}
+
+export const updateProfilePicture = async (formData : any, publicId : string = "") => {
+    try {
+        const response = await axiosInstance.patch('/candidate/profile/picture/update', formData,
+            {
+                params:{publicId},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('error occured while updating profile picture')
+    }
+}
+
+export const removeProfilePicture = async (cloudinaryPublicId : string) => {
+    try {
+        const response = await axiosInstance.patch(`candidate/profile/picture/remove/`,
+            {cloudinaryPublicId},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+
+        console.log('error occured', err)
+    }
+}
+
+export const updateCoverPhoto = async (formData : any, publicId : string = "") => {
+    try {
+        const response = await axiosInstance.patch('/candidate/profile/coverphoto/update', formData,
+            {   params:{publicId},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return
+
+        console.log('Error occured while updating coverphoto', err)
+    }
+}
+
+export const removeCoverphoto = async (publicId : string) => {
+    try {
+        const response = await axiosInstance.patch('/candidate/profile/coverphoto/remove', null,
+            {
+                params:{publicId},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+
+        console.log('Error occured while removing the cover photo', err)
     }
 }

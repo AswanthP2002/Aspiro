@@ -4,10 +4,14 @@ import defaultUser from '/default-img-instagram.png'
 import { logout, tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice"
 import useRefreshToken from "../../../hooks/refreshToken"
 import Swal from "sweetalert2"
-import { candidateLogout } from "../../../services/candidateServices"
+import { candidateLogout, getNotifications } from "../../../services/candidateServices"
+import NotificationComponent from "../../../components/common/NotificationComponent"
+import { useEffect, useState } from "react"
 //import { candidateLogout } from "../../../hooks/Logouts"
 
 export default function Header(){
+    const [notifications, setNotifications] = useState<any[]>([])
+    // let notificationstest : any[] = []
     const dispatch = useDispatch()
     const navigator = useNavigate()
     const logedUser = useSelector((state : any) => {
@@ -20,7 +24,7 @@ export default function Header(){
     console.log('This is loged user', logedUser)
 
     async function logoutCandidate(){
-        const logoutResult = await candidateLogout()
+        const logoutResult = await candidateLogout(dispatch, navigator)
         dispatch(logout())
         Swal.fire({
             icon:'success',
@@ -31,6 +35,16 @@ export default function Header(){
         }).then(() => navigator('/login'))
     }
 
+    useEffect(() => {
+        if(logedUser){
+            (async function(){
+                const result = await getNotifications()
+                console.log('notficiations', result.notifications)
+                // notificationstest = result?.notifications
+                setNotifications(result.notifications)
+            })()
+        }
+    }, [logedUser])
     
     return(
         <div className="w-full">
@@ -41,16 +55,20 @@ export default function Header(){
                     </div>
                     <div className="nav-actions flex justify-between w-full items-center">
                     <ul className="nav-links flex gap-10">
-                        <li className="nav-link active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
-                        <li className="nav-link cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
-                        <li className="nav-link cursor-pointer hover:text-blue-500">Candidates</li>
-                        <li className="nav-link cursor-pointer hover:text-blue-500">Companies</li>
-                        <li className="nav-link cursor-pointer hover:text-blue-500">Network</li>
+                        <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
+                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
+                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Candidates</li>
+                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
+                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
                     </ul>
+                    
                     <div className="actions flex gap-5 items-center">
+
                         {
                             logedUser
+                            
                                 ? <>
+                                    <NotificationComponent notifications={notifications?.length > 0 ? notifications : []} />
                                     <div className="relative account-action-wrapper group cursor-pointer">
                                         <img src={defaultUser} style={{width:'48px', height:'50px'}} alt="" />
                                         <div className="action-details hidden group-hover:block absolute bg-white shadow w-[150px] right-0 p-2">

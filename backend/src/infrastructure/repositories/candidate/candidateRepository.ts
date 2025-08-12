@@ -7,12 +7,15 @@ import { after } from "node:test";
 import { SaveCandidate } from "../../../domain/interfaces/candidate/saveResponses";
 import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import BaseRepository from "../baseRepository";
+import SocialLinks from "../../../domain/entities/socialLinks";
 
 export default class CandidateRepository extends BaseRepository<Candidate> implements ICandidateRepo {
-    private _collection = "candidate"
-
+    private _collection : string
+    db : Db
     constructor(db : Db){
         super(db, 'candidate')
+        this.db = db
+        this._collection = 'candidate'
     }
 
     // async create(candidate: Candidate): Promise<SaveCandidate | null> {
@@ -204,5 +207,79 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
         ]).toArray()
 
         return result[0]
+    }
+
+    async addSocialLink(candidateId: string, socialLink: SocialLinks): Promise<boolean | null> {
+        //find the domain is already exist or not
+        const isExist = await this.db.collection<Candidate>(this._collection).findOne({
+            _id:new mongoose.Types.ObjectId(candidateId),
+            socialLinks:{$elemMatch:{domain:socialLink.domain}}
+        })
+        if(isExist) return false
+        
+        const updateResult = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$push:{socialLinks:socialLink}}
+        )
+
+        return updateResult.modifiedCount === 1
+    }
+
+    async getSocialLinks(candidateId: string): Promise<SocialLinks[] | null> {
+        const result = await this.db.collection<Candidate>(this._collection).findOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)}
+        )
+
+        return result ? result.socialLinks : []
+    }
+
+    async deleteSocialLink(candidateId: string, domain: string): Promise<boolean | null> {
+        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$pull:{socialLinks:{domain:domain}}}
+        )
+
+        return result.modifiedCount === 1
+    }
+
+    async uploadProfilePhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<boolean | null> {
+        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$set:{profilePicture:{cloudinarySecureUrl:cloudinaryUrl, cloudinaryPublicId:cloudinaryPublicId}}}
+        )
+        return result.modifiedCount > 0
+    }
+
+    async removeProfilePhoto(candidateId: string): Promise<boolean | null> {
+        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$set:{
+                profilePicture:{cloudinaryPublicId:"", cloudinarySecureUrl:""}
+            }}
+        )
+
+        return result.modifiedCount > 0
+    }
+
+    async uploadCoverPhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<boolean | null> {
+        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$set:{
+                coverPhoto:{cloudinaryPublicId:cloudinaryPublicId, cloudinarySecureUrl:cloudinaryUrl}
+            }}
+        )
+
+        return result?.modifiedCount > 0
+    }
+
+    async removeCoverPhoto(candidateId: string): Promise<boolean | null> {
+        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+            {_id:new mongoose.Types.ObjectId(candidateId)},
+            {$set:{
+                coverPhoto:{cloudinaryPublicId:"", cloudinarySecureUrl:""}
+            }}
+        )
+
+        return result.modifiedCount > 0
     }
 }

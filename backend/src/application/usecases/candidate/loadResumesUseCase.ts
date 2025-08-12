@@ -6,7 +6,7 @@ export default class LoadResumesUseCase implements ILoadResumeUseCase {
     constructor(private _iResumeRepo : IResumeRepo){}
 
     async execute(candidateId : string) : Promise<Resume[] | null> {
-        const result = await this._iResumeRepo.findAll(candidateId)
+        const result = await this._iResumeRepo.findWithCandidateId(candidateId)
         return result
     }
 }

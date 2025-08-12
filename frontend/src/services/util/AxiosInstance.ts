@@ -24,8 +24,8 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<any> => {
     const customeRequest = request as AxiosRequest
-    console.log('Intercepter for request has been triggered')
-    console.log('Custome request before final request', customeRequest)
+    // console.log('Intercepter for request has been triggered')
+    // console.log('Custome request before final request', customeRequest)
     if(customeRequest?.sendCookie){
         customeRequest.withCredentials = true
     }
@@ -43,7 +43,7 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
         customeRequest.headers.Authorization = `Bearer ${token}`
     }
 
-    console.log('Final request before sending', request.headers)
+    console.log('Final request before sending', customeRequest)
 
     return customeRequest
 })
