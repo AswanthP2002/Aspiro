@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 
 export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal} : any){
     const [type, setskillType] = useState("")

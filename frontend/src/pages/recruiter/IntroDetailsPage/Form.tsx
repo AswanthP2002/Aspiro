@@ -2,7 +2,7 @@ import { useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
-import { recruiterService } from "../../../services/apiServices"
+import { recruiterService } from "../../../services/commonServices"
 import { addCoverPhotoCloudinary, addLogoCloudinary, saveIntroDetails } from "../../../services/recruiterServices"
 
 export default function IntroDetailsPageForm(){

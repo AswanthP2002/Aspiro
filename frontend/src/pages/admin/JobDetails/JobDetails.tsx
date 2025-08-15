@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
-import { adminServices } from '../../../services/apiServices'
+import { adminServices } from '../../../services/commonServices'
 import { blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
 
 

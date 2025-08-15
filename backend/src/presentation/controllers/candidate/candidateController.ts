@@ -2,41 +2,9 @@ import { Request, Response } from "express"
 import url from 'url'
 
 import CandidateRepository from "../../../infrastructure/repositories/candidate/candidateRepository"
-// import RegisterCandidateUseCase from "../../../application/usecases/candidate/registerCandidate"
-// import { RegisterCandidateSchema } from "../dtos/candidate/registerCandidateDTOs"
-// import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candidateMapper"
-// import VerifyUser from "../../../application/usecases/candidate/verifyUser"
-// import { LoginCandidateUseCase } from "../../../application/usecases/candidate/loginCandidate"
-// import SaveBasics from "../../../application/usecases/candidate/saveBasiscs"
 import { Auth } from "../../../middlewares/auth"
-//import { LoadCandidatePersonalDataUC} from "../../../application/usecases/candidate/loadPersonalDatas"
 import GetAuthUserUseCase from "../../../application/usecases/getPasspoartUser"
-//import EditProfileUseCase from "../../../application/usecases/candidate/editProfile"
 import { StatusCodes } from "../../statusCodes"
-// import VerifyUserUseCase from "../../../application/usecases/candidate/verifyUser"
-// import SaveIntroDetailsUseCase from "../../../application/usecases/candidate/saveBasiscs"
-// import CandidateLoginResult from "../dtos/candidate/loginResultDTO"
-// import AddExperienceUseCase from "../../../application/usecases/candidate/addExperience"
-// import getExperienceUseCase from "../../../application/usecases/candidate/getExperienceUseCase"
-// import deleteExperience from "../../../application/usecases/candidate/deleteExperienceUseCase"
-// import DeleteExperienceUseCase from "../../../application/usecases/candidate/deleteExperienceUseCase"
-// import EditExperienceUseCase from "../../../application/usecases/candidate/editExperienceUseCase"
-// import LoadJobsCandidateSideUseCase from "../../../application/usecases/candidate/loadJobLists"
-// import LoadJobDetailsCandidateSide from "../../../application/usecases/candidate/loadJobDetails"
-// import AddSkill from "../../../application/usecases/candidate/addSkill"
-// import GetSkillsUseCase from "../../../application/usecases/candidate/getSkills"
-// import DeleteSkillUseCase from "../../../application/usecases/candidate/deleteSkill"
-// import AddEducationUseCase from "../../../application/usecases/candidate/addEducation"
-// import GetEducationsUseCase from "../../../application/usecases/candidate/getEducationsUseCase"
-// import DeleteEducationUseCase from "../../../application/usecases/candidate/deleteEducationUseCase"
-// import EditEducationUseCase from "../../../application/usecases/candidate/editEducationUseCase"
-// import AddResumeUseCase from "../../../application/usecases/candidate/addResumeUseCase"
-// import LoadResumesUseCase from "../../../application/usecases/candidate/loadResumesUseCase"
-// import DeleteResumeUseCase from "../../../application/usecases/candidate/deleteResumeUseCase"
-// import AddCertificateUseCase from "../../../application/usecases/candidate/addCertificateUseCase"
-// import GetCertificatesUseCase from "../../../application/usecases/candidate/getCertificatesUseCase"
-// import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
-// import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
 import IRegisterCandidateUseCase from "../../../application/usecases/candidate/interface/IRegisterCandidateUseCase"
 import { connectDb } from "../../../infrastructure/database/connection"
 import IAddCertificateUseCase from "../../../application/usecases/candidate/interface/IAddCertificateUseCase"
@@ -75,6 +43,8 @@ import IUploadProfilePictureUseCase from "../../../application/usecases/candidat
 import imgUploadToCloudinary from "../../../services/uploadToCloudinary"
 import IRemoveProfilePictureUseCase from "../../../application/usecases/candidate/interface/IRemoveProfilePictureUseCase"
 import IUploadCoverPhotoUseCase from "../../../application/usecases/candidate/interface/IUploadCoverPhotoUseCase"
+import IGetCandidatesUseCase from "../../../application/usecases/interfaces/IGetCandidatesUseCase"
+import IGetCandidateDetailsUseCase from "../../../application/usecases/interfaces/IGetCandiateDetailsUseCase"
 
 export class CandidateController {
     constructor(
@@ -114,7 +84,9 @@ export class CandidateController {
         private _uploadProfilePictureUC : IUploadProfilePictureUseCase,
         private _removeProfilePictureUC : IRemoveProfilePictureUseCase,
         private _uploadCoverphotoUC : IUploadCoverPhotoUseCase,
-        private _removeCoverphotoUC : IRemoveProfilePictureUseCase
+        private _removeCoverphotoUC : IRemoveProfilePictureUseCase,
+        private _getCandidatesUC : IGetCandidatesUseCase,
+        private _getCandidateDetailsUC : IGetCandidateDetailsUseCase
         
     ){}
 
@@ -783,6 +755,41 @@ export class CandidateController {
         }
 
     }
+
+    async getCandidates(req : Request, res : Response) : Promise<Response> {
+        console.log('Trying to inspect the request query params', req.query)
+        const search = req.query?.search as string || ""
+        const page = parseInt(req.query?.page as string) || 1
+        const limit = parseInt(req.query?.limit as string) || 4
+        const sort = req.query?.sort as string || ""
+        const filter = JSON.parse(req.query?.filter as string) || {}
+
+        try {
+            const result = await this._getCandidatesUC.execute(search, page, limit, sort, filter)
+            return result
+                ? res.status(StatusCodes.OK).json({success:true, message:'Candidate list fetched successfully', result})
+                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        } catch (error : unknown) {
+            console.log('Error occured while geting candidate list', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+    
+    async getCandidateDetails(req : Request, res : Response) : Promise<Response> {
+        const candidateId = req.params?.candidateId as string
+        try {
+            const result = await this._getCandidateDetailsUC.execute(candidateId)
+
+            return result
+                ? res.status(StatusCodes.OK).json({success:true, message:'Candidate details fetched successfully', candidateDetails:result})
+                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong can not fetch details'})
+        } catch (error : unknown) {
+            console.log('Error occured while geting candidate details', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    }
+
+    
     
 
     

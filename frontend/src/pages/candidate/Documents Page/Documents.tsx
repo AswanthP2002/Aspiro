@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import pdf from 'pdf-parse'
 import Swal from "sweetalert2"
 import Loader from "../../../components/candidate/Loader"
-import { candidateService, commonService } from "../../../services/apiServices"
+import { candidateService, commonService } from "../../../services/commonServices"
 import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
 import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"

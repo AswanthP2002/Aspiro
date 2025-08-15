@@ -13,7 +13,7 @@ import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { recruiterLogedIn } from "../../../redux-toolkit/recruiterAuthSlice";
-import { recruiterService } from "../../../services/apiServices";
+import { recruiterService } from "../../../services/commonServices";
 import { recruiterLogin } from "../../../services/recruiterServices";
 
 export default function RecruiterLogin(){

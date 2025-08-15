@@ -194,7 +194,7 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
             }},
             {$lookup:{
                 from:'skill',
-                foreignField:'candidateID',
+                foreignField:'candidateId',
                 localField:'_id',
                 as:'skills'
             }},

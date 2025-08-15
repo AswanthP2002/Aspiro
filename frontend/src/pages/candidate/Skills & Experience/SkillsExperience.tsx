@@ -7,7 +7,7 @@ import AddExperienceForm from "../../../components/candidate/Forms/ExperienceAdd
 import Swal from "sweetalert2";
 import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEdit";
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { candidateLogout } from "../../../hooks/Logouts";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";

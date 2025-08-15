@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { recruiterService } from "../../../services/apiServices"
+import { recruiterService } from "../../../services/commonServices"
 import { useSelector } from "react-redux"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'

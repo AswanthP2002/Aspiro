@@ -11,7 +11,7 @@ export default class AddSkill implements IAddSkillsUseCase {
     async execute(candidateId : string, skill : Skills) : Promise<string | null>{
         const parsedSkill = SkillSchema.parse(skill)
         const skillModal = createSkillsFromSkillDTO(parsedSkill)
-        skillModal.candidateID = new mongoose.Types.ObjectId(candidateId)
+        skillModal.candidateId = new mongoose.Types.ObjectId(candidateId)
         const result = await this._skillRepo.create(skillModal)
         return result
     }

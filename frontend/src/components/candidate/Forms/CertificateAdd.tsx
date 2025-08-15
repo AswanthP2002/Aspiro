@@ -1,7 +1,7 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { addCandidateCertificates } from "../../../services/candidateServices";
 
 export default function AddCertificateForm({certificateModalOpen, closeCertificateModal, token} : any) {

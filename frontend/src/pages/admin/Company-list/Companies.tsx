@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import useRefreshToken from '../../../hooks/refreshToken';
-import { adminServices } from '../../../services/apiServices';
+import { adminServices } from '../../../services/commonServices';
 import { getCompanies } from '../../../services/adminServices';
 
 

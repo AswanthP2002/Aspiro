@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import useRefreshToken from "../../../hooks/refreshToken";
 import { tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { saveBasicDetails } from "../../../services/candidateServices";
 
 export default function StoreDetails(){

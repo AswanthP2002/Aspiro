@@ -57,7 +57,7 @@ export default function Header(){
                     <ul className="nav-links flex gap-10">
                         <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
                         <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
-                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Candidates</li>
+                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/candidates'}>Candidates</Link></li>
                         <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
                         <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
                     </ul>

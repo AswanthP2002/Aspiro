@@ -6,5 +6,5 @@ export default interface Skills {
     type : string
     skill : string
     level : string
-    candidateID? : mongoose.Types.ObjectId
+    candidateId? : mongoose.Types.ObjectId
 }

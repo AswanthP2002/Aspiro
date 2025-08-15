@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import defaultImage from '../../../../public/default-img-instagram.png'
 import { useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
-import { commonService, loadJobDetails } from "../../../services/apiServices"
+import { commonService, loadJobDetails } from "../../../services/commonServices"
 import { checkIsSaved, saveJob, unsaveJob } from "../../../services/candidateServices"
 import { useSelector } from "react-redux"
 

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { recruiterService } from "../../../services/apiServices"
+import { recruiterService } from "../../../services/commonServices"
 import { postJob } from "../../../services/recruiterServices"
 
 

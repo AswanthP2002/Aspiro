@@ -59,6 +59,8 @@ import UploadProfilePictureUseCase from '../../../application/usecases/candidate
 import RemoveProfilePictureUseCase from '../../../application/usecases/candidate/RemoveProfilePictureUseCase'
 import UploadCoverphotoUseCase from '../../../application/usecases/candidate/UploadCoverphotoUseCase'
 import RemoveCoverphotoUseCase from '../../../application/usecases/candidate/RemoveCoverphotoUseCase'
+import GetCandidatesUseCase from '../../../application/usecases/GetCandidatesUseCase'
+import GetCandidateDetailsUseCase from '../../../application/usecases/GetCandidateDetailsUseCase'
 
 async function createCandidateRouter(db : Db){
     const candidateRouter = express.Router()
@@ -113,6 +115,8 @@ async function createCandidateRouter(db : Db){
     const removeProfilePictureUC = new RemoveProfilePictureUseCase(candidateRepo)
     const uploadCoverPhotoUC = new UploadCoverphotoUseCase(candidateRepo) 
     const removeCoverPhotoUC = new RemoveCoverphotoUseCase(candidateRepo)
+    const getCandidatesUC = new GetCandidatesUseCase(candidateRepo)
+    const getCandidateDetailsUC = new GetCandidateDetailsUseCase(candidateRepo)
 
 
     const candidateController = new CandidateController(
@@ -152,7 +156,9 @@ async function createCandidateRouter(db : Db){
         uploadProfilePictureUC,
         removeProfilePictureUC,
         uploadCoverPhotoUC,
-        removeCoverPhotoUC
+        removeCoverPhotoUC,
+        getCandidatesUC,
+        getCandidateDetailsUC
     )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
@@ -201,13 +207,17 @@ candidateRouter.patch('/candidate/profile/picture/update', candidateAuth, upload
 candidateRouter.patch('/candidate/profile/picture/remove', candidateAuth, candidateController.removeProfilePicture.bind(candidateController))
 candidateRouter.patch('/candidate/profile/coverphoto/update', candidateAuth, upload.single('coverPhoto'), candidateController.uploadCoverphoto.bind(candidateController))
 candidateRouter.patch('/candidate/profile/coverphoto/remove', candidateAuth, candidateController.removeCoverphoto.bind(candidateController))
+candidateRouter.get('/candidates', candidateController.getCandidates.bind(candidateController))
+candidateRouter.get('/candidates/:candidateId', candidateController.getCandidateDetails.bind(candidateController))
+
 
 candidateRouter.get('/get/user/:id', getAuthUserData)
 
 
 
 function testMiddleWare(req : Request, res : Response, next : NextFunction) {
-    console.log('Testing request ', req.url)
+    console.log('Testing upcoming qury object', req.query)
+    console.log('decoded filters', JSON.parse(req.query?.filter as string))
     return res.status(StatusCodes.ACCEPTED).json({success:true, message:'Testing flow'})
 }
 
