@@ -6,7 +6,7 @@ import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import { useRef, useState } from "react";
 import Loader from "../../../components/candidate/Loader";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { registerCandiate } from "../../../services/candidateServices";
 
 export default function CandidateRegister(){

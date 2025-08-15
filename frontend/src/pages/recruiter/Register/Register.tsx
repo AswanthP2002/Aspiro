@@ -6,7 +6,7 @@ import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
-import { recruiterService } from "../../../services/apiServices";
+import { recruiterService } from "../../../services/commonServices";
 import { recruiterRegister } from "../../../services/recruiterServices";
 
 export default function RecruiterRegister(){

@@ -11,7 +11,7 @@ import arrowupdown from '/Arrows-up-down.png'
 import arrowdownup from '/Arrows-down-up.png'
 import Testimonial from '../../../components/common/testimonials'
 import { TileRegisterAsCandidate, TileRegisterAsRecruiter } from '../../../components/common/AccountInfoTile'
-import { commonService } from '../../../services/apiServices'
+import { commonService } from '../../../services/commonServices'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 

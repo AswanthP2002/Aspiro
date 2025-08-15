@@ -13,7 +13,7 @@ import Loader from "../../../components/candidate/Loader";
 import { loginSucess } from "../../../redux-toolkit/candidateAuthSlice";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { candidateLogin } from "../../../services/candidateServices";
 
 export default function CandidateLogin(){

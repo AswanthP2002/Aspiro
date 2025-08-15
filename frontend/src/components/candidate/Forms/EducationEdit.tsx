@@ -1,7 +1,7 @@
 import { Box, Modal, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import Swal from "sweetalert2";
 import { editCandidateEducation } from "../../../services/candidateServices";
 

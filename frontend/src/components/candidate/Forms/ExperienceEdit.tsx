@@ -2,7 +2,7 @@ import { Box, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/apiServices";
+import { candidateService } from "../../../services/commonServices";
 import { editCandidateExperience } from "../../../services/candidateServices";
 
 export default function EditExperienceForm({ experience, editExperienceModalOpen, closeExpEditModal, token }: any) {

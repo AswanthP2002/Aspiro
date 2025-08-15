@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import defaultImage from '../../../../public/default-img-instagram.png'
-import { adminServices } from "../../../services/apiServices"
+import { adminServices } from "../../../services/commonServices"
 import { candidateBlock, candidateUnblock, getCandidateDetails } from "../../../services/adminServices"
 
 export default function CandidateDetails(){

@@ -27,6 +27,7 @@ async function main(){
         }
     ))
     app.use(express.json())
+    app.use(express.urlencoded({extended:true}))
     app.use(bodyParser.urlencoded({extended:true}))
     app.use(cookieParser())
     app.use(passport.initialize())

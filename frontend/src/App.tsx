@@ -40,6 +40,8 @@ import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn'
 import CandidateProtectedRoute from './components/candidate/CandidateProtectedRoutes'
 import SavedJobs from './pages/SavedJobs/SavedJobs'
 import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList'
+import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails'
+import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList'
 
 function App() {
   return(
@@ -47,6 +49,11 @@ function App() {
       <Routes>
     <Route path="/" element={<Layouts />}>
       <Route index element={<Home />} />
+      <Route path='candidates'>
+        <Route index element={<CandidatesList />} />
+        <Route path=':id' element={<CandidatePublicProfile />} />
+      </Route>
+      {/* <Route path='candidates/:id' element={<CandidatePublicProfile />} /> */}
       <Route path='jobs'>
           <Route index element={<JobListing />} />
           <Route path=':id' element={<JObDetailsCandidateSide />} />

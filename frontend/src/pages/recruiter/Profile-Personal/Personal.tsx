@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import defaultProfile from '/default-img-instagram.png'
 import Swal from "sweetalert2"
 import useRefreshToken from "../../../hooks/refreshToken"
-import { recruiterService } from "../../../services/apiServices"
+import { recruiterService } from "../../../services/commonServices"
 import { getProfileOverview } from "../../../services/recruiterServices"
 
 

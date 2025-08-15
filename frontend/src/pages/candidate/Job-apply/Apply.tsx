@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
-import { candidateService } from "../../../services/apiServices"
+import { candidateService } from "../../../services/commonServices"
 import { useSelector } from "react-redux"
 import { addCandidateResume, candidateApplyJob } from "../../../services/candidateServices"
 

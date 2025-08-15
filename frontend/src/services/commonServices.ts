@@ -499,6 +499,35 @@ export const loadJobDetails = async (jobId : string) => {
         console.log('Error occured while geting job details')
     }
 }
+export const getCandidates = async (search : string, page : number, limit : number, sort : string, filter : any) => {
+    try {
+        const response = await axiosInstance.get('/candidates',
+            {           
+                headers:{'Content-Type':'application/json'},
+                params:{
+                    search,
+                    page,
+                    limit,
+                    sort,
+                    filter:JSON.stringify(filter)
+                }
+            }
+        )
+        return response.data
+    
+    } catch (error : unknown) {
+        console.log('Error occured while geting candidates', error)
+    }
+}
+export const getCandidateDetails = async (candidateId : string) => {
+    try {
+        const response = await axiosInstance.get(`/candidates/${candidateId}`)
+        return response.data
+    } catch (error : unknown) {
+        console.log('Error occ')
+    }
+}
+
 export const commonService = {
     loadJobDetails: async function (jobId: any) {
         return fetch(`http://localhost:5000/jobs/details/${jobId}`, {
