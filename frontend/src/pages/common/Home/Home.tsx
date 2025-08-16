@@ -198,7 +198,7 @@ export default function Home(){
 
         <div className="w-full bg-white pt-20 pb-20">
             <div className="aspiro-container">
-                <div className="flex flex-col md:flex-row justify-between gap-30">
+                <div className="grid grid-cols-2 gap-30">
                     <TileRegisterAsCandidate />
                     <TileRegisterAsRecruiter />
                 </div>
