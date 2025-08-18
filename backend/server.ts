@@ -39,7 +39,10 @@ async function main(){
     const adminRouter = await createAdminRouter(db)
 
     const port = process.env.PORT || 5000
-
+    app.use('/', (req : Request, res : Response, next : NextFunction) => {
+        console.log('Request reaced at the backend', req.url)
+        next()
+    })
     app.use('/', candidateRouter)
     app.use('/', authRouter)
     app.use('/', recruiterRouter)

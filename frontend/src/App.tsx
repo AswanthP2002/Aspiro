@@ -106,7 +106,7 @@ function App() {
     </Route>
     {/* <Route path="/admin/login" element={<LoginPage />} /> */}
 
-    <Route path="/verify/:email" element={<VerificationPage />} />
+    <Route path="/verify" element={<VerificationPage />} />
     <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
     <Route path='/store/details' element={<StoreDetails />} />
     <Route path='/auth-success' element={<AuthSuccess />} />

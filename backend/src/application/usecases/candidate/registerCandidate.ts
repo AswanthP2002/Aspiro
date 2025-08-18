@@ -20,8 +20,8 @@ export default class RegisterCandidateUseCase implements IRegisterCandidateUseCa
         const existingEmail = await this._candidateRepo.findByEmail(candidate.email)
         if(existingEmail) throw new Error('DuplicateEmail')
         
-        const existingUsername = await this._candidateRepo.findByUsername(candidate.username)
-        if(existingUsername) throw  new Error('DuplicateUserName')
+        const existingMobileNumber = await this._candidateRepo.findByMobileNumber(candidate.phone)
+        if(existingMobileNumber) throw  new Error('DuplicateMobileNumber')
             
         let hashedPassword
         if(candidate.password){

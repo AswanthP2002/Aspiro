@@ -104,15 +104,15 @@ export class CandidateController {
             console.log(`Error occured while registering the user ::candidateController.ts ${error}`)
             if(error instanceof Error){
                 switch (error.message) {
-                    case 'duplicate email':
+                    case 'DuplicateEmail':
                         return res.status(StatusCodes.CONFLICT).json({
                             success:false, 
                             message:"This email id already registered with another user, please choose another one"
                         })
-                    case 'duplicate username':
+                    case 'DuplicateMobileNumber':
                         return res.status(StatusCodes.CONFLICT).json({
                             success:false, 
-                            message:"Username already taken, choose new one"
+                            message:"Mobile number already taken, use another one"
                         })
                     default:
                         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

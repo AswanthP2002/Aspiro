@@ -9,7 +9,7 @@ export default interface ICandidateRepo extends IBaseRepo<Candidate>{
     findById(id : string) : Promise<Candidate | null>
     findByEmail(email : any) : Promise<Candidate | null>
     findByGoogleId(googleId : string) : Promise<Candidate | null>
-    findByUsername(username : string) : Promise<Candidate | null>
+    findByMobileNumber(mobileNumber : string) : Promise<Candidate | null>
     findByToken(token : string) : Promise<Candidate | null>
     updateCandidate(otp : string, field : string, value : boolean) : Promise<Candidate | null>
     updateIntroDetails(id : string, role : string, city : string, district : string, state : string, country : string, pincode : string, summary : string) : Promise<Candidate | null>

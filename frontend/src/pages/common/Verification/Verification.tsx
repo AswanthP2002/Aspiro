@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../../components/candidate/Loader";
 import { candidateService } from "../../../services/commonServices";
@@ -13,18 +13,39 @@ export default function VerificationPage(){
     const [remainingtime, setreminingtime] = useState(120)
     const [resendenabled, setresendenabled] = useState(false)
 
+    const location = useLocation()
+
     useEffect(() => {
-        if(remainingtime <= 0){
-            setresendenabled(true)
-            return
+        const otpExpireTimeStamp = localStorage.getItem('otpExpiresAtTS')
+
+        if(otpExpireTimeStamp){
+            const remTime = Math.floor((parseInt(otpExpireTimeStamp) - Date.now()) / 1000)
+            if(remTime > 0){
+                setreminingtime(remTime)
+            }else{
+                localStorage.removeItem('otpExpiresAtTS')
+                setresendenabled(true)
+            }
+        }else{
+            const timeStamp = Date.now() + (120 * 1000)
+            localStorage.setItem('otpExpiresAtTS', timeStamp.toString())
+            setreminingtime(120)
         }
 
-        let countDown = setTimeout(() => {
-            setreminingtime(prev => prev - 1)
-        }, 1000)
-
-        return () => clearInterval(countDown)
-    }, [remainingtime])
+        const interval = setInterval(() => {
+            setreminingtime(prv => {
+                if(prv > 1){
+                    return prv - 1
+                }else{
+                    localStorage.removeItem('otpExpiresAtTS')
+                    clearInterval(interval)
+                    setresendenabled(true)
+                    return 0
+                }
+            })
+        }, 1000);
+        
+    }, [])
 
     const getMinute = (time : number) : number => {
         return Math.floor(time / 60)
@@ -35,7 +56,7 @@ export default function VerificationPage(){
     }
     
 
-    const {email} = useParams()
+    const {email} = location.state || {}
 
     const navigator = useNavigate()
 

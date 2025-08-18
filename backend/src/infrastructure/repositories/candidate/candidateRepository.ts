@@ -34,9 +34,9 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
         return candidate
     }
 
-    async findByUsername(username: string): Promise<Candidate | null> {
+    async findByMobileNumber(mobileNumber: string): Promise<Candidate | null> {
         const db = await connectDb()
-        return await db.collection<Candidate>(this._collection).findOne({username:username})
+        return await db.collection<Candidate>(this._collection).findOne({phone:mobileNumber})
     }
 
     async findById(id: string): Promise<Candidate | null> {

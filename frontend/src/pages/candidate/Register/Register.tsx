@@ -77,7 +77,7 @@ export default function CandidateRegister(){
         setloading(true)
         event.preventDefault()
         const typedFullnameError = !/^[a-zA-Z]+(?: [a-zA-Z]+)*$/.test(name) || !name || false
-        const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false
+        // const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false //username removed Temp
         const typedEmailError = !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email) || !email || false
         const typedPasswordError = !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password) || !password || false
         const typedPhoneError = !/^[6-9]\d{9}$/.test(phone) || !phone || false
@@ -89,11 +89,11 @@ export default function CandidateRegister(){
         typedEmailError ? setemailerror("Enter a valid Email") : setemailerror("")
         typedPhoneError ? setphonerror("Enter valid phone number") : setphonerror("")
         typedPasswordError ? setpassworderror("Enter a strong password") : setpassworderror("")
-        typedUsernameError ? setusernameerror("Username can not be empty") : setusernameerror("")
+        // typedUsernameError ? setusernameerror("Username can not be empty") : setusernameerror("")
         typedFullnameError ? setfullnameerror("Enter a valid name") : setfullnameerror("")
         confirmationError ? setpasswordconfirmationerror("Password doesn't match") : setpasswordconfirmationerror("")
         
-        if(typedFullnameError || typedEmailError || typedUsernameError || typedPasswordError || typedPhoneError || confirmationError){
+        if(typedFullnameError || typedEmailError || typedPasswordError || typedPhoneError || confirmationError){
             setvalidationerror(true)
             setloading(false)
             setvalidationerrortext("Fill the details correctly!")
@@ -107,7 +107,7 @@ export default function CandidateRegister(){
 
                 if(result.success){
                     setloading(false)
-                    navigator(`/verify/${result.candidate}`)
+                    navigator(`/verify`, {state:{email:result?.candidate}})
                     
                 }else{
                     setloading(false)
@@ -146,18 +146,12 @@ export default function CandidateRegister(){
                     <div className="flex items-center justify-center">
                         <label htmlFor="" className="error-label mt-2" style={{textAlign:"center"}}>{validationerrortext}</label>
                     </div>
-                    <div className="flex justify-between gap-4 mt-3">
-                        <div className="w-1/2">
-                            <input value={name} onChange={(event) => setfullname(event.target.value)} className="border p-2 rounded-sm" type="text" name="fullname" id="fullname" placeholder="Full name" />
-                            <span className="field-error text-xs text-red-500">{fullnameerror}</span>
-                        </div>
-                        <div className="w-1/2">
-                            <input value={username} onChange={(event) => setusername(event.target.value)} className="border p-2 rounded-sm" type="text" name="username" id="username" placeholder="Username" />
-                            <span className="field-error text-xs text-red-500">{usernameerror}</span>
-                        </div>
+                    <div className="mt-3">
+                        <input value={name} onChange={(event) => setfullname(event.target.value)} className="w-full border p-2 rounded-sm" type="text" name="fullname" id="fullname" placeholder="Full name" />
+                        <span className="field-error text-xs text-red-500">{fullnameerror}</span>
                     </div>
                     <div className="mt-3">
-                        <input value={email} onChange={(event) => setemail(event.target.value)} className="border w-full p-2 rounded-sm" type="email" name="email" id="email" placeholder="Email" />
+                        <input value={email} onChange={(event) => setemail(event.target.value.toLowerCase())} className="border w-full p-2 rounded-sm" type="email" name="email" id="email" placeholder="Email" />
                         <span className="field-error text-xs text-red-500">{emailerror}</span>
                     </div>
                     <div className="mt-3">

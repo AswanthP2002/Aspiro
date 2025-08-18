@@ -13,14 +13,16 @@ export const registerCandiate = async (name: string, email: string, phone: strin
                 headers:{'Content-Type' : 'application/json'}
             } as AxiosRequest
         )
+        console.log('backend resposne for candidate register', response)
 
         return response.data
     } catch (error : unknown) {
+        console.log('This is normal error', error)
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500) return err.response.data
 
-        console.log('Error occure')
+        console.log('Error occure', err)
     }
 }
 

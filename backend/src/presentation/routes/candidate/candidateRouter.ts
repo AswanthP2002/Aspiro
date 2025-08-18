@@ -161,7 +161,10 @@ async function createCandidateRouter(db : Db){
         getCandidateDetailsUC
     )
 
-candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
+candidateRouter.post('/register', (req : Request, res : Response, next : NextFunction) => {
+    console.log('Candidate register request reached herre', req.body)
+    next()
+}, candidateController.registerCandidate.bind(candidateController))
 candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateController))
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
 candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))

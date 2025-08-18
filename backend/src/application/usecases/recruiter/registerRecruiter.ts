@@ -17,12 +17,12 @@ export default class RegisterRecruiterUseCase implements IRegisterRecruiterUseCa
         const recruiterModel = createRecruiterFromDTO(validateRecruiter)
         const existingEmail = await this.recruiterRepo.findByEmail(recruiterModel?.email)
         const existinCandidate = await this.crepo.findByEmail(recruiterModel?.email)
-        if(existingEmail || existinCandidate) throw new Error('duplicate email')
+        if(existingEmail || existinCandidate) throw new Error('DuplicateEmail')
         
         const existingUsername = await this.recruiterRepo.findByUserName(recruiterModel?.username)
-        const existingUserrnameCandidate = await this.crepo.findByUsername(recruiterModel?.username)
+        // const existingUserrnameCandidate = await this.crepo.findByUsername(recruiterModel?.username)
 
-        if(existingUsername || existingUserrnameCandidate) throw new Error('duplicate username')
+        if(existingUsername) throw new Error('duplicate username')
         let hashedPassword
         if(recruiterModel?.password){
             hashedPassword = await bcrypt.hash(recruiterModel.password, 10)
