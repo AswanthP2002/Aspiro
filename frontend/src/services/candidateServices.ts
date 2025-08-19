@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import { logout } from "../redux-toolkit/candidateAuthSlice";
 
 //const customeCandidateLogout = useCandidateLogout()
+const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
+console.log('Access token for geocode api', import.meta.env)
 
 export const registerCandiate = async (name: string, email: string, phone: string, username: string, password: string) => {
     try {
@@ -674,5 +676,26 @@ export const removeCoverphoto = async (publicId : string) => {
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
 
         console.log('Error occured while removing the cover photo', err)
+    }
+}
+
+export const getLocationDetails = async (lat : number, long : number) => {
+    try {
+        const response = await axios.get(`https://us1.locationiq.com/v1/reverse`,
+            {
+                params:{
+                    key:geocodeLocationAccessToken,
+                    lat:lat,
+                    lon:long,
+                    format:"json"
+                }
+            }
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        console.log('Error occured', err)
     }
 }

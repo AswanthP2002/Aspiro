@@ -77,3 +77,9 @@ button{
 .ring-shadow{
   box-shadow: 0 0 6px 12px rgba(0, 0, 0, 0.6);
 }
+.store-details {
+  overflow-y: hidden;
+}
+input:read-only{
+  background: rgba(98, 93, 93, 0.582);
+}

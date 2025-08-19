@@ -2,11 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import './Register.css'
 import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
-import { Tooltip } from "@mui/material";
-import Swal from "sweetalert2";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import validator from 'validator'
 import Loader from "../../../components/candidate/Loader";
-import { candidateService } from "../../../services/commonServices";
 import { registerCandiate } from "../../../services/candidateServices";
 
 export default function CandidateRegister(){
@@ -78,7 +76,7 @@ export default function CandidateRegister(){
         event.preventDefault()
         const typedFullnameError = !/^[a-zA-Z]+(?: [a-zA-Z]+)*$/.test(name) || !name || false
         // const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false //username removed Temp
-        const typedEmailError = !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email) || !email || false
+        const typedEmailError = !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email) || !validator.isEmail(email) || !email || false
         const typedPasswordError = !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password) || !password || false
         const typedPhoneError = !/^[6-9]\d{9}$/.test(phone) || !phone || false
         const confirmationError = password !== confirmpassword || false
