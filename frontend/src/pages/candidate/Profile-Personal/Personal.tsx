@@ -73,7 +73,7 @@ export default function ProfilePersonal(){
     const token = useSelector((state : any) => {
         return state?.candidateAuth?.token
     })
-    const navigator = useNavigate()
+    const navigateTo = useNavigate()
     console.log('state token before sending', token)
 
 
@@ -146,7 +146,13 @@ export default function ProfilePersonal(){
                 if(result?.success){
                     //setTimeout(() => {
                         if(!result?.userDetails?.role){
-                            navigator('/store/details')
+                            navigateTo('/store/details', {
+                                state:{
+                                    candidateName:result?.userDetails?.name,
+                                    candidateRole:result?.userDetails?.role,
+                                    candidateId:result?.userDetails?._id
+                                }
+                            })
                             return
                         }
                         setcandidate(result?.userDetails)
@@ -162,7 +168,7 @@ export default function ProfilePersonal(){
                     }).then((result) => {
                         if(result.isConfirmed){
                             dispatcher(logout())
-                            navigator('/')
+                            navigateTo('/')
 
                         }
                     })

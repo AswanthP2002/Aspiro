@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import {motion, AnimatePresence} from 'motion/react'
 import { getLocationDetails, saveBasicDetails } from "../../../services/candidateServices";
@@ -23,6 +23,10 @@ export default function StoreDetails(){
     const [summaryerror, setsummaryerror] = useState("")
     
     const [currentSection, setCurrentSection] = useState(1)
+
+    const location = useLocation()
+
+    const {candidateName, candidateId, candidateRole} = location.state || {}
 
     const errorLabelStyle = {
         fontSize:'0.7rem',
@@ -92,11 +96,19 @@ export default function StoreDetails(){
       ];
 
       const navigateTo = useNavigate()
+
+      
       const dispatch = useDispatch() 
 
       const token = useSelector((state : any) => {
         return state?.candidateAuth?.token
       })
+
+      useEffect(() : any => {
+        if(!candidateId || !candidateName || candidateRole){
+            return navigateTo(-1)
+        }
+      }, [])
 
       async function validateStore(event : any){
         event.preventDefault()
@@ -256,7 +268,7 @@ export default function StoreDetails(){
                             exit={{opacity:0}}
                         >
                             <div>
-                                <p className="text-blue-500 text-4xl">Welcome Aswanth P</p>
+                                <p className="text-blue-500 text-4xl">Welcome ${candidateName}</p>
                                 <p className="text-xl mt-5">We would love to know a bit more about you!</p>
                                 <div className="group mt-5">
                                     <label htmlFor="" className="text-white block">Which one should describe your interested job role ?</label>
