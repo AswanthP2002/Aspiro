@@ -24,7 +24,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
         return result
     }
 
-    async getJobs(search : string = '', page : number = 1, limit : number = 3, sort : string = 'job-latest', filters : any): Promise<any> { //change strict to later
+    async getJobs(search : string = '', page : number = 1, limit : number = 3, sort : string = 'job-latest', filters : any, minSalary : string = "", maxSalary : string = ""): Promise<any> { //change strict to later
         const db = await connectDb()
         const prelookupMatch : any = {}
         const postlookupMatch : any = {}
@@ -45,12 +45,12 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
             prelookupMatch.locationType = {$in:filters?.locationType}
         }
 
-        if(filters?.minSalary){
-            prelookupMatch.minSalary = {$gte:Number(filters?.minSalary)}
+        if(minSalary){
+            prelookupMatch.minSalary = {$gte:Number(minSalary)}
         }
 
-        if(filters?.maxSalary){
-            prelookupMatch.maxSalary = {$lte:Number(filters?.maxSalary)}
+        if(maxSalary){
+            prelookupMatch.maxSalary = {$lte:Number(maxSalary)}
         }
 
         //const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}

@@ -1,11 +1,10 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { useState } from "react";
 import { higherSecondaryEducation, bachelorsDegree, mastersDegree, diploma } from "../../../assets/data/educationalStreamsData";
-import { candidateService } from "../../../services/commonServices";
 import Swal from "sweetalert2";
 import { addCandidateEducation } from "../../../services/candidateServices";
 
-export default function AddEducationForm({educationModalOpen, closeEducationModal, token} : any){
+export default function AddEducationForm({educationModalOpen, closeEducationModal} : any){
 
     const [educationLevel, setEducationLevel] = useState("")
     const [educationLevelError, setEducationLevelError] = useState("")
@@ -64,22 +63,12 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
     }
 
     async function addEducation(){
-        //alert(location)
         const isValidated = validateForm()
         if(!isValidated) return
         closeEducationModal()
 
-        //try {
-            // let response = await candidateService.addEducation(token, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-        
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.addEducation(newAccessToken, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-            // }
-
             await addCandidateEducation(educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
 
-            //if(result?.success){
                 Swal.fire({
                     icon:'success',
                     title:'Added',
@@ -87,23 +76,6 @@ export default function AddEducationForm({educationModalOpen, closeEducationModa
                     showCancelButton:false,
                     timer:1500
                 }).then(() => window.location.reload())
-            // }else{
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:'Oop!',
-            //         text:result?.message
-            //     })
-            // }
-       // } catch (error : unknown) {
-            // if(error instanceof Error){
-            //     console.log('Error occured while adding education', error)
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:'Error',
-            //         text:error?.message
-            //     })
-            // }
-       // }
     }
 
     return(

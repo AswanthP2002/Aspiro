@@ -435,7 +435,7 @@ export const refreshCandidateToken = async () => {
 
 export const candidateApplyJob = async (jobId : string, coverLetterContent : string, resumeId : string) => {
     try {
-        alert(`Inside the candidateService going to call the applyjob ${resumeId}`)
+
         const response = await axiosInstance.post(`/candidate/job/${jobId}/apply`,
             {coverLetterContent, resumeId}, 
             {
@@ -697,5 +697,26 @@ export const getLocationDetails = async (lat : number, long : number) => {
         const err = error as AxiosError
 
         console.log('Error occured', err)
+    }
+}
+
+export const getJobs = async (search : string, page : number, sort : string, filter : any, minSalary : string, maxSalary : string) => {
+    try {
+        const response = await axiosInstance.get('/jobs', {
+            params:{
+                search,
+                page,
+                sort,
+                filter:JSON.stringify(filter),
+                minSalary,
+                maxSalary
+            }
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting jobs', err)
+        return err.response?.data
     }
 }

@@ -2,11 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import './Register.css'
 import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
-import { Tooltip } from "@mui/material";
-import Swal from "sweetalert2";
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
-import { recruiterService } from "../../../services/commonServices";
 import { recruiterRegister } from "../../../services/recruiterServices";
 
 export default function RecruiterRegister(){

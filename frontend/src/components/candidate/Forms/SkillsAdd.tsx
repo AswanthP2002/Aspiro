@@ -1,7 +1,5 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
 import { candidateService } from "../../../services/commonServices";
 

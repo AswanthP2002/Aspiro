@@ -1,10 +1,9 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/commonServices";
 import { addCandidateCertificates } from "../../../services/candidateServices";
 
-export default function AddCertificateForm({certificateModalOpen, closeCertificateModal, token} : any) {
+export default function AddCertificateForm({certificateModalOpen, closeCertificateModal} : any) {
 
     const [issuingOrganization, setIssuingOrganization] = useState('')
     const [issuingOrganizationError, setIssuingOrganizationError] = useState('')
@@ -59,7 +58,6 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
     async function addCertificate() : Promise<void> {
         const isValidated = validateExperienceForm()
         if(!isValidated){
-            alert('validate fails')
             return
         }
         closeCertificateModal()
@@ -70,13 +68,6 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
             formData.append('issuedOrganization', issuingOrganization)
             formData.append('issuedDate', issuedDate)
             formData.append('id', certificateId)
-
-            // let response = await candidateService.addCertificate(token, formData)
-
-            // if(response.status === 401) {
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.addCertificate(newAccessToken, formData)
-            // }
 
             const result = await addCandidateCertificates(formData)
 

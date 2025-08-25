@@ -167,7 +167,10 @@ candidateRouter.post('/register', (req : Request, res : Response, next : NextFun
 }, candidateController.registerCandidate.bind(candidateController))
 candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateController))
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
-candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))
+candidateRouter.get('/jobs', (req : Request, res : Response, next : NextFunction) => {
+    console.log('ensure the request is reaching here')
+    next()
+}, candidateController.loadJobs.bind(candidateController))
 candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
 candidateRouter.post('/candidate/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
 candidateRouter.get('/candidate/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))

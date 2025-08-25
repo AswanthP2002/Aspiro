@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react"
-import pdf from 'pdf-parse'
 import Swal from "sweetalert2"
 import Loader from "../../../components/candidate/Loader"
-import { candidateService, commonService } from "../../../services/commonServices"
 import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
 import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"
@@ -35,12 +33,7 @@ export default function DocumentsPage(){
         setpdffile(file)
         const formData = new FormData()
         formData.append('resume', pdfile || file)
-        //try {
-            // let response = await commonService.parsePdf(token, formData)
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await commonService.parsePdf(newAccessToken, formData)
-            // }
+        
             const result = await addCandidateResume(formData)
             setloading(false)
             if(result?.success){
@@ -61,25 +54,14 @@ export default function DocumentsPage(){
                     showCancelButton:false
                 })
             }
-        //} catch (error : unknown) {
-            
-        //} finally{
+    
             fileFieldRef.current.value = ''
-        //}
     }
 
     async function deleteResume(resumeId : string, publicId : string) {
-        //try {
-            // let response = await candidateService.deleteResume(token, resumeId, publicId)
-
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.deleteResume(newAccessToken, resumeId, publicId)
-            // }
 
             await deleteCandidateResume(resumeId, publicId)
 
-            //if(result?.success){
                 Swal.fire({
                     icon:'success',
                     title:'Deleted',
@@ -87,17 +69,7 @@ export default function DocumentsPage(){
                     showCancelButton:false,
                     timer:1300
                 }).then(() => window.location.reload())
-            //}
-        // } catch (error : unknown) {
-        //     if(error instanceof Error){
-        //         console.log('Error occured while deleting resume', error)
-        //         Swal.fire({
-        //             icon:'error',
-        //             title:'Error',
-        //             text:error?.message
-        //         })
-        //     }
-        // }
+
     }
 
     function makeInlinePdfUrl(originalUrl: string): string {
@@ -109,19 +81,6 @@ export default function DocumentsPage(){
     
     useEffect(() => {
        (async function(){
-          // try {
-            //    let resumeResponse = await candidateService.loadResumes(token)
-            //    let certificateResponse = await candidateService.loadCertificates(token)
-
-            //    if (resumeResponse.status === 401) {
-            //        const newAccessToken = await candidateService.refreshToken()
-            //        resumeResponse = await candidateService.loadResumes(newAccessToken)
-            //    }
-
-            //    if(certificateResponse.status === 401) {
-            //         const newAccessToken = await candidateService.refreshToken()
-            //         certificateResponse = await candidateService.loadCertificates(newAccessToken)
-            //    }
 
                const resumeResult = await loadCandidateResumes()
                const certificateResult = await loadCandidateCertificates()
@@ -137,16 +96,6 @@ export default function DocumentsPage(){
                        text: 'Sorry!, something went wrong'
                    })
                }
-        //    } catch (error : unknown) {
-        //         if(error instanceof Error) {
-        //             console.log('Error occured while geting resumes', error)
-        //             Swal.fire({
-        //                 icon:'error',
-        //                 title:'Error',
-        //                 text:error?.message
-        //             })
-        //         }
-        //    }
        })()
     }, [])
 
@@ -165,20 +114,6 @@ export default function DocumentsPage(){
                                 {
                                     resumes?.map((resume, index) => {
                                         return <ResumeCard key={index} resumeData={resume} deleteResume={deleteResume} />
-
-                                            {/* <div key={index} className="col bg-gray-100 p-5 flex justify-between items-center">
-                                                <div className="item flex gap-3 items-center">
-                                                    <i className="fa-solid fa-file"></i>
-                                                    <p className="text-sm">Resume</p>
-                                                </div>
-                                                <div className="relative group">
-                                                    <button type="button" className="group btn cursor-pointer"><i className="fa-solid fa-grip-vertical"></i></button>
-                                                    <div className="hidden group-hover:block absolute bg-white shadow bottom-0 right-0">
-                                                        <div className="px-5 py-2"><p className="text-xs">View</p></div>
-                                                        <div className="px-5 py-2"><p onClick={() => deleteResume(resume?._id, resume?. resumePublicIdCloudinary)} className="text-xs">Delete</p></div>
-                                                    </div>
-                                                </div>
-                                            </div> */}
                                     })
                                 }
                               </div>

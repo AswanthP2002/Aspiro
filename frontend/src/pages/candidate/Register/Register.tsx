@@ -21,7 +21,6 @@ export default function CandidateRegister(){
     const [emailerror, setemailerror] = useState("")
     const [phonerror, setphonerror] = useState("")
     const [passworderror, setpassworderror] = useState("")
-    const [usernameerror, setusernameerror] = useState("")
     const [fullnameerror, setfullnameerror] = useState("")
     const [passwordconfirmationerror, setpasswordconfirmationerror] = useState("")
 

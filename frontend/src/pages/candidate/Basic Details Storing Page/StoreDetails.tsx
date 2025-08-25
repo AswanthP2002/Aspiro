@@ -97,60 +97,12 @@ export default function StoreDetails(){
 
       const navigateTo = useNavigate()
 
-      
-      const dispatch = useDispatch() 
-
-      const token = useSelector((state : any) => {
-        return state?.candidateAuth?.token
-      })
 
       useEffect(() : any => {
         if(!candidateId || !candidateName || candidateRole){
             return navigateTo(-1)
         }
       }, [])
-
-      async function validateStore(event : any){
-        event.preventDefault()
-
-        const typedCityError = !/^[a-zA-Z\s\-]{2,50}$/.test(city) || !city || false
-        const typeddistricterror = !/^[a-zA-Z\s\-]{2,50}$/.test(district) || !district || false
-        const typedstateerror = !/^[a-zA-Z\s\-]{2,50}$/.test(state) || !state || false
-        const typedcountryerror = !/^[a-zA-Z\s\-]{2,50}$/.test(country) || !country || false
-        const typedpincodeerror = !/^[1-9][0-9]{5}$/.test(pincode) || !pincode || false
-        const typedsummaryerror = !/^[A-Za-z0-9.,'"\s\-]{30,}$/.test(summary) || !summary || false
-
-        typedCityError ? setcityerror("Enter your city") : setcityerror("")
-        typeddistricterror ? setdistricterror("Enter your district") : setdistricterror("")
-        typedstateerror ? setstateerror("Enter your state") : setstateerror("")
-        typedcountryerror ? setcountryerror("Enter your country") : setcountryerror("")
-        typedpincodeerror ? setpincodeError("Enter your pincode") : setpincodeError("")
-        typedsummaryerror ? setsummaryerror("Enter proper summary") : setsummaryerror("")
-
-        if(typedCityError || typeddistricterror || typedstateerror || typedcountryerror || typedpincodeerror || typedsummaryerror){
-            return
-        }else{
-            console.log('data before sending to confirm',
-                jobRole, city, districiterror, state, country, pinCodeError, summary
-            )
-            
-            //try {
-            const result = await saveBasicDetails(jobRole, city, district, state, country, pincode, summary)
-                    Swal.fire({
-                        icon:"success",
-                        title:"Saved",
-                        text:'Thank you for providing your basic details, you can add more details from the profile',
-                        showCancelButton:false,
-                        showConfirmButton:true,
-                        confirmButtonText:"Continue",
-                        allowOutsideClick:false,
-                    }).then((result) => {
-                        if(result.isConfirmed){
-                            navigateTo('/profile/personal')
-                        }
-                    })
-        }
-      }
 
       //handle error visibility when user types
       //first section
@@ -232,7 +184,6 @@ export default function StoreDetails(){
                         setcity(result?.address?.county)
                         setpincode(result?.address?.postcode)
                     }, (error : GeolocationPositionError) => {
-                        alert('Error occured')
                         console.log('Error occured while geting users position ', error)
                     })
                 }
@@ -377,59 +328,6 @@ export default function StoreDetails(){
                     )
                 }
             </AnimatePresence>
-
-            {/* <div className="detils-wrapper w-full max-w-2xl">
-                <h3 className="text-2xl font-medium">Share a little about you</h3>
-                <form className="form" onSubmit={(event) => validateStore(event)}>
-                <div className="mt-5">
-                    <label htmlFor="">Who are you?</label>
-                    <select className="w-full p-2 border border-gray-400 rounded" onChange={(event) => setjobrole(event.target.value)} name="job-role" id="job-role" value={jobRole}>
-                        {
-                            jobRoles.map((jobs, index) => {
-                                return <option key={index} value={jobs}>{jobs}</option>
-                            })
-                        }
-                    </select>
-                </div>
-                <div className="flex justify-between gap-10 mt-3">
-                    <div className="city">
-                        <label htmlFor="">City</label>
-                        <input value={city} onChange={(event) => setcity(event.target.value)} type="text" className="w-full border border-black-500 p-2" />
-                        <label htmlFor="" className="error-label">{cityerror}</label>
-                    </div>
-                    <div className="district">
-                        <label htmlFor="">District</label>
-                        <input value={district} onChange={(event) => setdistrict(event.target.value)} type="text" className="w-full border border-black-500 p-2" />
-                        <label className="error-label">{districiterror}</label>
-                    </div>
-                    <div className="state">
-                        <label htmlFor="">State</label>
-                        <input value={state} onChange={(event) => setstate(event.target.value)} type="text" className="w-full border border-black-500 p-2" />
-                        <label htmlFor="" className="error-label">{stateerror}</label>
-                    </div>
-                </div>
-                <div className="flex justify-between mt-3">
-                    <div className="pincode">
-                        <label htmlFor="">Pin Code</label>
-                        <input value={pincode} onChange={(event) => setpincode(event.target.value)} type="text" className="w-full border border-black-500 p-2" />
-                        <label htmlFor="" className="error-label">{pinCodeError}</label>
-                    </div>
-                    <div className="country">
-                        <label htmlFor="">Country</label>
-                        <input value={country} onChange={(event) => setcountry(event.target.value)} type="text" className="w-full border border-black-500 p-2" />
-                        <label htmlFor="" className="error-label">{countryerror}</label>
-                     </div>
-                </div>
-                <div className="mt-3">
-                    <label htmlFor="">About me</label>
-                    <textarea value={summary} onChange={(event) => setsummary(event.target.value)} name="summary" id="summary" className="p-2 w-full h-[200px] border border-gray-400 outline-none"></textarea>
-                    <label htmlFor="" className="error-label">{summaryerror}</label>
-                </div>
-                <div>
-                    <button type="submit" className="bg-blue-500 text-white rounded-sm px-3 py-1">Save</button>
-                </div>
-                </form>
-            </div> */}
         </div>
     )
 }

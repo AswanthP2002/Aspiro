@@ -1,8 +1,6 @@
 import { useState } from "react"
-import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { recruiterService } from "../../../services/commonServices"
 import { postJob } from "../../../services/recruiterServices"
 
 
@@ -38,10 +36,6 @@ export default function PostAJobForm(){
     const [requirementsError, setrequirementserror] = useState("")
     const [responsibilitiesError, setresponsibilitieserror] = useState("")
     
-    const token = useSelector((state : any) => {
-        return state.recruiterAuth.recruiterToken
-    })
-
     const navigator = useNavigate()
 
     function handleData(event : any){
@@ -90,7 +84,7 @@ export default function PostAJobForm(){
         }
 
        
-            const result = await postJob(details)
+            await postJob(details)
             
                 Swal.fire({
                     icon:'success',

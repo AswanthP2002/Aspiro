@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import defaultImage from '../../../../public/default-img-instagram.png'
-import { adminServices } from "../../../services/commonServices"
 import { candidateBlock, candidateUnblock, getCandidateDetails } from "../../../services/adminServices"
 
 export default function CandidateDetails(){
@@ -14,9 +12,6 @@ export default function CandidateDetails(){
     const [skills, setskills] = useState<any[]>([])
 
     const {id} = useParams()
-    const token = useSelector((state : any) => {
-        return state.adminAuth.adminToken
-    })
 
     useEffect(() => {
         async function fetchCandidateDetails(){
@@ -164,7 +159,7 @@ export default function CandidateDetails(){
                                             {
                                                 experiences.map((exp: any, index: number) => {
                                                     return <>
-                                                        <tr className="">
+                                                        <tr key={index} className="">
                                                             <td className="flex items-center gap-3">
                                                                 <div><i className="fa-solid fa-building-user !text-3xl !text-gray-400"></i></div>
                                                                 <div className="">
@@ -215,7 +210,7 @@ export default function CandidateDetails(){
                                             {
                                                 education.map((edu: any, index: number) => {
                                                     return <>
-                                                        <tr className="">
+                                                        <tr key={index} className="">
                                                             <td className="flex items-center gap-3">
                                                                 <div><i className="fa-solid fa-school !text-3xl !text-gray-400"></i></div>
                                                                 <div className="">

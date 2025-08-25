@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultUser from '../../../../public/default-img-instagram.png'
 import { jobRoles } from '../../../assets/data/dummyJobRole';
@@ -62,12 +61,7 @@ export default function Candidates() {
   const openFilter = () => setFilterVisible(true)
   const closeFilter = () => setFilterVisible(false)
 
-  const dispatcher = useDispatch()
   const navigator = useNavigate()
-
-  const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
-  })
 
   useEffect(() => {
     async function fetchCandidateLists(){

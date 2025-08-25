@@ -1,11 +1,10 @@
 import { Box, Modal, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
-import { candidateService } from "../../../services/commonServices";
 import Swal from "sweetalert2";
 import { editCandidateEducation } from "../../../services/candidateServices";
 
-export default function EditEducationForm({selectedEducation, editEducationModalOpen, closeEditEducationModal, token} : any) {
+export default function EditEducationForm({selectedEducation, editEducationModalOpen, closeEditEducationModal} : any) {
     
     const [educationLevel, setEducationLevel] = useState("")
     const [educationLevelError, setEducationLevelError] = useState("")
@@ -66,16 +65,8 @@ export default function EditEducationForm({selectedEducation, editEducationModal
         if (!isValidated) return
         closeEditEducationModal()
 
-        //try {
-            // let response = await candidateService.editEducation(token, selectedEducation?._id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-            // if (response.status === 401) {
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.editEducation(newAccessToken, selectedEducation?._id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-            // }
+            await editCandidateEducation(selectedEducation?.id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
 
-            const result = await editCandidateEducation(selectedEducation?.id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
-
-            //if (result?.success) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Edited',
@@ -83,22 +74,6 @@ export default function EditEducationForm({selectedEducation, editEducationModal
                     showCancelButton: false,
                     timer: 1500
                 }).then(() => window.location.reload())
-            // } else {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Oops!',
-            //         text: result?.message
-            //     })
-            // }
-        // } catch (error : unknown) {
-        //     if(error instanceof Error){
-        //         Swal.fire({
-        //             icon:'error',
-        //             title:'Error',
-        //             text:error?.message
-        //         })
-        //     }
-        // }
     }
 
     const style = {

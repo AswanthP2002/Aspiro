@@ -64,11 +64,17 @@ function App() {
       </Route>
       
 
-      <Route path="profile" element={<ProfileLayout />}>
-        <Route path="personal" index element={<ProfilePersonal />} />
+      <Route path="profile" element={<CandidateProtectedRoute />}>
+        <Route element={<ProfileLayout />}>
+          <Route path='personal' index element={<ProfilePersonal />} />
+          <Route path='experience' element={<ExperiencePage />} />
+          <Route path='documents' element={<DocumentsPage />} />
+          <Route path='favorites' element={<SavedJobs />} />
+        </Route>
+        {/* <Route path="personal" index element={<ProfilePersonal />} />
         <Route path='experience' element={<ExperiencePage />} />
         <Route path='documents' element={<DocumentsPage />} />
-        <Route path='favorites' element={<SavedJobs />} />
+        <Route path='favorites' element={<SavedJobs />} /> */}
       </Route>
 
     </Route>

@@ -9,17 +9,6 @@ export default function GeneralModal({openModal, closeModal, children, size = 'm
         outline:'none'
     }
 
-    // switch(size){
-    //     case 'large' :
-    //         modalStyle.width = '700px'
-    //         break
-    //     case 'medium' :
-    //         modalStyle.width = '500px'
-    //         break
-    //     default :
-    //         modalStyle.width = '350px'
-    // }
-
     return(
         <>
         <Modal sx={{display:'flex', justifyContent:'center', alignItems:'center'}} open={openModal} onClose={closeModal}>

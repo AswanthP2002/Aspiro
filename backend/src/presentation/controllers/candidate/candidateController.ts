@@ -340,12 +340,14 @@ export class CandidateController {
         const page = parseInt(req.query.page as string) || 1
         const limit = parseInt(req.query.limit as string) || 3
         const sortvalue = req.query.sort as string || 'job-latest'
+        const minSalary = req.query?.minSalary as string
+        const maxSalary = req.query?.maxSalary as string
         //console.log('filter before parsing', req.query.filter)
         const filters = JSON.parse(req.query.filter as string) || {}
         //console.log('filter after parsing', filters)
 
         try {
-            const result = await this._loadJobsUC.execute(search, page, limit, sortvalue, filters)
+            const result = await this._loadJobsUC.execute(search, page, limit, sortvalue, filters, minSalary, maxSalary)
             return res.status(StatusCodes.OK).json({success:true, message:'Jobs fetched successfully', result})
         } catch (error : unknown) {
             console.log('Error occured while fetching the job details', error)

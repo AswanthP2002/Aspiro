@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
@@ -87,10 +87,6 @@ export default function Jobs() {
   function toggleSortVisibility(){
     setSortVisibility(prev => !prev)
   }
-
-  const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
-  })
 
   const navigator = useNavigate()
 

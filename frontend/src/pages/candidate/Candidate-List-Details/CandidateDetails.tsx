@@ -134,7 +134,7 @@ export default function CandidatePublicProfile() {
                                                         {
                                                             candidateDetails?.experience.map((exp : any, index : number) => {
                                                                 return(
-                                                                    <tr className='border-b border-gray-300'>
+                                                                    <tr key={index} className='border-b border-gray-300'>
                                                             <td className='p-1'>
                                                                 <div className="flex gap-3">
                                                                     <div className="bg-blue-100 w-[50px] h-[50px]"></div>
@@ -191,7 +191,7 @@ export default function CandidatePublicProfile() {
                                                 <div className="flex gap-3 mt-3">
                                                     {
                                                         candidateDetails?.skills?.map((skill : any, index : number) => {
-                                                            return<>{skill?.type === 'Technical-Skill' && (<span className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
+                                                            return<>{skill?.type === 'Technical-Skill' && (<span key={index} className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
                                                         })
                                                     }
                                                 </div>
@@ -207,7 +207,7 @@ export default function CandidatePublicProfile() {
                                                 <div className="flex gap-3 mt-3">
                                                     {
                                                         candidateDetails?.skills?.map((skill : any, index : number) => {
-                                                            return<>{skill?.type === 'Soft-Skill' && (<span className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
+                                                            return<>{skill?.type === 'Soft-Skill' && (<span key={index} className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
                                                         })
                                                     }
                                                 </div>

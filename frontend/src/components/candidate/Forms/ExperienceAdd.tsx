@@ -1,11 +1,9 @@
 import { Modal, Box, Typography } from "@mui/material";
 import { useState } from "react";
-import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/commonServices";
 import { addCandidateExperience } from "../../../services/candidateServices";
 
-export default function AddExperienceForm({token, experiencemodalopen, closeModal} : any){
+export default function AddExperienceForm({experiencemodalopen, closeModal} : any){
     const [role, setrole] = useState("")
     const [jobtype, setjobtype] = useState("")
     const [organization, setorganization] = useState("")
@@ -60,17 +58,8 @@ export default function AddExperienceForm({token, experiencemodalopen, closeModa
     
         async function addExperience(){
     
-            //try {
-                // let response = await candidateService.addExperience(token, role, jobtype, location, locationtype, organization, ispresent, startdate, enddate)
-    
-                // if(response.status === 401){
-                //     const newAccessToken = await candidateService.refreshToken()
-                //     response = await candidateService.addExperience(newAccessToken, role, jobtype, location, locationtype, organization, ispresent, startdate, enddate)
-                // }
-    
                 const result = await addCandidateExperience(role, jobtype, location, locationtype, organization, ispresent, startdate, enddate)
                 closeModal() //closing form
-                // if(result?.success){
                     Swal.fire({
                         icon:'success',
                         title:'Added',
@@ -79,26 +68,6 @@ export default function AddExperienceForm({token, experiencemodalopen, closeModa
                         showCancelButton:false,
                         timer:3000
                     }).then(() => window.location.reload())
-                // }else{
-                //     Swal.fire({
-                //         icon:'error',
-                //         title:'Oops',
-                //         text:result?.message,
-                //         showConfirmButton:true,
-                //         allowOutsideClick:false,
-                //     })
-                // }
-                
-            // } catch (error : unknown) {
-            //     console.log('Error occured while adding candidate experience', error)
-            //     if(error instanceof Error){
-            //         Swal.fire({
-            //             icon:'error',
-            //             title:'Error',
-            //             text:error?.message
-            //         })
-            //     }
-            // }
         }
 
     function toggleIsPresent(){

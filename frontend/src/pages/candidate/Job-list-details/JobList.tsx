@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
 import Swal from "sweetalert2"
 import JobListTile from "../../../components/common/JobListTile"
 import { useNavigate } from "react-router-dom"
-import { industryTypes } from "../../../assets/data/companyDetailsArrayData"
+import JobFilterCandidateSide from "../../../components/candidate/JobFiltersCandidateSide"
+import { getJobs } from "../../../services/candidateServices"
 interface filterState {
     industry: string[]
     jobType: string[]
@@ -11,7 +11,6 @@ interface filterState {
     minSalary: string
     maxSalary: string
 }
-// const industryTypesTyped : string[] = industryTypes
 
 export default function JobListing() {
 
@@ -20,6 +19,47 @@ export default function JobListing() {
     const [page, setpage] = useState(1)
     const [totalPages, settotalpages] = useState(0)
     const [pagination, setpagination] = useState<any[]>([])
+
+    const [industryFilterOpen, setIndustryFilterOpen] = useState(false)
+    const [jobTyeFilterOpen, setJobTypeFilterOpen] = useState(false)
+    const [locationTypeFilterOpen, setLocationTypeFilterOpen] = useState(false)
+
+    // Filter view hide function
+    const toggleIndustryFilter = () => {
+        setIndustryFilterOpen(prv => {
+            if(!prv){
+                setJobTypeFilterOpen(false)
+                setLocationTypeFilterOpen(false)
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+
+    const toggleJobTypeFilter = () => {
+        setJobTypeFilterOpen(prv => {
+            if(!prv){
+                setIndustryFilterOpen(false)
+                setLocationTypeFilterOpen(false)
+                return true
+            }else{
+                return false
+            }
+        })
+    }
+
+    const toggleLocationFilter = () => {
+        setLocationTypeFilterOpen(prv => {
+            if(!prv){
+                setIndustryFilterOpen(false)
+                setJobTypeFilterOpen(false)
+                return true
+            }else{
+                return false
+            }
+        })
+    }
 
     const [sortvalue, setsortvalue] = useState('')
     const [visibleSort, setVisibleSort] = useState(false)
@@ -31,9 +71,29 @@ export default function JobListing() {
         minSalary:'',
         maxSalary:''
     })
-    const [visibleFilter, setVisibleFilter] = useState(false)
+    const [minSalary, setMinSalary] = useState("")
+    const [minSalaryError, setMinSalaryError] = useState("")
+    const [maxSalaryError, setMaxSalaryError] = useState("")
+    const [maxSalary, setMaxSalary] = useState("")
 
     const navigator = useNavigate()
+
+    function filterSalary(){
+        const minSalary : any = document.getElementById("minSalary")
+        const maxSalary : any = document.getElementById("maxSalary")
+
+        //validation
+        const minsalaryerror = !minSalary?.value || minSalary?.value.includes('.') || false
+        const maxsalaryerror = !maxSalary?.value || maxSalary?.value.includes('.') || false
+
+        minsalaryerror ? setMinSalaryError('Give minimum salary') : setMinSalaryError("")
+        maxsalaryerror ? setMaxSalaryError('Give maximum salary') : setMaxSalaryError("")
+
+        if(minsalaryerror || maxsalaryerror) return
+        
+        setMinSalary(minSalary?.value)
+        setMaxSalary(maxSalary?.value)
+    }
 
     function handleIndustryChange(industry : string, isChecked : boolean) {
         setFilter((state : any) => {
@@ -75,16 +135,10 @@ export default function JobListing() {
 
     useEffect(() => {
         async function fetchJobs(){
-            async function makeRequest(){
-                return fetch(`http://localhost:5000/jobs?search=${search}&page=${page}&sort=${sortvalue}&filter=${encodeURIComponent(JSON.stringify(filter))}`, {
-                    method:'GET',
-                })
-            }
-
             try {
-                let response = await makeRequest()
-
-                const result = await response.json()
+                
+                const result = await getJobs(search, page, sortvalue, filter, minSalary, maxSalary)
+                console.log('Result of job fetching candidate side', result)
 
                 if(result.success){
                     console.log('Result from the backend :: jobs', result.result)
@@ -107,7 +161,7 @@ export default function JobListing() {
         }
 
         fetchJobs()
-    }, [search, page, sortvalue, filter])
+    }, [search, page, sortvalue, filter, minSalary, maxSalary])
 
     const nextPage = () => setpage(prev => prev + 1)
     const previousPage = () => setpage(prev => prev - 1)
@@ -127,24 +181,6 @@ export default function JobListing() {
         }
     }
 
-    function handleMinSalary(salary : string) {
-        setFilter((prevState : any) => {
-            return {
-                ...prevState,
-                minSalary:salary
-            }
-        })
-    }
-
-    function handleMaxSalary(salary : string) {
-        setFilter((prevState : any) => {
-            return {
-                ...prevState,
-                maxSalary:salary
-            }
-        })
-    }
-
     const dSearch = debouncedSearch(searchJobs, 500)
 
     useEffect(() => {
@@ -152,64 +188,7 @@ export default function JobListing() {
     }, [filter])
 
     return (
-        <>  {
-            visibleFilter
-                ? <>
-                    <div style={{ zIndex: '1000' }} className="shadow filter bg-white w-[250px] h-screen absolute top-0 left-0">
-                        <div className="flex justify-between p-3">
-                            <p className="text-blue-500">Filter</p>
-                            <i onClick={() => setVisibleFilter(false)} className="cursor-pointer fa-solid fa-circle-xmark cursor-pointer"></i>
-                        </div>
-                        <div className="industries p-3 ">
-                            <p className="text-sm font-normal text-gray-500">Industries</p>
-                            <div className="overflow-y-scroll max-h-[300px]" >
-                                <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">All</label></li>
-                                {
-                                    industryTypes.map((industry: string, index: number) => {
-                                        return (
-                                            <li key={index} className="list-none"><input type="checkbox" checked={filter.industry.includes(industry)} onChange={(event) => handleIndustryChange(industry, event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">{industry}</label></li>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </div>
-
-                        <div className="job-type p-3">
-                            <p className="text-sm font-normal text-gray-500">Job Type</p>
-                            <div>
-                                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Full-Time')} onChange={(event) => handleJobTypeChange('Full-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Full-Time</label></li>
-                                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Part-Time')} onChange={(event) => handleJobTypeChange('Part-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Part-Time</label></li>
-                                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Internship')} onChange={(event) => handleJobTypeChange('Internship', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Internship</label></li>
-                            </div>
-                        </div>
-
-                        <div className="lcoation-type p-3">
-                            <p className="text-sm font-normal text-gray-500">Location Type</p>
-                            <div>
-                                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('In-Office')} onChange={(event) => handleLocationType('In-Office', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">In-Office</label></li>
-                                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('Remote')} onChange={(event) => handleLocationType('Remote', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Remote</label></li>
-                                
-                            </div>
-                        </div>
-
-                        <div className="salary p-3">
-                            <p className="text-sm font-normal text-gray-500">Salary (Monthly)</p>
-                            <div className="flex gap-2">
-                                <div className="w-1/2">
-                                    <label htmlFor="" className="!text-xs">Min Salary</label>
-                                    <input value={filter.minSalary} onChange={(event) => handleMinSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
-                                </div>
-
-                                <div className="w-1/2">
-                                    <label htmlFor="" className="!text-xs">Max Salary</label>
-                                    <input value={filter.maxSalary} onChange={(event) => handleMaxSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </>
-                : null
-        }
+        <>  
             <div className="job-listing-container w-full">
                 <div className="breadcrumbs-header bg-gray-100 w-full">
                     <div className="aspiro-container">
@@ -221,6 +200,39 @@ export default function JobListing() {
                 </div>
                 <section className="jobs mt-5">
                     <div className="aspiro-container">
+                        {/* Simplified filter implementation */}
+                        <div className="relative filter-wrapper mb-3 flex gap-3">
+                            <div className="">
+                                <button onClick={toggleIndustryFilter} className={`${industryFilterOpen ? "bg-blue-500 text-white" : null} text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}>
+                                    Industry {filter?.industry?.length > 0 ? `(${filter?.industry?.length})` : null}
+                                </button>
+                                <JobFilterCandidateSide openFilter={industryFilterOpen} filter={filter} filterType="Industry" handleFilterApply={handleIndustryChange} />
+                            </div>
+                            <div>
+                                <button onClick={toggleJobTypeFilter} className={`${jobTyeFilterOpen ? "bg-blue-500 text-white" : null} text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}>
+                                    Job Type {filter?.jobType?.length > 0 ? `(${filter?.jobType?.length})` : null}
+                                </button>
+                                <JobFilterCandidateSide openFilter={jobTyeFilterOpen} filter={filter} filterType="Jobtype" handleFilterApply={handleJobTypeChange} />
+                            </div>
+                            <div>
+                                <button onClick={toggleLocationFilter} className={`${locationTypeFilterOpen ? "bg-blue-500 text-white" : null} text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}>
+                                    Location Type {filter?.locationType?.length > 0 ? `(${filter?.locationType?.length})` : null}
+                                </button>
+                                <JobFilterCandidateSide openFilter={locationTypeFilterOpen} filter={filter} filterType="Locationtype" handleFilterApply={handleLocationType} />
+                            </div>
+                            {/* <button className="text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2">Salary</button> */}
+                            <div className="flex items-center gap-3">
+                                <div>
+                                    <input type="text" id="minSalary" placeholder="Minimum Salary" className="border border-gray-400 rounded-sm !text-xs px-2 py-1" />
+                                    <label htmlFor="" style={{color:'red', display:'block', fontSize:'0.7rem'}}>{minSalaryError}</label>
+                                </div>
+                                <div>
+                                    <input type="text" id="maxSalary" placeholder="Minimum Salary" className="border border-gray-400 rounded-sm !text-xs px-2 py-1" />
+                                    <label htmlFor="" style={{color:'red', display:'block', fontSize:'0.7rem'}}>{maxSalaryError}</label>
+                                </div>
+                                <button onClick={filterSalary} className="bg-blue-500 text-white text-xs px-3 py-1 rounded">Apply salary filter</button>
+                            </div>
+                        </div>
                         <div className="search-header w-full">
                             <div className="search-wrapper-w-full flex justify-between bg-white p-2 rounded-sm items-center border border-gray-300">
                                 <div className="search bg-white flex gap-3">
@@ -234,7 +246,6 @@ export default function JobListing() {
                                     </div>
                                 </div>
                                 <div className="actions relative">
-                                    <button onClick={() => setVisibleFilter(true)} type="button" className="px-3 py-1 btn filter bg-gray-300 rounded me-3"><i className="me-2 fa-solid fa-filter !text-sm"></i>Filter</button>
                                     <button onClick={toggleSortVisibility} type="button" className="px-3 py-1 btn sort bg-blue-400 text-white rounded"><i className="me-2 fa-solid fa-sort !text-sm"></i>Sort</button>
                                 
                                 {/* sort */}

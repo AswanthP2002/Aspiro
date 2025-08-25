@@ -15,7 +15,6 @@ export default function RecruiterHeader(){
     console.log('This is loged user', logedRecruiter)
 
    async function logout(){
-        //alert(' recruiter logout triggered')
         const result = await logoutRecruiter()
         dispatch(recruiterLogout())
         Swal.fire({
