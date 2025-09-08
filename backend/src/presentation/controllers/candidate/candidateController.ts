@@ -6,7 +6,6 @@ import { Auth } from "../../../middlewares/auth"
 import GetAuthUserUseCase from "../../../application/usecases/getPasspoartUser"
 import { StatusCodes } from "../../statusCodes"
 import IRegisterCandidateUseCase from "../../../application/usecases/candidate/interface/IRegisterCandidateUseCase"
-import { connectDb } from "../../../infrastructure/database/connection"
 import IAddCertificateUseCase from "../../../application/usecases/candidate/interface/IAddCertificateUseCase"
 import IAddEducationUseCase from "../../../application/usecases/candidate/interface/IAddEducationUseCase"
 import IAddExperience from "../../../application/usecases/candidate/interface/IAddExperienceUseCase"
@@ -45,6 +44,23 @@ import IRemoveProfilePictureUseCase from "../../../application/usecases/candidat
 import IUploadCoverPhotoUseCase from "../../../application/usecases/candidate/interface/IUploadCoverPhotoUseCase"
 import IGetCandidatesUseCase from "../../../application/usecases/interfaces/IGetCandidatesUseCase"
 import IGetCandidateDetailsUseCase from "../../../application/usecases/interfaces/IGetCandiateDetailsUseCase"
+import IGetCandidateApplicationsUseCase from "../../../application/usecases/candidate/interface/IGetCandidateApplicationsUseCase"
+import mapToCreateCandidateDTO from "../../mappers/candidate/mapToCreateCandidateDTO"
+import mapToVerifyUserDTO from "../../mappers/candidate/mapToVerifyUserRequestDTO"
+import mapToLoginCandidateInpDTO from "../../mappers/candidate/mapToLoginCandidateInpDTO"
+import mapToSaveIntroInpDTO from "../../mappers/candidate/mapToSaveIntroInpDto"
+import MapToAddExperienceDTO from "../../mappers/candidate/mapToCreateExperienceDto"
+import mapToCreateSkillDTOFromRequest from "../../mappers/candidate/mapToCreateSkillDTOFromRequest"
+import mapToCreateEducationDTOFromRequest from "../../mappers/candidate/mapToCreateEducationDTOFromRequest"
+import mapToUpdateEducationDTOFromRequest from "../../mappers/candidate/mapToUpdateEducationDTOFromRequest"
+import mapToCreateCertificateDTOFromRequest from "../../mappers/candidate/mapToCreateCertificateDTOFromRequest"
+import mapToEditCandidateDTOFromRequest from "../../mappers/candidate/mapToEditCandidateRequestDTOFromRequest"
+import mapToUploadProfilePictureDTOFromRequest from "../../mappers/candidate/mapToUploadProfilePictureDTOFromRequest"
+import mapToUploadCoverPhotoDTOFromRequest from "../../mappers/candidate/mapToUploadcoverphotoDTOFromRequest"
+import IRemoveCoverphotoUseCase from "../../../application/usecases/candidate/interface/IRemoveCoverphotoUseCase"
+import mapToFindCandidatesDTOFromRequest from "../../mappers/candidate/mapToFindCandidatesDTOFromRequest"
+import mapToAddsocialLinkDTOFromRequest from "../../mappers/candidate/mapToAddSocialLinkDTOFromRequest"
+import IUpdateNotificationReadStatus from "../../../application/usecases/candidate/interface/IUpdateNotificationReadStatus"
 
 export class CandidateController {
     constructor(
@@ -84,21 +100,23 @@ export class CandidateController {
         private _uploadProfilePictureUC : IUploadProfilePictureUseCase,
         private _removeProfilePictureUC : IRemoveProfilePictureUseCase,
         private _uploadCoverphotoUC : IUploadCoverPhotoUseCase,
-        private _removeCoverphotoUC : IRemoveProfilePictureUseCase,
+        private _removeCoverphotoUC : IRemoveCoverphotoUseCase,
         private _getCandidatesUC : IGetCandidatesUseCase,
-        private _getCandidateDetailsUC : IGetCandidateDetailsUseCase
-        
+        private _getCandidateDetailsUC : IGetCandidateDetailsUseCase,
+        private _getCandidateApplicationsUC : IGetCandidateApplicationsUseCase,
+        private _updateNotificationReadStatus : IUpdateNotificationReadStatus 
     ){}
 
     //register candidate
-    async registerCandidate(req : Request, res : Response) : Promise<Response> { //create account
-        //console.log('Account registering request reached here', req.body)
+    async registerCandidate(req : Request, res : Response) : Promise<Response> {
         const {name, email, phone, password, username} = req.body
         try {
-            //console.log('testing regCandidate usecase ', this._registerCandidateUC)
-            const createUser = await this._registerCandidateUC.execute({name, email, phone, password, username})
-            //console.log(`Registered Candidate is here ${createUser}`)
-            return res.status(StatusCodes.OK).json({success:true, message:'Candidate created need to verify before continue', candidate:email})
+            //convert into dto
+            const dto = mapToCreateCandidateDTO({name, email, phone, password})
+            //pass dto to the useCase
+            const createUser = await this._registerCandidateUC.execute(dto)
+            return res.status(StatusCodes.OK)
+                      .json({success:true, message:'Candidate created need to verify before continue', candidate:email})
         
         } catch (error : unknown) {
             console.log(`Error occured while registering the user ::candidateController.ts ${error}`)
@@ -128,15 +146,14 @@ export class CandidateController {
             })
         
         }
-    }
+    }//reworked
 
     async verifyUser(req : Request, res : Response) : Promise<Response> { //email verification for candidate
-        const {otp, email} = req.body
         try {
-            const isVerified = await this._verifyUserUC.execute(email, otp)
-
+            const dto = mapToVerifyUserDTO(req.body)
+            await this._verifyUserUC.execute(dto)
             return res.status(StatusCodes.OK).json({
-                success:isVerified, 
+                success:true, 
                 message:"Email verifed successfully, please login to continue"
             })
         } catch (error : unknown) {
@@ -166,15 +183,13 @@ export class CandidateController {
                 message:'An unknown error occured'
             })
         }
-    }
+    }//reworked
 
     async loginCandidate(req : Request, res : Response) : Promise<Response> { //candidate  login
-        const {email, password} = req.body
         try {
-            const result : any = await this._loginCandidateUC.execute(email, password)
+            const dto = mapToLoginCandidateInpDTO(req.body)
+            const result = await this._loginCandidateUC.execute(dto)
             const {refreshToken} = result
-
-            //console.log('Refresh token before sending to the frontend :: candidateController.ts', refreshToken)
 
             return res.status(StatusCodes.OK)
             .cookie('refreshToken', refreshToken, {httpOnly:true, secure:false, sameSite:'lax', maxAge:24 * 60 * 60 * 1000})
@@ -214,17 +229,18 @@ export class CandidateController {
                 message:'An unknown error occured'
             })
         }
-    }
+    }//reworked
 
     async saveIntroDetailsCandidate(req : Auth, res : Response) : Promise<Response> { //save 
         const id = req?.user?.id
-        const {city, jobRole, summary, district, country, state, pincode} = req.body
+        console.log(req.body)
         try {
-            const isSaved = await this._saveDetailsUC.execute({id, city, role:jobRole, summary, district, country, state, pincode})
-
+            const dto = mapToSaveIntroInpDTO(id, req.body)
+            const updatedCandidate = await this._saveDetailsUC.execute(dto)
             return res.status(StatusCodes.OK).json({
                 success:true, 
-                message:'Basic details saved, login to your profile to continue'
+                message:'Basic details saved, login to your profile to continue',
+                updatedCandidate
             })
         } catch (error : unknown) {
             if(error instanceof Error){
@@ -241,18 +257,16 @@ export class CandidateController {
             })
             
         }
-    }
+    }//reworked
 
     async loadCandidatePersonalData(req : Auth, res : Response) : Promise<Response> {
         const id = req.user.id
         try {
             const userDetails = await this._loadCandidatePersonalDataUC.execute(id)
 
-            return res.status(StatusCodes.OK).json({
-                success:true, 
-                message:'User details fetched successfully',
-                userDetails
-            })
+            return userDetails
+                ? res.status(StatusCodes.OK).json({success:true, message:'User details fetched successfully', userDetails})
+                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Details not found'})
         } catch (error : unknown) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success:false,
@@ -260,7 +274,7 @@ export class CandidateController {
             })
         }
 
-    }
+    } //reworked
 
     async candidateLogout(req : Request, res : Response) : Promise<Response> {
         try {
@@ -279,12 +293,13 @@ export class CandidateController {
 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
         }
-    }
+    } //reworked
 
     async addExperience(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user?.id
         try {
-            const addExperienceResult = await this._addExperienceUC.execute(req.body, candidateId)
+            const dto = MapToAddExperienceDTO({candidateId, ...req.body})
+            const addExperienceResult = await this._addExperienceUC.execute(dto)
             if(!addExperienceResult) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add experience'})
             
             return res.status(StatusCodes.OK).json({success:true, message:'Experience added successfully'})
@@ -292,21 +307,20 @@ export class CandidateController {
             console.log('Error occured while adding candidate experience', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    }//reworked
 
     async deleteExperience(req : Auth, res : Response) : Promise<Response> {
         const {experienceId} = req.params
 
         try {
-            const result = await this._deleteExperienceUC.execute(experienceId)
-            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete experience'})
-
+            await this._deleteExperienceUC.execute(experienceId)
+            // if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete experience'})
             return res.status(StatusCodes.OK).json({success:true, message:'Experience deleted'})
         } catch (error : unknown) {
             console.log('Error occured while deleting experience', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    }//reworked
 
     async getExperiences(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req?.user?.id
@@ -318,7 +332,7 @@ export class CandidateController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
 
-    }
+    } //reworked
 
     async editExperience(req : Auth, res : Response) : Promise<Response> {
         const {experienceId} = req.params
@@ -327,13 +341,13 @@ export class CandidateController {
             const result = await this._editExperienceUC.execute(experienceId, req.body)
             if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Can not edit experience"})
 
-            return res.status(StatusCodes.OK).json({success:true})
+            return res.status(StatusCodes.OK).json({success:true, message:'Edited', result})
         } catch (error : unknown) {
             console.log('Error occured while editing the experience')
             
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async loadJobs(req : Request, res : Response) : Promise<Response> {
         const search = req.query.search as string || ""
@@ -347,7 +361,7 @@ export class CandidateController {
         //console.log('filter after parsing', filters)
 
         try {
-            const result = await this._loadJobsUC.execute(search, page, limit, sortvalue, filters, minSalary, maxSalary)
+            const result = await this._loadJobsUC.execute({search, page, limit, sort:sortvalue, minSalary, maxSalary, filters})
             return res.status(StatusCodes.OK).json({success:true, message:'Jobs fetched successfully', result})
         } catch (error : unknown) {
             console.log('Error occured while fetching the job details', error)
@@ -356,7 +370,7 @@ export class CandidateController {
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'An unknown error occured'})
         }
-    }
+    } //reworked
 
     async loadJobDetails(req : Request, res : Response) : Promise<Response> {
         const {jobId} = req.params
@@ -377,7 +391,8 @@ export class CandidateController {
     async addSkill(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
         try {
-            const result = await this._addSkillsUC.execute(candidateId, req.body)
+            const dto = mapToCreateSkillDTOFromRequest({candidateId, ...req.body})
+            const result = await this._addSkillsUC.execute(dto)
             if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add skill'})
             
             return res.status(StatusCodes.OK).json({success:true, message:'added'})
@@ -389,11 +404,10 @@ export class CandidateController {
 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, mesage:'An unknown error occured'})
         }
-    }
+    } //reworked
 
     async getSkills(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
-        //console.log('Candidate id for geting skills', candidateId)
         try {
             const skills = await this._getSkillsUC.execute(candidateId)
             return res.status(StatusCodes.OK).json({success:true, message:'Skills fetched successfully', skills})
@@ -401,33 +415,35 @@ export class CandidateController {
             console.log('Error occured while geting the skills')
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error occured, please try again after some time'})
         }
-    }
+    }//reworked
 
     async deleteSkill(req : Auth, res : Response) : Promise<Response> {
         const {skillId} = req.params
 
         try {
-            const deleteResult = await this._deleteSkillUC.execute(skillId)
-            if(!deleteResult) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete skill'})
+            await this._deleteSkillUC.execute(skillId)
             return res.status(StatusCodes.OK).json({success:true, message:'Skill removed'})
         } catch (error : unknown) {
             console.log('Error occured while deleting the skill', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    }//reworked
 
     async addEducation(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
 
         try {
-            const saveEducationResult = await this._addEducationUC.execute(req.body, candidateId)
-            return res.status(StatusCodes.OK).json({success:saveEducationResult, message:'Education added successfully'})
+            const dto = mapToCreateEducationDTOFromRequest({candidateId, ...req.body})
+            const saveEducationResult = await this._addEducationUC.execute(dto)
+            return saveEducationResult
+                ? res.status(StatusCodes.OK).json({success:saveEducationResult, message:'Education added successfully', saveEducationResult})
+                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add education right now'})
         } catch (error : unknown) {
             console.log('Error occured while adding education', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
 
-    }
+    } //reworked
 
     async getEducations(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
@@ -439,33 +455,34 @@ export class CandidateController {
             console.log('Error occured while geting the educations', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async deleteEducation(req : Auth, res : Response) : Promise<Response> {
         const {educationId} = req.params
         try {
-            const deleteResult = await this._deleteEducationUC.execute(educationId)
-            if(!deleteResult) return res.status(StatusCodes.BAD_REQUEST).json({success:deleteResult, message:'Can not delete education'})
+            await this._deleteEducationUC.execute(educationId)
             
-            return res.status(StatusCodes.OK).json({success:deleteResult, message:'Deleted'})
+            return res.status(StatusCodes.OK).json({success:true, message:'Deleted'})
         } catch (error : unknown) {
             console.log('Error occured while deleting the education', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async editEducation(req : Auth, res : Response) : Promise<Response> {
         const {educationId} = req.params
-
+        console.log('educ id', educationId)
         try {
-            const result = await this._editEducationUC.execute(educationId, req.body)
+            const dto = mapToUpdateEducationDTOFromRequest({id:educationId, ...req.body})
+            console.log('dto before sendign', dto)
+            const result = await this._editEducationUC.execute(dto)
             if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not edit education'})
-            return res.status(StatusCodes.OK).json({success:true, message:'Education edited'})
+            return res.status(StatusCodes.OK).json({success:true, message:'Education edited', result})
         } catch (error : unknown) {
             console.log('Error occured while editing the education details', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async addResume( req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
@@ -474,11 +491,9 @@ export class CandidateController {
         try {
             if(req.file){
                 const resume = req.file.buffer
-                const result = await this._addResumeUC.execute(resume, req.file.originalname, candidateId)
+                const result = await this._addResumeUC.execute({file:resume, path:req.file?.originalname, candidateId:candidateId})
                 if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add resume'})
-                    console.log('uploading successfull candidateController.ts')
-                console.log('--------Resume saved in the database with this object id---------', result)
-                return res.status(StatusCodes.OK).json({success:true, message:'Resume added successfully', resumeId:result})
+                return res.status(StatusCodes.OK).json({success:true, message:'Resume added successfully', resumeId:result._id})
             }
             console.log('A problem occured while saving resume candidateController.ts')
             return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not add resume'})
@@ -486,7 +501,7 @@ export class CandidateController {
             console.log('Errro occured while adding the resume', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async loadResume(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
@@ -497,20 +512,20 @@ export class CandidateController {
         } catch (error : unknown) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async deleteResume(req : Auth, res : Response) : Promise<Response> {
         const {resumeId} = req.params
         const cloudinaryPublicId = req.query?.cloudinaryPublicId as string
 
         try {
-            const deleteResult = await this._deleteResumeUC.execute(resumeId, cloudinaryPublicId)
+            await this._deleteResumeUC.execute(resumeId, cloudinaryPublicId)
             return res.status(StatusCodes.OK).json({success:true, message:'Deleted'})
         } catch (error : unknown) {
             console.log('Error occured while deleting the resume', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server'})
         }
-    }
+    } //reworked
 
     async addCertificate(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
@@ -519,14 +534,8 @@ export class CandidateController {
             if(req.file){
                 const arrayBuffer = req.file.buffer
                 const filePathName = req.file.originalname.split('.')[0]
-                const {issuedOrganization, issuedDate, id} = req.body
-
-                const result = await this._addCertificate.execute(
-                    {issuedOrganization:issuedOrganization, issuedDate:new Date(issuedDate), certificateId:id}, 
-                    arrayBuffer, 
-                    filePathName, 
-                    candidateId
-                )
+                const dto = mapToCreateCertificateDTOFromRequest({candidateId:candidateId, file:arrayBuffer, path:filePathName, ...req.body})
+                const result = await this._addCertificate.execute(dto)
                 return res.status(StatusCodes.OK).json({success:true, message:'Certificate added successfully'})
             }
 
@@ -535,7 +544,7 @@ export class CandidateController {
             console.log('Error occured while adding the certificate', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async getCertificates(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
@@ -547,7 +556,7 @@ export class CandidateController {
             console.log('Error occured while geting certificates', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async saveJobApplication(req : Auth, res : Response) : Promise<Response> {
         //coverLetterContent, savedResumeId
@@ -556,15 +565,15 @@ export class CandidateController {
         const {coverLetterContent, resumeId} = req.body
 
         try {
-            const result = await this._saveJobApplicationUC.execute({coverLetterContent}, jobId, candidateId, resumeId)
+            const result = await this._saveJobApplicationUC.execute({candidateId, jobId, coverLetterContent, resumeId})
             if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong, can not apply job right now'})
             
-            return res.status(StatusCodes.OK).json({success:true, message:'success'})
+            return res.status(StatusCodes.OK).json({success:true, message:'success', result})
         } catch (error : unknown) {
             console.log('Error occured while applying the job', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async searchJobFromHomePage(req : Request, res : Response) : Promise<Response> {
         const search = req.query.search as string || ''
@@ -581,12 +590,13 @@ export class CandidateController {
     }
 
     async editCandidateProfile(req : Auth, res : Response) : Promise<Response> {
-        const userId = req.user.id
-        const {name, role, city, district, state, country, about} = req.body
-        
+        const id = req.user.id        
         try {
-            const result = await this._editCandidateProfileUC.execute(userId, name, role, city, district, state, country, about)
-            return res.status(StatusCodes.OK).json({success:true, message:'Profile details updated successfully'})
+            const dto = mapToEditCandidateDTOFromRequest({id, ...req.body})
+            const result = await this._editCandidateProfileUC.execute(dto)
+            return result
+                ? res.status(StatusCodes.OK).json({success:true, message:'Profile details updated successfully', result})
+                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not edit profile now'})
         } catch (error : unknown) {
             console.log('Erro occured while editing candidate profile', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
@@ -605,11 +615,22 @@ export class CandidateController {
         }
     }
 
+    async updateNotificationReadStatus(req : Auth, res : Response) : Promise<Response> {
+        const {id} = req.params
+        try {
+            const result = await this._updateNotificationReadStatus.execute(id)
+            return res.status(StatusCodes.OK).json({success:true, message:'Status updated to read'})
+        } catch (error : unknown) {
+            console.log('Errro occured while updating notification status', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal seerver error, pleaes try again after som etime'})
+        }
+    }
+
     async saveJob(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user.id
         const {jobId} = req.params
         try {
-            const result = await this._saveJobUC.execute(candidateId, jobId)
+            const result = await this._saveJobUC.execute({candidateId, jobId})
             if(!result){
                 console.log('result is empty')
                 return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not save job right now, please try again after some time'})
@@ -627,6 +648,7 @@ export class CandidateController {
         const jobId = req.query.jobId as string
         try {
             const result = await this._checkIsJobSavedUC.execute(jobId, candidateId)
+            console.log(result)
             return res.status(StatusCodes.OK).json({success:true, message:'checked', isSaved:result})
         } catch (error : unknown) {
             console.log('Error occured while saving ', error)
@@ -646,13 +668,12 @@ export class CandidateController {
     }
 
     async unsaveJob(req : Auth, res : Response) : Promise<Response> {
-        const id = req.params.id as string
-        const {jobId} = req.params
         const candidateId = req.user.id
-
+        const {jobId} = req.params
+    
         try {
-            const result = await this._unsaveJobUC.execute(id, jobId)
-            if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not unsave'})
+            await this._unsaveJobUC.execute(jobId, candidateId)
+            //  return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not unsave'})
             return res.status(StatusCodes.OK).json({success:true, message:'Unsaved'})
         } catch (error : unknown) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, messgae:'Internal server error, please try again after some time'})
@@ -665,7 +686,8 @@ export class CandidateController {
         const domain = urlObj?.hostname as string
 
         try {
-            const result = await this._addSocialLinkUC.execute(candidateId, domain, req.body?.url)
+            const dto = mapToAddsocialLinkDTOFromRequest({candidateId, domain, url:req.body?.url})
+            const result = await this._addSocialLinkUC.execute(dto)
 
             return result
                 ? res.status(StatusCodes.OK).json({success:true, message:'Social link added'})
@@ -675,30 +697,28 @@ export class CandidateController {
             console.log('Error occured while adding social media link', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async deleteSocialLink(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user?.id
         const domain = req.body?.domain as string
 
         try {
-            const result = await this._deleteSocialLinkUC.execute(candidateId, domain)
-            return result
-                ? res.status(StatusCodes.OK).json({success:true, message:'Removed'})
-                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not remove social link right now, please try again after some time'})
+            const result = await this._deleteSocialLinkUC.execute({candidateId, domain})
+            return res.status(StatusCodes.OK).json({success:true, message:'Removed'})
         } catch (error : unknown) {
             console.log('Error occured while removing social media link', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async uploadProfilePicture(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user?.id
         const img = req.file?.buffer
         const publicId = req.query?.publicId as string
         try {
-                       
-            const result = await this._uploadProfilePictureUC.execute(candidateId, img, publicId)
+            const dto = mapToUploadProfilePictureDTOFromRequest({candidateId, imageFile:img, publicId})
+            const result = await this._uploadProfilePictureUC.execute(dto)
 
             return result
                 ? res.status(StatusCodes.OK).json({success:true, message:'Profile photo updated'})
@@ -707,32 +727,30 @@ export class CandidateController {
             console.log('Error occured while saving profile picture', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async removeProfilePicture(req : Auth, res : Response) : Promise<Response> {
-        console.log('profile picture remove request reached controller : candidatecontroler.ts')
         const candidateId = req.user?.id
         const cloudinaryPublicId = req.body.cloudinaryPublicId as string
 
         try {
-            const result = await this._removeProfilePictureUC.execute(candidateId, cloudinaryPublicId)
+            await this._removeProfilePictureUC.execute(candidateId, cloudinaryPublicId)
 
-            return result
-                ? res.status(StatusCodes.OK).json({success:true, message:'Photo removed'})
-                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not remove profile picture now'})
+            return res.status(StatusCodes.OK).json({success:true, message:'Photo removed'})
         } catch (error : unknown) {
             console.log('Error occured while removing profile photo', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async uploadCoverphoto(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user?.id
-        const publicId = req.query?.publicId as string
+        const publicId = req.query?.publicId as string || ""
         const imgFile = req.file?.buffer
 
         try {
-            const result = await this._uploadCoverphotoUC.execute(candidateId, imgFile, publicId)
+            const dto = mapToUploadCoverPhotoDTOFromRequest({candidateId, publicId, imageFile:imgFile})
+            const result = await this._uploadCoverphotoUC.execute(dto)
             return result
                 ? res.status(StatusCodes.OK).json({success:true, message:'Cover photo updated'})
                 : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not update cover photo'})
@@ -740,23 +758,21 @@ export class CandidateController {
             console.log('Error occured while updating cover photo', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
 
     async removeCoverphoto(req : Auth, res : Response) : Promise<Response> {
         const candidateId = req.user?.id
         const cloudinaryPublicId = req.query?.publicId as string
 
         try {
-            const result = await this._removeCoverphotoUC.execute(candidateId, cloudinaryPublicId)
-            return result
-                ? res.status(StatusCodes.OK).json({success:true, message:'Cover photo removed'})
-                : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not remove cover photo now'})
+            await this._removeCoverphotoUC.execute(candidateId, cloudinaryPublicId)
+            return res.status(StatusCodes.OK).json({success:true, message:'Cover photo removed'})
         } catch (error : unknown) {
             console.log('Error occured while removing cover photo', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
 
-    }
+    } //reworked
 
     async getCandidates(req : Request, res : Response) : Promise<Response> {
         console.log('Trying to inspect the request query params', req.query)
@@ -767,7 +783,8 @@ export class CandidateController {
         const filter = JSON.parse(req.query?.filter as string) || {}
 
         try {
-            const result = await this._getCandidatesUC.execute(search, page, limit, sort, filter)
+            const dto = mapToFindCandidatesDTOFromRequest({search, page, limit, sort, filter})
+            const result = await this._getCandidatesUC.execute(dto)
             return result
                 ? res.status(StatusCodes.OK).json({success:true, message:'Candidate list fetched successfully', result})
                 : res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
@@ -775,7 +792,7 @@ export class CandidateController {
             console.log('Error occured while geting candidate list', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworked
     
     async getCandidateDetails(req : Request, res : Response) : Promise<Response> {
         const candidateId = req.params?.candidateId as string
@@ -789,26 +806,38 @@ export class CandidateController {
             console.log('Error occured while geting candidate details', error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
         }
-    }
+    } //reworkedjobsaved
+
+    async getCandidateApplications(req : Auth, res : Response) : Promise<Response> {
+        const candidateId = req.user?.id
+        try {
+            const applications = await this._getCandidateApplicationsUC.execute(candidateId)
+            console.log('-------applications in the contorller', applications)
+            return res.status(StatusCodes.OK).json({success:true, message:'Applications fetched successfully', applications})
+        } catch (error : unknown) {
+            console.log('Error occured while geting candidate applications', error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
+        }
+    } //reworked
 
     
     
 
     
-}
+// }
 
-export const getAuthUserData = async (req : Request, res : Response) : Promise<Response> => {
-    try {
-        const db = await connectDb()
-        const {id} = req.params
-        const cRepo = new CandidateRepository(db)
-        const getAuthUseCase = new GetAuthUserUseCase(cRepo)
-        const data = await getAuthUseCase.execute(id)
-        return res.status(200).json({success:true, message:'user details fetched successfully', user:data})
-    } catch (error) {
-        console.log('error occured while geting google auth user data', error)
-        return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
-    }
+// export const getAuthUserData = async (req : Request, res : Response) : Promise<Response> => {
+//     try {
+//         const db = await connectDb()
+//         const {id} = req.params
+//         const cRepo = new CandidateRepository(db)
+//         const getAuthUseCase = new GetAuthUserUseCase(cRepo)
+//         const data = await getAuthUseCase.execute(id)
+//         return res.status(200).json({success:true, message:'user details fetched successfully', user:data})
+//     } catch (error) {
+//         console.log('error occured while geting google auth user data', error)
+//         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
+//     }
 }
 
 

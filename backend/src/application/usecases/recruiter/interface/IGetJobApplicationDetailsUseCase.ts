@@ -1,5 +1,5 @@
-import JobApplication from "../../../../domain/entities/candidate/jobApplication";
+import ApplicationDetailsAggregatedDTO from "../../../DTOs/recruiter/ApplicationDetailsAggDTO";
 
 export default interface IGetJobApplicationDetailsUseCase {
-    execute(jobId : string) : Promise<JobApplication[] | any>
+    execute(applicationId : string) : Promise<ApplicationDetailsAggregatedDTO | null>
 }

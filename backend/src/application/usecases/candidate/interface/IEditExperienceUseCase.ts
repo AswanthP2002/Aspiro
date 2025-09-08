@@ -1,5 +1,5 @@
-import { EditableExperience } from "../editExperienceUseCase";
+import { EditExperienceDTO, ExperienceDTO } from "../../../DTOs/candidate/experienceDTO";
 
 export default interface IEditExperienceUseCase {
-    execute(experienceId : string, experience : EditableExperience) : Promise<boolean>
+    execute(experienceId : string, editExperienceDto : EditExperienceDTO) : Promise<ExperienceDTO | null>
 }

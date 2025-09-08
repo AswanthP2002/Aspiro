@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { addCandidateResume, candidateApplyJob } from "../../../services/candidateServices"
 
@@ -19,6 +19,7 @@ export default function JobApplyPage() {
     const jobId = params.id
 
     const location = useLocation()
+    const navigatTo = useNavigate()
     console.log('job details through location obj', location.state.jobDetails)
 
     function selectResume(event : any){
@@ -63,20 +64,30 @@ export default function JobApplyPage() {
             formData.append('resume', resume)
             
                 if(resume){
-                    
+        
                     const result = await addCandidateResume(formData)
 
-                    await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, result?.resumeId)
-
-                }
-
-                    Swal.fire({
+                    if(result?.success){
+                        await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, result?.resumeId)
+                        Swal.fire({
                         icon: 'success',
                         title: 'Applied',
                         showCancelButton:false,
                         showConfirmButton:false,
+                        allowOutsideClick:false,
                         timer:1300
-                    }).then(() => window.location.reload())
+                    }).then(() => {navigatTo('/profile/my-applications')})
+                    }else{
+                        Swal.fire({
+                            icon:'warning',
+                            title:'Sorry',
+                            text:result?.message
+                        })
+                    }
+
+                }
+
+                    
         }
     }
 

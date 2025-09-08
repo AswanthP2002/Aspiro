@@ -8,55 +8,64 @@ import { createCandidatefromDTO } from "../../../domain/mappers/candidate/candid
 import IRegisterCandidateUseCase from "./interface/IRegisterCandidateUseCase";
 import IBaseRepo from "../../../domain/interfaces/IBaseRepo";
 import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
+import CreateCandidateDTO from "../../DTOs/candidate/createCandidateDTO";
+import CandidateDTO from "../../DTOs/candidate/candidateDTO";
+import mapToCandidate from "../../mappers/candidate/mapToCandidate";
+import mapToCandidateDTO from "../../mappers/candidate/mapToCandidateDto";
 
 export default class RegisterCandidateUseCase implements IRegisterCandidateUseCase {
     constructor(private _candidateRepo : ICandidateRepo){}
     
-    async execute(candidatedto : RegisterCandidateDTO) : Promise<string>{ 
+    async execute(createCandidateDto : CreateCandidateDTO) : Promise<CandidateDTO | null>{ 
+        //convert candidatedto into candidate entity to transfer to the repository
+        const newCandidate = mapToCandidate(createCandidateDto)
         
-        const parsedCandidate = RegisterCandidateSchema.parse(candidatedto)
-        const candidate = createCandidatefromDTO(parsedCandidate)
+        // const parsedCandidate = RegisterCandidateSchema.parse(candidatedto)
+        // const candidate = createCandidatefromDTO(parsedCandidate)
 
-        const existingEmail = await this._candidateRepo.findByEmail(candidate.email)
-        if(existingEmail) throw new Error('DuplicateEmail')
+        //check if the email is already exist
+        const isExistingEmail = await this._candidateRepo.findByEmail(newCandidate.email)
+        if(isExistingEmail) throw new Error('DuplicateEmail')
         
-        const existingMobileNumber = await this._candidateRepo.findByMobileNumber(candidate.phone)
-        if(existingMobileNumber) throw  new Error('DuplicateMobileNumber')
-            
-        let hashedPassword
-        if(candidate.password){
-            hashedPassword = await bcrypt.hash(candidate.password, 10)   
-        }
-            
-
-        candidate.password = hashedPassword
+        //check if the mobile number is already exist or not
+        const isExistingMobileNumber = await this._candidateRepo.findByMobileNumber(newCandidate.phone)
+        if(isExistingMobileNumber) throw  new Error('DuplicateMobileNumber')
         
-        candidate.about = ""
-        candidate.certificates = []
-        candidate.coverPhoto = {
-            cloudinaryPublicId:"",
-            cloudinarySecureUrl:""
+        //has the password before saving to the db
+        let hashedPassword : string = ""
+        if(newCandidate.password){
+            hashedPassword = await bcrypt.hash(newCandidate.password, 10)   
         }
-        candidate.currentSubscription = ""
-        candidate.education = []
-        candidate.experience = []
-        candidate.favorites = []
-        candidate.isBlocked = false
-        candidate.location = {
-            city:"",
-            district:"",
-            state:"",
-            pincode:"",
-            country:""
-        }
-        candidate.profilePicture = {
-            cloudinaryPublicId:"",
-            cloudinarySecureUrl:""
-        }
-        candidate.resume = []
-        candidate.socialLinks = []
-        candidate.isVerified = false
-        candidate.googleid = ""
+        
+        //set hashed password
+        newCandidate.password = hashedPassword
+        
+        // candidate.about = ""
+        // candidate.certificates = []
+        // candidate.coverPhoto = {
+        //     cloudinaryPublicId:"",
+        //     cloudinarySecureUrl:""
+        // }
+        // candidate.currentSubscription = ""
+        // candidate.education = []
+        // candidate.experience = []
+        // candidate.favorites = []
+        // candidate.isBlocked = false
+        // candidate.location = {
+        //     city:"",
+        //     district:"",
+        //     state:"",
+        //     pincode:"",
+        //     country:""
+        // }
+        // candidate.profilePicture = {
+        //     cloudinaryPublicId:"",
+        //     cloudinarySecureUrl:""
+        // }
+        // candidate.resume = []
+        // candidate.socialLinks = []
+        // candidate.isVerified = false
+        // candidate.googleid = ""
         
         const otp : string = generateCode()
         const otpExpiresAt : Date = new Date(Date.now() + 2 * 60 * 1000)
@@ -72,14 +81,21 @@ export default class RegisterCandidateUseCase implements IRegisterCandidateUseCa
   <p>Best regards,<br>Aspiro Team</p>
 </div>
         `
-        candidate.isVerified = false
-        candidate.verificationToken = otp
-        candidate.otpExpiresAt = otpExpiresAt
+        // candidate.isVerified = false
+        newCandidate.verificationToken = otp
+        newCandidate.otpExpiresAt = otpExpiresAt
 
-        const info = await sendEmail(candidate.email, subject, content)
+        const info = await sendEmail(newCandidate.email, subject, content)
         console.log("otp send to the user ", otp)
 
-        const createdCandidate = await this._candidateRepo.create(candidate)
-        return `${createdCandidate} - ${info}`
+        const createdCandidate = await this._candidateRepo.create(newCandidate)
+
+        //convert it back to dto
+        if(createdCandidate){
+            let dto : CandidateDTO = mapToCandidateDTO(createdCandidate)
+            return dto
+        }
+
+        return null
     }
 }

@@ -1,12 +1,13 @@
 import { ObjectId } from "mongodb"
 
 export default interface Job {
-    _id? : ObjectId
-    companyId? : ObjectId
+    _id? : string
+    companyId? : string
     jobTitle : string
     description : string
     requirements : string
     responsibilities : string
+    duration : string
     jobType : string
     locationType : string
     location : string
@@ -16,9 +17,11 @@ export default interface Job {
     qualification : string
     experience : string
     jobLevel : string
+    requiredSkills : string[]
+    optionalSkills : string[]
     isBlocked? : boolean
     isRejected? : boolean,
     createdAt? : Date
     updatedAt? : Date
-    expiresAt? : Date
+    expiresAt : Date
 }

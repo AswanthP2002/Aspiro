@@ -1,20 +1,26 @@
 import { Db } from "mongodb";
-import Notifications from "../../domain/entities/notification";
 import INotificationRepo from "../../domain/interfaces/INotificationRepo";
 import BaseRepository from "./baseRepository";
 import mongoose from "mongoose";
+import { NotificationDAO } from "../database/DAOs/notification.dao";
+import Notifications from "../../domain/entities/notifications";
 
 export default class NotificationRepository extends BaseRepository<Notifications> implements INotificationRepo {
-    db : Db
-    collection : string
-    constructor(db : Db){
-        super(db, 'notification')
-        this.db = db
-        this.collection = 'notification'
+    constructor(){
+        super(NotificationDAO)
     }
 
-    async getNotifications(userId: string): Promise<Notifications[] | null> {
-        const notifications = await this.db.collection<Notifications>(this.collection).find({userId:new mongoose.Types.ObjectId(userId)}).sort({createdAt:-1}).toArray()
+    async getNotifications(receiverId: string): Promise<Notifications[] | null> {
+        const notifications = await NotificationDAO.find({receiverId:new mongoose.Types.ObjectId(receiverId)}).sort({createdAt:-1}).lean()
         return notifications
+    }
+
+    async updateReadStatus(id: string): Promise<Notifications | null> {
+        const updatedResult = await NotificationDAO.findOneAndUpdate(
+            {_id:new mongoose.Types.ObjectId(id)},
+            {$set:{isRead:true}}
+        )
+
+        return updatedResult
     }
 }

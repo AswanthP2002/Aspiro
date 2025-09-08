@@ -13,7 +13,6 @@ import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/r
 import CreateJobUseCase from '../../../application/usecases/createJob'
 import JobRepository from '../../../infrastructure/repositories/jobRepository'
 import JObApplicationRepository from '../../../infrastructure/repositories/JobApplicationRepository'
-import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/getApplicationDetailsUseCase'
 import { Db } from 'mongodb'
 import NotificationRepository from '../../../infrastructure/repositories/notificationRepository'
 import RejectCandidateUseCase from '../../../application/usecases/recruiter/rejectCandidateUseCase'
@@ -21,18 +20,20 @@ import CreateNotification from '../../../application/usecases/common/useCases/Cr
 import ShortlistRepository from '../../../infrastructure/repositories/recruiter/shortlistRepository'
 import FinalizeShortlistUseCase from '../../../application/usecases/recruiter/FinalizeShortlistUseCase'
 import GetFinalizedDataUseCase from '../../../application/usecases/recruiter/GetFinalizedDataUseCase'
+import GetJobApplicationsUseCase from '../../../application/usecases/recruiter/GetJobApplicationsUseCase'
+import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/GetJobApplicationDetailsUseCase'
 
-async function createRecruiterRouter(db : Db){
+async function createRecruiterRouter(){
 
 
 const recruiterRouter = express.Router()
 
-const recruiterRepo = new RecruiterRespository(db)
-const candiateRepo = new CandidateRepository(db)
-const jobRepo = new JobRepository(db)
-const jobApplicationRepo = new JObApplicationRepository(db)
-const notificationRepo = new NotificationRepository(db)
-const shortlsitRepo = new ShortlistRepository(db)
+const recruiterRepo = new RecruiterRespository()
+const candiateRepo = new CandidateRepository()
+const jobRepo = new JobRepository()
+const jobApplicationRepo = new JObApplicationRepository()
+const notificationRepo = new NotificationRepository()
+// const shortlsitRepo = new ShortlistRepository(db)
 
 const registerRecruiterUC = new RegisterRecruiterUseCase(recruiterRepo, candiateRepo)
 const verifyRecruiterUC = new VerifyRecruiterUseCase(recruiterRepo)
@@ -40,11 +41,13 @@ const loginRecruiterUC = new LoginRecruiterUseCase(recruiterRepo)
 const saveBasicsUC = new SaveBasicsUseCase(recruiterRepo)
 const loadRecruiterProfileDataUC = new LoadRecruiterProfileDataUseCase(recruiterRepo)
 const createJobUC = new CreateJobUseCase(jobRepo)
-const getJobApplicationDetails = new GetJobApplicationDetailsUseCase(jobApplicationRepo)
+const getJobApplicationsUC = new GetJobApplicationsUseCase(jobApplicationRepo)
 const rejectCandidateApplicationUC = new RejectCandidateUseCase(jobApplicationRepo)
 const createNotificationUC = new CreateNotification(notificationRepo)
-const finalizeShortlistUC = new FinalizeShortlistUseCase(shortlsitRepo)
-const getFinalizedDataUC = new GetFinalizedDataUseCase(shortlsitRepo)
+// const finalizeShortlistUC = new FinalizeShortlistUseCase(shortlsitRepo)
+// const getFinalizedDataUC = new GetFinalizedDataUseCase(shortlsitRepo)
+const getJobApplicationDetailsUC = new GetJobApplicationDetailsUseCase(jobApplicationRepo)
+
 
 const recruiterController = new RecruiterController(
     registerRecruiterUC,
@@ -53,11 +56,12 @@ const recruiterController = new RecruiterController(
     saveBasicsUC,
     loadRecruiterProfileDataUC,
     createJobUC,
-    getJobApplicationDetails,
+    getJobApplicationsUC,
     rejectCandidateApplicationUC,
     createNotificationUC,
-    finalizeShortlistUC,
-    getFinalizedDataUC
+    // finalizeShortlistUC,
+    // getFinalizedDataUC,
+    getJobApplicationDetailsUC
 )
 
 recruiterRouter.post('/recruiter/register',  recruiterController.registerRecruiter.bind(recruiterController))
@@ -65,18 +69,20 @@ recruiterRouter.post('/recruiter/verify', recruiterController.verifyRecruiter.bi
 recruiterRouter.post('/recruiter/login',  recruiterController.loginRecruiter.bind(recruiterController))
 recruiterRouter.post('/recruiter/intro/details', recruiterAuth, recruiterController.saveIntroDetailsRecruiter.bind(recruiterController))
 recruiterRouter.get('/recruiter/profile/overview', recruiterAuth, recruiterController.loadRecruiterProfileData.bind(recruiterController))
-recruiterRouter.post('/recruiter/job/create', recruiterAuth, recruiterController.createJob.bind(recruiterController))
-recruiterRouter.get('/recruiter/job/:jobId/application/details', recruiterController.getJobApplicationDetails.bind(recruiterController))
-recruiterRouter.put('/recruiter/reject/application/:applicationId/:candidateId', recruiterController.rejectCandidateJobApplication.bind(recruiterController))
-recruiterRouter.post('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.finalizeShortlist.bind(recruiterController))
-recruiterRouter.get('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.getFinalizedShortlistData.bind(recruiterController))
-
-recruiterRouter.post('/recruiter/logout', (req : Request, res : Response, next : NextFunction) => {
-    console.log('Logout request reached at test middleware', req.headers)
-    next()
-}, recruiterAuth, recruiterController.recruiterLogout.bind(recruiterController))
+recruiterRouter.post('/recruiter/job/create',  recruiterAuth, recruiterController.createJob.bind(recruiterController))
+recruiterRouter.get('/recruiter/job/:jobId/application/details', recruiterController.getJobApplications.bind(recruiterController))
+recruiterRouter.get('/recruiter/application/:applicationId', recruiterAuth, recruiterController.getJobApplicationDetails.bind(recruiterController))
+recruiterRouter.patch('/recruiter/reject/application/:applicationId', recruiterAuth, recruiterController.rejectCandidateJobApplication.bind(recruiterController))
+// recruiterRouter.post('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.finalizeShortlist.bind(recruiterController))
+// recruiterRouter.get('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.getFinalizedShortlistData.bind(recruiterController))
+recruiterRouter.post('/recruiter/logout', recruiterAuth, recruiterController.recruiterLogout.bind(recruiterController))
 
 recruiterRouter.get('/recruiter/token/refresh', refreshAccessToken)
+
+function testMIddleware(req : Request, res : Response, next : NextFunction){
+    console.log('request body', req.body)
+    return res.status(StatusCodes.ACCEPTED).json({success:true, message:'Testing job creating path'})
+}
 
 return recruiterRouter
 }

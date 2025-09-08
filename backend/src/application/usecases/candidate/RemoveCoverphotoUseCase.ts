@@ -5,11 +5,10 @@ import IRemoveCoverphotoUseCase from "./interface/IRemoveCoverphotoUseCase";
 export default class RemoveCoverphotoUseCase implements IRemoveCoverphotoUseCase {
     constructor(private _iCandidateRepo : ICandidateRepo){}
 
-    async execute(candidateId: string, cloudinaryPublicId: string): Promise<boolean | null> {
+    async execute(candidateId: string, cloudinaryPublicId: string) : Promise<void> {
         await deleteAssetsCloudinary(cloudinaryPublicId)
 
         //update db
-        const result = await this._iCandidateRepo.removeCoverPhoto(candidateId)
-        return result
+        await this._iCandidateRepo.removeCoverPhoto(candidateId)
     }
 }

@@ -1,16 +1,19 @@
 import mongoose from "mongoose";
 import Resume from "../../../domain/entities/candidate/resume";
 import IResumeRepo from "../../../domain/interfaces/candidate/IResumeRepo";
-import { connectDb } from "../../database/connection";
 import BaseRepository from "../baseRepository";
 import { Db } from "mongodb";
+import { ResumeDAO } from "../../database/DAOs/candidate/resume.dao";
 
 export default class ResumeRepository extends BaseRepository<Resume> implements IResumeRepo {
-    private _collection
-    constructor(db : Db){
-        super(db, 'resume')
-        this._collection = 'resume'
+    constructor(){
+        super(ResumeDAO)
     }
+    // private _collection
+    // constructor(db : Db){
+    //     super(db, 'resume')
+    //     this._collection = 'resume'
+    // }
 
     // async addResume(resume: Resume): Promise<boolean> {
     //     const db = await connectDb()

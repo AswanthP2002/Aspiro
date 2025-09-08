@@ -1,3 +1,6 @@
+import CandidateDTO from "../../../DTOs/candidate/candidateDTO";
+import AddSocialLinkDTO from "../../../DTOs/candidate/socialLinkDTO";
+
 export default interface IAddSocialLinkUsecase {
-    execute(candidateId : string, domain : string, url : string) : Promise<boolean | null>
+    execute(addSocialLinkDto : AddSocialLinkDTO) : Promise<CandidateDTO | null>
 }

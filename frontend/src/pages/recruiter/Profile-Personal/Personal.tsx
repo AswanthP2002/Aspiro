@@ -34,7 +34,7 @@ export default function RecruiterProfilePersonal(){
                         console.log('result from the backend', result)
                         setloading(false)
                     }
-                
+            
         }
 
         fetchRecruiterProfileData()

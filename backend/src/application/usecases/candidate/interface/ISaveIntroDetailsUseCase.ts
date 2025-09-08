@@ -1,5 +1,6 @@
-import { CandidateDetails } from "../../../../presentation/controllers/dtos/candidate/userDetailsDTO";
+import CandidateDTO from "../../../DTOs/candidate/candidateDTO";
+import { SaveIntroDetailsInpDTO } from "../../../DTOs/candidate/saveIntroDetailsDTO";
 
 export default interface ISaveIntroDetailsUseCase {
-    execute(candidate : CandidateDetails) : Promise<boolean>
+    execute(saveIntroDetailsInpDto : SaveIntroDetailsInpDTO) : Promise<CandidateDTO | null>
 }

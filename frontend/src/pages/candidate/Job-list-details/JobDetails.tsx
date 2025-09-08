@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import defaultImage from '../../../../public/default-img-instagram.png'
 import { useNavigate, useParams } from "react-router-dom"
+import {MdBookmarkAdded} from 'react-icons/md'
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
 import { checkIsSaved, saveJob, unsaveJob } from "../../../services/candidateServices"
 import { useSelector } from "react-redux"
+import { formatRelativeTime, transformDate } from "../../../services/util/formatDate"
+import { Notify } from "notiflix"
 
 export default function JObDetailsCandidateSide() {
     const [jobDetails, setjobDetails] = useState<any>({})
@@ -31,6 +34,7 @@ export default function JObDetailsCandidateSide() {
                     console.log('job details fetched', result)
                     
                     setjobDetails(result?.jobDetails)
+                    console.log('job details from the state', jobDetails)
                 }else{
                     Swal.fire({
                         icon:'error',
@@ -72,41 +76,20 @@ export default function JObDetailsCandidateSide() {
         const result = await saveJob(jobId)
 
         if(result?.success){
-            Swal.fire({
-                icon:'success',
-                title:'Saved',
-                showConfirmButton:false,
-                showCancelButton:false,
-                timer:2400
-            }).then(() => window.location.reload())
+            Notify.success('Saved', {timeout:1200})
+            setTimeout(() => window.location.reload(), 1200)
         }else{
-            Swal.fire({
-                icon:'error',
-                title:'Oops',
-                text:result?.message,
-                showCancelButton:false,
-            })
+            Notify.failure('Can not save job', {timeout:1200})
         }
     }
 
-    async function jobUnsave(jobId : string, id : string) {
-        const result = await unsaveJob(jobId, id)
-
+    async function jobUnsave(jobId : string) {
+        const result = await unsaveJob(jobId)
         if(result?.success){
-            Swal.fire({
-                icon:'success',
-                title:'Unsaved',
-                showConfirmButton:false,
-                showCancelButton:false,
-                timer:2400
-            }).then(() => window.location.reload())
+            Notify.success('Unsaved', {timeout:1200})
+            setTimeout(() => window.location.reload(), 1200)
         }else{
-            Swal.fire({
-                icon:'error',
-                title:'Oops',
-                text:result?.message,
-                showCancelButton:false,
-            })
+            Notify.failure('Something went wrong', {timeout:1200})
         }
     }
 
@@ -121,9 +104,122 @@ export default function JObDetailsCandidateSide() {
                         </div>
                     </div>
                 </div>
-                <section className="jobs mt-5">
+                <section className="jobs mt-5 mb-5">
                     <div className="aspiro-container">
-                        <div className="header w-full flex justify-between items-center">
+                        <div className="border border-gray-300 rounded-md !p-5">
+                            <div className="flex gap-3 items-center">
+                                <div className="border border-gray-300 w-[40px] h-[40px] flex justify-center items-center rounded-full"><i className="!text-gray-300 fa-solid fa-briefcase"></i></div>
+                                <div>
+                                    <p className="font-semibold">{jobDetails?.jobTitle}</p>
+                                    <p className="text-sm text-gray-400 mt-2">{jobDetails?.companyDetails?.companyName} | {jobDetails?.companyDetails?.location?.city}, {jobDetails?.companyDetails?.location?.state}</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-between mt-5">
+                                <div>
+                                    <p className="text-blue-500 text-sm">Apply by {transformDate(jobDetails?.expiresAt)} | Posted {formatRelativeTime(jobDetails?.createdAt)}</p>
+                                </div>
+                                <div className="flex gap-5">
+                                    {
+                                    isJobSaved
+                                        ? <button onClick={() => jobUnsave(jobDetails?._id)} type="button" className="save-button btn"><MdBookmarkAdded /></button>
+                                        : <button onClick={() => addJobToFavorites(jobDetails?._id)} type="button" className="save-button btn"><i className={`fa-solid fa-bookmark !text-xl !text-gray-300`}></i></button>
+                                    }
+                                    <button><i className="fa-solid fa-share-nodes !text-xl"></i></button>
+                                    <button onClick={() => goToApplyPage(jobDetails?._id)} className="text-sm bg-blue-500 rounded-md text-white !px-5 !py-2">Apply Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="border rounded-md !p-5 flex justify-between border-gray-300 rounde-md mt-5">
+                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-wallet me-2"></i>Pay</p>
+                                <p className="font-semibold">&#8377; {jobDetails?.minSalary} - {jobDetails?.maxSalary}</p>
+                            </div>
+                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-clock me-2"></i>Duration</p>
+                                <p className="font-semibold">{jobDetails?.jobType}</p>
+                            </div>
+                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-suitcase me-2"></i>Work Mode</p>
+                                <p className="font-semibold">{jobDetails?.locationType}</p>
+                            </div>
+                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-users me-2"></i>Vacancies</p>
+                                <p className="font-semibold">{jobDetails?.vacancies}</p>
+                            </div>
+                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-location-dot me-2"></i>Office Location</p>
+                                <p className="font-semibold">{jobDetails?.companyDetails?.location?.city}, {jobDetails?.companyDetails?.location?.state}</p>
+                            </div>
+                            <div className="!px-5">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-layer-group me-2"></i>Job Level</p>
+                                <p className="font-semibold">{jobDetails?.jobLevel}</p>
+                            </div>
+                        </div>
+                        <div className="mt-5 grid grid-cols-12 gap-10">
+                            <div className="col-span-7 border border-gray-300 rounded-md p-5">
+                                <div>
+                                    <p className="font-semibold">Description</p>
+                                    <p className="mt-3 text-sm text-gray-500">{jobDetails?.description}</p>
+                                </div>
+                                <div className="mt-5">
+                                    <p className="font-semibold">Requirements</p>
+                                    <p className="mt-3 text-sm text-gray-500">{jobDetails?.requirements}</p>
+                                </div>
+                                <div className="mt-5">
+                                    <p className="font-semibold">Responsibilties</p>
+                                    <p className="mt-3 text-sm text-gray-500">{jobDetails?.responsibilities}</p>
+                                </div>
+                            </div>
+                            <div className="col-span-5">
+                                <div className="border border-gray-300 rounded-md !p-5">
+                                    <div>
+                                        <p className="font-semibold">Required skills</p>
+                                    <div className="flex gap-3 mt-3">
+                                        {
+                                            jobDetails?.requiredSkills?.map((skill : string, index : number) => {
+                                                return <div key={index} className="bg-gray-200 rounded-full !px-3 !py-1">
+                                                    <p className="text-xs text-gray-500">{skill}</p>
+                                                </div>
+                                            })
+                                        }
+                                    </div>
+                                    </div>
+                                    {
+                                        jobDetails?.optionalSkills?.length > 0 && (
+                                            <div className="mt-5">
+                                                <p className="font-semibold">Optional</p>
+                                                <div className="flex gap-3 mt-3">
+                                                    {
+                                                        jobDetails?.optionalSkills?.map((skill: string, index: number) => {
+                                                            return <div key={index} className="bg-gray-200 rounded-full !px-3 !py-1">
+                                                                <p className="text-xs text-gray-500">{skill}</p>
+                                                            </div>
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                                <div className="border p-5 border-gray-300 mt-5 rounded-md">
+                                    <p className="font-semibold">Benefits</p>
+                                    <p className="text-sm text-gray-500 mt-3">{jobDetails?.companyDetails?.benefit}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-5 border border-gray-300 rounded-md p-5">
+                            <div className="flex gap-3 items-center">
+                                <div className="border border-gray-300 w-[40px] h-[40px] flex justify-center items-center rounded-full"><i className="!text-gray-300 fa-solid fa-building"></i></div>
+                                <div>
+                                    <p className="font-semibold">{jobDetails?.companyDetails?.companyName}</p>
+                                    <p className="text-sm text-gray-400 mt-2">{jobDetails?.companyDetails?.industry}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Existing */}
+                        {/* <div className="header w-full flex justify-between items-center">
                             <div className="company flex gap-4 items-center">
                                 <img src={defaultImage} style={{width:'50px', height:'52px'}} alt="" />
                                 <div>
@@ -143,8 +239,8 @@ export default function JObDetailsCandidateSide() {
                                 
                                 <button onClick={() => goToApplyPage(jobDetails?._id)} type="button" className="btn bg-blue-500 text-white rounded-sm px-3 py-2 text-sm">Apply now</button>
                             </div>
-                        </div>
-                        <div className="details w-full">
+                        </div> */}
+                        {/* <div className="details w-full">
                             <div className="flex flex-col md:flex-row w-full">
                                 <div className="col w-1/2">
                                     <div className="mt-10">
@@ -242,7 +338,7 @@ export default function JObDetailsCandidateSide() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </section>
             </div>

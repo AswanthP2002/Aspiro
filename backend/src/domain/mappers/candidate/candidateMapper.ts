@@ -6,15 +6,15 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
     return {
         ...dto,
         about:"",
-        certificates:[],
+        //certificates:[],
         coverPhoto:{
             cloudinaryPublicId:"",
             cloudinarySecureUrl:""
         },
         currentSubscription:"",
-        education:[],
-        experience:[],
-        favorites:[],
+        //education:[],
+        //experience:[],
+       // favorites:[],
         role : "",
         isBlocked:false,
         location:{
@@ -28,7 +28,7 @@ export function createCandidatefromDTO(dto : RegisterCandidateDTO) : Candidate {
             cloudinaryPublicId:"",
             cloudinarySecureUrl:""
         },
-        resume:[],
+        //resume:[],
         socialLinks:[],
         isVerified:false,
         verificationToken:"",
@@ -43,15 +43,15 @@ export function createGoogleAutCandidatefromDTO(dto : RegisterGoogleAuthCandidat
     return {
         ...dto,
         about:"",
-        certificates:[],
+        //certificates:[],
         coverPhoto:{
             cloudinaryPublicId:"",
             cloudinarySecureUrl:""
         },
         currentSubscription:"",
-        education:[],
-        experience:[],
-        favorites:[],
+        //education:[],
+       //// experience:[],
+       // favorites:[],
         role : "",
         isBlocked:false,
         location:{
@@ -65,7 +65,7 @@ export function createGoogleAutCandidatefromDTO(dto : RegisterGoogleAuthCandidat
             cloudinaryPublicId:"",
             cloudinarySecureUrl:""
         },
-        resume:[],
+       // resume:[],
         socialLinks:[],
         isVerified:false,
         verificationToken:"",

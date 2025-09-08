@@ -153,7 +153,7 @@ export const getProfileOverview = async () => {
 
 export const postJob = async (jobDetails : any) => {
     try {
-        const response = await axiosInstance.post('/recruiter/job/create', jobDetails, {
+        const response = await axiosInstance.post('/recruiter/job/create', {...jobDetails, expiresAt:new Date(jobDetails?.expiresAt)}, {
             headers:{'Content-Type' : 'application/json'},
             sendAuthTokenRecruiter:true
         } as AxiosRequest)
@@ -260,5 +260,45 @@ export const getFinalizedShortlistData = async (jobId : string) => {
         const err = error as AxiosError
 
         console.log(err)
+    }
+}
+
+export const getJobApplicationDetails = async (applicationId : string) => {
+    try {
+        const response = await axiosInstance.get(`/recruiter/application/${applicationId}`, {
+            sendAuthTokenRecruiter:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting spcific job application details', err)
+        if(err.response && err.response.status < 500 && err.response?.status !== 403){
+            return err.response.data
+        }
+    }
+}
+// //title:string
+//     rejector:string
+//     rejectee:string
+//     message:string
+//     relatedId:string
+//     type:string
+
+export const rejectCandidateJobApplication = async (title : string, description : string, type : string, relatedId : string, applicationId : string, candidateId : string) => {
+    try {
+        const response = await axiosInstance.patch(`/recruiter/reject/application/${applicationId}`,
+            {title, description, type, candidateId, relatedId},
+            {   
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenRecruiter:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        console.log('Error occured while rejecting candidate', error)
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
     }
 }

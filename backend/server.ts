@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
+import logger from './src/utilities/logger'
 //import candidateRouter from './src/presentation/routes/candidate/candidateRouter'
 import authRouter from './src/presentation/routes/candidate/authRouter'
 //import recruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
@@ -10,9 +11,11 @@ import authRouter from './src/presentation/routes/candidate/authRouter'
 import passport from 'passport'
 import './src/config/passport'
 import createCandidateRouter from './src/presentation/routes/candidate/candidateRouter'
-import { connectDb } from './src/infrastructure/database/connection'
+import connectToDb from './src/infrastructure/database/connection'
 import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
 import createAdminRouter from './src/presentation/routes/admin/adminRouter'
+import createFollowRouter from './src/presentation/routes/followRouter'
+import createPostRouter from './src/presentation/routes/postRouter'
 
 async function main(){
     const app = express()
@@ -32,34 +35,48 @@ async function main(){
     app.use(cookieParser())
     app.use(passport.initialize())
 
-    const db = await connectDb()
+    await connectToDb()
 
-    const candidateRouter = await createCandidateRouter(db)
-    const recruiterRouter = await createRecruiterRouter(db)
-    const adminRouter = await createAdminRouter(db)
+    const candidateRouter = await createCandidateRouter()
+    const recruiterRouter = await createRecruiterRouter()
+    const adminRouter = await createAdminRouter()
+    const followRouter = await createFollowRouter()
+    const postRouter = await createPostRouter()
 
     const port = process.env.PORT || 5000
     app.use('/', (req : Request, res : Response, next : NextFunction) => {
-        console.log('Request reaced at the backend', req.url)
+        logger.info(`${req.method} ${req.url} - User:${req.user ? req.user : "Guest"}`)
         next()
     })
     app.use('/', candidateRouter)
     app.use('/', authRouter)
     app.use('/', recruiterRouter)
     app.use('/', adminRouter)
+    app.use('/', followRouter)
+    app.use('/', postRouter)
     app.use((err : unknown, req : Request, res : Response, next : NextFunction) => {
         if(err instanceof Error){
-            console.error('Something went rong', err)
+            logger.error({err}, 'Something went wrong')
         }
+        next()
     })
 
     try {
         app.listen(port, () => {
-        console.log(`Server started running on port ${port}`)
+        logger.info(`Server started running on port ${port}`)
         })
     } catch (error) {
-        console.log('error occured', error)
+        logger.error({error},'error occured while starting the server')
     }
+
+    process.on('SIGINT', () => {
+        logger.info('Server shutting down...')
+        process.exit(0)
+    })
+
+    process.on("uncaughtException", (error : unknown) => {
+        logger.error({error}, "Uncaught Error occured")
+    })
 
 }
 

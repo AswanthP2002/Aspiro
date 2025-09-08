@@ -1,3 +1,5 @@
+import RecruiterLoginDTO, { RecruiterLoginResDTO } from "../../../DTOs/recruiter/recruiterLoginDTO";
+
 export default interface ILoginRecruiterrUseCase {
-    execute(email : string, password : string) : Promise<object>
+    execute(loginRecruiterDto : RecruiterLoginDTO) : Promise<RecruiterLoginResDTO | null>
 }

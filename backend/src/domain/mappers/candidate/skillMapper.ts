@@ -2,8 +2,8 @@ import { SkillDTO } from "../../../presentation/controllers/dtos/candidate/skill
 import Skills from "../../entities/candidate/skills";
 
 
-export default function createSkillsFromSkillDTO(dt0 : SkillDTO) : Skills{
+export default function createSkillsFromSkillDTO(dto : SkillDTO) : Skills{
     return {
-        ...dt0
+        ...dto
     }
 }

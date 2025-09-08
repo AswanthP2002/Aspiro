@@ -2,20 +2,28 @@ import mongoose from "mongoose";
 import Resume from "../../../domain/entities/candidate/resume";
 import IResumeRepo from "../../../domain/interfaces/candidate/IResumeRepo";
 import createResumefromDTO from "../../../domain/mappers/candidate/resumeMapper";
-import { ResumeSchema } from "../../../presentation/controllers/dtos/candidate/resumeDTO";
+import { ResumeDTO, ResumeSchema } from "../../../presentation/controllers/dtos/candidate/resumeDTO";
 import cloudinary from "../../../utilities/cloudinary";
 import streamifier from 'streamifier'
 import {v4} from 'uuid'
 import IAddResumeUseCase from "./interface/IAddResumeUseCase";
+import CreateResumeDTO from "../../DTOs/candidate/resumeDTO";
+import { UploadApiResponse } from "cloudinary";
+import mapToResumeDTOFromResume from "../../mappers/candidate/mapToResumeDTOFromResume";
+
+// interface CloudinaryResponse {
+//     secure_url : string
+//     public_id : string
+// }
 
 export default class AddResumeUseCase implements IAddResumeUseCase {
     constructor(private _iResumeRepo : IResumeRepo) {}
 
-    async execute(file : any, path : string, candidateId : string) : Promise<string | null> {
+    async execute(addResumeDto : CreateResumeDTO) : Promise<ResumeDTO | null> {
         
-        const result : any = await new Promise((resolve, reject) => {
+        const result : UploadApiResponse | undefined = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({
-                public_id:`candidate/documents/${path}_${new Date()}_${v4()}`,
+                public_id:`candidate/documents/${addResumeDto.path}_${new Date()}_${v4()}`,
                 resource_type:'auto',
                 access_mode:'public'
             }, async (error, result) => {
@@ -24,22 +32,24 @@ export default class AddResumeUseCase implements IAddResumeUseCase {
                 
             })
 
-            streamifier.createReadStream(file).pipe(stream)
+            streamifier.createReadStream(addResumeDto.file).pipe(stream)
         })
 
         if(result){
             //save the resume
             const addResumeResult = await this._iResumeRepo.create(
                 {
-                    candidateId:new mongoose.Types.ObjectId(candidateId),
-                    resumeUrlCoudinary:result?.secure_url,
+                    candidateId:addResumeDto.candidateId,
+                    resumeUrlCoudinary:result.secure_url,
                     resumePublicIdCloudinary:result?.public_id,
-                    resumeFileName:path,
-                    createdAt:new Date()
+                    resumeFileName:addResumeDto.path
                 }
             )
-            console.log('Resume saved successfully')
-            return addResumeResult
+
+            if(addResumeResult){
+                const dto = mapToResumeDTOFromResume(addResumeResult)
+                return dto
+            }
         }
         return null
     }

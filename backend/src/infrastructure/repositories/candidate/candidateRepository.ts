@@ -1,6 +1,5 @@
 import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import Candidate from "../../../domain/entities/candidate/candidates";
-import { connectDb } from "../../database/connection";
 import { Db, ObjectId } from "mongodb";
 import mongoose, { Mongoose } from "mongoose";
 import { after } from "node:test";
@@ -8,14 +7,13 @@ import { SaveCandidate } from "../../../domain/interfaces/candidate/saveResponse
 import ICandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import BaseRepository from "../baseRepository";
 import SocialLinks from "../../../domain/entities/socialLinks";
+import { CandidateDAO } from "../../database/DAOs/candidate/candidateDAO";
+import CandidateAggregated from "../../../domain/entities/candidate/candidateAggregated";
+import CandidatePaginated from "../../../domain/entities/candidate/candidatePaginated";
 
 export default class CandidateRepository extends BaseRepository<Candidate> implements ICandidateRepo {
-    private _collection : string
-    db : Db
-    constructor(db : Db){
-        super(db, 'candidate')
-        this.db = db
-        this._collection = 'candidate'
+    constructor(){
+        super(CandidateDAO) //chance for runtime error while creating experience :::
     }
 
     // async create(candidate: Candidate): Promise<SaveCandidate | null> {
@@ -27,49 +25,35 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
     // }
     
     async findByEmail(email: string): Promise<Candidate | null> {
-        console.log('Requested mail id in the repository side', email)
-        const db = await connectDb()
-        const candidate = await db.collection<Candidate>(this._collection).findOne({email:email})
-        console.log('Candidate founded from the respository side', candidate)
+        const candidate = await CandidateDAO.findOne({email:email})
         return candidate
     }
 
     async findByMobileNumber(mobileNumber: string): Promise<Candidate | null> {
-        const db = await connectDb()
-        return await db.collection<Candidate>(this._collection).findOne({phone:mobileNumber})
+        return await CandidateDAO.findOne({phone:mobileNumber})
     }
 
     async findById(id: string): Promise<Candidate | null> {
-        const db = await connectDb()
-        return await db.collection<Candidate>(this._collection).findOne({_id:new ObjectId(id)})
+        return await CandidateDAO.findOne({_id:new mongoose.Types.ObjectId(id)})
     }
 
     async findByGoogleId(googleId: string): Promise<Candidate | null> {
-        const db = await connectDb()
-        return await db.collection<Candidate>(this._collection).findOne({googleId:googleId})
+        return await CandidateDAO.findOne({googleid:googleId})
     }
 
     async findByToken(token: string): Promise<Candidate | null> {
-        const db = await connectDb()
-        const candidate = await db.collection<Candidate>(this._collection).findOne({verificationToken:token})
+        const candidate = await CandidateDAO.findOne({verificationToken:token})
         return candidate
     }
 
-    async updateCandidate(email : string, field: string, value: boolean): Promise<Candidate | null> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).findOneAndUpdate(
-            {email:email},
-            {$set:{[field]:value}},
-            {returnDocument:"after"}
-        )
-
-        return result
+    async updateVerification(email : string): Promise<Candidate | null> {
+        const updatedCandidate = await CandidateDAO.findOneAndUpdate({email:email}, {$set:{isVerified:true}}, {returnDocument:'after'})
+        return  updatedCandidate
     }
 
     async updateIntroDetails(id: string, role: string, city: string, district: string, state: string, country: string, pincode: string, summary: string): Promise<Candidate | null> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).findOneAndUpdate(
-            {_id:new ObjectId(id)},
+        const result = await CandidateDAO.findOneAndUpdate(
+            {_id:new mongoose.Types.ObjectId(id)},
             {$set:{
                 role:role,
                 "location.city":city,
@@ -88,8 +72,7 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
     }
 
     async editProfile(id: string, name: string, role: string, city: string, district: string, state: string, country: string, about : string): Promise<Candidate | null> {
-        const db = await connectDb()
-        const doc = await db.collection<Candidate>(this._collection).findOneAndUpdate(
+        const doc = await CandidateDAO.findOneAndUpdate(
             {_id:new ObjectId(id)},
             {$set:{
                 name:name,
@@ -106,8 +89,7 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
         return doc
     }
 
-    async findCandidates(search : string = "", page : number = 1, limit : number = 1, sort : string = 'joined-latest', filter : any): Promise<any | null> {
-        const db = await connectDb()
+    async findCandidates(search : string = "", page : number = 1, limit : number = 1, sort : string = 'joined-latest', filter : any): Promise<CandidatePaginated | null> {
         const skip = (page - 1) * limit
         //const query = search ? { name: { $regex: new RegExp(search, 'i') }, isAdmin:false } : {isAdmin:false}
         const currentSort = sort
@@ -150,15 +132,14 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
 
         console.log('Match query before applying', matchFilter)
 
-        const candidates = await db.collection<Candidate>(this._collection).find(matchFilter).sort(sortOption).skip(skip).limit(limit).toArray()
-        const totalDocuments = await db.collection<Candidate>(this._collection).countDocuments(matchFilter)
+        const candidates = await CandidateDAO.find(matchFilter).sort(sortOption).skip(skip).limit(limit).lean()
+        const totalDocuments = await CandidateDAO.countDocuments(matchFilter)
         const totalPages = Math.ceil(totalDocuments / limit)
         return {candidates, currentPage:page, totalPages, currentSort}
     }
 
     async blockCandidate(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).updateOne(
+        const result = await CandidateDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{isBlocked:true}}
         )
@@ -167,8 +148,7 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
     }
 
     async unblockCandidate(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).updateOne(
+        const result = await CandidateDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{isBlocked:false}}
         )
@@ -177,109 +157,105 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
     }
 
     async isCandidateBlocked(id: string): Promise<boolean | undefined> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).findOne({_id:new ObjectId(id)})
+        const result = await CandidateDAO.findOne({_id:new ObjectId(id)})
         return result?.isBlocked
     }
 
-    async candidateAggregatedData(candidateId: string): Promise<any> {
-        const db = await connectDb()
-        const result = await db.collection<Candidate>(this._collection).aggregate([
+    async candidateAggregatedData(candidateId: string): Promise<CandidateAggregated | null> {
+        
+        const result = await CandidateDAO.aggregate([
             {$match:{_id:new ObjectId(candidateId)}},
             {$lookup:{
-                from:'experience',
+                from:'experiences',
                 foreignField:'candidateId',
                 localField:'_id',
                 as:'experience'
             }},
             {$lookup:{
-                from:'skill',
+                from:'skills',
                 foreignField:'candidateId',
                 localField:'_id',
                 as:'skills'
             }},
             {$lookup:{
-                from:'education',
+                from:'educations',
                 foreignField:'candidateId',
                 localField:'_id',
                 as:'education'
             }}
-        ]).toArray()
+        ])
 
         return result[0]
     }
 
-    async addSocialLink(candidateId: string, socialLink: SocialLinks): Promise<boolean | null> {
+    async addSocialLink(candidateId: string, socialLink: SocialLinks): Promise<Candidate | null> {
         //find the domain is already exist or not
-        const isExist = await this.db.collection<Candidate>(this._collection).findOne({
+        const isExist = await CandidateDAO.findOne({
             _id:new mongoose.Types.ObjectId(candidateId),
             socialLinks:{$elemMatch:{domain:socialLink.domain}}
         })
-        if(isExist) return false
+        if(isExist) return null
         
-        const updateResult = await this.db.collection<Candidate>(this._collection).updateOne(
+        const updateResult = CandidateDAO.findOneAndUpdate(
             {_id:new mongoose.Types.ObjectId(candidateId)},
-            {$push:{socialLinks:socialLink}}
+            {$push:{socialLinks:socialLink}},
+            {returnDocument:'after'}
         )
 
-        return updateResult.modifiedCount === 1
+        return updateResult
     }
 
-    async getSocialLinks(candidateId: string): Promise<SocialLinks[] | null> {
-        const result = await this.db.collection<Candidate>(this._collection).findOne(
+    async getSocialLinks(candidateId: string): Promise<any> {
+        const result = await CandidateDAO.findOne(
             {_id:new mongoose.Types.ObjectId(candidateId)}
         )
 
-        return result ? result.socialLinks : []
+        return result ?  result.socialLinks : null
     }
 
-    async deleteSocialLink(candidateId: string, domain: string): Promise<boolean | null> {
-        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+    async deleteSocialLink(candidateId: string, domain: string): Promise<void> {
+        const result = await CandidateDAO.updateOne(
             {_id:new mongoose.Types.ObjectId(candidateId)},
             {$pull:{socialLinks:{domain:domain}}}
         )
-
-        return result.modifiedCount === 1
     }
 
-    async uploadProfilePhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<boolean | null> {
-        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+    async uploadProfilePhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<Candidate | null> {
+        const result = await CandidateDAO.findOneAndUpdate(
             {_id:new mongoose.Types.ObjectId(candidateId)},
-            {$set:{profilePicture:{cloudinarySecureUrl:cloudinaryUrl, cloudinaryPublicId:cloudinaryPublicId}}}
+            {$set:{profilePicture:{cloudinarySecureUrl:cloudinaryUrl, cloudinaryPublicId:cloudinaryPublicId}}},
+            {returnDocument:'after'}
         )
-        return result.modifiedCount > 0
+        return result
     }
 
-    async removeProfilePhoto(candidateId: string): Promise<boolean | null> {
-        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+    async removeProfilePhoto(candidateId: string): Promise<void> {
+        await CandidateDAO.updateOne(
             {_id:new mongoose.Types.ObjectId(candidateId)},
             {$set:{
                 profilePicture:{cloudinaryPublicId:"", cloudinarySecureUrl:""}
             }}
         )
-
-        return result.modifiedCount > 0
     }
 
-    async uploadCoverPhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<boolean | null> {
-        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+    async uploadCoverPhoto(candidateId: string, cloudinaryUrl: string, cloudinaryPublicId: string): Promise<Candidate | null> {
+        const result = await CandidateDAO.findOneAndUpdate(
             {_id:new mongoose.Types.ObjectId(candidateId)},
             {$set:{
                 coverPhoto:{cloudinaryPublicId:cloudinaryPublicId, cloudinarySecureUrl:cloudinaryUrl}
-            }}
+            }},
+            {returnDocument:'after'}
         )
 
-        return result?.modifiedCount > 0
+        return result
     }
 
-    async removeCoverPhoto(candidateId: string): Promise<boolean | null> {
-        const result = await this.db.collection<Candidate>(this._collection).updateOne(
+    async removeCoverPhoto(candidateId: string): Promise<void> {
+        await CandidateDAO.updateOne(
             {_id:new mongoose.Types.ObjectId(candidateId)},
             {$set:{
                 coverPhoto:{cloudinaryPublicId:"", cloudinarySecureUrl:""}
             }}
         )
-
-        return result.modifiedCount > 0
     }
 }

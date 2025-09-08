@@ -1,32 +1,22 @@
-import Job from "../../domain/entities/job";
 import IJobRepo from "../../domain/interfaces/IJobRepo";
-import { ObjectId } from "mongodb";
-import { CreateJobDTO, CreateJobSchema } from "../../presentation/controllers/dtos/jobDTO";
-import { createJobFromDTO } from "../../domain/mappers/jobMapper";
 import ICreateJobUseCase from "./recruiter/interface/ICreateJobUseCase";
+import CreateJobDTO, { JobDTO } from "../DTOs/recruiter/createJobDTO";
+import mapToJobFromCreateJobDTO from "../mappers/recruiter/mapToJobFromCreateJobDTO";
+import mapToJobDTOFromJob from "../mappers/recruiter/mapToJobDTOFromJob";
 
 
 export default class CreateJobUseCase implements ICreateJobUseCase {
     constructor(private jobRepo : IJobRepo){}
 
-    async execute(id : string, job : CreateJobDTO) : Promise<string> {
-        const validateJob = CreateJobSchema.parse(job)
-        const jobModel = createJobFromDTO(validateJob)
-        jobModel.companyId = new ObjectId(id)
-        jobModel.createdAt = new Date()
-        if (jobModel.expiresAt) {
-            jobModel.expiresAt = new Date(jobModel.expiresAt);
-        } else {
- 
-            jobModel.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        }
-        jobModel.isBlocked = false
-        jobModel.isRejected = false
-        jobModel.updatedAt = new Date()
-
-        console.log('job modal before creating the job', jobModel)
+    async execute(createjobDto : CreateJobDTO) : Promise<JobDTO | null> {
+        const newJob = mapToJobFromCreateJobDTO(createjobDto)        
+        const result = await this.jobRepo.create(newJob)
         
-        const result = await this.jobRepo.create(jobModel)
-        return `Job created successfully ${result}`
+        if(result){
+            const dto = mapToJobDTOFromJob(result)
+            return dto
+        }
+
+        return null
     }
 }

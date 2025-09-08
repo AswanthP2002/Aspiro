@@ -93,7 +93,7 @@ export default function CandidateDetails(){
                 <div className="flex w-full justify-between mt-15">
                     {/* Div one */}
                     <div className='flex items-center gap-2'>
-                        <img src={candidateDetails?.profilePicture ? candidateDetails?.profilePicture : defaultImage} alt="" style={{ width: '58px', height: '60px' }} />
+                        <img className="rounded-full" src={candidateDetails?.profilePicture?.cloudinarySecureUrl ? candidateDetails?.profilePicture?.cloudinarySecureUrl : defaultImage} alt="" style={{ width: '58px', height: '60px', objectFit:'cover' }} />
                         <div>
                             <p className="text-sm font-semibold mb-2">{candidateDetails?.name}</p>
                             <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.role}</p>

@@ -1,16 +1,19 @@
 import mongoose from "mongoose";
 import Certificates from "../../../domain/entities/candidate/certificates";
 import ICertificateRepo from "../../../domain/interfaces/candidate/ICertificateRepo";
-import { connectDb } from "../../database/connection";
 import BaseRepository from "../baseRepository";
 import { Db } from "mongodb";
+import { CertificateDAO } from "../../database/DAOs/candidate/certificate.dao";
 
 export default class CertificateRepository extends BaseRepository<Certificates> implements ICertificateRepo {
-    private _collection : string
-    constructor(db : Db){
-        super(db, 'certificate')
-        this._collection = 'certificate'
+    constructor(){
+        super(CertificateDAO)
     }
+    // private _collection : string
+    // constructor(db : Db){
+    //     super(db, 'certificate')
+    //     this._collection = 'certificate'
+    // }
 
     // async addCertificate(certificate: Certificates): Promise<boolean> {
     //     const db = await connectDb()

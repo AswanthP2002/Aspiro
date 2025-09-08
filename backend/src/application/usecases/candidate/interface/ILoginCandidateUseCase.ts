@@ -1,3 +1,5 @@
+import { LoginCandidateInpDTO, LoginCandidateOutDTO } from "../../../DTOs/candidate/candidateLoginDTO";
+
 export default interface ILoginCandidateUseCase {
-    execute(email : string, password : string) : Promise<Object>
+    execute(logincandidateinpDto : LoginCandidateInpDTO) : Promise<LoginCandidateOutDTO>
 }

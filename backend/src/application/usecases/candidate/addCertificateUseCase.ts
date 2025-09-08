@@ -7,18 +7,18 @@ import streamifier from 'streamifier'
 import cloudinary from "../../../utilities/cloudinary";
 import { v4 } from "uuid";
 import IAddCertificateUseCase from "./interface/IAddCertificateUseCase";
+import CertificateDTO, { CreateCertificateDTO } from "../../DTOs/candidate/certificateDTO";
+import { UploadApiResponse } from "cloudinary";
+import mapToCertificateDTOFromCertificate from "../../mappers/candidate/mapToCertificateDTOFromCertificate";
 
 export default class AddCertificateUseCase implements IAddCertificateUseCase {
     constructor(private _iCertificateRepo : ICertificateRepo) {}
 
-    async execute(certificate : Certificates, fileBuffer : any,  path : string, candidateId : string) : Promise<string | null> {
-        const parsedCertificate = CertificateSchema.parse(certificate)
-        const certificateModal = createCertificatefromDTO(parsedCertificate)
-        certificateModal.candidateId = new mongoose.Types.ObjectId(candidateId)
+    async execute(addCertificateDto : CreateCertificateDTO) : Promise<CertificateDTO | null> {
 
-        let result : any = await new Promise((resolve, reject) => {
+        let result : UploadApiResponse | undefined = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({
-                public_id:`candidate/documents/${path}_${new Date()}_${v4()}.pdf`,
+                public_id:`candidate/documents/${addCertificateDto.path}_${new Date()}_${v4()}.pdf`,
                 resource_type:'raw',
                 type:'upload',
                 access_mode:'public'
@@ -28,14 +28,24 @@ export default class AddCertificateUseCase implements IAddCertificateUseCase {
                 resolve(result)
             })
 
-            streamifier.createReadStream(fileBuffer).pipe(stream)
+            streamifier.createReadStream(addCertificateDto.file).pipe(stream)
         })
         if(result){
             const {secure_url, public_id} = result
-            certificateModal.certificateUrl = secure_url
-            certificateModal.certificatePublicId = public_id
 
-            return await this._iCertificateRepo.create(certificateModal)
+            const addCertificateResult = await this._iCertificateRepo.create({
+                certificateId:addCertificateDto.candidateId,
+                issuedOrganization:addCertificateDto.issuedOrganization,
+                issuedDate:addCertificateDto.issuedDate,
+                candidateId:addCertificateDto.candidateId,
+                certificateUrl:secure_url,
+                certificatePublicId:public_id
+            })
+
+            if(addCertificateResult){
+                const dto = mapToCertificateDTOFromCertificate(addCertificateResult)
+                return dto
+            }
         }
 
         return null

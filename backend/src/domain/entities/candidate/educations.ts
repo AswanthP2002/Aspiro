@@ -1,15 +1,15 @@
 import mongoose from "mongoose"
 
 export default interface Education {
-    _id? : mongoose.Types.ObjectId
-    candidateId? : mongoose.Types.ObjectId
-    stream : string
+    _id? : string
+    candidateId? : string
+    stream : string //particular group of education
     level : string
     organization : string
     location : string
-    startYear : string,
+    startYear : Date,
     isPresent : boolean
-    endYear? : string
-    createdAt : Date
-    updatedAt : Date
+    endYear? : any
+    createdAt? : Date
+    updatedAt? : Date
 }

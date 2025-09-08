@@ -65,7 +65,7 @@ export default function EditEducationForm({selectedEducation, editEducationModal
         if (!isValidated) return
         closeEditEducationModal()
 
-            await editCandidateEducation(selectedEducation?.id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
+            await editCandidateEducation(selectedEducation?._id, educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
 
                 Swal.fire({
                     icon: 'error',

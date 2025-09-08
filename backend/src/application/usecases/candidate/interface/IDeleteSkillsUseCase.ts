@@ -1,3 +1,3 @@
 export default interface IDeleteSkillsUseCase {
-    execute(skillId : string) : Promise<boolean>
+    execute(id : string) : Promise<void>
 }

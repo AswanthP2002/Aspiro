@@ -1,17 +1,15 @@
 import Recruiter from "../../../domain/entities/recruiter/recruiter";
 import { SaveRecruiter } from "../../../domain/interfaces/recruiter/createRecruiterRequest";
 import IRecruiterRepo from "../../../domain/interfaces/recruiter/IRecruiterRepo";
-import { connectDb } from "../../database/connection";
 import { Db, ObjectId } from "mongodb";
 import BaseRepository from "../baseRepository";
+import { RecruiterDAO } from "../../database/DAOs/recruiter/recruiter.dao";
+import RecruiterProfileAggregated from "../../../application/DTOs/recruiter/recruiterProfileAggregatedData";
 
 export default class RecruiterRespository extends BaseRepository<Recruiter> implements IRecruiterRepo{
-   private _collection = 'recruiter'
-   
-   constructor(db : Db){
-    super(db, 'recruiter')
-   }
-
+    constructor(){
+        super(RecruiterDAO)
+    }
 //    async create(recruiter: Recruiter): Promise<SaveRecruiter> {
 //         const db = await connectDb()
 //         const result = await db.collection<Recruiter>(this._collection).insertOne(recruiter)
@@ -19,14 +17,11 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
 //     }
 
     async findByEmail(email: string): Promise<Recruiter | null> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).findOne({email:email})
-        console.log('recruiter find request reached here, from recruiter repository side', result)
+        const result = await RecruiterDAO.findOne({email:email})
         return result
     }
 
     async findRecruiters(search : string = "", page : number = 1, limit : number = 1, sort : string): Promise<any | null> {
-        const db = await connectDb()
         const skip = (page - 1) * limit
         const query = search ? {companyName : {$regex:new RegExp(search, 'i')}} : {}
         let currentSort : string = sort
@@ -52,32 +47,30 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
             default :
                 sortOptions.createdAt = -1
         }
-        const recruiters = await db.collection<Recruiter>(this._collection).find(query).sort(sortOptions).skip(skip).limit(limit).toArray()
-        const totalRecruiters = await db.collection<Recruiter>(this._collection).countDocuments(query)
+        const recruiters = await RecruiterDAO.find(query).sort(sortOptions).skip(skip).limit(limit).lean()
+        const totalRecruiters = await RecruiterDAO.countDocuments(query)
         const totalPages = Math.ceil(totalRecruiters / limit)
         return {recruiters, page, totalPages, currentSort}
     }
 
     async findById(id: string): Promise<Recruiter | null> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).findOne({_id:new ObjectId(id)})
+        const result = RecruiterDAO.findOne({_id:new ObjectId(id)})
         return result
     }
 
     async findByUserName(username: string): Promise<Recruiter | null> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).findOne({username:username})
+        const result = await RecruiterDAO.findOne({username:username})
         return result
     }
 
-    async verifyRecruiter(email: string, field: string, update: boolean): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).updateOne(
+    async verifyRecruiter(email: string): Promise<Recruiter | null> {
+        
+        const result = await RecruiterDAO.findOneAndUpdate(
             {email:email},
-            {$set:{isVerified:update}}
+            {$set:{isVerified:true}},
+            {returnDocument:'after'}
         )
-        if(result.matchedCount > 0) return true
-        return false
+        return result
     }
 
     async updateIntroDetails(
@@ -94,11 +87,9 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
         country: string, 
         state: string, 
         city: string, 
-        mobile: string, 
-        logo : string, 
-        coverphoto : string): Promise<Recruiter | null> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).findOneAndUpdate(
+        mobile: string): Promise<Recruiter | null> {
+        
+        const result = await RecruiterDAO.findOneAndUpdate(
             {_id:new ObjectId(id)},
             {$set:{
                 companyName:companyName,
@@ -113,9 +104,7 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
                 "location.country":country,
                 "location.city":city,
                 "location.state":state,
-                phone:mobile,
-                logo:logo,
-                coverphoto:coverphoto
+                phone:mobile
             }},
             {returnDocument:'after'}
         )
@@ -124,8 +113,8 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
     }
 
     async blockRecruiter(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const blockResult = await db.collection<Recruiter>(this._collection).updateOne(
+        
+        const blockResult = await RecruiterDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:true
@@ -137,8 +126,8 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
     }
 
     async unblockRecruiter(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const unblockResult = await db.collection<Recruiter>(this._collection).updateOne(
+    
+        const unblockResult = await RecruiterDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:false
@@ -149,14 +138,14 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
     }
 
     async deleteRecruiter(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const deleteResult = await db.collection<Recruiter>(this._collection).deleteOne({_id:new ObjectId(id)})
+        
+        const deleteResult = await RecruiterDAO.deleteOne({_id:new ObjectId(id)})
         return deleteResult.acknowledged
     }
 
-    async aggregateRecruiterProfile(id: string): Promise<any> {
-        const db = await connectDb()
-        const result = await db.collection<Recruiter>(this._collection).aggregate([
+    async aggregateRecruiterProfile(id: string): Promise<RecruiterProfileAggregated | null> {
+       
+        const result = await RecruiterDAO.aggregate([
             {
                 $match: {
                     _id:new ObjectId(id)
@@ -164,7 +153,7 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
             },
             {
                 $lookup: {
-                    from: 'job',
+                    from: 'jobs',
                     let: { recruiterId: '$_id' },
                     pipeline: [
                         {
@@ -174,7 +163,7 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
                         },
                         {
                             $lookup: {
-                                from: 'jobApplication',
+                                from: 'jobapplications',
                                 let: { jobId: '$_id' },
                                 pipeline: [
                                     {
@@ -193,7 +182,7 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
                         },
                         {
                             $project: {
-                                applications: 0 // remove full application data if not needed
+                                applications: 0 
                             }
                         }
                     ],
@@ -201,7 +190,7 @@ export default class RecruiterRespository extends BaseRepository<Recruiter> impl
                 }
             }
         ]
-        ).toArray()
+        )
 
         return result[0]
     }

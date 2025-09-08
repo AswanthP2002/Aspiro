@@ -1,5 +1,6 @@
 import Education from "../../../../domain/entities/candidate/educations";
+import { CreateEducationDTO, EducationDTO } from "../../../DTOs/candidate/educationDTO";
 
 export default interface IAddEducationUseCase {
-    execute(education : Education, candidateId : string) : Promise<string | null>
+    execute(createEducationDto : CreateEducationDTO) : Promise<EducationDTO | null>
 }

@@ -1,6 +1,6 @@
 import {Box, Modal} from '@mui/material'
 
-export default function GeneralModal({openModal, closeModal, children, size = 'medium'} : any){
+export default function GeneralModal({openModal, closeModal, children, size = 'medium'} : {openModal : boolean, closeModal : any, children : any, size : string}){
     const modalStyle = {
         background:'white', 
         padding:'10px', 

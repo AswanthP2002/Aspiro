@@ -101,10 +101,10 @@ export const candidateLogout = async (dispatch : Function, navigate : Function) 
     }
 }
 
-export const saveBasicDetails = async (jobRole: string, city: string, district: string, state: string, country: string, pincode: string, summary: string) => {
+export const saveBasicDetails = async (role: string, city: string, district: string, state: string, country: string, pincode: string, summary: string) => {
     try {
         const response = await axiosInstance.post('candidate/personal/details/save',
-            {jobRole, city, district, state, country, pincode, summary},
+            {role, city, district, state, country, pincode, summary},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthTokenCandidate:true
@@ -306,7 +306,7 @@ export const addCandidateEducation = async (level : string, stream : string, org
 export const editCandidateEducation = async (educationId : string, level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
         const response = await axiosInstance.put(`/candidate/education/${educationId}`,
-            {level, stream, organization, isPresent, startYear, endYear, location},
+            {level, stream, organization, isPresent, startYear:new Date(startYear), endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthTokenCandidate:true
@@ -508,9 +508,9 @@ export const saveJob = async (jobId : string) => {
     }
 }
 
-export const unsaveJob = async (jobId : string, id : string) => {
+export const unsaveJob = async (jobId : string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/job/${jobId}/unsave/${id}`,
+        const response = await axiosInstance.delete(`/candidate/job/${jobId}/unsave`,
             {
                 sendAuthTokenCandidate:true
             } as AxiosRequest
@@ -718,5 +718,58 @@ export const getJobs = async (search : string, page : number, sort : string, fil
         const err = error as AxiosError
         console.log('Error occured while geting jobs', err)
         return err.response?.data
+    }
+}
+
+export const getMyApplications = async () => {
+    try {
+        const response = await axiosInstance.get('/candidate/applications',
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting my applicatios', err)
+        return err.response?.data
+    }
+}
+
+export const updateNOtificationReadStatus = async (id : string) => {
+    try {
+        const response = await axiosInstance.patch(`/candidate/notification/${id}`, {}, {sendAuthTokenCandidate:true} as AxiosRequest)
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        console.log('eror ocucred while status updating', err)
+    }
+}
+
+export const createPost = async (formdata : any) => {
+    try {
+        const response = await axiosInstance.post('/post',
+            formdata,
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while creating the post', err)
+    }
+}
+
+export const getPosts = async () => {
+    try {
+        const response = await axiosInstance.get('/post', {
+            sendAuthTokenCandidate:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error) {
+        console.log(error)
     }
 }

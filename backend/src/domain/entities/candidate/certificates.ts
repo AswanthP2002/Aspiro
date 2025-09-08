@@ -1,11 +1,12 @@
-import mongoose from "mongoose"
+
 
 export default interface Certificates {
-    _id? : mongoose.Types.ObjectId
-    candidateId? : mongoose.Types.ObjectId
+    _id? : string
+    candidateId? : string
     issuedOrganization : string
     issuedDate : Date
     certificateId? : string
     certificateUrl? : string
-    certificatePublicId? : string
+    certificatePublicId? : string,
+    createdAt? : Date
 }

@@ -1,16 +1,18 @@
 import mongoose from "mongoose";
 import Education from "../../../domain/entities/candidate/educations";
 import IEducationRepo from "../../../domain/interfaces/candidate/IEducationRepo";
-import { connectDb } from "../../database/connection";
 import BaseRepository from "../baseRepository";
-import { Db } from "mongodb";
+import { EducationDAO } from "../../database/DAOs/candidate/education.dao";
 
 export default class EducationRepository extends BaseRepository<Education> implements IEducationRepo {
-    private _collection : string
-    constructor(db : Db){
-        super(db, 'education')
-        this._collection = 'education'
+    constructor(){
+        super(EducationDAO)
     }
+    // private _collection : string
+    // constructor(db : Db){
+    //     super(db, 'education')
+    //     this._collection = 'education'
+    // }
     // async addEducation(education: Education): Promise<boolean> {
     //     const db = await connectDb()
     //     const result = await db.collection<Education>(this._collection).insertOne(education)
@@ -30,13 +32,22 @@ export default class EducationRepository extends BaseRepository<Education> imple
     //     return result.acknowledged
     // }
 
-    async editEducation(educationId: string, education: Education): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Education>(this._collection).updateOne(
-            {_id:new mongoose.Types.ObjectId(educationId)},
-            {$set:education}
+    async editEducation(updateEducation: Education): Promise<Education | null> {
+        console.log('update education id in the repository', updateEducation._id)
+        const result = await EducationDAO.findOneAndUpdate(
+            {_id:new mongoose.Types.ObjectId(updateEducation._id)},
+            {$set:{
+                stream:updateEducation.stream,
+                level:updateEducation.level,
+                organization:updateEducation.organization,
+                location:updateEducation.location,
+                isPresent:updateEducation.isPresent,
+                startYear:updateEducation.startYear,
+                endYear:updateEducation.endYear
+            }},
+            {returnDocument:'after'}
         )
 
-        return result.acknowledged
+        return result
     }
 }

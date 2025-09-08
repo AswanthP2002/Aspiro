@@ -1,5 +1,5 @@
-import { CreateJobDTO } from "../../../../presentation/controllers/dtos/jobDTO";
+import CreateJobDTO, { JobDTO } from "../../../DTOs/recruiter/createJobDTO";
 
 export default interface ICreateJobUseCase {
-    execute(id : string, job : CreateJobDTO) : Promise<string | null>
+    execute(createJobDto : CreateJobDTO) : Promise<JobDTO | null>
 }

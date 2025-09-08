@@ -1,5 +1,6 @@
-import { RegisterRecruiterDTO } from "../../../../presentation/controllers/dtos/recruiter/registerRecruiterDTO";
+
+import CreateRecruiterDTO, { RecruiterDTO } from "../../../DTOs/recruiter/recruiterDTO";
 
 export default interface IRegisterRecruiterUseCase {
-    execute(recruiterDTO : RegisterRecruiterDTO) : Promise<string | null>
+    execute(createRecruiterDto : CreateRecruiterDTO) : Promise<RecruiterDTO | null>
 }

@@ -1,5 +1,6 @@
-import Notifications from "../../../../domain/entities/notification";
+
+import CreateNotificationDTO, { NotificationDTO } from "../../../DTOs/notificationsDTO";
 
 export default interface ICreateNotification {
-    execute(notification : Notifications, userId : string) : Promise<string | null>
+    execute(createNotifications : CreateNotificationDTO) : Promise<NotificationDTO | null>
 }

@@ -1,3 +1,5 @@
+import { JobApplicationDTO } from "../../../DTOs/candidate/jobApplicationDTO";
+
 export default interface IRejectCandidateUseCase {
-    execute(applicationId : string, candidateId : string) : Promise<boolean | null>
+    execute(applicationId : string) : Promise<JobApplicationDTO | null>
 }

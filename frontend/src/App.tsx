@@ -42,6 +42,10 @@ import SavedJobs from './pages/SavedJobs/SavedJobs'
 import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList'
 import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails'
 import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList'
+import MyApplications from './pages/candidate/My-applications/Applications'
+import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication'
+import NotificationPage from './pages/candidate/Notification-Page/Notifications'
+import Feed from './pages/common/Feed/Feed'
 
 function App() {
   return(
@@ -70,13 +74,17 @@ function App() {
           <Route path='experience' element={<ExperiencePage />} />
           <Route path='documents' element={<DocumentsPage />} />
           <Route path='favorites' element={<SavedJobs />} />
+          <Route path='my-applications' element={<MyApplications />} />
+          <Route path='notifications' element={<NotificationPage />} />
         </Route>
         {/* <Route path="personal" index element={<ProfilePersonal />} />
         <Route path='experience' element={<ExperiencePage />} />
         <Route path='documents' element={<DocumentsPage />} />
         <Route path='favorites' element={<SavedJobs />} /> */}
       </Route>
-
+      <Route element={<CandidateProtectedRoute />}>
+          <Route path='feed' element={<Feed />} />
+      </Route>
     </Route>
 
     <Route path='/recruiter' element={<RecruiterLayouts />}>
@@ -87,6 +95,7 @@ function App() {
           <Route path='overview' index element={<RecruiterProfilePersonal />} />
           <Route path='post-a-job' element={<PostAJobForm />} />
           <Route path='applications/:jobId' element={<ApplicantManagePage />} />
+          <Route path='application/details/:applicationId' element={<ViewApplicationDetailsPage />} />
           <Route path='applications/:jobId/finalized' element={<FinalizedList />} />
         </Route>
       </Route>
@@ -129,7 +138,7 @@ function App() {
     </Route> */}
     
     {/* Testing routes */}
-    <Route path='/test' element={<RecruiterProfilePersonal />} />
+    <Route path='/test' element={<Feed />} />
   </Routes>
     </BrowserRouter>
   )

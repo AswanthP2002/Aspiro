@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb"
 import Certificates from "./certificates"
 import Education from "./educations"
 import Experience from "./experience"
@@ -7,44 +6,44 @@ import Resume from "./resume"
 import SocialLinks from "../socialLinks"
 
 export default interface Candidate {
-    _id? : ObjectId
+    _id? : string // domain entity id changed to string :: removed objectid prevent leakage of infrastructure details
     name : string
-    username : string
-    password? : string
-    role : string
+    username? : string
+    password : string
+    role? : string
     phone : string
     email : string
     googleid? : string
     facebookid? : string
-    experience : Experience[]
-    education : Education[]
-    location : {
+    // experience? : Experience[]
+    // education? : Education[]
+    location? : {
         city : string,
         district : string,
         state : string,
         pincode : string
         country : string
     }
-    profilePicture : {
+    profilePicture? : {
         cloudinaryPublicId : string,
         cloudinarySecureUrl : string
     }
-    coverPhoto : {
+    coverPhoto? : {
         cloudinaryPublicId : string,
         cloudinarySecureUrl : string
     }
-    favorites : Favorites[]
-    resume : Resume[]
-    certificates : Certificates[]
-    about : string
+    // favorites? : Favorites[]
+    // resume? : Resume[]
+    // certificates? : Certificates[]
+    about? : string
     dateOfBirth? : Date
-    isBlocked : boolean
-    socialLinks : SocialLinks[]
-    currentSubscription : string
-    isVerified:boolean
-    isAdmin : boolean
-    verificationToken:string
+    isBlocked? : boolean
+    socialLinks? : SocialLinks[]
+    currentSubscription? : string
+    isVerified?:boolean
+    isAdmin? : boolean
+    verificationToken?:string
     otpExpiresAt?:Date,
-    createdAt:Date,
-    updatedAt:Date
+    createdAt?:Date,
+    updatedAt?:Date
 }

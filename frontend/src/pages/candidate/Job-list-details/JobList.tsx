@@ -129,10 +129,6 @@ export default function JobListing() {
         setVisibleSort(prev => !prev)
     }
 
-    function viewJobDetails(id : any){
-        navigator(`${id}`)
-    }
-
     useEffect(() => {
         async function fetchJobs(){
             try {
@@ -270,9 +266,7 @@ export default function JobListing() {
                                         jobs.map((job : any, index : number) => {
                                             return(
                                                 <>
-                                                    <button onClick={() => viewJobDetails(job?._id)}>
-                                                        <JobListTile key={index} data={job} />
-                                                    </button>
+                                                    <JobListTile key={index} data={job} />
                                                 </>
                                             )
                                         })
