@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 
 export default interface Experience {
     _id? : string
-    candidateId : string
+    candidateId? : string
     role : string
     jobtype : string
     organization : string

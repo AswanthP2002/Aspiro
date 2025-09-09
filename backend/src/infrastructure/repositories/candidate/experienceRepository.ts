@@ -33,11 +33,14 @@ export default class ExperienceRepository extends BaseRepository<Experience> imp
     // }
 
     async editExperience(experienceId: string, editData : any): Promise<Experience | null> {
+        console.log('Edit expereince request reached here',editData)
         const result = await experienceDAO.findOneAndUpdate(
             {_id:new mongoose.Types.ObjectId(experienceId)},
             {$set:editData},
             {returnDocument:'after'}
         )
+        
         return result
+        
     }
 }

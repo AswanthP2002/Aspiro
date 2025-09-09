@@ -61,6 +61,7 @@ import IRemoveCoverphotoUseCase from "../../../application/usecases/candidate/in
 import mapToFindCandidatesDTOFromRequest from "../../mappers/candidate/mapToFindCandidatesDTOFromRequest"
 import mapToAddsocialLinkDTOFromRequest from "../../mappers/candidate/mapToAddSocialLinkDTOFromRequest"
 import IUpdateNotificationReadStatus from "../../../application/usecases/candidate/interface/IUpdateNotificationReadStatus"
+import mapToEditExperienceDTO from "../../mappers/candidate/mapToEditExperienceDTO"
 
 export class CandidateController {
     constructor(
@@ -338,7 +339,8 @@ export class CandidateController {
         const {experienceId} = req.params
 
         try {
-            const result = await this._editExperienceUC.execute(experienceId, req.body)
+            const dto = mapToEditExperienceDTO(req.body)
+            const result = await this._editExperienceUC.execute(experienceId, dto)
             if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:"Can not edit experience"})
 
             return res.status(StatusCodes.OK).json({success:true, message:'Edited', result})

@@ -7,6 +7,7 @@ import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
 import { deleteCandidateEducation, deleteCandidateExperience, deleteCandidateSkills, getCandidateEducation, getCandidateExperience, getCandidateSkills } from "../../../services/candidateServices";
+import { transformDate } from "../../../services/util/formatDate";
 
 export default function ExperiencePage(){
 
@@ -57,16 +58,29 @@ export default function ExperiencePage(){
     }
 
     async function deleteExperience(expId : string) {
+            Swal.fire({
+                icon:'warning',
+                title:'Confirm Delete?',
+                text:'Are you sure to delete this experience',
+                showConfirmButton:true,
+                showCancelButton:true,
+                confirmButtonText:'Delete'
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    await deleteCandidateExperience(expId)
 
-            await deleteCandidateExperience(expId)
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted',
-                    showCancelButton: false,
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => window.location.reload())
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => window.location.reload())
+                }else{
+                    return
+                }
+            })
+            
 
     }
 
@@ -84,16 +98,30 @@ export default function ExperiencePage(){
     }
 
     async function deleteEducation(educationId : string) {
+            Swal.fire({
+                icon:'warning',
+                title:'Confirm Delete',
+                text:'Are you sure to delete this education?',
+                showCancelButton:true,
+                showConfirmButton:true,
+                confirmButtonText:'Delete'
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    await deleteCandidateEducation(educationId)
 
-            await deleteCandidateEducation(educationId)
+                    Swal.fire({
+                        icon:'success',
+                        title:'Deleted',
+                        showConfirmButton:false,
+                        showCancelButton:false,
+                        timer:1500
+                    }).then(() => window.location.reload())
+                }else{
+                    return
+                }
+            })
 
-                Swal.fire({
-                    icon:'success',
-                    title:'Deleted',
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:1500
-                }).then(() => window.location.reload())
+            
 
     }
 
@@ -233,8 +261,8 @@ export default function ExperiencePage(){
                                                                     <p className="mt-3 text-gray-400 text-xs">{ed?.level} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{ed?.organization}</span></p>
                                                                 </div>
                                                             </td>
-                                                            <td className="text-sm">{ed?.startYear}</td>
-                                                            <td className="text-sm">{ed?.endYear ? ed?.endYear : "Studying"}</td>
+                                                            <td className="text-sm">{formatDate(ed?.startYear)}</td>
+                                                            <td className="text-sm">{ed?.endYear ? formatDate(ed?.endYear) : "Studying"}</td>
                                                             <td className="flex justify-end">
                                                                 <button className="btn text-xs border p-2 me-3" onClick={() => selecteEditableEducation(index)}>Edit <i className="fa-solid fa-pencil !text-xs"></i></button>
                                                                 <button className="btn text-xs border p-2" onClick={() => deleteEducation(ed?._id)}>Remove <i className="fa-solid fa-trash !text-xs"></i></button>

@@ -1,5 +1,5 @@
 export default interface CreateExperienceDTO {
-    candidateId : string
+    candidateId? : string
     role : string
     jobtype : string
     organization : string
@@ -12,7 +12,7 @@ export default interface CreateExperienceDTO {
 
 export interface ExperienceDTO {
     _id? : string
-    candidateId : string
+    candidateId? : string
     role : string
     jobtype : string
     organization : string
