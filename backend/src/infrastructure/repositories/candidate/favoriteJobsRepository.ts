@@ -5,22 +5,26 @@ import IFavoriteJobs from "../../../domain/interfaces/candidate/IFavoriteJobRepo
 import BaseRepository from "../baseRepository";
 import FavoriteJobs from "../../../domain/entities/candidate/favoriteJobs";
 import mongoose from "mongoose";
+import { FavoriteJobsDAO } from "../../database/DAOs/candidate/faovriteJobs.dao";
 
 export default class FavoriteJobsRepsitory extends BaseRepository<FavoriteJobs> implements IFavoriteJobsRepo {
-    db : Db
-    collection : string
-    constructor(db : Db){
-        super(db, 'favoriteJobs')
-        this.db = db
-        this.collection = 'favoriteJobs'
+    constructor(){
+        super(FavoriteJobsDAO)
     }
+    // db : Db
+    // collection : string
+    // constructor(db : Db){
+    //     super(db, 'favoriteJobs')
+    //     this.db = db
+    //     this.collection = 'favoriteJobs'
+    // }
 
     async getFavoriteJobWithDetails(candidateId: string): Promise<any[] | null> {
-        const result = await this.db.collection<FavoriteJobs>(this.collection).aggregate([
+        const result = await FavoriteJobsDAO.aggregate([
             { $match: { candidateId: new mongoose.Types.ObjectId(candidateId) } },
             {
                 $lookup: {
-                    from: 'job',
+                    from: 'jobs',
                     localField: 'jobId',
                     foreignField: '_id',
                     as: 'jobDetails'
@@ -28,8 +32,13 @@ export default class FavoriteJobsRepsitory extends BaseRepository<FavoriteJobs> 
             },
             { $unwind: '$jobDetails' }
 
-        ]).toArray()
+        ])
 
         return result
+    }
+
+    async deleteFavoriteJob(jobId: string, candidateId: string): Promise<void> {
+       const result = await FavoriteJobsDAO.deleteOne({candidateId:new mongoose.Types.ObjectId(candidateId), jobId:new mongoose.Types.ObjectId(jobId)})
+       console.log('result object', result)
     }
 }

@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import defaultProfileImage from '/default-img-instagram.png'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import useRefreshToken from '../../../hooks/refreshToken'
+import { useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import { adminServices } from '../../../services/commonServices'
 import { blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
 
 
@@ -13,10 +10,6 @@ export default function JobDetails(){
     const [jobdetails, setjobdetails] = useState<any>({})
     const params : any = useParams()
     const jobId = params.id
-    const token = useSelector((state : any) => {
-        return state.adminAuth.adminToken
-    })
-    const navigator = useNavigate()
 
     useEffect(() => {
 

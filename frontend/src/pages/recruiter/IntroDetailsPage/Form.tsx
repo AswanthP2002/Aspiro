@@ -1,14 +1,10 @@
 import { useRef, useState } from "react"
-import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
-import { recruiterService } from "../../../services/commonServices"
 import { addCoverPhotoCloudinary, addLogoCloudinary, saveIntroDetails } from "../../../services/recruiterServices"
 
 export default function IntroDetailsPageForm(){
-    const token = useSelector((state : any) => {
-        return state.recruiterAuth.recruiterToken
-    })
+    
     const [step, setstep] = useState(1)
     const [details, setdetails] = useState({
         logo:"",
@@ -109,8 +105,6 @@ export default function IntroDetailsPageForm(){
                     logoFormData.append('upload_preset', 'recruiter_profile_images')
                     logoFormData.append('folder', 'profile')
 
-                    //const logoResponse = await recruiterService.addLogoCloudinary(logoFormData)
-
                     const logoResult = await addLogoCloudinary(logoFormData)
                     setlogourl(logoResult.secure_url)
                 }
@@ -121,7 +115,6 @@ export default function IntroDetailsPageForm(){
                     coverFormData.append('upload_preset', 'recruiter_profile_images')
                     coverFormData.append('folder', 'profile')
 
-                    //const coverPhotoResponse = await recruiterService.addCoverPhotoCloudinary(coverFormData)
 
                     const coverPhotoResult = await addCoverPhotoCloudinary(coverFormData)
                     setcoverphotourl(coverPhotoResult.secure_url)
@@ -129,11 +122,6 @@ export default function IntroDetailsPageForm(){
 
                 //save details in the database
                 const result = await saveIntroDetails(details, logourl, coverphotourl)
-                //const saveResponse = await recruiterService.saveIntroDetails(token, details, logourl, coverphotourl)
-                
-                //if(saveResponse.status === 500) throw new Error('Internal server error, please try again after some time')
-                
-                //const saveResult = await saveResponse.json()
 
                 if(result.success){
                     Swal.fire({

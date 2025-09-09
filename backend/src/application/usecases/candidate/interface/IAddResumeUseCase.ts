@@ -1,3 +1,6 @@
+import Resume from "../../../../domain/entities/candidate/resume";
+import CreateResumeDTO, { ResumeDTO } from "../../../DTOs/candidate/resumeDTO";
+
 export default interface IAddResumeUseCase {
-    execute(file : any, path : string, candidateId : string) : Promise<string | null>
+    execute(addResumeDTO : CreateResumeDTO) : Promise<ResumeDTO | null>
 }

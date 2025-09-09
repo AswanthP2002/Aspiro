@@ -1,8 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import defaultUser from '/default-img-instagram.png'
-import { logout, tokenRefresh } from "../../../redux-toolkit/candidateAuthSlice"
-import useRefreshToken from "../../../hooks/refreshToken"
+import { logout } from "../../../redux-toolkit/candidateAuthSlice"
 import Swal from "sweetalert2"
 import { candidateLogout, getNotifications } from "../../../services/candidateServices"
 import NotificationComponent from "../../../components/common/NotificationComponent"
@@ -18,9 +17,7 @@ export default function Header(){
         return state.candidateAuth.user
     })
 
-    const token = useSelector((state : any) => {
-        return state.candidateAuth.token
-    })
+
     console.log('This is loged user', logedUser)
 
     async function logoutCandidate(){

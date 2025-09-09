@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { recruiterService } from "../../../services/commonServices"
 import { useSelector } from "react-redux"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'
@@ -16,12 +15,7 @@ export default function ApplicantManagePage(){
     const jobId = params.jobId
     const navigator = useNavigate()
 
-    const token = useSelector((state : any) => {
-        return state.recruiterAuth.recruiterToken
-    })
-
     function rejectIndividualCandidate(candidateId : string, applicationId : string){
-        alert('reject function triggered')
         Swal.fire({
             title: 'Reject Candidate',
             html: `
@@ -64,12 +58,6 @@ export default function ApplicantManagePage(){
                         }).then(() => window.location.reload())
                     })
                 
-                // rejectApplicationApi(applicationId, {
-                //     reason,
-                //     message
-                // }).then(() => {
-                //     Swal.fire('Rejected', 'Candidate rejected successfully!', 'success');
-                // });
             }
         });
     }
@@ -104,9 +92,7 @@ export default function ApplicantManagePage(){
     }
 
     const handleShortlistAll = () => {
-        alert('Clickied the shortlisting all')
-        const allSelectedApplications = applications.filter((item) => selectedCards.includes(item._id)
-        )
+        const allSelectedApplications = applications.filter((item) => selectedCards.includes(item._id))
         setShortList(allSelectedApplications);
 
         setApplications(prev => prev.filter(app => !selectedCards.includes(app._id)));
@@ -132,7 +118,6 @@ export default function ApplicantManagePage(){
     const [shortList, setShortList] = useState<any[]>([])
 
     async function finalizeShortlistMethod(){
-        alert('button trigered')
         const shortlistedIds = shortList.map((app) => {
             return app._id
         })

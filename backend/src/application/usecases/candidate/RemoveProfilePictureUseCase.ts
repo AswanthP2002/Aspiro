@@ -5,12 +5,11 @@ import IRemoveProfilePictureUseCase from "./interface/IRemoveProfilePictureUseCa
 export default class RemoveProfilePictureUseCase implements IRemoveProfilePictureUseCase {
     constructor(private _iCandidateRepo : ICandidateRepo) {}
 
-    async execute(candidateId: string, cloudinaryPublicUrl: string): Promise<boolean | null> {
+    async execute(candidateId: string, cloudinaryPublicUrl: string): Promise<void> {
         //delete image from cloudinary
         await deleteAssetsCloudinary(cloudinaryPublicUrl)
 
         //update database
-        const deleteResult = await this._iCandidateRepo.removeProfilePhoto(candidateId)
-        return deleteResult
+        await this._iCandidateRepo.removeProfilePhoto(candidateId)
     }
 }

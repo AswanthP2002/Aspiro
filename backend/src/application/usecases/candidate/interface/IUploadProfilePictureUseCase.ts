@@ -1,3 +1,6 @@
+import CandidateDTO from "../../../DTOs/candidate/candidateDTO";
+import { UploadProfilePictureDTO } from "../../../DTOs/candidate/uploadProfilePictureDTO";
+
 export default interface IUploadProfilePictureUseCase {
-    execute(candidateId : string, imgFile : any, publicId : string) : Promise<boolean | null>
+    execute(uploadProfilePictureDto : UploadProfilePictureDTO) : Promise<CandidateDTO | null>
 }

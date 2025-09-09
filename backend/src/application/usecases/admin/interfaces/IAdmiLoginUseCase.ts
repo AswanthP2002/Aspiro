@@ -1,3 +1,5 @@
+import AdminLoginResDTO, { AdminLoginDTO } from "../../../DTOs/admin/adminLoginResDTO";
+
 export default interface IAdminLoginUseCase {
-    execute(email : string, password : string) : Promise<Object>
+    execute(adminLoginDto : AdminLoginDTO) : Promise<AdminLoginResDTO>
 }

@@ -6,6 +6,6 @@ export function createJobApplicationFromDTO(dto : JobApplicationDTO) : JobApplic
         ...dto,
         createdAt:new Date(),
         updatedAt:new Date(),
-        status:'Opened'
+        status:'Applied'
     }
 }

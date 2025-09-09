@@ -1,11 +1,9 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import useRefreshToken from "../../../hooks/refreshToken";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/commonServices";
 import { editCandidateExperience } from "../../../services/candidateServices";
 
-export default function EditExperienceForm({ experience, editExperienceModalOpen, closeExpEditModal, token }: any) {
+export default function EditExperienceForm({ experience, editExperienceModalOpen, closeExpEditModal }: any) {
 
     const [editableRole, setEditableRole] = useState("")
     const [editableRoleError, setEditableRoleError] = useState("")
@@ -57,7 +55,7 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
     }
 
     async function validateEditExperience(experienceId : string){
-        alert('validation starts')
+        
             const roleerror = !editableRole || !/^[a-zA-Z\s]{2,50}$/.test(editableRole) || false
             const organizationerror = !editableOrganization || !/^[a-zA-Z0-9\s\.,&-]{2,100}$/.test(editableOrganization) || false
             const jobtypeerror = !editableJobType || false
@@ -82,30 +80,16 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
                 console.log('checking booleans', 
                     roleerror, organizationerror, jobtypeerror, locationerror, locationtypeerror, startdateerror, enddateerror
                 )
-                alert('validation failed')
                 return
             }
-
-            alert('validation success going to call sending function')
             await editExperience(experienceId)
 
     }
 
     async function editExperience(experienceId : string) {
-        
-        //try {
-            
-            // let response = await candidateService.editExperience(token, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
 
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.editExperience(newAccessToken, experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
-            // }
-
-            const result = await editCandidateExperience(experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
+            await editCandidateExperience(experienceId, editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType)
             closeExpEditModal()
-            
-            //if(result.success){
                 Swal.fire({
                     icon:'success',
                     title:'Edited',
@@ -113,23 +97,6 @@ export default function EditExperienceForm({ experience, editExperienceModalOpen
                     showCancelButton:false,
                     timer:2000
                 }).then(() => window.location.reload())
-            // //}else{
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:"Oops!",
-            //         text:result?.message
-            //     })
-            // }
-        //} catch (error : unknown) {
-            // console.log('Error occured while editing the experience', error)
-            // if(error instanceof Error){
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:'Error',
-            //         text:error.message
-            //     })
-            // }
-        //}
     }
 
 

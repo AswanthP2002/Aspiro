@@ -5,7 +5,7 @@ import IDeleteResumeUseCase from "./interface/IDeleteResumeUseCase";
 export default class DeleteResumeUseCase implements IDeleteResumeUseCase{
     constructor(private _iResumeRepo : IResumeRepo) {}
 
-    async execute(resumeId : string, cloudinaryPublicId : string) : Promise<boolean> {
+    async execute(resumeId : string, cloudinaryPublicId : string) : Promise<void> {
         const promiseResult : any = await new Promise((resolve, reject) => {
             cloudinary.uploader.destroy(cloudinaryPublicId, {
                 resource_type:'raw'
@@ -19,9 +19,5 @@ export default class DeleteResumeUseCase implements IDeleteResumeUseCase{
             const result = await this._iResumeRepo.delete(resumeId)
             return result
         }
-
-        return false
-
-        
     }
 }

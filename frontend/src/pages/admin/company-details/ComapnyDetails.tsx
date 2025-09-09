@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react'
 import defaultProfileImage from '/default-img-instagram.png'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import useRefreshToken from '../../../hooks/refreshToken'
 import Swal from 'sweetalert2'
-import { adminServices } from '../../../services/commonServices'
 import { blockCompanyUnblockCompany, deleteCompany, getCompanyDetails } from '../../../services/adminServices'
 
 
@@ -13,9 +11,6 @@ export default function CompanyDetails(){
     const [companyDetails, setcompanydetails] = useState<any>({})
     const params : any = useParams()
     const companyId = params.id
-    const token = useSelector((state : any) => {
-        return state.adminAuth.adminToken
-    })
     const navigator = useNavigate()
 
     useEffect(() => {

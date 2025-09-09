@@ -1,18 +1,19 @@
-import mongoose from "mongoose";
-import Notifications from "../../../../domain/entities/notification";
 import INotificationRepo from "../../../../domain/interfaces/INotificationRepo";
-import { createNotificationFromDTO } from "../../../../domain/mappers/notificationMapper";
-import { NotificationSchema } from "../../../../presentation/controllers/dtos/notificationDTO";
 import ICreateNotification from "../interface/ICreateNotificationUseCase";
+import mapToNotificationsFromCreateNotification from "../../../mappers/mapToNotificationsFromCreateNotification";
+import CreateNotificationDTO, { NotificationDTO } from "../../../DTOs/notificationsDTO";
+import mapToNotificationDTO from "../../../mappers/mapToCreateNotificationDTO";
 
 export default class CreateNotification implements ICreateNotification {
     constructor(private _iNotificationRepo : INotificationRepo){}
 
-    async execute(notification : Notifications, userId : string): Promise<string | null> {
-        const parsedNotification = NotificationSchema.parse(notification)
-        const notificationModal = createNotificationFromDTO(parsedNotification)
-        notificationModal.userId = new mongoose.Types.ObjectId(userId)
-        const result = await this._iNotificationRepo.create(notificationModal)
-        return result
+    async execute(notification : CreateNotificationDTO): Promise<NotificationDTO | null> {
+        const newNotification = mapToNotificationsFromCreateNotification(notification)
+        const result = await this._iNotificationRepo.create(newNotification)
+        if(result){
+            const dto = mapToNotificationDTO(result)
+            return dto
+        }
+        return null
     }
 }

@@ -1,3 +1,3 @@
 export default interface IDeleteExperienceUseCase {
-    execute(experienceId : string) : Promise<boolean>
+    execute(experienceId : string) : Promise<void>
 }

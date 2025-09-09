@@ -1,3 +1,7 @@
+import LoadCandidateDTO from "../../../DTOs/admin/loadCandidatesDTO";
+import CandidateAggregatedDTO from "../../../DTOs/candidate/candidateAggregatedDTO";
+import CandidatePaginatedDTO from "../../../DTOs/candidate/candidatePaginatedDTO";
+
 export default interface ILoadCandidateUseCase {
-    execute(search : string, page : number, limit : number, sort : string, filter? : any) : Promise<any>
+    execute(loadCandidateDto : LoadCandidateDTO) : Promise<CandidatePaginatedDTO | null>
 }

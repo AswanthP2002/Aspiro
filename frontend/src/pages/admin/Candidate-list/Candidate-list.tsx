@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultUser from '../../../../public/default-img-instagram.png'
 import { jobRoles } from '../../../assets/data/dummyJobRole';
@@ -62,12 +61,7 @@ export default function Candidates() {
   const openFilter = () => setFilterVisible(true)
   const closeFilter = () => setFilterVisible(false)
 
-  const dispatcher = useDispatch()
   const navigator = useNavigate()
-
-  const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
-  })
 
   useEffect(() => {
     async function fetchCandidateLists(){
@@ -183,7 +177,7 @@ export default function Candidates() {
                   className={`${selectedCandidate?._id === candidate?._id ? "bg-orange-300" : "bg-white"} rounded-lg`}
                 >
                   <td className="p-3 flex items-center gap-2">
-                    <img src={candidate?.profilePicture ? candidate?.profilePicture : defaultUser} alt="logo" className="w-8 h-8 rounded-full" />
+                    <img src={candidate?.profilePicture?.cloudinarySecureUrl ? candidate?.profilePicture?.cloudinarySecureUrl : defaultUser} alt="logo" className="w-8 h-8 rounded-full" />
                     {candidate.name}
                   </td>
                   <td>{candidate.email}</td>
@@ -225,7 +219,7 @@ export default function Candidates() {
 
       <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
         <div className="text-sm text-center text-gray-400">{selectedCandidate?.role ? selectedCandidate.role : "Not Specified" }</div>
-        <img src={selectedCandidate.profilePicture ? selectedCandidate.profilePicture : defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
+        <img style={{objectFit:'cover'}} src={selectedCandidate.profilePicture.cloudinarySecureUrl ? selectedCandidate.profilePicture.cloudinarySecureUrl : defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
         <div className="text-center">
           <h3 className="font-semibold">{selectedCandidate.name}</h3>
           <p className="text-sm text-gray-500">{selectedCandidate?.username}</p>

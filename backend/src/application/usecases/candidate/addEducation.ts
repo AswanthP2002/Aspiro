@@ -4,15 +4,21 @@ import IEducationRepo from "../../../domain/interfaces/candidate/IEducationRepo"
 import { createEducationFromDTO } from "../../../domain/mappers/candidate/educationMapper";
 import { EducationSchema } from "../../../presentation/controllers/dtos/candidate/educationDTO";
 import IAddEducationUseCase from "./interface/IAddEducationUseCase";
+import { CreateEducationDTO, EducationDTO } from "../../DTOs/candidate/educationDTO";
+import mapToEducationFromCreateEducationDTO from "../../mappers/candidate/mapToEducationFromCreateEducation";
+import mapToEducationDTOFromEducation from "../../mappers/candidate/mapToEducationDTOFromEducation";
 
 export default class AddEducationUseCase implements IAddEducationUseCase {
     constructor(private _iEducationRepo : IEducationRepo){}
 
-    async execute(education : Education, candidateId : string) : Promise<string | null> {
-        const parsedEducation = EducationSchema.parse(education)
-        const educationModal = createEducationFromDTO(parsedEducation)
-        educationModal.candidateId = new mongoose.Types.ObjectId(candidateId)
-        const saveEducation = await this._iEducationRepo.create(educationModal)
-        return saveEducation
+    async execute(createEducationDto: CreateEducationDTO): Promise<EducationDTO | null> {
+        const newEducation = mapToEducationFromCreateEducationDTO(createEducationDto)
+        const result = await this._iEducationRepo.create(newEducation)
+        if(result){
+            const dto = mapToEducationDTOFromEducation(result)
+            return dto
+        }
+
+        return null
     }
 }

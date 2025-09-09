@@ -1,4 +1,4 @@
-import { useState } from "react"
+
 import defaultImage from '/default-img-instagram.png'
 
 export default function Testimonial({reviewData} : any){

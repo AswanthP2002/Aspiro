@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import defaultProfile from '/default-img-instagram.png'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,11 +6,9 @@ import { Notify } from 'notiflix'
 import Swal from 'sweetalert2'
 import Loader from '../../../components/candidate/Loader'
 import { useNavigate } from 'react-router-dom'
-import { Box, Input, InputLabel, Modal, OutlinedInput, TextField, Typography } from '@mui/material'
-import { loginSucess, logout, tokenRefresh } from '../../../redux-toolkit/candidateAuthSlice'
+import { Box, Modal, Typography } from '@mui/material'
+import { logout } from '../../../redux-toolkit/candidateAuthSlice'
 import { addSocialmediaLinks, editCandidateProfile, getCandidateProfileData, removeSocialLink } from '../../../services/candidateServices'
-import useCandidateLogout from '../../../hooks/useLogout'
-import socialMediaLinks from '../../../assets/data/dummySocialMediaLinks'
 import SocialmediaLinks from '../../../components/candidate/SocialmediaLinksCard'
 import CropComponent from '../../../components/common/CropComponent'
 import GeneralModal from '../../../components/common/Modal'
@@ -21,10 +19,6 @@ interface Candidate {
     name : string
     role : string
 }
-
-//cover photo update modal
-//profile photo update modal
-//profile edit modal
 
 export default function ProfilePersonal(){
     const [candidate, setcandidate] = useState<any>({})
@@ -73,7 +67,7 @@ export default function ProfilePersonal(){
     const token = useSelector((state : any) => {
         return state?.candidateAuth?.token
     })
-    const navigator = useNavigate()
+    const navigateTo = useNavigate()
     console.log('state token before sending', token)
 
 
@@ -146,7 +140,13 @@ export default function ProfilePersonal(){
                 if(result?.success){
                     //setTimeout(() => {
                         if(!result?.userDetails?.role){
-                            navigator('/store/details')
+                            navigateTo('/store/details', {
+                                state:{
+                                    candidateName:result?.userDetails?.name,
+                                    candidateRole:result?.userDetails?.role,
+                                    candidateId:result?.userDetails?._id
+                                }
+                            })
                             return
                         }
                         setcandidate(result?.userDetails)
@@ -162,7 +162,7 @@ export default function ProfilePersonal(){
                     }).then((result) => {
                         if(result.isConfirmed){
                             dispatcher(logout())
-                            navigator('/')
+                            navigateTo('/')
 
                         }
                     })
@@ -366,24 +366,13 @@ export default function ProfilePersonal(){
           </Box>
         </Box>
       </Modal>
-        {/* ================= */}
-
-        {/* Profile photo edit modal */}
-        {/* <Modal open={openphotedit} onClose={handleClosePhotoEdit}>
-            <Box sx={style}>
-                <div className="flex justify-end"><i className="fa-solid fa-close" onClick={handleClosePhotoEdit}></i></div>
-                <h2>Edit profile</h2>
-            </Box>
-        </Modal> */}
-        {/* ================ */}
+   
             <GeneralModal 
                 openModal={openProfilePhotoModal} 
                 closeModal={closeProfilePhoto}
                 children={<EditProfilePictureComponent profilePicture={candidate?.profilePicture} />}
             />
-        {/* =================== */}
-        {/*  */}
-        {/* =============== */}
+
             <GeneralModal 
                 openModal={openCoverphotoModal}
                 closeModal={closeCoverphoto}

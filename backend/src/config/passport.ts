@@ -5,7 +5,6 @@ import CandidateRepository from "../infrastructure/repositories/candidate/candid
 import { RegisterGoogleAuthCandidateSchema } from "../presentation/controllers/dtos/candidate/registerGoogleAuthCandidate";
 import { createCandidatefromDTO, createGoogleAutCandidatefromDTO } from "../domain/mappers/candidate/candidateMapper";
 import { join } from "path";
-import { connectDb } from "../infrastructure/database/connection";
 dotenv.config()
 
 passport.use(new GoogleStrategy({
@@ -14,8 +13,7 @@ passport.use(new GoogleStrategy({
     callbackURL:"http://localhost:5000/auth/google/callback"
 }, 
     async (accesstoken : string, refreshtoken : string, profile : Profile, done : any) => {
-        const db = await connectDb()
-        const candidateRepository = new CandidateRepository(db)
+        const candidateRepository = new CandidateRepository()
         try{
             //find the user with same googleid
             console.log('user id before querying the db', profile.id)

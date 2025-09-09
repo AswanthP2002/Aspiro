@@ -60,7 +60,7 @@ export class AdminController {
     async adminLogin(req : Request, res : Response) : Promise<Response> { //login controller for admin
         const {email, password} = req.body 
         try {
-            const result : any = await this._adminLoginUC.execute(email, password)
+            const result : any = await this._adminLoginUC.execute({email, password})
             const {refreshToken} = result
             return res.status(StatusCodes.OK)
             .cookie('adminRefreshToken', refreshToken, {
@@ -115,8 +115,7 @@ export class AdminController {
         const filter = JSON.parse(req.query.filter as string) || {}
 
         try {
-            const result = await this._loadCandidatesUC.execute(search, page, limit, sort, filter)
-
+            const result = await this._loadCandidatesUC.execute({search, limit, page, sort, filter})
             return res.status(StatusCodes.OK).json({
                 success:true,
                 message:'Candidates details fetched successfully',

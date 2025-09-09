@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
 import { candidateLogout, refreshCandidateToken } from '../candidateServices';
@@ -24,8 +24,6 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<any> => {
     const customeRequest = request as AxiosRequest
-    // console.log('Intercepter for request has been triggered')
-    // console.log('Custome request before final request', customeRequest)
     if(customeRequest?.sendCookie){
         customeRequest.withCredentials = true
     }

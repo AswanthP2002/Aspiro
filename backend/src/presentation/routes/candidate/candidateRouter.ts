@@ -3,7 +3,7 @@ import url from 'url'
 import { upload } from "../../../utilities/multer"
 import pdf from 'pdf-parse'
 import { NextFunction, Request, Response } from "express"
-import { CandidateController, getAuthUserData } from "../../controllers/candidate/candidateController"
+import { CandidateController } from "../../controllers/candidate/candidateController"
 import { candidateAuth, refreshAccessToken } from "../../../middlewares/auth"
 import CandidateRepository from "../../../infrastructure/repositories/candidate/candidateRepository"
 import RegisterCandidateUseCase from "../../../application/usecases/candidate/registerCandidate"
@@ -43,8 +43,8 @@ import JObApplicationRepository from "../../../infrastructure/repositories/JobAp
 import SaveJobApplicationUseCase from "../../../application/usecases/saveJobApplicationUseCase"
 import parsePdf from "../../../middlewares/parsePdf"
 import SearchJobsFromHomeUseCase from "../../../application/usecases/searchJobsFromHomeUseCase"
-import { connectDb } from "../../../infrastructure/database/connection"
-import { Db } from "mongodb"
+// import { connectDb } from "../../../infrastructure/database/connection"
+// import { Db } from "mongodb"
 import EditProfileUseCase from "../../../application/usecases/candidate/editProfile"
 import GetNotificationsUseCase from "../../../application/usecases/candidate/GetNotificationsUseCase"
 import NotificationRepository from "../../../infrastructure/repositories/notificationRepository"
@@ -61,21 +61,23 @@ import UploadCoverphotoUseCase from '../../../application/usecases/candidate/Upl
 import RemoveCoverphotoUseCase from '../../../application/usecases/candidate/RemoveCoverphotoUseCase'
 import GetCandidatesUseCase from '../../../application/usecases/GetCandidatesUseCase'
 import GetCandidateDetailsUseCase from '../../../application/usecases/GetCandidateDetailsUseCase'
+import GetCandidateApplicationsUseCase from '../../../application/usecases/candidate/GetCandidateApplicationsUseCase'
+import UpdateNotificationReadStatus from '../../../application/usecases/candidate/UpdateNotificationReadStatus'
 
-async function createCandidateRouter(db : Db){
+async function createCandidateRouter(){
     const candidateRouter = express.Router()
     //const candidateRouter = express.Router()
 
-    const candidateRepo = new CandidateRepository(db)
-    const experienceRepo = new ExperienceRepository(db)
-    const jobRepo = new JobRepository(db)
-    const skillRepo = new SkillRepsitory(db)
-    const educationRepo = new EducationRepository(db)
-    const resumeRepo = new ResumeRepository(db)
-    const certificateRepo = new CertificateRepository(db)
-    const jobApplicationRepo = new JObApplicationRepository(db)
-    const notificationRepo = new NotificationRepository(db)
-    const favoriteJobsRepo = new FavoriteJobsRepsitory(db)
+    const candidateRepo = new CandidateRepository()
+    const experienceRepo = new ExperienceRepository()
+    const jobRepo = new JobRepository()
+    const skillRepo = new SkillRepsitory()
+    const educationRepo = new EducationRepository()
+    const resumeRepo = new ResumeRepository()
+    const certificateRepo = new CertificateRepository()
+    const jobApplicationRepo = new JObApplicationRepository()
+    const notificationRepo = new NotificationRepository()
+    const favoriteJobsRepo = new FavoriteJobsRepsitory()
 
 
     const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo)
@@ -117,6 +119,8 @@ async function createCandidateRouter(db : Db){
     const removeCoverPhotoUC = new RemoveCoverphotoUseCase(candidateRepo)
     const getCandidatesUC = new GetCandidatesUseCase(candidateRepo)
     const getCandidateDetailsUC = new GetCandidateDetailsUseCase(candidateRepo)
+    const getCandidateApplicationsUC = new GetCandidateApplicationsUseCase(jobApplicationRepo)
+    const updateNotificationReadStatus = new UpdateNotificationReadStatus(notificationRepo)
 
 
     const candidateController = new CandidateController(
@@ -158,13 +162,18 @@ async function createCandidateRouter(db : Db){
         uploadCoverPhotoUC,
         removeCoverPhotoUC,
         getCandidatesUC,
-        getCandidateDetailsUC
+        getCandidateDetailsUC,
+        getCandidateApplicationsUC,
+        updateNotificationReadStatus
     )
 
 candidateRouter.post('/register', candidateController.registerCandidate.bind(candidateController))
 candidateRouter.post('/verify', candidateController.verifyUser.bind(candidateController))
 candidateRouter.post('/login', candidateController.loginCandidate.bind(candidateController))
-candidateRouter.get('/jobs', candidateController.loadJobs.bind(candidateController))
+candidateRouter.get('/jobs', (req : Request, res : Response, next : NextFunction) => {
+    console.log('ensure the request is reaching here')
+    next()
+}, candidateController.loadJobs.bind(candidateController))
 candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
 candidateRouter.post('/candidate/personal/details/save', candidateAuth, candidateController.saveIntroDetailsCandidate.bind(candidateController))
 candidateRouter.get('/candidate/profile/personal/datas', candidateAuth, candidateController.loadCandidatePersonalData.bind(candidateController))
@@ -178,7 +187,7 @@ candidateRouter.delete('/candidate/skills/:skillId', candidateAuth, candidateCon
 candidateRouter.post('/candidate/education/add', candidateAuth, candidateController.addEducation.bind(candidateController))
 candidateRouter.get('/candidate/education', candidateAuth, candidateController.getEducations.bind(candidateController))
 candidateRouter.delete('/candidate/education/:educationId', candidateAuth, candidateController.deleteEducation.bind(candidateController))
-candidateRouter.put('/candidate/education/:educationId', candidateAuth, candidateController.editEducation.bind(candidateController))
+candidateRouter.put('/candidate/education/:educationId',testMiddleWare, candidateAuth, candidateController.editEducation.bind(candidateController))
 candidateRouter.delete('/candidate/resume/:resumeId', candidateAuth, candidateController.deleteResume.bind(candidateController))
 candidateRouter.post('/candidate/certificate',upload.single('certificate'), candidateAuth, candidateController.addCertificate.bind(candidateController))
 candidateRouter.get('/candidate/certificate', candidateAuth, candidateController.getCertificates.bind(candidateController))
@@ -197,10 +206,11 @@ candidateRouter.get('/candidate/token/refresh', refreshAccessToken) //only check
 candidateRouter.post('/candidate/logout', candidateAuth, candidateController.candidateLogout.bind(candidateController))
 
 candidateRouter.get('/candidate/notifications', candidateAuth, candidateController.getNotifications.bind(candidateController))
+candidateRouter.patch('/candidate/notification/:id', candidateAuth, candidateController.updateNotificationReadStatus.bind(candidateController))
 candidateRouter.post('/candidate/job/:jobId/save', candidateAuth, candidateController.saveJob.bind(candidateController))
 candidateRouter.get('/candidate/job/saved/check', candidateAuth, candidateController.checkIsJobSaved.bind(candidateController))
 candidateRouter.get('/candidate/job/saved', candidateAuth, candidateController.getFavoriteJobs.bind(candidateController))
-candidateRouter.delete('/candidate/job/:jobId/unsave/:id', candidateAuth, candidateController.unsaveJob.bind(candidateController))
+candidateRouter.delete('/candidate/job/:jobId/unsave', testMiddleWare, candidateAuth, candidateController.unsaveJob.bind(candidateController))
 candidateRouter.patch('/candidate/profile/links', candidateAuth, candidateController.addSocialLink.bind(candidateController))
 candidateRouter.patch('/candidate/profile/links/remove', candidateAuth, candidateController.deleteSocialLink.bind(candidateController))
 candidateRouter.patch('/candidate/profile/picture/update', candidateAuth, upload.single('profilePicture'), candidateController.uploadProfilePicture.bind(candidateController))
@@ -209,16 +219,17 @@ candidateRouter.patch('/candidate/profile/coverphoto/update', candidateAuth, upl
 candidateRouter.patch('/candidate/profile/coverphoto/remove', candidateAuth, candidateController.removeCoverphoto.bind(candidateController))
 candidateRouter.get('/candidates', candidateController.getCandidates.bind(candidateController))
 candidateRouter.get('/candidates/:candidateId', candidateController.getCandidateDetails.bind(candidateController))
+candidateRouter.get('/candidate/applications', candidateAuth, candidateController.getCandidateApplications.bind(candidateController))
 
 
-candidateRouter.get('/get/user/:id', getAuthUserData)
+// candidateRouter.get('/get/user/:id', getAuthUserData)
 
 
 
 function testMiddleWare(req : Request, res : Response, next : NextFunction) {
-    console.log('Testing upcoming qury object', req.query)
-    console.log('decoded filters', JSON.parse(req.query?.filter as string))
-    return res.status(StatusCodes.ACCEPTED).json({success:true, message:'Testing flow'})
+    console.log(req.url)
+    next()
+    //return res.status(StatusCodes.ACCEPTED).json({success:true, message:'Testing flow'})
 }
 
  return candidateRouter

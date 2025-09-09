@@ -14,6 +14,7 @@ export const CreateJobSchema = z.object({
     qualification : z.string(),
     experience : z.string(),
     jobLevel : z.string(),
+    expiresAt : z.date()
 })
 
 

@@ -2,8 +2,8 @@ import mongoose from "mongoose"
 
 
 export default interface Experience {
-    _id? : mongoose.Types.ObjectId
-    candidateId? : mongoose.Types.ObjectId
+    _id? : string
+    candidateId? : string
     role : string
     jobtype : string
     organization : string
@@ -12,6 +12,4 @@ export default interface Experience {
     enddate? : any //for checking
     location : string
     locationtype : string
-    createdAt : Date
-    updatedAt : Date
 }

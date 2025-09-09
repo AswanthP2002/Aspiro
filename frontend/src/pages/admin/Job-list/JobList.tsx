@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
@@ -87,10 +87,6 @@ export default function Jobs() {
   function toggleSortVisibility(){
     setSortVisibility(prev => !prev)
   }
-
-  const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
-  })
 
   const navigator = useNavigate()
 
@@ -266,8 +262,7 @@ export default function Jobs() {
                   <td>{job?.companyDetails?.industry}</td>
                   <td>{formatDate(job?.createdAt)}</td>
                   <td>
-                    blocked
-                    {/* <span className="text-green-500 font-medium">{job.isBlocked ? <label>Blocked</label> : <label>Active</label>}</span> */}
+                    <span className="text-green-500 font-medium">{job.isBlocked ? <label className='text-red-500'>Blocked</label> : <label className='text-green-500'>Active</label>}</span>
                   </td>
                 </tr>
               ))}

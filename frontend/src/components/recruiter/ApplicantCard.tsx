@@ -1,9 +1,12 @@
 import { useState } from "react"
 import formatDate from "../../services/util/formatDate"
 import ApplicantCardOptions from "./ApplicantOptionsCard"
+import { useNavigate } from "react-router-dom"
 
 export default function ApplicantCard({reject, removeFromShortlist, flag, buttonOptions, applicationData, isSelected, shortList, defaultProfile, selectionMode, selectFromOption, toggleCardSelection }: any) {
     const [showOptions, setShowOptions] = useState(false)
+
+    const navigateTo = useNavigate()
     
     const selectMethod = () => {
         selectFromOption()
@@ -17,6 +20,13 @@ export default function ApplicantCard({reject, removeFromShortlist, flag, button
     const rejectMethod = () => {
         reject()
         setShowOptions(false)
+    }
+
+    const openApplication = (applicationId : string) => {
+        if(applicationId){
+            navigateTo(`/recruiter/profile/application/details/${applicationId}`, {state:{applicationId}})
+            return
+        }
     }
     
     return (
@@ -39,7 +49,9 @@ export default function ApplicantCard({reject, removeFromShortlist, flag, button
                     {/* <li><p className="text-gray-400">Education : {applicant?.qualification}</p></li> */}
                 </ul>
                 <p className="cursor-pointer text-blue-500 text-xs font-semibold mt-2">Inspect Candidate</p>
-                <p className="cursor-pointer text-blue-500 text-xs font-semibold mt-2">Open Application</p>
+                <button onClick={() => openApplication(applicationData?._id)}>
+                    <p className="cursor-pointer text-blue-500 text-xs font-semibold mt-2">Open Application</p>
+                </button>
                 <p className="cursor-pointer text-blue-500 text-xs font-semibold mt-2">View Resume</p>
             </div>
             <div>

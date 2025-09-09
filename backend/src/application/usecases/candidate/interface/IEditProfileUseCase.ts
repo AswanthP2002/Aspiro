@@ -1,5 +1,6 @@
 import Candidate from "../../../../domain/entities/candidate/candidates";
+import CandidateDTO, { EditCandidateDTO } from "../../../DTOs/candidate/candidateDTO";
 
 export default interface IEditProfileUseCase {
-    execute(id : string, name : string, role : string, city : string, district : string, state : string, country : string, about : string) : Promise<Candidate | null>
+    execute(editCandidateDto : EditCandidateDTO) : Promise<CandidateDTO | null>
 }

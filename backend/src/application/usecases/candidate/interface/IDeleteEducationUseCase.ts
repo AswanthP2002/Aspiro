@@ -1,3 +1,3 @@
 export default interface IDeleteEducationUseCase {
-    execute(educationId : string) : Promise<boolean>
+    execute(educationId : string) : Promise<void>
 }

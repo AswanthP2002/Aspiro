@@ -1,18 +1,6 @@
+import { RecruiterDTO } from "../../../DTOs/recruiter/recruiterDTO";
+import SaveIntroDetailsDTO from "../../../DTOs/recruiter/saveIntroDetailsDTO";
+
 export default interface ISaveBasicsUseCase {
-    execute(id : string,
-        companyName : string,
-        about : string,
-        benefits : string,
-        companyType : string,
-        industryType : string,
-        teamStrength : string,
-        yearOfEstablishment : string,
-        website : string,
-        vision : string,
-        country : string,
-        state : string,
-        city : string,
-        mobile : string,
-        logo : string,
-        coverphoto : string) : Promise<boolean>
+    execute(saveIntroDetailsDto : SaveIntroDetailsDTO) : Promise<RecruiterDTO | null>
 }

@@ -51,7 +51,6 @@ export default function EditProfilePictureComponent({ profilePicture }: any) {
     }
 
     const handleUpload = (event: any) => {
-        alert('file uploaded')
         const file = event.target.files[0]
         if(file){
             setImage(URL.createObjectURL(file))

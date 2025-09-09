@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Swal from 'sweetalert2';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
-import useRefreshToken from '../../../hooks/refreshToken';
-import { adminServices } from '../../../services/commonServices';
 import { getCompanies } from '../../../services/adminServices';
 
 
@@ -23,11 +20,6 @@ export default function Companies() {
 
   const openSort = () => setSortVisibility(true)
   const closeSort = () => setSortVisibility(false)
-
-
-  const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
-  })
 
   const nextPage = () => setpage(prev => prev + 1)
   const previousPage = () => setpage(prev => prev - 1)

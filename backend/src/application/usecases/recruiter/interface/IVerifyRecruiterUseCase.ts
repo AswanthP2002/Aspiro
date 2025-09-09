@@ -1,3 +1,6 @@
+import { RecruiterDTO } from "../../../DTOs/recruiter/recruiterDTO";
+import VerifyRecruiterDTO from "../../../DTOs/recruiter/verifyRecruiterDTO";
+
 export default interface IVerifyRecruiterUseCase {
-    execute(email : string, otp : string) : Promise<Boolean>
+    execute(verifyRecruiterDto : VerifyRecruiterDTO) : Promise<RecruiterDTO | null>
 }

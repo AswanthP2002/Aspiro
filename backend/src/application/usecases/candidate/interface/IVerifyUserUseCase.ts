@@ -1,3 +1,5 @@
+import VerifyUserDTO from "../../../DTOs/candidate/verifyCandidateDTO";
+
 export default interface IVerifyUserUseCase {
-    execute(email : string, otp : string) : Promise<boolean>
+    execute(verifyUser : VerifyUserDTO) : Promise<void>
 }

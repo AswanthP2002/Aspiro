@@ -1,4 +1,5 @@
-import Notifications from "../../../domain/entities/notification";
+
+import Notifications from "../../../domain/entities/notifications";
 import INotificationRepo from "../../../domain/interfaces/INotificationRepo";
 import IGetNotificationsUseCase from "./interface/IGetNotificationsUseCase";
 

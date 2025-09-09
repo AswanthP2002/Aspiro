@@ -1,15 +1,14 @@
 import Job from "../../domain/entities/job";
 import IJobRepo from "../../domain/interfaces/IJobRepo";
-import { connectDb } from "../database/connection";
 import { SaveJob } from "../../domain/interfaces/IJobRepo";
 import { Db, ObjectId } from "mongodb";
 import BaseRepository from "./baseRepository";
+import { JobDAO } from "../database/DAOs/recruiter/job.dao";
+import { LoadJobRes } from "../../application/DTOs/loadJobDTO";
 
 export default class JobRepository extends BaseRepository<Job> implements IJobRepo {
-    private _collection = 'job'
-
-    constructor(db : Db){
-        super(db, 'job')
+    constructor(){
+        super(JobDAO)
     }
     
     // async create(job: Job): Promise<SaveJob> {
@@ -19,14 +18,14 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     // }
 
     async findCompanyJobsById(id: string): Promise<Job[]> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).find({companyId:new ObjectId(id)}).toArray()
+        
+        const result = await JobDAO.find({companyId:new ObjectId(id)}).lean()
         return result
     }
 
-    async getJobs(search : string = '', page : number = 1, limit : number = 3, sort : string = 'job-latest', filters : any): Promise<any> { //change strict to later
-        const db = await connectDb()
-        const prelookupMatch : any = {}
+    async getJobs(search : string = '', page : number = 1, limit : number = 3, sort : string = 'job-latest', filters : any, minSalary : string = "", maxSalary : string = ""): Promise<LoadJobRes | null> { //change strict to later
+       
+        const prelookupMatch : any = {expiresAt:{$gte:new Date()}}
         const postlookupMatch : any = {}
 
         if(search){
@@ -45,12 +44,12 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
             prelookupMatch.locationType = {$in:filters?.locationType}
         }
 
-        if(filters?.minSalary){
-            prelookupMatch.minSalary = {$gte:Number(filters?.minSalary)}
+        if(minSalary){
+            prelookupMatch.minSalary = {$gte:Number(minSalary)}
         }
 
-        if(filters?.maxSalary){
-            prelookupMatch.maxSalary = {$lte:Number(filters?.maxSalary)}
+        if(maxSalary){
+            prelookupMatch.maxSalary = {$lte:Number(maxSalary)}
         }
 
         //const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}
@@ -86,7 +85,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
         const pipeline: any[] = [
             {$match:prelookupMatch},
             { $lookup: {
-                from: 'recruiter',
+                from: 'recruiters',
                 localField: 'companyId',
                 foreignField: '_id',
                 as: 'companyDetails'
@@ -105,7 +104,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
             { $match: prelookupMatch },
             {
                 $lookup: {
-                    from: 'recruiter',
+                    from: 'recruiters',
                     localField: 'companyId',
                     foreignField: '_id',
                     as: 'companyDetails',
@@ -117,31 +116,31 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
         ]
 
 
-        const jobs = await db.collection<Job>(this._collection).aggregate(pipeline).toArray()
-        const totalDocumentsArray = await db.collection<Job>(this._collection).aggregate(countPipeLine).toArray()
+        const jobs = await JobDAO.aggregate(pipeline)
+        const totalDocumentsArray = await JobDAO.aggregate(countPipeLine)
         const totalDocumentsCount = totalDocumentsArray[0]?.count || 0
         const totalPages = totalDocumentsArray.length > 0 ? Math.ceil(totalDocumentsCount / limit) : 0
         return {jobs, page, totalPages, currentSort:sort}
     }
 
     async getJobDetails(id: string): Promise<any[]> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).aggregate([
+        
+        const result = await JobDAO.aggregate([
                             {$lookup: {
-                                from: 'recruiter',
+                                from: 'recruiters',
                                 localField: 'companyId',
                                 foreignField: '_id',
                                 as: 'companyDetails'
                             }},
                             {$unwind:'$companyDetails'},
                             {$match:{_id:new ObjectId(id)}}
-                            ]).toArray()
+                            ])
         return result
     }
 
     async blockJob(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).updateOne(
+        
+        const result = await JobDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:true
@@ -152,8 +151,8 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     }
 
     async unblockJob(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).updateOne(
+        // const db = await connectDb()
+        const result = await JobDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isBlocked:false
@@ -164,8 +163,8 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     }
 
     async rejectJob(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).updateOne(
+       
+        const result = await JobDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isRejected:true
@@ -176,8 +175,8 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     }
 
     async unrejectJob(id: string): Promise<boolean> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).updateOne(
+        
+        const result = await JobDAO.updateOne(
             {_id:new ObjectId(id)},
             {$set:{
                 isRejected:false
@@ -188,17 +187,17 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     }
 
     async searchJobsFromHome(search: string = ''): Promise<Job[] | any[]> {
-        const db = await connectDb()
-        const result = await db.collection<Job>(this._collection).aggregate([
+        
+        const result = await JobDAO.aggregate([
             {$lookup:{
-                from:'recruiter',
+                from:'recruiters',
                 localField:'companyId',
                 foreignField:'_id',
                 as:'companyDetails'
             }},
             {$unwind:'$companyDetails'},
             {$match:{jobTitle:{$regex:new RegExp(search, 'i')}}}
-        ]).toArray()
+        ])
         return result
     }
 }

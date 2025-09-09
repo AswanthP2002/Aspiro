@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginSucess } from "../../redux-toolkit/candidateAuthSlice";
 import Loader from "../candidate/Loader";
 
@@ -19,7 +19,6 @@ export default function AuthSuccess(){
         const email = params.get('email')
 
         if(!token || !id || !email){
-            alert('There is no token or id or email, so redirecting to login')
             navigator('/login')
             return
         }

@@ -2,20 +2,14 @@ import mongoose from "mongoose";
 import IFavoriteJobsRepo from "../../../domain/interfaces/candidate/IFavoriteJobRepo";
 import ISaveFavoriteJobUseCase from "./interface/ISaveFavoriteJobsUseCase";
 import FavoriteJobs from "../../../domain/entities/candidate/favoriteJobs";
+import AddJobFavoriteDTO from "../../DTOs/candidate/addJobFavoriteDTO";
 
 export default class SaveFavoriteJobUseCase implements ISaveFavoriteJobUseCase {
     constructor(private _IFavoriteJobRepo : IFavoriteJobsRepo){}
 
-    async execute(candidateId: string, jobId: string): Promise<string | null> {
-        const convertedCandidateId = new mongoose.Types.ObjectId(candidateId)
-        const convertedJobId = new mongoose.Types.ObjectId(jobId)
-        const savedJob : FavoriteJobs = {
-            candidateId:convertedCandidateId,
-            jobId:convertedJobId,
-            createdAt:new Date()
-        }
+    async execute(savefavoriteJobDto : AddJobFavoriteDTO): Promise<FavoriteJobs | null> {
 
-        const result = await this._IFavoriteJobRepo.create(savedJob)
+        const result = await this._IFavoriteJobRepo.create({candidateId:savefavoriteJobDto.candidateId, jobId:savefavoriteJobDto.jobId})
         return result
     }
 }

@@ -1,3 +1,5 @@
+import { RemoveSocialLinkDTO } from "../../../DTOs/candidate/socialLinkDTO";
+
 export default interface IDeleteSocialLinkUseCase {
-    execute(candidateId : string, domain : string) : Promise<boolean | null>
+    execute(removeSocialLinkDto : RemoveSocialLinkDTO) : Promise<void>
 }

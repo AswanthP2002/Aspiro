@@ -1,3 +1,6 @@
+import FavoriteJobs from "../../../../domain/entities/candidate/favoriteJobs";
+import AddJobFavoriteDTO from "../../../DTOs/candidate/addJobFavoriteDTO";
+
 export default interface ISaveFavoriteJobUseCase {
-    execute(candidateId : string, jobId : string) : Promise<string | null>
+    execute(addJobFavoriteDto : AddJobFavoriteDTO) : Promise<FavoriteJobs | null>
 }

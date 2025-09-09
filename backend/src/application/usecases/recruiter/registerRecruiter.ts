@@ -7,28 +7,30 @@ import CandidateRepo from "../../../domain/interfaces/candidate/ICandidateRepo";
 import { RegisterRecruiterDTO, RegisterRecruiterSchema } from "../../../presentation/controllers/dtos/recruiter/registerRecruiterDTO";
 import { createRecruiterFromDTO } from "../../../domain/mappers/recruiter/recruiterMapper";
 import IRegisterRecruiterUseCase from "./interface/IRegisterRecruiterUseCase";
+import CreateRecruiterDTO, { RecruiterDTO } from "../../DTOs/recruiter/recruiterDTO";
+import mapToRecruiterFromCreateRecruiterDTO from "../../mappers/recruiter/mapToRecruiterFromCreateRecruiterDto";
+import mapToRecruiterDtoFromRecruiter from "../../mappers/recruiter/mapToRecruiterDtoFromRecruiter";
 
 
 export default class RegisterRecruiterUseCase implements IRegisterRecruiterUseCase {
     constructor(private recruiterRepo : IRecruiterRepo, private crepo : CandidateRepo){}
 
-    async execute(recruiterDTO : RegisterRecruiterDTO) : Promise<string>{
-        const validateRecruiter = RegisterRecruiterSchema.parse(recruiterDTO)
-        const recruiterModel = createRecruiterFromDTO(validateRecruiter)
-        const existingEmail = await this.recruiterRepo.findByEmail(recruiterModel?.email)
-        const existinCandidate = await this.crepo.findByEmail(recruiterModel?.email)
-        if(existingEmail || existinCandidate) throw new Error('duplicate email')
+    async execute(createRecruiterDto : CreateRecruiterDTO) : Promise<RecruiterDTO | null>{
+       const newRecruiter = mapToRecruiterFromCreateRecruiterDTO(createRecruiterDto)
+        const isExistingEmail = await this.recruiterRepo.findByEmail(newRecruiter.email)
+        const isExistingCandidate = await this.crepo.findByEmail(newRecruiter.email)
+        if(isExistingCandidate || isExistingEmail) throw new Error('DuplicateEmail')
         
-        const existingUsername = await this.recruiterRepo.findByUserName(recruiterModel?.username)
-        const existingUserrnameCandidate = await this.crepo.findByUsername(recruiterModel?.username)
+        const existingUsername = await this.recruiterRepo.findByUserName(newRecruiter.username)
+        // const existingUserrnameCandidate = await this.crepo.findByUsername(recruiterModel?.username)
 
-        if(existingUsername || existingUserrnameCandidate) throw new Error('duplicate username')
+        if(existingUsername) throw new Error('duplicate username')
         let hashedPassword
-        if(recruiterModel?.password){
-            hashedPassword = await bcrypt.hash(recruiterModel.password, 10)
+        if(newRecruiter?.password){
+            hashedPassword = await bcrypt.hash(newRecruiter.password, 10)
         }
 
-        recruiterModel.password = hashedPassword
+        newRecruiter.password = hashedPassword
 
         const otp = generateCode()
         const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000)
@@ -45,14 +47,19 @@ export default class RegisterRecruiterUseCase implements IRegisterRecruiterUseCa
 </div>
         `
 
-        recruiterModel.isVerified = false
-        recruiterModel.verificationToken = otp
-        recruiterModel.otpExpiresAt = otpExpiresAt
+        
+        newRecruiter.verificationToken = otp
+        newRecruiter.otpExpiresAt = otpExpiresAt
 
-        const info = await sendEmail(recruiterModel.email, subject, content)
+        const info = await sendEmail(newRecruiter.email, subject, content)
         console.log('otp send to the user', otp)
 
-        const createRecruiter = await this.recruiterRepo.create(recruiterModel)
-        return `${createRecruiter} - ${info}`
+        const createRecruiter = await this.recruiterRepo.create(newRecruiter)
+
+        if(createRecruiter){
+            const dto = mapToRecruiterDtoFromRecruiter(createRecruiter)
+            return dto
+        }
+        return null
     }
 }

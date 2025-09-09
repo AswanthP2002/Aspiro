@@ -1,3 +1,5 @@
+import LoadJobDTO, { LoadJobResDTO } from "../../../DTOs/loadJobDTO";
+
 export default interface ILoadJobCandidateSideUseCase {
-    execute(search : string, page : number, limit : number, sort : string, filters : any) : Promise<any>
+    execute(loadJobDto : LoadJobDTO) : Promise<LoadJobResDTO | null>
 }

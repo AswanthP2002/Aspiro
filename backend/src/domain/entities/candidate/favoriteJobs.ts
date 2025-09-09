@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 export default interface FavoriteJobs {
-    candidateId : mongoose.Types.ObjectId
-    jobId : mongoose.Types.ObjectId
+    _id? : string
+    candidateId? : string
+    jobId? : string
     createdAt? : Date
 
 }

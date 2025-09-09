@@ -1,5 +1,7 @@
 import Experience from "../../../../domain/entities/candidate/experience";
+import { ExperienceDTO } from "../../../../presentation/controllers/dtos/candidate/experienceDTO";
+import CreateExperienceDTO from "../../../DTOs/candidate/experienceDTO";
 
 export default interface IAddExperience {
-    execute(experience : Experience, candidateId : string) : Promise<string | null>
+    execute(createExperienceDto : CreateExperienceDTO) : Promise<ExperienceDTO | null>
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { candidatesData } from "../../../assets/data/dummyCandidateDetails";
 import defaultPicture from '/default-img-instagram.png'
 import { getCandidates } from "../../../services/commonServices";
 import { useNavigate } from "react-router-dom";

@@ -3,6 +3,11 @@ import { unsaveJob } from '../../services/candidateServices'
 import { isDateExpired } from '../../services/util/checkExpiry'
 import getDaysLeftFromToday from '../../services/util/getDays'
 import defaultProfile from '/default-img-instagram.png'
+import {Document, Page, pdfjs} from 'react-pdf'
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min?url'
+import { Link } from 'react-router-dom'
+
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
 
 export default function JobVerticalCard({jobData} : any){
     console.log('job data fetched from the backend', jobData)
@@ -12,7 +17,7 @@ export default function JobVerticalCard({jobData} : any){
 
         if(result?.success){
             Swal.fire({
-                icon:'error',
+                icon:'success',
                 title:'Unsaved',
                 showCancelButton:false,
                 showConfirmButton:false,
@@ -30,6 +35,8 @@ export default function JobVerticalCard({jobData} : any){
     }
 
     return(
+        <>
+        <Link to={`/jobs/${jobData?.jobDetails?._id}`}>
         <div className="p-2 flex justify-between items-center border-b border-gray-300">
             <div className="job flex gap-4">
                 <div className='logo'>
@@ -44,11 +51,11 @@ export default function JobVerticalCard({jobData} : any){
                         
                         {
                             
-                            isDateExpired(jobData?.jobDetails?.expiresAt) ?
-                                <>
-                                <i className="fa-solid fa-circle-xmark"></i> 
-                                <span className='text-xs text-red-500 ms-2'>Expired</span>
-                                </>
+                            jobData?.jobDetails?.expiresAt < new Date() 
+                                ? <>
+                                   <i className="fa-solid fa-circle-xmark"></i> 
+                                   <span className='text-xs text-red-500 ms-2'>Expired</span>
+                                 </>
                                 : <span className='text-xs text-green-500'>{getDaysLeftFromToday(jobData?.jobDetails?.expiresAt)} Days left</span>
                             
                         }
@@ -61,6 +68,12 @@ export default function JobVerticalCard({jobData} : any){
             <div className="actions">
                 <i className="fa-solid fa-bookmark !text-black" onClick={() => jobUnsave(jobData?.jobId, jobData?._id)}></i>
             </div>
+            <p>Pdf viewer</p>
+            
         </div>
+        </Link>
+        
+        </>
+        
     )
 }

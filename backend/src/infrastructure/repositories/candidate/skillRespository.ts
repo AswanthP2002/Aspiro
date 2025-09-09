@@ -1,16 +1,15 @@
 import Skills from "../../../domain/entities/candidate/skills";
 import ISkillRepo from "../../../domain/interfaces/candidate/ISkillRepo";
-import { connectDb } from "../../database/connection";
 import mongoose, { mongo } from "mongoose";
 import BaseRepository from "../baseRepository";
 import { Db } from "mongodb";
+import { SkillDAO } from "../../database/DAOs/candidate/skill.dao";
 
 export default class SkillRepsitory extends BaseRepository<Skills> implements ISkillRepo {
-    private _collection : string
-    constructor(db : Db){
-        super(db, 'skill')
-        this._collection = 'skill'
+    constructor(){
+        super(SkillDAO)
     }
+    
     // async saveSkill(skill: Skills): Promise<boolean> {
     //     const db = await connectDb()
     //     const result = await db.collection<Skills>(this._collection).insertOne(skill)

@@ -1,10 +1,9 @@
 import mongoose, { ObjectId } from "mongoose"
-const {ObjectId} = mongoose.Types
 
 export default interface Skills {
-    _id? : mongoose.Types.ObjectId
+    _id? : string
     type : string
     skill : string
     level : string
-    candidateId? : mongoose.Types.ObjectId
+    candidateId? : string
 }

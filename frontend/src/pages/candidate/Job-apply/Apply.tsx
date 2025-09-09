@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
-import { candidateService } from "../../../services/commonServices"
-import { useSelector } from "react-redux"
 import { addCandidateResume, candidateApplyJob } from "../../../services/candidateServices"
 
 export default function JobApplyPage() {
@@ -16,15 +14,12 @@ export default function JobApplyPage() {
     const [coverLetterContentNillError, setResumeCoverLetterContentNillError] = useState('')
     const resumeFieldRef : any = useRef(null)
 
-    const token = useSelector((state : any) => {
-        return state.candidateAuth.token
-    })
-
     const params : any = useParams()
 
     const jobId = params.id
 
     const location = useLocation()
+    const navigatTo = useNavigate()
     console.log('job details through location obj', location.state.jobDetails)
 
     function selectResume(event : any){
@@ -67,29 +62,32 @@ export default function JobApplyPage() {
         }else{
             const formData = new FormData()
             formData.append('resume', resume)
-            //formData.append('coverLetterContent', coverLetterContent)
+            
                 if(resume){
-                    //if resume uploaded through that input, upload that resume first then return it reference send along with the jobApplication as resume
-                    //alert('going to add reusme first')
+        
                     const result = await addCandidateResume(formData)
-                    //alert(`Resume added, this is resumeid ${result?.resumeId}`)
-                    //console.log('This is the result after uploaidng resume', result)
-                    //console.log('safe to set resume id to the state', result.resumeId)
-                    //setSavedResumeId(result?.resumeId)
-                    await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, result?.resumeId)
 
-                }
-
-                // await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, resume)
-
-                //if (result?.success) {
-                    Swal.fire({
+                    if(result?.success){
+                        await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, result?.resumeId)
+                        Swal.fire({
                         icon: 'success',
                         title: 'Applied',
                         showCancelButton:false,
                         showConfirmButton:false,
+                        allowOutsideClick:false,
                         timer:1300
-                    }).then(() => window.location.reload())
+                    }).then(() => {navigatTo('/profile/my-applications')})
+                    }else{
+                        Swal.fire({
+                            icon:'warning',
+                            title:'Sorry',
+                            text:result?.message
+                        })
+                    }
+
+                }
+
+                    
         }
     }
 

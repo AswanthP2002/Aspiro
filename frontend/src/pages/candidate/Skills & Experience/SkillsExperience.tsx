@@ -1,17 +1,13 @@
-import { Box, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import state from "sweetalert/typings/modules/state";
-import useRefreshToken from "../../../hooks/refreshToken";
 import AddExperienceForm from "../../../components/candidate/Forms/ExperienceAdd";
 import Swal from "sweetalert2";
 import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEdit";
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
-import { candidateService } from "../../../services/commonServices";
-import { candidateLogout } from "../../../hooks/Logouts";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
 import { deleteCandidateEducation, deleteCandidateExperience, deleteCandidateSkills, getCandidateEducation, getCandidateExperience, getCandidateSkills } from "../../../services/candidateServices";
+import { transformDate } from "../../../services/util/formatDate";
 
 export default function ExperiencePage(){
 
@@ -62,66 +58,36 @@ export default function ExperiencePage(){
     }
 
     async function deleteExperience(expId : string) {
-        
-       // try {
-            // let response = await candidateService.deleteExperience(token, expId)
-            // if (response.status === 401) {
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.deleteExperience(newAccessToken, expId)
-            // }
+            Swal.fire({
+                icon:'warning',
+                title:'Confirm Delete?',
+                text:'Are you sure to delete this experience',
+                showConfirmButton:true,
+                showCancelButton:true,
+                confirmButtonText:'Delete'
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    await deleteCandidateExperience(expId)
 
-            // if (response.status === 403) {
-            //     Swal.fire({
-            //         icon: 'warning',
-            //         title: 'Blocked',
-            //         text: 'Your account has been blocked by the admin. You will logout shortly..',
-            //         showConfirmButton: false,
-            //         showCancelButton: false,
-            //         allowOutsideClick: false,
-            //         timer: 4000
-            //     }).then(() => candidateLogout(token))
-            // }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => window.location.reload())
+                }else{
+                    return
+                }
+            })
+            
 
-            await deleteCandidateExperience(expId)
-
-            //if (result.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted',
-                    showCancelButton: false,
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => window.location.reload())
-            // } else {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         text: result.message
-            //     })
-            // }
-        //} catch (error : unknown) {
-            // console.log('Error occured while removing experience', error)
-            //     if(error instanceof Error){
-            //         Swal.fire({
-            //         icon:'error',
-            //         title:'Error',
-            //         text:error.message
-            //     })
-            // }
-        //}
     }
 
     async function deleteSkill(skillId : string) {
-        //try {
-            // let response = await candidateService.deleteSkil(token, skillId)
-
-            // if(response.status === 401){
-            //     const newAccesstoken = await candidateService.refreshToken()
-            //     response = await candidateService.deleteSkil(newAccesstoken, skillId)
-            // }
 
             await deleteCandidateSkills(skillId)
 
-            //if(result.success){
                 Swal.fire({
                     icon:'success',
                     title:'Deleted',
@@ -129,79 +95,38 @@ export default function ExperiencePage(){
                     showCancelButton:false,
                     timer:1500
                 }).then(() => window.location.reload())
-            //}
-        //} catch (error : unknown) {
-            // if(error instanceof Error){
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:'Error',
-            //         text:error?.message
-            //     })
-            // }
-        //}
     }
 
     async function deleteEducation(educationId : string) {
-        //try {
-            // let response = await candidateService.deleteEducation(token, educationId)
+            Swal.fire({
+                icon:'warning',
+                title:'Confirm Delete',
+                text:'Are you sure to delete this education?',
+                showCancelButton:true,
+                showConfirmButton:true,
+                confirmButtonText:'Delete'
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    await deleteCandidateEducation(educationId)
 
-            // if(response.status === 401){
-            //     const newAccessToken = await candidateService.refreshToken()
-            //     response = await candidateService.deleteEducation(newAccessToken, educationId)
-            // }
+                    Swal.fire({
+                        icon:'success',
+                        title:'Deleted',
+                        showConfirmButton:false,
+                        showCancelButton:false,
+                        timer:1500
+                    }).then(() => window.location.reload())
+                }else{
+                    return
+                }
+            })
 
-            await deleteCandidateEducation(educationId)
+            
 
-            // if(result?.success){
-                Swal.fire({
-                    icon:'success',
-                    title:'Deleted',
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:1500
-                }).then(() => window.location.reload())
-            // }else{
-            //     Swal.fire({
-            //         icon:'error',
-            //         title:'Oops!',
-            //         text:result?.message
-            //     })
-            // }
-        // } catch (error : unknown) {
-        //     if(error instanceof Error){
-        //         console.log('Error occured while deleting the education client side::', error)
-        //         Swal.fire({
-        //             icon:'error',
-        //             title:'Error',
-        //             text:error?.message
-        //         })
-        //     }
-        // }
     }
 
     useEffect(() => {
         async function fetchExperiences(){
-           
-        //    try {
-        //     let experiencePromise = await candidateService.getExperiences(token)
-        //     let skillsPromise = await candidateService.getSkills(token)
-        //     let educationPromise = await candidateService.getEducations(token)
-        //     if(experiencePromise.status === 401){
-        //         const newAccesstoken = await candidateService.refreshToken()
-        //         experiencePromise = await candidateService.getExperiences(newAccesstoken)
-        //     }
-
-        //     if(skillsPromise.status === 401){
-        //         const newAccessToken = await candidateService.refreshToken()
-        //         skillsPromise = await candidateService.getSkills(newAccessToken)
-        //     }
-
-        //     if(educationPromise.status === 401){
-        //         const newAccessToken = await candidateService.refreshToken()
-        //         educationPromise = await candidateService.getEducations(newAccessToken)
-        //     }
-
-        //     const [experienceResponse, skillsResponse, educationResponse] = await Promise.all([experiencePromise, skillsPromise, educationPromise])
             
             const experienceResult = await getCandidateExperience()
             const skillResult = await getCandidateSkills()
@@ -222,16 +147,6 @@ export default function ExperiencePage(){
                     text:'Something went wrong'
                 })
             }
-        //    } catch (error : unknown) {
-        //         console.log('Error occured while geting experiencd', error)
-        //         if(error instanceof Error){
-        //             Swal.fire({
-        //             icon:'error',
-        //             title:'Error',
-        //             text:error?.message
-        //         })
-        //         }
-        //    }
         }
 
         fetchExperiences()
@@ -346,8 +261,8 @@ export default function ExperiencePage(){
                                                                     <p className="mt-3 text-gray-400 text-xs">{ed?.level} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{ed?.organization}</span></p>
                                                                 </div>
                                                             </td>
-                                                            <td className="text-sm">{ed?.startYear}</td>
-                                                            <td className="text-sm">{ed?.endYear ? ed?.endYear : "Studying"}</td>
+                                                            <td className="text-sm">{formatDate(ed?.startYear)}</td>
+                                                            <td className="text-sm">{ed?.endYear ? formatDate(ed?.endYear) : "Studying"}</td>
                                                             <td className="flex justify-end">
                                                                 <button className="btn text-xs border p-2 me-3" onClick={() => selecteEditableEducation(index)}>Edit <i className="fa-solid fa-pencil !text-xs"></i></button>
                                                                 <button className="btn text-xs border p-2" onClick={() => deleteEducation(ed?._id)}>Remove <i className="fa-solid fa-trash !text-xs"></i></button>

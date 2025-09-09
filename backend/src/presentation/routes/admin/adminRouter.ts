@@ -24,14 +24,14 @@ import { Db } from "mongodb"
 
 const express = require('express')
 
-async function createAdminRouter(db : Db){
+async function createAdminRouter(){
 
 
 const adminRouter = express.Router()
 
-const candidateRepo = new CandidateRepository(db)
-const recruiterRepo = new RecruiterRespository(db)
-const jobRepo = new JobRepository(db)
+const candidateRepo = new CandidateRepository()
+const recruiterRepo = new RecruiterRespository()
+const jobRepo = new JobRepository()
 
 const adminLoginUC = new AdminLoginUseCase(candidateRepo)
 const loadCandidatesUC = new LoadCandidatesUseCase(candidateRepo)
