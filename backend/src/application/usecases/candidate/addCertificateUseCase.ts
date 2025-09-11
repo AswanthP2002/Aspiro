@@ -1,8 +1,5 @@
-import mongoose from "mongoose";
-import Certificates from "../../../domain/entities/candidate/certificates";
+
 import ICertificateRepo from "../../../domain/interfaces/candidate/ICertificateRepo";
-import createCertificatefromDTO from "../../../domain/mappers/candidate/certificateMapper";
-import { CertificateSchema } from "../../../presentation/controllers/dtos/candidate/certificateDTO";
 import streamifier from 'streamifier'
 import cloudinary from "../../../utilities/cloudinary";
 import { v4 } from "uuid";

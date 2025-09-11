@@ -4,10 +4,16 @@ import ICertificateRepo from "../../../domain/interfaces/candidate/ICertificateR
 import BaseRepository from "../baseRepository";
 import { Db } from "mongodb";
 import { CertificateDAO } from "../../database/DAOs/candidate/certificate.dao";
+import { jasmine } from "globals";
 
 export default class CertificateRepository extends BaseRepository<Certificates> implements ICertificateRepo {
     constructor(){
         super(CertificateDAO)
+    }
+
+    async findWithCandidateId(id : string) : Promise<Certificates[] | null> {
+        const result = await CertificateDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result
     }
     // private _collection : string
     // constructor(db : Db){

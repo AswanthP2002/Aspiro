@@ -1,3 +1,5 @@
+import Follow from "../Follow"
+import Post from "../Post"
 import SocialLinks from "../socialLinks"
 import Certificates from "./certificates"
 import Education from "./educations"
@@ -43,6 +45,9 @@ export default interface CandidateAggregated {
   googleid : string
   facebookid : string
   skills : Skills[]
+  posts : Post[]
+  followers : Follow[]
+  following : Follow[]
 }
 
 // {

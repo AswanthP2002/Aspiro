@@ -43,4 +43,9 @@ export default class ExperienceRepository extends BaseRepository<Experience> imp
         return result
         
     }
+
+    async findWithCandidateId(id: string): Promise<Experience[] | null> {
+        const result = await experienceDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result
+    }
 }

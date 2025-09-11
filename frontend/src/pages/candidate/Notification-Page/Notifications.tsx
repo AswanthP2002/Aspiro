@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { getNotifications, updateNOtificationReadStatus } from "../../../services/candidateServices"
+import { formatRelativeTime } from "../../../services/util/formatDate"
 
 export default function NotificationPage() {
     const [notifications, setNotifications] = useState<any[]>([])
@@ -29,7 +30,7 @@ export default function NotificationPage() {
                                     <div className="flex gap-2">
                                         <i className="fa-solid fa-bell"></i>
                                         {notification.isRead === false && (<span className="bg-red-500 rounded-full absolute w-[7px] h-[7px]"></span>)}
-                                        <p className="text-xs text-gray-500">{notification?.createdAt}</p>
+                                        <p className="text-xs text-gray-500">{formatRelativeTime(notification?.createdAt)}</p>
                                     </div>
                                     <div className="mt-2">
                                         <p className="text-sm font-semibold">{notification?.title}</p>

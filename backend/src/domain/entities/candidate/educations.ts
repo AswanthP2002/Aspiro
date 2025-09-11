@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+
 
 export default interface Education {
     _id? : string

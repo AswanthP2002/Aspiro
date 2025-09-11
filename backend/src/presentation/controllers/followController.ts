@@ -5,13 +5,15 @@ import IGetFollowingUseCase from "../../application/usecases/interfaces/IGetFoll
 import IUnFollowUserUsercase from "../../application/usecases/interfaces/IUnFollowUserUseCase";
 import { Auth } from "../../middlewares/auth";
 import { StatusCodes } from "../statusCodes";
+import ICreateNotification from "../../application/usecases/common/interface/ICreateNotificationUseCase";
 
 export default class FollowController {
     constructor(
         private _followUseCase : IFollowUserUseCase,
         private _unfollowUseCase : IUnFollowUserUsercase,
         private _getFollowers : IGetFollowersUseCase,
-        private _getFollowing : IGetFollowingUseCase
+        private _getFollowing : IGetFollowingUseCase,
+        private _createNotification : ICreateNotification
     ) {}
 
     async followUser(req : Auth, res : Response) : Promise<void> {
@@ -19,11 +21,12 @@ export default class FollowController {
         const followingId = req.params.id
         const type = req.body
         try {
-            const result = await this._followUseCase.execute({follower:followerId, following:followingId, type})
+            const result = await this._followUseCase.execute({follower:followerId, following:followingId, type:req.body.userType})
+            const notification = await this._createNotification.execute({title:'Follower', description:`User ${followerId} started following you`, senderId:followerId, receiverId:followingId, type:'candidate'})
             res.status(StatusCodes.OK).json({success:true, message:'Followed', result})
             return
         } catch (error : unknown) {
-            console.log('error occured while follwoing the user')
+            console.log('error occured while follwoing the user', error)
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
             return
         }

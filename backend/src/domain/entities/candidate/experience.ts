@@ -1,5 +1,3 @@
-import mongoose from "mongoose"
-
 
 export default interface Experience {
     _id? : string
