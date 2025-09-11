@@ -9,7 +9,10 @@ export default class SkillRepsitory extends BaseRepository<Skills> implements IS
     constructor(){
         super(SkillDAO)
     }
-    
+    async findWithCandidateId(id: string): Promise<Skills[] | null> {
+        const result = await SkillDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result
+    }
     // async saveSkill(skill: Skills): Promise<boolean> {
     //     const db = await connectDb()
     //     const result = await db.collection<Skills>(this._collection).insertOne(skill)

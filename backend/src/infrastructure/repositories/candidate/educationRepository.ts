@@ -32,6 +32,11 @@ export default class EducationRepository extends BaseRepository<Education> imple
     //     return result.acknowledged
     // }
 
+    async findWithCandidateId(id: string): Promise<Education[] | null> {
+        const result = await EducationDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result
+    }
+
     async editEducation(updateEducation: Education): Promise<Education | null> {
         console.log('update education id in the repository', updateEducation._id)
         const result = await EducationDAO.findOneAndUpdate(

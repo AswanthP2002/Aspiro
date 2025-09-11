@@ -182,6 +182,24 @@ export default class CandidateRepository extends BaseRepository<Candidate> imple
                 foreignField:'candidateId',
                 localField:'_id',
                 as:'education'
+            }},
+            {$lookup:{
+                from:'posts',
+                foreignField:'creatorId',
+                localField:'_id',
+                as:'posts'
+            }},
+            {$lookup:{
+                from:'follows',
+                foreignField:'following',
+                localField:'_id',
+                as:'followers'
+            }},
+            {$lookup:{
+                from:'follows',
+                foreignField:'follower',
+                localField:'_id',
+                as:'following'
             }}
         ])
 

@@ -46,100 +46,106 @@ import MyApplications from './pages/candidate/My-applications/Applications'
 import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication'
 import NotificationPage from './pages/candidate/Notification-Page/Notifications'
 import Feed from './pages/common/Feed/Feed'
+import SidebarLayout from './pages/common/SidebarLayout'
+import Chat from './pages/common/Chat/Chat'
 
 function App() {
   return(
     <BrowserRouter>
       <Routes>
-    <Route path="/" element={<Layouts />}>
-      <Route index element={<Home />} />
-      <Route path='candidates'>
-        <Route index element={<CandidatesList />} />
-        <Route path=':id' element={<CandidatePublicProfile />} />
-      </Route>
-      {/* <Route path='candidates/:id' element={<CandidatePublicProfile />} /> */}
-      <Route path='jobs'>
-          <Route index element={<JobListing />} />
-          <Route path=':id' element={<JObDetailsCandidateSide />} />
-          <Route path=':id/apply' element={<CandidateProtectedRoute />}>
-            <Route index element={<JobApplyPage />} />
+        <Route path="/" element={<Layouts />}>
+          <Route index element={<Home />} />
+          <Route path='candidates'>
+            <Route index element={<CandidatesList />} />
+            <Route path=':id' element={<CandidatePublicProfile />} />
           </Route>
-          {/* <Route path=':id/apply' element={<JobApplyPage />} /> */}
-      </Route>
-      
+          {/* <Route path='candidates/:id' element={<CandidatePublicProfile />} /> */}
+          <Route path='jobs'>
+            <Route index element={<JobListing />} />
+            <Route path=':id' element={<JObDetailsCandidateSide />} />
+            <Route path=':id/apply' element={<CandidateProtectedRoute />}>
+              <Route index element={<JobApplyPage />} />
+            </Route>
+            {/* <Route path=':id/apply' element={<JobApplyPage />} /> */}
+          </Route>
 
-      <Route path="profile" element={<CandidateProtectedRoute />}>
-        <Route element={<ProfileLayout />}>
-          <Route path='personal' index element={<ProfilePersonal />} />
-          <Route path='experience' element={<ExperiencePage />} />
-          <Route path='documents' element={<DocumentsPage />} />
-          <Route path='favorites' element={<SavedJobs />} />
-          <Route path='my-applications' element={<MyApplications />} />
-          <Route path='notifications' element={<NotificationPage />} />
-        </Route>
-        {/* <Route path="personal" index element={<ProfilePersonal />} />
+
+          <Route path="profile" element={<CandidateProtectedRoute />}>
+            <Route element={<ProfileLayout />}>
+              <Route path='personal' index element={<ProfilePersonal />} />
+              <Route path='experience' element={<ExperiencePage />} />
+              <Route path='documents' element={<DocumentsPage />} />
+              <Route path='favorites' element={<SavedJobs />} />
+              <Route path='my-applications' element={<MyApplications />} />
+              <Route path='notifications' element={<NotificationPage />} />
+            </Route>
+            {/* <Route path="personal" index element={<ProfilePersonal />} />
         <Route path='experience' element={<ExperiencePage />} />
         <Route path='documents' element={<DocumentsPage />} />
         <Route path='favorites' element={<SavedJobs />} /> */}
-      </Route>
-      <Route element={<CandidateProtectedRoute />}>
-          <Route path='feed' element={<Feed />} />
-      </Route>
-    </Route>
-
-    <Route path='/recruiter' element={<RecruiterLayouts />}>
-      <Route index element={<RecruiterHome />} />
-
-      <Route element={<RecruiterProtectedRoutes />}>
-        <Route path='profile' element={<RecruiterProfileLayout />}>
-          <Route path='overview' index element={<RecruiterProfilePersonal />} />
-          <Route path='post-a-job' element={<PostAJobForm />} />
-          <Route path='applications/:jobId' element={<ApplicantManagePage />} />
-          <Route path='application/details/:applicationId' element={<ViewApplicationDetailsPage />} />
-          <Route path='applications/:jobId/finalized' element={<FinalizedList />} />
+          </Route>
+          <Route element={<CandidateProtectedRoute />}>
+            <Route path='feed' element={<Feed />} />
+          </Route>
         </Route>
-      </Route>
-    </Route>
 
-    <Route path='/admin' element={<AdminLayout />}>
-      <Route element={<AdminProtectedRoutes />}>
-        <Route path='dashboard' element={<Dashboard />} />
-        <Route path='companies' element={<Companies /> } />
-        <Route path='candidates' element={<Candidates />} />
-        <Route path='jobs' element={<Jobs />} /> 
-        <Route path='candidate/details/:id' element={<CandidateDetails />} />
-        <Route path='company/details/:id' element={<CompanyDetails />} />
-        <Route path='job/details/:id' element={<JobDetails />} />
-      </Route> 
-    </Route>
+        <Route path='/recruiter' element={<RecruiterLayouts />}>
+          <Route index element={<RecruiterHome />} />
 
-    <Route path="/register" element={<CandidateRegister />} />
-    <Route path="/login" element={<CandidateLogin />} />
+          <Route element={<RecruiterProtectedRoutes />}>
+            <Route path='profile' element={<RecruiterProfileLayout />}>
+              <Route path='overview' index element={<RecruiterProfilePersonal />} />
+              <Route path='post-a-job' element={<PostAJobForm />} />
+              <Route path='applications/:jobId' element={<ApplicantManagePage />} />
+              <Route path='application/details/:applicationId' element={<ViewApplicationDetailsPage />} />
+              <Route path='applications/:jobId/finalized' element={<FinalizedList />} />
+            </Route>
+          </Route>
+        </Route>
 
-    <Route path='/admin/login' element={<AdminLogedIn />}>
-      <Route index element={<LoginPage />} />
-    </Route>
-    {/* <Route path="/admin/login" element={<LoginPage />} /> */}
+        <Route path='/admin' element={<AdminLayout />}>
+          <Route element={<AdminProtectedRoutes />}>
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='companies' element={<Companies />} />
+            <Route path='candidates' element={<Candidates />} />
+            <Route path='jobs' element={<Jobs />} />
+            <Route path='candidate/details/:id' element={<CandidateDetails />} />
+            <Route path='company/details/:id' element={<CompanyDetails />} />
+            <Route path='job/details/:id' element={<JobDetails />} />
+          </Route>
+        </Route>
 
-    <Route path="/verify" element={<VerificationPage />} />
-    <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
-    <Route path='/store/details' element={<StoreDetails />} />
-    <Route path='/auth-success' element={<AuthSuccess />} />
+        <Route path="/register" element={<CandidateRegister />} />
+        <Route path="/login" element={<CandidateLogin />} />
 
-    {/* <Route path='/recruiter/login' element={<RecruiterLogin />} /> */}
-    <Route path='/recruiter/login' element={<RecruiterLogedInRoutes />}>
-      <Route index element={<RecruiterLogin />} />
-    </Route>
-    <Route path='/recruiter/register' element={<RecruiterRegister />} />
-    <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
-    
-    {/* <Route element={<RecruiterProtectedRoutes />}>
+        <Route path='/admin/login' element={<AdminLogedIn />}>
+          <Route index element={<LoginPage />} />
+        </Route>
+        {/* <Route path="/admin/login" element={<LoginPage />} /> */}
+
+        <Route path="/verify" element={<VerificationPage />} />
+        <Route path='/verify/recruiter/:email' element={<RecruiterVerificationPage />} />
+        <Route path='/store/details' element={<StoreDetails />} />
+        <Route path='/auth-success' element={<AuthSuccess />} />
+
+        {/* <Route path='/recruiter/login' element={<RecruiterLogin />} /> */}
+        <Route path='/recruiter/login' element={<RecruiterLogedInRoutes />}>
+          <Route index element={<RecruiterLogin />} />
+        </Route>
+        <Route path='/recruiter/register' element={<RecruiterRegister />} />
+        <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
+
+        {/* <Route element={<RecruiterProtectedRoutes />}>
       <Route path='/recruiter/profile/overview' element={<RecruiterProfilePersonal />} />
     </Route> */}
-    
-    {/* Testing routes */}
-    <Route path='/test' element={<Feed />} />
-  </Routes>
+
+        {/* Testing routes */}
+        <Route path='/test' element={<SidebarLayout />}>
+          <Route index element={<Feed />} />
+        </Route>
+
+        <Route path='/chat' element={<Chat />} />
+      </Routes>
     </BrowserRouter>
   )
 }

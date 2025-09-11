@@ -4,6 +4,8 @@ import Experience from "../../../domain/entities/candidate/experience"
 import FavoriteJobs from "../../../domain/entities/candidate/favoriteJobs"
 import Resume from "../../../domain/entities/candidate/resume"
 import Skills from "../../../domain/entities/candidate/skills"
+import Follow from "../../../domain/entities/Follow"
+import Post from "../../../domain/entities/Post"
 import SocialLinks from "../../../domain/entities/socialLinks"
 
 export default interface CandidateAggregatedDTO {
@@ -43,4 +45,7 @@ export default interface CandidateAggregatedDTO {
     googleid: string
     facebookid: string
     skills: Skills[]
+    posts : Post[]
+    followers : Follow[]
+    following : Follow[]
 }

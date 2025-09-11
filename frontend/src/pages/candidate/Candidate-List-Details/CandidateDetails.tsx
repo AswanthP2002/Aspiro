@@ -3,22 +3,83 @@ import defaultCoverPhoto from '/default-cover-photo.jpg'
 import { useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { getCandidateDetails } from '../../../services/commonServices'
-import formatDate from '../../../services/util/formatDate'
+import formatDate, { transformDate } from '../../../services/util/formatDate'
+import { followUser, unfollowUser } from '../../../services/candidateServices'
+import { Notify } from 'notiflix'
+import { useSelector } from 'react-redux'
+import Swal from 'sweetalert2'
+import GeneralModal from '../../../components/common/Modal'
+import ChatApp from '../../common/Chat/Chat'
 
 export default function CandidatePublicProfile() {
     const location = useLocation()
     const { candidateId } = location.state || {}
     const [candidateDetails, setCandidateDetails] = useState<any>({})
 
+    const [openModal, setOpenModal] = useState(false)
+
+    const modalOpen = () => setOpenModal(true)
+    const modalClose = () => setOpenModal(false)
+    
+
+    const logedUser = useSelector((state : any) => {
+        return state?.candidateAuth.user
+    })
+
+    const parsedLogedUser = JSON.parse(logedUser)
+
+    const userFollow = async (userId : string) => {
+        const result = await followUser(userId)
+        if(result?.success){
+            Notify.success('followed', {timeout:1000})
+            setTimeout(() => window.location.reload(), 1000)
+        }else{
+            Notify.failure('Something went wrong', {timeout:1200})
+        }
+    }
+
+    const userUnfollow = async (userId : string) => {
+        Swal.fire({
+            icon:'warning',
+            title:'Unfollow?',
+            text:'Do you want to unfollow this user?',
+            showConfirmButton:true,
+            confirmButtonText:'Unfollow',
+            showCancelButton:true
+        }).then(async (result) => {
+            if(result?.isConfirmed){
+                const unfollowResult = await unfollowUser(userId)
+                if(unfollowResult?.success){
+                    Notify.success('Unfollowed', {timeout:1000})
+                    setTimeout(() => window.location.reload(), 1000)
+                }else{
+                    Notify.failure('Something went wrong', {timeout:1000})
+                }
+            }
+            return
+        })
+    }
+
+    console.log('This is lloged user id', parsedLogedUser?.id, typeof logedUser)
+    console.log('thi is  followers list ', candidateDetails?.followers)
     useEffect(() => {
         (async function () {
             const result = await getCandidateDetails(candidateId)
             console.log('Candidate details from the backend', result)
             setCandidateDetails(result?.candidateDetails)
         })()
-    })
+    }, [])
+
+    const isFollowing = (userId : string) => {
+        const userFollowing = candidateDetails?.followers?.find((data : any) => {
+            return data?.follower === userId
+        })
+
+        return Object.entries(userFollowing || []).length > 0
+    }
 
     return (
+        <>
         <div className="candidate-details-container w-full">
             <div className="breadcrumbs-header bg-gray-100 w-full">
                 <div className="aspiro-container">
@@ -49,8 +110,12 @@ export default function CandidatePublicProfile() {
                                     </div>
                                 </div>
                                 <div className="actions flex gap-5">
-                                    <button><i className="fa-solid fa-user-plus !text-2xl"></i></button>
-                                    <button><i className="fa-solid fa-message !text-2xl"></i></button>
+                                    {
+                                        isFollowing(parsedLogedUser?.id)
+                                            ? <button onClick={() => userUnfollow(candidateDetails?._id)} className='bg-blue-500 text-white text-sm !px-5 rounded'>Following</button>
+                                            : <button onClick={() => userFollow(candidateDetails?._id)} className='bg-blue-500 text-white text-sm !px-5 rounded'>Follow</button>
+                                    }
+                                    <button onClick={modalOpen}><i className="fa-solid fa-message !text-2xl"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -63,25 +128,25 @@ export default function CandidatePublicProfile() {
                                     {candidateDetails?.about}
                                 </p>
                             </div>
-                            <div className='border border-blue-300 rounded p-4'>
+                            <div className='border border-gray-300 rounded-md p-4'>
                                 <div className="w-full flex justify-between">
                                     
                                     <div>
-                                        <p className="font-semibold text-sm mt-3">0</p>
+                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.followers?.length}</p>
                                         <p className="text-xs text-gray-500 mt-1">Followers</p>
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-sm mt-3">0</p>
+                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.following?.length}</p>
                                         <p className="text-xs text-gray-500 mt-1">Following</p>
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-sm mt-3">0</p>
+                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.posts?.length}</p>
                                         <p className="text-xs text-gray-500 mt-1">Posts</p>
                                     </div>
                                     <div>
                                         <i className="fa-solid fa-timeline !text-2xl"></i>
                                         <p className='font-semibold text-sm mt-3'>Joined</p>
-                                        <p className='text-xs text-gray-500 mt-1'>{formatDate(candidateDetails?.createdAt)}</p>
+                                        <p className='text-xs text-gray-500 mt-1'>{transformDate(candidateDetails?.createdAt)}</p>
                                     </div>
                                     <div>
                                         <i className="fa-solid fa-location-dot !text-2xl"></i>
@@ -224,5 +289,12 @@ export default function CandidatePublicProfile() {
                 </div>
             </div>
         </div>
+        <GeneralModal
+            openModal={openModal}
+            children={<ChatApp />}
+            closeModal={modalClose}
+            size='medium'
+        />
+        </>
     )
 }

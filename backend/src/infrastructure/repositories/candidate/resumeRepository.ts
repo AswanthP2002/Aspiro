@@ -9,6 +9,10 @@ export default class ResumeRepository extends BaseRepository<Resume> implements 
     constructor(){
         super(ResumeDAO)
     }
+    async findWithCandidateId(id: string): Promise<Resume[] | null> {
+        const result = await ResumeDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result
+    }
     // private _collection
     // constructor(db : Db){
     //     super(db, 'resume')

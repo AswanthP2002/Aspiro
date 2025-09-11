@@ -8,4 +8,5 @@ export default interface IExperienceRepo extends IBaseRepo<Experience> {
     //getExperiences(candidateIdd : string) : Promise<Experience[]>
     //deleteExperience(experienceId : string) : Promise<boolean>
     editExperience(experienceId : string, experience : any) : Promise<Experience | null>
+    findWithCandidateId(id : string) : Promise<Experience[] | null>
 }

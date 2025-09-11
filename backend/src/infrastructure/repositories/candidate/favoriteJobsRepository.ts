@@ -41,4 +41,9 @@ export default class FavoriteJobsRepsitory extends BaseRepository<FavoriteJobs> 
        const result = await FavoriteJobsDAO.deleteOne({candidateId:new mongoose.Types.ObjectId(candidateId), jobId:new mongoose.Types.ObjectId(jobId)})
        console.log('result object', result)
     }
+    
+    async findWithCandidateId(id: string): Promise<FavoriteJobs[] | null> {
+        const result = await FavoriteJobsDAO.find({candidateId:new mongoose.Types.ObjectId(id)})
+        return result   
+    }
 }

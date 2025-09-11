@@ -6,4 +6,5 @@ export default interface IEducationRepo extends IBaseRepo<Education> {
     //getEducations(candidateID : string) : Promise<Education[]>
     //deleteEducation(educationId : string) : Promise<boolean>
     editEducation(updateEducation : Education) : Promise<Education | null>
+    findWithCandidateId(id : string) : Promise<Education[] | null>
 }

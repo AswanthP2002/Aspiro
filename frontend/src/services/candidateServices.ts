@@ -762,6 +762,8 @@ export const createPost = async (formdata : any) => {
     }
 }
 
+
+
 export const getPosts = async () => {
     try {
         const response = await axiosInstance.get('/post', {
@@ -773,3 +775,84 @@ export const getPosts = async () => {
         console.log(error)
     }
 }
+
+export const likePost = async (postId : string, creatorId : string) => {
+    try {
+        const response = await axiosInstance.patch(`post/like/${postId}/user/${creatorId}`, {},
+            {sendAuthTokenCandidate:true} as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        console.log('Error occured while liking the post')
+    }
+}
+
+export const unlikePost = async (postId : string) => {
+    try {
+        const response = await axiosInstance.patch(`/post/unlike/${postId}`, {},
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+    }
+}
+
+export const followUser = async (userId : string, userType : string = 'candidate') => {
+    try {
+        const response = await axiosInstance.post(`/follow/${userId}`, {userType},
+            {   
+                headers:{'Content-Type':'application/json'},
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+    }
+}
+
+
+export const unfollowUser = async (userId : string) => {
+    try {
+        const response = await axiosInstance.delete(`/follow/${userId}`, 
+            {
+                sendAuthTokenCandidate:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+    }
+}
+
+export const getUserPosts = async () => {
+    try {
+        const response = await axiosInstance.get('/post/user',
+            {sendAuthTokenCandidate:true} as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+    }
+}
+
+// export const sendMessage = (receiver : string, sender : string, message : string) => {
+//     try {
+//         const response = await axiosInstance.post()
+//     } catch (error) {
+        
+//     }
+// }

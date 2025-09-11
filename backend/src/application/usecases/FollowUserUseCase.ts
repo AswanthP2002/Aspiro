@@ -12,7 +12,7 @@ export default class FollowUseruseCse implements IFollowUserUseCase {
             throw new Error('Duplicate : You cant follow yourself')
         }
         const newFollow = mapToFollowFromDTO(followUserDto)
-        const result = await this._repo.follow(newFollow)
+        const result = await this._repo.create(newFollow)
 
         if(result){
             const dto = mapToFollowDTOFromFollow(result)

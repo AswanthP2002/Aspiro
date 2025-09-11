@@ -11,7 +11,7 @@ export default class PostRespository extends BaseRepository<Post> implements IPo
     async likePost(postId: string, userId: string): Promise<Post | null> {
         const result = await PostDAO.findOneAndUpdate(
             {_id:new mongoose.Types.ObjectId(postId)},
-            {$push:{likes:new mongoose.Types.ObjectId(userId)}},
+            {$addToSet:{likes:new mongoose.Types.ObjectId(userId)}},
             {returnDocument:'after'}
         )
 
@@ -43,6 +43,20 @@ export default class PostRespository extends BaseRepository<Post> implements IPo
 
     async getPostById(postId: string): Promise<Post | null> {
         const result = await PostDAO.findOne({_id:new mongoose.Types.ObjectId(postId)})
+        return result
+    }
+
+    async getPostByUserId(userId: string): Promise<any | null> {
+        const result = await PostDAO.aggregate([
+            {$match:{creatorId:new mongoose.Types.ObjectId(userId)}},
+            {$lookup:{
+                from:'candidates',
+                localField:'creatorId',
+                foreignField:'_id',
+                as:'creatorDetails'
+            }}
+        ])
+
         return result
     }
 }

@@ -8,12 +8,13 @@ import Loader from '../../../components/candidate/Loader'
 import { useNavigate } from 'react-router-dom'
 import { Box, Modal, Typography } from '@mui/material'
 import { logout } from '../../../redux-toolkit/candidateAuthSlice'
-import { addSocialmediaLinks, editCandidateProfile, getCandidateProfileData, removeSocialLink } from '../../../services/candidateServices'
+import { addSocialmediaLinks, editCandidateProfile, getCandidateProfileData, getUserPosts, removeSocialLink } from '../../../services/candidateServices'
 import SocialmediaLinks from '../../../components/candidate/SocialmediaLinksCard'
 import CropComponent from '../../../components/common/CropComponent'
 import GeneralModal from '../../../components/common/Modal'
 import EditProfilePictureComponent from '../../../components/candidate/EditProfilePhotoComponent'
 import EditCoverphotoComponent from '../../../components/candidate/EditCoverPhotoComponent'
+import Post from '../../../components/common/Post'
 
 interface Candidate {
     name : string
@@ -24,6 +25,7 @@ export default function ProfilePersonal(){
     const [candidate, setcandidate] = useState<any>({})
     const [loading, setloading] = useState(false)
     const [openprofileedit, setopenprofileedit] = useState(false)
+    const [userPosts, setUserPosts] = useState<any[]>([])
 
     const [openProfilePhotoModal, setOpenProfilePhotoModal] = useState(false)
     const openProfilePhoto = () => setOpenProfilePhotoModal(true)
@@ -136,6 +138,7 @@ export default function ProfilePersonal(){
 
            
                 const result = await getCandidateProfileData()
+                //const postResult = await getUserPosts()
 
                 if(result?.success){
                     //setTimeout(() => {
@@ -150,6 +153,7 @@ export default function ProfilePersonal(){
                             return
                         }
                         setcandidate(result?.userDetails)
+                        //setUserPosts(postResult?.result)
                         console.log('Result from the backend', result?.userDetails)
                         setloading(false)
                     //}, 2000)
@@ -312,6 +316,22 @@ export default function ProfilePersonal(){
                 </div>
                 <button onClick={() => setIsAddLinkButtonClicked(true)} type="button" className="mt-2 border border-gray-400 rounded bg-gray-300 w-full p-2 border-dark-gray-400 text-xs">Add Social links <span><i className="fa-solid fa-plus-circle"></i></span></button>
             </div>
+            <section id="posts" className='py-5 font-semibold'>
+                <p>Posts</p>
+                <div>
+                    {
+                        userPosts.length > 0
+                            ? <>
+                                {
+                                    userPosts?.map((post : any, index : number) => {
+                                        return <Post key={index} post={post} />
+                                    })
+                                }
+                             </>
+                             : <p className='text-gray-500 text-sm text-center mt-5'>No posts created</p>
+                    }
+                </div>
+            </section>
         </div> 
 
         {/* Prfile edit modal */}
@@ -367,13 +387,15 @@ export default function ProfilePersonal(){
         </Box>
       </Modal>
    
-            <GeneralModal 
+            <GeneralModal
+                size='medium'
                 openModal={openProfilePhotoModal} 
                 closeModal={closeProfilePhoto}
                 children={<EditProfilePictureComponent profilePicture={candidate?.profilePicture} />}
             />
 
-            <GeneralModal 
+            <GeneralModal
+            size='medium'
                 openModal={openCoverphotoModal}
                 closeModal={closeCoverphoto}
                 children={<EditCoverphotoComponent coverPhoto={candidate?.coverPhoto} />}

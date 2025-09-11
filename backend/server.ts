@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
+import {Server} from 'socket.io'
 import logger from './src/utilities/logger'
 //import candidateRouter from './src/presentation/routes/candidate/candidateRouter'
 import authRouter from './src/presentation/routes/candidate/authRouter'
@@ -16,6 +17,8 @@ import createRecruiterRouter from './src/presentation/routes/recruiter/recruiter
 import createAdminRouter from './src/presentation/routes/admin/adminRouter'
 import createFollowRouter from './src/presentation/routes/followRouter'
 import createPostRouter from './src/presentation/routes/postRouter'
+import chatSocket from './src/infrastructure/socketio/chatSocket'
+import createChatRouter from './src/presentation/routes/chatRouter'
 
 async function main(){
     const app = express()
@@ -42,6 +45,7 @@ async function main(){
     const adminRouter = await createAdminRouter()
     const followRouter = await createFollowRouter()
     const postRouter = await createPostRouter()
+    const chatRouter = await createChatRouter()
 
     const port = process.env.PORT || 5000
     app.use('/', (req : Request, res : Response, next : NextFunction) => {
@@ -54,6 +58,7 @@ async function main(){
     app.use('/', adminRouter)
     app.use('/', followRouter)
     app.use('/', postRouter)
+    app.use('/', chatRouter)
     app.use((err : unknown, req : Request, res : Response, next : NextFunction) => {
         if(err instanceof Error){
             logger.error({err}, 'Something went wrong')
@@ -61,14 +66,24 @@ async function main(){
         next()
     })
 
-    try {
-        app.listen(port, () => {
+    
+    const expressServer = app.listen(port, (error) => {
+        if(error){
+            logger.error({error},'error occured while starting the server')
+            return
+        }
         logger.info(`Server started running on port ${port}`)
-        })
-    } catch (error) {
-        logger.error({error},'error occured while starting the server')
-    }
+    })
 
+    const socketio = new Server(expressServer, {
+        cors:{
+            origin:'*',
+            methods:['GET', 'POST', 'DELETE']
+        }
+    })
+    
+    chatSocket(socketio)
+        
     process.on('SIGINT', () => {
         logger.info('Server shutting down...')
         process.exit(0)

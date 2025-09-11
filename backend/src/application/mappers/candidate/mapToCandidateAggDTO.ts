@@ -24,6 +24,9 @@ export default function mapToCandidateAggDTO(candidateAggData : CandidateAggrega
         resume:candidateAggData.resume,
         role:candidateAggData.role,
         skills:candidateAggData.skills,
-        socialLinks:candidateAggData.socialLinks
+        socialLinks:candidateAggData.socialLinks,
+        posts:candidateAggData.posts,
+        followers:candidateAggData.followers,
+        following:candidateAggData.following
     }
 }
