@@ -24,6 +24,7 @@ export default function RecruiterProfilePersonal(){
             
     
                 const result = await getProfileOverview()
+                    console.log('details from the backend', result?.recruiterDetails)
                 
                     if (!result.recruiterDetails.companyName) {
                         setloading(false)

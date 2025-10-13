@@ -3,10 +3,38 @@ import { useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import defaultImage from '../../../../public/default-img-instagram.png'
 import { candidateBlock, candidateUnblock, getCandidateDetails } from "../../../services/adminServices"
+import { CandidatePersonalData } from "../../../types/entityTypes"
+import { Notify } from "notiflix"
 
 export default function CandidateDetails(){
 
-    const [candidateDetails, setcandidatedetails] = useState<any>({})
+    const [candidateDetails, setcandidatedetails] = useState<CandidatePersonalData>({
+        name:"",
+        about:"",
+        currentSubscription:"",
+        dateOfBirth:"",
+        jobTitle:"",
+        posts:[],
+        socialLinks:[],
+        userDetails:{
+            _id:"",
+            coverPhoto:{
+                cloudinaryPublicId:"",
+                cloudinarySecureUrl:""
+            },
+            profilePicture:{
+                cloudinaryPublicId:"",
+                cloudinarySecureUrl:""
+            },
+            email:"",
+            createdAt:"",
+            facebookid:"",
+            googleid:"",
+            phone:"",
+            isBlocked:false
+        },
+        userId:""
+    })
     const [experiences, setexperience] = useState<any[]>([])
     const [education, setEducation] = useState<any[]>([])
     const [skills, setskills] = useState<any[]>([])
@@ -17,6 +45,7 @@ export default function CandidateDetails(){
         async function fetchCandidateDetails(){
             
                 const result = await getCandidateDetails(id)
+                console.log('result from the backend', result)
                 
                     setcandidatedetails(result.candidateDetails)
                     setexperience(result?.candidateDetails?.experience)
@@ -35,31 +64,55 @@ export default function CandidateDetails(){
     }
 
     async function blockCandidate(candidateId : string){
-       
-            const result = await candidateBlock(candidateId)
-            
-                Swal.fire({
-                    icon:'success',
-                    title:'Blocked',
-                    text:result.message,
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:2000
-                }).then(() => window.location.reload())
+            Swal.fire({
+                icon:'warning',
+                title:'Block?',
+                text:'Are you sure to unblock this candidate',
+                showConfirmButton:true,
+                confirmButtonText:'Block',
+                showCancelButton:true
+            }).then(async (result) => {
+                if(result.isConfirmed){
+                    const result = await candidateBlock(candidateId)
+                    if(result?.success){
+                        Notify.success('Candidate blocked', {timeout:1500})
+                        setTimeout(() => {
+                            setcandidatedetails((prv : CandidatePersonalData) => {
+                                return {...prv, userDetails:{...prv.userDetails, isBlocked:true}}
+                            })
+                        }, 1500)
+                    }else{
+                        Notify.failure('Can not block candidate right now', {timeout:1500})
+                    }
+                }
+                return
+            })
     }
 
     async function unblockCandidate(candidateId : string){
-       
-            const result = await candidateUnblock(candidateId)
-            
-                Swal.fire({
-                    icon:'success',
-                    title:'Blocked',
-                    text:result.message,
-                    showCancelButton:false,
-                    showConfirmButton:false,
-                    timer:2000
-                }).then(() => window.location.reload())
+            Swal.fire({
+                icon:'warning',
+                title:'Unblock?',
+                text:'Are you sure to unblock this candidate',
+                showConfirmButton:true,
+                showCancelButton:true,
+                confirmButtonText:'Unblock'
+            }).then(async (result) => {
+                if(result?.isConfirmed){
+                    const result = await candidateUnblock(candidateId)
+                    if(result?.success){
+                        Notify.success('Unblocked', {timeout:1500})
+                        setTimeout(() => {
+                            setcandidatedetails((prv : CandidatePersonalData) => {
+                            return {...prv, userDetails:{...prv.userDetails, isBlocked:false}}
+                            })
+                        }, 1500)
+                    }else{
+                        Notify.failure('Can not unblock candidate right now', {timeout:1500})
+                    }
+                }
+                return
+            })
             
     }
 
@@ -75,6 +128,18 @@ export default function CandidateDetails(){
         return yearDifference * 12 + monthDifference
     }
 
+    // const onCandidateblock = () => {
+    //     setcandidatedetails((prv : CandidatePersonalData) => {
+    //         return {...prv, userDetails:{...prv.userDetails, isBlocked:true}}
+    //     })
+    // }
+
+    // const onCandidateUnblock = () => {
+    //     setcandidatedetails((prv : CandidatePersonalData) => {
+    //         return {...prv, userDetails:{...prv.userDetails, isBlocked:false}}
+    //     })
+    // }
+
     return(
         <>
             <h2 className="font-bold">Candidate Details</h2>
@@ -85,26 +150,26 @@ export default function CandidateDetails(){
                         <p className="text-sm font-semibold">{candidateDetails?._id}</p>
                     </div>
                     <div className="right">
-                        <p className="text-gray-400 font-semibold">Joined Date : <span className="ms-5 text-black font-semibold">{candidateDetails?.createdAt}</span></p>
-                        <p className="text-gray-400 font-semibold">Date of birth : <span className="ms-5 text-black font-semibold">NA</span></p>
+                        <p className="text-gray-400 font-semibold">Joined Date : <span className="ms-5 text-black font-semibold">{formatDate(candidateDetails?.createdAt as string)}</span></p>
+                        <p className="text-gray-400 font-semibold">Status : {candidateDetails?.userDetails?.isBlocked ? <span className="text-red-500">Blocked</span> : <span className="text-green-500">Active</span>}</p>
                     </div>
                 </div>
 
                 <div className="flex w-full justify-between mt-15">
                     {/* Div one */}
                     <div className='flex items-center gap-2'>
-                        <img className="rounded-full" src={candidateDetails?.profilePicture?.cloudinarySecureUrl ? candidateDetails?.profilePicture?.cloudinarySecureUrl : defaultImage} alt="" style={{ width: '58px', height: '60px', objectFit:'cover' }} />
+                        <img className="rounded-full" src={candidateDetails?.userDetails?.profilePicture?.cloudinarySecureUrl ? candidateDetails?.userDetails?.profilePicture?.cloudinarySecureUrl : defaultImage} alt="" style={{ width: '58px', height: '60px', objectFit:'cover' }} />
                         <div>
                             <p className="text-sm font-semibold mb-2">{candidateDetails?.name}</p>
-                            <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.role}</p>
-                            <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.username}</p>
+                            <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.jobTitle}</p>
+                            {/* <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.username}</p> */}
                         </div>
                     </div>
 
                     {/* Div two */}
                     <div>
                         <p className="text-sm font-semibold mb-2">Location</p>
-                        <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.location?.city}, {candidateDetails?.location?.state}, {candidateDetails?.location?.country}</p>
+                        <p className="text-xs font-normal text-gray-400 mb-1">{candidateDetails?.location?.district}, {candidateDetails?.location?.state}, {candidateDetails?.location?.country}</p>
                     </div>
 
                     {/* Div three */}
@@ -128,15 +193,15 @@ export default function CandidateDetails(){
                 <div className="w-full mt-10">
                     <p className="text-sm font-semibold mb-2">Contact Informations</p>
                     <ul>
-                        <li className='text-xs font-normal text-gray-400 mb-1'>Email : {candidateDetails?.email}</li>
+                        <li className='text-xs font-normal text-gray-400 mb-1'>Email : {candidateDetails?.userDetails?.email}</li>
                         {
-                            candidateDetails?.phone
-                                ? <li className='text-xs font-normal text-gray-400 mb-1'>Phone : {candidateDetails?.phone}</li>
+                            candidateDetails?.userDetails?.phone
+                                ? <li className='text-xs font-normal text-gray-400 mb-1'>Phone : {candidateDetails?.userDetails?.phone}</li>
                                 : null
                         }
                     </ul>
                 </div>
-                <hr />
+                <div className="border w-full border-gray-200 mt-3"></div>
                 <section className="experience mt-7">
                     <div className="w-full">
                         <div><p className="font-bold">Experiences</p></div>
@@ -264,9 +329,9 @@ export default function CandidateDetails(){
 
                 <div className="flex justify-end">
                     {
-                        candidateDetails.isBlocked
-                            ? <button onClick={() => unblockCandidate(candidateDetails?._id)} type="button" className="bg-blue-200 rounded-sm p-2 text-white">Unblock</button>
-                            : <button onClick={() => blockCandidate(candidateDetails?._id)} type="button" className="bg-orange-400 rounded-sm p-2 text-white">Block</button>
+                        candidateDetails?.userDetails?.isBlocked
+                            ? <button onClick={() => unblockCandidate(candidateDetails?._id as string)} type="button" className="bg-blue-200 rounded-sm p-2 text-white">Unblock</button>
+                            : <button onClick={() => blockCandidate(candidateDetails?._id as string)} type="button" className="bg-orange-400 rounded-sm p-2 text-white">Block</button>
                     }
                 </div>
             </div>

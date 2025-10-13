@@ -5,8 +5,24 @@ import Loader from '../../../components/admin/Loader'
 import { adminLoginSuccess } from '../../../redux-toolkit/adminAuthSlice'
 import { useDispatch } from 'react-redux'
 import { adminLogin} from '../../../services/adminServices'
+import { Controller, useForm } from 'react-hook-form'
+import { FormControl, TextField } from '@mui/material'
+import { loginSuccess } from '../../../redux-toolkit/userAuthSlice'
 
-export default function LoginPage(){
+export default function AdminLoginPage(){
+
+    type Inputs = {
+        email : string
+        password : string
+    }
+
+    const {control, watch, formState:{errors}, handleSubmit} = useForm<Inputs>({
+        defaultValues:{
+            email:"",
+            password:""
+        }
+    })
+
     const [email, setEmail] = useState("")
     const [loading, setloading] = useState(false)
     const [password, setPassword] = useState("")
@@ -22,22 +38,18 @@ export default function LoginPage(){
     const dispatcher = useDispatch()
     
 
-    async function validateForm(event : any) {
+    async function login() {
         setloading(true)
-        event.preventDefault()
-        let typedEmail = email || false
-        let typedPassword = password || false
-        if(!typedEmail || !typedPassword){
-            setloading(false)
-            setLoginError(true)
-            setLoginErrorText("Please enter full credentials")
-            return
-        }
         setLoginErrorText("")
+        const {email, password} = watch()
         const loginResult = await adminLogin(email, password)
 
         if(loginResult?.success){
-            dispatcher(adminLoginSuccess({admin:loginResult?.result?.admin, token:loginResult?.result?.token}))
+            console.log('admin login result', loginResult)
+            dispatcher(loginSuccess({user:loginResult?.result?.user, userToken:loginResult?.result?.token, userRole:loginResult?.result?.role}))
+            //dispatcher(adminLoginSuccess({admin:loginResult?.result?.admin, token:loginResult?.result?.token}))
+
+            //stoped at admin login here, now want to check by loggin in
             setloading(false)
             navigator('/admin/dashboard')
         }else{
@@ -59,18 +71,54 @@ export default function LoginPage(){
                 <div className='flex justify-center'>
                     {loginError ? <label htmlFor="" className='error-label'>{loginErrorText}</label> : null}
                 </div>
-                <form className="form" onSubmit={(event) => validateForm(event)}>
-                    <div className='relative mt-5'>
+                <form className="form" onSubmit={handleSubmit(login)}>
+                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                        <Controller
+                            name='email'
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Please enter email'}
+                            }}
+                            render={({field}) => {
+                                return <TextField
+                                    {...field}
+                                    label="Email"
+                                    variant='outlined'
+                                    error={Boolean(errors.email)}
+                                    helperText={errors.email?.message}
+                                />
+                            }}
+                        />
+                    </FormControl>
+                    {/* <div className='relative mt-5'>
                         <label htmlFor="" className='mb-2'>Email</label>
                         <input value={email} onChange={(event) => setEmail(event.target.value)} type="text" name="email" id="email" placeholder='Enter your email' className='border w-full mt-1 px-12 py-2 bg-gray rounded-full' />
                         <i className="fa-solid fa-envelope absolute left-4 bottom-3"></i>
-                    </div>
-                    <div className='relative mt-5'>
+                    </div> */}
+                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                        <Controller
+                            name='password'
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Enter password'}
+                            }}
+                            render={({field}) => {
+                                return <TextField
+                                    {...field}
+                                    label="Password"
+                                    variant='outlined'
+                                    error={Boolean(errors.password)}
+                                    helperText={errors.password?.message}
+                                />
+                            }}
+                        />
+                    </FormControl>
+                    {/* <div className='relative mt-5'>
                         <label htmlFor="" className='mb-2'>Password</label>
                         <input value={password} onChange={(event) => setPassword(event.target.value)} type={showpassword ? "text" : "password"} name="password" id="password" placeholder='Password' className='border w-full mt-1 px-12 py-2 bg-gray rounded-full'/>
                         <i className="fa-solid fa-key absolute left-4 bottom-3"></i>
                         <i onClick={togglePasswordVisibility} className={showpassword ? "fa-regular fa-eye-slash absolute right-4 bottom-3" : "fa-regular fa-eye absolute right-4 bottom-3"}></i>
-                    </div>
+                    </div> */}
                     <div className='flex justify-end'>
                         <Link to={'/forgot-password'} className='forgot-password mt-4 mb-4 block'>Forgot password?</Link>
                     </div>

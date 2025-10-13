@@ -19,7 +19,7 @@ export default function StoreDetails(){
     const [countryerror, setcountryerror] = useState("")
     const [pincode, setpincode] = useState("")
     const [pinCodeError, setpincodeError] = useState("")
-    const [summary, setsummary] = useState("")
+    const [about, setsummary] = useState("")
     const [summaryerror, setsummaryerror] = useState("")
     
     const [currentSection, setCurrentSection] = useState(1)
@@ -135,7 +135,7 @@ export default function StoreDetails(){
       }
 
       async function proceedToSave(){
-        const summary_error = !summary || !/^[A-Za-z0-9.,'"\s\-]{30,}$/.test(summary) || false
+        const summary_error = !about || !/^[A-Za-z0-9.,'"\s\-]{30,}$/.test(about) || false
 
         summary_error ? setsummaryerror('Please enter your summary') : setsummaryerror("")
 
@@ -143,7 +143,7 @@ export default function StoreDetails(){
             return
         }
 
-        await saveBasicDetails(jobRole, city, district, state, country, pincode, summary)
+        await saveBasicDetails(jobRole, city, district, state, country, pincode, about)
           Swal.fire({
               icon: "success",
               title: "Saved",
@@ -154,7 +154,7 @@ export default function StoreDetails(){
               allowOutsideClick: false,
           }).then((result) => {
               if (result.isConfirmed) {
-                  navigateTo('/profile/personal')
+                  navigateTo('/candidate/profile/personal')
               }
           })
       }
@@ -316,7 +316,7 @@ export default function StoreDetails(){
                                 <p className="text-lg text-black mt-5">Give a brief summary of yourself. This will help others to know about you more</p>
                                 <div className="group mt-5">
                                     <label htmlFor="" className="text-white block">About me</label>
-                                    <textarea value={summary} onChange={(event) => setsummary(event.target.value)} name="" id="" className="text-sm mt-2 border border-gray-400 outline-none rounded w-full h-[200px] text-black p-2"></textarea>
+                                    <textarea value={about} onChange={(event) => setsummary(event.target.value)} name="" id="" className="text-sm mt-2 border border-gray-400 outline-none rounded w-full h-[200px] text-black p-2"></textarea>
                                     <label htmlFor="" style={errorLabelStyle}>{summaryerror}</label>
                                 </div>
                                 <div className="mt-5 w-full flex justify-center items-center gap-5">

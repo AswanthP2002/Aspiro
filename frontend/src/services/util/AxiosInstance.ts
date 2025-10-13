@@ -1,14 +1,15 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
-import { candidateLogout, refreshCandidateToken } from '../candidateServices';
-import { tokenRefresh } from '../../redux-toolkit/candidateAuthSlice';
-import { refreshRecruiterToken } from '../recruiterServices';
-import { recruiterTokenRefresh } from '../../redux-toolkit/recruiterAuthSlice';
-import { refreshAdminToken } from '../adminServices';
-import { adminTokenRefresh } from '../../redux-toolkit/adminAuthSlice';
+import { candidateLogout } from '../candidateServices';
+import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
+import { refreshAccessToken } from '../commonServices';
+
+const baseUrl = import.meta.env.VITE_SERVER_URL
+
 interface customeRequest extends InternalAxiosRequestConfig {
     sendCookie : boolean
+    sendAuthToken : boolean
     sendAuthTokenCandidate : boolean
     sendAuthTokenRecruiter : boolean
     sendAuthTokenAdmin : boolean
@@ -18,16 +19,24 @@ export type AxiosRequest = customeRequest & InternalAxiosRequestConfig
 
 
 const axiosInstance = axios.create({
-    baseURL:'http://localhost:5000',
+    baseURL:baseUrl,
     withCredentials:true
 });
 
 axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<any> => {
     const customeRequest = request as AxiosRequest
+
     if(customeRequest?.sendCookie){
         customeRequest.withCredentials = true
     }
+
+    if(customeRequest.sendAuthToken){
+        const token = JSON.parse(localStorage.getItem('userToken') || "")
+        console.log('This is from browser token', token)
+        customeRequest.headers.Authorization = `Bearer ${token}`
+    }
     
+    //legacy : no more needed since authentication is centralized now
     if(customeRequest?.sendAuthTokenCandidate){
         const token = localStorage.getItem('candidateToken')
         customeRequest.headers.Authorization = `Bearer ${token}`
@@ -84,16 +93,24 @@ axiosInstance.interceptors.response.use(
 
             const requestUrl : string = originalRequest.url
 
-            if(requestUrl.startsWith('/candidate')){
-                const accessToken = await refreshCandidateToken()
-                store.dispatch(tokenRefresh({token:accessToken}))
-            }else if(requestUrl.startsWith('/recruiter')){
-                const accessToken = await refreshRecruiterToken()
-                store.dispatch(recruiterTokenRefresh({token:accessToken}))
-            }else if(requestUrl.startsWith('/admin')){
-                const accessToken = await refreshAdminToken()
-                store.dispatch(adminTokenRefresh({token:accessToken}))
-            }
+            //get new access token
+            const newAccessToken = await refreshAccessToken()
+
+            //set new access token
+            store.dispatch(tokenRefresh({userToken:newAccessToken}))
+
+            //legacy code no more needed
+        
+            // if(requestUrl.startsWith('/candidate')){
+            //     const accessToken = await refreshCandidateToken()
+            //     store.dispatch(tokenRefresh({token:accessToken}))
+            // }else if(requestUrl.startsWith('/recruiter')){
+            //     const accessToken = await refreshRecruiterToken()
+            //     store.dispatch(recruiterTokenRefresh({token:accessToken}))
+            // }else if(requestUrl.startsWith('/admin')){
+            //     const accessToken = await refreshAdminToken()
+            //     store.dispatch(adminTokenRefresh({token:accessToken}))
+            // }
             axiosInstance(originalRequest)
 
         }

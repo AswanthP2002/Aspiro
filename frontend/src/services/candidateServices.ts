@@ -7,10 +7,10 @@ import { logout } from "../redux-toolkit/candidateAuthSlice";
 const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
 console.log('Access token for geocode api', import.meta.env)
 
-export const registerCandiate = async (name: string, email: string, phone: string, username: string, password: string) => {
+export const registerCandiate = async (name: string, email: string, phone: string, password: string) => {
     try {
         const response = await axiosInstance.post('/register',
-            {name, email, phone, username, password},
+            {name, email, phone, password},
             {
                 headers:{'Content-Type' : 'application/json'}
             } as AxiosRequest
@@ -28,10 +28,10 @@ export const registerCandiate = async (name: string, email: string, phone: strin
     }
 }
 
-export const verify = async (email : any, otp : string) => {
+export const verify = async (id : string, email : any, otp : string) => {
     try {
         const response = await axiosInstance.post('/verify',
-            {email, otp},
+            {id, email, otp},
             {
                 headers:{'Content-Type':'application/json'}
             } as AxiosRequest
@@ -70,7 +70,7 @@ export const candidateLogout = async (dispatch : Function, navigate : Function) 
     try {
         const response = await axiosInstance.post('/candidate/logout', null,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -101,13 +101,13 @@ export const candidateLogout = async (dispatch : Function, navigate : Function) 
     }
 }
 
-export const saveBasicDetails = async (role: string, city: string, district: string, state: string, country: string, pincode: string, summary: string) => {
+export const saveBasicDetails = async (role: string, city: string, district: string, state: string, country: string, pincode: string, about: string) => {
     try {
         const response = await axiosInstance.post('candidate/personal/details/save',
-            {role, city, district, state, country, pincode, summary},
+            {role, city, district, state, country, pincode, about},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -133,7 +133,7 @@ export const getCandidateProfileData = async () => {
     try {
         const response = await axiosInstance.get('candidate/profile/personal/datas',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -149,13 +149,13 @@ export const getCandidateProfileData = async () => {
     }
 }
 
-export const editCandidateProfile = async (name: string, role: string, city: string, district: string, state: string, country: string, about: string) => {
+export const editCandidateProfile = async (name?: string, role?: string, city?: string, district?: string, state?: string, country?: string, about?: string, pincode? : string) => {
     try {
         const response = await axiosInstance.patch('/candidate/profile',
-            {name, role, city, district, state, country, about},
+            {name, role, city, district, state, country, about, pincode},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -175,7 +175,7 @@ export const getCandidateExperience = async () => {
     try {
         const response = await axiosInstance.get('/candidate/experience',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -191,7 +191,7 @@ export const getCandidateSkills = async () => {
     try {
         const response = await axiosInstance.get('/candidate/skills',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -202,11 +202,32 @@ export const getCandidateSkills = async () => {
     }
 }
 
+export const addCandidateSkill = async (type : string, skill : string, level : string) => {
+    try {
+        const response = await axiosInstance.post('/candidate/skills/add', 
+            {type, skill, level},
+            {
+                headers:{"Content-Type":'application/json'},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 401){
+            console.log('Error occured while adding skill')
+            return err.response.data
+        }
+    }
+}
+
 export const getCandidateEducation = async () => {
     try {
         const response = await axiosInstance.get('/candidate/education',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -224,7 +245,7 @@ export const addCandidateExperience = async (role: string, jobtype: string, loca
             {role, jobtype, location, locationtype, organization, ispresent, startdate, enddate},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -242,7 +263,7 @@ export const editCandidateExperience = async (experienceId: string, editableRole
             {editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -253,11 +274,11 @@ export const editCandidateExperience = async (experienceId: string, editableRole
     }
 }
 
-export const deleteCandidateExperience = async (expId : string) => {
+export const deleteCandidateExperience = async (expId? : string) => {
     try {
         const response = await axiosInstance.delete(`/candidate/experience/${expId}`,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -273,7 +294,7 @@ export const deleteCandidateSkills = async (skillId : string) => {
     try {
         const response = await axiosInstance.delete(`/candidate/skills/${skillId}`,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -291,7 +312,7 @@ export const addCandidateEducation = async (level : string, stream : string, org
             {level, stream, organization, isPresent, startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -306,10 +327,10 @@ export const addCandidateEducation = async (level : string, stream : string, org
 export const editCandidateEducation = async (educationId : string, level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
         const response = await axiosInstance.put(`/candidate/education/${educationId}`,
-            {level, stream, organization, isPresent, startYear:new Date(startYear), endYear, location},
+            {level, stream, organization, isPresent, startYear:startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -320,11 +341,11 @@ export const editCandidateEducation = async (educationId : string, level : strin
     }
 }
 
-export const deleteCandidateEducation = async (educationId : string) => {
+export const deleteCandidateEducation = async (educationId? : string) => {
     try {
         const response = await axiosInstance.delete(`/candidate/education/${educationId}`,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -360,7 +381,7 @@ export const loadCandidateResumes = async () => {
     try {
         const response = await axiosInstance.get('/candidate/resumes',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -392,7 +413,7 @@ export const addCandidateCertificates = async (formData : any) => {
     try {
         const response = await axiosInstance.post('/candidate/certificate', formData,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -412,7 +433,7 @@ export const loadCandidateCertificates = async () => {
     try {
         const response = await axiosInstance.get('/candidate/certificate', 
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -426,7 +447,7 @@ export const loadCandidateCertificates = async () => {
 
 export const refreshCandidateToken = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/token/refresh')
+        const response = await axiosInstance.get('/token/refresh')
         return response.data?.accessToken
     } catch (error : unknown) {
         console.log('Error occured while refreshing the token', error)
@@ -569,7 +590,7 @@ export const addSocialmediaLinks = async (url : string) => {
             {url},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -589,7 +610,7 @@ export const removeSocialLink = async (domain : string) => {
             {domain},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -608,7 +629,7 @@ export const updateProfilePicture = async (formData : any, publicId : string = "
         const response = await axiosInstance.patch('/candidate/profile/picture/update', formData,
             {
                 params:{publicId},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -628,7 +649,7 @@ export const removeProfilePicture = async (cloudinaryPublicId : string) => {
             {cloudinaryPublicId},
             {
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -647,7 +668,7 @@ export const updateCoverPhoto = async (formData : any, publicId : string = "") =
     try {
         const response = await axiosInstance.patch('/candidate/profile/coverphoto/update', formData,
             {   params:{publicId},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -666,7 +687,7 @@ export const removeCoverphoto = async (publicId : string) => {
         const response = await axiosInstance.patch('/candidate/profile/coverphoto/remove', null,
             {
                 params:{publicId},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -752,7 +773,7 @@ export const createPost = async (formdata : any) => {
         const response = await axiosInstance.post('/post',
             formdata,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -767,7 +788,7 @@ export const createPost = async (formdata : any) => {
 export const getPosts = async () => {
     try {
         const response = await axiosInstance.get('/post', {
-            sendAuthTokenCandidate:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
@@ -779,7 +800,7 @@ export const getPosts = async () => {
 export const likePost = async (postId : string, creatorId : string) => {
     try {
         const response = await axiosInstance.patch(`post/like/${postId}/user/${creatorId}`, {},
-            {sendAuthTokenCandidate:true} as AxiosRequest
+            {sendAuthToken:true} as AxiosRequest
         )
 
         return response.data
@@ -794,7 +815,7 @@ export const unlikePost = async (postId : string) => {
     try {
         const response = await axiosInstance.patch(`/post/unlike/${postId}`, {},
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 

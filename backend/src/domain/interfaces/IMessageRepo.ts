@@ -1,4 +1,4 @@
-import Messsage from "../entities/Message";
-import IBaseRepo from "./IBaseRepo";
+import Messsage from '../entities/message.entity';
+import IBaseRepo from './IBaseRepo';
 
 export default interface IMessageRepo extends IBaseRepo<Messsage> {}

@@ -1,9 +1,11 @@
-import VerifyRecruiterDTO from "../../../application/DTOs/recruiter/verifyRecruiterDTO";
-import verifyRecruiterRequestDTO from "../../DTOs/recruiter/verifyRecruiterRequestDTO";
+import VerifyRecruiterDTO from '../../../application/DTOs/recruiter/verifyRecruiter.dto';
+import verifyRecruiterRequestDTO from '../../DTOs/recruiter/verifyRecruiterRequestDTO';
 
-export default function mapToVerifyRecruiterDTOFromRequest(requestDto : verifyRecruiterRequestDTO) : VerifyRecruiterDTO {
-    return {
-        email:requestDto.email,
-        opt:requestDto.otp
-    }
+export default function mapToVerifyRecruiterDTOFromRequest(
+  requestDto: verifyRecruiterRequestDTO
+): VerifyRecruiterDTO {
+  return {
+    email: requestDto.email,
+    opt: requestDto.otp,
+  };
 }

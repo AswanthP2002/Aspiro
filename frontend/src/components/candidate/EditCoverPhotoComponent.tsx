@@ -5,7 +5,7 @@ import { CircularProgress } from '@mui/material'
 import CropComponent from '../common/CropComponent'
 import { removeCoverphoto, updateCoverPhoto } from '../../services/candidateServices'
 
-export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto} : any) {
+export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto, onSaveCoverPhoto, onDeleteCoverPhoto} : any) {
     const fileRef = useRef<HTMLInputElement>(null)
     const [openCrop, setOpenCrop] = useState(false)
     const [crop, setCrop] = useState({x : 0, y : 0})
@@ -79,7 +79,7 @@ export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto}
             
             setTimeout(() => {
                 setLoding(false)
-                window.location.reload()
+                onSaveCoverPhoto(URL.createObjectURL(croppedImage))
             }, 2000)
         }else{
             Notify.failure(result?.message, {timeout:2000})
@@ -95,7 +95,7 @@ export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto}
             Notify.success(result?.message, {timeout:2000})
             setTimeout(() => {
                 setLoding(false)
-                window.location.reload()
+                onDeleteCoverPhoto()
             }, 2000);
         }else{
             setLoding(false)

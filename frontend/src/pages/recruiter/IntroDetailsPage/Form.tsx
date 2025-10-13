@@ -2,10 +2,95 @@ import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
 import { addCoverPhotoCloudinary, addLogoCloudinary, saveIntroDetails } from "../../../services/recruiterServices"
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Recruiter } from "../../../types/entityTypes"
+import { Controller, useForm } from "react-hook-form"
+import { industryTypes } from "../../../assets/data/companyDetailsArrayData"
+import {Textarea} from '@mui/joy'
+import { companyType } from "../../../assets/data/companyDetailsArrayData"
 
 export default function IntroDetailsPageForm(){
+
+    /*
+    _id?: string;
+      userId?: string;
+      name: string;
+      employerType?: string;
+      organizationDetails?: {
+        organizationName: string;
+        organizationType: string;
+        industry: string;
+        logo?: {
+          cloudinaryPublicId: string;
+          cloudinarySecureUrl: string;
+        };
+        location?: {
+          city: string;
+          country: string;
+          state: string;
+          pinCode: string;
+        };
+        organizationContactNumber?: string;
+        organizationEmail?: string;
+        socialLinks?: SocialLinks[];
+        teamStrength?: string;
+        aboutCompany?: string;
+        foundIn?: string;
+        website?: string;
+        vision?: string;
+        benefit?: String;
+      };
+      location?: {
+        city: string;
+        country: string;
+        state: string;
+        pinCode: string;
+      };
+      socialLinks?: SocialLinks[];
+      about?: string;
+      createdAt?: Date;
+      updatedAt?: Date;
+      currentSubscription?: string;
+    */
+
+    type Inputs = {
+        employerType : string
+        industry : string
+        summary : string
+        city : string
+        state : string
+        country : string
+        pincode : string
+        organizationName : string
+        organizationType : string
+        teamStrength : string
+        aboutCompany : string
+        website : string
+        vision : string
+    }
+
+    const {control, watch, handleSubmit, formState:{errors}} = useForm<Inputs>({
+        defaultValues:{
+            aboutCompany:"",
+            city:"",
+            country:"",
+            employerType:"",
+            industry:"",
+            organizationName:"",
+            organizationType:"",
+            pincode:"",
+            state:"",
+            summary:"",
+            teamStrength:"",
+            vision:"",
+            website:""
+        }
+    })
     
     const [step, setstep] = useState(1)
+    // const [recruiter, setRecruiter] = useState<Recruiter>({
+    //     employerType:""
+    // })
     const [details, setdetails] = useState({
         logo:"",
         coverPhoto:"",
@@ -24,6 +109,118 @@ export default function IntroDetailsPageForm(){
         mobile:"",
         email:""
     })
+
+    const [recruiter, setRecruiter] = useState<Recruiter>({
+        name:"",
+        about:"",
+        employerType:"",
+        location:{
+            city:"",
+            country:"",
+            pinCode:"",
+            state:""
+        },
+        organizationDetails:{
+            industry:"",
+            organizationName:"",
+            organizationType:"",
+            aboutCompany:"",
+            benefit:"",
+            foundIn:"",
+            location:{
+                city:"",
+                country:"",
+                pinCode:"",
+                state:""
+            },
+            teamStrength:""
+        }
+    })
+
+    const employerType = watch('employerType')
+
+    async function saveDetails(){
+        console.log('details after submit', watch())
+        const {
+            aboutCompany,
+            city,
+            country,
+            employerType,
+            industry,
+            organizationName,
+            organizationType,
+            pincode,
+            state,
+            summary,
+            teamStrength,
+            vision,
+            website
+        } = watch()
+        const updatedRecruiter = {
+                ...recruiter,
+                employerType:employerType,
+                about:summary,
+                organizationDetails:{
+                    ...recruiter.organizationDetails,
+                    aboutCompany:aboutCompany,
+                    location:{
+                        city:city,
+                        country:country,
+                        state:state,
+                        pinCode:pincode
+                    },
+                    industry:industry,
+                    teamStrength:teamStrength,
+                    vision:vision,
+                    website:website,
+                    organizationName:organizationName,
+                    organizationType:organizationType,
+                }
+            }
+        // setRecruiter((prv : Recruiter) => {
+        //     return {
+        //         ...prv,
+        //         employerType:employerType,
+        //         about:summary,
+        //         organizationDetails:{
+        //             ...prv.organizationDetails,
+        //             aboutCompany:aboutCompany,
+        //             location:{
+        //                 city:city,
+        //                 country:country,
+        //                 state:state,
+        //                 pinCode:pincode
+        //             },
+        //             industry:industry,
+        //             teamStrength:teamStrength,
+        //             vision:vision,
+        //             website:website,
+        //             organizationName:organizationName,
+        //             organizationType:organizationType,
+        //         }
+        //     }
+        // })
+        const result = await saveIntroDetails(updatedRecruiter)
+        if(result.success){
+                    Swal.fire({
+                        icon:'success',
+                        title:'Saved',
+                        text:result.message,
+                        showConfirmButton:true,
+                        allowOutsideClick:false,
+                        showCancelButton:false,
+                        confirmButtonText:'Continue'
+                    })
+                    .then((result) => {
+                        if(result.isConfirmed){
+                            navigator('/recruiter/profile/overview')
+                            return
+                        }else{
+                            navigator('/')
+                        }
+                    })
+                }
+    }
 
     const [nameError, setnamerror] = useState("")
     const [aboutError, setabouterror] = useState("")
@@ -52,6 +249,8 @@ export default function IntroDetailsPageForm(){
     const coverphotoinput = useRef<HTMLInputElement>(null)
 
     const navigator = useNavigate()
+
+    const unSelectImage = () => setlogopreview("")
 
     function handleLogoUploadClick(){
         if(logophotoinput.current){
@@ -121,25 +320,25 @@ export default function IntroDetailsPageForm(){
                 }
 
                 //save details in the database
-                const result = await saveIntroDetails(details, logourl, coverphotourl)
+                // const result = await saveIntroDetails(details, logourl, coverphotourl)
 
-                if(result.success){
-                    Swal.fire({
-                        icon:'success',
-                        title:'Saved',
-                        text:result.message,
-                        showConfirmButton:true,
-                        confirmButtonText:'Continue'
-                    })
-                    .then((result) => {
-                        if(result.isConfirmed){
-                            navigator('/recruiter/profile/overview')
-                            return
-                        }else{
-                            navigator('/recruiter')
-                        }
-                    })
-                }
+                // if(result.success){
+                //     Swal.fire({
+                //         icon:'success',
+                //         title:'Saved',
+                //         text:result.message,
+                //         showConfirmButton:true,
+                //         confirmButtonText:'Continue'
+                //     })
+                //     .then((result) => {
+                //         if(result.isConfirmed){
+                //             navigator('/recruiter/profile/overview')
+                //             return
+                //         }else{
+                //             navigator('/recruiter')
+                //         }
+                //     })
+                // }
             } catch (error : any) {
                 console.log('Error occured while saving company/recruiter details', error.message)
                 Swal.fire({
@@ -262,170 +461,280 @@ export default function IntroDetailsPageForm(){
 
     return(
         <>
-            <div className="container w-full h-screen">
-                <div className="m-auto w-[600px] min-w-[400px] mt-30">
-                    <div className="w-full flex justify-center gap-15">
-                        <p className={step === 1 ? "font-bold shadow" : ""}>Company Info</p>
-                        <p className={step === 2 ? "font-bold shadow" : ""}>Founding Info</p>
-                        <p className={step === 3 ? "font-bold shadow" : ""}>Contact</p>
-                    </div>
-                    <hr />
-                    <div className="details py-3">
-                        {
-                            step === 1 && (
-                                <>  
-                                    <div className="media flex gap-5 p-1">
-                                        <div onClick={handleLogoUploadClick} className="p-2 border border-dotted h-[100px] w-[120px] flex flex-col justify-center items-center">
-                                            {
-                                                logogpreview
-                                                    ? <img src={logogpreview} className="w-full h-full" alt="" />
-                                                    : <>
-                                                        <i className="fa-solid fa-upload"></i>
-                                                        <p className="text-xs">Browse a photo</p>
-                                                        <p className="text-xs">Company Logo</p>
-                                                      </>
-                                            }
-                                            
-                                        </div>
-                                        <div onClick={handleCoverPhotoUpload} className="p-2 border border-dotted h-[100px] flex flex-col justify-center items-center" style={{flexGrow:1}}>
-                                            {
-                                                coverphotopreview
-                                                    ? <img src={coverphotopreview} className="w-full h-full" alt="" />
-                                                    : <>
-                                                        <i className="fa-solid fa-upload"></i>
-                                                        <p className="text-xs">Browse a photo</p>
-                                                        <p className="text-xs">Cover Photo</p>
-                                                      </>
-                                            }
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <input onChange={(event) => handleLogoFileUpload(event)} className="hidden" type="file" name="logo" id="" ref={logophotoinput} />
-                                        <input onChange={(event) => handleCoverPhotoFileUpload(event)} className="hidden" type="file" name="coverphoto" id="coverphoto" ref={coverphotoinput} />
-                                    </div>
-                                    <label htmlFor="" className="text-xs block">Company Name <span className="text-red-400">*</span></label>
-                                    <input value={details.companyName} onChange={(event) => handleData(event)} type="text" className="w-full p-2 mt-1 border border-gray-400 rounded-sm outline-none" name="companyName" />
-                                    <label htmlFor="" className="error-label">{nameError}</label>
+            <div className="w-full h-screen">
+                <form onSubmit={handleSubmit(saveDetails)} className="w-[500px] mx-auto my-10">
+                    <p className="text-xl">Fill some basic details about you</p>
+
+                    <FormControl fullWidth sx={{marginTop:'30px'}} error={Boolean(errors.employerType)}>
+                        <InputLabel id="employer-type-label">Employer Type</InputLabel>
+                        <Controller
+                            name="employerType"
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Select employer type'}
+                            }}
+                            render={({field}) => {
+                                return <Select error={Boolean(errors.employerType)} labelId="employer-type-label" label="Employer Type" {...field}>
+                                    <MenuItem value="self">I am an independant employer / self employer</MenuItem>
+                                    <MenuItem value="company">I am Recruiting for a company</MenuItem>
+                                </Select>
+                            }}
+                        />
+                        <FormHelperText>{errors.employerType?.message}</FormHelperText>
+                    </FormControl>
+
+                    {
+                        employerType === 'self' && (
+                            <div className="w-full">
+                                <FormControl fullWidth sx={{marginTop:'20px'}} error={Boolean(errors.industry)}>
+                                    <InputLabel id="industry-label">Focusing Industry</InputLabel>
+                                    <Controller
+                                        name="industry"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:'Please select industry'}
+                                        }}
+                                        render={({field}) => {
+                                            return <Select error={Boolean(errors.industry)} labelId="industry-label" label="Focusing Industry" {...field}>
+                                                {
+                                                    industryTypes.map((inustry : string, index : number) => {
+                                                        return <MenuItem key={index} value={inustry}>{inustry}</MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        }}
+                                    />
+                                    <FormHelperText>{errors.industry?.message}</FormHelperText>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{marginTop:'20px'}} error={Boolean(errors.summary)}>
+                                    <Controller
+                                        name="summary"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:'Summary can not be empty'},
+                                            pattern:{value:/^[\w\s.,:;'?!"-()]{10,500}$/, message:'Please enter a valid summary'}
+                                        }}
+                                        render={({field}) => {
+                                            return <Textarea error={Boolean(errors.summary)} {...field} sx={{height:'100px'}} placeholder="Write your summary" />
+                                        }}
+                                    />
+                                    <FormHelperText>{errors?.summary?.message}</FormHelperText>
+                                </FormControl>
+                                <div className="mt-8 flex gap-5">
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="city"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Please enter city name'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.city)} helperText={errors.city?.message} {...field} variant="outlined" label="City" />
+                                            }}
+                                        />
+                                    </FormControl>
                                     
-                                    <label htmlFor="" className="text-xs mt-3 block">About Us <span className="text-red-400">*</span></label>
-                                    <textarea value={details.about} onChange={(event) => handleData(event)} className="w-full p-2 mt-1 border border-gray-400 rounded-sm outline-none" name="about" id="about"></textarea>
-                                    <label htmlFor="" className="error-label">{aboutError}</label>
-                                    
-                                    <label htmlFor="" className="text-xs mt-3 block">Why work with us <span className="text-red-400">*</span></label>
-                                    <textarea value={details.benefits}  onChange={(event) => handleData(event)} className="w-full p-2 mt-1 border border-gray-400 rounded-sm outline-none" name="benefits" id="benefits"></textarea>
-                                    <label htmlFor="" className="error-label">{benefitsError}</label>
-                                    
-                                    <div className="action">
-                                    <button onClick={nextStep} type="button" className="bg-blue-400 rounded-sm px-2 text-xs w-25 py-2">Next</button>
-                                    </div>
-                                </>
-                            )
-                        }
-                        {
-                            step === 2 && (
-                                <>
-                                <div className="">
-                                    <div className="div mt-3">
-                                        <label htmlFor="" className="text-xs">Company Type <span className="text-red-400">*</span></label>
-                                        <select name="companyType" id="companyType" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.companyType} onChange={(event) => handleData(event)}>
-                                            <option value="">--Select Company Type--</option>
-                                            {
-                                                companyType.map((value, index) => {
-                                                    return <option key={index} value={value}>{value}</option>
-                                                })
-                                            }
-                                        </select>
-                                        <label htmlFor="" className="error-label">{companyTypeError}</label>
-                                    </div>
-                                    <div className="div mt-3">
-                                        <label htmlFor="" className="text-xs">Industry <span className="text-red-400">*</span></label>
-                                        <select name="industryType" id="industryType" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.industryType} onChange={(event) => handleData(event)}>
-                                            <option value="">--Select Industry--</option>
-                                            {
-                                                industryTypes.map((industry, index) => {
-                                                    return <option key={index} value={industry}>{industry}</option>
-                                                })
-                                            }
-                                        </select>
-                                        <label htmlFor="" className="error-label">{industryError}</label>
-                                    </div>
-                                    <div className="div mt-3">
-                                        <label htmlFor="" className="text-xs">Team Strength(Employees) <span className="text-red-400">*</span></label>
-                                        <select name="teamStrength" id="teamStrength" className="mt-1 w-full border border-gray-400 rounded-sm p-2" value={details.teamStrength} onChange={(event) => handleData(event)}>
-                                                <option value="">--Select team strength--</option>
-                                            {
-                                                strength.map((count, index) => {
-                                                    return <option key={index} value={count}>{count}</option>
-                                                })
-                                            }
-                                        </select>
-                                        <label htmlFor="" className="error-label">{teamStrengthError}</label>
-                                    </div>
-                                    <div className="flex justify-between gap-5 mt-3">
-                                        <div>
-                                            <label htmlFor="" className="text-xs">year of establishment <span className="text-red-400">*</span></label>
-                                            <input value={details.yearOfEstablishment} onChange={(event) => handleData(event)} type="number" name="yearOfEstablishment" id="yearOfEstablishment" className="mt-1 w-full border border-gray-400 rounded-sm p-2" />
-                                            <label htmlFor="" className="error-label">{establishmentyearError}</label>
-                                        </div>
-                                        <div>
-                                            <label htmlFor="" className="text-xs">Company website</label>
-                                            <input value={details.website} onChange={(event) => handleData(event)} type="text" name="website" id="website" className="mt-1 w-full border border-gray-400 rounded-sm p-2" />
-                                            <label htmlFor="" className="error-label">{websiteError}</label>
-                                        </div>
-                                        
-                                    </div>
-                                    <div className="mt-3">
-                                        <label htmlFor="" className="text-xs">Comapny Vision</label>
-                                        <textarea value={details.vision} onChange={(event) => handleData(event)} name="vision" id="vision" className="border border-gray-400 outline-none rounded-sm w-full mt-1 h-[100px]"></textarea>
-                                        <label htmlFor="" className="error-label">{visionError}</label>
-                                    </div>
-                                    <div className="actions mt-2">
-                                        <button onClick={nextStep} type="button" className="bg-blue-400 rounded-sm px-2 text-xs w-25 py-2">Next</button>
-                                        <button onClick={previousStep} className="bg-gray-400 rounded-sm px-2 text-xs w-24 py-2 ms-2">Previous</button>
-                                    </div>
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="state"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Please enter state name'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.state)} helperText={errors.state?.message} {...field} variant="outlined" label="State" />
+                                            }}
+                                        />
+                                    </FormControl>
                                 </div>
-                                </>
-                            )
-                        }
-                        {
-                            step === 3 && (
-                                <>
-                                    <div className="flex justify-between gap-5">
-                                        <div className="w-full">
-                                            <label htmlFor="" className="text-xs">City <span className="text-red-400">*</span></label>
-                                            <input value={details.city} onChange={(event) => handleData(event)} type="text" name="city" id="city" className="w-full border border-gray-400 rounded-sm p-2" />
-                                            <label htmlFor="" className="error-label">{cityError}</label>
-                                        </div>
-                                        <div className="w-full">
-                                            <label htmlFor="" className="text-xs">State <span className="text-red-400">*</span></label>
-                                            <input value={details.state} onChange={(event) => handleData(event)} type="text" name="state" id="state" className="w-full border border-gray-400 rounded-sm p-2" />
-                                            <label htmlFor="" className="error-label">{stateError}</label>
-                                        </div>
-                                        <div className="w-full">
-                                            <label htmlFor="" className="text-xs">Country <span className="text-red-400">*</span></label>
-                                            <input value={details.country} onChange={(event) => handleData(event)} type="text" name="country" id="country" className="w-full border border-gray-400 rounded-sm p-2" />
-                                            <label htmlFor="" className="error-label">{countryError}</label>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3">
-                                        <label htmlFor="" className="text-xs">Mobile <span className="text-red-400">*</span></label>
-                                        <input value={details.mobile} onChange={(event) => handleData(event)} type="tel" name="mobile" id="mobile" className="w-full border border-gray-400 rounded-sm p-2" />
-                                        <label htmlFor="" className="error-label">{mobileError}</label>
-                                    </div>
-                                    <div className="mt-3">
-                                        <label htmlFor="" className="text-xs">Email <span className="text-red-400">*</span></label>
-                                        <input value={details.email} onChange={(event) => handleData(event)} type="email" name="email" id="email" className="w-full border border-gray-400 rounded-sm p-2" />
-                                        <label htmlFor="" className="error-label">{emailError}</label>
-                                    </div>
-                                    <div className="actions mt-2">
-                                        <button onClick={nextStep} type="button" className="bg-blue-400 rounded-sm px-2 text-xs w-25 py-2">Save & Next</button>
-                                        <button onClick={previousStep} className="bg-gray-400 rounded-sm px-2 text-xs w-24 py-2 ms-2">Previous</button>
-                                    </div>
-                                </>
-                            )
-                        }
+                                <div className="mt-8 flex gap-5">
+                                    <FormControl fullWidth>
+                                        <Controller
+                                            name="country"
+                                            rules={{
+                                                required:{value:true, message:'Country can not be empty'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            control={control}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.country)} helperText={errors.country?.message} {...field} variant="outlined" label="Country" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                    
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="pincode"
+                                            rules={{
+                                                required:{value:true, message:'Pincode can not be empty'},
+                                                pattern:{value:/^[1-9]\d{5}$/, message:'Enter a valid pincode'}
+                                            }}
+                                            control={control}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.pincode)} helperText={errors.pincode?.message} {...field} variant="outlined" label="Pincode" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        employerType === 'company' && (
+                            <div className="w-full">
+                                <FormControl fullWidth sx={{marginTop:'20px'}}>
+                                    <Controller
+                                        name="organizationName"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:'Comapny name can not be empty'},
+                                            pattern:{value:/^[A-Za-z0-9&.,' -]{2,100}$/, message:'Enter a valid name'}
+                                        }}
+                                        render={({field}) => {
+                                            return <TextField error={Boolean(errors.organizationName)} helperText={errors.organizationName?.message} {...field} variant="outlined" label="Organization Name" />
+                                        }}
+                                    />
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{marginTop:'20px'}} error={Boolean(errors.organizationType)}>
+                                    <InputLabel id="organization-type-label">Organization Type</InputLabel>
+                                    <Controller
+                                        name="organizationType"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:'Select Organization Type'}
+                                        }}
+                                        render={({field}) => {
+                                            return <Select error={Boolean(errors.organizationType)} labelId="organization-type-label" label="Employer Type" {...field}>
+                                                {
+                                                    companyType.map((companyType : string, index : number) => {
+                                                        return <MenuItem key={index} value={companyType}>{companyType}</MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        }}
+                                    />
+                                    <FormHelperText>{errors.organizationType?.message}</FormHelperText>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{marginTop:'20px'}} error={Boolean(errors.industry)}>
+                                    <InputLabel id="industry-label">Industry</InputLabel>
+                                    <Controller
+                                        name="industry"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:'Please select industry'}
+                                        }}
+                                        render={({field}) => {
+                                            return <Select error={Boolean(errors.industry)} labelId="industry-label" label="Industry" {...field}>
+                                                {
+                                                    industryTypes.map((inustry : string, index : number) => {
+                                                        return <MenuItem key={index} value={inustry}>{inustry}</MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        }}
+                                    />
+                                    <FormHelperText>{errors.industry?.message}</FormHelperText>
+                                </FormControl>
+
+                                <div className="mt-8 flex gap-5">
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="city"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Please enter city name'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.city)} helperText={errors.city?.message} {...field} variant="outlined" label="City" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                    
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="state"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Please enter state name'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.state)} helperText={errors.state?.message} {...field} variant="outlined" label="State" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                </div>
+                                <div className="mt-8 flex gap-5">
+                                    <FormControl fullWidth>
+                                        <Controller
+                                            name="country"
+                                            rules={{
+                                                required:{value:true, message:'Country can not be empty'},
+                                                pattern:{value:/^[a-zA-Z\s\-']{2,50}$/, message:'Enter valid data'}
+                                            }}
+                                            control={control}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.country)} helperText={errors.country?.message} {...field} variant="outlined" label="Country" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                    
+                                    <FormControl fullWidth>
+                                        <Controller 
+                                            name="pincode"
+                                            rules={{
+                                                required:{value:true, message:'Pincode can not be empty'},
+                                                pattern:{value:/^[1-9]\d{5}$/, message:'Enter a valid pincode'}
+                                            }}
+                                            control={control}
+                                            render={({field}) => {
+                                                return <TextField error={Boolean(errors.pincode)} helperText={errors.pincode?.message} {...field} variant="outlined" label="Pincode" />
+                                            }}
+                                        />
+                                    </FormControl>
+                                </div>
+                                <FormControl fullWidth sx={{marginTop:'20px'}}>
+                                    <Controller
+                                        name="teamStrength"
+                                        control={control}
+                                        rules={{
+                                            pattern:{value:/^\d{1,2}$/, message:'Enter a value in a range with - or to'}
+                                        }}
+                                        render={({field}) => {
+                                            return <TextField error={Boolean(errors.teamStrength)} helperText={errors.teamStrength?.message} variant="outlined" label="Team strength" {...field} />
+                                        }}
+                                    />
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{marginTop:'20px'}} error={Boolean(errors.aboutCompany)}>
+                                    <Controller
+                                        name="aboutCompany"
+                                        control={control}
+                                        rules={{
+                                            required:{value:true, message:"Please give a short intro about your company"},
+                                            //pattern:{value:/^\d{1,2}$/, message:'Enter a value in a range with - or to'}
+                                        }}
+                                        render={({field}) => {
+                                            return <Textarea error={Boolean(errors.aboutCompany)} {...field} sx={{height:'100px'}} placeholder="About your company" />
+                                        }}
+                                    />
+                                    <FormHelperText>{errors.aboutCompany?.message}</FormHelperText>
+                                </FormControl>
+                            </div>
+                        )
+                    }
+
+                    <div className="mt-10">
+                        <button type="submit" className="text-white text-sm px-5 py-2  rounded bg-gradient-to-br from-blue-500 to-indigo-600">Save</button>
                     </div>
-                </div>
+                </form>
             </div>
         </>
         // 

@@ -6,7 +6,7 @@ import CropComponent from '../common/CropComponent'
 import { removeProfilePicture, updateProfilePicture } from '../../services/candidateServices'
 import { CircularProgress } from '@mui/material'
 
-export default function EditProfilePictureComponent({ profilePicture }: any) {
+export default function EditProfilePictureComponent({ profilePicture, onSaveProfilePhoto, onDeleteProfilePhoto }: any) {
     const fileRef = useRef<HTMLInputElement>(null)
     const [uploadedFile, setUploadedFile] = useState("")
     const [openCrop, setOpenCrop] = useState(false)
@@ -41,7 +41,7 @@ export default function EditProfilePictureComponent({ profilePicture }: any) {
             Notify.success(result?.message,{timeout:2000})
             setTimeout(() => {
                 setLoading(false)
-                window.location.reload()
+                onSaveProfilePhoto(URL.createObjectURL(croppedImage))
             }, 2000)
         }else{
             setLoading(false)
@@ -68,7 +68,7 @@ export default function EditProfilePictureComponent({ profilePicture }: any) {
             Notify.success(result?.message, {timeout:2000})
             setTimeout(() => {
                 setLoading(false)
-                window.location.reload()
+                onDeleteProfilePhoto()
             }, 2000);
         }else{
             setLoading(false)

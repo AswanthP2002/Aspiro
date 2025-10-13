@@ -4,7 +4,7 @@ export interface UpdateEducationRequestDto {
     level : string
     organization : string
     location : string
-    startYear : Date,
+    startYear : string,
     isPresent : boolean
-    endYear? : any
+    endYear? : string
 }

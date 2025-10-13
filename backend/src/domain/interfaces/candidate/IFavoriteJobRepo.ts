@@ -1,9 +1,12 @@
-import FavoriteJobs from "../../entities/candidate/favoriteJobs";
+import FavoriteJobs from '../../entities/candidate/favoriteJobs.entity';
+import FavoriteJobsAggregated from '../../entities/candidate/favoriteJobsAggregated.entity';
 
-import IBaseRepo from "../IBaseRepo";
+import IBaseRepo from '../IBaseRepo';
 
 export default interface IFavoriteJobsRepo extends IBaseRepo<FavoriteJobs> {
-    getFavoriteJobWithDetails(candidateId : string) : Promise<FavoriteJobs[] | null>
-    deleteFavoriteJob(jobId : string, candidateId : string) : Promise<void>
-    findWithCandidateId(id : string) : Promise<FavoriteJobs[] | null>
+  getFavoriteJobWithDetails(
+    candidateId: string
+  ): Promise<FavoriteJobsAggregated[] | null>;
+  deleteFavoriteJob(jobId: string, candidateId: string): Promise<void>;
+  findWithCandidateId(id: string): Promise<FavoriteJobs[] | null>;
 }

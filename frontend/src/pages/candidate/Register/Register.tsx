@@ -4,17 +4,16 @@ import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 import { useState } from "react";
 import validator from 'validator'
-import Loader from "../../../components/candidate/Loader";
 import { registerCandiate } from "../../../services/candidateServices";
+import InfinitySpinner from "../../../components/common/InfinitySpinner";
+import GoogleLoginButton from "../../../components/common/GoogleLoginButton";
 
 export default function CandidateRegister(){
     const [name, setfullname] = useState("")
-    const [username, setusername] = useState("")
     const [email, setemail] = useState("")
     const [phone, setphone] = useState("")
     const [password, setpassword] = useState("")
     const [confirmpassword, setconfirmpassword] = useState("")
-    const [validationerror, setvalidationerror] = useState(false)
     const [validationerrortext, setvalidationerrortext] = useState("")
     const [loading, setloading] = useState(false)
     const [showpassword, setshowpassword] = useState(false)
@@ -74,43 +73,46 @@ export default function CandidateRegister(){
         setloading(true)
         event.preventDefault()
         const typedFullnameError = !/^[a-zA-Z]+(?: [a-zA-Z]+)*$/.test(name) || !name || false
-        // const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false //username removed Temp
         const typedEmailError = !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email) || !validator.isEmail(email) || !email || false
         const typedPasswordError = !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password) || !password || false
         const typedPhoneError = !/^[6-9]\d{9}$/.test(phone) || !phone || false
         const confirmationError = password !== confirmpassword || false
         
-        //check for passsword confirmation
-
-
         typedEmailError ? setemailerror("Enter a valid Email") : setemailerror("")
         typedPhoneError ? setphonerror("Enter valid phone number") : setphonerror("")
         typedPasswordError ? setpassworderror("Enter a strong password") : setpassworderror("")
-        // typedUsernameError ? setusernameerror("Username can not be empty") : setusernameerror("")
         typedFullnameError ? setfullnameerror("Enter a valid name") : setfullnameerror("")
         confirmationError ? setpasswordconfirmationerror("Password doesn't match") : setpasswordconfirmationerror("")
         
         if(typedFullnameError || typedEmailError || typedPasswordError || typedPhoneError || confirmationError){
-            setvalidationerror(true)
             setloading(false)
             setvalidationerrortext("Fill the details correctly!")
             return
         }else{
-            setvalidationerror(false)
             setvalidationerrortext("")
             //send data to the backend
 
-                const result = await registerCandiate(name, email, phone, username, password)
+                const result = await registerCandiate(name, email, phone, password)
 
-                if(result.success){
+                setTimeout(() => {
+                    if(result.success){
                     setloading(false)
-                    navigator(`/verify`, {state:{email:result?.candidate}})
+                    navigator(`/verify`, {state:{email:result?.candidateEmail, id:result?.candidateId}})
                     
                 }else{
                     setloading(false)
-                    setvalidationerror(true)
                     setvalidationerrortext(result.message) 
                 }
+                }, 2000)
+
+                // if(result.success){
+                //     setloading(false)
+                //     navigator(`/verify`, {state:{email:result?.candidate}})
+                    
+                // }else{
+                //     setloading(false)
+                //     setvalidationerrortext(result.message) 
+                // }
 
         }
     }
@@ -121,8 +123,8 @@ export default function CandidateRegister(){
     }
 
     return(
-        <div className="flex items-center justify-center w-full h-screen">
-            {loading ? <Loader /> : null}
+        <div className="flex items-center justify-center w-full min-h-screen">
+            {loading ? <InfinitySpinner  /> : null}
             <div className="candidate-register-form-wrapper w-full max-w-md p-5">
                 <h2 className="text-center font-bold">Create Account</h2>
                 <p className="text-center text-xs mt-1" id="login-switch">Already have an account? <span><Link to={'/login'} className="link">Login</Link></span></p>
@@ -186,7 +188,8 @@ export default function CandidateRegister(){
                 </div>
                 <div className="social-auth w-full flex justify-between mt-2 gap-3">
                     <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={facebookIcon} className="inline-block" alt="" /> Sign In with facebook</button>
-                    <button onClick={googleAuth} type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button>
+                    {/* <button onClick={googleAuth} type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button> */}
+                    <GoogleLoginButton />
                 </div>
             </div>
         </div>

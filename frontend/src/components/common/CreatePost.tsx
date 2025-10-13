@@ -1,10 +1,14 @@
-import { useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import {IoMdImages} from 'react-icons/io'
 import CropComponent from "./CropComponent"
 import { createPost } from "../../services/candidateServices"
 import { Notify } from "notiflix"
+import { appContext } from "../../context/AppContext"
 
 export default function CreatePost(){
+
+    const {closeCreatePostModal} = useContext(appContext)
+
     const [sectionUpload, setSectionUpload] = useState(1)
     const [imagePreview, setImagePrivew] = useState("")
     const [crop, setCrop] = useState({x : 0, y : 0})
@@ -88,7 +92,11 @@ export default function CreatePost(){
         const result = await createPost(formData)
         if(result?.success){
             Notify.success('Post created successfully', {timeout:1200})
-            setTimeout(() => window.location.reload(), 1200)
+            setTimeout(() => {
+                closeCreatePostModal()
+                window.location.reload()
+
+            , 1200})
         }else{
             Notify.failure('Something went wrong', {timeout:1200})
             setTimeout(() => window.location.reload(), 1200)

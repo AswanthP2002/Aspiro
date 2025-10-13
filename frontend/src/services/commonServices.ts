@@ -23,6 +23,20 @@ export const adminLogin = async (email : string, password : string) => {
     }
 }
 
+export const refreshAccessToken = async () => {
+    try {
+        const response = await axiosInstance.get('/token/refresh', 
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data?.accessToken
+    } catch (error : unknown) {
+        console.log('Error occured while refreshing the token', error instanceof Error ? error.message : null)
+    }
+}
+
 
 
 export const adminServices = {
@@ -547,5 +561,26 @@ export const commonService = {
         return fetch(`http://localhost:5000/home/jobs?search=${searchValue}`, {
             method:'GET'
         })
+    }
+}
+
+export const googleLogin = async (googleToken : string) => {
+    try {
+        const response = await axiosInstance.post('/google/sign-up',
+            {googleToken},
+            {
+                headers:{'Content-Type':'application/json'}
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while google login')
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+
+        
     }
 }

@@ -4,8 +4,8 @@ import defaultImage from '/default-img-instagram.png'
 export default function Testimonial({reviewData} : any){
     const stars = Array.from({length:5})
     return (
-        <div className="card rounded-lg bg-white shadow p-5">
-            <div className="flex gap-2">
+        <div className="card rounded-lg bg-white shadow p-6">
+            <div className="flex gap-2 mb-5">
             {
                 stars.map((_, index) => {
                     return <>
@@ -18,8 +18,8 @@ export default function Testimonial({reviewData} : any){
                 })
             }
             </div>
-            <div>
-                <p className="text-xs text-gray-400 mt-5">{reviewData?.comment}</p>
+            <div className='mt-3'>
+                <p className="text-base text-gray-600">{reviewData?.comment}</p>
             </div>
             <div className="flex justify-between mt-6">
                 <div className="flex gap-3 items-center">
