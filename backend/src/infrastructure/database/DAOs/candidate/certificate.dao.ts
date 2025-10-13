@@ -1,5 +1,8 @@
-import { model } from "mongoose";
-import Certificates from "../../../../domain/entities/candidate/certificates";
-import { CertificateSchema } from "../../Schemas/candidate/certificate.schema";
+import { model } from 'mongoose';
+import Certificates from '../../../../domain/entities/candidate/certificates.entity';
+import { CertificateSchema } from '../../Schemas/candidate/certificate.schema';
 
-export const CertificateDAO = model<Certificates>('certificate', CertificateSchema)
+export const CertificateDAO = model<Certificates>(
+  'certificate',
+  CertificateSchema
+);

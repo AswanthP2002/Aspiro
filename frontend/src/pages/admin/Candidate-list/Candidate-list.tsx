@@ -4,6 +4,7 @@ import defaultUser from '../../../../public/default-img-instagram.png'
 import { jobRoles } from '../../../assets/data/dummyJobRole';
 import FilterComponent from '../../../components/common/FilterComponent';
 import { getCandidates } from '../../../services/adminServices';
+import { CandidatePersonalData } from '../../../types/entityTypes';
 
 interface FilterType {
   status:boolean[]
@@ -14,13 +15,13 @@ interface FilterType {
 
 export default function Candidates() {
   
-  const [candidates, setCandidates] = useState<any[]>([])
+  const [candidates, setCandidates] = useState<CandidatePersonalData[]>([])
   const [page, setpage] = useState(1)
   const [limit, setlimit] = useState(10)
   const [totalPage, settotalpage] = useState(0)
   const [search, setsearch] = useState("")
   const [pagination, setpagination] = useState<any[]>([])
-  const [selectedCandidate, setselectedcandidate] = useState<any>({})
+  const [selectedCandidate, setselectedcandidate] = useState<CandidatePersonalData>()
 
   const [sortVisible, setSortVisible] = useState(false)
   const [sort, setsort] = useState('joined-latest')
@@ -170,22 +171,22 @@ export default function Candidates() {
               </tr>
             </thead>
             <tbody>
-              {candidates.map((candidate : any, index : number) => (
+              {candidates.map((candidate : CandidatePersonalData, index : number) => (
                 <tr
                   key={index}
                   onClick={() => setselectedcandidate(candidate)}
                   className={`${selectedCandidate?._id === candidate?._id ? "bg-orange-300" : "bg-white"} rounded-lg`}
                 >
                   <td className="p-3 flex items-center gap-2">
-                    <img src={candidate?.profilePicture?.cloudinarySecureUrl ? candidate?.profilePicture?.cloudinarySecureUrl : defaultUser} alt="logo" className="w-8 h-8 rounded-full" />
+                    <img src={candidate?.userDetails?.profilePicture?.cloudinarySecureUrl ? candidate?.userDetails?.profilePicture?.cloudinarySecureUrl : defaultUser} alt="logo" className="w-8 h-8 rounded-full" />
                     {candidate.name}
                   </td>
-                  <td>{candidate.email}</td>
-                  <td>{candidate?.role ? candidate?.role : "Not specified"}</td>
-                  <td>{formatDate(candidate.createdAt)}</td>
+                  <td>{candidate?.userDetails?.email}</td>
+                  <td>{candidate?.jobTitle ? candidate?.jobTitle : "Not specified"}</td>
+                  <td>{formatDate(candidate?.createdAt as string)}</td>
                   <td>
                     {
-                      candidate?.isBlocked
+                      candidate?.userDetails?.isBlocked
                           ? <p className="text-red-400">Blocked</p>
                           : <p className='text-green-400'>Active</p>
                     }
@@ -218,17 +219,17 @@ export default function Candidates() {
       </div>
 
       <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
-        <div className="text-sm text-center text-gray-400">{selectedCandidate?.role ? selectedCandidate.role : "Not Specified" }</div>
-        <img style={{objectFit:'cover'}} src={selectedCandidate.profilePicture.cloudinarySecureUrl ? selectedCandidate.profilePicture.cloudinarySecureUrl : defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
+        <div className="text-sm text-center text-gray-400">{selectedCandidate?.jobTitle ? selectedCandidate?.jobTitle : "Not Specified"}</div>
+        <img style={{objectFit:'cover'}} src={selectedCandidate?.userDetails?.profilePicture?.cloudinarySecureUrl ? selectedCandidate?.userDetails?.profilePicture?.cloudinarySecureUrl : defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
         <div className="text-center">
-          <h3 className="font-semibold">{selectedCandidate.name}</h3>
-          <p className="text-sm text-gray-500">{selectedCandidate?.username}</p>
+          <h3 className="font-semibold">{selectedCandidate?.name}</h3>
+          {/* <p className="text-sm text-gray-500">{selectedCandidate?.username}</p> */}
         </div>
 
         <div className="mt-4">
           <h4 className="font-medium text-sm text-gray-600 mb-1">About</h4>
           <p className="text-xs text-gray-500">
-            {selectedCandidate.about ? selectedCandidate.about : "Not Added Yet"}
+            {selectedCandidate?.about ? selectedCandidate?.about : "Not Added Yet"}
           </p>
         </div>
 
@@ -243,7 +244,7 @@ export default function Candidates() {
           </div>
           <div>
             <span className="font-medium">Joined</span>
-            <p>{formatDate(selectedCandidate.createdAt)}</p>
+            <p>{formatDate(selectedCandidate?.createdAt as string)}</p>
           </div>
           <div>
             <span className="font-medium">Location</span>
@@ -258,11 +259,11 @@ export default function Candidates() {
           style={{ borderRadius: "10px" }}
           loading="lazy"
           allowFullScreen
-          src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedCandidate.location?.city}, ${selectedCandidate.location?.state}, ${selectedCandidate.location?.country}`)}&output=embed`}
+          src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedCandidate?.location?.city}, ${selectedCandidate?.location?.state}, ${selectedCandidate?.location?.country}`)}&output=embed`}
           ></iframe>
         </div>
 
-        <button onClick={() => navigator(`/admin/candidate/details/${selectedCandidate._id}`)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
+        <button onClick={() => navigator(`/admin/candidate/details/${selectedCandidate?._id}`)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
       </div>
     </div>
     : <p className='text-center font-gray-400 mt-3'>No Candidates</p>

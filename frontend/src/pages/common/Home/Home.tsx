@@ -6,6 +6,8 @@ import { useState } from 'react'
 import Tile from '../../../components/common/Tile'
 import TileGuide from '../../../components/common/TileGuide'
 import { guideData } from '../../../assets/data/guideData'
+import {FaSuitcase, FaBriefcase, FaUsers, FaConnectdevelop} from 'react-icons/fa'
+import {PiBuildingOfficeFill} from 'react-icons/pi'
 import reviews from '../../../assets/data/dummyReviews'
 import arrowupdown from '/Arrows-up-down.png'
 import arrowdownup from '/Arrows-down-up.png'
@@ -23,6 +25,33 @@ export default function Home(){
     const [reviewData, setreviews] = useState(reviews)
     const [jobKeywordSearch, setJobKeywordSearch] = useState('')
     const [searchedJobs, setSearchedJobs] = useState<any[]>([])
+
+    const cardData = [
+        {
+        id:1,
+        title:"Jobs",
+        count:10000,
+        icon:<FaBriefcase size={30} color='white' />
+    },
+    {
+        id:2,
+        title:"Companies",
+        count:5000,
+        icon:<PiBuildingOfficeFill size={30} color='white' />
+    },
+    {
+        id:3,
+        title:"Candidates",
+        count:7000,
+        icon:<FaUsers size={30} color='white' />
+    },
+    {
+        id:4,
+        title:"Internships",
+        count:8500,
+        icon:<FaConnectdevelop size={30} color='white' />
+    }
+    ]
 
     const navigator = useNavigate()
 
@@ -67,28 +96,29 @@ export default function Home(){
 
     return(
         <>
-            <div className="w-full landing-section-wrapper bg-cluttered" id="landing-section">
-            <div className="container w-full aspiro-container py-5">
+            <section className="w-full landing-section-wrapper bg-white py-20" id="landing-section">
+            <div className="container w-full aspiro-container">
                 <div className="flex flex-col md:flex-row gap-10 py-20">
                     <div className="left text w-1/2">
-                        <p className="intro-landing-page text-ibm-plex-sans font-medium text-5xl">Level up your career with Asprio</p>
-                        <p className="description-landing-page cluttered-text font-semibold font-poppins text-xs mt-6 me-8 lh-2">
+                    {/* main heading font family changed to default :: previous ibm-plex-sans */}
+                        <h1 className="intro-landing-page font-bold leading-tight text-gray-900 text-5xl">Level up your career with Asprio</h1>
+                        <h3 className="mt-4 text-sm font-normal leading-relaxed text-gray-600">
                         No experience? No problem! Work on real projects, gain hands-on experience, build valuable skills, 
                         and connect with top companies offering internships—prepare for your dream job today!
-                        </p>
-                        <div className="search-options-wrapper relative">
-                        <div className="search-options border border-gray-200 bg-white w-full max-w-[550px] mt-5 px-2 py-2 flex items-center justify-between">
+                        </h3>
+                        <div className="search-options-wrapper relative !mt-6">
+                        <div className="search-options border shadow-md border-gray-200 bg-white w-full max-w-[550px] px-2 py-2 flex items-center justify-between">
                             <div className="item relative">
-                               <input onKeyUp={(event) => dSearch(event)} className='pl-6' type="text" name="search-keywords" id="search-keywords" placeholder='Opportunity title...' /> 
+                               <input onKeyUp={(event) => dSearch(event)} className='pl-6 outline-none' type="text" name="search-keywords" id="search-keywords" placeholder='Opportunity title...' /> 
                                 <i className="fa-solid fa-search absolute left-0 top-2"></i>
                             </div>
                             
                             <div className="location relative">
-                                <input type="text" name="search-location" placeholder='location....' id="search-location" className='pl-6' />
+                                <input type="text" name="search-location" placeholder='location....' id="search-location" className='pl-6 outline-none' />
                                 <i className="fa-solid fa-location-dot absolute left-0 top-2"></i>
                             </div>
                             <div className="button">
-                                <button type="button" className="bg-blue-600 rounded-sm px-3 py-2 text-white text-xs">Find Jobs</button>
+                                <button type="button" className="bg-gradient-to-br from-blue-500 to-indigo-600 hover:bg-blue-700 rounded-sm px-5 py-2.5 text-white text-xs">Find Jobs</button>
                             </div>
                             
                         </div>
@@ -120,40 +150,43 @@ export default function Home(){
                         <img src={landingPageImage} alt="" />
                     </div>
                 </div>
-                <div className="tiles flex justify-between gap-10">
+                <div className="tiles flex justify-between gap-8">
                     {
-                        tileData ? tileData.map((data : any) => {
-                            return <Tile tileData={data} />
+                        cardData ? cardData.map((data : any, index : number) => {
+                            return <Tile key={index} tileData={data} />
                         })
                         : null
                     }
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div className="w-full pt-3 pb-3">
+        <section className="w-full py-16 bg-gray-50">
             <div className='aspiro-container container w-full px-2 md:px-20 py-5'>
-                <p className="text-xl section-title poppins-font mt-5">Most popular vacancies</p>
-                <div className="grid grid-cols-4 gap-y-8 gap-x-4 mt-10">
+                <p className="text-3xl text-center font-bold text-gray-900">Most popular vacancies</p>
+                <div className="grid grid-cols-4 gap-6 gap-x-4 mt-10">
                     {
-                        jobvacancies.map((job) => {
-                            return <div>
-                                <p className="poppins-font section-content !font-normal">{job.jobRole}</p>
-                                <label htmlFor="">Vacancies {job.vacancies}</label>
+                        jobvacancies.map((job, index : number) => {
+                            return <div key={index} className='bg-white flex gap-3 items-center border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out rounded-lg p-5'>
+                                <div className='border border-gray-200 w-[40px] h-[40px] rounded-full flex justify-center items-center'><FaBriefcase /></div>
+                                <div>
+                                    <p className="text-lg font-semibold text-gray-800 mb-2">{job.jobRole}</p>
+                                    <p className="text-sm font-medium text-gray-500">Openings {job.vacancies}</p>
+                                </div>
                             </div>
                         })
                     }
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div className="w-full pt-5 pb-20 bg-cluttered">
+        <section className="w-full bg-white py-20">
             <div className="container w-full px-2 md:px-20 py-5">
-                <p className="text-xl section-title poppins-font mt-5 text-center">How Aspiro Works</p>
-                <div className="w-full mt-10 flex justify-between gap-10 relative">
+                <p className="text-3xl font-semibold text-center mb-16">How Aspiro Works</p>
+                <div className="w-full grid grid-cols-4 gap-10 relative">
                     {
-                        tileguideData.map((data) => {
-                            return <TileGuide data={data} />
+                        tileguideData.map((data, index : number) => {
+                            return <TileGuide key={index} data={data} />
                         })
                     }
 
@@ -163,16 +196,16 @@ export default function Home(){
 
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div className="w-full bg-white pt-20 pb-20">
+        <section className="w-full bg-gradient-to-r from-blue-50 to-indigo-70 py-20">
             <div className="aspiro-container">
-                <div className="flex flex-col md:flex-row">
-                    <div className="col w-1/2 flex items-center justify-center">
-                        <p className="text-3xl font-bold">Why Aspiro?</p>
+                <div className="grid grid-cols-2 gap-10">
+                    <div className="flex items-center justify-center">
+                        <p className="text-3xl font-extrabold text-gray-900">Why Aspiro?</p>
                     </div>
-                    <div className="col w-1/2">
-                        <p className='leading-loose'>
+                    <div className="">
+                        <p className='leading-relaxed text-lg text-gray-700'>
                             Aspiro is your gateway to real-world experience, connecting freshers and students with top companies. 
                             Whether it's internships, mini-projects, or career opportunities, we help you build skills, 
                             gain hands-on experience, and take the first step toward your dream job. With personalized 
@@ -181,20 +214,20 @@ export default function Home(){
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div className="w-full bg-cluttered pt-20 pb-20">
+        <section className="w-full bg-cluttered py-20">
             <div className="aspiro-container">
-                <p className="text-2xl font-semibold text-center mb-10">What others saying?</p>
+                <p className="text-3xl font-bold text-center mb-10">What others are saying?</p>
                 <div className="flex jusityf-between gap-10">
                     {
                         reviewData.map((data : any, index : number) => {
-                            return <Testimonial reviewData={data} />
+                            return <Testimonial key={index} reviewData={data} />
                         })
                      }
                 </div>
             </div>
-        </div>
+        </section>
 
         <div className="w-full bg-white pt-20 pb-20">
             <div className="aspiro-container">

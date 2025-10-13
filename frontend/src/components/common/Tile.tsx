@@ -1,12 +1,12 @@
 export default function Tile({tileData} : any){
     return(
-        <div className="shadow flex gap-4 bg-white w-full p-3 group hover:shadow-lg">
-            <div className="p-4 group-hover:bg-blue-500 bg-blue-300 flex items-center justify-center">
-                <i className={`${tileData.icon} group-hover:!text-white !text-blue-600`} style={{fontSize:'1.7rem'}}></i>
+        <div className="border border-gray-200 rounded hover:-translate-y-1 hover:shadow-lg transition-all duration-200 ease-in-out flex gap-4 bg-white w-full p-3 group hover:shadow-lg">
+            <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                {tileData.icon}
             </div>
             <div>
-                <p className="font-bold">{tileData.title}</p>
-                <p className="text-xs mt-2">{tileData.count}</p>
+                <p className="text-lg font-semibold text-gray-800">{tileData.title}</p>
+                <p className="text-sm text-gray-500 mt-1">{tileData.count}</p>
             </div>
         </div>
     )

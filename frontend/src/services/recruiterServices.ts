@@ -2,11 +2,12 @@ import { AxiosError } from "axios";
 import axios from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
+import { Recruiter } from "../types/entityTypes";
 
-export const recruiterRegister = async (email : string, username : string, password : string) => {
+export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
     try {
         const response = await axiosInstance.post('/recruiter/register',
-            {email, username, password},
+            {fullName, email, phone, password},
             {
                 headers:{'Content-Type' : 'application/json'}
             } as AxiosRequest
@@ -41,13 +42,13 @@ export const recruiterLogin = async (email : string, password : string) => {
     }
 }
 
-export const saveIntroDetails = async (details: any, logourl: string, coverphotourl: string) => {
+export const saveIntroDetails = async (recruiterDetails : Recruiter) => {
     try {
         const response = await axiosInstance.post('/recruiter/intro/details',
-            {details, logourl, coverphotourl},
+            recruiterDetails,
             {
                 headers:{'Content-Type' : 'application/json'},
-                sendAuthTokenRecruiter:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -130,7 +131,7 @@ export const logoutRecruiter = async () => {
 export const getProfileOverview = async () => {
     try {
         const response = await axiosInstance.get('/recruiter/profile/overview', {
-            sendAuthTokenRecruiter:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data

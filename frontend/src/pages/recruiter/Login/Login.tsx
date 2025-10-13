@@ -8,6 +8,7 @@ import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import { recruiterLogedIn } from "../../../redux-toolkit/recruiterAuthSlice";
 import { recruiterLogin } from "../../../services/recruiterServices";
+import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
 
 export default function RecruiterLogin(){
     const [showpassword, setshowpassword] = useState(false)
@@ -49,9 +50,9 @@ export default function RecruiterLogin(){
                 if(result.success){
                     console.log('testing full result ', result)
                     console.log('testing incoming data', result?.result?.token, result?.result?.user)
-                    dispatcher(recruiterLogedIn({recruiter:result?.result?.recruiter, token:result?.result?.token}))
+                    dispatcher(loginSuccess({user:result?.result?.user, userToken:result?.result?.token, userRole:result?.result?.role}))
                     setloading(false)
-                    navigator('/recruiter')
+                    navigator('/')
                 }else{
                     setloading(false)
                     setvalidationerror(true)

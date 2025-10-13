@@ -8,4 +8,5 @@ export enum StatusCodes {
     NOT_ACCEPTABLE = 406,
     CONFLICT = 409,
     INTERNAL_SERVER_ERROR = 500,
+    LOGIN_TIMEOUT_NON_STANDARD = 440 //This one is not a standard http status code :: Microsoft
 }

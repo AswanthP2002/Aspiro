@@ -8,7 +8,7 @@ export default function SocialmediaLinks({data, removeLink} : any) {
                 {data?.domain?.includes('twitter') ? <i className="fa-brands fa-twitter"></i> : null}
                 <div className="border-l p-0 border-gray-300 px-2 w-full">
                     {/* <p className="text-xs text-gray-400">{data.url}</p> */}
-                    <input type="text" disabled={true} className="text-xs text-gray-400 border-none w-full" value={data.url} />
+                    <input type="text" disabled={false} className="cursor-not-allowed text-xs text-gray-400 border-none w-full" value={data.url} />
                 </div>
                 {/* <div className="flex justify-end w-full">
                     <i className="fa-solid fa-pencil !text-xs cursor-pointer"></i>

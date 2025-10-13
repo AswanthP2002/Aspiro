@@ -55,7 +55,7 @@ export default function VerificationPage(){
     }
     
 
-    const {email} = location.state || {}
+    const {email, id} = location.state || {}
 
     const navigator = useNavigate()
 
@@ -72,7 +72,7 @@ export default function VerificationPage(){
         }else{
             setloading(false)
             
-                const result = await verify(email, otp)
+                const result = await verify(id, email, otp)
 
                 if(result.success){
                     Swal.fire({
@@ -84,7 +84,7 @@ export default function VerificationPage(){
                         confirmButtonText:"Login"
                     }).then((result) => {
                         if(result.isConfirmed){
-                            navigator(`/login`)
+                            navigator(`/candidate/login`)
                         }
                     })
                 }else{

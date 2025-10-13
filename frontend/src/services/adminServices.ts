@@ -27,7 +27,7 @@ export const logoutAdmin = async () => {
     try {
         const result = await axiosInstance.post('/admin/logout', null, {
             sendCookie:true,
-            sendAuthTokenAdmin:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return result.data
@@ -246,7 +246,7 @@ export const getCandidates = async (search: string, page: number, sort : string,
     try {
         const response = await axiosInstance.get('/admin/candidates/data', {
             params:{search, page, sort, filter:JSON.stringify(filter)},
-            sendAuthTokenAdmin:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
@@ -271,7 +271,7 @@ export const getCandidateDetails = async (candidateId : any) => {
     try {
         const response = await axiosInstance.get('/admin/candidate/details', {
             params:{candidateId},
-            sendAuthTokenAdmin:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
@@ -295,7 +295,7 @@ export const getCandidateDetails = async (candidateId : any) => {
 export const candidateBlock = async (candidateId : string) => {
     try {
         const response = await axiosInstance.patch(`/admin/candidate/block/${candidateId}`, null, {
-            sendAuthTokenAdmin:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
@@ -319,7 +319,7 @@ export const candidateBlock = async (candidateId : string) => {
 export const candidateUnblock = async (candidateId : string) => {
     try {
         const response = await axiosInstance.patch(`/admin/candidate/unblock/${candidateId}`, null, {
-            sendAuthTokenAdmin:true
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data

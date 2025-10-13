@@ -1,7 +1,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { adminLogout } from '../../../redux-toolkit/adminAuthSlice';
+import { logout } from '../../../redux-toolkit/userAuthSlice';
 import { logoutAdmin } from '../../../services/adminServices';
 import Swal from 'sweetalert2';
 
@@ -12,7 +12,7 @@ export default function Sidebar(){
   async function triggerAdminLogout(){
     const logoutResult = await logoutAdmin()
     if(logoutResult?.success){
-      dispatcher(adminLogout())
+      dispatcher(logout())
       Swal.fire({
         icon:'success',
         title:'Logout Successful',

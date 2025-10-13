@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy, Profile} from "passport-google-oauth20";
 import dotenv from 'dotenv'
 import CandidateRepository from "../infrastructure/repositories/candidate/candidateRepository";
 import { RegisterGoogleAuthCandidateSchema } from "../presentation/controllers/dtos/candidate/registerGoogleAuthCandidate";
-import { createCandidatefromDTO, createGoogleAutCandidatefromDTO } from "../domain/mappers/candidate/candidateMapper";
+import { createCandidatefromDTO, createGoogleAutCandidatefromDTO } from "../domain/mappers/candidate/candidate.mapper";
 import { join } from "path";
 dotenv.config()
 
@@ -19,10 +19,10 @@ passport.use(new GoogleStrategy({
             console.log('user id before querying the db', profile.id)
             const candidate = await candidateRepository.findByGoogleId(profile.id)
             console.log('after fetching from passport.ts:::', candidate)
-            if(candidate && !candidate.isBlocked){//already user account exist => login procedure
+            if(candidate){//already user account exist => login procedure
                 console.log('Passport.ts :: Candidate account already exist going to return that user', candidate)
                 return done(null, candidate)
-            }else if(candidate && candidate.isBlocked){//candidate blocked so need information
+            }else if(candidate){//candidate blocked so need information
                 console.log('Passport.ts :: Candidate found but blocked by admin')
                 return done(null, false)
 

@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AddExperienceForm from "../../../components/candidate/Forms/ExperienceAdd";
+import {IoSchoolSharp}  from 'react-icons/io5'
 import Swal from "sweetalert2";
 import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEdit";
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
 import { deleteCandidateEducation, deleteCandidateExperience, deleteCandidateSkills, getCandidateEducation, getCandidateExperience, getCandidateSkills } from "../../../services/candidateServices";
-import { transformDate } from "../../../services/util/formatDate";
+import { Education, Experience, Skills } from "../../../types/entityTypes";
+import CandidateExperienceCard from "../../../components/candidate/Cards/ExperienceCard";
+import CandidateEducationCard from "../../../components/candidate/Cards/EducationCard";
+
 
 export default function ExperiencePage(){
 
-    const [experiences, setexperiences] = useState<any[]>([])
-    const [education, seteducation] = useState<any[]>([])
-    const [skills, setskills] = useState<any[]>([])
+    const [experiences, setexperiences] = useState<Experience[]>([])
+    const [education, seteducation] = useState<Education[]>([])
+    const [skills, setskills] = useState<Skills[]>([])
 
     const [selectedExperience, setSelectedExperience] = useState<any>({})
     const [selectedEducation, setSelecteEducation] = useState<any>({})
@@ -25,6 +29,48 @@ export default function ExperiencePage(){
 
     const [educationModalOpen, setEducationModalOpen] = useState(false)
     const [editEducationModalOpen, setEditEducationModalOpen] = useState(false)
+
+    const onAddSkill = (skill : string, type : string, level : string) => {
+        setskills((prv : Skills[]) => {
+            return [...prv, {level, type, skill}]
+        })
+    }
+    const onRemoveSkill = (skill : string) => {
+        setskills((prv : Skills[]) => {
+            return prv.filter((s : Skills) => s.skill.toLowerCase() !== skill.toLowerCase())
+        })
+    }
+
+    const onEditEducation = (id : string, education : Education) => {
+        seteducation((prv : Education[]) => {
+            return [
+                    ...prv.filter((edu : Education) => edu._id !== id),
+                    {
+                        level:education.level,
+                        stream:education.stream,
+                        organization:education.organization,
+                        isPresent:education.isPresent,
+                        startYear:education.startYear,
+                        endYear:education.endYear,
+                        location:education.location,
+                        _id:education._id
+                    }
+                   ]
+        })
+    }
+    const onDeleteEducation = (eduId? : string) => {
+        seteducation((prv : Education[]) => {
+            return prv.filter((edu : Education) => edu._id !== eduId)
+        })
+    }
+
+    const onDeleteExperience = (expId : string) => {
+        setexperiences((prv : Experience[]) => {
+            return prv.filter((exp : Experience) => exp._id !== expId)
+        })
+    }
+
+
 
     const token = useSelector((state : any) => {
         return state.candidateAuth.token
@@ -57,7 +103,7 @@ export default function ExperiencePage(){
         openEditEducationModal()
     }
 
-    async function deleteExperience(expId : string) {
+    async function deleteExperience(expId? : string) {
             Swal.fire({
                 icon:'warning',
                 title:'Confirm Delete?',
@@ -75,7 +121,7 @@ export default function ExperiencePage(){
                         showCancelButton: false,
                         showConfirmButton: false,
                         timer: 2000
-                    }).then(() => window.location.reload())
+                    }).then(() => onDeleteExperience(expId as string))
                 }else{
                     return
                 }
@@ -84,7 +130,7 @@ export default function ExperiencePage(){
 
     }
 
-    async function deleteSkill(skillId : string) {
+    async function deleteSkill(skillId : string, skill : string) {
 
             await deleteCandidateSkills(skillId)
 
@@ -94,10 +140,10 @@ export default function ExperiencePage(){
                     showConfirmButton:false,
                     showCancelButton:false,
                     timer:1500
-                }).then(() => window.location.reload())
+                }).then(() => onRemoveSkill(skill))
     }
 
-    async function deleteEducation(educationId : string) {
+    async function deleteEducation(educationId? : string) {
             Swal.fire({
                 icon:'warning',
                 title:'Confirm Delete',
@@ -115,7 +161,7 @@ export default function ExperiencePage(){
                         showConfirmButton:false,
                         showCancelButton:false,
                         timer:1500
-                    }).then(() => window.location.reload())
+                    }).then(() => onDeleteEducation(educationId))
                 }else{
                     return
                 }
@@ -123,6 +169,63 @@ export default function ExperiencePage(){
 
             
 
+    }
+
+    const onAddExperience = (experience : Experience) => {
+        setexperiences((prv : Experience[]) => {
+            return [
+                ...prv,
+                {
+                    role:experience.role,
+                    jobtype:experience.jobtype,
+                    organization:experience.organization,
+                    location:experience.location,
+                    locationtype:experience.locationtype,
+                    ispresent:experience.ispresent,
+                    startdate:experience.startdate,
+                    enddate:experience.enddate
+                }
+            ]
+        })
+        // role, jobtype, location, locationtype, organization, ispresent, startdate, enddate
+
+        setexperiencemodalopen(false)
+    }
+
+    const onEditExperience = (experience : Experience) => {
+        setexperiences((prv : Experience[]) => {
+            return [
+                ...prv.filter((exp : Experience) => exp._id !== experience._id),
+                {
+                    _id:experience._id,
+                    role:experience.role,
+                    organization:experience.organization,
+                    jobtype:experience.jobtype,
+                    location:experience.location,
+                    locationtype:experience.locationtype,
+                    startdate:experience.startdate,
+                    enddate:experience.enddate,
+                    ispresent:experience.ispresent
+                }
+            ]
+        })
+    }
+
+    const onAddEducation = (education : Education) => {
+        seteducation((prv : Education[]) => {
+            return [
+                ...prv,
+                {
+                    level:education.level,
+                    stream:education.stream,
+                    organization:education.organization,
+                    location:education.location,
+                    isPresent:education.isPresent,
+                    startYear:education.startYear,
+                    endYear:education.endYear
+                }
+            ]
+        })
     }
 
     useEffect(() => {
@@ -170,116 +273,55 @@ export default function ExperiencePage(){
 
     return(
         <>
-        <div className="container px-10 py-5">
+        <div className="container px-5 py-5">
             <section className="experience">
                 <div className="w-full flex justify-between">
                     <div><p className="font-bold">Experiences</p></div>
                     <div><button onClick={openModal} type="button" className="btn font-normal text-sm">Add experience <i className="fa-solid fa-circle-plus"></i></button></div>
                 </div>
-                <div className="mt-5">
+                <div className="mt-5 grid grid-cols-2 gap-3">
                     {
                         experiences.length > 0
                                 ? <>
-                                    <table className="table w-full">
-                                        <thead className="w-full">
-                                            <tr className="bg-gray-300">
-                                                <th className="text-sm font-semibold py-1">Role</th>
-                                                <th className="text-sm font-semibold py-1">From</th>
-                                                <th className="text-sm font-semibold py-1">To</th>
-                                                <th className="text-sm font-semibold py-1">Duration</th>
-                                                <th className="text-sm font-semibold py-1">Action</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {
-                                                experiences.map((exp: any, index: number) => {
-                                                    return <>
-                                                        <tr className="">
-                                                            <td className="flex items-center gap-3">
-                                                                <div><i className="fa-solid fa-building-user !text-3xl !text-gray-400"></i></div>
-                                                                <div className="">
-                                                                    <p className="font-semibold text-sm">{exp?.role} <span className="ms-2 rounded-full bg-blue-200 text-blue-500 text-xs font-semibold px-2">{exp?.locationtype}</span></p>
-                                                                    <p className="mt-3 text-gray-400 text-xs">{exp.organization} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{exp.location}</span></p>
-                                                                </div>
-                                                            </td>
-                                                            <td className="text-sm">{formatDate(exp?.startdate)}</td>
-                                                            <td className="text-sm">{exp?.enddate ? formatDate(exp?.enddate) : "Present"}</td>
-                                                            <td className="text-sm">
-                                                                {
-                                                                    exp?.enddate
-                                                                        ? getExperienceDuration(new Date(exp?.startdate), new Date(exp.enddate))
-                                                                        : getExperienceDuration(new Date(exp?.startdate), "")
-                                                                } Months
-                                                            </td>
-                                                            <td className="flex justify-end">
-                                                                <button className="btn text-xs border p-2 me-3" onClick={() => selecteEditableExperience(index)}>Edit <i className="fa-solid fa-pencil !text-xs"></i></button>
-                                                                <button className="btn text-xs border p-2" onClick={() => deleteExperience(exp?._id)}>Remove <i className="fa-solid fa-trash !text-xs"></i></button>
-                                                            </td>
-                                                        </tr>
-                                                    </>
-                                                })
-                                            }
-                                        </tbody>
-                                    </table>
+                                    {
+                                        experiences.map((exp : Experience, index : number) => {
+                                            return <CandidateExperienceCard 
+                                                    key={index} 
+                                                    exp={exp} 
+                                                    editExperience={() => selecteEditableExperience(index)} 
+                                                    deleteExperience={() => deleteExperience(exp?._id)}
+                                                   />
+                                        })
+                                    }
                                 </>
                                 : <p className="text-center text-gray-300">No Experience provided</p>
                     }
                 </div>
             </section>
 
-            <hr className="mt-5" />
+            <div className="mt-5 border border-gray-200"></div>
 
             <section className="education mt-10">
                 <div className="w-full flex justify-between">
                     <div><p className="font-bold">Education</p></div>
                     <div><button onClick={openEducationModal} type="button" className="btn font-normal text-sm">Add education <i className="fa-solid fa-circle-plus"></i></button></div>
                 </div>
-                    <div className="mt-5">
+                    <div className="mt-5 grid grid-cols-4 gap-5">
                         {
                             education.length > 0
                                 ? <>
-                                    <table className="table w-full">
-                                        <thead className="w-full">
-                                            <tr className="bg-gray-300">
-                                                <th className="text-sm font-semibold py-1">Education</th>
-                                                <th className="text-sm font-semibold py-1">From</th>
-                                                <th className="text-sm font-semibold py-1">To</th>
-                                                <th className="text-sm font-semibold py-1">Action</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {
-                                                education.map((ed: any, index: number) => {
-                                                    return <>
-                                                        <tr className="">
-                                                            <td className="flex items-center gap-3">
-                                                                <div><i className="fa-solid fa-school !text-3xl !text-gray-400"></i></div>
-                                                                <div className="">
-                                                                    <p className="font-semibold text-sm">{ed?.stream}</p>
-                                                                    <p className="mt-3 text-gray-400 text-xs">{ed?.level} <span><i className="fa-solid fa-location-dot !text-gray-400 me-2"></i>{ed?.organization}</span></p>
-                                                                </div>
-                                                            </td>
-                                                            <td className="text-sm">{formatDate(ed?.startYear)}</td>
-                                                            <td className="text-sm">{ed?.endYear ? formatDate(ed?.endYear) : "Studying"}</td>
-                                                            <td className="flex justify-end">
-                                                                <button className="btn text-xs border p-2 me-3" onClick={() => selecteEditableEducation(index)}>Edit <i className="fa-solid fa-pencil !text-xs"></i></button>
-                                                                <button className="btn text-xs border p-2" onClick={() => deleteEducation(ed?._id)}>Remove <i className="fa-solid fa-trash !text-xs"></i></button>
-                                                            </td>
-                                                        </tr>
-                                                    </>
-                                                })
-                                            }
-                                        </tbody>
-                                    </table>
+                                    {
+                                        education.map((education : Education, index : number) => {
+                                            return <CandidateEducationCard key={index} education={education} openEditEducationModal={() => selecteEditableEducation(index)}  deleteEducation={() => deleteEducation(education._id)} />
+                                        })
+                                    }
                                 </>
                                 : <p className="text-center text-gray-300">No Education provided</p>
                         }
                     </div>
             </section>
 
-            <hr className="mt-5" />
+            <div className="mt-5 border border-gray-200"></div>
 
             <section className="skills mt-10">
                 <div className="w-full flex justify-between">
@@ -298,7 +340,7 @@ export default function ExperiencePage(){
                                              <div key={index} className="">
                                                  <div className="skill rounded-full px-3 py-2 flex items-center gap-2 border border-gray-300">
                                                      <p className="text-xs skill-name">{skill?.skill}</p>
-                                                     <i onClick={() => deleteSkill(skill._id)} className="cursor-pointer fa-regular fa-circle-xmark"></i>
+                                                     <i onClick={() => deleteSkill(skill._id, skill.skill)} className="cursor-pointer fa-regular fa-circle-xmark"></i>
                                                  </div>
                                              </div>
                                             </>
@@ -314,13 +356,17 @@ export default function ExperiencePage(){
         </div>
         {/* Experience Modal */}
 
-        <AddExperienceForm token={token} experiencemodalopen={experiencemodalopen} closeModal={closeModal} />
-        <EditExperienceForm experience={selectedExperience} token={token} editExperienceModalOpen={editExperienceModalOpen} closeExpEditModal={closeExpEditModal} />
+        <AddExperienceForm onAddExperience={onAddExperience} token={token} experiencemodalopen={experiencemodalopen} closeModal={closeModal} />
+        {
+            editExperienceModalOpen && (<EditExperienceForm onEditExperience={onEditExperience} experience={selectedExperience} token={token} editExperienceModalOpen={editExperienceModalOpen} closeExpEditModal={closeExpEditModal} />)
+        }
         
-        <AddEducationForm token={token} educationModalOpen={educationModalOpen} closeEducationModal={closeEducationModal} />
-        <EditEducationForm selectedEducation={selectedEducation} token={token} editEducationModalOpen={editEducationModalOpen} closeEditEducationModal={closeEditEducationModal} />
+        <AddEducationForm onAddEducation={onAddEducation} token={token} educationModalOpen={educationModalOpen} closeEducationModal={closeEducationModal} />
+        {
+            editEducationModalOpen && (<EditEducationForm selectedEducation={selectedEducation} token={token} onEditEducation={onEditEducation} editEducationModalOpen={editEducationModalOpen} closeEditEducationModal={closeEditEducationModal} />)
+        }
         
-        <AddSkillsForm token={token} skillsModalOpen={skillsModalOpen} closeSkillsModal={closeSkillsModal} />
+        <AddSkillsForm onRemoveSkill={onRemoveSkill} onAddSkill={onAddSkill} token={token} skillsModalOpen={skillsModalOpen} closeSkillsModal={closeSkillsModal} />
         </>
     )
 }

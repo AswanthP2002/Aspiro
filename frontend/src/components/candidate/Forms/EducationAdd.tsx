@@ -1,182 +1,366 @@
-import { Box, Modal, Typography } from "@mui/material";
-import { useState } from "react";
-import { higherSecondaryEducation, bachelorsDegree, mastersDegree, diploma } from "../../../assets/data/educationalStreamsData";
-import Swal from "sweetalert2";
-import { addCandidateEducation } from "../../../services/candidateServices";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useState } from 'react';
+import {
+  higherSecondaryEducation,
+  bachelorsDegree,
+  mastersDegree,
+  diploma,
+} from '../../../assets/data/educationalStreamsData';
+import { addCandidateEducation } from '../../../services/candidateServices';
+import { Controller, useForm } from 'react-hook-form';
+import { Notify } from 'notiflix';
 
-export default function AddEducationForm({educationModalOpen, closeEducationModal} : any){
+export default function AddEducationForm({
+  educationModalOpen,
+  closeEducationModal,
+  onAddEducation,
+}: any) {
+  type Inputs = {
+    educationLevel: string;
+    educationStream: string;
+    educationInstitution: string;
+    isPresent: boolean;
+    startYear: string;
+    endYear: string;
+    location: string;
+  };
 
-    const [educationLevel, setEducationLevel] = useState("")
-    const [educationLevelError, setEducationLevelError] = useState("")
-    const [educationStream, setEducationStream] = useState("")
-    const [educationStreamError, setEducationStreamError] = useState("")
-    const [educationInstitution, setEducationInstitution] = useState("")
-    const [educationInstitutionError, setEducationInstituitonError] = useState("")
-    const [isPresent, setIspresent] = useState(false)
-    const [startYear, setStartDate] = useState("")
-    const [startDateError, setStartDateError] = useState("")
-    const [endYear, setEndDate] = useState("")
-    const [endDateError, setEndDateError] = useState("")
-    const [location, setLocation] = useState("")
-    const [locationError, setLocationError] = useState("")
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>();
 
-    const toggleIsPresent = () => {
-        setIspresent(prev => !prev)
-    }
+  const addEducation = async (data: any) => {
+    setLoading(true);
+    const {
+      educationInstitution,
+      educationLevel,
+      educationStream,
+      startYear,
+      endYear,
+      location,
+    } = data;
+    const result = await addCandidateEducation(
+      educationLevel,
+      educationStream,
+      educationInstitution,
+      isPresent,
+      startYear,
+      endYear,
+      location
+    );
+    setTimeout(() => {
+      if (result?.success) {
+        Notify.success('Education added', { timeout: 2000 });
+      } else {
+        Notify.failure(result?.message, { timeout: 2000 });
+      }
+      setLoading(false);
+      closeEducationModal();
+      reset({
+        educationLevel:"",
+        educationStream:"",
+        educationInstitution:"",
+        isPresent:false,
+        startYear:"",
+        endYear:"",
+        location:""
+      })
+      onAddEducation({
+        level: educationLevel,
+        stream: educationStream,
+        organization: educationInstitution,
+        isPresent: isPresent,
+        location: location,
+        startYear: startYear,
+        endYear: endYear,
+      });
+    }, 2000);
+  };
 
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width:'auto',
-        minWidth:400,
-        bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 24,
-        p: 4,
-    };
+  const eduLevel = watch('educationLevel');
 
-    function validateForm() : boolean{
-        const educationlevelerror = !educationLevel || false
-        const educationstreamerror = !educationStream || !/^[A-Za-z.&-]+(?: [A-Za-z.&-]+)*$/.test(educationStream) || false
-        const educationinstitutionerror = !educationInstitution || !/^[A-Za-z0-9 .&'()-]{2,100}$/.test(educationInstitution) || false
-        const startdateerror = !startYear || false
-        let enddaterror = false
-        if(endYear){
-            enddaterror = !endYear || false
-        }
-        const locationerror = !location || !/^[A-Za-z .'-]{2,50}(, [A-Za-z .'-]{2,50})?$/.test(location) || false
+  const [loading, setLoading] = useState(false);
+  const [isPresent, setIspresent] = useState(false);
 
-        educationlevelerror ? setEducationLevelError('Please select education level') : setEducationLevelError('')
-        educationstreamerror ? setEducationStreamError('Please provide education stream') : setEducationStreamError('')
-        educationinstitutionerror ? setEducationInstituitonError('Enter a valid institution name') : setEducationInstituitonError('')
-        startdateerror ? setStartDateError('Provide a valid date') : setStartDateError('')
-        enddaterror ? setEndDateError('Provide a valid date') : setEndDateError('')
-        locationerror ? setLocationError('Provide location') : setLocationError('')
+  //seting vales from watch
 
-        if(educationlevelerror || educationstreamerror || educationinstitutionerror || startdateerror || enddaterror || locationerror){
-            return false
-        }
+  const toggleIsPresent = () => {
+    setIspresent((prev) => !prev);
+  };
 
-        return true
-    }
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 'auto',
+    minWidth: 400,
+    bgcolor: 'background.paper',
+    borderRadius: 2,
+    boxShadow: 24,
+    p: 4,
+  };
 
-    async function addEducation(){
-        const isValidated = validateForm()
-        if(!isValidated) return
-        closeEducationModal()
+  return (
+    <Modal open={educationModalOpen} onClose={closeEducationModal}>
+      <Box sx={style}>
+        <div className="w-full flex justify-end">
+          <button onClick={closeEducationModal} type="button" className="">
+            <i className="fa-solid fa-close"></i>
+          </button>
+        </div>
+        <Typography variant="h6" component="h2" sx={{ textAlign: 'center' }}>
+          Add Education
+        </Typography>
+        <form onSubmit={handleSubmit(addEducation)}>
+          <FormControl
+            fullWidth
+            sx={{ marginTop: '20px' }}
+            error={Boolean(errors.educationLevel)}
+          >
+            <InputLabel id="education-level-label">Education Level</InputLabel>
+            <Controller
+              name="educationLevel"
+              control={control}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Education level can not be empty',
+                },
+              }}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId="education-level-label"
+                  label="Education Level"
+                  error={Boolean(errors.educationLevel)}
+                >
+                  <MenuItem value="higherSecondary">Higher Secondary</MenuItem>
+                  <MenuItem value="bachelors">Bachelors Degree</MenuItem>
+                  <MenuItem value="masters">Masters Degree</MenuItem>
+                  <MenuItem value="diploma">Diploma</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
+                </Select>
+              )}
+            />
+            <FormHelperText>{errors.educationLevel?.message}</FormHelperText>
+          </FormControl>
 
-            await addCandidateEducation(educationLevel, educationStream, educationInstitution, isPresent, startYear, endYear, location)
+          <FormControl
+            fullWidth
+            sx={{ marginTop: '20px' }}
+            error={Boolean(errors.educationStream)}
+          >
+            {eduLevel === 'other' ? (
+              <TextField
+                variant="outlined"
+                label="Education Stream"
+                {...register('educationStream', {
+                  required: {
+                    value: true,
+                    message: 'Education stream can not empty',
+                  },
+                  minLength: { value: 2, message: 'Minimum 2 charecters' },
+                  maxLength: { value: 30, message: 'Maximum 30 charecters' },
+                  pattern: {
+                    value: /^[a-zA-Z0-9\s-&()\/]+$/,
+                    message: 'Enter a valid education',
+                  },
+                })}
+                error={Boolean(errors.educationStream)}
+                helperText={errors.educationStream?.message}
+              />
+            ) : (
+              <>
+                <InputLabel id="education-stream-label">
+                  Education Stream
+                </InputLabel>
+                <Controller
+                  name="educationStream"
+                  control={control}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: 'Education stream can not be empty',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      labelId="education-stream-label"
+                      label="Education Stream"
+                    >
+                      {eduLevel === 'higherSecondary' &&
+                        higherSecondaryEducation.map(
+                          (stream, index: number) => (
+                            <MenuItem key={index} value={stream}>
+                              {stream}
+                            </MenuItem>
+                          )
+                        )}
+                      {eduLevel === 'bachelors' &&
+                        bachelorsDegree.map((stream, index: number) => (
+                          <MenuItem key={index} value={stream}>
+                            {stream}
+                          </MenuItem>
+                        ))}
+                      {eduLevel === 'masters' &&
+                        mastersDegree.map((stream, index: number) => (
+                          <MenuItem key={index} value={stream}>
+                            {stream}
+                          </MenuItem>
+                        ))}
+                      {eduLevel === 'diploma' &&
+                        diploma.map((stream, index: number) => (
+                          <MenuItem key={index} value={stream}>
+                            {stream}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  )}
+                />
+                <FormHelperText>
+                  {errors.educationStream?.message}
+                </FormHelperText>
+              </>
+            )}
+          </FormControl>
 
-                Swal.fire({
-                    icon:'success',
-                    title:'Added',
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:1500
-                }).then(() => window.location.reload())
-    }
+          <FormControl fullWidth sx={{ marginTop: '20px' }}>
+            <TextField
+              variant="outlined"
+              label="Institution"
+              {...register('educationInstitution', {
+                required: {
+                  value: true,
+                  message: 'Institution name can not be empty',
+                },
+                maxLength: { value: 50, message: 'Maximum 50 charecters' },
+                pattern: {
+                  value: /^[a-zA-Z0-9\s.,'()&-]+$/,
+                  message: 'Enter a valid name',
+                },
+              })}
+              error={Boolean(errors.educationInstitution)}
+              helperText={errors.educationInstitution?.message}
+            />
+          </FormControl>
 
-    return(
-        <Modal open={educationModalOpen} onClose={closeEducationModal}>
-        <Box sx={style}>
-            <div className='w-full flex justify-end'>
-                <button onClick={closeEducationModal} type="button" className=""><i className="fa-solid fa-close"></i></button>
-            </div>
-          <Typography variant="h6" component="h2" sx={{textAlign:'center'}}>Add Education</Typography>
-          <Box sx={{width:'100%'}}>
-            <label htmlFor="">Education Level</label>
-            <select name="educationlevel" id="" value={educationLevel} onChange={(event) => setEducationLevel(event.target.value)} className="outline-none border border-gray-400 p-2 w-full rounded">
-                <option value="">--Select Education Level--</option>
-                <option value="higherSecondary">Higher Secondary</option>
-                <option value="bachelors">Bachelors Degree</option>
-                <option value="masters">Masters Degree</option>
-                <option value="diploma">Diploma</option>
-                <option value="other">Other</option>
-            </select>
-            <label className='error-label'>{educationLevelError}</label>
-          </Box>
-          <Box sx={{width:'100%', marginTop:'10px'}}>
-            <label htmlFor="">Stream</label>
-            {
-                educationLevel === 'other'
-                    ? <input type="text" value={educationStream} onChange={(event) => setEducationStream(event.target.value)} className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-                    : <>
-                        <select name="" id="" value={educationStream} onChange={(event) => setEducationStream(event?.target.value)} className="outline-none border border-gray-400 p-2 rounded w-full">
-                            <option value="">--Select Education Stream--</option>
-                            {
-                                educationLevel === 'higherSecondary' && (
-                                    higherSecondaryEducation.map((stream, index) => {
-                                        return <option key={index} value={stream}>{stream}</option>
-                                    })
-                                )
-                            }
-                            {
-                                educationLevel === 'bachelors' && (
-                                    bachelorsDegree.map((stream, index) => {
-                                        return <option key={index} value={stream}>{stream}</option>
-                                    })
-                                )
-                            }
-                            {
-                                educationLevel === 'masters' && (
-                                    mastersDegree.map((stream, index) => {
-                                        return <option key={index} value={stream}>{stream}</option>
-                                    })
-                                )
-                            }
-                            {
-                                educationLevel === 'diploma' && (
-                                    diploma.map((stream, index) => {
-                                        return <option value={stream} key={index}>{stream}</option>
-                                    })
-                                )
-                            }
-
-
-                        </select>
-                    </>
+          <FormControlLabel
+            control={
+              <Checkbox
+                defaultChecked={isPresent ? true : false}
+                onChange={toggleIsPresent}
+              />
             }
-            <label htmlFor="" className="error-label">{educationStreamError}</label>
-          </Box>
-          <Box sx={{width:'100%'}}>
-            <label htmlFor="">Institution</label>
-            <input value={educationInstitution} onChange={(event) => setEducationInstitution(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            <label className='error-label'>{educationInstitutionError}</label>
-          </Box>
-          <Box sx={{width:'100%'}}>
-            <div className="flex items-center mt-2">
-                <input onChange={toggleIsPresent} checked={isPresent ? true : false} type="checkbox" name="name" id="name" className="outline-none border border-gray-400 me-2 rounded" />
-                <label htmlFor="">I am currently studying here</label>
-            
-            </div>
-            <label className='error-label'></label>
-          </Box>
-          <Box sx={{width:'100%', display:'flex', justifyContent:'between', gap:'100px'}}>
-            <div className="w-full">
-                <label htmlFor="">Start Date</label>
-                <input value={startYear} onChange={(event) => setStartDate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                <label className='error-label'>{startDateError}</label>
-            </div>
+            label="I am currently studying here"
+          />
 
-            <div className="w-full">
-                <label htmlFor="">End Date</label>
-                <input disabled={isPresent ? true : false} value={endYear} onChange={(event) => setEndDate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                <label className='error-label'>{endDateError}</label>
-            </div>
+          <Box
+            sx={{
+              marginTop: '20px',
+              display: 'flex',
+              gap: '10px',
+              width: '100%',
+            }}
+          >
+            <FormControl fullWidth>
+              <TextField
+                variant="outlined"
+                label="Start year"
+                {...register('startYear', {
+                  required: {
+                    value: true,
+                    message: 'Start year can not be empty',
+                  },
+                  pattern: {
+                    value: /^(19|20)\d{2}$/,
+                    message: 'Enter a valid year',
+                  },
+                })}
+                error={Boolean(errors.startYear)}
+                helperText={errors.startYear?.message}
+              />
+            </FormControl>
+
+            <FormControl fullWidth>
+              <TextField
+                variant="outlined"
+                label="End year"
+                disabled={isPresent ? true : false}
+                {...register('endYear', {
+                  required: {
+                    value: isPresent ? false : true,
+                    message: 'End year can not be empty',
+                  },
+                  pattern: {
+                    value: /^(19|20)\d{2}$/,
+                    message: 'Enter a valid year',
+                  },
+                })}
+                error={Boolean(errors.endYear)}
+                helperText={errors.endYear?.message}
+              />
+            </FormControl>
           </Box>
 
-          <Box sx={{width:'100%'}}>
-            <label htmlFor="">Location</label>
-            <input value={location} onChange={(event) => setLocation(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            <label className='error-label'>{locationError}</label>
-          </Box>
-          
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button onClick={addEducation} className="bg-blue-400 rounded w-full p-1 text-white">Add</button>
+            <FormControl fullWidth error={Boolean(errors.location)}>
+              <Controller
+                name='location'
+                control={control}
+                rules={{
+                  required:{value:true, message:'Please enter location'},
+                  minLength:{value:5, message:'Minimum 5 charecters'},
+                  maxLength:{value:50, message:'Maximum 50 charecters'},
+                  pattern:{value:/^[\w\s-]+(?:,\s*[\w\s-]+){0,3}$/, message:'Enter a valid location'}
+                }}
+                render={({field}) => {
+                  return <TextField
+                    {...field}
+                    label="Location"
+                    variant='outlined'
+                    error={Boolean(errors.location)}
+                    helperText={errors.location?.message}
+                  />
+                }}
+              />
+            </FormControl>
           </Box>
-        </Box>
-      </Modal>
-    )
+
+          <Box sx={{ width: '100%', marginTop: '10px' }}>
+            <Button
+              type="submit"
+              fullWidth
+              sx={{ color: 'white', background: 'blue' }}
+              variant="outlined"
+              loading={loading}
+              loadingPosition="end"
+            >
+              Add Education
+            </Button>
+            {/* <button onClick={addEducation} className="bg-blue-400 rounded w-full p-1 text-white">Add</button> */}
+          </Box>
+        </form>
+      </Box>
+    </Modal>
+  );
 }

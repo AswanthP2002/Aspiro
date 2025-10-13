@@ -5,6 +5,7 @@ import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
 import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"
 import ResumeCard from "../../../components/candidate/ResumeCard"
+import ViewPDFDocument from "../../../components/common/PdfViewer"
 
 export default function DocumentsPage(){
     const [resumes, setResumes] = useState<any[]>([])
@@ -139,11 +140,12 @@ export default function DocumentsPage(){
                     {
                         certificates.length > 0
                             ? <div>
-                                <p>Certificates available</p>
-                                <div>
+                                <p className="mt-2 mb-2">Certificates available</p>
+                                <div className="mt-4">
                                     {
                                         certificates.map((certificate, index) => {
-                                            return <iframe key={index} src={certificate?.certificateUrl}></iframe>
+                                            // return <iframe key={index} src={certificate?.certificateUrl}></iframe>
+                                            return <ViewPDFDocument docHeight={100} docWidth={300} classes="shadow-lg w-[300px]" key={index} fileUrl={certificate?.certificateUrl} />
                                         })
                                     }
                                 </div>

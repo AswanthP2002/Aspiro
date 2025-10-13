@@ -1,6 +1,8 @@
-import { LoginCandidateInpDTO } from "../../../application/DTOs/candidate/candidateLoginDTO";
-import LoginCandidateRequestDTO from "../../DTOs/candidate/loginCandidateRequestDTO";
+import { LoginCandidateInpDTO } from '../../../application/DTOs/candidate/candidateLogin.dto';
+import LoginCandidateRequestDTO from '../../DTOs/candidate/loginCandidateRequestDTO';
 
-export default function mapToLoginCandidateInpDTO(dto : LoginCandidateRequestDTO) : LoginCandidateInpDTO {
-    return {...dto}
+export default function mapToLoginCandidateInpDTO(
+  dto: LoginCandidateRequestDTO
+): LoginCandidateInpDTO {
+  return { ...dto };
 }

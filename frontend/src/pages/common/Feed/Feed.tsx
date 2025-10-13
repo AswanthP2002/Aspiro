@@ -1,21 +1,21 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import atlas from '/3atlas.png'
 import dummyUserImage from '/recejames.jpg'
 import dummyCompany from '/company.jpg'
 import Swal from "sweetalert2";
-import {CiHeart} from 'react-icons/ci'
-import {FaHeart, FaRegComment, FaShare} from 'react-icons/fa'
-import {PiShareFat} from 'react-icons/pi'
 import { createPost, getPosts, likePost, unlikePost } from "../../../services/candidateServices";
-import defaultPicture from '/default-img-instagram.png'
 import { Notify } from "notiflix";
 import { useSelector } from "react-redux";
 import GeneralModal from "../../../components/common/Modal";
 import CreatePost from "../../../components/common/CreatePost";
 import Post from "../../../components/common/Post";
+import { appContext } from "../../../context/AppContext";
 
 export default function Feed() {
-    const [loading, setLoading] = useState(true);
+
+    const {createPostModalOpen, closeCreatePostModal} = useContext(appContext)
+
+    // const [loading, setLoading] = useState(true);
     const [content, setContent] = useState("");
     const [postImage, setPostImage] = useState<any>(null)
     const [image, setImage] = useState<string | null>("")
@@ -23,78 +23,78 @@ export default function Feed() {
     const [likedPosts, setLikedPosts] = useState<any[]>([])
 
     const logedUser = useSelector((state : any) => {
-        return state.candidateAuth?.user
+        return state.userAuth.user
     })
 
     const [modalOpen, setModalOpen] = useState(true)
     const closeModal = () => setModalOpen(false)
 
     console.log('loged user', logedUser, typeof logedUser)
-    const parsed = JSON.parse(logedUser)
-    console.log('loged user paresed', parsed, typeof parsed)
+    //const parsed = JSON.parse(logedUser)
+    //console.log('loged user paresed', parsed, typeof parsed)
 
     const selectFile = () => {
         fileref.current?.click()
     }
-    function handleImageSelect(event : React.ChangeEvent<HTMLInputElement>){
-        if(event.target.files){
-            const file = event.target.files[0]
-            setImage(URL.createObjectURL(file))
-            setPostImage(file)
-        }
-    }
+    // function handleImageSelect(event : React.ChangeEvent<HTMLInputElement>){
+    //     if(event.target.files){
+    //         const file = event.target.files[0]
+    //         setImage(URL.createObjectURL(file))
+    //         setPostImage(file)
+    //     }
+    // }
 
-    const unselectImage = () => {
-        setImage(null)
-        setPostImage(null)
-    }
+    // const unselectImage = () => {
+    //     setImage(null)
+    //     setPostImage(null)
+    // }
 
-    const handleCreatePost = async () => {
-        if(!postImage || !content){
-            Swal.fire({
-                icon:'warning',
-                title:'Add Details',
-                showCancelButton:false
-            })
-            return
-        }
+    // const handleCreatePost = async () => {
+    //     if(!postImage || !content){
+    //         Swal.fire({
+    //             icon:'warning',
+    //             title:'Add Details',
+    //             showCancelButton:false
+    //         })
+    //         return
+    //     }
 
-        const formData = new FormData()
+    //     const formData = new FormData()
 
-        formData.append('media', postImage)
-        formData.append('content', content)
-        formData.append('type', "candidate")
+    //     formData.append('media', postImage)
+    //     formData.append('content', content)
+    //     formData.append('type', "candidate")
 
-        const result = await createPost(formData)
-        if(result.success){
-            Swal.fire({
-                icon:"success",
-                title:"Created",
-                showConfirmButton:false,
-                showCancelButton:false,
-                timer:1500
-            }).then(() => window.location.reload())
-        }
+    //     const result = await createPost(formData)
+    //     if(result.success){
+    //         Swal.fire({
+    //             icon:"success",
+    //             title:"Created",
+    //             showConfirmButton:false,
+    //             showCancelButton:false,
+    //             timer:1500
+    //         }).then(() => window.location.reload())
+    //     }
 
-    };
+    // };
 
-    const postLiking = async (postId : string, creatorId : string) => {        
-        const result = await likePost(postId, creatorId)
-        if(result?.success){
-            setLikedPosts(prv => [...prv, postId])
-        }else{
-            Notify.failure('Something went wrong', {timeout:1200})
-        }
-    }
+    // const postLiking = async (postId : string, creatorId : string) => {        
+    //     const result = await likePost(postId, creatorId)
+    //     if(result?.success){
+    //         setLikedPosts(prv => [...prv, postId])
+    //     }else{
+    //         Notify.failure('Something went wrong', {timeout:1200})
+    //     }
+    // }
 
-    const postUnliking = async (postId : string) => {
-        const result = await unlikePost(postId)
-        if(result.success){
-            setLikedPosts(prv => prv.filter((id : string) => id !== postId))
-        }else{
-            Notify.failure('Something went wrong', {timeout:1200})
-        }
-    }
+    // const postUnliking = async (postId : string) => {
+    //     const result = await unlikePost(postId)
+    //     if(result.success){
+    //         setLikedPosts(prv => prv.filter((id : string) => id !== postId))
+    //     }else{
+    //         Notify.failure('Something went wrong', {timeout:1200})
+    //     }
+    // }
 
     const [posts, setPosts] = useState<any[]>([
         {
@@ -176,8 +176,8 @@ export default function Feed() {
             </div>
         </div>
         <GeneralModal
-            openModal={modalOpen}
-            closeModal={closeModal}
+            openModal={createPostModalOpen}
+            closeModal={closeCreatePostModal}
             size="large"
             children={<CreatePost />}
         />

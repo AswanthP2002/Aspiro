@@ -1,6 +1,6 @@
 import './Loader.css'
 
-export default function Loader(){
+export default function ArcLoader(){
     return(
         <div className="loader-wrapper">
             <span className="loader"></span>

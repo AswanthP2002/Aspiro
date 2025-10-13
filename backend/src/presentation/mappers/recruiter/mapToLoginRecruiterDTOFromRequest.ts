@@ -1,9 +1,11 @@
-import RecruiterLoginDTO from "../../../application/DTOs/recruiter/recruiterLoginDTO";
-import LoginRecruiterRequestDTO from "../../DTOs/recruiter/loginRecruiterRequestDTO";
+import RecruiterLoginDTO from '../../../application/DTOs/recruiter/recruiterLogin.dto';
+import LoginRecruiterRequestDTO from '../../DTOs/recruiter/loginRecruiterRequestDTO';
 
-export default function mapToLoginRecruiterDTOFromRequest(requestDto : LoginRecruiterRequestDTO) : RecruiterLoginDTO {
-    return {
-        email:requestDto.email,
-        password:requestDto.password
-    }
+export default function mapToLoginRecruiterDTOFromRequest(
+  requestDto: LoginRecruiterRequestDTO
+): RecruiterLoginDTO {
+  return {
+    email: requestDto.email,
+    password: requestDto.password,
+  };
 }
