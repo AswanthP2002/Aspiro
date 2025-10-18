@@ -106,7 +106,7 @@ export default function Header(){
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
                                 </ul>
-                                <button onClick={() => navigateTo('/candidate/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
+                                <button onClick={() => navigateTo('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                                 </div>
                               </>
                     }

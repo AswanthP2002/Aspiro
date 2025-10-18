@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import Recruiter from '../../../../domain/entities/recruiter/recruiter.entity';
-import SocialLinks from '../../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../../domain/entities/SocialLinks';
 
 const SocialLinkSchema = new Schema<SocialLinks>({
   domain: { type: String },

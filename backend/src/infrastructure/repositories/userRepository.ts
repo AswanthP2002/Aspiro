@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import User from '../../domain/entities/shared/User.entitty';
+import User from '../../domain/entities/shared/User';
 import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
 import { UserDAO } from '../database/DAOs/user.dao.refactored';
 import BaseRepository from './baseRepository';

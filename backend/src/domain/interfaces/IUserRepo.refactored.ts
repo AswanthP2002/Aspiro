@@ -1,4 +1,4 @@
-import User from '../entities/shared/User.entitty';
+import User from '../entities/shared/User';
 import IBaseRepo from './IBaseRepo';
 
 export default interface IUserRepository extends IBaseRepo<User> {

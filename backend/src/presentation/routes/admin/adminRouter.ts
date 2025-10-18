@@ -26,7 +26,7 @@ import {
 } from '../../../middlewares/auth';
 import { AdminController } from '../../controllers/admin/adminController';
 import { Db } from 'mongodb';
-import UserRepository from '../../../infrastructure/repositories/userRepository.refactored';
+import UserRepository from '../../../infrastructure/repositories/userRepository';
 import { container } from 'tsyringe';
 
 const express = require('express');
@@ -63,7 +63,7 @@ function createAdminRouter() {
   //   // loadCompaniesUC,
   //   // loadCandidateDetailsUC,
   //   // blockCandidateUC,
-  //   // unblockCandidateUC, 
+  //   // unblockCandidateUC,
   //   // loadCompanyDetailsUC,
   //   // blockCompanyUC,
   //   // unblockCompanyUC,

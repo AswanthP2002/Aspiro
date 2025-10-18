@@ -1,4 +1,4 @@
-import User, { Role } from './shared/User.entitty';
+import User, { Role } from './shared/User';
 
 export default interface PostsAggregated {
   _id: string;

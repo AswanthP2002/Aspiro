@@ -1,4 +1,4 @@
-import SocialLinks from '../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../domain/entities/SocialLinks';
 
 export default interface UpdateCandidateDTO {
   _id?: string; // domain entity id changed to string :: removed objectid prevent leakage of infrastructure details

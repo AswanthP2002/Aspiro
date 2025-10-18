@@ -1,17 +1,16 @@
-import User from '../../../domain/entities/shared/User.entitty';
-import UpdateUserDTO from '../../DTOs/shared/updateUser.dto';
+import User from '../../../domain/entities/shared/User';
+import UpdateUserDTO from '../../DTOs/user/updateUser.dto';
 
-export default function mapUpdateUserDtoToUser(
-  updateUserDto: UpdateUserDTO
-): User {
+export default function mapUpdateUserDtoToUser(updateUserDto: UpdateUserDTO): User {
   return {
     _id: updateUserDto._id,
     coverPhoto: updateUserDto.coverPhoto,
     profilePicture: updateUserDto.profilePicture,
     email: updateUserDto.email,
     createdAt: updateUserDto.createdAt,
-    facebookid: updateUserDto.facebookid,
-    googleid: updateUserDto.googleid,
+    facebookId: updateUserDto.facebookId,
+    googleId: updateUserDto.googleId,
+    linkedinId: updateUserDto.linkedinId,
     isAdmin: updateUserDto.isAdmin,
     isBlocked: updateUserDto.isBlocked,
     isVerified: updateUserDto.isVerified,

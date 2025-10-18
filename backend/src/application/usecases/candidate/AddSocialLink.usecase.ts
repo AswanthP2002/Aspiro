@@ -1,4 +1,4 @@
-import SocialLinks from '../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../domain/entities/SocialLinks';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 import CandidateDTO from '../../DTOs/candidate/candidate.dto';
 import AddSocialLinkDTO from '../../DTOs/candidate/socialLink.dto';

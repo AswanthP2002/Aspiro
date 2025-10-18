@@ -1,5 +1,5 @@
-import User from '../../domain/entities/shared/User.entitty';
-import { Role } from './shared/user.dto';
+import User from '../../domain/entities/shared/User';
+import { Role } from './user/user.dto';
 
 export default interface PostsAggregatedDTO {
   _id: string;

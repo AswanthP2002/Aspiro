@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import LoginPage from './pages/admin/Login/Login';
-import CandidateRegister from './pages/candidate/Register/Register';
+import CandidateRegister from './pages/user/Register/Register';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
 import VerificationPage from './pages/common/Verification/Verification';
@@ -84,7 +84,7 @@ function App() {
         
         {/* Candidate specific routes not applicable header & sidebar & footer */}
         <Route path='/candidate/login' element={<CandidateLogin />} />
-        <Route path='/candidate/register' element={<CandidateRegister />} />
+        <Route path='/register' element={<CandidateRegister />} />
         <Route path='/candidate/store/details' element={<StoreDetails />} />
 
         {/* Recruiter specific routes not applicable header & sidebar & footer */}

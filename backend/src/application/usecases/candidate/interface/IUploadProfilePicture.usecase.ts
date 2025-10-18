@@ -1,9 +1,7 @@
 import CandidateDTO from '../../../DTOs/candidate/candidate.dto';
 import { UploadProfilePictureDTO } from '../../../DTOs/candidate/uploadProfilePicture.dto';
-import UserDTO from '../../../DTOs/shared/user.dto';
+import UserDTO from '../../../DTOs/user/user.dto';
 
 export default interface IUploadProfilePictureUseCase {
-  execute(
-    uploadProfilePictureDto: UploadProfilePictureDTO
-  ): Promise<UserDTO | null>;
+  execute(uploadProfilePictureDto: UploadProfilePictureDTO): Promise<UserDTO | null>;
 }

@@ -1,4 +1,4 @@
-import { Role } from '../shared/user.dto';
+import { Role } from '../user/user.dto';
 
 export default interface AdminLoginResDTO {
   token: string;

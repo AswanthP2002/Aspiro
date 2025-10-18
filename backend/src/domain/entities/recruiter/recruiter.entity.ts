@@ -1,4 +1,4 @@
-import SocialLinks from '../socialLinks.entity';
+import SocialLinks from '../SocialLinks';
 
 export default interface Recruiter {
   _id?: string;

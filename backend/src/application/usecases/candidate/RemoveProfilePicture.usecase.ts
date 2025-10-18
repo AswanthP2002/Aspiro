@@ -1,22 +1,15 @@
-import User from '../../../domain/entities/shared/User.entitty';
+import User from '../../../domain/entities/shared/User';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
 import RemoveProfilePhotoDTO from '../../DTOs/candidate/removeProfilePhoto.dto';
-import mapUserToUserDTO from '../../mappers/shared/mapUserToUserDTO.mapper';
+import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import IRemoveProfilePictureUseCase from './interface/IRemoveProfilePicture.usecase';
 
-export default class RemoveProfilePictureUseCase
-  implements IRemoveProfilePictureUseCase
-{
-  constructor(
-    private _iCandidateRepo: ICandidateRepo,
-    private _userRepo: IUserRepository
-  ) {}
+export default class RemoveProfilePictureUseCase implements IRemoveProfilePictureUseCase {
+  constructor(private _iCandidateRepo: ICandidateRepo, private _userRepo: IUserRepository) {}
 
-  async execute(
-    removeProfilePhotoDto: RemoveProfilePhotoDTO
-  ): Promise<User | null> {
+  async execute(removeProfilePhotoDto: RemoveProfilePhotoDTO): Promise<User | null> {
     //delete image from cloudinary
     const { candidateId, cloudinaryPublicId } = removeProfilePhotoDto;
 

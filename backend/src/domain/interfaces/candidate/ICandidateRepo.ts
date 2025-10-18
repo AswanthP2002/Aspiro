@@ -3,7 +3,7 @@ import Candidate from '../../entities/candidate/candidate.entity';
 //import Candidate from '../../entities/candidate/candidate.entity';
 import CandidateAggregated from '../../entities/candidate/candidateAggregated.entity';
 import CandidatePaginated from '../../entities/candidate/candidatePaginated.entity';
-import SocialLinks from '../../entities/socialLinks.entity';
+import SocialLinks from '../../entities/SocialLinks';
 import IBaseRepo from '../IBaseRepo';
 
 import { SaveCandidate } from './saveResponses';

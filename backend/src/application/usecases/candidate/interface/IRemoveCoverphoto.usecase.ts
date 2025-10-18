@@ -1,4 +1,4 @@
-import User from '../../../../domain/entities/shared/User.entitty';
+import User from '../../../../domain/entities/shared/User';
 import { RemoveCoverPhotoDTO } from '../../../DTOs/candidate/removeProfilePhoto.dto';
 
 export default interface IRemoveCoverphotoUseCase {

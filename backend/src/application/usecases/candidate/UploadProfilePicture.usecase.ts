@@ -3,25 +3,18 @@ import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
 import imgUploadToCloudinary from '../../../services/uploadToCloudinary';
 import CandidateDTO from '../../DTOs/candidate/candidate.dto';
 import { UploadProfilePictureDTO } from '../../DTOs/candidate/uploadProfilePicture.dto';
-import UserDTO from '../../DTOs/shared/user.dto';
+import UserDTO from '../../DTOs/user/user.dto';
 import mapToCandidate from '../../mappers/candidate/mapToCandidate.mapper';
 import mapToCandidateDTO from '../../mappers/candidate/mapToCandidateDTO.mapper';
 import mapUpdateCandidateDtoToEntity from '../../mappers/candidate/mapUpdateCandidateDtoToEntity.mapper';
-import mapUpdateUserDtoToUser from '../../mappers/shared/mapUpdateUserDtoToUser.refactored.mapper';
-import mapUserToUserDTO from '../../mappers/shared/mapUserToUserDTO.mapper';
+import mapUpdateUserDtoToUser from '../../mappers/user/mapUpdateUserDtoToUser.refactored.mapper';
+import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import IUploadProfilePictureUseCase from './interface/IUploadProfilePicture.usecase';
 
-export default class UploadProfilePictureUseCase
-  implements IUploadProfilePictureUseCase
-{
-  constructor(
-    private _ICandidateRepo: ICandidateRepo,
-    private _userRepo: IUserRepository
-  ) {}
+export default class UploadProfilePictureUseCase implements IUploadProfilePictureUseCase {
+  constructor(private _ICandidateRepo: ICandidateRepo, private _userRepo: IUserRepository) {}
 
-  async execute(
-    uploadProfilepictureDto: UploadProfilePictureDTO
-  ): Promise<UserDTO | null> {
+  async execute(uploadProfilepictureDto: UploadProfilePictureDTO): Promise<UserDTO | null> {
     const { candidateId } = uploadProfilepictureDto;
     const cloudinaryResult: any = await imgUploadToCloudinary(
       uploadProfilepictureDto.imageFile,
@@ -36,10 +29,7 @@ export default class UploadProfilePictureUseCase
         cloudinaryPublicId: public_id,
       },
     });
-    const result = await this._userRepo.update(
-      candidateId.toString(),
-      updateData
-    );
+    const result = await this._userRepo.update(candidateId.toString(), updateData);
 
     if (result) {
       const dto = mapUserToUserDTO(result);

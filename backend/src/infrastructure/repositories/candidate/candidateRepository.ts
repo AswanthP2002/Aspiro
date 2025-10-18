@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 import BaseRepository from '../baseRepository';
-import SocialLinks from '../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../domain/entities/SocialLinks';
 import { CandidateDAO } from '../../database/DAOs/candidate/candidateDAO';
 import CandidateAggregated from '../../../domain/entities/candidate/candidateAggregated.entity';
 import CandidatePaginated from '../../../domain/entities/candidate/candidatePaginated.entity';

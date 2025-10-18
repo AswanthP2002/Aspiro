@@ -1,6 +1,6 @@
 // import {Schema, Document} from 'mongoose'
 // import Candidate from '../../../../domain/entities/candidate/candidates'
-import SocialLinks from '../../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../../domain/entities/SocialLinks';
 
 import { Schema } from 'mongoose';
 import Candidate from '../../../../domain/entities/candidate/candidate.entity';

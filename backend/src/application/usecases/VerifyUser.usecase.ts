@@ -5,9 +5,9 @@ import {
   OtpExpiredError,
   WrongCredentialsError,
 } from '../../domain/errors/AppError';
-import UserDTO from '../DTOs/shared/user.dto';
+import UserDTO from '../DTOs/user/user.dto';
 import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
-import mapUserToUserDTO from '../mappers/shared/mapUserToUserDTO.mapper';
+import mapUserToUserDTO from '../mappers/user/mapUserToUserDTO.mapper';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()

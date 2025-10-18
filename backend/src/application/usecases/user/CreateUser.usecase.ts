@@ -1,26 +1,24 @@
 import { inject, injectable } from 'tsyringe';
-import {
-  DuplicateEmailError,
-  DuplicateMobileError,
-} from '../../domain/errors/AppError';
-import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
-import { generateCode } from '../../utilities/generateCode';
-import { sendEmail } from '../../utilities/sendmail';
-import CreateUserDTO from '../DTOs/shared/createUser.dto';
-import UserDTO from '../DTOs/shared/user.dto';
-import mapCreateUserDtoToUser from '../mappers/shared/mapCreateUserDtoToUser.mapper';
-import mapUserToUserDTO from '../mappers/shared/mapUserToUserDTO.mapper';
-import hashPassword from '../Services/hashPassword';
-import ICreateUserUseCase from './interfaces/ICreateUser.usecase';
+import { DuplicateEmailError, DuplicateMobileError } from '../../../domain/errors/AppError';
+import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import { generateCode } from '../../../utilities/generateCode';
+import CreateUserDTO from '../../DTOs/user/createUser.dto';
+import UserDTO from '../../DTOs/user/user.dto';
+import mapCreateUserDtoToUser from '../../mappers/user/mapCreateUserDtoToUser.mapper';
+import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
+import hashPassword from '../../Services/hashPassword';
+import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase';
+import IEmailService from '../../interfaces/services/IEmailService';
 
 @injectable()
 export default class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
-    @inject('IUserRepository') private readonly _repo: IUserRepository
+    @inject('IUserRepository') private readonly _repo: IUserRepository,
+    @inject('IEmailService') private _emailService: IEmailService
   ) {}
 
   async execute(createUserDto: CreateUserDTO): Promise<UserDTO | null> {
-    const newUser = mapCreateUserDtoToUser(createUserDto);
+    let newUser = mapCreateUserDtoToUser(createUserDto);
     //check if the email is already linked with another user
     const isExistingEmail = await this._repo.findByEmail(newUser.email);
     if (isExistingEmail) {
@@ -34,7 +32,7 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
       throw new DuplicateMobileError();
     }
 
-    //has the password
+    //hash the password
     if (newUser.password) {
       newUser.password = await hashPassword(newUser.password, 10);
     }
@@ -53,15 +51,18 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
       <p>Best regards,<br>Aspiro Team</p>
     </div> 
             `;
-    // candidate.isVerified = false
+
+    // Set OTP and expiry on the user entity itself, not in the session
     newUser.verificationToken = otp;
     newUser.otpExpiresAt = otpExpiresAt;
 
-    const info = await sendEmail(newUser.email, subject, content);
-    console.log('otp send to the user ', otp);
+    console.log(otp); //Development only : Testing the value
 
-    //save to db
+    // 1. Save user to the database first to ensure data integrity.
     const result = await this._repo.create(newUser);
+
+    // 2. Then, send the verification email.
+    const info = await this._emailService.sendEmail(newUser.email as string, subject, content);
 
     if (result) {
       const dto = mapUserToUserDTO(result);

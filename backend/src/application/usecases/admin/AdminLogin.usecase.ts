@@ -45,7 +45,7 @@ export class AdminLoginUseCase implements IAdminLoginUseCase {
       token,
       refreshToken,
       user: { id: admin._id, email: admin.email },
-      role: admin.role,
+      role: "admin"
     };
   }
 }

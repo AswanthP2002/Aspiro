@@ -46,7 +46,7 @@ export class LoginRecruiterUseCase implements ILoginRecruiterrUseCase {
       token,
       refreshToken,
       user: { id: user._id, email: user.email as string },
-      role: user.role as string,
+      role: "recruiter"
     };
   }
 }

@@ -27,8 +27,8 @@ import mapToSaveIntroDetailsDTOFromRequest from '../../mappers/recruiter/mapToSa
 import mapToCreateJobDTOFromRequest from '../../mappers/recruiter/mapToCreateJobDTOFromRequest';
 import mapToCreateNotificationFromRejectRequest from '../../mappers/recruiter/mapToCreateNotificationFromRejectRequest';
 import { inject, injectable } from 'tsyringe';
-import mapCreateUserRequestToDTO from '../../mappers/mapCreateUserRequestToDTO.refactored';
-import ICreateUserUseCase from '../../../application/usecases/interfaces/ICreateUser.usecase';
+import mapCreateUserRequestToDTO from '../../mappers/user/mapCreateUserRequestToDTO.refactored';
+import ICreateUserUseCase from '../../../application/interfaces/usecases/user/ICreateUser.usecase';
 import { RecruiterRegisterValidator } from '../../../application/validators/recruiterRegister.validator';
 import IVerifyUserUseCase from '../../../application/usecases/interfaces/IVerifyUser.usecase';
 import { VerifyUserValidator } from '../../../application/validators/verifyUser.validator';

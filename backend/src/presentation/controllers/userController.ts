@@ -1,154 +1,106 @@
 import { NextFunction, Request, Response } from 'express';
 import url from 'url';
 
-import { Auth } from '../../../middlewares/auth';
-import { StatusCodes } from '../../statusCodes';
-import IRegisterCandidateUseCase from '../../../application/usecases/candidate/interface/IRegisterCandidate.usecase';
-import IAddCertificateUseCase from '../../../application/usecases/candidate/interface/IAddCertificate.usecase';
-import IAddEducationUseCase from '../../../application/usecases/candidate/interface/IAddEducation.usecase';
-import IAddExperience from '../../../application/usecases/candidate/interface/IAddExperience.usecase';
-import IAddResumeUseCase from '../../../application/usecases/candidate/interface/IAddResume.usecase';
-import IAddSkillsUseCase from '../../../application/usecases/candidate/interface/IAddSkill.usecase';
-import ISaveJobApplicationUseCase from '../../../application/usecases/candidate/interface/IApplyJob.usecase';
-import ILoadCertificateUseCase from '../../../application/usecases/candidate/interface/IGetCeritificates.usecase';
-import IDeleteExperienceUseCase from '../../../application/usecases/candidate/interface/IDeleteExperience.usecase';
-import IDeleteSkillsUseCase from '../../../application/usecases/candidate/interface/IDeleteSkills.usecase';
-import IDeleteEducationUseCase from '../../../application/usecases/candidate/interface/IDeleteEducation.usecase';
-import IDeleteResumeUseCase from '../../../application/usecases/candidate/interface/IDeleteResume.usecase';
-import ILoadResumeUseCase from '../../../application/usecases/candidate/interface/ILoadResumes.usecase';
-import ILoadExperiencesUseCase from '../../../application/usecases/candidate/interface/IGetExperiences.usecase';
-import ILoadSkillsUseCase from '../../../application/usecases/candidate/interface/IGetSkills.usecase';
-import ILoadEducationsUseCase from '../../../application/usecases/candidate/interface/IGetEducations.usecase';
-import IVerifyUserUseCase from '../../../application/usecases/interfaces/IVerifyUser.usecase';
-import ILoginCandidateUseCase from '../../../application/usecases/candidate/interface/ILoginCandidate.usecase';
-import ILoadCandidatePersonalDataUseCase from '../../../application/usecases/candidate/interface/ILoadCandidatePersonalData.usecase';
-import ILoadJobCandidateSideUseCase from '../../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
-import ILoadJobDetailsCandidateSideUseCase from '../../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSide.usecase';
-import IEditExperienceUseCase from '../../../application/usecases/candidate/interface/IEditExperience.usecase';
-import IEditEducationUseCase from '../../../application/usecases/candidate/interface/IEditEducation.usecase';
-import ISearchJobsFromHomeUseCase from '../../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
-import IEditProfileUseCase from '../../../application/usecases/candidate/interface/IEditProfile.usecase';
-import IGetNotificationsUseCase from '../../../application/usecases/candidate/interface/IGetNotifications.usecase';
-import ISaveFavoriteJobUseCase from '../../../application/usecases/candidate/interface/ISaveFavoriteJobs.usecase';
-import ICheckIsJobSavedUseCase from '../../../application/usecases/candidate/interface/ICheckIsJobSaved.usecase';
-import IGetFavoriteJobUseCase from '../../../application/usecases/candidate/interface/IGetFavoriteJobs.usecase';
-import IUnsaveJobUseCase from '../../../application/usecases/candidate/interface/IUnsaveJob.usecase';
-import IAddSocialLinkUsecase from '../../../application/usecases/candidate/interface/IAddSocialLink.usecase';
-import IDeleteSocialLinkUseCase from '../../../application/usecases/candidate/interface/IDeleteSocialLink.usecase';
-import IUploadProfilePictureUseCase from '../../../application/usecases/candidate/interface/IUploadProfilePicture.usecase';
-import IRemoveProfilePictureUseCase from '../../../application/usecases/candidate/interface/IRemoveProfilePicture.usecase';
-import IUploadCoverPhotoUseCase from '../../../application/usecases/candidate/interface/IUploadCoverPhoto.usecase';
-import IGetCandidatesUseCase from '../../../application/usecases/interfaces/IGetCandidates.usecase';
-import IGetCandidateDetailsUseCase from '../../../application/usecases/interfaces/IGetCandiateDetails.usecase';
-import IGetCandidateApplicationsUseCase from '../../../application/usecases/candidate/interface/IGetCandidateApplications.usecase';
-import mapToCreateCandidateDTO from '../../mappers/candidate/mapToCreateCandidateDTO';
-import mapToVerifyUserDTO from '../../mappers/candidate/mapToVerifyUserRequestDTO';
-import mapToLoginCandidateInpDTO from '../../mappers/candidate/mapToLoginCandidateInpDTO';
-import MapToAddExperienceDTO from '../../mappers/candidate/mapToCreateExperienceDto';
-import mapToCreateSkillDTOFromRequest from '../../mappers/candidate/mapToCreateSkillDTOFromRequest';
-import mapToCreateEducationDTOFromRequest from '../../mappers/candidate/mapToCreateEducationDTOFromRequest';
-import mapToUpdateEducationDTOFromRequest from '../../mappers/candidate/mapToUpdateEducationDTOFromRequest';
-import mapToCreateCertificateDTOFromRequest from '../../mappers/candidate/mapToCreateCertificateDTOFromRequest';
-import mapToUploadProfilePictureDTOFromRequest from '../../mappers/candidate/mapToUploadProfilePictureDTOFromRequest';
-import mapToUploadCoverPhotoDTOFromRequest from '../../mappers/candidate/mapToUploadcoverphotoDTOFromRequest';
-import IRemoveCoverphotoUseCase from '../../../application/usecases/candidate/interface/IRemoveCoverphoto.usecase';
-import mapToFindCandidatesDTOFromRequest from '../../mappers/candidate/mapToFindCandidatesDTOFromRequest';
-import mapToAddsocialLinkDTOFromRequest from '../../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
-import IUpdateNotificationReadStatus from '../../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
-import mapToEditExperienceDTO from '../../mappers/candidate/mapToEditExperienceDTO';
-import ISaveBasicsCandidateUseCase from '../../../application/usecases/candidate/interface/ISaveBasicsCandidate.usecase';
-import mapRequestDtoToUpdateCandidateDTO from '../../mappers/candidate/mapRequestDtoToUpdateCandidateDTO';
-import mapEditProfileRequestToUpdateDTO from '../../mappers/candidate/mapEditProfileRequestToUpdateDTO';
-import ICreateUserUseCase from '../../../application/usecases/interfaces/ICreateUser.usecase';
-import mapCreateUserRequestToDTO from '../../mappers/mapCreateUserRequestToDTO.refactored';
-import mapToCandidateDTO from '../../../application/mappers/candidate/mapToCandidateDTO.mapper';
-import IFindCandidateByUserIdUseCase from '../../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
+import { Auth } from '../../middlewares/auth';
+import { StatusCodes } from '../statusCodes';
+import IRegisterCandidateUseCase from '../../application/usecases/candidate/interface/IRegisterCandidate.usecase';
+import IAddCertificateUseCase from '../../application/usecases/candidate/interface/IAddCertificate.usecase';
+import IAddEducationUseCase from '../../application/usecases/candidate/interface/IAddEducation.usecase';
+import IAddExperience from '../../application/usecases/candidate/interface/IAddExperience.usecase';
+import IAddResumeUseCase from '../../application/usecases/candidate/interface/IAddResume.usecase';
+import IAddSkillsUseCase from '../../application/usecases/candidate/interface/IAddSkill.usecase';
+import ISaveJobApplicationUseCase from '../../application/usecases/candidate/interface/IApplyJob.usecase';
+import ILoadCertificateUseCase from '../../application/usecases/candidate/interface/IGetCeritificates.usecase';
+import IDeleteExperienceUseCase from '../../application/usecases/candidate/interface/IDeleteExperience.usecase';
+import IDeleteSkillsUseCase from '../../application/usecases/candidate/interface/IDeleteSkills.usecase';
+import IDeleteEducationUseCase from '../../application/usecases/candidate/interface/IDeleteEducation.usecase';
+import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase';
+import ILoadResumeUseCase from '../../application/usecases/candidate/interface/ILoadResumes.usecase';
+import ILoadExperiencesUseCase from '../../application/usecases/candidate/interface/IGetExperiences.usecase';
+import ILoadSkillsUseCase from '../../application/usecases/candidate/interface/IGetSkills.usecase';
+import ILoadEducationsUseCase from '../../application/usecases/candidate/interface/IGetEducations.usecase';
+import IVerifyUserUseCase from '../../application/usecases/interfaces/IVerifyUser.usecase';
+import ILoginCandidateUseCase from '../../application/usecases/candidate/interface/ILoginCandidate.usecase';
+import ILoadCandidatePersonalDataUseCase from '../../application/usecases/candidate/interface/ILoadCandidatePersonalData.usecase';
+import ILoadJobCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
+import ILoadJobDetailsCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSide.usecase';
+import IEditExperienceUseCase from '../../application/usecases/candidate/interface/IEditExperience.usecase';
+import IEditEducationUseCase from '../../application/usecases/candidate/interface/IEditEducation.usecase';
+import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
+import IEditProfileUseCase from '../../application/usecases/candidate/interface/IEditProfile.usecase';
+import IGetNotificationsUseCase from '../../application/usecases/candidate/interface/IGetNotifications.usecase';
+import ISaveFavoriteJobUseCase from '../../application/usecases/candidate/interface/ISaveFavoriteJobs.usecase';
+import ICheckIsJobSavedUseCase from '../../application/usecases/candidate/interface/ICheckIsJobSaved.usecase';
+import IGetFavoriteJobUseCase from '../../application/usecases/candidate/interface/IGetFavoriteJobs.usecase';
+import IUnsaveJobUseCase from '../../application/usecases/candidate/interface/IUnsaveJob.usecase';
+import IAddSocialLinkUsecase from '../../application/usecases/candidate/interface/IAddSocialLink.usecase';
+import IDeleteSocialLinkUseCase from '../../application/usecases/candidate/interface/IDeleteSocialLink.usecase';
+import IUploadProfilePictureUseCase from '../../application/usecases/candidate/interface/IUploadProfilePicture.usecase';
+import IRemoveProfilePictureUseCase from '../../application/usecases/candidate/interface/IRemoveProfilePicture.usecase';
+import IUploadCoverPhotoUseCase from '../../application/usecases/candidate/interface/IUploadCoverPhoto.usecase';
+import IGetCandidatesUseCase from '../../application/usecases/interfaces/IGetCandidates.usecase';
+import IGetCandidateDetailsUseCase from '../../application/usecases/interfaces/IGetCandiateDetails.usecase';
+import IGetCandidateApplicationsUseCase from '../../application/usecases/candidate/interface/IGetCandidateApplications.usecase';
+import mapToCreateCandidateDTO from '../mappers/candidate/mapToCreateCandidateDTO';
+import mapToVerifyUserDTO from '../mappers/candidate/mapToVerifyUserRequestDTO';
+import mapToLoginCandidateInpDTO from '../mappers/candidate/mapToLoginCandidateInpDTO';
+import MapToAddExperienceDTO from '../mappers/candidate/mapToCreateExperienceDto';
+import mapToCreateSkillDTOFromRequest from '../mappers/candidate/mapToCreateSkillDTOFromRequest';
+import mapToCreateEducationDTOFromRequest from '../mappers/candidate/mapToCreateEducationDTOFromRequest';
+import mapToUpdateEducationDTOFromRequest from '../mappers/candidate/mapToUpdateEducationDTOFromRequest';
+import mapToCreateCertificateDTOFromRequest from '../mappers/candidate/mapToCreateCertificateDTOFromRequest';
+import mapToUploadProfilePictureDTOFromRequest from '../mappers/candidate/mapToUploadProfilePictureDTOFromRequest';
+import mapToUploadCoverPhotoDTOFromRequest from '../mappers/candidate/mapToUploadcoverphotoDTOFromRequest';
+import IRemoveCoverphotoUseCase from '../../application/usecases/candidate/interface/IRemoveCoverphoto.usecase';
+import mapToFindCandidatesDTOFromRequest from '../mappers/candidate/mapToFindCandidatesDTOFromRequest';
+import mapToAddsocialLinkDTOFromRequest from '../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
+import IUpdateNotificationReadStatus from '../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
+import mapToEditExperienceDTO from '../mappers/candidate/mapToEditExperienceDTO';
+import ISaveBasicsCandidateUseCase from '../../application/usecases/candidate/interface/ISaveBasicsCandidate.usecase';
+import mapRequestDtoToUpdateCandidateDTO from '../mappers/candidate/mapRequestDtoToUpdateCandidateDTO';
+import mapEditProfileRequestToUpdateDTO from '../mappers/candidate/mapEditProfileRequestToUpdateDTO';
+import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase';
+import mapToCandidateDTO from '../../application/mappers/candidate/mapToCandidateDTO.mapper';
+import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
+import { inject, injectable } from 'tsyringe';
+import { CreateUserSchema } from '../schemas/user/createUser.schema';
+import mapRequestToCreateUserDTO from '../mappers/user/mapCreateUserRequestToDTO.refactored';
 
-export class CandidateController {
+@injectable()
+export class UserController {
   constructor(
-    private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface
-    private _verifyUserUC: IVerifyUserUseCase, //usecase interface
-    private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface
-    private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface
-    private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface
-    private _addExperienceUC: IAddExperience, //usecase interface
-    private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface
-    private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface
-    private _editExperienceUC: IEditExperienceUseCase, //usecase interface
-    private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface
-    private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface
-    private _addSkillsUC: IAddSkillsUseCase, //usecase interface
-    private _getSkillsUC: ILoadSkillsUseCase, //usecase interface
-    private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface
-    private _addEducationUC: IAddEducationUseCase, //usecase interface
-    private _getEducationsUC: ILoadEducationsUseCase, //usecase interface
-    private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface
-    private _editEducationUC: IEditEducationUseCase, //usecase interface
-    private _addResumeUC: IAddResumeUseCase, //usecase interface
-    private _loadResumeUC: ILoadResumeUseCase, //usecase interface
-    private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface
-    private _addCertificate: IAddCertificateUseCase, //usecase interface
-    private _getCertificates: ILoadCertificateUseCase, //usecase interface
-    private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface
-    private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface,
-    private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface
-    private _getNotificationsUC: IGetNotificationsUseCase,
-    private _saveJobUC: ISaveFavoriteJobUseCase,
-    private _checkIsJobSavedUC: ICheckIsJobSavedUseCase,
-    private _getSavedJobsUC: IGetFavoriteJobUseCase,
-    private _unsaveJobUC: IUnsaveJobUseCase,
-    private _addSocialLinkUC: IAddSocialLinkUsecase,
-    private _deleteSocialLinkUC: IDeleteSocialLinkUseCase,
-    private _uploadProfilePictureUC: IUploadProfilePictureUseCase,
-    private _removeProfilePictureUC: IRemoveProfilePictureUseCase,
-    private _uploadCoverphotoUC: IUploadCoverPhotoUseCase,
-    private _removeCoverphotoUC: IRemoveCoverphotoUseCase,
-    private _getCandidatesUC: IGetCandidatesUseCase,
-    private _getCandidateDetailsUC: IGetCandidateDetailsUseCase,
-    private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase,
-    private _updateNotificationReadStatus: IUpdateNotificationReadStatus,
-    private _createUserUC: ICreateUserUseCase,
-    private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
-  ) {}
+    @inject('ICreateUserUsecase') private _createUserUsecase: ICreateUserUseCase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase,
+  ) // private _addSocialLinkUC: IAddSocialLinkUsecase,
+  // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase,
+  // private _uploadProfilePictureUC: IUploadProfilePictureUseCase,
+  // private _removeProfilePictureUC: IRemoveProfilePictureUseCase,
+  // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase,
+  // private _removeCoverphotoUC: IRemoveCoverphotoUseCase,
+  // private _getCandidatesUC: IGetCandidatesUseCase,
+  // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase,
+  // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase,
+  // private _updateNotificationReadStatus: IUpdateNotificationReadStatus,
+  // private _createUserUC: ICreateUserUseCase,
+  // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
+  {}
 
-  //register candidate
-  // async registerCandidate(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     const createUserDto = mapCreateUserRequestToDTO({
-  //       role: 'candidate',
-  //       ...req.body,
-  //     });
-  //     const createUser = await this._createUserUC.execute(createUserDto);
-  //     if (createUser) {
-  //       const registerCandidateDto = mapToCreateCandidateDTO({
-  //         userId: createUser._id,
-  //         email: createUser.email,
-  //         name: req.body.name,
-  //         password: createUser.password,
-  //         phone: createUser.phone,
-  //       });
-  //       const candidate = await this._registerCandidateUC.execute(
-  //         registerCandidateDto
-  //       );
+  async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validateInput = CreateUserSchema.parse(req.body);
+      const createUserDto = mapRequestToCreateUserDTO(validateInput);
+      const createUser = await this._createUserUsecase.execute(createUserDto);
 
-  //       res.status(StatusCodes.OK).json({
-  //         success: true,
-  //         message: 'Candidate created need to verify before continue',
-  //         candidateId: createUser?._id,
-  //         candidateEmail: createUser?.email,
-  //       });
-  //       return;
-  //     }
-
-  //     throw new Error('Something went wrong');
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: 'Candidate created need to verify before continue',
+        userId: createUser?._id,
+        userEmail: createUser?.email,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
   // async verifyUser(
   //   req: Request,
@@ -1093,3 +1045,32 @@ export class CandidateController {
 //         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
 //     }
 // }
+
+/**
+ * Llama 3.1 8B
+ * Llama 3.1 Chat
+ * Llama 3.2 Chat
+ * CodeLlama Instruct
+ * Llama 3.1 Nemotron 70B
+ * Llama3 Chat
+ * Phind CodeLlama (34b)
+ * Llama 4 Maverick Instruct
+ * Llama 3.3 70B Instruct
+ * Llama 3.3 Swallow 70B Instruct
+ * Llama 3.1 8B
+ */
+
+/**
+ * Qwen 2.5 coder 7b
+ * Qwen 2.5 coder 32b
+ * Qwen QwQ 32b Preview
+ * Qwen 2.5 Coder 32b
+ * Qwen 3 32B
+ */
+
+/**
+ * Mistral Chat
+ * Mistral
+ * Codestral Mamba
+ * Mistral Nemo
+ */

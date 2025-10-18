@@ -3,24 +3,17 @@ import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
 import imgUploadToCloudinary from '../../../services/uploadToCloudinary';
 import CandidateDTO from '../../DTOs/candidate/candidate.dto';
 import { UploadCoverPhotoDTO } from '../../DTOs/candidate/uploadCoverPhoto.dto';
-import UserDTO from '../../DTOs/shared/user.dto';
+import UserDTO from '../../DTOs/user/user.dto';
 import mapToCandidateDTO from '../../mappers/candidate/mapToCandidateDTO.mapper';
 import mapUpdateCandidateDtoToEntity from '../../mappers/candidate/mapUpdateCandidateDtoToEntity.mapper';
-import mapUpdateUserDtoToUser from '../../mappers/shared/mapUpdateUserDtoToUser.refactored.mapper';
-import mapUserToUserDTO from '../../mappers/shared/mapUserToUserDTO.mapper';
+import mapUpdateUserDtoToUser from '../../mappers/user/mapUpdateUserDtoToUser.refactored.mapper';
+import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import IUploadCoverPhotoUseCase from './interface/IUploadCoverPhoto.usecase';
 
-export default class UploadCoverphotoUseCase
-  implements IUploadCoverPhotoUseCase
-{
-  constructor(
-    private _iCandidateRepo: ICandidateRepo,
-    private _userRepo: IUserRepository
-  ) {}
+export default class UploadCoverphotoUseCase implements IUploadCoverPhotoUseCase {
+  constructor(private _iCandidateRepo: ICandidateRepo, private _userRepo: IUserRepository) {}
 
-  async execute(
-    uploadCoverPhotoDto: UploadCoverPhotoDTO
-  ): Promise<UserDTO | null> {
+  async execute(uploadCoverPhotoDto: UploadCoverPhotoDTO): Promise<UserDTO | null> {
     const { candidateId } = uploadCoverPhotoDto;
     const cloudinaryResult: any = await imgUploadToCloudinary(
       uploadCoverPhotoDto.imageFile,
@@ -36,10 +29,7 @@ export default class UploadCoverphotoUseCase
       },
     });
 
-    const result = await this._userRepo.update(
-      candidateId.toString(),
-      updateData
-    );
+    const result = await this._userRepo.update(candidateId.toString(), updateData);
     if (result) {
       const dto = mapUserToUserDTO(result);
       return dto;
