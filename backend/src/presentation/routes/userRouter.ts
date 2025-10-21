@@ -175,10 +175,8 @@ function createUserRouter() {
   // findCandidateByUserId
  
   userRouter.post('/register', userController.registerUser.bind(userController));
-  // candidateRouter.post(
-  //   '/verify',
-  //   candidateController.verifyUser.bind(candidateController)
-  // );
+  userRouter.post('/verify', userController.verifyUser.bind(userController));
+  userRouter.post('/otp/resend', userController.resendOTP.bind(userController))
   // candidateRouter.post(
   //   '/login',
   //   candidateController.loginCandidate.bind(candidateController)

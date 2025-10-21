@@ -132,7 +132,6 @@ function App() {
 
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
 
-        
         <Route path='*' element={<NotFoundPage />} />
 
       </Routes>

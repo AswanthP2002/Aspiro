@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
 import { logout } from "../redux-toolkit/candidateAuthSlice";
@@ -28,10 +28,10 @@ export const registerCandiate = async (name: string, email: string, phone: strin
     }
 }
 
-export const verify = async (id : string, email : any, otp : string) => {
+export const verify = async (id : string, otp : string) => {
     try {
         const response = await axiosInstance.post('/verify',
-            {id, email, otp},
+            {id, otp},
             {
                 headers:{'Content-Type':'application/json'}
             } as AxiosRequest
@@ -44,6 +44,25 @@ export const verify = async (id : string, email : any, otp : string) => {
         if(err.response && err.response.status < 500) return err.response.data
 
         console.log('Error occured while verifying candidate', err)
+    }
+}
+
+export const resendOtp = async (email : string, id : string) => {
+    try {
+        const response = await axiosInstance.post('/otp/resend',
+            {email, id},
+            {
+                headers:{'Content-Type':'application/json'}
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        console.log('Error occured while resending otp', error)
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
     }
 }
 

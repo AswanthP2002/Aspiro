@@ -19,7 +19,7 @@ import ILoadResumeUseCase from '../../application/usecases/candidate/interface/I
 import ILoadExperiencesUseCase from '../../application/usecases/candidate/interface/IGetExperiences.usecase';
 import ILoadSkillsUseCase from '../../application/usecases/candidate/interface/IGetSkills.usecase';
 import ILoadEducationsUseCase from '../../application/usecases/candidate/interface/IGetEducations.usecase';
-import IVerifyUserUseCase from '../../application/usecases/interfaces/IVerifyUser.usecase';
+import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import ILoginCandidateUseCase from '../../application/usecases/candidate/interface/ILoginCandidate.usecase';
 import ILoadCandidatePersonalDataUseCase from '../../application/usecases/candidate/interface/ILoadCandidatePersonalData.usecase';
 import ILoadJobCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
@@ -42,7 +42,7 @@ import IGetCandidatesUseCase from '../../application/usecases/interfaces/IGetCan
 import IGetCandidateDetailsUseCase from '../../application/usecases/interfaces/IGetCandiateDetails.usecase';
 import IGetCandidateApplicationsUseCase from '../../application/usecases/candidate/interface/IGetCandidateApplications.usecase';
 import mapToCreateCandidateDTO from '../mappers/candidate/mapToCreateCandidateDTO';
-import mapToVerifyUserDTO from '../mappers/candidate/mapToVerifyUserRequestDTO';
+import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
 import mapToLoginCandidateInpDTO from '../mappers/candidate/mapToLoginCandidateInpDTO';
 import MapToAddExperienceDTO from '../mappers/candidate/mapToCreateExperienceDto';
 import mapToCreateSkillDTOFromRequest from '../mappers/candidate/mapToCreateSkillDTOFromRequest';
@@ -65,19 +65,18 @@ import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/
 import { inject, injectable } from 'tsyringe';
 import { CreateUserSchema } from '../schemas/user/createUser.schema';
 import mapRequestToCreateUserDTO from '../mappers/user/mapCreateUserRequestToDTO.refactored';
+import { verifyUserInputsSchema } from '../schemas/user/verifyUserInputs.schema';
+import IResendOTPUseCase from '../../application/interfaces/usecases/user/IResendOTP.usecase';
+import { resendOtpSchema } from '../schemas/user/resendOtp.schema';
+
 
 @injectable()
 export class UserController {
   constructor(
-    @inject('ICreateUserUsecase') private _createUserUsecase: ICreateUserUseCase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase,
-  ) // private _addSocialLinkUC: IAddSocialLinkUsecase,
-  // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase,
-  // private _uploadProfilePictureUC: IUploadProfilePictureUseCase,
-  // private _removeProfilePictureUC: IRemoveProfilePictureUseCase,
-  // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase,
-  // private _removeCoverphotoUC: IRemoveCoverphotoUseCase,
-  // private _getCandidatesUC: IGetCandidatesUseCase,
-  // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase,
+    @inject('ICreateUserUsecase') private _createUserUsecase: ICreateUserUseCase,
+    @inject('IVerifyUserUsecase') private _verifyUserUC: IVerifyUserUseCase,
+    @inject('IResendOTPUsecase') private _resendOTPUC: IResendOTPUseCase// private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase,
+  ) // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase,
   // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase,
   // private _updateNotificationReadStatus: IUpdateNotificationReadStatus,
   // private _createUserUC: ICreateUserUseCase,
@@ -102,24 +101,55 @@ export class UserController {
     }
   }
 
-  // async verifyUser(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   //email verification for candidate
-  //   try {
-  //     const dto = mapToVerifyUserDTO(req.body);
-  //     await this._verifyUserUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Email verifed successfully, please login to continue',
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async verifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validatedInputs = verifyUserInputsSchema.parse(req.body);
+      const dto = mapToVerifyUserDTO(validatedInputs);
+      const verifiedUser = await this._verifyUserUC.execute(dto);
+
+      if (!verifiedUser) {
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: 'User verification failed. Please try again.',
+        });
+        return;
+      }
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Email verified successfully, please login to continue',
+        verifiedUser,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async resendOTP(req : Request, res: Response, next: NextFunction) : Promise<void> {
+    try {
+      const validateInputs = resendOtpSchema.parse(req.body)
+      const result = await this._resendOTPUC.execute({...validateInputs})
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false,
+          message:'Something went wrong'
+        })
+        return
+      }
+
+      res.status(StatusCodes.OK).json({
+        success:true,
+        message:'OTP sent successfully',
+        result:{id:result?._id, email:result?.email}
+      })
+      return
+    } catch (error : unknown) {
+        next(error)
+    }
+  }
+
+  //backend ok frontend implementation is left
 
   // async loginCandidate(
   //   req: Request,

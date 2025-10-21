@@ -24,6 +24,7 @@ import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
 import createUserRouter from './src/presentation/routes/userRouter';
+import connectRedis from './src/infrastructure/redis/redisClient';
 
 async function main() {
   const app = express();
@@ -54,6 +55,8 @@ async function main() {
   );
 
   await connectToDb();
+  //connect redis
+  await connectRedis()
 
   const userRouter = createUserRouter();
   //const recruiterRouter = createRecruiterRouter();

@@ -30,9 +30,9 @@ import { inject, injectable } from 'tsyringe';
 import mapCreateUserRequestToDTO from '../../mappers/user/mapCreateUserRequestToDTO.refactored';
 import ICreateUserUseCase from '../../../application/interfaces/usecases/user/ICreateUser.usecase';
 import { RecruiterRegisterValidator } from '../../../application/validators/recruiterRegister.validator';
-import IVerifyUserUseCase from '../../../application/usecases/interfaces/IVerifyUser.usecase';
+import IVerifyUserUseCase from '../../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import { VerifyUserValidator } from '../../../application/validators/verifyUser.validator';
-import mapToVerifyUserDTO from '../../mappers/candidate/mapToVerifyUserRequestDTO';
+import mapToVerifyUserDTO from '../../mappers/user/mapToVerifyUserRequestDTO';
 
 @injectable()
 export default class RecruiterController {

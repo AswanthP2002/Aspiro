@@ -25,8 +25,8 @@ import IRecruiterRepo from '../domain/interfaces/recruiter/IRecruiterRepo';
 import RecruiterRespository from '../infrastructure/repositories/recruiter/recruiterRepository';
 import IRegisterRecruiterUseCase from '../application/usecases/recruiter/interface/IRegisterRecruiter.usecase';
 import RegisterRecruiterUseCase from '../application/usecases/recruiter/RegisterRecruiter.usecase';
-import IVerifyUserUseCase from '../application/usecases/interfaces/IVerifyUser.usecase';
-import VerifyUserUseCase from '../application/usecases/VerifyUser.usecase';
+import IVerifyUserUseCase from '../application/interfaces/usecases/user/IVerifyUser.usecase';
+import VerifyUserUseCase from '../application/usecases/user/VerifyUser.usecase';
 import ILoginRecruiterrUseCase from '../application/usecases/recruiter/interface/ILoginRecruiter.usecase';
 import { LoginRecruiterUseCase } from '../application/usecases/recruiter/LoginRecruiter.usecase';
 import ILoadRecruiterProfileUseCase from '../application/usecases/recruiter/interface/ILoadRecruiterProfile.usecase';
@@ -36,6 +36,9 @@ import { LoadCompaniesUseCase } from '../application/usecases/admin/LoadCompanie
 import IEmailService from '../application/interfaces/services/IEmailService';
 import EmailService from '../infrastructure/services/EmailService';
 import { UserController } from '../presentation/controllers/userController';
+import IResendOTPUseCase from '../application/interfaces/usecases/user/IResendOTP.usecase';
+import ResendOTPUseCase from '../application/usecases/user/ResendOTP.usecase';
+
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -80,6 +83,8 @@ container.registerSingleton<ILoadRecruiterProfileUseCase>(
   LoadRecruiterProfileDataUseCase
 );
 container.registerSingleton<ILoadCompaniesUseCase>('ILoadCompaniesUseCase', LoadCompaniesUseCase);
+container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUserUseCase);
+container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUseCase)
 
 //register controller
 container.registerSingleton(UserController);
@@ -88,3 +93,5 @@ container.registerSingleton(RecruiterController);
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
+
+
