@@ -1,88 +1,154 @@
-export default function FilterComponent({filterType, jobRole, closeFilter, candidateFilter, handleCandidateStatusSelect, handleJobRoleSelect} : any) {
+import React from 'react';
 
-    return (
-        <div className="filter absolute bg-white shadow h-screen top-0 left-0 w-[270px]">
-            <div className="flex justify-between p-3 items-center">
-                <p className="text-blue-500">Filter</p>
-                <i onClick={closeFilter} className="fa-solid fa-circle-xmark cursor-pointer"></i>
-            </div>
-            {
-                filterType === 'candidate' && (
-                    <div className="status p-3">
-                        <p className="!text-sm mt-1 mb-2 text-gray-400">Candidate Status</p>
-                        <ul>
-                            <li className="list-none"><input type="checkbox" checked={candidateFilter?.status.includes(false)} onChange={(event) => handleCandidateStatusSelect(false, event.target.checked)} name="" id="" /> <label htmlFor="" className="!text-xs">Active</label></li>
-                            <li className="list-none"><input type="checkbox" checked={candidateFilter?.status.includes(true)} onChange={(event) => handleCandidateStatusSelect(true, event.target.checked)} name="" id="" /> <label htmlFor="" className="!text-xs">Blocked</label></li>
-                        </ul>
-                        <div className="border border-gray-200 mt-3 w-full"></div>
-                    </div>
-                )
-            }
-
-            {
-                filterType === 'candidate' && jobRole && (
-                    <div className="job-role-type p-3 ">
-                    <div className="max-h-[300px] overflow-y-scroll">
-                        <p className="!text-sm mt-1 mb-2 text-gray-400">Candidate Role</p>
-                        <ul>
-                            {
-                                jobRole.map((roles : any, index : number) => {
-                                    return(
-                                        <li key={index} className="list-none"><input type="checkbox" checked={candidateFilter.jobRole.includes(roles) ? true : false} onChange={(event) => handleJobRoleSelect(roles, event.target.checked)} name="" id="" /> <label htmlFor="" className="!text-xs">{roles}</label></li>
-                                    )
-                                })
-                            }
-                        </ul>
-                        
-                    </div>
-                    <div className="border border-gray-200 mt-3 w-full"></div>
-                    </div>
-                )
-            }
-            {/* <div className="industries p-3 max-h-[300px] overflow-y-scroll">
-                <p className="text-sm font-normal-text-gray-500">Industry</p>
-                <ul>
-                    {
-                        industryTypes.map((industry: string, index: number) => {
-                            return (
-                                <li key={index}><input /><label>{}</label></li>
-                            )
-                        })
-                    }
-                </ul>
-            </div> */}
-
-            {/* <div className="job-type p-3">
-                <p className="text-sm font-normal text-gray-500">Job Type</p>
-                <div>
-                    <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">Full-Time</label></li>
-                    <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">Part-Time</label></li>
-                    <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">Internship</label></li>
-                </div>
-            </div> */}
-
-            {/* <div className="lcoation-type p-3">
-                <p className="text-sm font-normal text-gray-500">Location Type</p>
-                <div>
-                    <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">In-Office</label></li>
-                    <li className="list-none"><input type="checkbox" /><label htmlFor="" className="ms-2 !text-xs">Remote</label></li>
-                </div>
-            </div> */}
-
-            {/* <div className="salary p-3">
-                <p className="text-sm font-normal text-gray-500">Salary (Monthly)</p>
-                <div className="flex gap-2">
-                    <div className="w-1/2">
-                        <label htmlFor="" className="!text-xs">Min Salary</label>
-                        <input type="number" className="border border-gray-300 w-full" name="" id="" />
-                    </div>
-
-                    <div className="w-1/2">
-                        <label htmlFor="" className="!text-xs">Max Salary</label>
-                        <input type="number" className="border border-gray-300 w-full" name="" id="" />
-                    </div>
-                </div>
-            </div> */}
-        </div>
-    )
+interface FilterOptions {
+  status: boolean[];
+  roles: string[];
+  verification: boolean[];
 }
+
+interface FilterComponentProps {
+  handleFilterChange: (
+    category: keyof FilterOptions,
+    value: string | boolean,
+    isChecked: boolean
+  ) => void;
+  currentFilters: FilterOptions;
+  closeFilter: () => void;
+  filterType: 'user' | 'candidate'; // To control which filters are shown
+  jobRole?: any[]; // Optional, for other filter types
+}
+
+const FilterComponent: React.FC<FilterComponentProps> = ({
+  handleFilterChange,
+  currentFilters,
+  closeFilter,
+  filterType,
+}) => {
+  const userRoles = ['user', 'recruiter', 'admin'];
+
+  return (
+    <div className="fixed inset-0 bg-opacity-30 flex justify-start z-40">
+      <div className="bg-white w-70 h-full p-6 shadow-lg animate-slide-in">
+        <div className="flex justify-between items-center mb-8 border-b pb-4">
+          <h3 className="font-bold text-xl text-gray-800">Filters</h3>
+          <i
+            onClick={closeFilter}
+            className="cursor-pointer fa-solid fa-times text-gray-500 hover:text-gray-800 transition-colors"
+          ></i>
+        </div>
+
+        {/* User Filters */}
+        {filterType === 'user' && (
+          <div className="space-y-8">
+            {/* Filter by Status (Blocked/Active) */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-700">Status</h4>
+              <ul className="space-y-2">
+                <li>
+                  <input
+                    type="checkbox"
+                    id="status-active"
+                    className="form-checkbox h-4 w-4 text-orange-600"
+                    checked={currentFilters.status.includes(false)}
+                    onChange={(e) =>
+                      handleFilterChange('status', false, e.target.checked)
+                    }
+                  />
+                  <label htmlFor="status-active" className="ml-3 text-sm text-gray-600">
+                    Active
+                  </label>
+                </li>
+                <li>
+                  <input
+                    type="checkbox"
+                    id="status-blocked"
+                    className="form-checkbox h-4 w-4 text-orange-600"
+                    checked={currentFilters.status.includes(true)}
+                    onChange={(e) =>
+                      handleFilterChange('status', true, e.target.checked)
+                    }
+                  />
+                  <label htmlFor="status-blocked" className="ml-3 text-sm text-gray-600">
+                    Blocked
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+           {/* Filter by verification */}
+           <div>
+              <h4 className="font-semibold mb-3 text-gray-700">Verificaion</h4>
+              <ul className="space-y-2">
+                <li>
+                  <input
+                    type="checkbox"
+                    id="status-active"
+                    className="form-checkbox h-4 w-4 text-orange-600"
+                    checked={currentFilters.verification.includes(true)}
+                    onChange={(e) =>
+                      handleFilterChange('verification', true, e.target.checked)
+                    }
+                  />
+                  <label htmlFor="status-active" className="ml-3 text-sm text-gray-600">
+                    Verified
+                  </label>
+                </li>
+                <li>
+                  <input
+                    type="checkbox"
+                    id="status-blocked"
+                    className="form-checkbox h-4 w-4 text-orange-600"
+                    checked={currentFilters.verification.includes(false)}
+                    onChange={(e) =>
+                      handleFilterChange('verification', false, e.target.checked)
+                    }
+                  />
+                  <label htmlFor="status-blocked" className="ml-3 text-sm text-gray-600">
+                    Not Verified
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            {/* Filter by Role */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-700">Role</h4>
+              <ul className="space-y-2">
+                {userRoles.map((role) => (
+                  <li key={role}>
+                    <input
+                      type="checkbox"
+                      id={`role-${role}`}
+                      className="form-checkbox h-4 w-4 text-orange-600"
+                      checked={currentFilters.roles.includes(role)}
+                      onChange={(e) =>
+                        handleFilterChange('roles', role, e.target.checked)
+                      }
+                    />
+                    <label htmlFor={`role-${role}`} className="ml-3 text-sm text-gray-600 capitalize">
+                      {role}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Filter by Verification Status */}
+            {/* ... (You can add this following the same pattern for `isVerified`) ... */}
+
+          </div>
+        )}
+
+        {/* You can add 'candidate' specific filters here */}
+        {filterType === 'candidate' && (
+          <div>
+            {/* Candidate-specific filter UI */}
+            <p>Candidate filters would go here.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FilterComponent;

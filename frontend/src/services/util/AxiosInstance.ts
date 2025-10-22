@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
-import { candidateLogout } from '../candidateServices';
+import { userLogout } from '../candidateServices';
 import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
 import { refreshAccessToken } from '../commonServices';
 
@@ -31,9 +31,10 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
     }
 
     if(customeRequest.sendAuthToken){
-        const token = JSON.parse(localStorage.getItem('userToken') || "")
-        console.log('This is from browser token', token)
-        customeRequest.headers.Authorization = `Bearer ${token}`
+        const token = store.getState().userAuth.userToken
+        if (token) {
+            customeRequest.headers.Authorization = `Bearer ${token}`
+        }
     }
     
     //legacy : no more needed since authentication is centralized now
@@ -81,38 +82,31 @@ axiosInstance.interceptors.response.use(
                 showCancelButton:false,
                 allowOutsideClick:false,
                 timer:4000
-            }).then(async () => {
-                const dispatch = store.dispatch
-                await candidateLogout(dispatch,() => {
-                    window.location.replace('http://localhost:5173/login')
-                })
+            })//.then(async () => {
+            //     const dispatch = store.dispatch
+            //     await userLogout(dispatch,() => {
+            //         window.location.replace('http://localhost:5173/login')
+            //     })
 
-            })
+            // })
         }else if(response && response.status === 401 && !originalRequest?._retry) {//automatically retrying request after refreshing the token
             originalRequest._retry = true
 
-            const requestUrl : string = originalRequest.url
-
-            //get new access token
-            const newAccessToken = await refreshAccessToken()
-
-            //set new access token
-            store.dispatch(tokenRefresh({userToken:newAccessToken}))
-
-            //legacy code no more needed
-        
-            // if(requestUrl.startsWith('/candidate')){
-            //     const accessToken = await refreshCandidateToken()
-            //     store.dispatch(tokenRefresh({token:accessToken}))
-            // }else if(requestUrl.startsWith('/recruiter')){
-            //     const accessToken = await refreshRecruiterToken()
-            //     store.dispatch(recruiterTokenRefresh({token:accessToken}))
-            // }else if(requestUrl.startsWith('/admin')){
-            //     const accessToken = await refreshAdminToken()
-            //     store.dispatch(adminTokenRefresh({token:accessToken}))
-            // }
-            axiosInstance(originalRequest)
-
+            try {
+                //get new access token
+                const newAccessToken = await refreshAccessToken()
+                
+                if (newAccessToken) {
+                    //set new access token in Redux store
+                    store.dispatch(tokenRefresh({userToken:newAccessToken}))
+                    // Update the header of the original request and retry it
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return axiosInstance(originalRequest); // Return the promise of the retried request
+                }
+            } catch (refreshError) {
+                // Handle refresh token failure (e.g., redirect to login)
+                return Promise.reject(refreshError);
+            }
         }
 
         return Promise.reject(error)

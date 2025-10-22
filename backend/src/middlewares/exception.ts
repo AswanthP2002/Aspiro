@@ -51,10 +51,12 @@ export default function exceptionhandle(
       break;
     
     case 'JsonWebTokenError':
-      responseMessage = 'Invalid token, please re login again'
-      code = StatusCodes.BAD_REQUEST
-
+      console.log('json web token error executed') //debugging
+      responseMessage = 'Invalid token'
+      code = StatusCodes.UNAUTHORIZED
+      break;
     default:
+      console.log('Internal server error executed') // debugging
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;

@@ -8,7 +8,7 @@ import CandidateAggregated from '../../../domain/entities/candidate/candidateAgg
 import CandidatePaginated from '../../../domain/entities/candidate/candidatePaginated.entity';
 import Candidate from '../../../domain/entities/candidate/candidate.entity';
 import { injectable } from 'tsyringe';
-import { FindCandidatesQuery } from '../../../application/queries/candidates.query';
+import { FindUsersQuery } from '../../../application/queries/users.query';
 
 @injectable()
 export default class CandidateRepository
@@ -124,7 +124,7 @@ export default class CandidateRepository
   }
 
   async findCandidates(
-    query: FindCandidatesQuery
+    query: FindUsersQuery
   ): Promise<CandidatePaginated | null> {
     const { filterOptions, limit, page, search, sortOption } = query;
     const skip = (page - 1) * limit;
@@ -146,9 +146,9 @@ export default class CandidateRepository
       matchFilter.name = { $regex: new RegExp(search, 'i') };
     }
 
-    if (filterOptions.jobRole.length > 0) {
-      matchFilter.jobTitle = { $in: filterOptions?.jobRole };
-    }
+    // if (filterOptions.jobRole.length > 0) {
+    //   matchFilter.jobTitle = { $in: filterOptions?.jobRole };
+    // }
 
     console.log('testing candidate is blocked or not', filterOptions.status);
 

@@ -5,7 +5,7 @@ import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCirclePlus} from 'react-icons/fa6'
 import { logout } from "../../../redux-toolkit/userAuthSlice"
 import Swal from "sweetalert2"
-import { candidateLogout, getNotifications } from "../../../services/candidateServices"
+import { userLogout, getNotifications } from "../../../services/candidateServices"
 import { useContext, useEffect, useState } from "react"
 import { appContext } from "../../../context/AppContext"
 import { Notify } from "notiflix"
@@ -18,7 +18,7 @@ export default function Header(){
     const [notifications, setNotifications] = useState<any[]>([])
     // let notificationstest : any[] = []
     const dispatch = useDispatch()
-    const navigateTo = useNavigate()
+    const navigate = useNavigate()
     const user = useSelector((state : any) => {
         return state.userAuth.user
     })
@@ -29,23 +29,40 @@ export default function Header(){
 
     console.log('This is loged user', user)
 
-    async function logoutCandidate(){
-        const logoutResult = await candidateLogout(dispatch, navigateTo)
-        dispatch(logout())
+    async function logoutUser(){
         Swal.fire({
-            icon:'success',
-            title:logoutResult.message,
-            showConfirmButton:false,
-            showCancelButton:false,
-            timer:2000
-        }).then(() => navigateTo('/'))
+            icon:'info',
+            title:'Logout?',
+            text:'Are your sure your want to logout?',
+            showConfirmButton:true,
+            confirmButtonText:'Yes',
+            showCancelButton:true,
+            cancelButtonText:'No'
+        }).then(async (result) => {
+            if(result?.isConfirmed){
+                const logoutResult = await userLogout(dispatch, navigate)
+                dispatch(logout())
+                Swal.fire({
+                    icon:'success',
+                    title:'Logout',
+                    text:'You have successfully logged out',
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:1500
+                }).then(() => navigate('/'))
+            }else{
+                return
+            }
+        })
+        
+        
     }
 
     function goToProfile(){
         if(userRole === 'candidate'){
-            navigateTo('/candidate/profile/personal')
+            navigate('/candidate/profile/personal')
         }else if(userRole === 'recruiter'){
-            navigateTo('/recruiter/profile/overview')
+            navigate('/recruiter/profile/overview')
         }else{
             Notify.failure('Something went wrong', {timeout:1400})
         }
@@ -91,7 +108,7 @@ export default function Header(){
                                                 <p className="text-sm">Profile</p>
                                             </div>
                                             <div className="mt-2">
-                                                <span onClick={() => logoutCandidate()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
+                                                <span onClick={logoutUser} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +123,7 @@ export default function Header(){
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
                                 </ul>
-                                <button onClick={() => navigateTo('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
+                                <button onClick={() => navigate('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                                 </div>
                               </>
                     }

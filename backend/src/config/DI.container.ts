@@ -1,13 +1,12 @@
 import { container } from 'tsyringe';
 import IUserRepository from '../domain/interfaces/IUserRepo.refactored';
 import UserRepository from '../infrastructure/repositories/userRepository';
-import IAdminLoginUseCase from '../application/usecases/admin/interfaces/IAdminLogin.usecase';
+import IAdminLoginUseCase from '../application/interfaces/usecases/admin/IAdminLogin.usecase';
 import { AdminLoginUseCase } from '../application/usecases/admin/AdminLogin.usecase';
-import { AdminController } from '../presentation/controllers/admin/adminController';
+import { AdminController } from '../presentation/controllers/adminController';
 import ICandidateRepo from '../domain/interfaces/candidate/ICandidateRepo';
 import CandidateRepository from '../infrastructure/repositories/candidate/candidateRepository';
-import ILoadCandidateUseCase from '../application/usecases/admin/interfaces/ILoadCandidate.usecase';
-import { LoadCandidatesUseCase } from '../application/usecases/admin/LoadCandidates.usecase';
+import ILoadCandidateUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
 import ILoadCandidateDetailsUseCase from '../application/usecases/admin/interfaces/ILoadCandidateDetails.usecase';
 import { LoadCandidateDetailsUseCase } from '../application/usecases/admin/LoadCandidateDetails.usecase';
 import IBlockCandidateUseCase from '../application/usecases/admin/interfaces/IBlockCandidate.usecase';
@@ -38,7 +37,10 @@ import EmailService from '../infrastructure/services/EmailService';
 import { UserController } from '../presentation/controllers/userController';
 import IResendOTPUseCase from '../application/interfaces/usecases/user/IResendOTP.usecase';
 import ResendOTPUseCase from '../application/usecases/user/ResendOTP.usecase';
-
+import IUserLoginUseCase from '../application/interfaces/usecases/user/IUserLogin.usecase';
+import { UserLoginUseCase } from '../application/usecases/user/UserLogin.usecase';
+import { LoadUsersAdminUsecase } from '../application/usecases/admin/LoadUsersAdmin.usecase';
+import ILoadUsersAdminUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -47,7 +49,7 @@ container.registerSingleton<IRecruiterRepo>('IRecruiterRepository', RecruiterRes
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
-container.registerSingleton<ILoadCandidateUseCase>('ILoadCandidatesUseCase', LoadCandidatesUseCase);
+container.registerSingleton<ILoadUsersAdminUseCase>('ILoadUsersAdminUsecase', LoadUsersAdminUsecase);
 container.registerSingleton<ILoadCandidateDetailsUseCase>(
   'ILoadCandidateDetailsUseCase',
   LoadCandidateDetailsUseCase
@@ -69,11 +71,9 @@ container.registerSingleton<IFindCandidateByCandidateIdUseCase>(
   FindCandidateByCandidateIDUseCase
 );
 container.registerSingleton<ICreateUserUseCase>('ICreateUserUsecase', CreateUserUseCase);
-container.registerSingleton<IRegisterRecruiterUseCase>(
-  'IRegisterRecruiterUseCase',
-  RegisterRecruiterUseCase
-);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUseCase', VerifyUserUseCase);
+container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUseCase);
+container.registerSingleton<IUserLoginUseCase>('IUserLoginUsecase', UserLoginUseCase)
 container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
   LoginRecruiterUseCase
@@ -82,9 +82,12 @@ container.registerSingleton<ILoadRecruiterProfileUseCase>(
   'ILoadRecruiterProfileUseCase',
   LoadRecruiterProfileDataUseCase
 );
+container.registerSingleton<IRegisterRecruiterUseCase>(
+  'IRegisterRecruiterUseCase',
+  RegisterRecruiterUseCase
+);
 container.registerSingleton<ILoadCompaniesUseCase>('ILoadCompaniesUseCase', LoadCompaniesUseCase);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUserUseCase);
-container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUseCase)
 
 //register controller
 container.registerSingleton(UserController);
@@ -93,5 +96,3 @@ container.registerSingleton(RecruiterController);
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
-
-

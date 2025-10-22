@@ -1,78 +1,78 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
-import { AdminAuth, Auth } from '../../../middlewares/auth';
-import { StatusCodes } from '../../statusCodes';
-import IAdminLoginUseCase from '../../../application/usecases/admin/interfaces/IAdminLogin.usecase';
-import IBlockCandidateUseCase from '../../../application/usecases/admin/interfaces/IBlockCandidate.usecase';
-import IBlockCompanyUseCase from '../../../application/usecases/admin/interfaces/IBlockCompany.usecase';
-import IBlockJobUseCase from '../../../application/usecases/admin/interfaces/IBlockJob.usecase';
-import ICloseCompanyUseCase from '../../../application/usecases/admin/interfaces/ICloseCompany.usecase';
-import ILoadCandidateDetailsUseCase from '../../../application/usecases/admin/interfaces/ILoadCandidateDetails.usecase';
-import ILoadCandidateUseCase from '../../../application/usecases/admin/interfaces/ILoadCandidate.usecase';
-import ILoadCompanyDetailsUseCase from '../../../application/usecases/admin/interfaces/ILoadCompanyDetails.usecase';
-import ILoadCompaniesUseCase from '../../../application/usecases/admin/interfaces/ILoadCompanies.usecase';
-import ILoadJobsUseCase from '../../../application/usecases/admin/interfaces/ILoadJobs.usecase';
-import ILoadJobDetailsUseCase from '../../../application/usecases/admin/interfaces/ILoadJobDetails.usecase';
-import IRejectJobUseCase from '../../../application/usecases/admin/interfaces/IRejectJob.usecase';
-import IUnblockCompanyUseCase from '../../../application/usecases/admin/interfaces/IUnblockCompany.usecase';
-import IUnblockCandidateUseCase from '../../../application/usecases/admin/interfaces/IUnblockCandidate.usecase';
-import IUnblockJobUseCase from '../../../application/usecases/admin/interfaces/IUnblockJob.usecase';
-import IUnrejectJobUseCase from '../../../application/usecases/admin/interfaces/IUnrejectJob.usecase';
-import { LoadCandidatesValidator } from '../../../application/validators/loadCandidates.validator';
-import { CandidateIdValidator } from '../../../application/validators/candidateId.validator';
-import IFindCandidateByUserIdUseCase from '../../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
-import IFindCandidateByCandidateIdUseCase from '../../../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
+import { AdminAuth, Auth } from '../../middlewares/auth';
+import { StatusCodes } from '../statusCodes';
+import IAdminLoginUseCase from '../../application/interfaces/usecases/admin/IAdminLogin.usecase';
+import IBlockCandidateUseCase from '../../application/usecases/admin/interfaces/IBlockCandidate.usecase';
+import IBlockCompanyUseCase from '../../application/usecases/admin/interfaces/IBlockCompany.usecase';
+import IBlockJobUseCase from '../../application/usecases/admin/interfaces/IBlockJob.usecase';
+import ICloseCompanyUseCase from '../../application/usecases/admin/interfaces/ICloseCompany.usecase';
+import ILoadCandidateDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadCandidateDetails.usecase';
+import ILoadCandidateUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
+import ILoadCompanyDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadCompanyDetails.usecase';
+import ILoadCompaniesUseCase from '../../application/usecases/admin/interfaces/ILoadCompanies.usecase';
+import ILoadJobsUseCase from '../../application/usecases/admin/interfaces/ILoadJobs.usecase';
+import ILoadJobDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadJobDetails.usecase';
+import IRejectJobUseCase from '../../application/usecases/admin/interfaces/IRejectJob.usecase';
+import IUnblockCompanyUseCase from '../../application/usecases/admin/interfaces/IUnblockCompany.usecase';
+import IUnblockCandidateUseCase from '../../application/usecases/admin/interfaces/IUnblockCandidate.usecase';
+import IUnblockJobUseCase from '../../application/usecases/admin/interfaces/IUnblockJob.usecase';
+import IUnrejectJobUseCase from '../../application/usecases/admin/interfaces/IUnrejectJob.usecase';
+import { CandidateIdValidator } from '../../application/validators/candidateId.validator';
+import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
+import IFindCandidateByCandidateIdUseCase from '../../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
+import { userLoginSchema } from '../schemas/user/userLogin.schema';
+import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
+import ILoadUsersAdminUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
+import { loadUsersSchema } from '../schemas/admin/loadUsers.schema';
+import mapRequestToLoadUsersQueryDto from '../mappers/user/mapRequestToLoadUsersQueryDto';
 
 @injectable()
 export class AdminController {
   constructor(
-    @inject('IAdminLoginUseCase')
-    private _adminLoginUC: IAdminLoginUseCase, //usecase interface
-    @inject('ILoadCandidatesUseCase')
-    private _loadCandidatesUC: ILoadCandidateUseCase, //usecase interface
-    // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
-    @inject('ILoadCandidateDetailsUseCase')
-    private _loadCandidateDetailsUC: ILoadCandidateDetailsUseCase, //usecase interface
-    @inject('IBlockCandidateUseCase')
-    private _blockCandidateUC: IBlockCandidateUseCase, //usecase interface
-    @inject('IFindCandidateByUserIdUseCase')
-    private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase,
-    @inject('IUnblockCandidateUseCase')
-    private _unblockCandidateUC: IUnblockCandidateUseCase,
-    @inject('IFindCandidateByCandidateIDUseCase')
-    private _findCandidateByCandidateIdUC: IFindCandidateByCandidateIdUseCase,
-    @inject('ILoadCompaniesUseCase')
-    private _loadComapniesUC: ILoadCompaniesUseCase // private _unblockCandidateUC: IUnblockCandidateUseCase, //usecase interface // private _loadCompanyDetailsUC: ILoadCompanyDetailsUseCase, //usecase interface // private _blockCompanyUC: IBlockCompanyUseCase, //usecase interface // private _unblockCompanyUC: IUnblockCompanyUseCase, //usecase interface // private _closeCompanyUC: ICloseCompanyUseCase, //usecase interface // private _loadJobsUC: ILoadJobsUseCase, //usecase interface // private _loadJobDetails: ILoadJobDetailsUseCase, //usecase interface // private _blockJobUC: IBlockJobUseCase, //usecase interface // private _unblockJobUC: IUnblockJobUseCase, //usecase interface // private _rejectJobUC: IRejectJobUseCase, //usecase interface // private _unrejectJobUC: IUnrejectJobUseCase //usecase interface
-  ) {}
+    @inject('IAdminLoginUseCase') private _adminLoginUC: IAdminLoginUseCase,
+    @inject('ILoadUsersAdminUsecase') private _loadUsersAdminUC: ILoadUsersAdminUseCase
+  ) // @inject('ILoadCandidatesUseCase')
+  // private _loadCandidatesUC: ILoadCandidateUseCase, //usecase interface
+  // // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
+  // @inject('ILoadCandidateDetailsUseCase')
+  // private _loadCandidateDetailsUC: ILoadCandidateDetailsUseCase, //usecase interface
+  // @inject('IBlockCandidateUseCase')
+  // private _blockCandidateUC: IBlockCandidateUseCase, //usecase interface
+  // @inject('IFindCandidateByUserIdUseCase')
+  // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase,
+  // @inject('IUnblockCandidateUseCase')
+  // private _unblockCandidateUC: IUnblockCandidateUseCase,
+  // @inject('IFindCandidateByCandidateIDUseCase')
+  // private _findCandidateByCandidateIdUC: IFindCandidateByCandidateIdUseCase,
+  // @inject('ILoadCompaniesUseCase')
+  // private _loadComapniesUC: ILoadCompaniesUseCase // private _unblockCandidateUC: IUnblockCandidateUseCase, //usecase interface // private _loadCompanyDetailsUC: ILoadCompanyDetailsUseCase, //usecase interface // private _blockCompanyUC: IBlockCompanyUseCase, //usecase interface // private _unblockCompanyUC: IUnblockCompanyUseCase, //usecase interface // private _closeCompanyUC: ICloseCompanyUseCase, //usecase interface // private _loadJobsUC: ILoadJobsUseCase, //usecase interface // private _loadJobDetails: ILoadJobDetailsUseCase, //usecase interface // private _blockJobUC: IBlockJobUseCase, //usecase interface // private _unblockJobUC: IUnblockJobUseCase, //usecase interface // private _rejectJobUC: IRejectJobUseCase, //usecase interface // private _unrejectJobUC: IUnrejectJobUseCase //usecase interface
+  {}
 
-  // async adminLogin(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   //login controller for admin
-  //   const { email, password } = req.body;
-  //   try {
-  //     const result: any = await this._adminLoginUC.execute({ email, password });
-  //     const { refreshToken } = result;
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .cookie('refreshToken', refreshToken, {
-  //         httpOnly: true,
-  //         secure: false,
-  //         sameSite: 'lax',
-  //         maxAge: 24 * 60 * 60 * 1000,
-  //       })
-  //       .json({
-  //         success: true,
-  //         message: 'Admin loged in successfully',
-  //         result,
-  //       });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //common middleware
+  async adminLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validateInput = userLoginSchema.parse(req.body);
+      const dto = mapToUserLoginDTO({ ...validateInput });
+      const result: any = await this._adminLoginUC.execute(dto);
+      const { refreshToken } = result;
+
+      res
+        .status(StatusCodes.OK)
+        .cookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          secure: false, //will change to true when it ready for production
+          sameSite: 'lax',
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .json({
+          success: true,
+          message: 'Admin loged in successfully',
+          result: { user: result?.user, role: result?.role, accessToken: result?.token },
+        });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //common middleware
 
   // async logoutAdmin(
   //   req: Auth,
@@ -94,47 +94,34 @@ export class AdminController {
   //   }
   // }
 
-  // async loadCandidates(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   //list of candidates
-  //   const search = (req.query.search as string) || '';
-  //   console.log('Search query reached here', req.query.search);
-  //   const page = parseInt(req?.query?.page as string) || 1;
-  //   const limit = parseInt(req?.query?.limit as string) || 3;
-  //   const sort = req.query.sort as string;
-  //   const filter = JSON.parse(req.query.filter as string) || {};
+  async loadUsers(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1; // Removed redundant optional chaining
+    const limit = parseInt(req.query.limit as string) || 3; // Removed redundant optional chaining
+    const sort = (req.query.sort as string) || ''; // Added default for sort
+    let filter = JSON.parse(req.query?.filter as string) || {} //: Record<string, unknown> = {}; // Explicitly type filter
 
-  //   try {
-  //     const validatedData = LoadCandidatesValidator.parse({
-  //       search,
-  //       page,
-  //       limit,
-  //       sort,
-  //       filter,
-  //     });
-  //     //console.log('This is validated data', validatedData)
-  //     const result = await this._loadCandidatesUC.execute({
-  //       search: validatedData.search as string,
-  //       limit: validatedData.limit,
-  //       page: validatedData.page,
-  //       sort: validatedData.sort,
-  //       filter: validatedData.filter,
-  //     });
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Candidates details fetched successfully',
-  //       result,
-  //       pagination: { page, limit },
-  //     });
-
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // }
+    try {
+      const validatedQuery = loadUsersSchema.parse({
+        search,
+        page,
+        limit,
+        sort,
+        filter
+      })
+      const dto = mapRequestToLoadUsersQueryDto(validatedQuery)
+      const result = await this._loadUsersAdminUC.execute(dto)
+      
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Users details fetched successfully',
+        result,
+        pagination: { page, limit },
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
   // async loadCandidateDetails(
   //   req: AdminAuth,

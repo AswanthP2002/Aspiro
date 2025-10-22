@@ -1,7 +1,7 @@
 import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
 import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
 import { generateRefreshToken, generateToken } from '../../services/jwt';
-import { LoginCandidateOutDTO } from '../DTOs/candidate/candidateLogin.dto';
+import { UserLoginOutpDTO } from '../DTOs/user/userLogin.dto';
 import mapToCandidate from '../mappers/candidate/mapToCandidate.mapper';
 import IGoogleLoginUseCase from './interfaces/IGoogleLogin.usecase';
 import IVerifyGoogleTokenUseCase from './interfaces/IVerifyGoogleToken.usecase';
@@ -13,7 +13,7 @@ export default class GoogleLoginUseCase implements IGoogleLoginUseCase {
     private _userRepo: IUserRepository
   ) {}
 
-  async execute(googleToken: string): Promise<LoginCandidateOutDTO | null> {
+  async execute(googleToken: string): Promise<UserLoginOutpDTO> {
     //verify the token first
     const { googleId, email, name } = await this._tokenVerify.verify(
       googleToken
@@ -31,15 +31,13 @@ export default class GoogleLoginUseCase implements IGoogleLoginUseCase {
 
     //create token
     const token = await generateToken({
-      id: createdUser?._id,
-      name: createdUser?.name,
+      id: createdUser?._id as string,
       email: 'createdUser?.email',
       role: 'Candidate',
     });
 
     const refreshToken = await generateRefreshToken({
-      id: createdUser?._id,
-      name: createdUser?.name,
+      id: createdUser?._id as string,
       email: 'createdUser?.email',
       role: 'Candidate',
     });

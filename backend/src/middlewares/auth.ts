@@ -16,7 +16,7 @@ let checkCandidateBlockStatusUC: any;
 })();
 
 export interface Auth extends Request {
-  user: any;
+  user?: any;
 }
 
 export interface AdminAuth extends Request {
@@ -192,13 +192,13 @@ export const adminAuth = async (req: AdminAuth, res: Response, next: NextFunctio
   }
 };
 
-export const refreshAccessToken = async (req: Auth, res: Response, next: NextFunction) => {
+export const refreshAccessToken = async (req: Auth, res: Response, next: NextFunction) : Promise<void> => {
   const refreshToken = req.cookies?.refreshToken;
 
-  if (refreshToken) {
-    return res
+  if (!refreshToken) {
+    res
       .status(StatusCodes.NOT_ACCEPTABLE)
-      .json({ success: false, message: 'No tocken provided' });
+      .json({ success: false, message: 'No token provided' });
   }
 
   try {
@@ -207,10 +207,10 @@ export const refreshAccessToken = async (req: Auth, res: Response, next: NextFun
     const accessToken = await generateToken({
       id: decoded?.id,
       email: decoded?.email,
-      role: req.user?.role,
+      role: decoded?.role,
     });
 
-    return res
+    res
       .status(StatusCodes.OK)
       .json({ success: true, message: 'New Access Token issued', accessToken });
   } catch (error: unknown) {
@@ -218,18 +218,18 @@ export const refreshAccessToken = async (req: Auth, res: Response, next: NextFun
       logger.error({ error }, 'Error occured  while issuing new access token');
       switch (error.name) {
         case 'TokenExpiredError':
-          return res.status(StatusCodes.LOGIN_TIMEOUT_NON_STANDARD).json({
+           res.status(StatusCodes.LOGIN_TIMEOUT_NON_STANDARD).json({
             success: false,
             message: 'Your session has expired, please login again to continue',
           });
         case 'JsonWebTokenError':
-          return res.status(StatusCodes.BAD_REQUEST).json({
+           res.status(StatusCodes.BAD_REQUEST).json({
             success: false,
             message: 'Invalid Token, please login again',
           });
         default:
           logger.error('Token verification failed');
-          return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+           res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong, please try again after some time',
           });
@@ -242,19 +242,21 @@ export const centralizedAuthentication = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const auth = req.headers.authorization; //access the token from header
-
+  console.log('This is auth', auth);
   if (!auth) {
     console.log('No authorization header');
-    return res.status(StatusCodes.UNAUTHORIZED).json({
+    res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
       message: 'Unauthorized Action',
     });
+    return;
   }
 
   try {
     const decoded = await verifyToken(auth.split(' ')[1]);
+    console.log('Decoded value for debuging', decoded)
 
     req.user = decoded;
     next();
@@ -264,7 +266,7 @@ export const centralizedAuthentication = async (
 };
 
 export const authorization = (roles: string[]) => {
-  return async (req: Auth, res: Response, next: NextFunction) => {
+  return async (req: Auth, res: Response, next: NextFunction) : Promise<void> => {
     if (!roles.includes(req?.user?.role)) {
       res.status(StatusCodes.FORBIDEN).json({ success: false, message: 'Forbidden request' });
       return;

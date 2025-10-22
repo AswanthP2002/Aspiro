@@ -1,4 +1,4 @@
-import { FindCandidatesQuery } from '../../../application/queries/candidates.query';
+import { FindCandidatesQuery } from '../../../application/queries/users.query';
 import Candidate from '../../entities/candidate/candidate.entity';
 //import Candidate from '../../entities/candidate/candidate.entity';
 import CandidateAggregated from '../../entities/candidate/candidateAggregated.entity';

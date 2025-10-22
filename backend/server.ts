@@ -15,7 +15,7 @@ import './src/config/passport';
 //import createCandidateRouter from './src/presentation/routes/userRouter';
 import connectToDb from './src/infrastructure/database/connection';
 //import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
-import createAdminRouter from './src/presentation/routes/admin/adminRouter';
+import createAdminRouter from './src/presentation/routes/adminRouter';
 import createFollowRouter from './src/presentation/routes/followRouter';
 import createPostRouter from './src/presentation/routes/postRouter';
 import chatSocket from './src/infrastructure/socketio/chatSocket';
@@ -56,7 +56,7 @@ async function main() {
 
   await connectToDb();
   //connect redis
-  await connectRedis()
+  //await connectRedis()
 
   const userRouter = createUserRouter();
   //const recruiterRouter = createRecruiterRouter();

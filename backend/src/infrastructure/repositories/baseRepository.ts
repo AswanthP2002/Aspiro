@@ -12,6 +12,11 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
     return result.toObject();
   }
 
+  async find(): Promise<T[] | null> {
+    const result = await this._model.find();
+    return result;
+  }
+
   async findById(id: string): Promise<T | null> {
     const result = await this._model.findOne({
       _id: new mongoose.Types.ObjectId(id),

@@ -85,9 +85,9 @@ export const candidateLogin = async (email : string, password : string) => {
     }
 }
 
-export const candidateLogout = async (dispatch : Function, navigate : Function) => {
+export const userLogout = async (dispatch : Function, navigate : Function) => {
     try {
-        const response = await axiosInstance.post('/candidate/logout', null,
+        const response = await axiosInstance.post('/logout', null,
             {
                 sendAuthToken:true
             } as AxiosRequest

@@ -4,8 +4,8 @@ import LoginPage from './pages/admin/Login/Login';
 import CandidateRegister from './pages/user/Register/Register';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
-import VerificationPage from './pages/common/Verification/Verification';
-import CandidateLogin from './pages/candidate/Login/Login';
+import VerificationPage from './pages/user/Verification/Verification';
+import CandidateLogin from './pages/user/Login/Login';
 import ProfileLayout from './pages/candidate/Profile-Layout';
 import ProfilePersonal from './pages/candidate/Profile-Personal/Personal';
 import StoreDetails from './pages/candidate/Basic Details Storing Page/StoreDetails';
@@ -23,7 +23,7 @@ import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob';
 import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard/Dashboard';
 import Companies from './pages/admin/Company-list/Companies';
-import Candidates from './pages/admin/Candidate-list/Candidate-list';
+import Users from './pages/admin/Users-List/Users';
 import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails';
 import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
 import Jobs from './pages/admin/Job-list/JobList';
@@ -83,7 +83,7 @@ function App() {
         <Route path='/verify' element={<VerificationPage />} />
         
         {/* Candidate specific routes not applicable header & sidebar & footer */}
-        <Route path='/candidate/login' element={<CandidateLogin />} />
+        <Route path='/login' element={<CandidateLogin />} />
         <Route path='/register' element={<CandidateRegister />} />
         <Route path='/candidate/store/details' element={<StoreDetails />} />
 
@@ -94,7 +94,7 @@ function App() {
         <Route path='/admin/login' element={<AdminLoginPage />} />
         <Route path='/admin' element={<AdminLayout />}>
           <Route path='dashboard' element={<Dashboard />} />
-          <Route path='candidates' element={<Candidates />} />
+          <Route path='users' element={<Users />} />
           <Route path='candidate/details/:id' element={<CandidateDetails />} />
         </Route>
 

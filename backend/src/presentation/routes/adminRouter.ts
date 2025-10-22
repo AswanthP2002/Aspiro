@@ -1,35 +1,36 @@
-import { Request, Response, NextFunction } from 'express';
-import { AdminLoginUseCase } from '../../../application/usecases/admin/AdminLogin.usecase';
-import { BlockCandidateUseCase } from '../../../application/usecases/admin/BlockCandidate.usecase';
-import BlockCompanyUseCase from '../../../application/usecases/admin/BlockComapny.usecase';
-import { BlockJobUseCase } from '../../../application/usecases/admin/BlockJob.usecase';
-import CloseCompanyUseCase from '../../../application/usecases/admin/CloseCompany.usecase';
-import { LoadCandidateDetailsUseCase } from '../../../application/usecases/admin/LoadCandidateDetails.usecase';
-import { LoadCandidatesUseCase } from '../../../application/usecases/admin/LoadCandidates.usecase';
-import LoadCompanyDetailsUseCase from '../../../application/usecases/admin/LoadCompanyDetails.usecase';
-import { LoadCompaniesUseCase } from '../../../application/usecases/admin/LoadCompanies.usecase';
-import { LoadJobDetailsUseCase } from '../../../application/usecases/admin/LoadJobDetails.usecase';
-import LoadJobsUseCase from '../../../application/usecases/admin/LoadJobs.usecase';
-import { RejectJobUseCase } from '../../../application/usecases/admin/RejectJob.usecase';
-import { UnblockCandidateUseCase } from '../../../application/usecases/admin/UnblockCandidate.usecase';
-import UnblockCompanyUseCase from '../../../application/usecases/admin/UnblockComapny.usecase';
-import { UnblockJobUseCase } from '../../../application/usecases/admin/UnblockJob.usecase';
-import { UnRejectJobUseCase } from '../../../application/usecases/admin/UnrejectJob.usecase';
-import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository';
-import JobRepository from '../../../infrastructure/repositories/jobRepository';
-import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository';
-import {
-  adminAuth,
-  authorization,
-  centralizedAuthentication,
-  refreshAccessToken,
-} from '../../../middlewares/auth';
-import { AdminController } from '../../controllers/admin/adminController';
-import { Db } from 'mongodb';
-import UserRepository from '../../../infrastructure/repositories/userRepository';
+import express, { NextFunction, Request, Response } from 'express';
+// import { Request, Response, NextFunction } from 'express';
+// import { AdminLoginUseCase } from '../../../application/usecases/admin/AdminLogin.usecase';
+// import { BlockCandidateUseCase } from '../../../application/usecases/admin/BlockCandidate.usecase';
+// import BlockCompanyUseCase from '../../../application/usecases/admin/BlockComapny.usecase';
+// import { BlockJobUseCase } from '../../../application/usecases/admin/BlockJob.usecase';
+// import CloseCompanyUseCase from '../../../application/usecases/admin/CloseCompany.usecase';
+// import { LoadCandidateDetailsUseCase } from '../../../application/usecases/admin/LoadCandidateDetails.usecase';
+// import { LoadCandidatesUseCase } from '../../../application/usecases/admin/LoadCandidates.usecase';
+// import LoadCompanyDetailsUseCase from '../../../application/usecases/admin/LoadCompanyDetails.usecase';
+// import { LoadCompaniesUseCase } from '../../../application/usecases/admin/LoadCompanies.usecase';
+// import { LoadJobDetailsUseCase } from '../../../application/usecases/admin/LoadJobDetails.usecase';
+// import LoadJobsUseCase from '../../../application/usecases/admin/LoadJobs.usecase';
+// import { RejectJobUseCase } from '../../../application/usecases/admin/RejectJob.usecase';
+// import { UnblockCandidateUseCase } from '../../../application/usecases/admin/UnblockCandidate.usecase';
+// import UnblockCompanyUseCase from '../../../application/usecases/admin/UnblockComapny.usecase';
+// import { UnblockJobUseCase } from '../../../application/usecases/admin/UnblockJob.usecase';
+// import { UnRejectJobUseCase } from '../../../application/usecases/admin/UnrejectJob.usecase';
+// import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository';
+// import JobRepository from '../../../infrastructure/repositories/jobRepository';
+// import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository';
+// import {
+//   adminAuth,
+//   authorization,
+//   centralizedAuthentication,
+//   refreshAccessToken,
+// } from '../../../middlewares/auth';
+// import { AdminController } from '../../controllers/adminController';
+// import { Db } from 'mongodb';
+// import UserRepository from '../../../infrastructure/repositories/userRepository';
 import { container } from 'tsyringe';
-
-const express = require('express');
+import { AdminController } from '../controllers/adminController';
+import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
 
 function createAdminRouter() {
   const adminRouter = express.Router();
@@ -76,16 +77,13 @@ function createAdminRouter() {
   //   // unrejectJobUC
   // );
 
-  // adminRouter.post(
-  //   '/admin/login',
-  //   adminController.adminLogin.bind(adminController)
-  // );
-  // adminRouter.get(
-  //   '/admin/candidates/data',
-  //   centralizedAuthentication,
-  //   authorization(['admin']),
-  //   adminController.loadCandidates.bind(adminController)
-  // );
+  adminRouter.post('/login', adminController.adminLogin.bind(adminController));
+  adminRouter.get('/users',
+    centralizedAuthentication,
+    authorization(['admin']),
+    testMiddleware,
+    adminController.loadUsers.bind(adminController)
+  )
   // // adminRouter.get(
   // //   '/admin/companies/data',
   // //   adminAuth,
@@ -165,7 +163,7 @@ function createAdminRouter() {
   // //   adminController.unrejectJob.bind(adminController)
   // // );
 
-  // adminRouter.post('/admin/token/refresh', refreshAccessToken);
+  //adminRouter.post('/token/refresh', refreshAccessToken);
   // adminRouter.post(
   //   '/admin/logout',
   //   centralizedAuthentication,
@@ -173,14 +171,16 @@ function createAdminRouter() {
   //   adminController.logoutAdmin
   // );
 
-  // function testMiddleware(req: Request, res: Response, next: NextFunction) {
-  //   console.log('Request for logout reached here', req.url);
-  //   console.log('Request headers', req.headers.authorization);
 
-  //   next();
-  // }
 
   return adminRouter;
+}
+
+function testMiddleware(req : Request, res : Response, next : NextFunction){
+  console.log(req.body)
+  console.log(req.query?.filter)
+  //console.log('Checking request values filter', JSON.parse(req?.query?.filterOptions as string))
+  next()
 }
 
 export default createAdminRouter;

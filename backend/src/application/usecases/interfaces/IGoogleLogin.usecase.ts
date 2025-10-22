@@ -1,5 +1,5 @@
-import { LoginCandidateOutDTO } from '../../DTOs/candidate/candidateLogin.dto';
+import {UserLoginOutpDTO } from '../../DTOs/user/userLogin.dto';
 
 export default interface IGoogleLoginUseCase {
-  execute(googleToken: string): Promise<LoginCandidateOutDTO | null>;
+  execute(googleToken: string): Promise<UserLoginOutpDTO>;
 }

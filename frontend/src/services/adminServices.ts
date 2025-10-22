@@ -242,28 +242,20 @@ export const deleteCompany = async (companyId : string) => { //delete / close co
     }
 }
 
-export const getCandidates = async (search: string, page: number, sort : string, filter : any) => {
+export const getUsers = async (search: string, page: number, sort : string, filter : any) => {
     try {
-        const response = await axiosInstance.get('/admin/candidates/data', {
+        const response = await axiosInstance.get('/admin/users', {
             params:{search, page, sort, filter:JSON.stringify(filter)},
             sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
-        console.log('Error occured while geting candidate list', err)
+        // Log the error for debugging purposes
+        console.log('Error occurred while getting user list', error);
+        // Re-throw the error to be handled by the calling function's catch block
+        // or the global Axios error interceptor.
+        throw error;
     }
 }
 

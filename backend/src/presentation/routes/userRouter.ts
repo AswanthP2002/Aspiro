@@ -1,6 +1,6 @@
 // import { upload } from '../../utilities/multer';
 // import { NextFunction, Request, Response } from 'express';
-import express, { NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { UserController } from '../controllers/userController';
 // import {
 //   authorization,
@@ -68,6 +68,8 @@ import { UserController } from '../controllers/userController';
 // import CreateUserUseCase from '../../application/usecases/user/CreateUser.usecase';
 // import FindCandidateByUserIdUseCase from '../../application/usecases/candidate/FindCandidateByUserId.usecase';
 import { container } from 'tsyringe';
+import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
+import { refreshAccessToken } from '../../middlewares/auth';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -176,7 +178,14 @@ function createUserRouter() {
  
   userRouter.post('/register', userController.registerUser.bind(userController));
   userRouter.post('/verify', userController.verifyUser.bind(userController));
-  userRouter.post('/otp/resend', userController.resendOTP.bind(userController))
+  userRouter.post(
+    '/otp/resend',
+    allowResendOtp,
+    userController.resendOTP.bind(userController)
+  )
+  userRouter.post('/login', userController.userLogin.bind(userController))
+  userRouter.post('/logout', userController.userLogout.bind(userController))
+  userRouter.get('/token/refresh', refreshAccessToken)
   // candidateRouter.post(
   //   '/login',
   //   candidateController.loginCandidate.bind(candidateController)
@@ -406,14 +415,13 @@ function createUserRouter() {
   //   candidateController.getCandidateApplications.bind(candidateController)
   // );
 
-  // // candidateRouter.get('/get/user/:id', getAuthUserData)
-
-  function testMiddleWare(req: Request, res: Response, next: NextFunction) {
-    console.log('Request reached here in the register route')
-    // return res
-    //   .status(StatusCodes.ACCEPTED)
-    //   .json({ success: false, message: 'Testing flow' });
+  function testMiddleware(req : Request, res : Response, next : NextFunction){
+    console.log('inspecting request body')
+    console.log(req.body)
+    next()
   }
+
+  // // candidateRouter.get('/get/user/:id', getAuthUserData)
 
   return userRouter;
 }

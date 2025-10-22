@@ -1,11 +1,11 @@
-import { Role } from '../user/user.dto';
+import { Role } from "../../../domain/entities/shared/User";
 
-export interface LoginCandidateInpDTO {
+export interface UserLoginInpDTO {
   email: string;
   password: string;
 }
 
-export interface LoginCandidateOutDTO {
+export interface UserLoginOutpDTO {
   token: string;
   refreshToken: string;
   user: {

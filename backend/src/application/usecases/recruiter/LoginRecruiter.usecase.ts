@@ -32,14 +32,14 @@ export class LoginRecruiterUseCase implements ILoginRecruiterrUseCase {
     }
 
     const token = await generateToken({
-      id: user._id,
-      email: user.email,
-      role: user.role,
+      id: user._id as string,
+      email: user.email as string,
+      role: "recruiter"
     });
     const refreshToken = await generateRefreshToken({
-      id: user._id,
-      email: user.email,
-      role: user.role,
+      id: user._id as string,
+      email: user.email as string,
+      role: "recruiter",
     });
 
     return {
