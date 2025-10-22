@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import {MdBookmarkAdded} from 'react-icons/md'
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
-import { checkIsSaved, saveJob, unsaveJob } from "../../../services/candidateServices"
+import { checkIsSaved, saveJob, unsaveJob } from "../../../services/userServices"
 import { useSelector } from "react-redux"
 import { formatRelativeTime, transformDate } from "../../../services/util/formatDate"
 import { Notify } from "notiflix"

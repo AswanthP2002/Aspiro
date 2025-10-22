@@ -6,7 +6,6 @@ export default interface UpdateUserDTO {
     name?: string;
     headline?: string;
     summary?: string;
-    password?: string;
     dateOfBirth?: string;
     socialLinks?: SocialLinks[];
     location?: {
@@ -34,8 +33,4 @@ export default interface UpdateUserDTO {
     isVerified?: boolean;
     isAdmin?: boolean;
     isRecruiter?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-    verificationToken?: string;
-    otpExpiresAt?: Date;
 }

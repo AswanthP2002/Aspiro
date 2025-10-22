@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import InfinitySpinner from "../../../components/common/InfinitySpinner";
-import { resendOtp, verify } from "../../../services/candidateServices";
+import { resendOtp, verify } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
 import { FormControl, TextField } from "@mui/material";
 import { Notify } from "notiflix";

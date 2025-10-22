@@ -5,7 +5,7 @@ import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCirclePlus} from 'react-icons/fa6'
 import { logout } from "../../../redux-toolkit/userAuthSlice"
 import Swal from "sweetalert2"
-import { userLogout, getNotifications } from "../../../services/candidateServices"
+import { userLogout, getNotifications } from "../../../services/userServices"
 import { useContext, useEffect, useState } from "react"
 import { appContext } from "../../../context/AppContext"
 import { Notify } from "notiflix"
@@ -59,10 +59,8 @@ export default function Header(){
     }
 
     function goToProfile(){
-        if(userRole === 'candidate'){
-            navigate('/candidate/profile/personal')
-        }else if(userRole === 'recruiter'){
-            navigate('/recruiter/profile/overview')
+        if(userRole === 'user'){
+            navigate('/profile/personal')
         }else{
             Notify.failure('Something went wrong', {timeout:1400})
         }

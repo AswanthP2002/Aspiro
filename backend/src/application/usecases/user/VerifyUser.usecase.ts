@@ -6,7 +6,7 @@ import {
   WrongCredentialsError,
 } from '../../../domain/errors/AppError';
 import UserDTO from '../../DTOs/user/user.dto';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import { inject, injectable } from 'tsyringe';
 

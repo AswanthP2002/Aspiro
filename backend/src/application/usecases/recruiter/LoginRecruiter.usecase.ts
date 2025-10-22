@@ -4,7 +4,7 @@ import RecruiterLoginDTO, {
   RecruiterLoginResDTO,
 } from '../../DTOs/recruiter/recruiterLogin.dto';
 import { inject, injectable } from 'tsyringe';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import {
   InvalidUserError,
   WrongPasswordError,

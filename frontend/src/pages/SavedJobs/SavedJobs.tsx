@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import JobVerticalCard from "../../components/common/JobVerticalCard";
-import { getSavedJobs } from "../../services/candidateServices";
+import { getSavedJobs } from "../../services/userServices";
 
 export default function SavedJobs(){
     const [savedJobs, setSavedJobs] = useState([])

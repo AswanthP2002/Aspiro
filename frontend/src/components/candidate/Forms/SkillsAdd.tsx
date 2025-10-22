@@ -3,7 +3,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { candidateService } from "../../../services/commonServices";
 import { Controller, useForm } from "react-hook-form";
-import { addCandidateSkill } from "../../../services/candidateServices";
+import { addCandidateSkill } from "../../../services/userServices";
 
 export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal, onAddSkill, onRemoveSkill} : any){
     const [type, setskillType] = useState("")

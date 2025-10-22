@@ -116,13 +116,13 @@ export interface UserType {
   summary?: string;
   password?: string;
   dateOfBirth?: string;
-  socialLinks?: SocialLinks[];
+  socialLinks: SocialLinks[];
   location?: {
-    city: string;
-    district: string;
-    state: string;
-    country: string;
-    pincode: string;
+    city?: string;
+    district?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
   };
   role?: Role[];
   phone?: string;
@@ -131,12 +131,12 @@ export interface UserType {
   facebookId?: string;
   linkedinId?: string;
   profilePicture?: {
-    cloudinaryPublicId: string;
-    cloudinarySecureUrl: string;
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
   };
   coverPhoto?: {
-    cloudinaryPublicId: string;
-    cloudinarySecureUrl: string;
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
   };
   isBlocked?: boolean;
   isVerified?: boolean;

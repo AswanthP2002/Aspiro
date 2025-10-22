@@ -1,19 +1,18 @@
-import { JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
-const CandidateProtectedRoute = () => {
+const UserProtectedRoute = () => {
   const userAuth = useSelector((state: any) => {
     return state.userAuth;
   });
 
   const { user, userRole } = userAuth;
 
-  return user && userRole === 'candidate' ? (
+  return user && userRole === 'user' ? (
     <Outlet />
   ) : (
-    <Navigate to={'/candidate/login'} replace />
+    <Navigate to={'/login'} replace />
   );
 };
 
-export default CandidateProtectedRoute;
+export default UserProtectedRoute;

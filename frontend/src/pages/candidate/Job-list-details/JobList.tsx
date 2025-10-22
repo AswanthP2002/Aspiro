@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 import JobListTile from '../../../components/common/JobListTile';
 import { useNavigate } from 'react-router-dom';
 import JobFilterCandidateSide from '../../../components/candidate/JobFiltersCandidateSide';
-import { getJobs } from '../../../services/candidateServices';
+import { getJobs } from '../../../services/userServices';
 interface filterState {
   industry: string[];
   jobType: string[];

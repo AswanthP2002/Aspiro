@@ -6,7 +6,7 @@ import {
   InvalidUserError,
   WrongPasswordError,
 } from '../../../domain/errors/AppError';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import comparePassword from '../../Services/comparePassword';
 import { UserLoginInpDTO, UserLoginOutpDTO } from '../../DTOs/user/userLogin.dto';
 import { inject, injectable } from 'tsyringe';

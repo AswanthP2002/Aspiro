@@ -3,7 +3,7 @@ import atlas from '/3atlas.png'
 import dummyUserImage from '/recejames.jpg'
 import dummyCompany from '/company.jpg'
 import Swal from "sweetalert2";
-import { createPost, getPosts, likePost, unlikePost } from "../../../services/candidateServices";
+import { createPost, getPosts, likePost, unlikePost } from "../../../services/userServices";
 import { Notify } from "notiflix";
 import { useSelector } from "react-redux";
 import GeneralModal from "../../../components/common/Modal";

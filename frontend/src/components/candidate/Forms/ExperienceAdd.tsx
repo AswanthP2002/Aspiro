@@ -1,7 +1,7 @@
 import { Modal, Box, Typography, FormControl, TextField, InputLabel, Select, MenuItem, FormHelperText, Checkbox, FormControlLabel } from "@mui/material";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { addCandidateExperience } from "../../../services/candidateServices";
+import { addCandidateExperience } from "../../../services/userServices";
 import { Dayjs } from "dayjs";
 import { Controller, useForm } from "react-hook-form";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";

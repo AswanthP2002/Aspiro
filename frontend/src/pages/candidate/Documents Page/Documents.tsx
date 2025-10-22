@@ -3,7 +3,7 @@ import Swal from "sweetalert2"
 import Loader from "../../../components/candidate/Loader"
 import { useSelector } from "react-redux"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
-import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/candidateServices"
+import { addCandidateResume, deleteCandidateResume, loadCandidateCertificates, loadCandidateResumes } from "../../../services/userServices"
 import ResumeCard from "../../../components/candidate/ResumeCard"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 

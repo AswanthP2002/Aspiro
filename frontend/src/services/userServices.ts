@@ -120,10 +120,10 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
     }
 }
 
-export const saveBasicDetails = async (role: string, city: string, district: string, state: string, country: string, pincode: string, about: string) => {
+export const saveBasicDetails = async (headline: string, city: string, district: string, state: string, country: string, pincode: string, summary: string) => {
     try {
-        const response = await axiosInstance.post('candidate/personal/details/save',
-            {role, city, district, state, country, pincode, about},
+        const response = await axiosInstance.post('/personal/details/save',
+            {headline, city, district, state, country, pincode, summary},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -134,23 +134,14 @@ export const saveBasicDetails = async (role: string, city: string, district: str
 
     } catch (error : unknown) {
         const err = error as AxiosError
-
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-        console.log('Error occured while saving basic details', )
+        console.log('Error occured while saving basic details', err)
+        throw(error)
     }
 }
 
 export const getCandidateProfileData = async () => {
     try {
-        const response = await axiosInstance.get('candidate/profile/personal/datas',
+        const response = await axiosInstance.get('/profile/personal/datas',
             {
                 sendAuthToken:true
             } as AxiosRequest

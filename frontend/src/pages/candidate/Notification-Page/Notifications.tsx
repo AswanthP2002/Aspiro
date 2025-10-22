@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getNotifications, updateNOtificationReadStatus } from "../../../services/candidateServices"
+import { getNotifications, updateNOtificationReadStatus } from "../../../services/userServices"
 import { formatRelativeTime } from "../../../services/util/formatDate"
 
 export default function NotificationPage() {

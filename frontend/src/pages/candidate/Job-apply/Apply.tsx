@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
-import { addCandidateResume, candidateApplyJob } from "../../../services/candidateServices"
+import { addCandidateResume, candidateApplyJob } from "../../../services/userServices"
 
 export default function JobApplyPage() {
     

@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IResendOTPUseCase from '../../interfaces/usecases/user/IResendOTP.usecase';
 import ResendOtpDTO from '../../DTOs/user/resendOtp.dto';
 import UserDTO from '../../DTOs/user/user.dto';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import IEmailService from '../../interfaces/services/IEmailService';
 import { generateCode } from '../../../utilities/generateCode';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';

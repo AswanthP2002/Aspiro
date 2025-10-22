@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
-import { userLogout } from '../candidateServices';
+import { userLogout } from '../userServices';
 import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
 import { refreshAccessToken } from '../commonServices';
 
@@ -33,6 +33,8 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
     if(customeRequest.sendAuthToken){
         const token = store.getState().userAuth.userToken
         if (token) {
+            customeRequest.headers.Authorization = `Bearer ${token}`
+        }else{
             customeRequest.headers.Authorization = `Bearer ${token}`
         }
     }

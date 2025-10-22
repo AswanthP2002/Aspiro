@@ -6,7 +6,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { addCandidateCertificates } from "../../../services/candidateServices";
+import { addCandidateCertificates } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
 
 export default function AddCertificateForm({certificateModalOpen, closeCertificateModal} : any) {

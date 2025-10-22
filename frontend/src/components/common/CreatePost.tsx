@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react"
 import {IoMdImages} from 'react-icons/io'
 import CropComponent from "./CropComponent"
-import { createPost } from "../../services/candidateServices"
+import { createPost } from "../../services/userServices"
 import { Notify } from "notiflix"
 import { appContext } from "../../context/AppContext"
 

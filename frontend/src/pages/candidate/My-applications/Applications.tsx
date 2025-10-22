@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getMyApplications } from "../../../services/candidateServices"
+import { getMyApplications } from "../../../services/userServices"
 import moment from 'moment'
 import Swal from "sweetalert2"
 

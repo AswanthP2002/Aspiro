@@ -69,7 +69,7 @@ import { UserController } from '../controllers/userController';
 // import FindCandidateByUserIdUseCase from '../../application/usecases/candidate/FindCandidateByUserId.usecase';
 import { container } from 'tsyringe';
 import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
-import { refreshAccessToken } from '../../middlewares/auth';
+import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -195,20 +195,18 @@ function createUserRouter() {
   // //     next()
   // // }, candidateController.loadJobs.bind(candidateController))
   // //candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
-  // candidateRouter.post(
-  //   //auth (2)
-  //   '/candidate/personal/details/save',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.saveIntroDetailsCandidate.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   //auth (1)
-  //   '/candidate/profile/personal/datas',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.loadCandidatePersonalData.bind(candidateController)
-  // );
+  userRouter.post(
+    '/personal/details/save',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.saveUsersBasics.bind(userController)
+  );
+  userRouter.get(
+    '/profile/personal/datas',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadUserProfile.bind(userController)
+  );
   // candidateRouter.post(
   //   '/candidate/experience/add',
   //   centralizedAuthentication,

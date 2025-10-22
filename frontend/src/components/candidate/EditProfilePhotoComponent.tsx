@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import {Notify} from 'notiflix'
 import defaultProfilePicture from '/default-img-instagram.png'
 import CropComponent from '../common/CropComponent'
-import { removeProfilePicture, updateProfilePicture } from '../../services/candidateServices'
+import { removeProfilePicture, updateProfilePicture } from '../../services/userServices'
 import { CircularProgress } from '@mui/material'
 
 export default function EditProfilePictureComponent({ profilePicture, onSaveProfilePhoto, onDeleteProfilePhoto }: any) {

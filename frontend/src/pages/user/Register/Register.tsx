@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 import facebookIcon from '/icons/icons8-facebook-48.png';
 import { useState } from 'react';
-import { registerCandiate } from '../../../services/candidateServices';
+import { registerCandiate } from '../../../services/userServices';
 import InfinitySpinner from '../../../components/common/InfinitySpinner';
 import GoogleLoginButton from '../../../components/common/GoogleLoginButton';
 import { Controller, useForm } from 'react-hook-form';

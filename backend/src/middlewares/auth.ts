@@ -79,6 +79,7 @@ export const candidateAuth = async (req: Auth, res: Response, next: NextFunction
 };
 export const userAuth = async (req: Auth, res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
+  console.log('token for testing incoming token', token)
 
   if (!token) {
     logger.warn({}, 'No Token');

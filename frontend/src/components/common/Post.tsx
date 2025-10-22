@@ -1,5 +1,5 @@
 import { Notify } from "notiflix"
-import { likePost, unlikePost } from "../../services/candidateServices"
+import { likePost, unlikePost } from "../../services/userServices"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { FaHeart, FaRegComment } from "react-icons/fa6"

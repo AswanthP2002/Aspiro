@@ -1,32 +1,40 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../../../redux-toolkit/userAuthSlice';
-import { logoutAdmin } from '../../../services/adminServices';
 import Swal from 'sweetalert2';
+import { userLogout } from '../../../services/userServices';
 
 export default function Sidebar(){
   const dispatcher = useDispatch()
-  const navigator = useNavigate()
+  const navigate = useNavigate()
 
   async function triggerAdminLogout(){
-    const logoutResult = await logoutAdmin()
-    if(logoutResult?.success){
-      dispatcher(logout())
-      Swal.fire({
+    Swal.fire({
+      icon:'info',
+      title:'Logout?',
+      text:'Are you sure you want to logout?',
+      showConfirmButton:true,
+      confirmButtonText:'Yes',
+      showCancelButton:true,
+      cancelButtonText:'No',
+      allowOutsideClick:false
+    }).then(async (result) => {
+      if(result?.isConfirmed){
+        const logoutResult = await userLogout(dispatcher, navigate)
+        Swal.fire({
         icon:'success',
         title:'Logout Successful',
         showConfirmButton:false,
         showCancelButton:false,
         timer:2000
-      }).then(() =>  navigator('/admin/login'))
+      }).then(() =>  navigate('/admin/login'))
+      }
+    })     
      
-    }
-    
   }
 
   const token = useSelector((state : any) => {
-    return state.adminAuth.adminToken
+    return state.userAuth.userToken
   })
   return (
     <div className="w-64 bg-white p-6 shadow-md flex flex-col justify-between">
@@ -49,4 +57,5 @@ export default function Sidebar(){
     </div>
   );
 };
+
 

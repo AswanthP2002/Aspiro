@@ -1,5 +1,5 @@
 import { container } from 'tsyringe';
-import IUserRepository from '../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../domain/interfaces/IUserRepo';
 import UserRepository from '../infrastructure/repositories/userRepository';
 import IAdminLoginUseCase from '../application/interfaces/usecases/admin/IAdminLogin.usecase';
 import { AdminLoginUseCase } from '../application/usecases/admin/AdminLogin.usecase';
@@ -41,6 +41,10 @@ import IUserLoginUseCase from '../application/interfaces/usecases/user/IUserLogi
 import { UserLoginUseCase } from '../application/usecases/user/UserLogin.usecase';
 import { LoadUsersAdminUsecase } from '../application/usecases/admin/LoadUsersAdmin.usecase';
 import ILoadUsersAdminUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
+import ILoadUserProfileUsecase from '../application/interfaces/usecases/user/ILoadUserProfile.usecase';
+import { LoadUserProfileUsecase } from '../application/usecases/user/LoadUserProfile.usecase';
+import ISaveUserBasicsUsecase from '../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
+import SaveUserBasicsUsecase from '../application/usecases/candidate/SaveUserBasics.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -73,7 +77,9 @@ container.registerSingleton<IFindCandidateByCandidateIdUseCase>(
 container.registerSingleton<ICreateUserUseCase>('ICreateUserUsecase', CreateUserUseCase);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUseCase', VerifyUserUseCase);
 container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUseCase);
-container.registerSingleton<IUserLoginUseCase>('IUserLoginUsecase', UserLoginUseCase)
+container.registerSingleton<IUserLoginUseCase>('IUserLoginUsecase', UserLoginUseCase);
+container.registerSingleton<ILoadUserProfileUsecase>('ILoadUserProfileUsecase', LoadUserProfileUsecase)
+container.registerSingleton<ISaveUserBasicsUsecase>('ISaveUserBasicsUsecase', SaveUserBasicsUsecase)
 container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
   LoginRecruiterUseCase

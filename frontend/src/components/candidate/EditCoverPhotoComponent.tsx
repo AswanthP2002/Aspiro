@@ -3,7 +3,7 @@ import { Notify } from 'notiflix'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import { CircularProgress } from '@mui/material'
 import CropComponent from '../common/CropComponent'
-import { removeCoverphoto, updateCoverPhoto } from '../../services/candidateServices'
+import { removeCoverphoto, updateCoverPhoto } from '../../services/userServices'
 
 export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto, onSaveCoverPhoto, onDeleteCoverPhoto} : any) {
     const fileRef = useRef<HTMLInputElement>(null)

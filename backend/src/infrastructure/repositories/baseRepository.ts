@@ -18,9 +18,12 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
   }
 
   async findById(id: string): Promise<T | null> {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return null; // Return null if the ID format is invalid
+    }
     const result = await this._model.findOne({
       _id: new mongoose.Types.ObjectId(id),
-    });
+    }); // Use .lean() for better performance and a plain object
     return result;
   }
 

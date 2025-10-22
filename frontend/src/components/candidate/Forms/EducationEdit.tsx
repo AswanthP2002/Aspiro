@@ -2,7 +2,7 @@ import { Box, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabe
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
 import Swal from "sweetalert2";
-import { editCandidateEducation } from "../../../services/candidateServices";
+import { editCandidateEducation } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
 
 export default function EditEducationForm({selectedEducation, onEditEducation, editEducationModalOpen, closeEditEducationModal} : any) {

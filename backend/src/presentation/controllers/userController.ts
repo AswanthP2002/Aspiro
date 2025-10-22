@@ -21,7 +21,7 @@ import ILoadSkillsUseCase from '../../application/usecases/candidate/interface/I
 import ILoadEducationsUseCase from '../../application/usecases/candidate/interface/IGetEducations.usecase';
 import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import ILoginCandidateUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase';
-import ILoadCandidatePersonalDataUseCase from '../../application/usecases/candidate/interface/ILoadCandidatePersonalData.usecase';
+import ILoadCandidatePersonalDataUseCase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase';
 import ILoadJobCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
 import ILoadJobDetailsCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSide.usecase';
 import IEditExperienceUseCase from '../../application/usecases/candidate/interface/IEditExperience.usecase';
@@ -56,7 +56,7 @@ import mapToFindCandidatesDTOFromRequest from '../mappers/candidate/mapToFindCan
 import mapToAddsocialLinkDTOFromRequest from '../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
 import IUpdateNotificationReadStatus from '../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
 import mapToEditExperienceDTO from '../mappers/candidate/mapToEditExperienceDTO';
-import ISaveBasicsCandidateUseCase from '../../application/usecases/candidate/interface/ISaveBasicsCandidate.usecase';
+import ISaveBasicsCandidateUseCase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
 import mapRequestDtoToUpdateCandidateDTO from '../mappers/candidate/mapRequestDtoToUpdateCandidateDTO';
 import mapEditProfileRequestToUpdateDTO from '../mappers/candidate/mapEditProfileRequestToUpdateDTO';
 import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase';
@@ -71,6 +71,11 @@ import { resendOtpSchema } from '../schemas/user/resendOtp.schema';
 import IUserLoginUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase';
 import { userLoginSchema } from '../schemas/user/userLogin.schema';
 import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
+import ILoadUserProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase';
+import { userIdSchema } from '../schemas/user/userId.schema';
+import ISaveUserBasicsUsecase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
+import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasics.schema';
+import mapToUpdateUserDTO from '../mappers/user/mapToUpdateUserDTO';
 
 
 @injectable()
@@ -79,10 +84,10 @@ export class UserController {
     @inject('ICreateUserUsecase') private _createUserUsecase: ICreateUserUseCase,
     @inject('IVerifyUserUsecase') private _verifyUserUC: IVerifyUserUseCase,
     @inject('IResendOTPUsecase') private _resendOTPUC: IResendOTPUseCase,
-    @inject('IUserLoginUsecase') private _userLoginUC: IUserLoginUseCase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase,
-  ) // private _updateNotificationReadStatus: IUpdateNotificationReadStatus,
-  // private _createUserUC: ICreateUserUseCase,
-  // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
+    @inject('IUserLoginUsecase') private _userLoginUC: IUserLoginUseCase,
+    @inject('ILoadUserProfileUsecase') private _loadUserProfileUC: ILoadUserProfileUsecase,
+    @inject('ISaveUserBasicsUsecase') private _saveUserBasicsUC: ISaveUserBasicsUsecase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase,
+  ) // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
   {}
 
   async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -97,7 +102,6 @@ export class UserController {
         userId: createUser?._id,
         userEmail: createUser?.email,
       });
-      
     } catch (error: unknown) {
       next(error);
     }
@@ -114,14 +118,12 @@ export class UserController {
           success: false,
           message: 'User verification failed. Please try again.',
         });
-        
       }
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Email verified successfully, please login to continue',
         verifiedUser,
       });
-      
     } catch (error: unknown) {
       next(error);
     }
@@ -137,7 +139,6 @@ export class UserController {
           success: false,
           message: 'Something went wrong',
         });
-        
       }
 
       res.status(StatusCodes.OK).json({
@@ -145,7 +146,6 @@ export class UserController {
         message: 'OTP sent successfully',
         result: { id: result?._id, email: result?.email },
       });
-      
     } catch (error: unknown) {
       next(error);
     }
@@ -179,51 +179,42 @@ export class UserController {
     }
   } //reworked : void
 
-  // async saveIntroDetailsCandidate(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   //save
-  //   const id = req.user.id as string;
+  async saveUsersBasics(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user.id as string;
 
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(id);
-  //     const dto = mapRequestDtoToUpdateCandidateDTO({
-  //       id: candidate?._id,
-  //       ...req.body,
-  //     });
-  //     const updatedCandidate = await this._SaveBasicsCandidateUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Basic details saved, login to your profile to continue',
-  //       updatedCandidate: updatedCandidate,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+    try {
+      const validatedId = userIdSchema.parse({ id });
+      const validatedData = SaveUserBasicsSchema.parse(req.body)
+      const dto = mapToUpdateUserDTO({id:validatedId.id, ...validatedData})
+      
+      const result = await this._saveUserBasicsUC.execute(dto)
+      
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Basic details saved, login to your profile to continue',
+        updatedCandidate: result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async loadCandidatePersonalData(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const id = req.user.id;
-  //   try {
-  //     const userDetails = await this._loadCandidatePersonalDataUC.execute(id);
+  async loadUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user.id;
+    try {
+      const validateId = userIdSchema.parse({ id });
+      const userDetails = await this._loadUserProfileUC.execute(validateId.id);
 
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'User details fetched successfully',
-  //       userDetails,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'User Profile data fetched successfully',
+        userDetails,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   async userLogout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

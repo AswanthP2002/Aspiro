@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import User from '../../domain/entities/shared/User';
-import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { UserDAO } from '../database/DAOs/user.dao.refactored';
 import BaseRepository from './baseRepository';
 import { injectable } from 'tsyringe';

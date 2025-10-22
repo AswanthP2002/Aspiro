@@ -1,332 +1,321 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import {motion, AnimatePresence} from 'motion/react'
-import { getLocationDetails, saveBasicDetails } from "../../../services/candidateServices";
+import { getLocationDetails, saveBasicDetails } from "../../../services/userServices";
+import { Controller, useForm } from "react-hook-form";
+import { FormControl, FormHelperText, TextField } from "@mui/material";
+import { Textarea } from "@mui/joy";
+
+interface FormState {
+    headline: string;
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+    summary: string;
+}
+
 
 export default function StoreDetails(){
-    const [jobRole, setjobrole] = useState("")
-    const [isLocationUsing, setIsLocationUsing] = useState(false)
-    const [jobRoleError, setJobRoleError] = useState("")
-    const [city, setcity] = useState("")
-    const [cityerror, setcityerror] = useState("")
-    const [district, setdistrict] = useState("")
-    const [districiterror, setdistricterror] = useState("")
-    const [state, setstate] = useState("")
-    const [stateerror, setstateerror] = useState("")
-    const [country, setcountry] = useState("")
-    const [countryerror, setcountryerror] = useState("")
-    const [pincode, setpincode] = useState("")
-    const [pinCodeError, setpincodeError] = useState("")
-    const [about, setsummary] = useState("")
-    const [summaryerror, setsummaryerror] = useState("")
+
+    const {formState:{errors}, control, handleSubmit} = useForm<FormState>({
+        defaultValues:{
+            headline:"",
+            city:"",
+            district:"",
+            state:"",
+            country:"",
+            pincode:"",
+            summary:""
+        }
+    })
+
     
-    const [currentSection, setCurrentSection] = useState(1)
+    async function onSubmit(data : FormState){
+        const {headline, city, district, state, country, pincode, summary} = data
+        try {
+            const result = await saveBasicDetails(headline, city    , district, state, country, pincode, summary)
 
-    const location = useLocation()
+            if(result?.success){
+                Swal.fire({
+                    icon: "success",
+                    title: "Saved",
+                    text: 'Thank you for providing your basic details, you can add more details from the profile',
+                    showCancelButton: false,
+                    showConfirmButton: true,
+                    confirmButtonText: "Continue",
+                    allowOutsideClick: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                         navigateTo('/profile/personal')
+                    }
+                })
+            }else{
+                Swal.fire({icon:'error', title:'Save Failed', text:result?.message})
+            }
+        } catch (error : unknown) {
+            Swal.fire({icon:'error', title:'Oops', text:'Something went wrong'})
+        }
 
-    const {candidateName, candidateId, candidateRole} = location.state || {}
-
-    const errorLabelStyle = {
-        fontSize:'0.7rem',
-        color:'red',
-        marginBottom:'0rem'
+          
     }
+    //const [errors, setErrors] = useState<ValidationErrors>({});
+    //const [isLocationUsing, setIsLocationUsing] = useState(false)
     
-    const jobRoles = [
-        "Software Engineer",
-        "Frontend Developer",
-        "Backend Developer",
-        "Full Stack Developer",
-        "Mobile App Developer",
-        "Android Developer",
-        "iOS Developer",
-        "React Developer",
-        "Node.js Developer",
-        "Java Developer",
-        "Python Developer",
-        "Go Developer",
-        "PHP Developer",
-        "DevOps Engineer",
-        "Cloud Engineer",
-        "Solutions Architect",
-        "Data Scientist",
-        "Data Analyst",
-        "Machine Learning Engineer",
-        "AI Researcher",
-        "Cybersecurity Analyst",
-        "Penetration Tester",
-        "System Administrator",
-        "Network Engineer",
-        "Database Administrator",
-        "Product Manager",
-        "Project Manager",
-        "Technical Program Manager",
-        "Business Analyst",
-        "Scrum Master",
-        "UI/UX Designer",
-        "Graphic Designer",
-        "Product Designer",
-        "Visual Designer",
-        "Web Designer",
-        "Content Writer",
-        "Technical Writer",
-        "SEO Specialist",
-        "Digital Marketing Manager",
-        "Social Media Manager",
-        "Sales Executive",
-        "Customer Success Manager",
-        "HR Manager",
-        "Recruiter",
-        "Talent Acquisition Specialist",
-        "Finance Analyst",
-        "Accountant",
-        "Legal Advisor",
-        "Operations Manager",
-        "Quality Assurance Engineer",
-        "Automation Test Engineer",
-        "Game Developer",
-        "Embedded Systems Engineer",
-        "AR/VR Developer",
-        "Blockchain Developer",
-        "Robotics Engineer",
-        "Bioinformatics Analyst",
-        "IT Support Specialist"
-      ];
+    const location = useLocation()
+    const { userName, userId } = location.state || {};
 
-      const navigateTo = useNavigate()
-
+    const navigateTo = useNavigate()
 
       useEffect(() : any => {
-        if(!candidateId || !candidateName || candidateRole){
+        if(!userId || !userName){
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Required user information is missing.' });
             return navigateTo(-1)
         }
       }, [])
 
       //handle error visibility when user types
-      //first section
-      function goToSecondSection(){
-        const job_role_error = !jobRole || !/^[A-Za-z]/.test(jobRole) || false
-        job_role_error ? setJobRoleError("Please choose job role") : setJobRoleError("")
-        if(job_role_error) return
-        setCurrentSection(2)
-      }
-
-      function goToThirdSection(){
-        const country_error = !country || !/^[a-zA-Z\s\-]{2,50}$/.test(country) || false
-        const state_error = !state || !/^[a-zA-Z\s\-]{2,50}$/.test(state) || false
-        const district_error = !district || !/^[a-zA-Z\s\-]{2,50}$/.test(district) || false
-        const city_error = !city || !/^[a-zA-Z\s\-]{2,50}$/.test(city) || false
-        const zip_code_error = !pincode || !/^[1-9][0-9]{5}$/.test(pincode) || false
-
-        country_error ? setcountryerror('Please enter your country') : setcountryerror("")
-        state_error ? setstateerror('Please enter your state') : setstateerror("")
-        district_error ? setdistricterror('Please enter your district') : setdistricterror("")
-        city_error ? setcityerror('Please enter your city') : setcityerror("")
-        zip_code_error ? setpincodeError('Please enter your pin code') : setpincodeError("")
-
-        if(country_error || state_error || district_error || city_error || zip_code_error){
-            return
-        }
-
-        setCurrentSection(3)
-
-      }
-
-      async function proceedToSave(){
-        const summary_error = !about || !/^[A-Za-z0-9.,'"\s\-]{30,}$/.test(about) || false
-
-        summary_error ? setsummaryerror('Please enter your summary') : setsummaryerror("")
-
-        if(summary_error){
-            return
-        }
-
-        await saveBasicDetails(jobRole, city, district, state, country, pincode, about)
-          Swal.fire({
-              icon: "success",
-              title: "Saved",
-              text: 'Thank you for providing your basic details, you can add more details from the profile',
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "Continue",
-              allowOutsideClick: false,
-          }).then((result) => {
-              if (result.isConfirmed) {
-                  navigateTo('/candidate/profile/personal')
-              }
-          })
-      }
-      ///pending route direction etc
-
-      //ask live location permission
-      function getLocation(){
-        Swal.fire({
-            icon:'info',
-            title:'Access',
-            text:'Aspiro need access to your location',
-            showConfirmButton:true,
-            confirmButtonText:'Allow',
-            showCancelButton:true,
-            cancelButtonText:'Deny'
-        }).then(async (response) => {
+    
+      
+    //   ask live location permission
+    //   function getLocation(){
+    //     Swal.fire({
+    //         icon:'info',
+    //         title:'Access',
+    //         text:'Aspiro need access to your location',
+    //         showConfirmButton:true,
+    //         confirmButtonText:'Allow',
+    //         showCancelButton:true,
+    //         cancelButtonText:'Deny'
+    //     }).then(async (response) => {
             
-            if(response.isConfirmed){
-                if(navigator.geolocation){
-                    navigator.geolocation.getCurrentPosition(async (position : GeolocationPosition) => {
-                        console.log('This is user current position', position)
-                        const result = await getLocationDetails(position.coords.latitude, position.coords.longitude)
-                        console.log('Fetched reuslt of my location', result)
-                        setcountry(result?.address?.country)
-                        setstate(result?.address?.state)
-                        setdistrict(result?.address?.state_district)
-                        setcity(result?.address?.county)
-                        setpincode(result?.address?.postcode)
-                    }, (error : GeolocationPositionError) => {
-                        console.log('Error occured while geting users position ', error)
-                    })
-                }
-            }else{
-                return
-            }
-        })
+    //         if(response.isConfirmed){
+    //             if(navigator.geolocation){
+    //                 navigator.geolocation.getCurrentPosition(async (position : GeolocationPosition) => {
+    //                     console.log('This is user current position', position)
+    //                     const result = await getLocationDetails(position.coords.latitude, position.coords.longitude)
+    //                     if (result?.address) {
+    //                         setFormData(prev => ({
+    //                             ...prev,
+    //                             country: result.address.country || "",
+    //                             state: result.address.state || "",
+    //                             district: result.address.state_district || "",
+    //                             city: result.address.county || "",
+    //                             pincode: result.address.postcode || ""
+    //                         }));
+    //                     }
+    //                 }, (error : GeolocationPositionError) => {
+    //                     console.log('Error occured while geting users position ', error)
+    //                 })
+    //             }
+    //         }else{
+    //             return
+    //         }
+    //     })
         
 
-      }
-
-
-      console.log('this is current state', currentSection)
+//      }
       
     return(
         <div className="w-full min-h-screen grid grid-cols-1 relative store-details">
-            <div className="fixed w-full flex justify-center gap-3 bottom-6">
-                <div className={`px-7 py-1 rounded-full ${currentSection === 1 ? "bg-blue-500" : "bg-gray-500"}`}></div>
-                <div className={`px-7 py-1 rounded-full ${currentSection === 2 ? "bg-blue-500" : "bg-gray-500"}`}></div>
-                <div className={`px-7 py-1 rounded-full ${currentSection === 3 ? "bg-blue-500" : "bg-gray-500"}`}></div>
-            </div>
-            {/* Details sections */}
 
             <AnimatePresence mode="wait">
-                {
-                    currentSection === 1 && (
+                            
                         <motion.section
                             key="section-one" 
-                            className="flex h-screen justify-center items-center store-details"
+                            className="flex flex-col !py-10 justify-center items-center store-details"
                             initial={{opacity:0, y:50}}
                             animate={{opacity:1, y:0}}
                             transition={{duration:0.6}}
                             exit={{opacity:0}}
-                        >
+                        >   
+                        <form className="max-w-[600px]" onSubmit={handleSubmit(onSubmit)}>
                             <div>
-                                <p className="text-blue-500 text-4xl">Welcome ${candidateName}</p>
+                                <p className="text-blue-500 !mt-10 text-4xl">Welcome {userName}</p>
                                 <p className="text-xl mt-5">We would love to know a bit more about you!</p>
                                 <div className="group mt-5">
-                                    <label htmlFor="" className="text-white block">Which one should describe your interested job role ?</label>
-                                    <select value={jobRole} onChange={(evet) => setjobrole(evet.target.value)} className="border border-gray-300 w-full mt-2 text-sm rounded px-2 py-1 outline-none" name="" id="">
-                                        <option value="" className="">Role</option>
-                                        {
-                                            jobRoles.map((role : any, index : number) => {
-                                                return(<option value={role} key={index}>{role}</option>)
-                                            })
-                                        }
-                                        <option value="other">Other</option>
-                                    </select>
-                                    {
-                                        jobRole === "other"
-                                            ? <input className="w-full border border-gray-300 rounded mt-3 px-2 py-1" type="text" />
-                                            : null
-                                    }
-                                    <label htmlFor="" className="" style={errorLabelStyle}>{jobRoleError}</label>
-                                <div className="mt-5 w-full flex justify-center items-center">
-                                    <button onClick={goToSecondSection} type="button" className="hover:bg-blue-400 hover:text-white bg-blue-500 text-white text-sm rounded px-5 py-2">Next</button>
-                                </div>
+                                    <label htmlFor="headline" className="text-white block">Which one should describe your interested job role/headline?</label>
+                                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="headline"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Headline can not be empty'},
+                                                minLength:{value:3, message:'Minimum 3 charecters'},
+                                                maxLength:{value:30, message:'Maximum 30 charecters'},
+                                                pattern:{value:/^[A-Za-z\s-.,&()]+$/, message:'Please choose a valid headline/job role'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="Headline"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.headline)}
+                                                    helperText={errors.headline?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
                                 </div>
                             </div>
-                        </motion.section>
-                    )
-                }
-
-                {
-                    currentSection === 2 && (
-                        <motion.section
-                            key="section-two"
-                            className="flex h-screen justify-center items-center store-details"
-                            initial={{opacity:0, y:50}}
-                            animate={{opacity:1, y:0}}
-                            transition={{duration:0.6}}
-                            exit={{opacity:0}}
-                        >
-                            <div>
+                    
+                            <div className="!mt-10">
                                 <p className="text-blue-500 text-3xl">May I know about your location?</p>
                                 <p className="mt-5 text-black text-lg">This will help us to personalize near by jobs.</p>
                                 <div className="mt-2">
-                                    {
+                                    {/* {
                                         isLocationUsing
                                             ? <button onClick={() => setIsLocationUsing(false)} className="text-xs text-blue-500">Fill manually</button>
                                             : <button onClick={getLocation} className="text-xs text-blue-500">Use my current location</button>
-                                    }
+                                    } */}
                                 </div>
-                                <div className="group mt-3">
-                                    <label htmlFor="" className="text-white block">Country</label>
-                                    <input value={country} onChange={(event) => setcountry(event.target.value)} readOnly={isLocationUsing} type="text" name="" className="border border-white rounded px-2 py-1 mt-1 text-black w-full" id="" />
-                                    <label htmlFor="" style={errorLabelStyle}>{countryerror}</label>
-                                </div>
-                                <div className="group mt-3">
-                                    <label htmlFor="" className="text-white block">State</label>
-                                    <input value={state} onChange={(event) => setstate(event.target.value)} readOnly={isLocationUsing} type="text" name="" className="border border-white rounded px-2 py-1 mt-1 text-black w-full" id="" />
-                                    <label htmlFor="" style={errorLabelStyle}>{stateerror}</label>
-                                </div>
-                                <div className="group mt-3">
-                                    <label htmlFor="" className="text-white block">District</label>
-                                    <input value={district} onChange={(event) => setdistrict(event.target.value)} readOnly={isLocationUsing} type="text" name="" className="border border-white rounded px-2 py-1 mt-1 text-black w-full" id="" />
-                                    <label htmlFor="" style={errorLabelStyle}>{districiterror}</label>
-                                </div>
-                                <div className="group mt-3">
-                                    <label htmlFor="" className="text-white block">City</label>
-                                    <input value={city} onChange={(event) => setcity(event.target.value)} readOnly={isLocationUsing} type="text" name="" className="border border-white rounded px-2 py-1 mt-1 text-black w-full" id="" />
-                                    <label htmlFor="" style={errorLabelStyle}>{cityerror}</label>
-                                </div>
-                                <div className="group mt-3">
-                                    <label htmlFor="" className="text-white block">Zip code</label>
-                                    <input value={pincode} onChange={(event) => setpincode(event.target.value)} readOnly={isLocationUsing} type="text" name="" className="border border-white rounded px-2 py-1 mt-1 text-black w-full" id="" />
-                                    <label htmlFor="" style={errorLabelStyle}>{pinCodeError}</label>
-                                </div>
-                                <div className="mt-5 w-full flex justify-center items-center gap-5">
-                                    <button onClick={() => setCurrentSection(1)} type="button" className="border border-blue-500 text-blue-500 text-sm rounded px-5 py-2">Previous</button>
-                                    <button onClick={goToThirdSection} type="button" className="hover:bg-gray-500 hover:text-white bg-blue-500 text-white text-sm rounded px-5 py-2">Next</button>
-                                </div>
+                                <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="city"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'City can not be empty'},
+                                                minLength:{value:3, message:'Minimum 3 charecters'},
+                                                maxLength:{value:30, message:'Maximum 30 charecters'},
+                                                pattern:{value:/^[a-zA-Z\s\-]{2,50}$/, message:'Please enter a valid district'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="City"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.city)}
+                                                    helperText={errors.city?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
+                                
+                                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="district"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'District can not be empty'},
+                                                minLength:{value:3, message:'Minimum 3 charecters'},
+                                                maxLength:{value:30, message:'Maximum 30 charecters'},
+                                                pattern:{value:/^[a-zA-Z\s\-]{2,50}$/, message:'Please enter a valid district'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="District"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.district)}
+                                                    helperText={errors.district?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
+                                
+                                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="state"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'State can not be empty'},
+                                                minLength:{value:3, message:'Minimum 3 charecters'},
+                                                maxLength:{value:30, message:'Maximum 30 charecters'},
+                                                pattern:{value:/^[a-zA-Z\s\-]{2,50}$/, message:'Please enter a valid state name'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="State"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.state)}
+                                                    helperText={errors.state?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
+                                    
+                                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="country"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Country can not be empty'},
+                                                minLength:{value:3, message:'Minimum 3 charecters'},
+                                                maxLength:{value:30, message:'Maximum 30 charecters'},
+                                                pattern:{value:/^[a-zA-Z\s\-]{2,50}$/, message:'Please enter a valid country name'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="Country"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.country)}
+                                                    helperText={errors.country?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
+                                    
+                                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+                                        <Controller
+                                            name="pincode"
+                                            control={control}
+                                            rules={{
+                                                required:{value:true, message:'Pincode can not be empty'},
+                                                minLength:{value:6, message:'Minimum 6 charecters'},
+                                                maxLength:{value:6, message:'Maximum 6 charecters'},
+                                                pattern:{value:/^[1-9][0-9]{5}$/, message:'Please enter a valid country name'}
+                                            }}
+                                            render={({field}) => {
+                                                return <TextField
+                                                    {...field}
+                                                    label="Pincode"
+                                                    variant="outlined"
+                                                    error={Boolean(errors.pincode)}
+                                                    helperText={errors.pincode?.message}
+                                                />
+                                            }}
+                                        />
+                                    </FormControl>
                             </div>   
-                        </motion.section>
-                    )
-                }
-
-                {
-                    currentSection === 3 && (
-                        <motion.section
-                            key="section-three"
-                            className="flex h-screen justify-center items-center animate-smooth store-details"
-                            initial={{opacity:0, y:50}}
-                            animate={{opacity:1, y:0}}
-                            transition={{duration:0.6}}
-                            exit={{opacity:0}}
-                        >
-                            <div>
+                        
+                            <div className="!mt-10 flex flex-col items-center">
                                 <p className="text-blue-500 text-4xl">Now the final part</p>
                                 <p className="text-lg text-black mt-5">Give a brief summary of yourself. This will help others to know about you more</p>
-                                <div className="group mt-5">
-                                    <label htmlFor="" className="text-white block">About me</label>
-                                    <textarea value={about} onChange={(event) => setsummary(event.target.value)} name="" id="" className="text-sm mt-2 border border-gray-400 outline-none rounded w-full h-[200px] text-black p-2"></textarea>
-                                    <label htmlFor="" style={errorLabelStyle}>{summaryerror}</label>
-                                </div>
-                                <div className="mt-5 w-full flex justify-center items-center gap-5">
-                                    <button onClick={() => setCurrentSection(2)} type="button" className="border border-blue-500 text-blue-500 text-sm rounded px-5 py-2">Previous</button>
-                                    <button onClick={proceedToSave} type="button" className="bg-blue-500 text-white text-sm px-5 py-2 hover:bg-blue-400 hover:text-white rounded">Finish</button>
-                                </div>
+                                <FormControl fullWidth sx={{marginTop:'10px'}} error={Boolean(errors.summary)}>
+                                    <Controller
+                                        name="summary"
+                                        control={control}
+                                        rules={{
+                                            required: 'Please provide a brief summary about yourself.',
+                                            minLength: { value: 30, message: 'Summary must be at least 30 characters.' }
+                                        }}
+                                        render={({field}) => {
+                                            return <Textarea
+                                                {...field}
+                                                minRows={4}
+                                                placeholder="Enter little about you..."
+                                                error={Boolean(errors.summary)}
+                                            />
+                                        }}
+                                    />
+                                    <FormHelperText>{errors.summary?.message}</FormHelperText>
+                                </FormControl>
+                                
+                                {/* <div className="group mt-5">
+                                    <label htmlFor="summary" className="text-white block">About me</label>
+                                    <textarea value={formData.summary} onChange={handleFormChange} name="summary" id="summary" className="text-sm mt-2 border border-gray-400 outline-none rounded w-full h-[200px] text-black p-2"></textarea>
+                                    {errors.summary && <label style={errorLabelStyle}>{errors.summary}</label>}
+                                </div> */}
+                                <button className="!mt-5 w-fit bg-gradient-to-br from-blue-500 to-indigo-600 text-white !px-5 !py-2 rounded" type="submit">Save and continue</button>
                             </div>
+
+                            </form>
                         </motion.section>
-                    )
-                }
+                
             </AnimatePresence>
         </div>
     )

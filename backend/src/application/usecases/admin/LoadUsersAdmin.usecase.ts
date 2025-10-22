@@ -5,7 +5,7 @@ import {
   UserJoinDateSortQuery,
   UsersNameSortQuery,
 } from '../../queries/users.query';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import LoadUsersQueryDTO from '../../DTOs/admin/loadUsersAdminside.dto';
 import UserDTO from '../../DTOs/user/user.dto';
 import User from '../../../domain/entities/shared/User';

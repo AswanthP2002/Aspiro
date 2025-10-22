@@ -55,6 +55,7 @@ import PublicRoute from './components/route-components/PublicRoute';
 import CandidateProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
 import NotFoundPage from './pages/shared/NotFound';
 import AdminLoginPage from './pages/admin/Login/Login';
+import UserProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
 
 function App() {
   return (
@@ -71,7 +72,7 @@ function App() {
             <Route index element={<Feed />} />
           </Route>
 
-          <Route path='/candidate/profile' element={<CandidateProtectedRoute />}>
+          <Route path='/profile' element={<UserProtectedRoute />}>
             <Route element={<ProfileLayout />}>
               <Route path='personal' index element={<ProfilePersonal />} />
               <Route path='documents' element={<DocumentsPage />} />
@@ -85,7 +86,7 @@ function App() {
         {/* Candidate specific routes not applicable header & sidebar & footer */}
         <Route path='/login' element={<CandidateLogin />} />
         <Route path='/register' element={<CandidateRegister />} />
-        <Route path='/candidate/store/details' element={<StoreDetails />} />
+        <Route path='/store/details' element={<StoreDetails />} />
 
         {/* Recruiter specific routes not applicable header & sidebar & footer */}
 

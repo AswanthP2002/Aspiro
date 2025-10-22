@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { DuplicateEmailError, DuplicateMobileError } from '../../../domain/errors/AppError';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateCode } from '../../../utilities/generateCode';
 import CreateUserDTO from '../../DTOs/user/createUser.dto';
 import UserDTO from '../../DTOs/user/user.dto';

@@ -18,7 +18,6 @@ import IUnblockCompanyUseCase from '../../application/usecases/admin/interfaces/
 import IUnblockCandidateUseCase from '../../application/usecases/admin/interfaces/IUnblockCandidate.usecase';
 import IUnblockJobUseCase from '../../application/usecases/admin/interfaces/IUnblockJob.usecase';
 import IUnrejectJobUseCase from '../../application/usecases/admin/interfaces/IUnrejectJob.usecase';
-import { CandidateIdValidator } from '../../application/validators/candidateId.validator';
 import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
 import IFindCandidateByCandidateIdUseCase from '../../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
 import { userLoginSchema } from '../schemas/user/userLogin.schema';

@@ -1,6 +1,6 @@
 import { generateRefreshToken, generateToken } from '../../../services/jwt';
 import IAdminLoginUseCase from '../../interfaces/usecases/admin/IAdminLogin.usecase';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { UserLoginInpDTO, UserLoginOutpDTO } from '../../DTOs/user/userLogin.dto';
 import {
   InvalidUserError,

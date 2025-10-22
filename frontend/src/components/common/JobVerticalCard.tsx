@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2'
-import { unsaveJob } from '../../services/candidateServices'
+import { unsaveJob } from '../../services/userServices'
 import { isDateExpired } from '../../services/util/checkExpiry'
 import getDaysLeftFromToday from '../../services/util/getDays'
 import defaultProfile from '/default-img-instagram.png'

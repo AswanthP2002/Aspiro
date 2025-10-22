@@ -7,7 +7,7 @@ import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEd
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
-import { deleteCandidateEducation, deleteCandidateExperience, deleteCandidateSkills, getCandidateEducation, getCandidateExperience, getCandidateSkills } from "../../../services/candidateServices";
+import { deleteCandidateEducation, deleteCandidateExperience, deleteCandidateSkills, getCandidateEducation, getCandidateExperience, getCandidateSkills } from "../../../services/userServices";
 import { Education, Experience, Skills } from "../../../types/entityTypes";
 import CandidateExperienceCard from "../../../components/candidate/Cards/ExperienceCard";
 import CandidateEducationCard from "../../../components/candidate/Cards/EducationCard";

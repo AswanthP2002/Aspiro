@@ -1,5 +1,5 @@
 import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
-import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { generateRefreshToken, generateToken } from '../../services/jwt';
 import { UserLoginOutpDTO } from '../DTOs/user/userLogin.dto';
 import mapToCandidate from '../mappers/candidate/mapToCandidate.mapper';

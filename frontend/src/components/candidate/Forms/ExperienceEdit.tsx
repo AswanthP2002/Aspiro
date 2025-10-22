@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { editCandidateExperience } from '../../../services/candidateServices';
+import { editCandidateExperience } from '../../../services/userServices';
 import { Experience } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

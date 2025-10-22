@@ -1,5 +1,5 @@
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import imgUploadToCloudinary from '../../../services/uploadToCloudinary';
 import CandidateDTO from '../../DTOs/candidate/candidate.dto';
 import { UploadCoverPhotoDTO } from '../../DTOs/candidate/uploadCoverPhoto.dto';

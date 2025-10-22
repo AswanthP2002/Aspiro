@@ -5,7 +5,7 @@ import './Login.css'
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
-import { candidateLogin } from "../../../services/candidateServices";
+import { candidateLogin } from "../../../services/userServices";
 import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
 import { Controller, useForm } from "react-hook-form";
 import { FormControl, TextField } from "@mui/material";

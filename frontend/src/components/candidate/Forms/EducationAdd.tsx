@@ -19,7 +19,7 @@ import {
   mastersDegree,
   diploma,
 } from '../../../assets/data/educationalStreamsData';
-import { addCandidateEducation } from '../../../services/candidateServices';
+import { addCandidateEducation } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { Notify } from 'notiflix';
 

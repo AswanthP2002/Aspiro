@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IBlockCandidateUseCase from './interfaces/IBlockCandidate.usecase';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 
 @injectable()
 export class BlockCandidateUseCase implements IBlockCandidateUseCase {

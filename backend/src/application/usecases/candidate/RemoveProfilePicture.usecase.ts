@@ -1,6 +1,6 @@
 import User from '../../../domain/entities/shared/User';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import IUserRepository from '../../../domain/interfaces/IUserRepo.refactored';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
 import RemoveProfilePhotoDTO from '../../DTOs/candidate/removeProfilePhoto.dto';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
