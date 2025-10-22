@@ -1,14 +1,14 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import defaultProfile from '/default-img-instagram.png'
-import { Provider, useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Notify } from 'notiflix'
 import Swal from 'sweetalert2'
 import Loader from '../../../components/candidate/Loader'
 import { useNavigate } from 'react-router-dom'
-import { Box, Modal, Typography } from '@mui/material'
+import { Box, FormControl, Modal, TextField, Typography } from '@mui/material'
 import { logout } from '../../../redux-toolkit/candidateAuthSlice'
-import { addSocialmediaLinks, editCandidateProfile, getCandidateProfileData, getUserPosts, removeSocialLink } from '../../../services/userServices'
+import { addSocialmediaLinks, editUsersProfile, getCandidateProfileData, removeSocialLink, saveBasicDetails } from '../../../services/userServices'
 import SocialmediaLinks from '../../../components/candidate/SocialmediaLinksCard'
 import CropComponent from '../../../components/common/CropComponent'
 import GeneralModal from '../../../components/common/Modal'
@@ -16,6 +16,8 @@ import EditProfilePictureComponent from '../../../components/candidate/EditProfi
 import EditCoverphotoComponent from '../../../components/candidate/EditCoverPhotoComponent'
 import Post from '../../../components/common/Post'
 import { SocialLinks, UserType } from '../../../types/entityTypes'
+import { Controller, useForm } from 'react-hook-form'
+import { Textarea } from '@mui/joy'
 
 interface ProfileFormState {
     name?: string;
@@ -28,13 +30,27 @@ interface ProfileFormState {
     pincode?: string;
 }
 
-type ValidationErrors = Partial<Record<keyof ProfileFormState, string>>;
-
 export default function ProfilePersonal(){
+
+    
+
     const [user, setUser] = useState<UserType | null>(null);
     const [loading, setloading] = useState(false)
     const [openprofileedit, setopenprofileedit] = useState(false)
     const [userPosts, setUserPosts] = useState<any[]>([])
+
+    const {control, handleSubmit, reset, formState:{errors}} = useForm<ProfileFormState>({
+        defaultValues:{
+            name:user?.name,
+            headline:user?.headline,
+            city:user?.location?.city,
+            district:user?.location?.district,
+            state:user?.location?.state,
+            country:user?.location?.country,
+            summary:user?.summary,
+            pincode:user?.location?.pincode
+        }
+    })
 
     const [openProfilePhotoModal, setOpenProfilePhotoModal] = useState(false)
     const openProfilePhoto = () => setOpenProfilePhotoModal(true)
@@ -52,9 +68,6 @@ export default function ProfilePersonal(){
     const [socialmediaurl, setsocialmediaurl] = useState("")
     const [socialmediaurlerror, setsocialmediaurlerror] = useState("")
 
-    const [formState, setFormState] = useState<ProfileFormState>({});
-    const [errors, setErrors] = useState<ValidationErrors>({});
-
     const dispatcher = useDispatch()
     
 
@@ -63,59 +76,46 @@ export default function ProfilePersonal(){
  
     const navigateTo = useNavigate()
 
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormState(prev => ({ ...prev, [name]: value }));
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: ValidationErrors = {};
-        if (!formState.name || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.name)) newErrors.name = 'Enter a valid name';
-        if (!formState.headline || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.headline)) newErrors.headline = 'Enter a valid headline/role';
-        if (!formState.city || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.city)) newErrors.city = 'Enter a valid city';
-        if (!formState.district || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.district)) newErrors.district = 'Enter a valid district';
-        if (!formState.state || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.state)) newErrors.state = 'Enter a valid state';
-        if (!formState.country || !/^[A-Za-z\s.'-]{2,50}$/.test(formState.country)) newErrors.country = 'Enter a valid country';
-        if (!formState.summary || formState.summary.length < 10) newErrors.summary = 'Summary must be at least 10 characters';
-        if (!formState.pincode || !/^[1-9][0-9]{5}$/.test(formState.pincode)) newErrors.pincode = 'Enter a valid 6-digit pincode';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    async function editProfile(event: React.FormEvent<HTMLFormElement>){
-        event.preventDefault()
-
-        if (!validateForm()) return;
-        
+    async function onSubmit(data : ProfileFormState){
+        const {name, headline, city, district, state, country, summary, pincode} = data
         handCloseProfileEdit()
 
-        const { name, headline, city, district, state, country, summary, pincode } = formState;
-        const result = await editCandidateProfile(name, headline, city, district, state, country, summary, pincode);
+        //const { name, headline, city, district, state, country, summary, pincode } = formState;
+        try {
+            const result = await saveBasicDetails(
+                headline as string,
+                city as string,
+                district as string,
+                state as string,
+                country as string,
+                pincode as string,
+                summary as string
+            );
 
             if(result?.success){
-                //setloading(false)
                 Swal.fire({
                     icon:'success',
                     title:'Updated',
                     text:"Your profile has been updated successfully.",
                     showConfirmButton:false,
                     showCancelButton:false,
+                    allowOutsideClick:false,
                     timer:3000
                 }).then(() => {
                     setUser((prev) => {
                         if (!prev) return null;
                         return {
                             ...prev,
-                            name: formState.name,
-                            headline: formState.headline,
-                            summary: formState.summary,
+                            name: name,
+                            headline: headline,
+                            summary: summary,
                             location: {
                                 ...prev.location,
-                                city: formState.city,
-                                district: formState.district,
-                                state: formState.state,
-                                country: formState.country,
-                                pincode: formState.pincode,
+                                city: city,
+                                district: district,
+                                state: state,
+                                country: country,
+                                pincode: pincode,
                             }
                         };
                     });
@@ -126,6 +126,11 @@ export default function ProfilePersonal(){
                     title:'Something went wrong'
                  })
             }
+        } catch (error) {
+            
+        }
+
+            
 
     }
 
@@ -231,7 +236,7 @@ export default function ProfilePersonal(){
     useEffect(() => {
         // When the edit modal is opened, populate the form with the current user data.
         if (user && openprofileedit) {
-            setFormState({
+            reset({
                 name: user.name,
                 headline: user.headline,
                 city: user.location?.city,
@@ -406,60 +411,141 @@ export default function ProfilePersonal(){
         {/* Prfile edit modal */}
         <Modal open={openprofileedit} onClose={handCloseProfileEdit} aria-labelledby="edit-profile-modal-title">
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto', minWidth: 400, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 24, p: 4 }}>
-            <form onSubmit={editProfile}>
+            <form onSubmit={handleSubmit(onSubmit)}>
             <div className='w-full flex justify-end'>
                 <button onClick={handCloseProfileEdit} type="button" className=""><i className="fa-solid fa-close"></i></button>
             </div>
           <Typography id="edit-profile-modal-title" variant="h6" component="h2" sx={{textAlign:'center'}}>Edit Profile</Typography>
-          <Box sx={{width:'100%'}}>
-            <label htmlFor="">Name</label>
-            <input value={formState.name} onChange={handleFormChange} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            {errors.name && <label className='error-label'>{errors.name}</label>}
-          </Box>
-          <Box sx={{width:'100%', marginTop:'10px'}}>
-            <label htmlFor="">Headline</label>
-            <input value={formState.headline} onChange={handleFormChange} type="text" name="headline" id="headline" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            {errors.headline && <label htmlFor="" className="error-label">{errors.headline}</label>}
-          </Box>
+          <FormControl fullWidth>
+            <Controller
+                name='name'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="Name"
+                        variant="outlined"
+                        error={Boolean(errors.name)}
+                        helperText={errors.name?.message}
+                    />
+                }}
+             />
+          </FormControl>
+             
+          
+          <FormControl fullWidth sx={{marginTop:'12px'}}>
+            <Controller
+                name='headline'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="Headline"
+                        variant="outlined"
+                        error={Boolean(errors.headline)}
+                        helperText={errors.headline?.message}
+                    />
+                }}
+             />
+          </FormControl>
           <Box sx={{width:'100%', marginTop:'10px', display:'flex', gap:'30px', justifyContent:'space-between'}}>
-            <div className='flex-1'>
-                <label htmlFor="">City</label>
-                <input value={formState.city} onChange={handleFormChange} type="text" name="city" id="city" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                {errors.city && <label htmlFor="" className="error-label">{errors.city}</label>}
-            </div>
-            <div className='flex-1'>
-                <label htmlFor="">District</label>
-                <input value={formState.district} onChange={handleFormChange} type="text" name="district" id="district" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                {errors.district && <label htmlFor="" className="error-label">{errors.district}</label>}
-            </div>
+            <FormControl fullWidth>
+                <Controller
+                name='city'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="City"
+                        variant="outlined"
+                        error={Boolean(errors.city)}
+                        helperText={errors.city?.message}
+                    />
+                }}
+             />
+            </FormControl>
 
-            <div className='flex-1'>
-                <label htmlFor="">State</label>
-                <input value={formState.state} onChange={handleFormChange} type="text" name="state" id="state" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                {errors.state && <label htmlFor="" className="error-label">{errors.state}</label>}
-            </div>
+            <FormControl fullWidth>
+                <Controller
+                name='district'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="District"
+                        variant="outlined"
+                        error={Boolean(errors.district)}
+                        helperText={errors.district?.message}
+                    />
+                }}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <Controller
+                name='state'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="State"
+                        variant="outlined"
+                        error={Boolean(errors.state)}
+                        helperText={errors.state?.message}
+                    />
+                }}
+                />
+            </FormControl>
           </Box>
           <Box sx={{display:'flex', width:'100%', gap:'30px'}}>
-            <div className='w-full flex-1'>
-                <label htmlFor="">Country</label>
-                <input value={formState.country} onChange={handleFormChange} type="text" name="country" id="country" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                {errors.country && <label htmlFor="" className="error-label">{errors.country}</label>}
-            </div>
+            <FormControl fullWidth sx={{marginTop:'10px'}}>
+                <Controller
+                name='country'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="Country"
+                        variant="outlined"
+                        error={Boolean(errors.country)}
+                        helperText={errors.country?.message}
+                    />
+                }}
+                />
+            </FormControl>
 
-            <div className='w-full flex-1'>
-                <label htmlFor="">Pincode</label>
-                <input value={formState.pincode} onChange={handleFormChange} type="text" name="pincode" id="pincode" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                {errors.pincode && <label htmlFor="" className="error-label">{errors.pincode}</label>}
-            </div>
+            <FormControl fullWidth sx={{marginTop:'10px'}}>
+                <Controller
+                name='pincode'
+                control={control}
+                render={({field}) => {
+                    return <TextField
+                        {...field}
+                        label="Pincode"
+                        variant="outlined"
+                        error={Boolean(errors.pincode)}
+                        helperText={errors.pincode?.message}
+                    />
+                }}
+                />
+            </FormControl>
           </Box>
+          <FormControl fullWidth sx={{marginTop:'10px'}}>
+            <Controller
+                name='summary'
+                control={control}
+                render={({field}) => {
+                    return <Textarea
+                        minRows={5}
+                        {...field}
+                        placeholder='Enter a little about you...'
+                    />
+                }}
+             />
+          </FormControl>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <label htmlFor="">Summary</label>
-            <textarea value={formState.summary} onChange={handleFormChange} name="summary" id="summary" className='outline-none border border-gray-400 w-full mt-2 block p-2 rounded h-fit'></textarea>
-            {errors.summary && <label htmlFor="" className="error-label">{errors.summary}</label>}
-          </Box>
-          <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button type="submit" className="bg-blue-500 p-1 w-full rounded">Save</button>
-            <button type="button" className="bg-gray-400 p-1 w-full rounded mt-2" onClick={handCloseProfileEdit}>Cancel</button>
+            <button type="submit" className='bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm w-full !py-2 rounded'>Save Changes</button>
+            <button type="button" className="bg-gray-400 !py-2 text-sm w-full rounded mt-2" onClick={handCloseProfileEdit}>Cancel</button>
           </Box>
           </form>
         </Box>

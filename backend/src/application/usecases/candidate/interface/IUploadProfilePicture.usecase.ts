@@ -1,4 +1,3 @@
-import CandidateDTO from '../../../DTOs/candidate/candidate.dto';
 import { UploadProfilePictureDTO } from '../../../DTOs/candidate/uploadProfilePicture.dto';
 import UserDTO from '../../../DTOs/user/user.dto';
 

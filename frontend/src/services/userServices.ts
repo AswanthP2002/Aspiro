@@ -159,7 +159,7 @@ export const getCandidateProfileData = async () => {
     }
 }
 
-export const editCandidateProfile = async (name?: string, role?: string, city?: string, district?: string, state?: string, country?: string, about?: string, pincode? : string) => {
+export const editUsersProfile = async (name?: string, role?: string, city?: string, district?: string, state?: string, country?: string, about?: string, pincode? : string) => {
     try {
         const response = await axiosInstance.patch('/candidate/profile',
             {name, role, city, district, state, country, about, pincode},
