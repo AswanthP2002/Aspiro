@@ -45,6 +45,14 @@ import ILoadUserProfileUsecase from '../application/interfaces/usecases/user/ILo
 import { LoadUserProfileUsecase } from '../application/usecases/user/LoadUserProfile.usecase';
 import ISaveUserBasicsUsecase from '../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
 import SaveUserBasicsUsecase from '../application/usecases/candidate/SaveUserBasics.usecase';
+import IUploadUserProfilePictureUsecase from '../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase';
+import UploadUserProfilePictureUsecase from '../application/usecases/user/UploadUserProfilePicture.usecase';
+import IUploadUserCoverPhotoUsecase from '../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
+import UploadUserCoverPhotoUsecase from '../application/usecases/user/UploadCoverphoto.usecase';
+import IRemoveUserProfilePictureUsecase from '../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
+import RemoveUserProfilePictureUsecase from '../application/usecases/user/RemoveProfilePicture.usecase';
+import IRemoveUserCoverPhotoUsecase from '../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';
+import RemoveUserCoverPhotoUsecase from '../application/usecases/user/RemoveCoverphoto.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -80,6 +88,12 @@ container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUse
 container.registerSingleton<IUserLoginUseCase>('IUserLoginUsecase', UserLoginUseCase);
 container.registerSingleton<ILoadUserProfileUsecase>('ILoadUserProfileUsecase', LoadUserProfileUsecase)
 container.registerSingleton<ISaveUserBasicsUsecase>('ISaveUserBasicsUsecase', SaveUserBasicsUsecase)
+container.registerSingleton<IUploadUserProfilePictureUsecase>('IUploadUserProfilePictureUsecase', UploadUserProfilePictureUsecase)
+container.registerSingleton<IUploadUserCoverPhotoUsecase>('IUploadUserCoverPhotoUsecase', UploadUserCoverPhotoUsecase)
+container.registerSingleton<IRemoveUserProfilePictureUsecase>('IRemoveUserProfilePictureUsecase', RemoveUserProfilePictureUsecase)
+container.registerSingleton<IRemoveUserCoverPhotoUsecase>('IRemoveUserCoverPhotoUsecase', RemoveUserCoverPhotoUsecase)
+
+
 container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
   LoginRecruiterUseCase

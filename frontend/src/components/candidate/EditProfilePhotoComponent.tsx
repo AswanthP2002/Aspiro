@@ -5,6 +5,7 @@ import defaultProfilePicture from '/default-img-instagram.png'
 import CropComponent from '../common/CropComponent'
 import { removeProfilePicture, updateProfilePicture } from '../../services/userServices'
 import { CircularProgress } from '@mui/material'
+import Swal from 'sweetalert2'
 
 export default function EditProfilePictureComponent({ profilePicture, onSaveProfilePhoto, onDeleteProfilePhoto }: any) {
     const fileRef = useRef<HTMLInputElement>(null)
@@ -61,19 +62,33 @@ export default function EditProfilePictureComponent({ profilePicture, onSaveProf
     }
 
     const deleteProfilePicture = async (cloudinaryPublicId : string) => {
-        setLoading(true)
-        const result = await removeProfilePicture(cloudinaryPublicId)
+        Swal.fire({
+            icon:'info',
+            title:'Delete profile picture?',
+            text:'Are you sure you want to delete your profile picture?',
+            showCancelButton:true,
+            confirmButtonText:'Yes',
+            cancelButtonText:'No',
+            allowOutsideClick:false
+        }).then(async (response) => {
+            if(response.isConfirmed){
+                setLoading(true)
+                const result = await removeProfilePicture(cloudinaryPublicId)
 
-        if(result?.success){
-            Notify.success(result?.message, {timeout:2000})
-            setTimeout(() => {
-                setLoading(false)
-                onDeleteProfilePhoto()
-            }, 2000);
-        }else{
-            setLoading(false)
-            Notify.failure(result?.message, {timeout:2000})
-        }
+                if(result?.success){
+                    Notify.success(result?.message, {timeout:2000})
+                    setTimeout(() => {
+                        setLoading(false)
+                        onDeleteProfilePhoto()
+                    }, 2000);
+                }else{
+                    setLoading(false)
+                    Notify.failure(result?.message, {timeout:2000})
+                }
+            }else{
+                return
+            }
+        }) 
     }
 
 

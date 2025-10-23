@@ -1,11 +1,11 @@
 import { UploadProfilePictureDTO } from '../../../application/DTOs/candidate/uploadProfilePicture.dto';
-import { uploadProfilePictureRequestDTO } from '../../DTOs/candidate/uploadProfilePictureRequestDTO';
+import { uploadProfilePictureRequestDTO } from '../../DTOs/user/uploadProfilePictureRequestDTO';
 
 export default function mapToUploadProfilePictureDTOFromRequest(
   requestDto: uploadProfilePictureRequestDTO
 ): UploadProfilePictureDTO {
   return {
-    candidateId: requestDto.candidateId,
+    userId: requestDto.userId,
     imageFile: requestDto.imageFile,
     publicId: requestDto.publicId,
   };

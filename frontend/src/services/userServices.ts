@@ -636,7 +636,7 @@ export const removeSocialLink = async (domain : string) => {
 
 export const updateProfilePicture = async (formData : any, publicId : string = "") => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile/picture/update', formData,
+        const response = await axiosInstance.patch('/profile/picture/update', formData,
             {
                 params:{publicId},
                 sendAuthToken:true
@@ -655,7 +655,7 @@ export const updateProfilePicture = async (formData : any, publicId : string = "
 
 export const removeProfilePicture = async (cloudinaryPublicId : string) => {
     try {
-        const response = await axiosInstance.patch(`candidate/profile/picture/remove/`,
+        const response = await axiosInstance.patch(`/profile/picture/remove/`,
             {cloudinaryPublicId},
             {
                 headers:{'Content-Type':'application/json'},
@@ -676,7 +676,7 @@ export const removeProfilePicture = async (cloudinaryPublicId : string) => {
 
 export const updateCoverPhoto = async (formData : any, publicId : string = "") => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile/coverphoto/update', formData,
+        const response = await axiosInstance.patch('/profile/coverphoto/update', formData,
             {   params:{publicId},
                 sendAuthToken:true
             } as AxiosRequest
@@ -694,7 +694,7 @@ export const updateCoverPhoto = async (formData : any, publicId : string = "") =
 
 export const removeCoverphoto = async (publicId : string) => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile/coverphoto/remove', null,
+        const response = await axiosInstance.patch('/profile/coverphoto/remove', null,
             {
                 params:{publicId},
                 sendAuthToken:true

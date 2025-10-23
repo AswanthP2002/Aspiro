@@ -1,11 +1,11 @@
 import { UploadCoverPhotoDTO } from '../../../application/DTOs/candidate/uploadCoverPhoto.dto';
-import { UploadCoverPhotoRequestDTO } from '../../DTOs/candidate/uploadCoverphotoRequestDTO';
+import { UploadCoverPhotoRequestDTO } from '../../DTOs/user/uploadCoverphotoRequestDTO';
 
 export default function mapToUploadCoverPhotoDTOFromRequest(
   requestDto: UploadCoverPhotoRequestDTO
 ): UploadCoverPhotoDTO {
   return {
-    candidateId: requestDto.candidateId,
+    userId: requestDto.userId,
     imageFile: requestDto.imageFile,
     publicId: requestDto.publicId,
   };

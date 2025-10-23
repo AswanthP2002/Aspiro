@@ -1,20 +1,22 @@
 import User from '../../../domain/entities/shared/User';
-import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
 import { RemoveCoverPhotoDTO } from '../../DTOs/candidate/removeProfilePhoto.dto';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
-import IRemoveCoverphotoUseCase from './interface/IRemoveCoverphoto.usecase';
+import { inject, injectable } from 'tsyringe';
+import IRemoveUserCoverPhotoUsecase from '../../interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';
 
-export default class RemoveCoverphotoUseCase implements IRemoveCoverphotoUseCase {
-  constructor(private _iCandidateRepo: ICandidateRepo, private _userRepo: IUserRepository) {}
+
+@injectable()
+export default class RemoveUserCoverPhotoUsecase implements IRemoveUserCoverPhotoUsecase {
+  constructor(@inject('IUserRepository') private _userRepo : IUserRepository) {}
 
   async execute(removeCoverphotoDto: RemoveCoverPhotoDTO): Promise<User | null> {
-    const { candidateId, cloudinaryPublicId } = removeCoverphotoDto;
+    const { userId, cloudinaryPublicId } = removeCoverphotoDto;
     await deleteAssetsCloudinary(cloudinaryPublicId);
 
     //update db
-    const result = await this._userRepo.update(candidateId.toString(), {
+    const result = await this._userRepo.update(userId.toString(), {
       coverPhoto: { cloudinarySecureUrl: '', cloudinaryPublicId: '' },
     });
     if (result) {

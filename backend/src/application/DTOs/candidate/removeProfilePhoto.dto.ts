@@ -1,9 +1,9 @@
 export default interface RemoveProfilePhotoDTO {
-  candidateId: string;
+  userId: string;
   cloudinaryPublicId: string;
 }
 
 export interface RemoveCoverPhotoDTO {
-  candidateId: string;
+  userId: string;
   cloudinaryPublicId: string;
 }

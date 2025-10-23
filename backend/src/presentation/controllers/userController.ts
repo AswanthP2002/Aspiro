@@ -35,9 +35,8 @@ import IGetFavoriteJobUseCase from '../../application/usecases/candidate/interfa
 import IUnsaveJobUseCase from '../../application/usecases/candidate/interface/IUnsaveJob.usecase';
 import IAddSocialLinkUsecase from '../../application/usecases/candidate/interface/IAddSocialLink.usecase';
 import IDeleteSocialLinkUseCase from '../../application/usecases/candidate/interface/IDeleteSocialLink.usecase';
-import IUploadProfilePictureUseCase from '../../application/usecases/candidate/interface/IUploadProfilePicture.usecase';
-import IRemoveProfilePictureUseCase from '../../application/usecases/candidate/interface/IRemoveProfilePicture.usecase';
-import IUploadCoverPhotoUseCase from '../../application/usecases/candidate/interface/IUploadCoverPhoto.usecase';
+import IRemoveProfilePictureUseCase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
+import IUploadCoverPhotoUseCase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
 import IGetCandidatesUseCase from '../../application/usecases/interfaces/IGetCandidates.usecase';
 import IGetCandidateDetailsUseCase from '../../application/usecases/interfaces/IGetCandiateDetails.usecase';
 import IGetCandidateApplicationsUseCase from '../../application/usecases/candidate/interface/IGetCandidateApplications.usecase';
@@ -49,9 +48,9 @@ import mapToCreateSkillDTOFromRequest from '../mappers/candidate/mapToCreateSkil
 import mapToCreateEducationDTOFromRequest from '../mappers/candidate/mapToCreateEducationDTOFromRequest';
 import mapToUpdateEducationDTOFromRequest from '../mappers/candidate/mapToUpdateEducationDTOFromRequest';
 import mapToCreateCertificateDTOFromRequest from '../mappers/candidate/mapToCreateCertificateDTOFromRequest';
-import mapToUploadProfilePictureDTOFromRequest from '../mappers/candidate/mapToUploadProfilePictureDTOFromRequest';
-import mapToUploadCoverPhotoDTOFromRequest from '../mappers/candidate/mapToUploadcoverphotoDTOFromRequest';
-import IRemoveCoverphotoUseCase from '../../application/usecases/candidate/interface/IRemoveCoverphoto.usecase';
+import mapToUploadProfilePictureDTOFromRequest from '../mappers/user/mapToUploadProfilePictureDTOFromRequest';
+import mapToUploadCoverPhotoDTOFromRequest from '../mappers/user/mapToUploadcoverphotoDTOFromRequest';
+import IRemoveCoverphotoUseCase from '../../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';
 import mapToFindCandidatesDTOFromRequest from '../mappers/candidate/mapToFindCandidatesDTOFromRequest';
 import mapToAddsocialLinkDTOFromRequest from '../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
 import IUpdateNotificationReadStatus from '../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
@@ -76,6 +75,9 @@ import { userIdSchema } from '../schemas/user/userId.schema';
 import ISaveUserBasicsUsecase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
 import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasics.schema';
 import mapToUpdateUserDTO from '../mappers/user/mapToUpdateUserDTO';
+import IUploadUserCoverPhotoUsecase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
+import IUploadUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase';
+import IRemoveUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
 
 
 @injectable()
@@ -86,9 +88,16 @@ export class UserController {
     @inject('IResendOTPUsecase') private _resendOTPUC: IResendOTPUseCase,
     @inject('IUserLoginUsecase') private _userLoginUC: IUserLoginUseCase,
     @inject('ILoadUserProfileUsecase') private _loadUserProfileUC: ILoadUserProfileUsecase,
-    @inject('ISaveUserBasicsUsecase') private _saveUserBasicsUC: ISaveUserBasicsUsecase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase,
-  ) // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
-  {}
+    @inject('ISaveUserBasicsUsecase') private _saveUserBasicsUC: ISaveUserBasicsUsecase,
+    @inject('IUploadUserCoverPhotoUsecase')
+    private _uploadUserCoverPhotoUC: IUploadUserCoverPhotoUsecase,
+    @inject('IUploadUserProfilePictureUsecase')
+    private _uploadUserProfilePictureUC: IUploadUserProfilePictureUsecase,
+    @inject('IRemoveUserCoverPhotoUsecase')
+    private _removeUserCoverPhotoUC: IRemoveCoverphotoUseCase,
+    @inject('IRemoveUserProfilePictureUsecase')
+    private _removeUserProfPictureUC: IRemoveUserProfilePictureUsecase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase, // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
+  ) {}
 
   async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -184,11 +193,11 @@ export class UserController {
 
     try {
       const validatedId = userIdSchema.parse({ id });
-      const validatedData = SaveUserBasicsSchema.parse(req.body)
-      const dto = mapToUpdateUserDTO({id:validatedId.id, ...validatedData})
-      
-      const result = await this._saveUserBasicsUC.execute(dto)
-      
+      const validatedData = SaveUserBasicsSchema.parse(req.body);
+      const dto = mapToUpdateUserDTO({ id: validatedId.id, ...validatedData });
+
+      const result = await this._saveUserBasicsUC.execute(dto);
+
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Basic details saved, login to your profile to continue',
@@ -857,100 +866,75 @@ export class UserController {
   //   }
   // } //reworked : void
 
-  // async uploadProfilePicture(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user?.id;
-  //   const img = req.file?.buffer;
-  //   const publicId = req.query?.publicId as string;
-  //   try {
-  //     const dto = mapToUploadProfilePictureDTOFromRequest({
-  //       candidateId,
-  //       imageFile: img,
-  //       publicId,
-  //     });
-  //     const result = await this._uploadProfilePictureUC.execute(dto);
+  async uploadProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const img = req.file?.buffer;
+    const publicId = req.query?.publicId as string;
 
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Profile photo updated' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked :void
+    try {
+      const dto = mapToUploadProfilePictureDTOFromRequest({
+        userId,
+        imageFile: img,
+        publicId,
+      });
+      const result = await this._uploadUserProfilePictureUC.execute(dto);
 
-  // async removeProfilePicture(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user?.id;
-  //   const cloudinaryPublicId = req.body.cloudinaryPublicId as string;
+      res.status(StatusCodes.OK).json({ success: true, message: 'Profile photo updated' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked :void
 
-  //   try {
-  //     await this._removeProfilePictureUC.execute({
-  //       candidateId,
-  //       cloudinaryPublicId,
-  //     });
+  async removeProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const cloudinaryPublicId = req.body.cloudinaryPublicId as string;
 
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Photo removed' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+    try {
+      await this._removeUserProfPictureUC.execute({
+        userId,
+        cloudinaryPublicId,
+      });
 
-  // async uploadCoverphoto(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user?.id;
-  //   const publicId = (req.query?.publicId as string) || '';
-  //   const imgFile = req.file?.buffer;
+      res.status(StatusCodes.OK).json({ success: true, message: 'Photo removed' });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //   try {
-  //     const dto = mapToUploadCoverPhotoDTOFromRequest({
-  //       candidateId,
-  //       publicId,
-  //       imageFile: imgFile,
-  //     });
-  //     const result = await this._uploadCoverphotoUC.execute(dto);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Cover photo updated' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async uploadCoverphoto(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const publicId = (req.query?.publicId as string) || '';
+    const imgFile = req.file?.buffer;
 
-  // async removeCoverphoto(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user?.id;
-  //   const cloudinaryPublicId = req.query?.publicId as string;
+    try {
+      const dto = mapToUploadCoverPhotoDTOFromRequest({
+        userId,
+        publicId,
+        imageFile: imgFile,
+      });
+      const result = await this._uploadUserCoverPhotoUC.execute(dto);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo updated' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //   try {
-  //     await this._removeCoverphotoUC.execute({
-  //       candidateId,
-  //       cloudinaryPublicId,
-  //     });
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Cover photo removed' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async removeCoverphoto(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const cloudinaryPublicId = req.query?.publicId as string;
+
+    try {
+      await this._removeUserCoverPhotoUC.execute({
+        userId,
+        cloudinaryPublicId,
+      });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo removed' });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // async getCandidates(
   //   req: Request,

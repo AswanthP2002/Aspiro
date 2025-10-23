@@ -70,6 +70,7 @@ import { UserController } from '../controllers/userController';
 import { container } from 'tsyringe';
 import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
 import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
+import { upload } from '../../utilities/multer';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -373,32 +374,32 @@ function createUserRouter() {
   //   authorization(['candidate']),
   //   candidateController.deleteSocialLink.bind(candidateController)
   // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/picture/update',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   upload.single('profilePicture'),
-  //   candidateController.uploadProfilePicture.bind(candidateController)
-  // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/picture/remove',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.removeProfilePicture.bind(candidateController)
-  // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/coverphoto/update',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   upload.single('coverPhoto'),
-  //   candidateController.uploadCoverphoto.bind(candidateController)
-  // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/coverphoto/remove',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.removeCoverphoto.bind(candidateController)
-  // );
+  userRouter.patch(
+    '/profile/picture/update',
+    centralizedAuthentication,
+    authorization(['user']),
+    upload.single('profilePicture'),
+    userController.uploadProfilePicture.bind(userController)
+  );
+  userRouter.patch(
+    '/profile/picture/remove',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.removeProfilePicture.bind(userController)
+  );
+  userRouter.patch(
+    '/profile/coverphoto/update',
+    centralizedAuthentication,
+    authorization(['user']),
+    upload.single('coverPhoto'),
+    userController.uploadCoverphoto.bind(userController)
+  );
+  userRouter.patch(
+    '/profile/coverphoto/remove',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.removeCoverphoto.bind(userController)
+  );
   // candidateRouter.get(
   //   '/candidates',
   //   candidateController.getCandidates.bind(candidateController)
