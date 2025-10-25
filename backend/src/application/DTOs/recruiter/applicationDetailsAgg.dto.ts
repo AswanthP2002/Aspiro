@@ -1,5 +1,5 @@
-import Candidate from '../../../domain/entities/candidate/candidates.LEGACY';
-import Resume from '../../../domain/entities/candidate/resume.entity';
+import Candidate from '../../../domain/entities/user/candidates.LEGACY';
+import Resume from '../../../domain/entities/user/resume.entity';
 import Job from '../../../domain/entities/job.entity';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 

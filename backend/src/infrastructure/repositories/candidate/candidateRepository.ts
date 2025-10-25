@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 import BaseRepository from '../baseRepository';
 import SocialLinks from '../../../domain/entities/SocialLinks';
-import { CandidateDAO } from '../../database/DAOs/candidate/candidateDAO';
-import CandidateAggregated from '../../../domain/entities/candidate/candidateAggregated.entity';
-import CandidatePaginated from '../../../domain/entities/candidate/candidatePaginated.entity';
-import Candidate from '../../../domain/entities/candidate/candidate.entity';
+import { CandidateDAO } from '../../database/DAOs/user/candidateDAO';
+import CandidateAggregated from '../../../domain/entities/user/candidateAggregated.entity';
+import CandidatePaginated from '../../../domain/entities/user/candidatePaginated.entity';
+import Candidate from '../../../domain/entities/user/candidate.entity';
 import { injectable } from 'tsyringe';
 import { FindUsersQuery } from '../../../application/queries/users.query';
 

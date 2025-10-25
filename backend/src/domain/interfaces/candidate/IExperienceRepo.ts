@@ -1,4 +1,4 @@
-import Experience from '../../entities/candidate/experience.entity';
+import Experience from '../../entities/user/experience.entity';
 import IBaseRepo from '../IBaseRepo';
 import { SaveExperience } from './saveResponses';
 import { ObjectId } from 'mongoose';
@@ -11,5 +11,5 @@ export default interface IExperienceRepo extends IBaseRepo<Experience> {
     experienceId: string,
     experience: any
   ): Promise<Experience | null>;
-  findWithCandidateId(id: string): Promise<Experience[] | null>;
+  findWihUserId(userId: string): Promise<Experience[] | null>;
 }

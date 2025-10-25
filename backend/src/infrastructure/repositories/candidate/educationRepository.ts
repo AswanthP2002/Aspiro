@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import Education from '../../../domain/entities/candidate/educations.entity';
+import Education from '../../../domain/entities/user/educations.entity';
 import IEducationRepo from '../../../domain/interfaces/candidate/IEducationRepo';
 import BaseRepository from '../baseRepository';
-import { EducationDAO } from '../../database/DAOs/candidate/education.dao';
+import { EducationDAO } from '../../database/DAOs/user/education.dao';
 
 export default class EducationRepository
   extends BaseRepository<Education>
@@ -35,9 +35,9 @@ export default class EducationRepository
   //     return result.acknowledged
   // }
 
-  async findWithCandidateId(id: string): Promise<Education[] | null> {
+  async findWithUserId(userId: string): Promise<Education[] | null> {
     const result = await EducationDAO.find({
-      candidateId: new mongoose.Types.ObjectId(id),
+      userId: new mongoose.Types.ObjectId(userId),
     });
     return result;
   }
@@ -48,9 +48,9 @@ export default class EducationRepository
       { _id: new mongoose.Types.ObjectId(updateEducation._id) },
       {
         $set: {
-          stream: updateEducation.stream,
-          level: updateEducation.level,
-          organization: updateEducation.organization,
+          stream: updateEducation.educationStream,
+          level: updateEducation.educationLevel,
+          organization: updateEducation.institution,
           location: updateEducation.location,
           isPresent: updateEducation.isPresent,
           startYear: updateEducation.startYear,

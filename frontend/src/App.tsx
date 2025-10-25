@@ -76,7 +76,7 @@ function App() {
             <Route element={<ProfileLayout />}>
               <Route path='personal' index element={<ProfilePersonal />} />
               <Route path='documents' element={<DocumentsPage />} />
-              <Route path='experience' element={<ExperiencePage />} />
+              <Route path='skills-experience' element={<ExperiencePage />} />
             </Route>
           </Route>
         </Route>

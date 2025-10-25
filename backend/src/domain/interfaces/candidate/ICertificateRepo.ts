@@ -1,4 +1,4 @@
-import Certificates from '../../entities/candidate/certificates.entity';
+import Certificates from '../../entities/user/certificates.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface ICertificateRepo extends IBaseRepo<Certificates> {

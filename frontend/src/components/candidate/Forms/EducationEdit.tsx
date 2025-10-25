@@ -2,8 +2,9 @@ import { Box, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabe
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
 import Swal from "sweetalert2";
-import { editCandidateEducation } from "../../../services/userServices";
+import { editUserEducation } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
+import { Notify } from "notiflix";
 
 export default function EditEducationForm({selectedEducation, onEditEducation, editEducationModalOpen, closeEditEducationModal} : any) {
     
@@ -13,6 +14,7 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
         institution : string
         startDate : string
         endDate : string
+        isPresent: boolean
         location : string
     }
 
@@ -23,7 +25,8 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
             institution:"",
             startDate:"",
             endDate:"",
-            location:""
+            location:"",
+            isPresent:false
         }
     })
 
@@ -41,27 +44,32 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
     useEffect(() => {
         console.log('This component is mounted ')
         reset({
-            educationLevel:selectedEducation.level,
-            stream:selectedEducation.stream,
-            institution:selectedEducation.organization,
+            educationLevel:selectedEducation.educationLevel,
+            stream:selectedEducation.educationStream,
+            institution:selectedEducation.institution,
             startDate:selectedEducation.startYear,
             endDate:selectedEducation.endYear,
-            location:selectedEducation.location
+            location:selectedEducation.location,
+            isPresent:selectedEducation.isPresent
         })
         return () => console.log('Component unmounted')
 
     }, [])
+
+    const currentEducationStatus = watch("isPresent")
 
     const toggleIsPresent = () => {
         setIspresent(prev => !prev)
     }
 
 
-    async function editEducation() {
-        const {educationLevel, stream, institution, location, startDate, endDate} = watch()
+    async function editEducation(data : Inputs) {
+        const {educationLevel, stream, institution, location, startDate, endDate} = data
+        
         closeEditEducationModal()
 
-            const result = await editCandidateEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
+            try {
+                const result = await editUserEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
 
             if(result?.success){
                 Swal.fire({
@@ -82,11 +90,10 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
                     })
                 })
             }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:result?.message
-                })
+                Notify.failure(result?.message, {timeout:2000})
+            }
+            } catch (error : unknown) {
+                Notify.failure('Something went wrong', {timeout:2000})
             }
     }
 
@@ -225,16 +232,16 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
            
           </Box>
           <Box sx={{width:'100%', marginTop:'10pxf'}}>
-            <FormControlLabel
-                control={
-                    <Checkbox onChange={toggleIsPresent}
-                        defaultChecked={isPresent ? true : false}
+            <Controller
+                name="isPresent"
+                control={control}
+                render={({field}) => (
+                    <FormControlLabel 
+                        control={<Checkbox {...field} checked={field.value} />}
+                        label="Im currently studying here"
                     />
-                }
-                label="I am currently studying here"
-            >
-
-            </FormControlLabel>
+                )}
+            />
           </Box>
           <Box sx={{width:'100%', display:'flex', gap:'5px'}}>
             <FormControl>
@@ -262,12 +269,13 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
                     name="endDate"
                     control={control}
                     rules={{
+                        required:{value:currentEducationStatus ? false : true, message:'Please enter end year'},
                         minLength:{value:4, message:'Minimum 4 charecters'},
                         maxLength:{value:4, message:'Maximum 4 charecters'}
                     }}
                     render={({field}) => {
                         return <TextField 
-                        disabled={isPresent ? true : false} 
+                        disabled={currentEducationStatus} 
                         label="End Year" 
                         variant="outlined" 
                         {...field} 

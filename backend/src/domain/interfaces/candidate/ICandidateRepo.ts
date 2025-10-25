@@ -1,8 +1,8 @@
 import { FindCandidatesQuery } from '../../../application/queries/users.query';
-import Candidate from '../../entities/candidate/candidate.entity';
+import Candidate from '../../entities/user/candidate.entity';
 //import Candidate from '../../entities/candidate/candidate.entity';
-import CandidateAggregated from '../../entities/candidate/candidateAggregated.entity';
-import CandidatePaginated from '../../entities/candidate/candidatePaginated.entity';
+import CandidateAggregated from '../../entities/user/candidateAggregated.entity';
+import CandidatePaginated from '../../entities/user/candidatePaginated.entity';
 import SocialLinks from '../../entities/SocialLinks';
 import IBaseRepo from '../IBaseRepo';
 

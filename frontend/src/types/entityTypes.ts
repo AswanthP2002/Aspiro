@@ -51,10 +51,10 @@ export interface SocialLinks {
 
 export interface Skills {
   _id?: string;
-  type: string;
+  skillType: string;
   skill: string;
-  level: string;
-  candidateId?: string;
+  skillLevel: string;
+  userId?: string;
 }
 
 export interface Experience {
@@ -63,9 +63,9 @@ export interface Experience {
   role: string;
   jobtype: string;
   organization: string;
-  startdate: string;
+  startDate: any;
   ispresent: boolean;
-  enddate: string;
+  endDate: string;
   location: string;
   locationtype: string;
   createdAt?: string;
@@ -74,10 +74,10 @@ export interface Experience {
 
 export interface Education {
   _id?: string;
-  candidateId?: string;
-  stream: string; //particular group of education
-  level: string;
-  organization: string;
+  userId?: string;
+  educationStream: string; //particular group of education
+  educationLevel: string;
+  institution: string;
   location: string;
   startYear: string;
   isPresent: boolean;

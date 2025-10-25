@@ -1,5 +1,5 @@
-import JobApplication from '../entities/candidate/jobApplication.entity';
-import JobApplicationAggregated from '../entities/candidate/jobApplicationAggregated.entity';
+import JobApplication from '../entities/user/jobApplication.entity';
+import JobApplicationAggregated from '../entities/user/jobApplicationAggregated.entity';
 import ApplicationDetailsAggregated from '../entities/recruiter/jobApplicationDetailsAggregated.entity';
 import ApplicationsAggregated from '../entities/recruiter/jobApplicationsAggregated.entity';
 import IBaseRepo from './IBaseRepo';

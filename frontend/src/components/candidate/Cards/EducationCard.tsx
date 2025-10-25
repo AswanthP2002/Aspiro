@@ -24,10 +24,10 @@ export default function CandidateEducationCard({
         </div>
       </div>
       <div className="card-body p-3">
-        <p className="font-semibold">{education.stream}</p>
-        <p className="!text-gray-500 text-sm">{education.level}</p>
+        <p className="font-semibold">{education.educationStream}</p>
+        <p className="!text-gray-500 text-sm">{education.educationLevel}</p>
         <p className="text-gray-500 text-xs mt-3">
-          {education.organization}, {education.location}
+          {education.institution}, {education.location}
         </p>
         <p className="text-gray-500 text-xs mt-5 font-semibold">
           {education.startYear} -{' '}

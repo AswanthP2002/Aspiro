@@ -1,4 +1,4 @@
-import Resume from '../../entities/candidate/resume.entity';
+import Resume from '../../entities/user/resume.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IResumeRepo extends IBaseRepo<Resume> {

@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
-import Experience from '../../../domain/entities/candidate/experience.entity';
+import Experience from '../../../domain/entities/user/experience.entity';
 import IExperienceRepo from '../../../domain/interfaces/candidate/IExperienceRepo';
 import { SaveExperience } from '../../../domain/interfaces/candidate/saveResponses';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
 const { ObjectId } = mongoose.Types;
-import { experienceDAO } from '../../database/DAOs/candidate/candidateExperience.dao';
+import { experienceDAO } from '../../database/DAOs/user/candidateExperience.dao';
 
 export default class ExperienceRepository
   extends BaseRepository<Experience>
@@ -49,9 +49,9 @@ export default class ExperienceRepository
     return result;
   }
 
-  async findWithCandidateId(id: string): Promise<Experience[] | null> {
+  async findWihUserId(userId: string): Promise<Experience[] | null> {
     const result = await experienceDAO.find({
-      candidateId: new mongoose.Types.ObjectId(id),
+      userId: new mongoose.Types.ObjectId(userId),
     });
     return result;
   }

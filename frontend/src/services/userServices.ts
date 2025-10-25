@@ -181,9 +181,9 @@ export const editUsersProfile = async (name?: string, role?: string, city?: stri
     }
 }
 
-export const getCandidateExperience = async () => {
+export const getUserExperiences = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/experience',
+        const response = await axiosInstance.get('/experience',
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -197,9 +197,9 @@ export const getCandidateExperience = async () => {
     }
 }
 
-export const getCandidateSkills = async () => {
+export const getUserSkills = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/skills',
+        const response = await axiosInstance.get('/skills',
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -209,13 +209,14 @@ export const getCandidateSkills = async () => {
         const err = error as AxiosError
 
         console.log('Error occured while geting candidate skills', err)
+        throw error
     }
 }
 
-export const addCandidateSkill = async (type : string, skill : string, level : string) => {
+export const addUserSkill = async (skillType : string, skill : string, skillLevel : string) => {
     try {
-        const response = await axiosInstance.post('/candidate/skills/add', 
-            {type, skill, level},
+        const response = await axiosInstance.post('/skills/add', 
+            {skillType, skill, skillLevel},
             {
                 headers:{"Content-Type":'application/json'},
                 sendAuthToken:true
@@ -233,9 +234,9 @@ export const addCandidateSkill = async (type : string, skill : string, level : s
     }
 }
 
-export const getCandidateEducation = async () => {
+export const getUserEducations = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/education',
+        const response = await axiosInstance.get('/education',
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -246,13 +247,14 @@ export const getCandidateEducation = async () => {
         const err = error as AxiosError
 
         console.log('Error occured while geting candidate education', err)
+        throw error
     }
 }
 
-export const addCandidateExperience = async (role: string, jobtype: string, location: string, locationtype: string, organization: string, ispresent: boolean, startdate: string, enddate: string) => {
+export const addUserExperience = async (jobRole: string, jobType: string, location: string, workMode: string, organization: string, isPresent: boolean, startDate: string, endDate: string) => {
     try {
-        const response = await axiosInstance.post('/candidate/experience/add',
-            {role, jobtype, location, locationtype, organization, ispresent, startdate, enddate},
+        const response = await axiosInstance.post('/experience/add',
+            {jobRole, jobType, location, workMode, organization, isPresent, startDate, endDate},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -264,13 +266,15 @@ export const addCandidateExperience = async (role: string, jobtype: string, loca
         const err = error as AxiosError
 
         console.log('Error occured while adding candidat experience', err)
+
+        throw error
     }
 }
 
-export const editCandidateExperience = async (experienceId: string, editableRole: string, editableJobType: string, editableOrganization: string, editableIsPresent: boolean, editableStartDate: string, editableEndDate: string, editableLocation: string, editableLocationType: string) => {
+export const editUserExperience = async (experienceId: string, jobRole: string, jobType: string, organization: string, isPresent: boolean, startDate: string, endDate: string, location: string, workMode: string) => {
     try {
-        const response = await axiosInstance.put(`/candidate/experience/edit/${experienceId}`,
-            {editableRole, editableJobType, editableOrganization, editableIsPresent, editableStartDate, editableEndDate, editableLocation, editableLocationType},
+        const response = await axiosInstance.put(`/experience/edit/${experienceId}`,
+            {jobRole, jobType, organization, isPresent, startDate, endDate, location, workMode},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -284,9 +288,9 @@ export const editCandidateExperience = async (experienceId: string, editableRole
     }
 }
 
-export const deleteCandidateExperience = async (expId? : string) => {
+export const deleteUserExperience = async (expId? : string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/experience/${expId}`,
+        const response = await axiosInstance.delete(`/experience/${expId}`,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -300,9 +304,9 @@ export const deleteCandidateExperience = async (expId? : string) => {
     }
 }
 
-export const deleteCandidateSkills = async (skillId : string) => {
+export const deleteUserSkill = async (skillId : string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/skills/${skillId}`,
+        const response = await axiosInstance.delete(`/skills/${skillId}`,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -313,13 +317,15 @@ export const deleteCandidateSkills = async (skillId : string) => {
         const err = error as AxiosError
         
         console.log('Error occured while deleting skills', err)
+
+        throw error
     }
 }
 
-export const addCandidateEducation = async (level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
+export const addUserEducation = async (educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
-        const response = await axiosInstance.post('/candidate/education/add',
-            {level, stream, organization, isPresent, startYear, endYear, location},
+        const response = await axiosInstance.post('/education/add',
+            {educationLevel, educationStream, institution, isPresent, startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -331,13 +337,14 @@ export const addCandidateEducation = async (level : string, stream : string, org
         const err = error as AxiosError
 
         console.log('Error occured while adding candidate education', err)
+        throw error
     }
 }
 
-export const editCandidateEducation = async (educationId : string, level : string, stream : string, organization : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
+export const editUserEducation = async (educationId : string, educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
-        const response = await axiosInstance.put(`/candidate/education/${educationId}`,
-            {level, stream, organization, isPresent, startYear:startYear, endYear, location},
+        const response = await axiosInstance.put(`/education/${educationId}`,
+            {educationLevel, educationStream, institution, isPresent, startYear:startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -348,12 +355,14 @@ export const editCandidateEducation = async (educationId : string, level : strin
         const err = error as AxiosError
 
         console.log('Error occured while editing candidate education', err)
+
+        throw error
     }
 }
 
-export const deleteCandidateEducation = async (educationId? : string) => {
+export const deleteUserEducation = async (educationId? : string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/education/${educationId}`,
+        const response = await axiosInstance.delete(`/education/${educationId}`,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -363,6 +372,8 @@ export const deleteCandidateEducation = async (educationId? : string) => {
         const err = error as AxiosError
 
         console.log('Error occured while deleting education data', err)
+
+        throw error
     }
 }
 

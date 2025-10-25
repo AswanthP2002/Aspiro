@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import JobApplication from '../../domain/entities/candidate/jobApplication.entity';
+import JobApplication from '../../domain/entities/user/jobApplication.entity';
 import IJobApplicationRepo from '../../domain/interfaces/IJobApplicationRepo';
 import BaseRepository from './baseRepository';
-import { JobApplicationDAO } from '../database/DAOs/candidate/jobApplication.dao';
-import JobApplicationAggregated from '../../domain/entities/candidate/jobApplicationAggregated.entity';
+import { JobApplicationDAO } from '../database/DAOs/user/jobApplication.dao';
+import JobApplicationAggregated from '../../domain/entities/user/jobApplicationAggregated.entity';
 import ApplicationsAggregated from '../../domain/entities/recruiter/jobApplicationsAggregated.entity';
 import ApplicationDetailsAggregated from '../../domain/entities/recruiter/jobApplicationDetailsAggregated.entity';
 

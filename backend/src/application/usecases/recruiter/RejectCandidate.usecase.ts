@@ -1,6 +1,6 @@
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
 import { JobApplicationDTO } from '../../DTOs/candidate/jobApplication.dto';
-import mapToJobApplicationDTOFromJobApplication from '../../mappers/candidate/mapToJobApplicationDTOFromJobApplication.mapper';
+import mapToJobApplicationDTOFromJobApplication from '../../mappers/user/mapToJobApplicationDTOFromJobApplication.mapper';
 import IRejectCandidateUseCase from './interface/IRejectCandidate.usecase';
 
 export default class RejectCandidateUseCase implements IRejectCandidateUseCase {

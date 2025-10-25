@@ -1,8 +1,8 @@
-import Candidate from '../../domain/entities/candidate/candidates.LEGACY';
+import Candidate from '../../domain/entities/user/candidates.LEGACY';
 import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
 import { FindCandidatesDTO } from '../DTOs/candidate/candidate.dto';
 import CandidatePaginatedDTO from '../DTOs/candidate/candidatePaginated.dto';
-import mapToCandidatePaginatedDTO from '../mappers/candidate/mapToCandidatePaginatedDTO.mapper';
+import mapToCandidatePaginatedDTO from '../mappers/user/mapToCandidatePaginatedDTO.mapper';
 import IGetCandidatesUseCase from './interfaces/IGetCandidates.usecase';
 
 export default class GetCandidatesUseCase implements IGetCandidatesUseCase {

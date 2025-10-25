@@ -40,6 +40,9 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
   }
 
   async delete(id: string): Promise<void> {
-    await this._model.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
+    console.log('delete profposed id', id)
+    const result = await this._model.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
+    console.log('is dleted or not', result.deletedCount)
+
   }
 }

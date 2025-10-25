@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import CandidateAggregatedDTO from '../../DTOs/candidate/candidateAggregated.dto';
-import mapToCandidateAggDTO from '../../mappers/candidate/mapToCandidateAggDTO.mapper';
+import mapToCandidateAggDTO from '../../mappers/user/mapToCandidateAggDTO.mapper';
 import ILoadCandidateDetailsUseCase from './interfaces/ILoadCandidateDetails.usecase';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
 

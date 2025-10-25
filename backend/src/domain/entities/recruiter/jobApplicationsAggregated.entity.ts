@@ -1,5 +1,5 @@
-import Candidate from '../candidate/candidates.LEGACY';
-import Resume from '../candidate/resume.entity';
+import Candidate from '../user/candidates.LEGACY';
+import Resume from '../user/resume.entity';
 
 export default interface ApplicationsAggregated {
   _id: string;

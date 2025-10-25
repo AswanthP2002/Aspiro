@@ -1,5 +1,5 @@
-import Candidate from '../../../domain/entities/candidate/candidates.LEGACY';
-import Resume from '../../../domain/entities/candidate/resume.entity';
+import Candidate from '../../../domain/entities/user/candidates.LEGACY';
+import Resume from '../../../domain/entities/user/resume.entity';
 
 export default interface ApplicationsAggregatedDTO {
   _id: string;

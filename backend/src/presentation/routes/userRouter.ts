@@ -71,111 +71,12 @@ import { container } from 'tsyringe';
 import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
 import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
+import { StatusCodes } from '../statusCodes';
 
 function createUserRouter() {
   const userRouter = express.Router();
-  //const candidateRouter = express.Router()
-
-  // const candidateRepo = new CandidateRepository();
-  // const experienceRepo = new ExperienceRepository();
-  // const jobRepo = new JobRepository();
-  // const skillRepo = new SkillRepsitory();
-  // const educationRepo = new EducationRepository();
-  // const resumeRepo = new ResumeRepository();
-  // const certificateRepo = new CertificateRepository();
-  // const jobApplicationRepo = new JObApplicationRepository();
-  // const notificationRepo = new NotificationRepository();
-  // const favoriteJobsRepo = new FavoriteJobsRepsitory();
-  // const userRepo = new UserRepository();
-
-  // const registerCandidateUC = new RegisterCandidateUseCase(candidateRepo); //fixed
-  // const verifyCandidateUC = new VerifyUserUseCase(userRepo); //fixed
-  // const loginCandidateUC = new LoginCandidateUseCase(candidateRepo, userRepo); //fixed
-  // const saveCandidateBasicUC = new SaveIntroDetailsUseCase(candidateRepo, userRepo);
-  // const loadCandidatePersonalDataUC = new LoadCandidatePersonalDataUC(candidateRepo);
-  // const addExperienceUC = new AddExperienceUseCase(experienceRepo);
-  // const getExperiencesUC = new GetExperienceUseCase(experienceRepo);
-  // const deleteExperienceUC = new DeleteExperienceUseCase(experienceRepo);
-  // const editExperienceUC = new EditExperienceUseCase(experienceRepo);
-  // const loadJobsUC = new LoadJobsCandidateSideUseCase(jobRepo);
-  // const loadJobDetailsUC = new LoadJobDetailsCandidateSide(jobRepo);
-  // const addSkillUC = new AddSkill(skillRepo);
-  // const getSkillsUC = new GetSkillsUseCase(skillRepo);
-  // const deleteSkillUC = new DeleteSkillUseCase(skillRepo);
-  // const addEducationUC = new AddEducationUseCase(educationRepo);
-  // const getEducationsUC = new GetEducationsUseCase(educationRepo);
-  // const deleteEducationUC = new DeleteEducationUseCase(educationRepo);
-  // const editEducationUC = new EditEducationUseCase(educationRepo);
-  // const addResumeUC = new AddResumeUseCase(resumeRepo);
-  // const loadResumeUC = new LoadResumesUseCase(resumeRepo);
-  // const deleteResumeUC = new DeleteResumeUseCase(resumeRepo);
-  // const addCertificateUC = new AddCertificateUseCase(certificateRepo);
-  // const loadCertificatesUC = new GetCertificatesUseCase(certificateRepo);
-  // const applyJobUC = new SaveJobApplicationUseCase(jobApplicationRepo);
-  // const searchJobsHomePageUC = new SearchJobsFromHomeUseCase(jobRepo);
-  // const editCandidateProfileUC = new EditProfileUseCase(candidateRepo);
-  // const getNotificationsUC = new GetNotificationsUseCase(notificationRepo);
-  // const saveJobUC = new SaveFavoriteJobUseCase(favoriteJobsRepo);
-  // const checkIsJobSavedUC = new CheckIsJobSavedUseCase(favoriteJobsRepo);
-  // const getFavoriteJobsUC = new GetFavoriteJobUseCase(favoriteJobsRepo);
-  // const unsaveJobUC = new UnsaveJobUseCase(favoriteJobsRepo);
-  // const addSocialLinkUC = new AddSocialLinkUseCase(candidateRepo);
-  // const deleteSocialLinkUC = new DeleteSocialLinkUseCase(candidateRepo);
-  // const uploadProfilePictureUC = new UploadProfilePictureUseCase(candidateRepo, userRepo);
-  // const removeProfilePictureUC = new RemoveProfilePictureUseCase(candidateRepo, userRepo);
-  // const uploadCoverPhotoUC = new UploadCoverphotoUseCase(candidateRepo, userRepo);
-  // const removeCoverPhotoUC = new RemoveCoverphotoUseCase(candidateRepo, userRepo);
-  // const getCandidatesUC = new GetCandidatesUseCase(candidateRepo);
-  // const getCandidateDetailsUC = new GetCandidateDetailsUseCase(candidateRepo);
-  // const getCandidateApplicationsUC = new GetCandidateApplicationsUseCase(jobApplicationRepo);
-  // const updateNotificationReadStatus = new UpdateNotificationReadStatus(notificationRepo);
-  // //const createUserUC = new CreateUserUseCase(userRepo);
-  // const findCandidateByUserId = new FindCandidateByUserIdUseCase(candidateRepo);
-
+  
   const userController = container.resolve(UserController);
-  // registerCandidateUC,
-  // verifyCandidateUC,
-  // loginCandidateUC,
-  // saveCandidateBasicUC,
-  // loadCandidatePersonalDataUC,
-  // addExperienceUC,
-  // getExperiencesUC,
-  // deleteExperienceUC,
-  // editExperienceUC,
-  // loadJobsUC,
-  // loadJobDetailsUC,
-  // addSkillUC,
-  // getSkillsUC,
-  // deleteSkillUC,
-  // addEducationUC,
-  // getEducationsUC,
-  // deleteEducationUC,
-  // editEducationUC,
-  // addResumeUC,
-  // loadResumeUC,
-  // deleteResumeUC,
-  // addCertificateUC,
-  // loadCertificatesUC,
-  // applyJobUC,
-  // searchJobsHomePageUC,
-  // editCandidateProfileUC,
-  // getNotificationsUC,
-  // saveJobUC,
-  // checkIsJobSavedUC,
-  // getFavoriteJobsUC,
-  // unsaveJobUC,
-  // addSocialLinkUC,
-  // deleteSocialLinkUC,
-  // uploadProfilePictureUC,
-  // removeProfilePictureUC,
-  // uploadCoverPhotoUC,
-  // removeCoverPhotoUC,
-  // getCandidatesUC,
-  // getCandidateDetailsUC,
-  // getCandidateApplicationsUC,
-  // updateNotificationReadStatus,
-  // createUserUC,
-  // findCandidateByUserId
  
   userRouter.post('/register', userController.registerUser.bind(userController));
   userRouter.post('/verify', userController.verifyUser.bind(userController));
@@ -208,72 +109,75 @@ function createUserRouter() {
     authorization(['user']),
     userController.loadUserProfile.bind(userController)
   );
-  // candidateRouter.post(
-  //   '/candidate/experience/add',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.addExperience.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/experience',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.getExperiences.bind(candidateController)
-  // );
-  // candidateRouter.delete(
-  //   '/candidate/experience/:experienceId',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.deleteExperience.bind(candidateController)
-  // );
-  // candidateRouter.put(
-  //   '/candidate/experience/edit/:experienceId',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.editExperience.bind(candidateController)
-  // );
-  // candidateRouter.post(
-  //   '/candidate/skills/add',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.addSkill.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/skills',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.getSkills.bind(candidateController)
-  // );
-  // candidateRouter.delete(
-  //   '/candidate/skills/:skillId',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.deleteSkill.bind(candidateController)
-  // );
-  // candidateRouter.post(
-  //   '/candidate/education/add',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.addEducation.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/education',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.getEducations.bind(candidateController)
-  // );
-  // candidateRouter.delete(
-  //   '/candidate/education/:educationId',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.deleteEducation.bind(candidateController)
-  // );
-  // candidateRouter.put(
-  //   '/candidate/education/:educationId',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.editEducation.bind(candidateController)
-  // );
+  userRouter.post(
+    '/experience/add',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.addExperience.bind(userController)
+  );
+  userRouter.get(
+    '/experience',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getExperiences.bind(userController)
+  );
+  userRouter.delete(
+    '/experience/:experienceId',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.deleteExperience.bind(userController)
+  );
+  userRouter.put(
+    '/experience/edit/:experienceId',
+    centralizedAuthentication,
+    authorization(['user']),
+    testMiddleware,
+    userController.editExperience.bind(userController)
+  );
+  userRouter.post(
+    '/skills/add',
+    centralizedAuthentication,
+    authorization(['user']),
+    testMiddleware,
+    userController.addSkill.bind(userController)
+  );
+  userRouter.get(
+    '/skills',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getSkills.bind(userController)
+  );
+  userRouter.delete(
+    '/skills/:skillId',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.deleteSkill.bind(userController)
+  );
+  userRouter.post(
+    '/education/add',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.addEducation.bind(userController)
+  );
+  userRouter.get(
+    '/education',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getEducations.bind(userController)
+  );
+  userRouter.delete(
+    '/education/:educationId',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.deleteEducation.bind(userController)
+  );
+  userRouter.put(
+    '/education/:educationId',
+    centralizedAuthentication,
+    authorization(['user']),
+    testMiddleware,
+    userController.editEducation.bind(userController)
+  );
   // candidateRouter.delete(
   //   '/candidate/resume/:resumeId',
   //   candidateAuth,
@@ -418,6 +322,7 @@ function createUserRouter() {
     console.log('inspecting request body')
     console.log(req.body)
     next()
+    ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }
 
   // // candidateRouter.get('/get/user/:id', getAuthUserData)

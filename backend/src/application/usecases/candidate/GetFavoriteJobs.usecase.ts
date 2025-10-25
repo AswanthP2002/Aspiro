@@ -1,4 +1,4 @@
-import FavoriteJobsAggregated from '../../../domain/entities/candidate/favoriteJobsAggregated.entity';
+import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
 import IFavoriteJobsRepo from '../../../domain/interfaces/candidate/IFavoriteJobRepo';
 import FavoriteJobsAggregatedDTO from '../../DTOs/candidate/favoriteJobAggregated.dto';
 import IGetFavoriteJobUseCase from './interface/IGetFavoriteJobs.usecase';

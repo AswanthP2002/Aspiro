@@ -1,4 +1,4 @@
-import FavoriteJobs from '../../../domain/entities/candidate/favoriteJobs.entity';
+import FavoriteJobs from '../../../domain/entities/user/favoriteJobs.entity';
 import IFavoriteJobsRepo from '../../../domain/interfaces/candidate/IFavoriteJobRepo';
 import ICheckIsJobSavedUseCase from './interface/ICheckIsJobSaved.usecase';
 

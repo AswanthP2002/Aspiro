@@ -1,4 +1,4 @@
-import Education from '../../entities/candidate/educations.entity';
+import Education from '../../entities/user/educations.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IEducationRepo extends IBaseRepo<Education> {
@@ -6,5 +6,5 @@ export default interface IEducationRepo extends IBaseRepo<Education> {
   //getEducations(candidateID : string) : Promise<Education[]>
   //deleteEducation(educationId : string) : Promise<boolean>
   editEducation(updateEducation: Education): Promise<Education | null>;
-  findWithCandidateId(id: string): Promise<Education[] | null>;
+  findWithUserId(userId: string): Promise<Education[] | null>;
 }

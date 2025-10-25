@@ -7,7 +7,7 @@ import CertificateDTO, {
   CreateCertificateDTO,
 } from '../../DTOs/candidate/certificate.dto';
 import { UploadApiResponse } from 'cloudinary';
-import mapToCertificateDTOFromCertificate from '../../mappers/candidate/mapToCertificateDTOFromCertificate.mapper';
+import mapToCertificateDTOFromCertificate from '../../mappers/user/mapToCertificateDTOFromCertificate.mapper';
 
 export default class AddCertificateUseCase implements IAddCertificateUseCase {
   constructor(private _iCertificateRepo: ICertificateRepo) {}

@@ -1,4 +1,4 @@
-import Candidate from '../../domain/entities/candidate/candidates.LEGACY';
+import Candidate from '../../domain/entities/user/candidates.LEGACY';
 import CandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
 
 export default class GetAuthUserUseCase {

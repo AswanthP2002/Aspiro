@@ -53,11 +53,42 @@ import IRemoveUserProfilePictureUsecase from '../application/interfaces/usecases
 import RemoveUserProfilePictureUsecase from '../application/usecases/user/RemoveProfilePicture.usecase';
 import IRemoveUserCoverPhotoUsecase from '../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';
 import RemoveUserCoverPhotoUsecase from '../application/usecases/user/RemoveCoverphoto.usecase';
+import IExperienceRepo from '../domain/interfaces/candidate/IExperienceRepo';
+import ExperienceRepository from '../infrastructure/repositories/candidate/experienceRepository';
+import IAddUserExperienceUsecase from '../application/interfaces/usecases/user/IAddUserExperience.usecase';
+import AddUserExperienceUsecase from '../application/usecases/user/AddUserExperience.usecase';
+import IGetUserExperiencesUsecase from '../application/interfaces/usecases/user/IGetUserExperiences.usecase';
+import GetUserExperiencesUsecase from '../application/usecases/user/GetUserExperience.usecase';
+import IEducationRepo from '../domain/interfaces/candidate/IEducationRepo';
+import EducationRepository from '../infrastructure/repositories/candidate/educationRepository';
+import IAddUserEducationUsecase from '../application/interfaces/usecases/user/IAddUserEducation.usecase';
+import AddUserEducationUsecase from '../application/usecases/user/AddUserEducation.usecase';
+import IGetUserEducationsUsecase from '../application/interfaces/usecases/user/IGetUserEducations.usecase';
+import GetUserEducationsUsecase from '../application/usecases/user/GetUserEducations.usecase';
+import ISkillRepo from '../domain/interfaces/candidate/ISkillRepo';
+import SkillRepsitory from '../infrastructure/repositories/candidate/skillRespository';
+import IAddUsersSkillUsecase from '../application/interfaces/usecases/user/IAddUsersSkill.usecase';
+import AddUsersSkillsUsecase from '../application/usecases/user/AddUserSkills.usecase';
+import IGetUserSkillsUsecase from '../application/interfaces/usecases/user/IGetUserSkills.usecase';
+import GetUserSkillsUsecase from '../application/usecases/user/GetUserSkills.usecase';
+import IEditUserEducationUsecase from '../application/interfaces/usecases/user/IEditUserEducation.usecase';
+import EditUserEducationUsecase from '../application/usecases/user/EditUserEducation.usecase';
+import IEditUserExperienceUsecase from '../application/interfaces/usecases/user/IEditUserExperience.usecase';
+import EditUserExperienceUsecase from '../application/usecases/user/EditUserExperience.usecase';
+import IDeleteUserEducationUsecase from '../application/interfaces/usecases/user/IDeleteUserEducation.usecase';
+import DeleteUserEducationUsecase from '../application/usecases/user/DeleteUserEducation.usecase';
+import IDeleteUserExperienceUsecase from '../application/interfaces/usecases/user/IDeleteUserExperience.usecase';
+import DeleteUserExperienceUsecase from '../application/usecases/user/DeleteUserExperience.usecase';
+import IDeleteUserSkillUsecase from '../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
+import DeleteUserSkillUsecase from '../application/usecases/user/DeleteUserSkill.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
 container.registerSingleton<ICandidateRepo>('ICandidateRepository', CandidateRepository);
 container.registerSingleton<IRecruiterRepo>('IRecruiterRepository', RecruiterRespository);
+container.registerSingleton<IExperienceRepo>('IExperienceRepository', ExperienceRepository)
+container.registerSingleton<IEducationRepo>('IEducationRepository', EducationRepository)
+container.registerSingleton<ISkillRepo>('ISkillRepository', SkillRepsitory)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
@@ -92,6 +123,17 @@ container.registerSingleton<IUploadUserProfilePictureUsecase>('IUploadUserProfil
 container.registerSingleton<IUploadUserCoverPhotoUsecase>('IUploadUserCoverPhotoUsecase', UploadUserCoverPhotoUsecase)
 container.registerSingleton<IRemoveUserProfilePictureUsecase>('IRemoveUserProfilePictureUsecase', RemoveUserProfilePictureUsecase)
 container.registerSingleton<IRemoveUserCoverPhotoUsecase>('IRemoveUserCoverPhotoUsecase', RemoveUserCoverPhotoUsecase)
+container.registerSingleton<IAddUserExperienceUsecase>('IAddUserExperienceUsecase', AddUserExperienceUsecase)
+container.registerSingleton<IGetUserExperiencesUsecase>('IGetUserExperiencesUsecase', GetUserExperiencesUsecase)
+container.registerSingleton<IAddUserEducationUsecase>('IAddUserEducationUsecase', AddUserEducationUsecase)
+container.registerSingleton<IGetUserEducationsUsecase>('IGetUserEducationsUsecase', GetUserEducationsUsecase)
+container.registerSingleton<IAddUsersSkillUsecase>('IAddUsersSkillUsecase', AddUsersSkillsUsecase)
+container.registerSingleton<IGetUserSkillsUsecase>('IGetUsersSkillsUsecase', GetUserSkillsUsecase)
+container.registerSingleton<IEditUserEducationUsecase>('IEditUserEducationUsecase', EditUserEducationUsecase)
+container.registerSingleton<IEditUserExperienceUsecase>('IEditUserExperienceUsecase', EditUserExperienceUsecase)
+container.registerSingleton<IDeleteUserEducationUsecase>('IDeleteUserEducationUsecase', DeleteUserEducationUsecase)
+container.registerSingleton<IDeleteUserExperienceUsecase>('IDeleteUserExperienceUsecase', DeleteUserExperienceUsecase)
+container.registerSingleton<IDeleteUserSkillUsecase>('IDeleteUserSkillUsecase', DeleteUserSkillUsecase)
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(

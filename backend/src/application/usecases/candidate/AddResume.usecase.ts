@@ -4,7 +4,7 @@ import streamifier from 'streamifier';
 import { v4 } from 'uuid';
 import IAddResumeUseCase from './interface/IAddResume.usecase';
 import { UploadApiResponse } from 'cloudinary';
-import mapToResumeDTOFromResume from '../../mappers/candidate/mapToResumeDTOFromResume.mapper';
+import mapToResumeDTOFromResume from '../../mappers/user/mapToResumeDTOFromResume.mapper';
 import ResumeDTO, { CreateResumeDTO } from '../../DTOs/candidate/resume.dto';
 
 export default class AddResumeUseCase implements IAddResumeUseCase {

@@ -1,6 +1,6 @@
 import { RegisterCandidateDTO } from '../../../presentation/controllers/dtos/candidate/registerCandidateDTOs';
 import { RegisterGoogleAuthCandidateDTO } from '../../../presentation/controllers/dtos/candidate/registerGoogleAuthCandidate';
-import Candidate from '../../entities/candidate/candidates.LEGACY';
+import Candidate from '../../entities/user/candidates.LEGACY';
 
 export function createCandidatefromDTO(dto: RegisterCandidateDTO): Candidate {
   return {

@@ -3,8 +3,8 @@ import ISaveJobApplicationUseCase from './candidate/interface/IApplyJob.usecase'
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
 } from '../DTOs/candidate/jobApplication.dto';
-import mapToJobApplicationFromCreateJobDTO from '../mappers/candidate/mapToJobFromCreateJobDTO.mapper';
-import mapToJobApplicationDTOFromJobApplication from '../mappers/candidate/mapToJobApplicationDTOFromJobApplication.mapper';
+import mapToJobApplicationFromCreateJobDTO from '../mappers/user/mapToJobFromCreateJobDTO.mapper';
+import mapToJobApplicationDTOFromJobApplication from '../mappers/user/mapToJobApplicationDTOFromJobApplication.mapper';
 
 export default class SaveJobApplicationUseCase
   implements ISaveJobApplicationUseCase

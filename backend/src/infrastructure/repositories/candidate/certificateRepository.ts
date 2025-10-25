@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import Certificates from '../../../domain/entities/candidate/certificates.entity';
+import Certificates from '../../../domain/entities/user/certificates.entity';
 import ICertificateRepo from '../../../domain/interfaces/candidate/ICertificateRepo';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
-import { CertificateDAO } from '../../database/DAOs/candidate/certificate.dao';
+import { CertificateDAO } from '../../database/DAOs/user/certificate.dao';
 import { jasmine } from 'globals';
 
 export default class CertificateRepository

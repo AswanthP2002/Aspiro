@@ -1,4 +1,4 @@
-import { CreateSkillDTO } from '../../../application/DTOs/candidate/skill.dto';
+import { CreateSkillDTO } from '../../../application/DTOs/user/skill.dto';
 import AddSkillRequestDTO from '../../DTOs/candidate/addSkillReuestDTO';
 
 export default function mapToCreateSkillDTOFromRequest(
@@ -6,8 +6,8 @@ export default function mapToCreateSkillDTOFromRequest(
 ): CreateSkillDTO {
   return {
     skill: requestDto.skill,
-    level: requestDto.level,
-    type: requestDto.type,
-    candidateId: requestDto.candidateId,
+    skillLevel: requestDto.skillLevel,
+    skillType: requestDto.skillType,
+    userId: requestDto.userId,
   };
 }

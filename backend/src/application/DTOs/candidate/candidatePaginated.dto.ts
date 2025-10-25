@@ -1,4 +1,4 @@
-import Candidate from '../../../domain/entities/candidate/candidate.entity';
+import Candidate from '../../../domain/entities/user/candidate.entity';
 
 export default interface CandidatePaginatedDTO {
   candidates: Candidate[];

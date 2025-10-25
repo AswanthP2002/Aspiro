@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import Resume from '../../../domain/entities/candidate/resume.entity';
+import Resume from '../../../domain/entities/user/resume.entity';
 import IResumeRepo from '../../../domain/interfaces/candidate/IResumeRepo';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
-import { ResumeDAO } from '../../database/DAOs/candidate/resume.dao';
+import { ResumeDAO } from '../../database/DAOs/user/resume.dao';
 
 export default class ResumeRepository
   extends BaseRepository<Resume>

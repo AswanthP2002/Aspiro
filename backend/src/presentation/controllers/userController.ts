@@ -5,27 +5,27 @@ import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import IRegisterCandidateUseCase from '../../application/usecases/candidate/interface/IRegisterCandidate.usecase';
 import IAddCertificateUseCase from '../../application/usecases/candidate/interface/IAddCertificate.usecase';
-import IAddEducationUseCase from '../../application/usecases/candidate/interface/IAddEducation.usecase';
-import IAddExperience from '../../application/usecases/candidate/interface/IAddExperience.usecase';
+import IAddEducationUseCase from '../../application/interfaces/usecases/user/IAddUserEducation.usecase';
+import IAddExperience from '../../application/interfaces/usecases/user/IAddUserExperience.usecase';
 import IAddResumeUseCase from '../../application/usecases/candidate/interface/IAddResume.usecase';
-import IAddSkillsUseCase from '../../application/usecases/candidate/interface/IAddSkill.usecase';
+import IAddSkillsUseCase from '../../application/interfaces/usecases/user/IAddUsersSkill.usecase';
 import ISaveJobApplicationUseCase from '../../application/usecases/candidate/interface/IApplyJob.usecase';
 import ILoadCertificateUseCase from '../../application/usecases/candidate/interface/IGetCeritificates.usecase';
-import IDeleteExperienceUseCase from '../../application/usecases/candidate/interface/IDeleteExperience.usecase';
-import IDeleteSkillsUseCase from '../../application/usecases/candidate/interface/IDeleteSkills.usecase';
-import IDeleteEducationUseCase from '../../application/usecases/candidate/interface/IDeleteEducation.usecase';
+import IDeleteExperienceUseCase from '../../application/interfaces/usecases/user/IDeleteUserExperience.usecase';
+import IDeleteSkillsUseCase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
+import IDeleteEducationUseCase from '../../application/interfaces/usecases/user/IDeleteUserEducation.usecase';
 import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase';
 import ILoadResumeUseCase from '../../application/usecases/candidate/interface/ILoadResumes.usecase';
-import ILoadExperiencesUseCase from '../../application/usecases/candidate/interface/IGetExperiences.usecase';
-import ILoadSkillsUseCase from '../../application/usecases/candidate/interface/IGetSkills.usecase';
-import ILoadEducationsUseCase from '../../application/usecases/candidate/interface/IGetEducations.usecase';
+import ILoadExperiencesUseCase from '../../application/interfaces/usecases/user/IGetUserExperiences.usecase';
+import ILoadSkillsUseCase from '../../application/interfaces/usecases/user/IGetUserSkills.usecase';
+import ILoadEducationsUseCase from '../../application/interfaces/usecases/user/IGetUserEducations.usecase';
 import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import ILoginCandidateUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase';
 import ILoadCandidatePersonalDataUseCase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase';
 import ILoadJobCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
 import ILoadJobDetailsCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSide.usecase';
-import IEditExperienceUseCase from '../../application/usecases/candidate/interface/IEditExperience.usecase';
-import IEditEducationUseCase from '../../application/usecases/candidate/interface/IEditEducation.usecase';
+import IEditExperienceUseCase from '../../application/interfaces/usecases/user/IEditUserExperience.usecase';
+import IEditEducationUseCase from '../../application/interfaces/usecases/user/IEditUserEducation.usecase';
 import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
 import IEditProfileUseCase from '../../application/usecases/candidate/interface/IEditProfile.usecase';
 import IGetNotificationsUseCase from '../../application/usecases/candidate/interface/IGetNotifications.usecase';
@@ -43,7 +43,7 @@ import IGetCandidateApplicationsUseCase from '../../application/usecases/candida
 import mapToCreateCandidateDTO from '../mappers/candidate/mapToCreateCandidateDTO';
 import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
 import mapToLoginCandidateInpDTO from '../mappers/user/mapToUserLoginDTO';
-import MapToAddExperienceDTO from '../mappers/candidate/mapToCreateExperienceDto';
+import MapToAddExperienceDTO from '../mappers/user/mapToCreateExperienceDto';
 import mapToCreateSkillDTOFromRequest from '../mappers/candidate/mapToCreateSkillDTOFromRequest';
 import mapToCreateEducationDTOFromRequest from '../mappers/candidate/mapToCreateEducationDTOFromRequest';
 import mapToUpdateEducationDTOFromRequest from '../mappers/candidate/mapToUpdateEducationDTOFromRequest';
@@ -54,12 +54,12 @@ import IRemoveCoverphotoUseCase from '../../application/interfaces/usecases/user
 import mapToFindCandidatesDTOFromRequest from '../mappers/candidate/mapToFindCandidatesDTOFromRequest';
 import mapToAddsocialLinkDTOFromRequest from '../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
 import IUpdateNotificationReadStatus from '../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
-import mapToEditExperienceDTO from '../mappers/candidate/mapToEditExperienceDTO';
+import mapToEditExperienceDTO from '../mappers/user/mapToEditExperienceDTO';
 import ISaveBasicsCandidateUseCase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
 import mapRequestDtoToUpdateCandidateDTO from '../mappers/candidate/mapRequestDtoToUpdateCandidateDTO';
 import mapEditProfileRequestToUpdateDTO from '../mappers/candidate/mapEditProfileRequestToUpdateDTO';
 import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase';
-import mapToCandidateDTO from '../../application/mappers/candidate/mapToCandidateDTO.mapper';
+import mapToCandidateDTO from '../../application/mappers/user/mapToCandidateDTO.mapper';
 import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
 import { inject, injectable } from 'tsyringe';
 import { CreateUserSchema } from '../schemas/user/createUser.schema';
@@ -78,6 +78,22 @@ import mapToUpdateUserDTO from '../mappers/user/mapToUpdateUserDTO';
 import IUploadUserCoverPhotoUsecase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
 import IUploadUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase';
 import IRemoveUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
+import IAddUserExperienceUsecase from '../../application/interfaces/usecases/user/IAddUserExperience.usecase';
+import { userExperienceSchema } from '../schemas/user/userExperience.schema';
+import IGetUserExperiencesUsecase from '../../application/interfaces/usecases/user/IGetUserExperiences.usecase';
+import IAddUserEducationUsecase from '../../application/interfaces/usecases/user/IAddUserEducation.usecase';
+import { addUserEducationSchema } from '../schemas/user/createUserEducation.schema';
+import IGetUserEducationsUsecase from '../../application/interfaces/usecases/user/IGetUserEducations.usecase';
+import IAddUsersSkillUsecase from '../../application/interfaces/usecases/user/IAddUsersSkill.usecase';
+import { createUserSkillSchema } from '../schemas/user/createUserSkill.schema';
+import IGetUserSkillsUsecase from '../../application/interfaces/usecases/user/IGetUserSkills.usecase';
+import IEditUserEducationUsecase from '../../application/interfaces/usecases/user/IEditUserEducation.usecase';
+import IEditUserExperienceUsecase from '../../application/interfaces/usecases/user/IEditUserExperience.usecase';
+import IDeleteUserExperienceUsecase from '../../application/interfaces/usecases/user/IDeleteUserExperience.usecase';
+import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/user/IDeleteUserEducation.usecase';
+import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
+import { experienceIdSchema } from '../schemas/user/experienceId.schema';
+import { educationIdSchema } from '../schemas/user/educationId.schema';
 
 
 @injectable()
@@ -96,8 +112,31 @@ export class UserController {
     @inject('IRemoveUserCoverPhotoUsecase')
     private _removeUserCoverPhotoUC: IRemoveCoverphotoUseCase,
     @inject('IRemoveUserProfilePictureUsecase')
-    private _removeUserProfPictureUC: IRemoveUserProfilePictureUsecase // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase, // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
+    private _removeUserProfPictureUC: IRemoveUserProfilePictureUsecase,
+    @inject('IAddUserExperienceUsecase') private _addUserExperience: IAddUserExperienceUsecase,
+    @inject('IGetUserExperiencesUsecase') private _getUserExperiencesUC: IGetUserExperiencesUsecase,
+    @inject('IAddUserEducationUsecase') private _addUserEducationUC: IAddUserEducationUsecase, // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase, // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
+    @inject('IGetUserEducationsUsecase') private _getUserEducationsUC: IGetUserEducationsUsecase,
+    @inject('IAddUsersSkillUsecase') private _addUserSkillUC: IAddUsersSkillUsecase,
+    @inject('IGetUsersSkillsUsecase') private _getUserSkillsUC: IGetUserSkillsUsecase,
+    @inject('IEditUserEducationUsecase') private _editUserEducationUC: IEditUserEducationUsecase,
+    @inject('IEditUserExperienceUsecase') private _editUserExperienceUC: IEditUserExperienceUsecase,
+    @inject('IDeleteUserExperienceUsecase')
+    private _deleteUserExperienceUC: IDeleteUserExperienceUsecase,
+    @inject('IDeleteUserEducationUsecase')
+    private _deleteUserEducationUC: IDeleteUserEducationUsecase,
+    @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase
   ) {}
+
+
+  /**
+   * written controller flow
+   * 1. recieving request
+   * 2. validate data
+   * 3. dto mapping
+   * 4. executing
+   * 5. sending response
+   */
 
   async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -192,7 +231,7 @@ export class UserController {
     const id = req.user.id as string;
 
     try {
-      const validatedId = userIdSchema.parse({ id });
+      const validatedId = userIdSchema.parse({ id }); 
       const validatedData = SaveUserBasicsSchema.parse(req.body);
       const dto = mapToUpdateUserDTO({ id: validatedId.id, ...validatedData });
 
@@ -239,87 +278,79 @@ export class UserController {
     }
   } //reworked : void
 
-  // async addExperience(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userId = req.user?.id;
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const dto = MapToAddExperienceDTO({
-  //       candidateId: candidate?._id?.toString(),
-  //       ...req.body,
-  //     });
-  //     const addExperienceResult = await this._addExperienceUC.execute(dto);
-  //     res
-  //       .status(StatusCodes.BAD_REQUEST)
-  //       .json({ success: false, message: 'Can not add experience' });
+  async addExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    try {
+      const validateUserId = userIdSchema.parse({ id: userId });
+      const validateData = userExperienceSchema.parse(req.body);
+      const dto = MapToAddExperienceDTO({ userId: validateUserId.id, ...validateData });
 
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      const result = await this._addUserExperience.execute(dto);
 
-  // async deleteExperience(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const { experienceId } = req.params;
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+      }
 
-  //   try {
-  //     await this._deleteExperienceUC.execute(experienceId);
-  //     // if(!result) return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not delete experience'})
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Experience deleted' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: 'Experience added successfully',
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async getExperiences(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userId = req?.user?.id;
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const experience = await this._getExperiencesUC.execute(candidate?._id);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Experience details fetched successfully',
-  //       experience,
-  //     });
+  async deleteExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { experienceId } = req.params;
 
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+    try {
+      const validatedId = experienceIdSchema.parse({id:experienceId})
+      await this._deleteUserExperienceUC.execute(experienceId);
+      
+      res.status(StatusCodes.OK).json({ success: true, message: 'Experience deleted' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async editExperience(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const { experienceId } = req.params;
+  async getExperiences(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req?.user?.id;
+    try {
+      const validatedUserId = userIdSchema.parse({ id: userId });
+      const experience = await this._getUserExperiencesUC.execute(validatedUserId.id);
 
-  //   try {
-  //     const dto = mapToEditExperienceDTO({ experienceId, ...req.body });
-  //     const result = await this._editExperienceUC.execute(dto);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Edited', result });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Experience details fetched successfully',
+        experience,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
+
+  async editExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { experienceId } = req.params;
+
+    try {
+      const validatedExperienceId = experienceIdSchema.parse({id:experienceId})
+      const validateData = userExperienceSchema.parse(req.body);
+      const dto = mapToEditExperienceDTO({ experienceId: validatedExperienceId.id, ...validateData });
+      
+      const result = await this._editUserExperienceUC.execute(dto)
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false, message:'Something went wrong'
+        })
+      }
+      res.status(StatusCodes.OK).json({ success: true, message: 'Edited', result });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // // async loadJobs(req: Request, res: Response): Promise<Response> {
   // //   const search = (req.query.search as string) || '';
@@ -377,140 +408,130 @@ export class UserController {
   // //   }
   // // } //reworked : void
 
-  // async addSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
-  //   const userId = req.user.id;
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const dto = mapToCreateSkillDTOFromRequest({
-  //       candidateId: candidate?._id?.toString(),
-  //       ...req.body,
-  //     });
-  //     const result = await this._addSkillsUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({ success: true, message: 'added' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async addSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const validatedId = userIdSchema.parse({ id: userId });
+      const validateData = createUserSkillSchema.parse(req.body);
+      const dto = mapToCreateSkillDTOFromRequest({
+        userId: validatedId.id,
+        ...validateData,
+      });
 
-  // async getSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
-  //   const userId = req.user.id;
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const skills = await this._getSkillsUC.execute(candidate?._id);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Skills fetched successfully',
-  //       skills,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      const result = await this._addUserSkillUC.execute(dto);
+      res.status(StatusCodes.OK).json({ success: true, message: 'added', skill: result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async deleteSkill(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const { skillId } = req.params;
+  async getSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const validatedId = userIdSchema.parse({ id: userId });
+      const skills = await this._getUserSkillsUC.execute(validatedId.id);
 
-  //   try {
-  //     await this._deleteSkillUC.execute(skillId);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Skill removed' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Skills fetched successfully',
+        skills,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async addEducation(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userId = req.user.id;
+  async deleteSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { skillId } = req.params;
 
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const dto = mapToCreateEducationDTOFromRequest({
-  //       candidateId: candidate?._id?.toString(),
-  //       ...req.body,
-  //     });
-  //     const saveEducationResult = await this._addEducationUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: saveEducationResult,
-  //       message: 'Education added successfully',
-  //       saveEducationResult,
-  //     });
+    try {
+      await this._deleteUserSkillUC.execute(skillId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Skill removed' });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async addEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
 
-  // async getEducations(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userId = req.user.id;
+    try {
+      const validateId = userIdSchema.parse({ id: userId });
+      const validateData = addUserEducationSchema.parse(req.body);
+      
+      const dto = mapToCreateEducationDTOFromRequest({
+        userId:validateId.id,
+        ...validateData
+      })
 
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const result = await this._getEducationsUC.execute(candidate?._id);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Educations fetched successfully',
-  //       educations: result,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      const result = await this._addUserEducationUC.execute(dto);
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false, message:'Something went wrong'
+        })
+      }
 
-  // async deleteEducation(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const { educationId } = req.params;
-  //   try {
-  //     await this._deleteEducationUC.execute(educationId);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Education added successfully',
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //     res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async getEducations(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
 
-  // async editEducation(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const { educationId } = req.params;
+    try {
+      const validateId = userIdSchema.parse({ id: userId });
+      const result = await this._getUserEducationsUC.execute(validateId.id);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Educations fetched successfully',
+        educations: result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //   try {
-  //     const dto = mapToUpdateEducationDTOFromRequest({
-  //       id: educationId,
-  //       ...req.body,
-  //     });
+  async deleteEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { educationId } = req.params;
+    try {
+      await this._deleteUserEducationUC.execute(educationId);
 
-  //     const result = await this._editEducationUC.execute(dto);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Education edited', result });
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
+
+  async editEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { educationId } = req.params;
+
+    try {
+      const validateId = educationIdSchema.parse({id:educationId})
+      const validateData = addUserEducationSchema.parse(req.body);
+      const dto = mapToUpdateEducationDTOFromRequest({
+        id: validateId.id,
+        ...validateData,
+      });
+
+      const result = await this._editUserEducationUC.execute(dto);
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false, message:'Something went wrong'
+        })
+      }
+      res.status(StatusCodes.OK).json({ success: true, message: 'Education edited', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
   //   const candidateId = req.user.id;
