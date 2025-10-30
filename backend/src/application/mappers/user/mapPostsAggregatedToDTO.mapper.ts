@@ -1,19 +1,18 @@
-import PostsAggregated from '../../domain/entities/PostsAggregated.entity';
-import PostsAggregatedDTO from '../DTOs/postsAggregated.dto';
+import PostsAggregated from '../../../domain/entities/PostsAggregated.entity';
+import PostsAggregatedDTO from '../../DTOs/postsAggregated.dto';
 
 export default function mapPostsAggregatedToDTO(
   postAggregated: PostsAggregated
 ): PostsAggregatedDTO {
   return {
     _id: postAggregated._id,
-    content: postAggregated.content,
+    description: postAggregated.description,
     creatorId: postAggregated.creatorId,
-    creatorType: postAggregated.creatorType,
     likes: postAggregated.likes,
     media: postAggregated.media,
-    createdUserDetails: postAggregated.createdUserDetails,
-    profileDetails: postAggregated.profileDetails,
+    userDetails: postAggregated.userDetails,
     createdAt: postAggregated.createdAt,
     updatedAt: postAggregated.updatedAt,
+    comments: postAggregated.comments
   };
 }

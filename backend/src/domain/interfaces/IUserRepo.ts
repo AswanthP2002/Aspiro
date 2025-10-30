@@ -1,5 +1,5 @@
 import { FindUsersQuery } from '../../application/queries/users.query';
-import User from '../entities/shared/User';
+import User from '../entities/user/User';
 import IBaseRepo from './IBaseRepo';
 
 export default interface IUserRepository extends IBaseRepo<User> {

@@ -1,7 +1,7 @@
 export default interface Comments {
-  _id: string;
+  _id?: string;
   postId?: string;
   userId?: string;
   text: string;
-  createdAt: string | Date;
+  createdAt?: string | Date;
 }

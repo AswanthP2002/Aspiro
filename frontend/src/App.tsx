@@ -46,7 +46,7 @@ import MyApplications from './pages/candidate/My-applications/Applications';
 import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication';
 import NotificationPage from './pages/candidate/Notification-Page/Notifications';
 import Feed from './pages/common/Feed/Feed';
-import SidebarLayout from './pages/common/SidebarLayout';
+import CommonLayout from './pages/common/SidebarLayout';
 import Chat from './pages/common/Chat/Chat';
 import ArcLoader from './components/candidate/Loader';
 import CircularSpinner from './components/common/CircularSpinner';
@@ -68,8 +68,10 @@ function App() {
             </PublicRoute>
           } />
 
-          <Route path='/feed' element={<SidebarLayout />}>
-            <Route index element={<Feed />} />
+          <Route path='/feed' element={<UserProtectedRoute />}>
+            <Route element={<CommonLayout />}>
+              <Route index element={<Feed />} />
+            </Route> 
           </Route>
 
           <Route path='/profile' element={<UserProtectedRoute />}>

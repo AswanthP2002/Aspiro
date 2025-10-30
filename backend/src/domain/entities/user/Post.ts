@@ -1,13 +1,12 @@
 export default interface Post {
   _id?: string
   creatorId?: string                 
-  creatorType: "candidate" | "recruiter"
   media : {
-    url : string
-    publidId : string
+    cloudUrl : string
+    publicId : string
   }
-  content: string
-  likes?: any[]         
+  description : string
+  likes?: any[]       
   createdAt?: string
   updatedAt?: string
 }

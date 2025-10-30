@@ -1,4 +1,4 @@
-import Post from '../../../../domain/entities/Post.entity';
+import Post from '../../../../domain/entities/user/Post';
 import { CreatePostResDTO } from '../../../DTOs/post.dto';
 
 export default interface IGetUserSpecificPosts {

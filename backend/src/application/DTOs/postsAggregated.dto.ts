@@ -1,18 +1,17 @@
-import User from '../../domain/entities/shared/User';
-import { Role } from './user/user.dto';
+import Comments from '../../domain/entities/user/comments.entity';
+import User from '../../domain/entities/user/User';
 
 export default interface PostsAggregatedDTO {
   _id: string;
-  content: string;
+  description: string;
   creatorId: string;
-  creatorType: Role;
   likes: string[];
   media: {
-    url: string;
-    publidId: string;
+    cloudUrl: string;
+    publicId: string;
   };
   createdAt: string | Date;
   updatedAt: string | Date;
-  createdUserDetails: User;
-  profileDetails: any;
+  userDetails: User
+  comments: Comments[]
 }

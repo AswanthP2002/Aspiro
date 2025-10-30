@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Comments from '../../../domain/entities/comments.entity';
+import Comments from '../../../domain/entities/user/comments.entity';
 
 export const CommentSchema = new Schema<Comments>(
   {

@@ -26,6 +26,7 @@ export default function Header(){
         return state.userAuth.userRole
     })
     
+    
 
     console.log('This is loged user', user)
 
@@ -80,7 +81,7 @@ export default function Header(){
     
     return(
         <div className="w-full sticky top-0 left-0 bg-white shadow z-59">
-            <div className="w-full px-2 md:px-20 py-3 shadow-sm">
+            <div className="w-full px-2 md:px-20 py-5 shadow-sm">
                 <div className="navbar flex items-center justify-between gap-10">
                     <div className="brand">
                         <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
@@ -90,11 +91,15 @@ export default function Header(){
                     {
                         user
                             ? <>
-                                <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
+                                <div className="border border-gray-300 w-100 relative rounded-full !py-2">
+                                    <input type="text" className="w-full !ps-10 !pe-3" placeholder="Search for people" />
+                                    <i className="fa-solid fa-search absolute absolute left-3 bottom-3 !text-gray-400"></i>
+                                </div>
+                                {/* <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
                                     <i className="absolute top-1 fa-solid fa-search !text-sm"></i>
                                     <input type="text" placeholder="search in community" className="w-full !px-5 text-sm" />
                                     <button type="button" className="text-xs bg-white w-[20px] rounded">/</button>
-                                </div>
+                                </div> */}
 
                                 <div className="flex items-center gap-3">
                                     <button className="relative"><span className="absolute bg-red-500 !w-[7px] !h-[7px] rounded-full"></span> <IoMdNotificationsOutline size={20} /></button>

@@ -8,7 +8,7 @@ import {
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import LoadUsersQueryDTO from '../../DTOs/admin/loadUsersAdminside.dto';
 import UserDTO from '../../DTOs/user/user.dto';
-import User from '../../../domain/entities/shared/User';
+import User from '../../../domain/entities/user/User';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import ILoadUsersAdminUseCase from '../../interfaces/usecases/admin/ILoadUsersAdmin.usecase';
 

@@ -1,4 +1,4 @@
-import { Role } from "../../../domain/entities/shared/User";
+import { Role } from "../../../domain/entities/user/User";
 
 export interface UserLoginInpDTO {
   email: string;

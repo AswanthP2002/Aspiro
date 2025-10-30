@@ -81,6 +81,25 @@ import IDeleteUserExperienceUsecase from '../application/interfaces/usecases/use
 import DeleteUserExperienceUsecase from '../application/usecases/user/DeleteUserExperience.usecase';
 import IDeleteUserSkillUsecase from '../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
 import DeleteUserSkillUsecase from '../application/usecases/user/DeleteUserSkill.usecase';
+import ICloudStroageService from '../application/interfaces/services/ICloudStorageService';
+import CloudStorageService from '../infrastructure/services/CloudStorageService';
+import IPostRepo from '../domain/interfaces/IPostRepo';
+import PostRespository from '../infrastructure/repositories/PostRepository';
+import ICreatePostUsecase from '../application/interfaces/usecases/user/ICreatePost.usecase';
+import PostController from '../presentation/controllers/postController';
+import IGetPostsUsecase from '../application/interfaces/usecases/user/IGetPosts.usecase';
+import GetPostsUsecase from '../application/usecases/GetPosts.usecase';
+import ILikePostUsecase from '../application/interfaces/usecases/user/ILikePost.usecase';
+import LikePostUsecase from '../application/usecases/user/LikePost.usecase';
+import CreatePostUseCase from '../application/usecases/user/CreatePost.usecase';
+import IUnlikePostUsecase from '../application/interfaces/usecases/user/IUnlikePost.usecase';
+import UnlikePostUsecase from '../application/usecases/user/UnlikePost.usecase';
+import ICommentRepository from '../domain/interfaces/IComment.repository';
+import CommentRepository from '../infrastructure/repositories/comment.repository';
+import ICreateCommentUsecase from '../application/interfaces/usecases/user/ICreateComment.usecase';
+import CreateCommentUsecase from '../application/usecases/user/CreateComment.usecase';
+import IDeleteCommentUsecase from '../application/interfaces/usecases/user/IDeleteComment.usecase';
+import DeleteCommentUsecase from '../application/usecases/user/DeleteComment.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -89,6 +108,8 @@ container.registerSingleton<IRecruiterRepo>('IRecruiterRepository', RecruiterRes
 container.registerSingleton<IExperienceRepo>('IExperienceRepository', ExperienceRepository)
 container.registerSingleton<IEducationRepo>('IEducationRepository', EducationRepository)
 container.registerSingleton<ISkillRepo>('ISkillRepository', SkillRepsitory)
+container.registerSingleton<IPostRepo>('IPostRepository', PostRespository)
+container.registerSingleton<ICommentRepository>('ICommentRepository', CommentRepository)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
@@ -134,6 +155,13 @@ container.registerSingleton<IEditUserExperienceUsecase>('IEditUserExperienceUsec
 container.registerSingleton<IDeleteUserEducationUsecase>('IDeleteUserEducationUsecase', DeleteUserEducationUsecase)
 container.registerSingleton<IDeleteUserExperienceUsecase>('IDeleteUserExperienceUsecase', DeleteUserExperienceUsecase)
 container.registerSingleton<IDeleteUserSkillUsecase>('IDeleteUserSkillUsecase', DeleteUserSkillUsecase)
+container.registerSingleton<ICreatePostUsecase>('ICreatePostUsecase', CreatePostUseCase)
+container.registerSingleton<IGetPostsUsecase>('IGetPostsUsecase', GetPostsUsecase)
+container.registerSingleton<ILikePostUsecase>('ILikePostUsecase', LikePostUsecase)
+container.registerSingleton<IUnlikePostUsecase>('IUnlikePostUsecase', UnlikePostUsecase)
+container.registerSingleton<ICreateCommentUsecase>('ICreateCommentUsecase', CreateCommentUsecase)
+container.registerSingleton<IDeleteCommentUsecase>('IDeleteCommentUsecase', DeleteCommentUsecase)
+
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
@@ -154,7 +182,9 @@ container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUser
 //register controller
 container.registerSingleton(UserController);
 container.registerSingleton(AdminController);
+container.registerSingleton(PostController)
 container.registerSingleton(RecruiterController);
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
+container.registerSingleton<ICloudStroageService>('ICloudStorageService', CloudStorageService)

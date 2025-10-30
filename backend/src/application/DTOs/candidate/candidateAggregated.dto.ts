@@ -5,8 +5,8 @@ import FavoriteJobs from '../../../domain/entities/user/favoriteJobs.entity';
 import Resume from '../../../domain/entities/user/resume.entity';
 import Skills from '../../../domain/entities/user/skills.entity';
 import Follow from '../../../domain/entities/follow.entity';
-import Post from '../../../domain/entities/Post.entity';
-import User from '../../../domain/entities/shared/User';
+import Post from '../../../domain/entities/user/Post';
+import User from '../../../domain/entities/user/User';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 
 export default interface CandidateAggregatedDTO {

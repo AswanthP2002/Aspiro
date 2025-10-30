@@ -1,4 +1,4 @@
-import Post from '../../../domain/entities/Post.entity';
+import Post from '../../../domain/entities/user/Post';
 import IPostRepo from '../../../domain/interfaces/IPostRepo';
 import { CreatePostResDTO } from '../../DTOs/post.dto';
 import mapToPostDTOFromPost from '../../mappers/mapToPostDTOFromPost.mapper';

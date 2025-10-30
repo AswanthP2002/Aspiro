@@ -1,4 +1,4 @@
-import User from '../../../domain/entities/shared/User';
+import User from '../../../domain/entities/user/User';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
 import { RemoveCoverPhotoDTO } from '../../DTOs/candidate/removeProfilePhoto.dto';

@@ -148,7 +148,8 @@ export interface UserType {
   otpExpiresAt?: Date;
 }
 
-export interface CandidatePersonalData { //LEGACY
+export interface CandidatePersonalData {
+  //LEGACY
   _id?: string;
   name: string;
   userId: string;
@@ -216,3 +217,29 @@ export interface Recruiter {
   updatedAt?: Date;
   currentSubscription?: string;
 }
+
+export interface UserPosts {
+  _id?: string;
+  description: string;
+  creatorId: string;
+  likes: string[];
+  media: {
+    cloudUrl: string;
+    publicId: string;
+  };
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  userDetails: UserType;
+  comments: Comments[]
+}
+
+export interface Comments {
+  _id?: string;
+  postId?: string;
+  userId?: string;
+  text: string;
+  createdAt?: string | Date;
+  userDetails?: UserType;
+}
+
+

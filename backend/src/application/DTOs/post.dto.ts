@@ -1,20 +1,18 @@
 export default interface CreatePostDTO {
   creatorId?: string                 
-  creatorType: "candidate" | "recruiter"
-  media : any
-  content: string
+  media : Buffer
+  description: string
   likes?: any[]         
 }
 
-export interface CreatePostResDTO {
+export interface PostDTO {
   _id?: string
   creatorId?: string                 
-  creatorType: "candidate" | "recruiter"
   media : {
-    url : string
-    publidId : string
+    cloudUrl : string
+    publicId : string
   }
-  content: string
+  description: string
   likes?: any[]         
   createdAt?: string
   updatedAt?: string

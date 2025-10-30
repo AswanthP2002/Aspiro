@@ -1,11 +1,10 @@
-import Post from '../../domain/entities/Post.entity';
-import { CreatePostResDTO } from '../DTOs/post.dto';
+import Post from '../../domain/entities/user/Post';
+import { PostDTO } from '../DTOs/post.dto';
 
-export default function mapToPostDTOFromPost(post: Post): CreatePostResDTO {
+export default function mapToPostDTOFromPost(post: Post): PostDTO {
   return {
     _id: post._id,
-    content: post.content,
-    creatorType: post.creatorType,
+    description: post.description,
     media: post.media,
     likes: post.likes,
     createdAt: post.createdAt,

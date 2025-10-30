@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
-import User from '../../../domain/entities/shared/User';
-import { Role } from '../../../domain/entities/shared/User';
+import User from '../../../domain/entities/user/User';
+import { Role } from '../../../domain/entities/user/User';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 export const SocialLinksSchema = new Schema<SocialLinks>({
   domain:{type:String},

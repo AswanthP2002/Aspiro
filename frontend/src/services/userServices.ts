@@ -790,6 +790,7 @@ export const updateNOtificationReadStatus = async (id : string) => {
 }
 
 export const createPost = async (formdata : any) => {
+    console.log('checking data before sending request', formdata)
     try {
         const response = await axiosInstance.post('/post',
             formdata,
@@ -801,6 +802,7 @@ export const createPost = async (formdata : any) => {
     } catch (error : unknown) {
         const err = error as AxiosError
         console.log('Error occured while creating the post', err)
+        throw error
     }
 }
 
@@ -818,9 +820,9 @@ export const getPosts = async () => {
     }
 }
 
-export const likePost = async (postId : string, creatorId : string) => {
+export const likePost = async (postId : string) => {
     try {
-        const response = await axiosInstance.patch(`post/like/${postId}/user/${creatorId}`, {},
+        const response = await axiosInstance.patch(`post/like/${postId}`, {},
             {sendAuthToken:true} as AxiosRequest
         )
 
@@ -828,7 +830,8 @@ export const likePost = async (postId : string, creatorId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-        console.log('Error occured while liking the post')
+        
+        throw error
     }
 }
 
@@ -844,6 +847,42 @@ export const unlikePost = async (postId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        
+        throw error
+    }
+}
+
+export const addComment = async (postId: string, text: string) => {
+    try {
+        const response = await axiosInstance.post(`/post/${postId}/comment`,
+            {text},
+            {
+                sendAuthToken:true,
+                headers:{'Content-Type':'application/json'}
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('error occured while adding comment', err)
+        throw error
+    }
+}
+
+export const deleteComment = async (postId: string, commentId: string) => {
+    try {
+        const response = await axiosInstance.delete(`/post/${postId}/comment/${commentId}`,
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('error occured while deleting comment', err)
+        throw error
     }
 }
 

@@ -1,4 +1,4 @@
-import User from '../../../domain/entities/shared/User';
+import User from '../../../domain/entities/user/User';
 import CreateUserDTO from '../../DTOs/user/createUser.dto';
 
 export default function mapCreateUserDtoToUser(createUser: CreateUserDTO): User {

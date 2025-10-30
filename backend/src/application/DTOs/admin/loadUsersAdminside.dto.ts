@@ -1,4 +1,4 @@
-import User from "../../../domain/entities/shared/User"
+import User from "../../../domain/entities/user/User"
 import UserDTO from "../user/user.dto"
 
 export default interface LoadUsersQueryDTO {
