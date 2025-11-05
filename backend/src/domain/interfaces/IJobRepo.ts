@@ -1,14 +1,18 @@
 import { LoadJobRes } from '../../application/DTOs/loadJob.dto';
-import Job from '../entities/job.entity';
+import Job from '../entities/recruiter/job.entity';
 import JobAggregated from '../entities/jobAggregated.entity';
 import IBaseRepo from './IBaseRepo';
+import { JobsQuery } from '../../application/queries/jobs.query';
 export interface SaveJob {
   acknowledged: boolean;
   insertedId: Object;
 }
 export default interface IJobRepo extends IBaseRepo<Job> {
   //create(job : Job) : Promise<SaveJob>
-  findCompanyJobsById(id: string): Promise<Job[]>;
+
+  getRecruiterJobsByRecruiterId(
+    recruiterId: string, dbQuery: JobsQuery
+  ): Promise<{jobs: Job[], totalPages: number, totalDocs: number, page: number} | null>;
   getJobs(
     search: string,
     page: number,

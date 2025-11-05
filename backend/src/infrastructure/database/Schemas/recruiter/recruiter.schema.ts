@@ -9,17 +9,9 @@ const SocialLinkSchema = new Schema<SocialLinks>({
 
 export const RecruiterSchema = new Schema<Recruiter>(
   {
-    name: { type: String },
     employerType: { type: String },
     userId: { type: Schema.Types.ObjectId, ref: 'user', required: true },
-    about: { type: String },
     currentSubscription: { type: String },
-    location: {
-      city: { type: String },
-      state: { type: String },
-      country: { type: String },
-      pinCode: { type: String },
-    },
     socialLinks: { type: [SocialLinkSchema] },
     organizationDetails: {
       organizationName: { type: String },

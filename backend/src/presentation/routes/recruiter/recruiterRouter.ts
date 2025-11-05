@@ -1,3 +1,9 @@
+import express, { NextFunction, Request, Response } from 'express'
+import { container } from 'tsyringe';
+import RecruiterController from '../../controllers/recruiterController';
+import { StatusCodes } from '../../statusCodes';
+import { authorization, centralizedAuthentication } from '../../../middlewares/auth';
+
 // const express = require('express');
 // import { Request, Response, NextFunction } from 'express';
 // import RecruiterController from '../../controllers/recruiter/recruiterController';
@@ -29,128 +35,111 @@
 // import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/GetJobApplicationDetails.usecase';
 // import { container } from 'tsyringe';
 
-// function createRecruiterRouter() {
-//   const recruiterRouter = express.Router();
+function createRecruiterRouter() {
+  const recruiterRouter = express.Router();
 
-//   const recruiterRepo = new RecruiterRespository();
-//   const candiateRepo = new CandidateRepository();
-//   const jobRepo = new JobRepository();
-//   const jobApplicationRepo = new JObApplicationRepository();
-//   const notificationRepo = new NotificationRepository();
-//   // const shortlsitRepo = new ShortlistRepository(db)
+  const recruiterController = container.resolve(RecruiterController)
 
-//   // const registerRecruiterUC = new RegisterRecruiterUseCase(
-//   //   recruiterRepo,
-//   //   candiateRepo
-//   // );
-//   //const verifyRecruiterUC = new VerifyRecruiterUseCase(recruiterRepo);
-//   //const loginRecruiterUC = new LoginRecruiterUseCase(recruiterRepo);
-//   const saveBasicsUC = new SaveBasicsUseCase(recruiterRepo);
-//   const loadRecruiterProfileDataUC = new LoadRecruiterProfileDataUseCase(
-//     recruiterRepo
-//   );
-//   const createJobUC = new CreateJobUseCase(jobRepo);
-//   const getJobApplicationsUC = new GetJobApplicationsUseCase(
-//     jobApplicationRepo
-//   );
-//   const rejectCandidateApplicationUC = new RejectCandidateUseCase(
-//     jobApplicationRepo
-//   );
-//   const createNotificationUC = new CreateNotification(notificationRepo);
-//   // const finalizeShortlistUC = new FinalizeShortlistUseCase(shortlsitRepo)
-//   // const getFinalizedDataUC = new GetFinalizedDataUseCase(shortlsitRepo)
-//   const getJobApplicationDetailsUC = new GetJobApplicationDetailsUseCase(
-//     jobApplicationRepo
-//   );
+  recruiterRouter.post(
+    '/recruiter/create',
+    centralizedAuthentication,
+    authorization(['user']),
+    recruiterController.CreateRecruiter.bind(recruiterController)
+  );
+  // recruiterRouter.post(
+  //   '/recruiter/verify',
+  //   recruiterController.verifyRecruiter.bind(recruiterController)
+  // );
+  // recruiterRouter.post(
+  //   '/recruiter/login',
+  //   recruiterController.loginRecruiter.bind(recruiterController)
+  // );
+  // recruiterRouter.post(
+  //   '/recruiter/intro/details',
+  //   centralizedAuthentication,
+  //   authorization(['recruiter']),
+  //   testMIddleware
+  //   //recruiterController.saveIntroDetailsRecruiter.bind(recruiterController)
+  // );
+  recruiterRouter.get(
+    '/recruiter/profile/overview',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.loadRecruiterProfileData.bind(recruiterController)
+  );
+  recruiterRouter.post(
+    '/recruiter/job/create',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.createJob.bind(recruiterController)
+  );
+  recruiterRouter.put(
+    '/recruiter/job/edit',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.editJob.bind(recruiterController)
+  )
+  recruiterRouter.delete(
+    '/recruiter/job/delete/:jobId',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.deleteJob.bind(recruiterController)
+  )
+  
+  recruiterRouter.get(
+    '/recruiter/jobs',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.LoadRecruiterJobs.bind(recruiterController)
+  )
+  // // recruiterRouter.get(
+  // //   '/recruiter/job/:jobId/application/details',
+  // //   recruiterController.getJobApplications.bind(recruiterController)
+  // // );
+  // // recruiterRouter.get(
+  // //   '/recruiter/application/:applicationId',
+  // //   recruiterAuth,
+  // //   recruiterController.getJobApplicationDetails.bind(recruiterController)
+  // // );
+  // // recruiterRouter.patch(
+  // //   '/recruiter/reject/application/:applicationId',
+  // //   recruiterAuth,
+  // //   recruiterController.rejectCandidateJobApplication.bind(recruiterController)
+  // // );
+  // // // recruiterRouter.post('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.finalizeShortlist.bind(recruiterController))
+  // // // recruiterRouter.get('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.getFinalizedShortlistData.bind(recruiterController))
+  // // recruiterRouter.post(
+  // //   '/recruiter/logout',
+  // //   recruiterAuth,
+  // //   recruiterController.recruiterLogout.bind(recruiterController)
+  // // );
 
-//   const recruiterController = container.resolve(RecruiterController);
+  // // recruiterRouter.get('/recruiter/token/refresh', refreshAccessToken);
 
-//   // const recruiterController = new RecruiterController(
-//   //   registerRecruiterUC,
-//   //   verifyRecruiterUC,
-//   //   loginRecruiterUC,
-//   //   saveBasicsUC,
-//   //   loadRecruiterProfileDataUC,
-//   //   createJobUC,
-//   //   getJobApplicationsUC,
-//   //   rejectCandidateApplicationUC,
-//   //   createNotificationUC,
-//   //   // finalizeShortlistUC,
-//   //   // getFinalizedDataUC,
-//   //   getJobApplicationDetailsUC
-//   // );
+  // function testMIddleware(req: Request, res: Response, next: NextFunction) {
+  //   function removeEmpty(obj: any) {
+  //     return Object.entries(obj)
+  //       .filter(([_, v]) => v !== '' && v !== null && v !== undefined)
+  //       .reduce((acc: any, [k, v]) => {
+  //         acc[k] =
+  //           typeof v === 'object' && !Array.isArray(v) ? removeEmpty(v) : v;
+  //         return acc;
+  //       }, {});
+  //   }
+  //   console.log('request body', removeEmpty(req.body));
 
-//   // recruiterRouter.post(
-//   //   '/recruiter/register',
-//   //   recruiterController.registerRecruiter.bind(recruiterController)
-//   // );
-//   // recruiterRouter.post(
-//   //   '/recruiter/verify',
-//   //   recruiterController.verifyRecruiter.bind(recruiterController)
-//   // );
-//   // recruiterRouter.post(
-//   //   '/recruiter/login',
-//   //   recruiterController.loginRecruiter.bind(recruiterController)
-//   // );
-//   // recruiterRouter.post(
-//   //   '/recruiter/intro/details',
-//   //   centralizedAuthentication,
-//   //   authorization(['recruiter']),
-//   //   testMIddleware
-//   //   //recruiterController.saveIntroDetailsRecruiter.bind(recruiterController)
-//   // );
-//   // recruiterRouter.get(
-//   //   '/recruiter/profile/overview',
-//   //   recruiterAuth,
-//   //   recruiterController.loadRecruiterProfileData.bind(recruiterController)
-//   // );
-//   // // recruiterRouter.post(
-//   // //   '/recruiter/job/create',
-//   // //   recruiterAuth,
-//   // //   recruiterController.createJob.bind(recruiterController)
-//   // // );
-//   // // recruiterRouter.get(
-//   // //   '/recruiter/job/:jobId/application/details',
-//   // //   recruiterController.getJobApplications.bind(recruiterController)
-//   // // );
-//   // // recruiterRouter.get(
-//   // //   '/recruiter/application/:applicationId',
-//   // //   recruiterAuth,
-//   // //   recruiterController.getJobApplicationDetails.bind(recruiterController)
-//   // // );
-//   // // recruiterRouter.patch(
-//   // //   '/recruiter/reject/application/:applicationId',
-//   // //   recruiterAuth,
-//   // //   recruiterController.rejectCandidateJobApplication.bind(recruiterController)
-//   // // );
-//   // // // recruiterRouter.post('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.finalizeShortlist.bind(recruiterController))
-//   // // // recruiterRouter.get('/recruiter/applications/finalize/:jobId', recruiterAuth, recruiterController.getFinalizedShortlistData.bind(recruiterController))
-//   // // recruiterRouter.post(
-//   // //   '/recruiter/logout',
-//   // //   recruiterAuth,
-//   // //   recruiterController.recruiterLogout.bind(recruiterController)
-//   // // );
+  //   return res
+  //     .status(StatusCodes.ACCEPTED)
+  //     .json({ success: true, message: 'Testing job creating path' });
+  // }
 
-//   // // recruiterRouter.get('/recruiter/token/refresh', refreshAccessToken);
+  function testMiddleware(req: Request, res: Response, next: NextFunction){
+    console.log('checking request body', req.body)
+    next()
 
-//   // function testMIddleware(req: Request, res: Response, next: NextFunction) {
-//   //   function removeEmpty(obj: any) {
-//   //     return Object.entries(obj)
-//   //       .filter(([_, v]) => v !== '' && v !== null && v !== undefined)
-//   //       .reduce((acc: any, [k, v]) => {
-//   //         acc[k] =
-//   //           typeof v === 'object' && !Array.isArray(v) ? removeEmpty(v) : v;
-//   //         return acc;
-//   //       }, {});
-//   //   }
-//   //   console.log('request body', removeEmpty(req.body));
+  }
 
-//   //   return res
-//   //     .status(StatusCodes.ACCEPTED)
-//   //     .json({ success: true, message: 'Testing job creating path' });
-//   // }
+  return recruiterRouter;
+}
 
-//   return recruiterRouter;
-// }
-
-// export default createRecruiterRouter;
+export default createRecruiterRouter;

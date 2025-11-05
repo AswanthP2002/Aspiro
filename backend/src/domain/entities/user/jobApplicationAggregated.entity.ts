@@ -1,4 +1,4 @@
-import Job from '../job.entity';
+import Job from '../recruiter/job.entity';
 import Recruiter from '../recruiter/recruiter.entity';
 
 export default interface JobApplicationAggregated {

@@ -25,6 +25,7 @@ import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
 import createUserRouter from './src/presentation/routes/userRouter';
 import connectRedis from './src/infrastructure/redis/redisClient';
+import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
 
 async function main() {
   const app = express();
@@ -59,7 +60,7 @@ async function main() {
   //await connectRedis()
 
   const userRouter = createUserRouter();
-  //const recruiterRouter = createRecruiterRouter();
+  const recruiterRouter = createRecruiterRouter()
   const adminRouter = createAdminRouter();
   const followRouter = createFollowRouter();
   const postRouter = createPostRouter();
@@ -76,7 +77,7 @@ async function main() {
   // Group all API routes under the /api prefix for better organization
   app.use('/api', userRouter);
   // app.use('/api', authRouter); // Consider moving login/verify routes here
-  //app.use('/api', recruiterRouter);
+  app.use('/api', recruiterRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api', followRouter);
   app.use('/api', postRouter);

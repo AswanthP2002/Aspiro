@@ -1,4 +1,4 @@
-import Job from '../job.entity';
+import Job from '../recruiter/job.entity';
 
 export default interface FavoriteJobsAggregated {
   _id?: string;

@@ -4,6 +4,7 @@ import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
 import { Recruiter } from "../types/entityTypes";
 
+//legacy
 export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
     try {
         const response = await axiosInstance.post('/recruiter/register',
@@ -20,6 +21,33 @@ export const recruiterRegister = async (fullName : string, email : string, phone
         if(err.response && err.response?.status < 500) return err.response.data
 
         console.log('Error occured while recruiter registering', err)
+    }
+}
+
+export const createRecruiterService = async (
+    employerType: string, industry?: string, organizationName?: string, organizationType?: string,
+    teamStrength?: string, aboutCompany?: string, website?: string, vision?: string, 
+    organizationContactNumber?: string, organizationEmail?: string
+) => {
+    try {
+        const response = await axiosInstance.post('/recruiter/create', {
+            employerType, industry, organizationName, 
+            organizationType, teamStrength, aboutCompany, website, vision, 
+            organizationContactNumber, organizationEmail
+        },
+        {
+            headers:{'Content-Type':'application/json'},
+            sendAuthToken:true
+        } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
     }
 }
 
@@ -138,42 +166,129 @@ export const getProfileOverview = async () => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+       if(err.response && err.response.status < 500 && err.response.status !== 403){
+        throw error
+       }
 
         console.log('Error occured while geting the profile overview', err)
     }
 }
 
-export const postJob = async (jobDetails : any) => {
+/**
+ * jobTitle: string,
+     description: string,
+     requirements: string,
+     responsibilities: string,
+     duration: string,
+     jobType: 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary' | '',
+     workMode: 'On-site' | 'Remote' | 'Hybrid' | '',
+     location: string,
+     minSalary: number | '',
+     maxSalary: number | '',
+     salaryCurrency: string,
+     salaryPeriod: 'annually' | 'monthly' | 'weekly' | 'hourly' | '',
+     vacancies: number | '',
+     qualification: string,
+     experienceInYears: number | '',
+     jobLevel: 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager' | '',
+     requiredSkills: string[],
+     optionalSkills: string[],
+     expiresAt: Dayjs | null;
+ */
+
+export const postJob = async (
+    {
+        jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency, 
+        salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
+    }: any,
+) => {
     try {
-        const response = await axiosInstance.post('/recruiter/job/create', {...jobDetails, expiresAt:new Date(jobDetails?.expiresAt)}, {
-            headers:{'Content-Type' : 'application/json'},
-            sendAuthTokenRecruiter:true
-        } as AxiosRequest)
+        const response = await axiosInstance.post('/recruiter/job/create', {
+            jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency,
+            salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
+        },
+        {   headers:{"Content-Type":'application/json'},
+            sendAuthToken:true
+        } as AxiosRequest
+    )
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
         }
 
         console.log('Error occured while posting a job', err)
+    }
+}
+
+export const editJob = async (
+    {
+        _id, recruiterId, jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency, 
+        salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
+    }: any,
+) => {
+    try {
+        const response = await axiosInstance.put('/recruiter/job/edit', 
+            {
+                _id, recruiterId, jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location,
+                salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt,
+                minSalary, maxSalary, salaryCurrency
+            },
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response?.status < 500 && err.response?.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const deleteJob = async (jobId: string) => {
+    try {
+        const response = await axiosInstance.delete(`/recruiter/job/delete/${jobId}`,
+            {sendAuthToken:true} as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response?.status < 500 && err.response?.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const getJobs = async (search: string, page: number, limit: number = 3, sortOption: string, filterStatus: string, filterWorkMode: string) => {
+    try {
+        const response = await axiosInstance.get('/recruiter/jobs',
+            {
+                sendAuthToken:true,
+                params:{
+                    search, page, limit, sortOption, filter:JSON.stringify({status:filterStatus, workMode:filterWorkMode})
+                }
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+
+        
     }
 }
 

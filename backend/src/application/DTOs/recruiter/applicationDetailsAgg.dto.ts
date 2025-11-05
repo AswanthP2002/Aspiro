@@ -1,6 +1,6 @@
 import Candidate from '../../../domain/entities/user/candidates.LEGACY';
 import Resume from '../../../domain/entities/user/resume.entity';
-import Job from '../../../domain/entities/job.entity';
+import Job from '../../../domain/entities/recruiter/job.entity';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 
 export default interface ApplicationDetailsAggregatedDTO {

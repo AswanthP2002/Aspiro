@@ -1,27 +1,33 @@
-import Job from '../../../domain/entities/job.entity';
+import Job from '../../../domain/entities/recruiter/job.entity';
 import CreateJobDTO from '../../DTOs/recruiter/createJob.dto';
 
 export default function mapToJobFromCreateJobDTO(
   createJobDto: CreateJobDTO
 ): Job {
   return {
-    description: createJobDto.description,
-    experience: createJobDto.experience,
-    expiresAt: createJobDto.expiresAt,
-    jobLevel: createJobDto.jobLevel,
-    jobTitle: createJobDto.jobTitle,
-    location: createJobDto.location,
-    jobType: createJobDto.jobType,
-    locationType: createJobDto.locationType,
-    maxSalary: createJobDto.maxSalary,
-    minSalary: createJobDto.minSalary,
-    qualification: createJobDto.qualification,
-    requirements: createJobDto.requirements,
-    responsibilities: createJobDto.responsibilities,
-    vacancies: createJobDto.vacancies,
-    companyId: createJobDto.companyId,
-    duration: createJobDto.duration,
-    requiredSkills: createJobDto.requiredSkills,
-    optionalSkills: createJobDto.optionalSkills,
+    recruiterId:createJobDto.recruiterId,
+    jobTitle:createJobDto.jobTitle,
+    description:createJobDto.description,
+    requirements:createJobDto.requirements,
+    responsibilities:createJobDto.responsibilities,
+    duration:createJobDto.duration,
+    jobType:createJobDto.jobType,
+    workMode:createJobDto.workMode,
+    location:createJobDto.location,
+    minSalary:createJobDto.minSalary,
+    maxSalary:createJobDto.maxSalary,
+    salaryCurrency:createJobDto.salaryCurrency,
+    salaryPeriod:createJobDto.salaryPeriod,
+    vacancies:createJobDto.vacancies,
+    qualification:createJobDto.qualification,
+    experienceInYears:createJobDto.experienceInYears,
+    jobLevel:createJobDto.jobLevel,
+    requiredSkills:createJobDto.requiredSkills,
+    optionalSkills:createJobDto.optionalSkills,
+    status:createJobDto.status,
+    rejectionReason:createJobDto.rejectionReason,
+    views:createJobDto.views,
+    applicationsCount:createJobDto.applicationsCount,
+    expiresAt:createJobDto.expiresAt
   };
 }

@@ -1,46 +1,97 @@
+import {
+  JobLevel,
+  JobStatus,
+  JobType,
+  WorkMode,
+  SalaryPeriod,
+} from '../../../domain/entities/recruiter/job.entity';
+
 export default interface CreateJobDTO {
-    companyId : string
-    jobTitle : string
-    description : string
-    requirements : string
-    responsibilities : string
-    jobType : string
-    duration : string
-    requiredSkills : string[]
-    optionalSkills : string[]
-    locationType : string
-    location : string
-    minSalary : number
-    maxSalary : number
-    vacancies : number
-    qualification : string
-    experience : string
-    jobLevel : string
-    expiresAt : Date
+  _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
 }
 
 export interface JobDTO {
-    _id? : string
-    companyId? : string
-    jobTitle : string
-    description : string
-    requirements : string
-    responsibilities : string
-    duration : string
-    requiredSkills : string[]
-    optionalSkills : string[]
-    jobType : string
-    locationType : string
-    location : string
-    minSalary : number
-    maxSalary : number
-    vacancies : number
-    qualification : string
-    experience : string
-    jobLevel : string
-    isBlocked? : boolean
-    isRejected? : boolean,
-    createdAt? : Date
-    updatedAt? : Date
-    expiresAt : Date
+  _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
+}
+
+export interface EditJobDTO {
+  _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
 }

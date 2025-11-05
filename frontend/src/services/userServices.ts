@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
-import { logout } from "../redux-toolkit/candidateAuthSlice";
+import { Notify } from "notiflix";
+import { logout } from "../redux-toolkit/userAuthSlice";
 
 //const customeCandidateLogout = useCandidateLogout()
 const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
@@ -93,30 +94,28 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
             } as AxiosRequest
         )
 
-        Swal.fire({
-            icon:'info',
-            title:'Logout Successfull',
-            showConfirmButton:false,
-            showCancelButton:false,
-            allowOutsideClick:false,
-            timer:3000
-        }).then(() => { //calling to clear candidate from redux candidateAuthSlice then navigate to login
-            dispatch(logout()) 
+        Notify.info('Logout successfully, redirecting to login page', {timeout:2000})
+        setTimeout(() => {
+            dispatch(logout())
             navigate('/login')
-        })
+        }, 2000)
+        // Swal.fire({
+        //     icon:'info',
+        //     title:'Logout Successfull',
+        //     showConfirmButton:false,
+        //     showCancelButton:false,
+        //     allowOutsideClick:false,
+        //     timer:3000
+        // }).then(() => { //calling to clear candidate from redux candidateAuthSlice then navigate to login
+        //     dispatch(logout()) 
+        //     navigate('/login')
+        // })
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+        throw error
     }
 }
 

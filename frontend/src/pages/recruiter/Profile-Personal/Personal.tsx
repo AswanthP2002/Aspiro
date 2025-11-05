@@ -91,7 +91,7 @@ export default function RecruiterProfilePersonal(){
                 <div className="p-4 mt-4 bg-white rounded-xl shadow">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-semibold">Recently posted jobs</h2>
-                        <a href="#" className="text-sm text-blue-600 hover:underline">View All →</a>
+                        <a onClick={() => navigator('/recruiter/profile/my-jobs')} className="text-sm text-blue-600 hover:underline cursor-pointer">View All →</a>
                     </div>
 
                     <div className="space-y-4">

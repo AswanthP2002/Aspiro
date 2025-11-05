@@ -4,7 +4,7 @@ import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 export default function mapToRecruiterDtoFromRecruiter(
   recruiter: Recruiter
 ): RecruiterDTO {
-  return {
-    ...recruiter,
-  };
+  return{
+    ...recruiter
+  }
 }

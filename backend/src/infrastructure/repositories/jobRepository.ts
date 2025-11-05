@@ -1,4 +1,4 @@
-import Job from '../../domain/entities/job.entity';
+import Job from '../../domain/entities/recruiter/job.entity';
 import IJobRepo from '../../domain/interfaces/IJobRepo';
 import { SaveJob } from '../../domain/interfaces/IJobRepo';
 import { Db, ObjectId } from 'mongodb';
@@ -6,6 +6,7 @@ import BaseRepository from './baseRepository';
 import { JobDAO } from '../database/DAOs/recruiter/job.dao';
 import { LoadJobRes } from '../../application/DTOs/loadJob.dto';
 import JobAggregated from '../../domain/entities/jobAggregated.entity';
+import { JobsQuery } from '../../application/queries/jobs.query';
 
 export default class JobRepository
   extends BaseRepository<Job>
@@ -21,9 +22,52 @@ export default class JobRepository
   //     return result
   // }
 
-  async findCompanyJobsById(id: string): Promise<Job[]> {
-    const result = await JobDAO.find({ companyId: new ObjectId(id) }).lean();
-    return result;
+  async getRecruiterJobsByRecruiterId(
+    recruiterId: string, dbQuery: JobsQuery
+  ): Promise<{jobs: Job[], totalPages: number, totalDocs: number, page: number} | null> {
+    if(!ObjectId.isValid(recruiterId)) return null
+    console.log('checking data from the db side', recruiterId, dbQuery)
+    const {sortOption, skip, search, filter, limit, page} = dbQuery
+
+    const matchFilter: any = {recruiterId: new ObjectId(recruiterId)}
+
+    if(search){
+      matchFilter['jobTitle'] = {$regex: new RegExp(search, 'i')}
+    }
+
+    if(filter.status){
+      matchFilter['status'] = {$in: filter.status}
+    }
+
+    if(filter.workMode){
+      matchFilter['workMode'] = {$in: filter.workMode}
+    }
+
+    const jobsFetchingPipeline: any[] = [
+      {$match: matchFilter},
+      {$sort: sortOption},
+      {$skip: skip},
+      {$limit: limit}
+    ]
+
+    // console.log('jobs fetching pipeline', jobsFetchingPipeline)
+    
+    const totalJobsPipeline = [
+      {$match: matchFilter},
+      {$count: 'count'}
+    ]
+
+    const [jobs, totalJobs] = await Promise.all([
+      JobDAO.aggregate(jobsFetchingPipeline),
+      JobDAO.aggregate(totalJobsPipeline)
+    ])
+
+    const totalDocs = totalJobs[0]?.count || 0
+    const totalPages = Math.ceil(totalDocs/limit)
+
+    //console.log('Jobs before sending to the frontend', jobs)
+    
+    return {jobs, totalPages, totalDocs, page}
   }
 
   async getJobs(

@@ -19,6 +19,7 @@ import RecruiterProfileLayout from './pages/recruiter/ProfileLayout';
 import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Personal';
 import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute';
 import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form';
+import MyJobs from './pages/recruiter/Profile-Personal/MyJobs';
 import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob';
 import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard/Dashboard';
@@ -56,6 +57,10 @@ import CandidateProtectedRoute from './components/route-components/Candidate-Pro
 import NotFoundPage from './pages/shared/NotFound';
 import AdminLoginPage from './pages/admin/Login/Login';
 import UserProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
+import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
+import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
+import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
+import EditJobForm from './pages/recruiter/EditJob/EditJob';
 
 function App() {
   return (
@@ -79,6 +84,12 @@ function App() {
               <Route path='personal' index element={<ProfilePersonal />} />
               <Route path='documents' element={<DocumentsPage />} />
               <Route path='skills-experience' element={<ExperiencePage />} />
+              <Route path='recruiter/register' element={<RecruiterRegisterPage />} />
+              <Route path='recruiter/post-job' element={<PostAJobForm />} />
+              <Route path='recruiter/post-a-job' element={<PostAJobForm />} />
+              <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
+              <Route path='recruiter/my-jobs' element={<MyJobs />} />
+              <Route path='recruiter/edit-job' element={<EditJobForm />} />
             </Route>
           </Route>
         </Route>
@@ -103,8 +114,8 @@ function App() {
 
 
         {/* Recruiter login */}
-        <Route path='/recruiter/login' element={<RecruiterLogin />} />
-        <Route path='/recruiter/register' element={<RecruiterRegister />} />
+        {/* <Route path='/recruiter/login' element={<RecruiterLogin />} />
+        <Route path='/recruiter/register' element={<RecruiterRegister />} /> */}
 
         <Route path="/recruiter" element={<RecruiterLayouts />}>
            <Route index element={<RecruiterHome />} />
@@ -116,6 +127,7 @@ function App() {
                 index
                 element={<RecruiterProfilePersonal />}
               />
+              <Route path="my-jobs" element={<MyJobs />} />
               <Route path="post-a-job" element={<PostAJobForm />} />
               <Route
                 path="applications/:jobId"
@@ -134,6 +146,9 @@ function App() {
         </Route>
 
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
+        <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
+
+        <Route path='/test' element={<PostAJobForm />} />
 
         <Route path='*' element={<NotFoundPage />} />
 

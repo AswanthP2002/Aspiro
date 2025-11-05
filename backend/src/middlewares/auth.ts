@@ -245,7 +245,7 @@ export const centralizedAuthentication = async (
   next: NextFunction
 ): Promise<void> => {
   const auth = req.headers.authorization; //access the token from header
-  console.log('This is auth', auth);
+  //console.log('This is auth', auth);
   if (!auth) {
     console.log('No authorization header');
     res.status(StatusCodes.UNAUTHORIZED).json({
@@ -257,7 +257,7 @@ export const centralizedAuthentication = async (
 
   try {
     const decoded = await verifyToken(auth.split(' ')[1]);
-    console.log('Decoded value for debuging', decoded)
+    //console.log('Decoded value for debuging', decoded)
 
     req.user = decoded;
     next();

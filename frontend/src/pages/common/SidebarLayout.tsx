@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import Header from "./Header/Header";
 import Sidebar from "./Header/Sidebar";
 import {CgProfile} from 'react-icons/cg'
@@ -18,10 +18,12 @@ export default function CommonLayout(){
                     <Sidebar />
                 </div>
                 <div className="actions bg-white rounded !mx-5 !mt-5 !p-2">
-                    <div className="flex flex gap-2 cursor-pointer">
-                        <CgProfile color="blue" size={25} />
-                        <p className="text-blue-500">Profile</p>
-                    </div>
+                    <Link to={'/profile/personal'}>
+                        <div className="flex flex gap-2 cursor-pointer">
+                            <CgProfile color="blue" size={25} />
+                            <p className="text-blue-500">Profile</p>
+                        </div>
+                    </Link>
                     <div className="flex flex gap-2 mt-3 cursor-pointer">
                         <CiLogout color="blue" size={25} />
                         <p className="text-blue-500">Logout</p>

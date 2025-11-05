@@ -1,7 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
-import { userLogout } from '../userServices';
 import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
 import { refreshAccessToken } from '../commonServices';
 
@@ -70,11 +69,12 @@ axiosInstance.interceptors.response.use(
                 text:'Internal server error, please try again after some time'
             })
         }else if(response && response.status === 406){
-            Swal.fire({
-                icon:'error',
-                title:'Not Acceptable',
-                text:'Access denied, No token provided or token malformed'
-            })
+            window.location.replace('http://localhost:5173/token/expired')
+            // Swal.fire({
+            //     icon:'error',
+            //     title:'Not Acceptable',
+            //     text:'Access denied, No token provided or token malformed'
+            // })
         }else if(response && response.status === 403){
             Swal.fire({
                 icon:'info',

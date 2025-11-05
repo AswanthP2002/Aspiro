@@ -19,17 +19,17 @@ import IFindCandidateByCandidateIdUseCase from '../application/usecases/interfac
 import FindCandidateByCandidateIDUseCase from '../application/usecases/FindCandidateByCandidateID.usecase';
 import ICreateUserUseCase from '../application/interfaces/usecases/user/ICreateUser.usecase';
 import CreateUserUseCase from '../application/usecases/user/CreateUser.usecase';
-import RecruiterController from '../presentation/controllers/recruiter/recruiterController';
+import RecruiterController from '../presentation/controllers/recruiterController';
 import IRecruiterRepo from '../domain/interfaces/recruiter/IRecruiterRepo';
 import RecruiterRespository from '../infrastructure/repositories/recruiter/recruiterRepository';
-import IRegisterRecruiterUseCase from '../application/usecases/recruiter/interface/IRegisterRecruiter.usecase';
-import RegisterRecruiterUseCase from '../application/usecases/recruiter/RegisterRecruiter.usecase';
+import IRegisterRecruiterUseCase from '../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
+import RegisterRecruiterUseCase from '../application/usecases/recruiter/CreateRecruiter.usecase';
 import IVerifyUserUseCase from '../application/interfaces/usecases/user/IVerifyUser.usecase';
 import VerifyUserUseCase from '../application/usecases/user/VerifyUser.usecase';
 import ILoginRecruiterrUseCase from '../application/usecases/recruiter/interface/ILoginRecruiter.usecase';
 import { LoginRecruiterUseCase } from '../application/usecases/recruiter/LoginRecruiter.usecase';
-import ILoadRecruiterProfileUseCase from '../application/usecases/recruiter/interface/ILoadRecruiterProfile.usecase';
-import { LoadRecruiterProfileDataUseCase } from '../application/usecases/recruiter/LoadRecruiterProfile.usecase';
+import ILoadRecruiterProfileOverviewUsecase from '../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
+import { LoadRecruiterProfileOverviewUsecase } from '../application/usecases/recruiter/LoadRecruiterProfileOverview.usecase';
 import ILoadCompaniesUseCase from '../application/usecases/admin/interfaces/ILoadCompanies.usecase';
 import { LoadCompaniesUseCase } from '../application/usecases/admin/LoadCompanies.usecase';
 import IEmailService from '../application/interfaces/services/IEmailService';
@@ -100,6 +100,18 @@ import ICreateCommentUsecase from '../application/interfaces/usecases/user/ICrea
 import CreateCommentUsecase from '../application/usecases/user/CreateComment.usecase';
 import IDeleteCommentUsecase from '../application/interfaces/usecases/user/IDeleteComment.usecase';
 import DeleteCommentUsecase from '../application/usecases/user/DeleteComment.usecase';
+import ICreateRecruiterUsecase from '../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
+import CreateRecruiterUsecase from '../application/usecases/recruiter/CreateRecruiter.usecase';
+import IJobRepo from '../domain/interfaces/IJobRepo';
+import JobRepository from '../infrastructure/repositories/jobRepository';
+import ICreateJobUseCase from '../application/interfaces/usecases/recruiter/ICreateJob.usecase';
+import CreateJobUseCase from '../application/usecases/recruiter/CreateJob.usecase';
+import ILoadRecruiterJobsUsecase from '../application/interfaces/usecases/recruiter/ILoadRecruiterJobs.usecase';
+import { LoadRecruiterJobsUsecase } from '../application/usecases/recruiter/LoadRecruiterJobs.usecase';
+import IEditJobUsecase from '../application/interfaces/usecases/recruiter/IEditJob.usecase';
+import EditJobUsecase from '../application/usecases/recruiter/EditJob.usecase';
+import IDeleteJobUsecase from '../application/interfaces/usecases/recruiter/IDeleteJob.usecase';
+import DeleteJobUsecase from '../application/usecases/recruiter/DeleteJob.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -110,6 +122,7 @@ container.registerSingleton<IEducationRepo>('IEducationRepository', EducationRep
 container.registerSingleton<ISkillRepo>('ISkillRepository', SkillRepsitory)
 container.registerSingleton<IPostRepo>('IPostRepository', PostRespository)
 container.registerSingleton<ICommentRepository>('ICommentRepository', CommentRepository)
+container.registerSingleton<IJobRepo>('IJobRepository', JobRepository)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
@@ -161,6 +174,10 @@ container.registerSingleton<ILikePostUsecase>('ILikePostUsecase', LikePostUsecas
 container.registerSingleton<IUnlikePostUsecase>('IUnlikePostUsecase', UnlikePostUsecase)
 container.registerSingleton<ICreateCommentUsecase>('ICreateCommentUsecase', CreateCommentUsecase)
 container.registerSingleton<IDeleteCommentUsecase>('IDeleteCommentUsecase', DeleteCommentUsecase)
+container.registerSingleton<ICreateJobUseCase>('ICreateJobUsecase', CreateJobUseCase)
+container.registerSingleton<ILoadRecruiterJobsUsecase>('ILoadRecruiterJobsUsecase', LoadRecruiterJobsUsecase)
+container.registerSingleton<IEditJobUsecase>('IEditJobUsecase', EditJobUsecase)
+container.registerSingleton<IDeleteJobUsecase>('IDeleteJobUsecase', DeleteJobUsecase)
 
 
 
@@ -168,13 +185,13 @@ container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
   LoginRecruiterUseCase
 );
-container.registerSingleton<ILoadRecruiterProfileUseCase>(
-  'ILoadRecruiterProfileUseCase',
-  LoadRecruiterProfileDataUseCase
+container.registerSingleton<ILoadRecruiterProfileOverviewUsecase>(
+  'ILoadRecruiterProfileOverviewUsecase',
+  LoadRecruiterProfileOverviewUsecase
 );
-container.registerSingleton<IRegisterRecruiterUseCase>(
-  'IRegisterRecruiterUseCase',
-  RegisterRecruiterUseCase
+container.registerSingleton<ICreateRecruiterUsecase>(
+  'ICreateRecruiterUsecase',
+  CreateRecruiterUsecase
 );
 container.registerSingleton<ILoadCompaniesUseCase>('ILoadCompaniesUseCase', LoadCompaniesUseCase);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUserUseCase);

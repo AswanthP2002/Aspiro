@@ -1,4 +1,4 @@
-import Job from '../../../domain/entities/job.entity';
+import Job from '../../../domain/entities/recruiter/job.entity';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 
 export default interface JobApplicationAggregatedDTO {

@@ -6,6 +6,7 @@ import BaseRepository from '../baseRepository';
 import { RecruiterDAO } from '../../database/DAOs/recruiter/recruiter.dao';
 import RecruiterProfileAggregated from '../../../application/DTOs/recruiter/recruiterProfileAggregatedData.dto';
 import FindCompaniesQuery from '../../../application/queries/recruiter.query';
+import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
 
 export default class RecruiterRespository
   extends BaseRepository<Recruiter>
@@ -136,55 +137,78 @@ export default class RecruiterRespository
     return deleteResult.acknowledged;
   }
 
-  async aggregateRecruiterProfile(
-    id: string
-  ): Promise<RecruiterProfileAggregated | null> {
-    const result = await RecruiterDAO.aggregate([
-      {
-        $match: {
-          userId: new ObjectId(id),
-        },
-      },
-      {
-        $lookup: {
-          from: 'jobs',
-          let: { recruiterId: '$_id' },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ['$companyId', '$$recruiterId'] },
-              },
-            },
-            {
-              $lookup: {
-                from: 'jobapplications',
-                let: { jobId: '$_id' },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: ['$jobId', '$$jobId'] },
-                    },
-                  },
-                ],
-                as: 'applications',
-              },
-            },
-            {
-              $addFields: {
-                applicantCount: { $size: '$applications' },
-              },
-            },
-            {
-              $project: {
-                applications: 0,
-              },
-            },
-          ],
-          as: 'jobs',
-        },
-      },
-    ]);
+  async getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null> {
+    if(!ObjectId.isValid(recruiterId)) return null
 
-    return result[0];
+    const result = await RecruiterDAO.aggregate([
+      {$match:{userId:new ObjectId(recruiterId)}},
+      {$lookup:{
+        from:'users',
+        localField:'userId',
+        foreignField:'_id',
+        as:'userProfile'
+      }},
+      {$unwind:'$userProfile'},
+      {$lookup:{
+        from:'jobs',
+        localField:'recruiterId',
+        foreignField:'userProfile._id',
+        as:'jobs'
+      }}
+    ])
+
+    return result[0]
   }
+
+  // async aggregateRecruiterProfile(
+  //   id: string
+  // ): Promise<RecruiterProfileAggregated | null> {
+  //   const result = await RecruiterDAO.aggregate([
+  //     {
+  //       $match: {
+  //         userId: new ObjectId(id),
+  //       },
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: 'jobs',
+  //         let: { recruiterId: '$_id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $eq: ['$companyId', '$$recruiterId'] },
+  //             },
+  //           },
+  //           {
+  //             $lookup: {
+  //               from: 'jobapplications',
+  //               let: { jobId: '$_id' },
+  //               pipeline: [
+  //                 {
+  //                   $match: {
+  //                     $expr: { $eq: ['$jobId', '$$jobId'] },
+  //                   },
+  //                 },
+  //               ],
+  //               as: 'applications',
+  //             },
+  //           },
+  //           {
+  //             $addFields: {
+  //               applicantCount: { $size: '$applications' },
+  //             },
+  //           },
+  //           {
+  //             $project: {
+  //               applications: 0,
+  //             },
+  //           },
+  //         ],
+  //         as: 'jobs',
+  //       },
+  //     },
+  //   ]);
+
+  //   return result[0];
+  // }
 }
