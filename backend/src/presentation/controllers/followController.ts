@@ -1,19 +1,22 @@
 import { Request, Response } from 'express';
-import IFollowUserUseCase from '../../application/usecases/interfaces/IFollowUser.usecase';
+import IFollowUserUseCase from '../../application/interfaces/usecases/user/IFollowUser.usecase';
 import IGetFollowersUseCase from '../../application/usecases/interfaces/IGetFollowers.usecase';
 import IGetFollowingUseCase from '../../application/usecases/interfaces/IGetFollowing.usecase';
 import IUnFollowUserUsercase from '../../application/usecases/interfaces/IUnFollowUser.usecase';
 import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
-import ICreateNotification from '../../application/usecases/common/interface/ICreateNotification.usecase';
+import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
+import { emitNotification } from '../../infrastructure/socketio/chatSocket';
+import { inject, injectable } from 'tsyringe';
 
+@injectable()
 export default class FollowController {
   constructor(
-    private _followUseCase: IFollowUserUseCase,
+    @inject('IFollowUserUsecase') private _followUseCase: IFollowUserUseCase,
     private _unfollowUseCase: IUnFollowUserUsercase,
     private _getFollowers: IGetFollowersUseCase,
     private _getFollowing: IGetFollowingUseCase,
-    private _createNotification: ICreateNotification
+    @inject('ICreateNotificationUsecase') private _createNotification: ICreateNotification
   ) {}
 
   async followUser(req: Auth, res: Response): Promise<void> {
@@ -24,15 +27,19 @@ export default class FollowController {
       const result = await this._followUseCase.execute({
         follower: followerId,
         following: followingId,
-        type: req.body.userType,
       });
+      // Assuming you have a way to get the sender's name/details
       const notification = await this._createNotification.execute({
-        title: 'Follower',
-        description: `User ${followerId} started following you`,
+        title: 'New Follower',
+        description: `You have a new follower.`, // Keep it simple, sender details will be in the notification object
         senderId: followerId,
         receiverId: followingId,
-        type: 'candidate',
+        type: 'follow',
+        link: `/profile/${followerId}` // Example link to the follower's profile
       });
+      if (notification) {
+        emitNotification(followingId, notification);
+      }
       res
         .status(StatusCodes.OK)
         .json({ success: true, message: 'Followed', result });

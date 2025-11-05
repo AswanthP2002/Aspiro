@@ -7,6 +7,7 @@ import { JobDAO } from '../database/DAOs/recruiter/job.dao';
 import { LoadJobRes } from '../../application/DTOs/loadJob.dto';
 import JobAggregated from '../../domain/entities/jobAggregated.entity';
 import { JobsQuery } from '../../application/queries/jobs.query';
+import JobAggregatedData from '../../domain/entities/user/jobAggregated.entity';
 
 export default class JobRepository
   extends BaseRepository<Job>
@@ -70,118 +71,84 @@ export default class JobRepository
     return {jobs, totalPages, totalDocs, page}
   }
 
-  async getJobs(
-    search: string = '',
-    page: number = 1,
-    limit: number = 3,
-    sort: string = 'job-latest',
-    filters: any,
-    minSalary: string = '',
-    maxSalary: string = ''
-  ): Promise<LoadJobRes | null> {
+  async getJobs(dbQuery: JobsQuery): Promise<{jobs: JobAggregatedData[], totalPages: number, totalDocs: number, page: number} | null> {
     //change strict to later
+    const {sortOption, skip, search, filter, limit, page, locationSearch} = dbQuery
 
+    const matchFilter: any = {}
+    
     const prelookupMatch: any = { expiresAt: { $gte: new Date() } };
     const postlookupMatch: any = {};
 
     if (search) {
-      prelookupMatch.jobTitle = { $regex: new RegExp(search, 'i') };
+      matchFilter['jobTitle'] = { $regex: new RegExp(search, 'i') };
     }
 
-    if (filters?.industry.length > 0) {
-      postlookupMatch['companyDetails.industry'] = { $in: filters?.industry };
+    if(locationSearch){
+      matchFilter['location'] = { $regex: new RegExp(locationSearch, 'i') };
     }
 
-    if (filters?.jobType.length > 0) {
-      prelookupMatch.jobType = { $in: filters?.jobType };
+    // if (filter.status && filter.status.length > 0) {
+    //   matchFilter['status'] = { $in: filter.status };
+    // }
+
+    if (filter.workMode && filter.workMode.length > 0) {
+      matchFilter['workMode'] = { $in: filter.workMode };
     }
 
-    if (filters?.locationType.length > 0) {
-      prelookupMatch.locationType = { $in: filters?.locationType };
+    if (filter.jobType && filter.jobType.length > 0) {
+      matchFilter['jobType'] = { $in: filter.jobType };
     }
 
-    if (minSalary) {
-      prelookupMatch.minSalary = { $gte: Number(minSalary) };
+    if (filter.jobLevel && filter.jobLevel.length > 0) {
+      matchFilter['jobLevel'] = { $in: filter.jobLevel };
     }
-
-    if (maxSalary) {
-      prelookupMatch.maxSalary = { $lte: Number(maxSalary) };
-    }
+    console.log('testing match filter values', JSON.stringify(matchFilter))
 
     //const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}
-    const skip = (page - 1) * limit;
-    const currentSort = sort;
-    let sortData: any = {};
-    const filterData: any = {};
-    switch (sort) {
-      case 'salary-high':
-        sortData['minSalary'] = -1;
-        break;
-      case 'salary-low':
-        sortData['maxSalary'] = 1;
-        break;
-      case 'job-latest':
-        sortData['createdAt'] = -1;
-        break;
-      case 'job-oldest':
-        sortData['createdAt'] = 1;
-        break;
-      case 'Name A - Z':
-        sortData['JobTitle'] = 1;
-        break;
-      case 'Name Z - A':
-        sortData['JobTitle'] = -1;
-        break;
-      default:
-        sortData = {};
-        break;
-    }
-
-    const pipeline: any[] = [
-      { $match: prelookupMatch },
+    const jobsFetchingPipeline: any[] = [
+      { $match: matchFilter },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'recruiterId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      { $unwind: '$userDetails' },
       {
         $lookup: {
           from: 'recruiters',
-          localField: 'companyId',
-          foreignField: '_id',
-          as: 'companyDetails',
+          localField: 'userDetails._id',
+          foreignField: 'userId',
+          as: 'recruiterProfile',
         },
       },
-      { $unwind: '$companyDetails' },
-      { $match: postlookupMatch },
+      { $unwind: '$recruiterProfile' },
+      { $sort: sortOption },
       { $skip: skip },
       { $limit: limit },
     ];
 
-    if (Object.keys(sortData).length > 0) {
-      pipeline.push({ $sort: sortData });
-    }
+    const totalJobsPipeline = [
+      { $match: matchFilter },
+      { $count: 'count'}
+    ]
 
-    const countPipeLine = [
-      { $match: prelookupMatch },
-      {
-        $lookup: {
-          from: 'recruiters',
-          localField: 'companyId',
-          foreignField: '_id',
-          as: 'companyDetails',
-        },
-      },
-      { $unwind: '$companyDetails' },
-      { $match: postlookupMatch },
-      { $count: 'count' },
-    ];
+    console.log('Pipeline before applying', jobsFetchingPipeline)
 
-    const jobs = await JobDAO.aggregate(pipeline);
+    const [jobs, totalJobs] = await Promise.all([
+      JobDAO.aggregate(jobsFetchingPipeline),
+      JobDAO.aggregate(totalJobsPipeline)
+    ])
 
-    const totalDocumentsArray = await JobDAO.aggregate(countPipeLine);
-    const totalDocumentsCount = totalDocumentsArray[0]?.count || 0;
-    const totalPages =
-      totalDocumentsArray.length > 0
-        ? Math.ceil(totalDocumentsCount / limit)
-        : 0;
+    const totalPages = Math.ceil(totalJobs[0]?.count || 0 / limit);
+    const totalDocs = totalJobs[0]?.count || 0;
 
-    return { jobs, page, totalPages, currentSort: sort };
+    console.log('Testing job before retruing', jobs)
+
+    return { jobs, totalPages, totalDocs, page };
   }
 
   async getJobDetails(id: string): Promise<JobAggregated | null> {

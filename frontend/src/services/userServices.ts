@@ -741,24 +741,25 @@ export const getLocationDetails = async (lat : number, long : number) => {
     }
 }
 
-export const getJobs = async (search : string, page : number, sort : string, filter : any, minSalary : string, maxSalary : string) => {
+export const getJobs = async (search: string, locationSearch: string, page: number, sortOption: string, status: string, workMode: string, jobLevel: string, jobType: string) => {
     try {
         const response = await axiosInstance.get('/jobs', {
             params:{
                 search,
+                locationSearch,
                 page,
-                sort,
-                filter:JSON.stringify(filter),
-                minSalary,
-                maxSalary
+                sortOption,
+                filter:JSON.stringify({status, workMode, jobLevel, jobType}),
             }
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-        console.log('Error occured while geting jobs', err)
-        return err.response?.data
+        
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 

@@ -92,11 +92,12 @@ function createUserRouter() {
   //   '/login',
   //   candidateController.loginCandidate.bind(candidateController)
   // );
-  // // candidateRouter.get('/jobs', (req : Request, res : Response, next : NextFunction) => {
-  // //     console.log('ensure the request is reaching here')
-  // //     next()
-  // // }, candidateController.loadJobs.bind(candidateController))
-  // //candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
+userRouter.get(
+  '/jobs',
+  userController.loadJobs.bind(userController)
+)
+
+  //candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
   userRouter.post(
     '/personal/details/save',
     centralizedAuthentication,

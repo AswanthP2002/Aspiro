@@ -5,6 +5,8 @@ import {
   WorkMode,
   SalaryPeriod,
 } from '../../../domain/entities/recruiter/job.entity';
+import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
+import User from '../../../domain/entities/user/User';
 
 export default interface CreateJobDTO {
   _id?: string;
@@ -95,3 +97,20 @@ export interface EditJobDTO {
   updatedAt?: Date;
   expiresAt?: String;
 }
+
+
+
+/**
+ * search: string,
+    page: number,
+    limit: number,
+    sortOption: string,
+    filter:{
+        status: string,
+        workMode: string,
+        jobType: string,
+        jobLevel: string,
+        minSalary?: number,
+        maxSalary?: number
+    }
+ */

@@ -1,15 +1,16 @@
-import Notifications from '../../domain/entities/notifications.entity';
+import Notification from '../../domain/entities/notification.entity';
 import CreateNotificationDTO from '../DTOs/notifications.dto';
 
 export default function mapToNotificationsFromCreateNotification(
   createNotification: CreateNotificationDTO
-): Notifications {
+): Notification {
   return {
+    description: createNotification.description,
     senderId: createNotification.senderId,
     receiverId: createNotification.receiverId,
-    description: createNotification.description,
-    title: createNotification.title,
-    link: createNotification.link,
-    type: createNotification.type,
+    title:createNotification.title,
+    link:createNotification.link,
+    type:createNotification.type,
+    typeRelatedId:createNotification.typeRelatedId
   };
 }

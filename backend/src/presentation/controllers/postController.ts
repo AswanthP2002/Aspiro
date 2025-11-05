@@ -4,7 +4,7 @@ import IGetPosts from '../../application/interfaces/usecases/user/IGetPosts.usec
 import IUnlikePost from '../../application/interfaces/usecases/user/IUnlikePost.usecase';
 import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
-import ICreateNotification from '../../application/usecases/common/interface/ICreateNotification.usecase';
+import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
 import IGetUserSpecificPosts from '../../application/usecases/candidate/interface/IGetUserSpecificPosts.usecase';
 import { inject, injectable } from 'tsyringe';
 import ICreatePostUsecase from '../../application/interfaces/usecases/user/ICreatePost.usecase';

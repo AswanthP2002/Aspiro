@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import '../backend/src/config/DI.container';
+import http from 'http'
 import cors from 'cors';
 import session from 'express-session';
 import dotenv from 'dotenv';
@@ -18,7 +19,7 @@ import connectToDb from './src/infrastructure/database/connection';
 import createAdminRouter from './src/presentation/routes/adminRouter';
 import createFollowRouter from './src/presentation/routes/followRouter';
 import createPostRouter from './src/presentation/routes/postRouter';
-import chatSocket from './src/infrastructure/socketio/chatSocket';
+import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 import createChatRouter from './src/presentation/routes/chatRouter';
 import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
@@ -87,7 +88,9 @@ async function main() {
 
   app.use(exceptionhandle); //centralized exception handling
 
-  const expressServer = app.listen(port, () => {
+  const expressServer = http.createServer(app)
+  
+  app.listen(port, () => {
     logger.info(`Server started running on port ${port}`);
   });
 
@@ -96,14 +99,7 @@ async function main() {
     process.exit(1);
   });
 
-  const socketio = new Server(expressServer, {
-    cors: {
-      origin: 'http://localhost:5173', // Be more specific than '*' for security
-      methods: ['GET', 'POST'],
-    },
-  });
-
-  chatSocket(socketio);
+  initalizeSocket(expressServer)
 
   process.on('SIGINT', () => {
     logger.info('Server shutting down...');

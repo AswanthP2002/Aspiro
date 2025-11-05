@@ -10,6 +10,6 @@ export function transformDate(date : string) {
     return formatedDate
 }
 
-export function formatRelativeTime(date : string){
+export function formatRelativeTime(date : any){
     return moment(date).startOf('days').fromNow()
 }

@@ -1,16 +1,13 @@
 import { Schema } from 'mongoose';
-import Notifications from '../../../domain/entities/notifications.entity';
+import Notification from '../../../domain/entities/notification.entity';
 
-export const NotificationSchema = new Schema<Notifications>(
-  {
-    senderId: { type: Schema.Types.ObjectId },
-    receiverId: { type: Schema.Types.ObjectId },
-    description: { type: String },
-    isRead: { type: Boolean, default: false },
-    link: { type: String },
-    title: { type: String },
-    type: { type: String },
-    typeRelatedId: { type: Schema.Types.ObjectId },
-  },
-  { timestamps: true }
-);
+export const NotificationSchema = new Schema<Notification>({
+  title:{type:String, required:true},
+  description:{type:String, required:true},
+  senderId:{type:Schema.Types.ObjectId, ref:'users', required:true},
+  receiverId:{type:Schema.Types.ObjectId, ref:'users', required:true},
+  type:{type:String, enum:['comment', 'follow', 'application', 'like', 'message']},
+  isRead:{type:Boolean, default:false},
+  link:{type:String},
+  typeRelatedId:{type:Schema.Types.ObjectId}
+})

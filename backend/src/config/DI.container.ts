@@ -112,6 +112,17 @@ import IEditJobUsecase from '../application/interfaces/usecases/recruiter/IEditJ
 import EditJobUsecase from '../application/usecases/recruiter/EditJob.usecase';
 import IDeleteJobUsecase from '../application/interfaces/usecases/recruiter/IDeleteJob.usecase';
 import DeleteJobUsecase from '../application/usecases/recruiter/DeleteJob.usecase';
+import ILoadJobsAggregatedUsecase from '../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
+import LoadJobsAggregatedUsecase from '../application/usecases/user/LoadJobsAggregated.usecase';
+import INotificationRepo from '../domain/interfaces/INotificationRepo';
+import NotificationRepository from '../infrastructure/repositories/notificationRepository';
+import IFollowRepo from '../domain/interfaces/IFollowRepo';
+import FollowRepository from '../infrastructure/repositories/FollowRepository';
+import FollowController from '../presentation/controllers/followController';
+import ICreateNotificationUsecase from '../application/interfaces/usecases/shared/ICreateNotification.usecase';
+import CreateNotificationUsecase from '../application/usecases/common/useCases/CreateNotification.usecase';
+import IFollowUserUseCase from '../application/interfaces/usecases/user/IFollowUser.usecase';
+import FollowUseruseCse from '../application/usecases/FollowUser.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -123,6 +134,8 @@ container.registerSingleton<ISkillRepo>('ISkillRepository', SkillRepsitory)
 container.registerSingleton<IPostRepo>('IPostRepository', PostRespository)
 container.registerSingleton<ICommentRepository>('ICommentRepository', CommentRepository)
 container.registerSingleton<IJobRepo>('IJobRepository', JobRepository)
+container.registerSingleton<INotificationRepo>('INotificationRepository', NotificationRepository)
+container.registerSingleton<IFollowRepo>('IFollowRepository', FollowRepository)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
@@ -178,8 +191,9 @@ container.registerSingleton<ICreateJobUseCase>('ICreateJobUsecase', CreateJobUse
 container.registerSingleton<ILoadRecruiterJobsUsecase>('ILoadRecruiterJobsUsecase', LoadRecruiterJobsUsecase)
 container.registerSingleton<IEditJobUsecase>('IEditJobUsecase', EditJobUsecase)
 container.registerSingleton<IDeleteJobUsecase>('IDeleteJobUsecase', DeleteJobUsecase)
-
-
+container.registerSingleton<ILoadJobsAggregatedUsecase>('ILoadJobsAggregatedUsecase', LoadJobsAggregatedUsecase)
+container.registerSingleton<ICreateNotificationUsecase>('ICreateNotificationUsecase', CreateNotificationUsecase)
+container.registerSingleton<IFollowUserUseCase>('IFollowUserUsecase', FollowUseruseCse)
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
@@ -201,6 +215,7 @@ container.registerSingleton(UserController);
 container.registerSingleton(AdminController);
 container.registerSingleton(PostController)
 container.registerSingleton(RecruiterController);
+container.registerSingleton(FollowController)
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service

@@ -15,7 +15,7 @@ import ISaveBasicsUseCase from '../../application/usecases/recruiter/interface/I
 import ILoadRecruiterProfileOverviewUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
 import IRejectCandidate from '../../application/usecases/recruiter/interface/IRejectCandidate.usecase';
 import IRejectCandidateUseCase from '../../application/usecases/recruiter/interface/IRejectCandidate.usecase';
-import ICreateNotification from '../../application/usecases/common/interface/ICreateNotification.usecase';
+import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
 import IFinalizeShortlist from '../../application/usecases/recruiter/interface/IFinalizeShortlist.usecase';
 import IGetFinalizedShortlistData from '../../application/usecases/recruiter/interface/IGetFinalizedData.usecase';
 import IGetJobApplicationsUseCase from '../../application/usecases/recruiter/interface/IGetJobApplications.usecase';

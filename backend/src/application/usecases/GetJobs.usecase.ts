@@ -10,19 +10,9 @@ export default class GetJobsUseCase implements IGetJobsUseCase {
     const { search, sort, filters, limit, maxSalary, minSalary, page } =
       loadJobsDto;
 
-    const result = await this._repo.getJobs(
-      search,
-      page,
-      limit,
-      sort,
-      filters,
-      minSalary,
-      maxSalary
-    );
-    if (result) {
-      const dto = mapLoadJobResToDTO(result);
-      return dto;
-    }
+    /**
+     * legacy need to remove
+     */
     return null;
   }
 }

@@ -1,8 +1,8 @@
 import { model } from 'mongoose';
-import Notifications from '../../../domain/entities/notifications.entity';
 import { NotificationSchema } from '../Schemas/notification.schema';
+import Notification from '../../../domain/entities/notification.entity';
 
-export const NotificationDAO = model<Notifications>(
+export const NotificationDAO = model<Notification>(
   'notification',
   NotificationSchema
 );

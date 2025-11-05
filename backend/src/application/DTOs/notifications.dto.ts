@@ -2,7 +2,7 @@
 export default interface CreateNotificationDTO {
     senderId? : string
     receiverId? : string
-    type? : string
+    type? : 'follow' | 'application' | 'comment' | 'like' | 'message'
     typeRelatedId? : string
     title: string
     description : string
@@ -11,10 +11,10 @@ export default interface CreateNotificationDTO {
 
 
 export interface NotificationDTO {
-    _id? : string
+     _id? : string
     senderId? : string
     receiverId? : string
-    type? : string
+    type? : 'follow' | 'application' | 'comment' | 'like' | 'message'
     typeRelatedId? : string
     title: string
     description : string

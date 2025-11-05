@@ -3,6 +3,7 @@ import Job from '../entities/recruiter/job.entity';
 import JobAggregated from '../entities/jobAggregated.entity';
 import IBaseRepo from './IBaseRepo';
 import { JobsQuery } from '../../application/queries/jobs.query';
+import JobAggregatedData from '../entities/user/jobAggregated.entity';
 export interface SaveJob {
   acknowledged: boolean;
   insertedId: Object;
@@ -13,15 +14,7 @@ export default interface IJobRepo extends IBaseRepo<Job> {
   getRecruiterJobsByRecruiterId(
     recruiterId: string, dbQuery: JobsQuery
   ): Promise<{jobs: Job[], totalPages: number, totalDocs: number, page: number} | null>;
-  getJobs(
-    search: string,
-    page: number,
-    limit: number,
-    sort?: string,
-    filters?: any,
-    minSalary?: string,
-    maxSalary?: string
-  ): Promise<LoadJobRes | null>; //change strict later
+  getJobs(dbQuery: JobsQuery): Promise<{jobs: JobAggregatedData[], totalPages: number, totalDocs: number, page: number} | null>; //change strict later
   searchJobsFromHome(search: string): Promise<JobAggregated[] | null>;
   getJobDetails(id: string): Promise<JobAggregated | null>;
   blockJob(id: string): Promise<boolean>;

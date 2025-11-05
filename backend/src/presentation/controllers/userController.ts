@@ -22,7 +22,7 @@ import ILoadEducationsUseCase from '../../application/interfaces/usecases/user/I
 import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import ILoginCandidateUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase';
 import ILoadCandidatePersonalDataUseCase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase';
-import ILoadJobCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobCandidateSide.usecase';
+import ILoadJobCandidateSideUseCase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 import ILoadJobDetailsCandidateSideUseCase from '../../application/usecases/candidate/interface/ILoadJobDetailsCandidateSide.usecase';
 import IEditExperienceUseCase from '../../application/interfaces/usecases/user/IEditUserExperience.usecase';
 import IEditEducationUseCase from '../../application/interfaces/usecases/user/IEditUserEducation.usecase';
@@ -94,6 +94,9 @@ import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/u
 import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
 import { experienceIdSchema } from '../schemas/user/experienceId.schema';
 import { educationIdSchema } from '../schemas/user/educationId.schema';
+import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
+import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
+import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
 
 
 @injectable()
@@ -125,7 +128,8 @@ export class UserController {
     private _deleteUserExperienceUC: IDeleteUserExperienceUsecase,
     @inject('IDeleteUserEducationUsecase')
     private _deleteUserEducationUC: IDeleteUserEducationUsecase,
-    @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase
+    @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase,
+    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
   ) {}
 
 
@@ -352,43 +356,31 @@ export class UserController {
     }
   } //reworked : void
 
-  // // async loadJobs(req: Request, res: Response): Promise<Response> {
-  // //   const search = (req.query.search as string) || '';
-  // //   const page = parseInt(req.query.page as string) || 1;
-  // //   const limit = parseInt(req.query.limit as string) || 3;
-  // //   const sortvalue = (req.query.sort as string) || 'job-latest';
-  // //   const minSalary = req.query?.minSalary as string;
-  // //   const maxSalary = req.query?.maxSalary as string;
-  // //   //console.log('filter before parsing', req.query.filter)
-  // //   const filters = JSON.parse(req.query.filter as string) || {};
-  // //   //console.log('filter after parsing', filters)
+  async loadJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 3;
+    const sortOption = (req.query.sort as string) || 'Newest';
+    const filter = JSON.parse(req.query.filter as string) || {}
+    
 
-  // //   try {
-  // //     const result = await this._loadJobsUC.execute({
-  // //       search,
-  // //       page,
-  // //       limit,
-  // //       sort: sortvalue,
-  // //       minSalary,
-  // //       maxSalary,
-  // //       filters,
-  // //     });
-  // //     return res
-  // //       .status(StatusCodes.OK)
-  // //       .json({ success: true, message: 'Jobs fetched successfully', result });
-  // //   } catch (error: unknown) {
-  // //     console.log('Error occured while fetching the job details', error);
-  // //     if (error instanceof Error) {
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'Intenal server error, please try again after some time',
-  // //       });
-  // //     }
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({ success: false, message: 'An unknown error occured' });
-  // //   }
-  // // } //reworked
+    try {
+      const valdiateQueryData = recruiterJobsSchema.parse({search, page, limit, sortOption, filter})
+      const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData)
+      const result = await this._loadJobs.execute(dto)
+      
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        return
+      }
+      
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Jobs fetched successfully', result });
+    } catch (error: unknown) {
+      next(error)
+    }
+  } //reworked
 
   // // async loadJobDetails(
   // //   req: Request,

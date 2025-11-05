@@ -62,9 +62,12 @@ import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
 import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
 import EditJobForm from './pages/recruiter/EditJob/EditJob';
 
+import { SocketProvider } from './context/SocketContext';
+
 function App() {
   return (
     <BrowserRouter>
+      <SocketProvider>
       <Routes>
         <Route path='/' element={<Layouts />}>
           <Route index element={
@@ -73,10 +76,11 @@ function App() {
             </PublicRoute>
           } />
 
-          <Route path='/feed' element={<UserProtectedRoute />}>
+          <Route element={<UserProtectedRoute />}>
             <Route element={<CommonLayout />}>
-              <Route index element={<Feed />} />
-            </Route> 
+              <Route path='/feed' element={<Feed />} />
+              <Route path='/jobs' element={<JobListing />} />
+            </Route>
           </Route>
 
           <Route path='/profile' element={<UserProtectedRoute />}>
@@ -153,6 +157,7 @@ function App() {
         <Route path='*' element={<NotFoundPage />} />
 
       </Routes>
+      </SocketProvider>
     </BrowserRouter>
     // <BrowserRouter>
     //   <Routes>

@@ -1,9 +1,13 @@
-import mongoose from "mongoose";
 
 export default interface Notification {
-    userId? : mongoose.Types.ObjectId,
+    _id? : string
+    senderId? : string
+    receiverId? : string
+    type? : 'follow' | 'application' | 'comment' | 'like' | 'message'
+    typeRelatedId? : string
     title: string
-    message : string,
-    createdAt? : Date
+    description : string
     isRead? : boolean
+    createdAt? : Date
+    link? : string
 }

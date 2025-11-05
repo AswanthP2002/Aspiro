@@ -6,6 +6,9 @@ export interface JobsQuery {
     sortOption:{[key: string]: number},
     filter:{
         status:string[],
-        workMode:string[]
-    }
+        workMode:string[],
+        jobLevel?:string[],
+        jobType?:string[]
+    },
+    locationSearch?: string
 }
