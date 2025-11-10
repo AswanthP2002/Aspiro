@@ -1,5 +1,5 @@
 import CandidateAggregated from '../../../domain/entities/user/candidateAggregated.entity';
-import CandidateAggregatedDTO from '../../DTOs/candidate/candidateAggregated.dto';
+import CandidateAggregatedDTO from '../../DTOs/candidate -LEGACY/candidateAggregated.dto';
 
 export default function mapCandidateAggToOverviewData(
   aggData: CandidateAggregated

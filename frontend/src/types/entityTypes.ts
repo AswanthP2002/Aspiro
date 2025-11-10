@@ -96,17 +96,16 @@ export interface Follow {
 }
 
 export interface Post {
-  _id?: string;
-  creatorId?: string;
-  creatorType: 'candidate' | 'recruiter';
-  media: {
-    url: string;
-    publidId: string;
-  };
-  content: string;
-  likes?: any[];
-  createdAt?: string;
-  updatedAt?: string;
+  _id?: string
+  creatorId?: string                 
+  media : {
+    cloudUrl : string
+    publicId : string
+  }
+  description : string
+  likes?: any[]       
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface UserType {
@@ -334,6 +333,64 @@ export interface JobAggregatedData {
   expiresAt?: String;
   userDetails:UserType;
   recruiterProfile:Recruiter
+}
+
+
+export interface Certificates {
+    _id? : string
+    candidateId? : string
+    issuedOrganization : string
+    issuedDate : Date
+    certificateId? : string
+    certificateUrl? : string
+    certificatePublicId? : string,
+    createdAt? : Date
+}
+
+export interface UserProfileAggrgatedAdmin {
+  _id?: string;
+      name?: string;
+      headline?: string;
+      summary?: string;
+      password?: string;
+      dateOfBirth?: string;
+      socialLinks?: SocialLinks[];
+      location?: {
+        city: string;
+        district: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+      role?: Role[];
+      phone?: string;
+      email?: string;
+      googleId?: string;
+      facebookId?: string;
+      linkedinId?: string;
+      profilePicture?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      coverPhoto?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      isBlocked?: boolean;
+      isVerified?: boolean;
+      isAdmin?: boolean;
+      isRecruiter?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+      verificationToken?: string;
+      otpExpiresAt?: Date;
+      experiences: Experience[]
+      educations: Education[]
+      certificates: Certificates[]
+      skills: Skills[]
+      posts: Post[]
+      recruiterProfile:Recruiter
+      jobs:Job[]
 }
 
 

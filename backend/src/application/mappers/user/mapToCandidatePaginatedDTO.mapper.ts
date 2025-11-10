@@ -1,5 +1,5 @@
 import CandidatePaginated from '../../../domain/entities/user/candidatePaginated.entity';
-import CandidatePaginatedDTO from '../../DTOs/candidate/candidatePaginated.dto';
+import CandidatePaginatedDTO from '../../DTOs/candidate -LEGACY/candidatePaginated.dto';
 
 export default function mapToCandidatePaginagedDTO(
   candidatePaginated: CandidatePaginated

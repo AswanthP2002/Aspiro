@@ -43,6 +43,7 @@ import IEditJobUsecase from '../../application/interfaces/usecases/recruiter/IEd
 import { editJobSchema } from '../schemas/recruiter/editJob.schema';
 import mapToEditJobDTOFromRequest from '../mappers/recruiter/mapToEditJobDTOFromRequest';
 import IDeleteJobUsecase from '../../application/interfaces/usecases/recruiter/IDeleteJob.usecase';
+import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 
 @injectable()
 export default class RecruiterController {
@@ -53,7 +54,8 @@ export default class RecruiterController {
     @inject('ILoadRecruiterProfileOverviewUsecase')
     private _loadRecruiterProfileOverview: ILoadRecruiterProfileOverviewUsecase,
     @inject('IEditJobUsecase') private _editJob: IEditJobUsecase,
-    @inject('IDeleteJobUsecase') private _deleteJob: IDeleteJobUsecase
+    @inject('IDeleteJobUsecase') private _deleteJob: IDeleteJobUsecase,
+    // @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
   ) // @inject('IRegisterRecruiterUseCase')
   // private _registerRecruiterUC: IRegisterRecruiterUseCase,
   // @inject('IVerifyUserUseCase') private _verifyUserUC: IVerifyUserUseCase,
@@ -141,24 +143,6 @@ export default class RecruiterController {
     }
   }
 
-  // async verifyRecruiter(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     const validatedData = VerifyUserValidator.parse(req.body);
-  //     const dto = mapToVerifyUserDTO(validatedData);
-  //     const result = await this._verifyUserUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Email verified successfully, please login to continue',
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked
 
   // async loginRecruiter(
   //   req: Request,
@@ -209,31 +193,6 @@ export default class RecruiterController {
   // //   }
   // // } //reworked
 
-  // // async saveIntroDetailsRecruiter(req: Auth, res: Response): Promise<Response> {
-  // //   const id = req.user?.id;
-  // //   try {
-  // //     const dto = mapToSaveIntroDetailsDTOFromRequest({
-  // //       id,
-  // //       ...req.body?.details,
-  // //     });
-  // //     const isSaved = await this._saveBasicsUC.execute(dto);
-  // //     return isSaved
-  // //       ? res
-  // //           .status(StatusCodes.OK)
-  // //           .json({ success: true, message: 'Basic details saved' })
-  // //       : res
-  // //           .status(StatusCodes.BAD_REQUEST)
-  // //           .json({ success: false, messsage: 'Something went wrong' });
-  // //   } catch (error: unknown) {
-  // //     console.log('Error occured while saving basics details', error);
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({
-  // //         success: false,
-  // //         message: 'Internal server error please try again after some time',
-  // //       });
-  // //   }
-  // // } //reworked
 
   async loadRecruiterProfileData(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;

@@ -1,4 +1,4 @@
-import { SaveIntroDetailsInpDTO } from "../../../application/DTOs/candidate/saveIntroDetails.dto";
+import { SaveIntroDetailsInpDTO } from "../../../application/DTOs/candidate -LEGACY/saveIntroDetails.dto";
 import { SaveIntroDetailsRequestDTO } from "../../DTOs/candidate/saveIntroDetailsRequestDTO";
 
 export default function mapToSaveIntroInpDTO(id : string, requestDto : SaveIntroDetailsRequestDTO) : SaveIntroDetailsInpDTO {

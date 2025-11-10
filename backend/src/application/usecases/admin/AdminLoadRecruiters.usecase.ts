@@ -1,26 +1,24 @@
 import { inject, injectable } from 'tsyringe';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import ILoadCompaniesUseCase from './interfaces/ILoadCompanies.usecase';
+import ILoadCompaniesUseCase from '../../interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
 import LoadCompaniesDTO from '../../DTOs/admin/loadCompanies.dto';
 import FindCompaniesQuery, {
   RecruiterJoinedDateQuery,
   RecruiterNameSortQuery,
 } from '../../queries/recruiter.query';
 import RecruiterPaginatedDTO from '../../DTOs/recruiter/recruiterPaginated.dto';
+import IAdminLoadRecruitersUsecase from '../../interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
+import LoadRecruitersDTO from '../../DTOs/admin/loadCompanies.dto';
 
 @injectable()
-export class LoadCompaniesUseCase implements ILoadCompaniesUseCase {
-  constructor(
-    @inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo
-  ) {}
+export class AdminLoadRecruitersUsecase implements IAdminLoadRecruitersUsecase {
+  constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {}
 
-  async execute(
-    loadCompaniesDto: LoadCompaniesDTO
-  ): Promise<RecruiterPaginatedDTO | null> {
+  async execute(loadRecruitersDto: LoadRecruitersDTO): Promise<RecruiterPaginatedDTO | null> {
     //change to strict later
-    const { search, page, limit, sort } = loadCompaniesDto;
-    const sortOption: RecruiterJoinedDateQuery & RecruiterNameSortQuery = {
+    const { search, page, limit, sort, filter } = loadRecruitersDto;
+    const sortOption: {[key: string]: number} = {
       createdAt: -1,
       companyName: 1,
     };

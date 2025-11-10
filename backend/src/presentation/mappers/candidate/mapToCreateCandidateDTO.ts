@@ -1,4 +1,4 @@
-import CreateCandidateDTO from '../../../application/DTOs/candidate/createCandidate.dto';
+import CreateCandidateDTO from '../../../application/DTOs/candidate -LEGACY/createCandidate.dto';
 import CreateCandidateRequestDTO from '../../DTOs/candidate/createCandidateRequestDTO';
 
 export default function mapToCreateCandidateDTO(

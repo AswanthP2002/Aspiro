@@ -1,4 +1,4 @@
-import { UploadCoverPhotoDTO } from '../../../DTOs/candidate/uploadCoverPhoto.dto';
+import { UploadCoverPhotoDTO } from '../../../DTOs/candidate -LEGACY/uploadCoverPhoto.dto';
 import UserDTO from '../../../DTOs/user/user.dto';
 
 export default interface IUploadUserCoverPhotoUsecase {

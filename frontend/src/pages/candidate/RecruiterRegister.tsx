@@ -5,15 +5,14 @@ import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } 
 import { Textarea } from '@mui/joy';
 import { industryTypes, companyType } from '../../assets/data/companyDetailsArrayData';
 import { createRecruiterService } from '../../services/recruiterServices';
-// You would import your API service function here
-// import { applyForRecruiterRole } from '../../services/recruiterService';
+
 
 export default function RecruiterRegisterPage() {
 
     type Inputs = {
         employerType: string;
         industry: string;
-        about: string; // Renamed from summary to match backend
+        about: string; 
         city: string;
         state: string;
         country: string;

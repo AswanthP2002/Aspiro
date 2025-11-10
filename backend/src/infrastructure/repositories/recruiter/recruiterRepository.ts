@@ -33,7 +33,7 @@ export default class RecruiterRespository
       ? { companyName: { $regex: new RegExp(search, 'i') } }
       : {};
     const currentSort = sortOption;
-    const pipeLine = [];
+    const pipeLine: any = [];
 
     pipeLine.push({ $match: searchQuery });
     pipeLine.push({ $sort: sortOption });

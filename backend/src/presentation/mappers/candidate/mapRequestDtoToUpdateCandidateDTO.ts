@@ -1,4 +1,4 @@
-import UpdateCandidateDTO from '../../../application/DTOs/candidate/updateCandidate.dto';
+import UpdateCandidateDTO from '../../../application/DTOs/candidate -LEGACY/updateCandidate.dto';
 import SaveBasicsRequestDTO from '../../DTOs/candidate/saveBasicsRequest.dto';
 import UpdateCandidateRequestDTO from '../../DTOs/candidate/updateCandidateRequest.dto';
 

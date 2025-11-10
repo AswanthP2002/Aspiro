@@ -2,7 +2,7 @@ export default interface CreatePostDTO {
   creatorId?: string                 
   media : Buffer
   description: string
-  likes?: any[]         
+  likes?: string[]         
 }
 
 export interface PostDTO {
@@ -13,7 +13,7 @@ export interface PostDTO {
     publicId : string
   }
   description: string
-  likes?: any[]         
+  likes?: string[]         
   createdAt?: string
   updatedAt?: string
 }

@@ -27,7 +27,7 @@ export default class JobRepository
     recruiterId: string, dbQuery: JobsQuery
   ): Promise<{jobs: Job[], totalPages: number, totalDocs: number, page: number} | null> {
     if(!ObjectId.isValid(recruiterId)) return null
-    console.log('checking data from the db side', recruiterId, dbQuery)
+    // console.log('checking data from the db side', recruiterId, dbQuery)
     const {sortOption, skip, search, filter, limit, page} = dbQuery
 
     const matchFilter: any = {recruiterId: new ObjectId(recruiterId)}
@@ -103,7 +103,7 @@ export default class JobRepository
     if (filter.jobLevel && filter.jobLevel.length > 0) {
       matchFilter['jobLevel'] = { $in: filter.jobLevel };
     }
-    console.log('testing match filter values', JSON.stringify(matchFilter))
+    // console.log('testing match filter values', JSON.stringify(matchFilter))
 
     //const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}
     const jobsFetchingPipeline: any[] = [
@@ -136,7 +136,7 @@ export default class JobRepository
       { $count: 'count'}
     ]
 
-    console.log('Pipeline before applying', jobsFetchingPipeline)
+    //console.log('Pipeline before applying', jobsFetchingPipeline)
 
     const [jobs, totalJobs] = await Promise.all([
       JobDAO.aggregate(jobsFetchingPipeline),
@@ -146,7 +146,7 @@ export default class JobRepository
     const totalPages = Math.ceil(totalJobs[0]?.count || 0 / limit);
     const totalDocs = totalJobs[0]?.count || 0;
 
-    console.log('Testing job before retruing', jobs)
+    //console.log('Testing job before retruing', jobs)
 
     return { jobs, totalPages, totalDocs, page };
   }

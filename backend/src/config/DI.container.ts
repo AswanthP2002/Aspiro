@@ -7,14 +7,14 @@ import { AdminController } from '../presentation/controllers/adminController';
 import ICandidateRepo from '../domain/interfaces/candidate/ICandidateRepo';
 import CandidateRepository from '../infrastructure/repositories/candidate/candidateRepository';
 import ILoadCandidateUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
-import ILoadCandidateDetailsUseCase from '../application/usecases/admin/interfaces/ILoadCandidateDetails.usecase';
-import { LoadCandidateDetailsUseCase } from '../application/usecases/admin/LoadCandidateDetails.usecase';
-import IBlockCandidateUseCase from '../application/usecases/admin/interfaces/IBlockCandidate.usecase';
-import { BlockCandidateUseCase } from '../application/usecases/admin/BlockCandidate.usecase';
+import ILoadCandidateDetailsUseCase from '../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
+import { AdminLoadUsersDetailsUsecase} from '../application/usecases/admin/AdminLoadUsersDetails.usecase';
+import IBlockCandidateUseCase from '../application/interfaces/usecases/admin/IAdminBlockUser.usecase';
+import { AdminBlockUserUsecase } from '../application/usecases/admin/AdminBlockUser.usecase';
 import IFindCandidateByUserIdUseCase from '../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
 import FindCandidateByUserIdUseCase from '../application/usecases/candidate/FindCandidateByUserId.usecase';
-import IUnblockCandidateUseCase from '../application/usecases/admin/interfaces/IUnblockCandidate.usecase';
-import { UnblockCandidateUseCase } from '../application/usecases/admin/UnblockCandidate.usecase';
+import IUnblockCandidateUseCase from '../application/interfaces/usecases/admin/IAdminUnblockUser.usecase';
+import { AdminUnblockUserUsecase } from '../application/usecases/admin/AdminUnblockUser.usecase';
 import IFindCandidateByCandidateIdUseCase from '../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
 import FindCandidateByCandidateIDUseCase from '../application/usecases/FindCandidateByCandidateID.usecase';
 import ICreateUserUseCase from '../application/interfaces/usecases/user/ICreateUser.usecase';
@@ -30,8 +30,8 @@ import ILoginRecruiterrUseCase from '../application/usecases/recruiter/interface
 import { LoginRecruiterUseCase } from '../application/usecases/recruiter/LoginRecruiter.usecase';
 import ILoadRecruiterProfileOverviewUsecase from '../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
 import { LoadRecruiterProfileOverviewUsecase } from '../application/usecases/recruiter/LoadRecruiterProfileOverview.usecase';
-import ILoadCompaniesUseCase from '../application/usecases/admin/interfaces/ILoadCompanies.usecase';
-import { LoadCompaniesUseCase } from '../application/usecases/admin/LoadCompanies.usecase';
+import ILoadCompaniesUseCase from '../application/interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
+import { AdminLoadRecruitersUsecase } from '../application/usecases/admin/AdminLoadRecruiters.usecase';
 import IEmailService from '../application/interfaces/services/IEmailService';
 import EmailService from '../infrastructure/services/EmailService';
 import { UserController } from '../presentation/controllers/userController';
@@ -123,6 +123,13 @@ import ICreateNotificationUsecase from '../application/interfaces/usecases/share
 import CreateNotificationUsecase from '../application/usecases/common/useCases/CreateNotification.usecase';
 import IFollowUserUseCase from '../application/interfaces/usecases/user/IFollowUser.usecase';
 import FollowUseruseCse from '../application/usecases/FollowUser.usecase';
+import IAdminLoadUserDetailsUsecase from '../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
+import IAdminBlockUserUsecase from '../application/interfaces/usecases/admin/IAdminBlockUser.usecase';
+import IAdminUnblockUserUsecase from '../application/interfaces/usecases/admin/IAdminUnblockUser.usecase';
+import IGetFavoriteJobUseCase from '../application/interfaces/usecases/user/IGetFavoriteJobs.usecase';
+import GetFavoriteJobUseCase from '../application/usecases/candidate/GetFavoriteJobs.usecase';
+import IFavoriteJobsRepo from '../domain/interfaces/candidate/IFavoriteJobRepo';
+import FavoriteJobsRepsitory from '../infrastructure/repositories/candidate/favoriteJobsRepository';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -136,21 +143,19 @@ container.registerSingleton<ICommentRepository>('ICommentRepository', CommentRep
 container.registerSingleton<IJobRepo>('IJobRepository', JobRepository)
 container.registerSingleton<INotificationRepo>('INotificationRepository', NotificationRepository)
 container.registerSingleton<IFollowRepo>('IFollowRepository', FollowRepository)
+container.registerSingleton<IFavoriteJobsRepo>('IFavoriteJobRepository', FavoriteJobsRepsitory)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
 container.registerSingleton<ILoadUsersAdminUseCase>('ILoadUsersAdminUsecase', LoadUsersAdminUsecase);
-container.registerSingleton<ILoadCandidateDetailsUseCase>(
-  'ILoadCandidateDetailsUseCase',
-  LoadCandidateDetailsUseCase
+
+container.registerSingleton<IAdminBlockUserUsecase>(
+  'IAdminBlockUserUsecase',
+  AdminBlockUserUsecase
 );
-container.registerSingleton<IBlockCandidateUseCase>(
-  'IBlockCandidateUseCase',
-  BlockCandidateUseCase
-);
-container.registerSingleton<IUnblockCandidateUseCase>(
-  'IUnblockCandidateUseCase',
-  UnblockCandidateUseCase
+container.registerSingleton<IAdminUnblockUserUsecase>(
+  'IAdminUnblockUserUsecase',
+  AdminUnblockUserUsecase
 );
 container.registerSingleton<IFindCandidateByUserIdUseCase>(
   'IFindCandidateByUserIdUseCase',
@@ -194,6 +199,9 @@ container.registerSingleton<IDeleteJobUsecase>('IDeleteJobUsecase', DeleteJobUse
 container.registerSingleton<ILoadJobsAggregatedUsecase>('ILoadJobsAggregatedUsecase', LoadJobsAggregatedUsecase)
 container.registerSingleton<ICreateNotificationUsecase>('ICreateNotificationUsecase', CreateNotificationUsecase)
 container.registerSingleton<IFollowUserUseCase>('IFollowUserUsecase', FollowUseruseCse)
+container.registerSingleton<IAdminLoadUserDetailsUsecase>('IAdminLoadUserDetailsUsecase', AdminLoadUsersDetailsUsecase)
+container.registerSingleton<IGetFavoriteJobUseCase>('IGetFavoriteJobsUsecase', GetFavoriteJobUseCase)
+
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
   'ILoginRecruiterUseCase',
@@ -207,7 +215,7 @@ container.registerSingleton<ICreateRecruiterUsecase>(
   'ICreateRecruiterUsecase',
   CreateRecruiterUsecase
 );
-container.registerSingleton<ILoadCompaniesUseCase>('ILoadCompaniesUseCase', LoadCompaniesUseCase);
+container.registerSingleton<ILoadCompaniesUseCase>('ILoadCompaniesUseCase', AdminLoadRecruitersUsecase);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUserUseCase);
 
 //register controller

@@ -1,4 +1,5 @@
 import { FindUsersQuery } from '../../application/queries/users.query';
+import UserProfileAggregatedAdmin from '../entities/admin/userProfileAggregatedAdmin';
 import User from '../entities/user/User';
 import IBaseRepo from './IBaseRepo';
 
@@ -10,6 +11,7 @@ export default interface IUserRepository extends IBaseRepo<User> {
   blockUser(userId: string): Promise<boolean>;
   unblockUser(userId: string): Promise<boolean>;
   findUsersWithQuery(query : FindUsersQuery) : Promise<{users: User[], total: number} | null>
+  getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null>
   //removeProfilePicture(id? : string) : Promise<User | null>
   //removeCoverPhoto(id? : string) : Promise<User | null>
 }

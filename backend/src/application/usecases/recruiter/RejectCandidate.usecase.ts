@@ -1,5 +1,5 @@
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
-import { JobApplicationDTO } from '../../DTOs/candidate/jobApplication.dto';
+import { JobApplicationDTO } from '../../DTOs/candidate -LEGACY/jobApplication.dto';
 import mapToJobApplicationDTOFromJobApplication from '../../mappers/user/mapToJobApplicationDTOFromJobApplication.mapper';
 import IRejectCandidateUseCase from './interface/IRejectCandidate.usecase';
 

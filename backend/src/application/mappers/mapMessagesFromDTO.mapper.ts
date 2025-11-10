@@ -1,7 +1,5 @@
-import Messsage, {
-  CreateMessageDTO,
-  MessageDTO,
-} from '../../domain/entities/message.entity';
+import Messsage from "../../domain/entities/message.entity";
+import { CreateMessageDTO } from "../DTOs/user/message.dto";
 
 export default function mapMessagesFromDto(
   createMessagedto: CreateMessageDTO

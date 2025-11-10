@@ -1,6 +1,6 @@
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import imgUploadToCloudinary from '../../../services/uploadToCloudinary';
-import { UploadCoverPhotoDTO } from '../../DTOs/candidate/uploadCoverPhoto.dto';
+import { UploadCoverPhotoDTO } from '../../DTOs/candidate -LEGACY/uploadCoverPhoto.dto';
 import UserDTO from '../../DTOs/user/user.dto';
 import mapUpdateUserDtoToUser from '../../mappers/user/mapUpdateUserDtoToUser.refactored.mapper';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';

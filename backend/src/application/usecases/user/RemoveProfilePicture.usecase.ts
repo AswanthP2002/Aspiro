@@ -1,6 +1,6 @@
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
-import RemoveProfilePhotoDTO from '../../DTOs/candidate/removeProfilePhoto.dto';
+import RemoveProfilePhotoDTO from '../../DTOs/candidate -LEGACY/removeProfilePhoto.dto';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import IRemoveUserProfilePictureUsecase from '../../interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
 import { inject, injectable } from 'tsyringe';

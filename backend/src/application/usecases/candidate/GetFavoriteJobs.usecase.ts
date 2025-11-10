@@ -1,10 +1,13 @@
+import { inject, injectable } from 'tsyringe';
 import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
 import IFavoriteJobsRepo from '../../../domain/interfaces/candidate/IFavoriteJobRepo';
-import FavoriteJobsAggregatedDTO from '../../DTOs/candidate/favoriteJobAggregated.dto';
-import IGetFavoriteJobUseCase from './interface/IGetFavoriteJobs.usecase';
+import FavoriteJobsAggregatedDTO from '../../DTOs/candidate -LEGACY/favoriteJobAggregated.dto';
+import IGetFavoriteJobUseCase from '../../interfaces/usecases/user/IGetFavoriteJobs.usecase';
 
+
+@injectable()
 export default class GetFavoriteJobUseCase implements IGetFavoriteJobUseCase {
-  constructor(private _iFavoriteJobsRepo: IFavoriteJobsRepo) {}
+  constructor(@inject('') private _iFavoriteJobsRepo: IFavoriteJobsRepo) {}
 
   async execute(
     candidateId: string

@@ -1,6 +1,6 @@
 import Resume from '../../../domain/entities/user/resume.entity';
 import IResumeRepo from '../../../domain/interfaces/candidate/IResumeRepo';
-import ResumeDTO from '../../DTOs/candidate/resume.dto';
+import ResumeDTO from '../../DTOs/candidate -LEGACY/resume.dto';
 import mapToResumeDTOFromResume from '../../mappers/user/mapToResumeDTOFromResume.mapper';
 import ILoadResumeUseCase from './interface/ILoadResumes.usecase';
 

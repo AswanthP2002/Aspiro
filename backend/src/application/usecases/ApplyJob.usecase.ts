@@ -2,7 +2,7 @@ import IJobApplicationRepo from '../../domain/interfaces/IJobApplicationRepo';
 import ISaveJobApplicationUseCase from './candidate/interface/IApplyJob.usecase';
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
-} from '../DTOs/candidate/jobApplication.dto';
+} from '../DTOs/candidate -LEGACY/jobApplication.dto';
 import mapToJobApplicationFromCreateJobDTO from '../mappers/user/mapToJobFromCreateJobDTO.mapper';
 import mapToJobApplicationDTOFromJobApplication from '../mappers/user/mapToJobApplicationDTOFromJobApplication.mapper';
 

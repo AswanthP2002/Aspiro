@@ -1,4 +1,4 @@
-import { FindCandidatesDTO } from '../../../application/DTOs/candidate/candidate.dto';
+import { FindCandidatesDTO } from '../../../application/DTOs/candidate -LEGACY/candidate.dto';
 import { FindCandidatesRequestDTO } from '../../DTOs/candidate/findCandidatesRequestDTO';
 
 export default function mapToFindCandidatesDTOFromRequest(

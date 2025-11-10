@@ -59,10 +59,7 @@ const dummyUserWithRecruiterDetails = {
     }
 };
 
-// To switch between seeing the recruiter profile and the "Become a Recruiter" CTA,
-// you can change this flag.
-// `true` will show the recruiter profile card with dummy data.
-// `false` will show the call-to-action to register as a recruiter.
+
 const showDummyRecruiterProfile = true;
 
 

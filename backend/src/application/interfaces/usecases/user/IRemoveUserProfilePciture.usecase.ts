@@ -1,4 +1,4 @@
-import RemoveProfilePhotoDTO from '../../../DTOs/candidate/removeProfilePhoto.dto';
+import RemoveProfilePhotoDTO from '../../../DTOs/candidate -LEGACY/removeProfilePhoto.dto';
 import UserDTO from '../../../DTOs/user/user.dto';
 
 export default interface IRemoveUserProfilePictureUsecase {

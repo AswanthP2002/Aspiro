@@ -1,5 +1,5 @@
 import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
-import FavoriteJobsAggregatedDTO from '../../DTOs/candidate/favoriteJobAggregated.dto';
+import FavoriteJobsAggregatedDTO from '../../DTOs/candidate -LEGACY/favoriteJobAggregated.dto';
 
 export default function mapFavoriteJobsAggregatedToFavoriteJobsAggDTO(
   favoriteJobsAgg: FavoriteJobsAggregated

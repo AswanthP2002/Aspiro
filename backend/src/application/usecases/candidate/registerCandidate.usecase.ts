@@ -3,8 +3,8 @@ import { generateCode } from '../../../utilities/generateCode';
 import { sendEmail } from '../../../utilities/sendmail';
 import IRegisterCandidateUseCase from './interface/IRegisterCandidate.usecase';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import CreateCandidateDTO from '../../DTOs/candidate/createCandidate.dto';
-import CandidateDTO from '../../DTOs/candidate/candidate.dto';
+import CreateCandidateDTO from '../../DTOs/candidate -LEGACY/createCandidate.dto';
+import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
 import mapToCandidate from '../../mappers/user/mapToCandidate.mapper';
 import mapToCandidateDTO from '../../mappers/user/mapToCandidateDTO.mapper';
 import {

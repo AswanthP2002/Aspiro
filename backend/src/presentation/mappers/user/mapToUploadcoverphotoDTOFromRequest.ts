@@ -1,4 +1,4 @@
-import { UploadCoverPhotoDTO } from '../../../application/DTOs/candidate/uploadCoverPhoto.dto';
+import { UploadCoverPhotoDTO } from '../../../application/DTOs/candidate -LEGACY/uploadCoverPhoto.dto';
 import { UploadCoverPhotoRequestDTO } from '../../DTOs/user/uploadCoverphotoRequestDTO';
 
 export default function mapToUploadCoverPhotoDTOFromRequest(

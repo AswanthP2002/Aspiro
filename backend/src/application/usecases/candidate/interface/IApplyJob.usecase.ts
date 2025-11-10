@@ -1,6 +1,6 @@
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
-} from '../../../DTOs/candidate/jobApplication.dto';
+} from '../../../DTOs/candidate -LEGACY/jobApplication.dto';
 
 export default interface ISaveJobApplicationUseCase {
   execute(

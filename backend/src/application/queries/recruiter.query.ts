@@ -10,5 +10,5 @@ export default interface FindCompaniesQuery {
   search: string;
   page: number;
   limit: number;
-  sortOption: RecruiterNameSortQuery | RecruiterJoinedDateQuery;
+  sortOption: {[key: string]: number}
 }

@@ -1,7 +1,7 @@
 import User from '../../../domain/entities/user/User';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
-import { RemoveCoverPhotoDTO } from '../../DTOs/candidate/removeProfilePhoto.dto';
+import { RemoveCoverPhotoDTO } from '../../DTOs/candidate -LEGACY/removeProfilePhoto.dto';
 import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import { inject, injectable } from 'tsyringe';
 import IRemoveUserCoverPhotoUsecase from '../../interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';

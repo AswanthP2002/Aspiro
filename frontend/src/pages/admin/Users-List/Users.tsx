@@ -9,28 +9,28 @@ import { getUsers } from '../../../services/adminServices';
 import { UserType } from '../../../types/entityTypes';
 
 interface FilterOptions {
-  status: boolean[]; // For isBlocked
-  roles: string[]; // For user roles
-  verification: boolean[]; // For isVerified
+  status: boolean[]; 
+  roles: string[]; 
+  verification: boolean[]; 
 }
 
 export default function Users() {
   
   const [users, setUsers] = useState<UserType[]>([]);
-  const [page, setPage] = useState(1); // Renamed for consistency
-  const [limit, setLimit] = useState(10); // Renamed for consistency
-  const [totalPage, setTotalPage] = useState(0); // Renamed for consistency
-  const [search, setSearch] = useState(""); // Renamed for consistency
-  const [pagination, setPagination] = useState<number[]>([]); // Changed type to number[]
+  const [page, setPage] = useState(1); 
+  const [limit, setLimit] = useState(10); 
+  const [totalPage, setTotalPage] = useState(0); 
+  const [search, setSearch] = useState(""); 
+  const [pagination, setPagination] = useState<number[]>([]); 
   const [selectedUser, setSelectedUser] = useState<UserType>()
 
   const [sortVisible, setSortVisible] = useState(false);
-  const [sort, setSort] = useState('joined-latest'); // Renamed for consistency
-  const [currentSort, setCurrentSort] = useState('joined-latest'); // Reflects the *applied* sort
+  const [sort, setSort] = useState('joined-latest'); 
+  const [currentSort, setCurrentSort] = useState('joined-latest');
 
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
-  const [error, setError] = useState<string | null>(null); // Added error state
+  const [isLoading, setIsLoading] = useState(true); 
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterOptions>({
     status: [],
     roles: [],
@@ -65,29 +65,28 @@ export default function Users() {
 
   useEffect(() => {
     async function fetchCandidateLists(){
-      setIsLoading(true); // Start loading
-      setError(null); // Clear previous errors
+      setIsLoading(true); 
+      setError(null); 
 
       try {
         const result = await getUsers(search, page, sort, filter);
         
-        if (result && result.success) { // Check for success flag from backend
+        if (result && result.success) {
             // console.log('users list from the backend', result); // Removed debug log
             setUsers(result.result?.users || []);
             setPage(result.result?.currentPage || 1);
             setTotalPage(result?.result?.totalPages || 0);
-            // Create an array for pagination buttons: [1, 2, ..., totalPages]
             setPagination(Array.from({ length: result?.result?.totalPages || 0 }, (_, i) => i + 1));
             
             if (result?.result?.users.length > 0) {
               setSelectedUser(result?.result?.users[0]);
             }
-            setCurrentSort(result?.result?.sort || sort); // Use backend's applied sort, or fallback to requested sort
+            setCurrentSort(result?.result?.sort || sort); 
         } else if (result && result.message) {
-            // Handle backend-specific error messages if success is false
+           
             setError(result.message);
             Notify.failure(result.message);
-            setUsers([]); // Clear users on error
+            setUsers([]); 
             setPagination([]);
             setSelectedUser(undefined);
         } else {
@@ -101,11 +100,11 @@ export default function Users() {
         console.error('Failed to fetch user list:', err);
         setError(err.message || "Failed to fetch user list.");
         Notify.failure(err.message || "Failed to fetch user list.");
-        setUsers([]); // Clear users on error
+        setUsers([]); 
         setPagination([]);
         setSelectedUser(undefined);
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false); 
       }
     }
 
@@ -125,14 +124,13 @@ export default function Users() {
   const nextPage = () => setPage(prev => prev + 1);
   const previousPage = () => setPage(prev => prev - 1);
 
-  function searchCandidates(event: React.ChangeEvent<HTMLInputElement>) { // Added type for event
+  function searchCandidates(event: React.ChangeEvent<HTMLInputElement>) { 
     setSearch(event.target.value);
   }
 
-  // Debounce function definition (should be outside component or memoized)
-  // For simplicity, keeping it here for now, but ideally it's a stable reference.
+  
   const debouncedSearch = (fn: Function, delay: number): Function => {
-      let timer: ReturnType<typeof setTimeout>; // Correct type for timer
+      let timer: ReturnType<typeof setTimeout>;
       return function(...args: any[]) {
         clearTimeout(timer);
         timer = setTimeout(() => {
@@ -199,9 +197,9 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user : UserType) => ( // Removed index from key, use user._id
+              {users.map((user : UserType) => ( 
                 <tr
-                  key={user._id} // Use unique ID for key
+                  key={user._id} 
                   onClick={() => setSelectedUser(user)}
                   className={`${selectedUser?._id === user?._id ? "bg-orange-300" : "bg-white"} rounded-lg cursor-pointer`} // Added cursor-pointer
                 >
@@ -233,7 +231,7 @@ export default function Users() {
               page > 1 && <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button>
             }
             {
-              pagination.map((pageNumber) => { // Use pageNumber directly
+              pagination.map((pageNumber) => { 
                 return(
                     <button onClick={() => changePage(pageNumber)} key={pageNumber} className={pageNumber === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{pageNumber}</button>
                 )
@@ -247,7 +245,7 @@ export default function Users() {
       </div>
       
 
-      {selectedUser && ( // Only render if selectedUser exists
+      {selectedUser && ( 
         <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
         <div className="text-sm text-center text-gray-400">{selectedUser?.headline || "Not Specified"}</div>
         <img style={{objectFit:'cover'}} src={selectedUser?.profilePicture?.cloudinarySecureUrl || defaultUser} alt="logo" className="w-16 h-16 rounded-full mx-auto" />

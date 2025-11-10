@@ -1,7 +1,7 @@
 import Certificates from '../../../domain/entities/user/certificates.entity';
 import ICertificateRepo from '../../../domain/interfaces/candidate/ICertificateRepo';
 import ILoadCertificateUseCase from './interface/IGetCeritificates.usecase';
-import CertificateDTO from '../../DTOs/candidate/certificate.dto';
+import CertificateDTO from '../../DTOs/candidate -LEGACY/certificate.dto';
 import mapToCertificateDTOFromCertificate from '../../mappers/user/mapToCertificateDTOFromCertificate.mapper';
 
 export default class GetCertificatesUseCase implements ILoadCertificateUseCase {

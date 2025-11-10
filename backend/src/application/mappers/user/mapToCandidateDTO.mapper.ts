@@ -1,5 +1,5 @@
 import Candidate from '../../../domain/entities/user/candidate.entity';
-import CandidateDTO from '../../DTOs/candidate/candidate.dto';
+import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
 
 export default function mapToCandidateDTO(candidate: Candidate): CandidateDTO {
   return {

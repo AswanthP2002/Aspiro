@@ -245,7 +245,7 @@ export const centralizedAuthentication = async (
   next: NextFunction
 ): Promise<void> => {
   const auth = req.headers.authorization; //access the token from header
-  //console.log('This is auth', auth);
+  console.log('This is auth', auth);
   if (!auth) {
     console.log('No authorization header');
     res.status(StatusCodes.UNAUTHORIZED).json({

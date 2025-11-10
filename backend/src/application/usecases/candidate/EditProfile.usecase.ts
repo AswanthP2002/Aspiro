@@ -1,6 +1,6 @@
 import CandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import CandidateDTO from '../../DTOs/candidate/candidate.dto';
-import UpdateCandidateDTO from '../../DTOs/candidate/updateCandidate.dto';
+import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
+import UpdateCandidateDTO from '../../DTOs/candidate -LEGACY/updateCandidate.dto';
 import mapToCandidateDTO from '../../mappers/user/mapToCandidateDTO.mapper';
 import mapUpdateCandidateDtoToEntity from '../../mappers/user/mapUpdateCandidateDtoToEntity.mapper';
 import IEditProfileUseCase from './interface/IEditProfile.usecase';

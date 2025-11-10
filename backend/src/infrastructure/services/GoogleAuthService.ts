@@ -24,8 +24,8 @@ export default class GoogleAuthService implements IVerifyGoogleTokenUseCase {
 
     return {
       googleId: payload.sub,
-      email: payload.email,
-      name: payload.name,
+      email: payload.email as string,
+      name: payload.name as string,
     };
   }
 }

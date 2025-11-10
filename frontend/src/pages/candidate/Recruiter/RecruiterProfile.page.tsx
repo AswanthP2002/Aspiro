@@ -132,7 +132,6 @@ export default function RecruiterProfilePage(){
                                 
                                 <div className="border-t border-gray-200 pt-4 mt-4 !mb-4">
                                     <p className="mt-2 mb-1 font-semibold text-base">Recently Posted Jobs</p>
-                                  {/* This is a single job card. You can map over an array of jobs to display multiple. */}
                                   {
                                     profileData?.jobs.map((job: Job, index: number) => {
                                       return (

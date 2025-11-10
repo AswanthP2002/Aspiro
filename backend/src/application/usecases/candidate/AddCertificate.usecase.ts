@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import IAddCertificateUseCase from './interface/IAddCertificate.usecase';
 import CertificateDTO, {
   CreateCertificateDTO,
-} from '../../DTOs/candidate/certificate.dto';
+} from '../../DTOs/candidate -LEGACY/certificate.dto';
 import { UploadApiResponse } from 'cloudinary';
 import mapToCertificateDTOFromCertificate from '../../mappers/user/mapToCertificateDTOFromCertificate.mapper';
 

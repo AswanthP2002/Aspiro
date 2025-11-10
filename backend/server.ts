@@ -19,7 +19,6 @@ import connectToDb from './src/infrastructure/database/connection';
 import createAdminRouter from './src/presentation/routes/adminRouter';
 import createFollowRouter from './src/presentation/routes/followRouter';
 import createPostRouter from './src/presentation/routes/postRouter';
-import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 import createChatRouter from './src/presentation/routes/chatRouter';
 import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
@@ -27,6 +26,7 @@ import CreateJobRouter from './src/presentation/routes/jobRouter';
 import createUserRouter from './src/presentation/routes/userRouter';
 import connectRedis from './src/infrastructure/redis/redisClient';
 import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
+import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
   const app = express();
@@ -89,21 +89,13 @@ async function main() {
   app.use(exceptionhandle); //centralized exception handling
 
   const expressServer = http.createServer(app)
-  
-  app.listen(port, () => {
-    logger.info(`Server started running on port ${port}`);
-  });
-
-  expressServer.on('error', (error) => {
-    logger.error({ error }, 'Error occurred while starting the server');
-    process.exit(1);
-  });
-
   initalizeSocket(expressServer)
 
-  process.on('SIGINT', () => {
-    logger.info('Server shutting down...');
-    process.exit(0);
+  expressServer.listen(port, () => {
+    logger.info(`Server started running on port ${port}`);
+  }).on('error', (error) => {
+    logger.error({ error }, 'Error occurred while starting the server');
+    process.exit(1);
   });
 
   process.on('uncaughtException', (error: unknown) => {

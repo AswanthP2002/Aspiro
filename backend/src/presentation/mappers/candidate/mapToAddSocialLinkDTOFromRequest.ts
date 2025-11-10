@@ -1,4 +1,4 @@
-import AddSocialLinkDTO from '../../../application/DTOs/candidate/socialLink.dto';
+import AddSocialLinkDTO from '../../../application/DTOs/candidate -LEGACY/socialLink.dto';
 import AddSocialLinkRequestDTO from '../../DTOs/candidate/addSocialLinkRequestDTO';
 
 export default function mapToAddsocialLinkDTOFromRequest(

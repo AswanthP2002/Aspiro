@@ -1,6 +1,6 @@
 import JobApplicationAggregated from '../../../domain/entities/user/jobApplicationAggregated.entity';
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
-import JobApplicationAggregatedDTO from '../../DTOs/candidate/jobApplicationAggregated.dto';
+import JobApplicationAggregatedDTO from '../../DTOs/candidate -LEGACY/jobApplicationAggregated.dto';
 import mapTojobApplicationAggregatedDTOFromAggregatedData from '../../mappers/user/mapToJobApplAggrDTOFromJobApplAggreData.mapper';
 import IGetCandidateApplicationsUseCase from './interface/IGetCandidateApplications.usecase';
 

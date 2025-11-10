@@ -1,5 +1,5 @@
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import { RemoveSocialLinkDTO } from '../../DTOs/candidate/socialLink.dto';
+import { RemoveSocialLinkDTO } from '../../DTOs/candidate -LEGACY/socialLink.dto';
 import IDeleteSocialLinkUseCase from './interface/IDeleteSocialLink.usecase';
 
 export default class DeleteSocialLinkUseCase

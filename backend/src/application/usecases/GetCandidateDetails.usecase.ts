@@ -1,5 +1,5 @@
 import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
-import CandidateAggregatedDTO from '../DTOs/candidate/candidateAggregated.dto';
+import CandidateAggregatedDTO from '../DTOs/candidate -LEGACY/candidateAggregated.dto';
 import mapToCandidateAggDTO from '../mappers/user/mapToCandidateAggDTO.mapper';
 import IGetCandidateDetailsUseCase from './interfaces/IGetCandiateDetails.usecase';
 

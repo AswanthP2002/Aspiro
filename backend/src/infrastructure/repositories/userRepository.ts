@@ -5,12 +5,10 @@ import { UserDAO } from '../database/DAOs/user.dao.refactored';
 import BaseRepository from './baseRepository';
 import { injectable } from 'tsyringe';
 import { FindUsersQuery } from '../../application/queries/users.query';
+import UserProfileAggregatedAdmin from '../../domain/entities/admin/userProfileAggregatedAdmin';
 
 @injectable()
-export default class UserRepository
-  extends BaseRepository<User>
-  implements IUserRepository
-{
+export default class UserRepository extends BaseRepository<User> implements IUserRepository {
   constructor() {
     super(UserDAO);
   }
@@ -18,6 +16,69 @@ export default class UserRepository
   async findByEmail(email?: string): Promise<User | null> {
     const result = await UserDAO.findOne({ email: email });
     return result;
+  }
+
+  async getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null> {
+    const result = await UserDAO.aggregate([
+      {$match:{_id:new mongoose.Types.ObjectId(userId)}},
+      {
+        $lookup: {
+          from: 'certificates',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'certificates',
+        },
+      },
+      {
+        $lookup: {
+          from: 'educations',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'educations',
+        },
+      },
+      {
+        $lookup: {
+          from: 'experiences',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'experiences',
+        },
+      },
+      {
+        $lookup: {
+          from: 'skills',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'skills',
+        },
+      },
+      {
+        $lookup: {
+          from: 'posts',
+          localField: '_id',
+          foreignField: 'creatorId',
+          as: 'posts',
+        },
+      },
+      {
+        $lookup:{
+          from:'recruiters',
+          localField:'userId',
+          foreignField:'_id',
+          as:'recruiterProfile'
+        }
+      },
+      {$unwind:'$recruiterProfile'},
+      {$lookup:{
+        from:'jobs',
+        localField:'recruiterId',
+        foreignField:'_id',
+        as:'jobs'
+      }}
+    ]);
+
+    return result[0]
   }
 
   async findByPhone(phone?: string): Promise<User | null> {
@@ -61,39 +122,38 @@ export default class UserRepository
     return result.modifiedCount > 0;
   }
 
-  async findUsersWithQuery(query: FindUsersQuery): Promise<{users: User[], total: number} | null> {
+  async findUsersWithQuery(
+    query: FindUsersQuery
+  ): Promise<{ users: User[]; total: number } | null> {
     const { search, page, limit, filterOptions, sortOption } = query;
     const skip = (page - 1) * limit;
 
-    const matchFilter : any = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
-    
-    if (filterOptions.status.length > 0){
-      matchFilter['isBlocked'] = { $in: filterOptions.status }
+    const matchFilter: any = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+
+    if (filterOptions.status.length > 0) {
+      matchFilter['isBlocked'] = { $in: filterOptions.status };
     }
 
-    if(filterOptions.roles.length > 0){
-      matchFilter['role'] = { $in: filterOptions.roles }
+    if (filterOptions.roles.length > 0) {
+      matchFilter['role'] = { $in: filterOptions.roles };
     }
 
-    if(filterOptions.verification.length > 0){
-      matchFilter['isVerified'] = { $in: filterOptions.verification }
+    if (filterOptions.verification.length > 0) {
+      matchFilter['isVerified'] = { $in: filterOptions.verification };
     }
-    
+
     const usersPipeline = [
       { $match: matchFilter },
       { $sort: sortOption },
       { $skip: skip },
-      { $limit: limit }
+      { $limit: limit },
     ];
 
-    const totalCountPipeline = [
-      { $match: matchFilter },
-      { $count: 'total' }
-    ];
+    const totalCountPipeline = [{ $match: matchFilter }, { $count: 'total' }];
 
     const [users, totalResult] = await Promise.all([
       UserDAO.aggregate(usersPipeline),
-      UserDAO.aggregate(totalCountPipeline)
+      UserDAO.aggregate(totalCountPipeline),
     ]);
 
     const total = totalResult[0]?.total || 0;

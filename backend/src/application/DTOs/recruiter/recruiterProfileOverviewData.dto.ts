@@ -1,8 +1,6 @@
 import Job from '../../../domain/entities/recruiter/job.entity';
-import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 import User from '../../../domain/entities/user/User';
-import { Role } from '../user/createUser.dto';
 
 export default interface RecruiterProfilelOverviewDataDTO {
   _id?: string;

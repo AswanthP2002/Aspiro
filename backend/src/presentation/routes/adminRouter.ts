@@ -85,29 +85,29 @@ function createAdminRouter() {
     adminController.loadUsers.bind(adminController)
   )
   // // adminRouter.get(
-  // //   '/admin/companies/data',
+  // //   '/companies/data',
   // //   adminAuth,
   // //   testMiddleware,
   // //   adminController.loadCompanies.bind(adminController)
   // // );
-  // adminRouter.get(
-  //   '/admin/candidate/details',
-  //   centralizedAuthentication,
-  //   authorization(['admin']),
-  //   adminController.loadCandidateDetails.bind(adminController)
-  // );
-  // adminRouter.patch(
-  //   '/admin/candidate/block/:candidateId',
-  //   centralizedAuthentication,
-  //   authorization(['admin']),
-  //   adminController.blockCandidate.bind(adminController)
-  // );
-  // adminRouter.patch(
-  //   '/admin/candidate/unblock/:candidateId',
-  //   centralizedAuthentication,
-  //   authorization(['admin']),
-  //   adminController.unblockCandidate.bind(adminController)
-  // );
+  adminRouter.get(
+    '/users/details/:userId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.loadCandidateDetails.bind(adminController)
+  );
+  adminRouter.patch(
+    '/user/block/:userId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.blockCandidate.bind(adminController)
+  );
+  adminRouter.patch(
+    '/user/unblock/:userId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.unblockCandidate.bind(adminController)
+  );
   // // adminRouter.get(
   // //   '/admin/company/details/:companyId',
   // //   adminAuth,
@@ -128,15 +128,12 @@ function createAdminRouter() {
   // //   adminAuth,
   // //   adminController.closeCompany.bind(adminController)
   // // );
-  // // adminRouter.get(
-  // //   '/admin/jobs/data',
-  // //   adminAuth,
-  // //   (req: Request, res: Response, next: NextFunction) => {
-  // //     console.log('request quey', req?.query);
-  // //     next();
-  // //   },
-  // //   adminController.loadJobs.bind(adminController)
-  // // );
+  adminRouter.get(
+    '/jobs/data',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.loadJobs.bind(adminController)
+  );
   // // adminRouter.get(
   // //   '/admin/job/details/:jobId',
   // //   adminAuth,

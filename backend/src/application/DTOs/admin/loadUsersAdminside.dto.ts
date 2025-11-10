@@ -1,18 +1,16 @@
-import User from "../../../domain/entities/user/User"
-import UserDTO from "../user/user.dto"
+import UserDTO from '../user/user.dto';
 
 export default interface LoadUsersQueryDTO {
-    search : string
-    page : number
-    limit : number
-    sort : string
-    filter? : any
+  search: string;
+  page: number;
+  limit: number;
+  sort: string;
+  filter?: any;
 }
 
-
 export interface PaginatedUsersDTO {
-        users : UserDTO[]
-        page  : number
-        totalPages : number
-        currentSort : string
+  users: UserDTO[];
+  page: number;
+  totalPages: number;
+  currentSort: string;
 }

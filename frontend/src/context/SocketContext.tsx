@@ -12,7 +12,9 @@ export const SocketProvider = ({children}: {children: React.ReactNode}) => {
 
     useEffect(() => {
         if(user?._id){
-            const newSocket = io('http://localhost:5000')
+            const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+                path: '/socket.io' // Match the server path
+            });
             setSocket(newSocket)
 
             newSocket.emit('register_user', user._id)

@@ -259,10 +259,9 @@ export const getUsers = async (search: string, page: number, sort : string, filt
     }
 }
 
-export const getCandidateDetails = async (candidateId : any) => {
+export const getUserDetails = async (userId : any) => {
     try {
-        const response = await axiosInstance.get('/admin/candidate/details', {
-            params:{candidateId},
+        const response = await axiosInstance.get(`/admin/users/details/${userId}`, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -284,9 +283,9 @@ export const getCandidateDetails = async (candidateId : any) => {
     }
 }
 
-export const candidateBlock = async (candidateId : string) => {
+export const userBlock = async (userId : string) => {
     try {
-        const response = await axiosInstance.patch(`/admin/candidate/block/${candidateId}`, null, {
+        const response = await axiosInstance.patch(`/admin/user/block/${userId}`, null, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -294,23 +293,15 @@ export const candidateBlock = async (candidateId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+        if(err.response && err.response.status < 500  && err.response.status !== 403) throw error
 
         console.log('Error occured while blocking the candidate', err)
     }
 }
 
-export const candidateUnblock = async (candidateId : string) => {
+export const userUnblock = async (userId : string) => {
     try {
-        const response = await axiosInstance.patch(`/admin/candidate/unblock/${candidateId}`, null, {
+        const response = await axiosInstance.patch(`/admin/user/unblock/${userId}`, null, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -318,14 +309,8 @@ export const candidateUnblock = async (candidateId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
         }
 
         console.log('Error occured while unblocking the candidate', err)

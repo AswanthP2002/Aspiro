@@ -1,5 +1,5 @@
 import Certificates from '../../../domain/entities/user/certificates.entity';
-import CertificateDTO from '../../DTOs/candidate/certificate.dto';
+import CertificateDTO from '../../DTOs/candidate -LEGACY/certificate.dto';
 
 export default function mapToCertificateDTOFromCertificate(
   certificate: Certificates

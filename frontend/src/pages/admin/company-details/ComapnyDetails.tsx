@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import defaultProfileImage from '/default-img-instagram.png'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import { blockCompanyUnblockCompany, deleteCompany, getCompanyDetails } from '../../../services/adminServices'
 

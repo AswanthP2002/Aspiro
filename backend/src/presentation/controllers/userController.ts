@@ -31,7 +31,7 @@ import IEditProfileUseCase from '../../application/usecases/candidate/interface/
 import IGetNotificationsUseCase from '../../application/usecases/candidate/interface/IGetNotifications.usecase';
 import ISaveFavoriteJobUseCase from '../../application/usecases/candidate/interface/ISaveFavoriteJobs.usecase';
 import ICheckIsJobSavedUseCase from '../../application/usecases/candidate/interface/ICheckIsJobSaved.usecase';
-import IGetFavoriteJobUseCase from '../../application/usecases/candidate/interface/IGetFavoriteJobs.usecase';
+import IGetFavoriteJobUseCase from '../../application/interfaces/usecases/user/IGetFavoriteJobs.usecase';
 import IUnsaveJobUseCase from '../../application/usecases/candidate/interface/IUnsaveJob.usecase';
 import IAddSocialLinkUsecase from '../../application/usecases/candidate/interface/IAddSocialLink.usecase';
 import IDeleteSocialLinkUseCase from '../../application/usecases/candidate/interface/IDeleteSocialLink.usecase';

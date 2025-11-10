@@ -1,8 +1,6 @@
-import {
-  CreateMessageDTO,
-  MessageDTO,
-} from '../../domain/entities/message.entity';
+
 import IMessageRepo from '../../domain/interfaces/IMessageRepo';
+import { CreateMessageDTO, MessageDTO } from '../DTOs/user/message.dto';
 import mapMessagesFromDto from '../mappers/mapMessagesFromDTO.mapper';
 import mapToMessageDTO from '../mappers/mapToMessageDTO.mapper';
 import ICreateMessageUseCase from './interfaces/ICreateMessage.usecase';

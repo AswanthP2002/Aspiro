@@ -1,7 +1,7 @@
 import SocialLinks from '../../../domain/entities/SocialLinks';
 import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import CandidateDTO from '../../DTOs/candidate/candidate.dto';
-import AddSocialLinkDTO from '../../DTOs/candidate/socialLink.dto';
+import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
+import AddSocialLinkDTO from '../../DTOs/candidate -LEGACY/socialLink.dto';
 import mapToCandidateDTO from '../../mappers/user/mapToCandidateDTO.mapper';
 import IAddSocialLinkUsecase from './interface/IAddSocialLink.usecase';
 

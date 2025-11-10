@@ -1,4 +1,4 @@
-import UpdateCandidateDTO from "../../../application/DTOs/candidate/updateCandidate.dto";
+import UpdateCandidateDTO from "../../../application/DTOs/candidate -LEGACY/updateCandidate.dto";
 import EditProfileRequestDTO from "../../DTOs/candidate/editProfileRequest.dto";
 
 export default function mapEditProfileRequestToUpdateDTO(requestDto : EditProfileRequestDTO) : UpdateCandidateDTO {

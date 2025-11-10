@@ -1,6 +1,6 @@
 import CertificateDTO, {
   CreateCertificateDTO,
-} from '../../../DTOs/candidate/certificate.dto';
+} from '../../../DTOs/candidate -LEGACY/certificate.dto';
 
 export default interface IAddCertificateUseCase {
   execute(

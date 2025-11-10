@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 import './Login.css'
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import { candidateLogin } from "../../../services/userServices";
@@ -10,8 +10,11 @@ import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
 import { Controller, useForm } from "react-hook-form";
 import { FormControl, TextField } from "@mui/material";
 import { Notify } from "notiflix";
+import { SocketContext } from "../../../context/SocketContext";
 
 export default function CandidateLogin(){
+
+    const {socket} = useContext(SocketContext)
 
     type Inputs = {
         email : string
@@ -52,6 +55,7 @@ export default function CandidateLogin(){
                     userToken:result?.result?.accessToken,
                     userRole:result?.result?.role
                 }))
+                socket?.emit('register_user', result?.result?.user?._id)
                 setloading(false)
                 navigateTo('/')
             }else{

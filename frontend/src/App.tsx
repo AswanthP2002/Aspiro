@@ -25,7 +25,7 @@ import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard/Dashboard';
 import Companies from './pages/admin/Company-list/Companies';
 import Users from './pages/admin/Users-List/Users';
-import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails';
+import CandidateDetails from './pages/admin/CandidateDetails/UserDetails';
 import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
 import Jobs from './pages/admin/Job-list/JobList';
 import JobDetails from './pages/admin/JobDetails/JobDetails';
@@ -94,6 +94,7 @@ function App() {
               <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
               <Route path='recruiter/my-jobs' element={<MyJobs />} />
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
+              <Route path='favorites' element={<SavedJobs />} />
             </Route>
           </Route>
         </Route>
@@ -114,6 +115,7 @@ function App() {
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='users' element={<Users />} />
           <Route path='candidate/details/:id' element={<CandidateDetails />} />
+          <Route path='jobs' element={<Jobs />} />
         </Route>
 
 
