@@ -97,6 +97,9 @@ import { educationIdSchema } from '../schemas/user/educationId.schema';
 import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
 import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
+import SendResetPassworLinkUsecase from '../../application/usecases/user/SendPasswordResetLink.usecase';
+import ResetPasswordUsecase from '../../application/usecases/user/ResetPassword.usecase';
+import mapResetPasswordDtoMapper from '../../application/mappers/user/mapResetPasswordDto.mapper';
 
 
 @injectable()
@@ -129,17 +132,16 @@ export class UserController {
     @inject('IDeleteUserEducationUsecase')
     private _deleteUserEducationUC: IDeleteUserEducationUsecase,
     @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase,
-    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
+    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase,
+    @inject('ISendResetPasswordLinkUsecase') private _sendResetPasswordLink: SendResetPassworLinkUsecase,
+    @inject('IResetPasswordUsecase') private _resetPassword: ResetPasswordUsecase
   ) {}
 
 
   /**
-   * written controller flow
-   * 1. recieving request
-   * 2. validate data
-   * 3. dto mapping
-   * 4. executing
-   * 5. sending response
+   * 1. Controller gets validated data from the router
+   * 2. map to dto
+   * 3. call particular usecase
    */
 
   async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -524,6 +526,34 @@ export class UserController {
       next(error);
     }
   } //reworked : void
+
+  async sendResetPasswordLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { email } = req.body;
+
+    try {
+      await this._sendResetPasswordLink.execute(email)
+
+      res.status(StatusCodes.OK).json({success:true, message:'Email sent successfully'})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  async resetPassword(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const dto = mapResetPasswordDtoMapper(req.body)
+      const result = await this._resetPassword.execute(dto)
+      
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        return
+      }
+
+      res.status(StatusCodes.OK).json({success:true, message:'Password reset successfully'})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
 
   // async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
   //   const candidateId = req.user.id;

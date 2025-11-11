@@ -72,6 +72,8 @@ import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
 import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
 import { StatusCodes } from '../statusCodes';
+import Validator from '../../validation/validator.zod';
+import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.zod';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -179,6 +181,16 @@ userRouter.get(
     testMiddleware,
     userController.editEducation.bind(userController)
   );
+  userRouter.get(
+    '/reset-password/link/send',
+    userController.sendResetPasswordLink.bind(userController)
+  )
+
+  userRouter.post(
+    '/reset-password',
+    Validator(ResetPasswordSchema),
+    userController.resetPassword.bind(userController)
+  )
   // candidateRouter.delete(
   //   '/candidate/resume/:resumeId',
   //   candidateAuth,

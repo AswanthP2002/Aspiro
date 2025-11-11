@@ -63,6 +63,10 @@ import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.p
 import EditJobForm from './pages/recruiter/EditJob/EditJob';
 
 import { SocketProvider } from './context/SocketContext';
+import ForgotPasswordPage from './pages/user/Forgot-Password/ForgotPassword';
+import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
+import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
+import PasswordResetSuccessPage from './pages/user/Forgot-Password/PasswordResetSuccessPage';
 
 function App() {
   return (
@@ -100,7 +104,11 @@ function App() {
         </Route>
 
         <Route path='/verify' element={<VerificationPage />} />
-        
+        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/password-reset-link/send' element={<ResetLinkSendPage />} />
+        <Route path='/password-reset' element={<PasswordResetPage />} />
+        <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
+
         {/* Candidate specific routes not applicable header & sidebar & footer */}
         <Route path='/login' element={<CandidateLogin />} />
         <Route path='/register' element={<CandidateRegister />} />

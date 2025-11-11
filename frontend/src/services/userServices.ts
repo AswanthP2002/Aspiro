@@ -67,6 +67,24 @@ export const resendOtp = async (email : string, id : string) => {
     }
 }
 
+export const passwordResetLinkSend = async (email: string) => {
+    try {
+        const response = await axiosInstance.post('/reset-password/link/send', 
+            {email},
+            {
+                headers:{'Content-Type':'application/json'}
+            }
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
 export const candidateLogin = async (email : string, password : string) => {
     try {
         const response = await axiosInstance.post('/login', 

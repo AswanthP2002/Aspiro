@@ -130,6 +130,12 @@ import IGetFavoriteJobUseCase from '../application/interfaces/usecases/user/IGet
 import GetFavoriteJobUseCase from '../application/usecases/candidate/GetFavoriteJobs.usecase';
 import IFavoriteJobsRepo from '../domain/interfaces/candidate/IFavoriteJobRepo';
 import FavoriteJobsRepsitory from '../infrastructure/repositories/candidate/favoriteJobsRepository';
+import ISendResetPassworLinkUsecase from '../application/interfaces/usecases/user/ISendPasswordResetLink.usecase';
+import SendResetPassworLinkUsecase from '../application/usecases/user/SendPasswordResetLink.usecase';
+import IDataHashService from '../application/interfaces/services/IDataHashService';
+import DataHashService from '../infrastructure/services/DataHashService';
+import IResetPasswordUsecase from '../application/interfaces/usecases/user/IResetPassword.usecase';
+import ResetPasswordUsecase from '../application/usecases/user/ResetPassword.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -201,6 +207,8 @@ container.registerSingleton<ICreateNotificationUsecase>('ICreateNotificationUsec
 container.registerSingleton<IFollowUserUseCase>('IFollowUserUsecase', FollowUseruseCse)
 container.registerSingleton<IAdminLoadUserDetailsUsecase>('IAdminLoadUserDetailsUsecase', AdminLoadUsersDetailsUsecase)
 container.registerSingleton<IGetFavoriteJobUseCase>('IGetFavoriteJobsUsecase', GetFavoriteJobUseCase)
+container.registerSingleton<ISendResetPassworLinkUsecase>('ISendResetPasswordLinkUsecase', SendResetPassworLinkUsecase)
+container.registerSingleton<IResetPasswordUsecase>('IResetPasswordUsecase', ResetPasswordUsecase)
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
@@ -228,3 +236,4 @@ container.registerSingleton(FollowController)
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
 container.registerSingleton<ICloudStroageService>('ICloudStorageService', CloudStorageService)
+container.registerSingleton<IDataHashService>('IDataHashService', DataHashService)

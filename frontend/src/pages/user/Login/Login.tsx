@@ -11,6 +11,10 @@ import { Controller, useForm } from "react-hook-form";
 import { FormControl, TextField } from "@mui/material";
 import { Notify } from "notiflix";
 import { SocketContext } from "../../../context/SocketContext";
+import {FaArrowLeft} from 'react-icons/fa'
+import {HiOutlineEnvelope} from 'react-icons/hi2'
+import {GoLock} from 'react-icons/go'
+
 
 export default function CandidateLogin(){
 
@@ -119,7 +123,7 @@ export default function CandidateLogin(){
                             }}
                         />
                     </FormControl>
-        
+                    <Link to='/forgot-password'><p className="text-blue-500 text-sm !mt-2">Forgot password?</p></Link>
                     <div className="mt-3">
                         <button type="submit" id="register-button" className="bg-blue-600 rounded-sm w-full py-2 text-xs transition transform active:scale-95" style={{cursor:"pointer"}}>Login</button>
                     </div>
