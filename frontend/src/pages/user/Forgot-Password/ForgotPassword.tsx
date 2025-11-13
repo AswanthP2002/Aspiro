@@ -6,7 +6,6 @@ import { passwordResetLinkSend } from '../../../services/userServices'
 import { Notify } from 'notiflix'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import ThreeDotLoading from '../../../components/common/ThreeDotLoading'
 
 export default function ForgotPasswordPage(){
     const navigate = useNavigate()
@@ -16,7 +15,7 @@ export default function ForgotPasswordPage(){
         email: string
     }
 
-    const {control, handleSubmit, formState:{errors}, reset} = useForm<FormInput>()
+    const {control, handleSubmit, formState:{errors}} = useForm<FormInput>()
 
     const sendPasswordResetLink = async (data: FormInput) => {
         // alert('testing')
@@ -26,9 +25,9 @@ export default function ForgotPasswordPage(){
             const result = await passwordResetLinkSend(email)
             
             if(result?.success){
-                navigate('/password-reset-link/send')
+                navigate('/password-reset-link/send', {state:{email}})
             }else{
-                //Notify.failure(result?.message, {timeout:1500})
+                Notify.failure(result?.message, {timeout:1500})
                 setServerResponseError(result?.message)
             }
         } catch (error: unknown) {

@@ -3,12 +3,11 @@ import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 import './Login.css'
 import { useContext, useState } from "react";
-import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import { candidateLogin } from "../../../services/userServices";
 import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
 import { Controller, useForm } from "react-hook-form";
-import { FormControl, TextField } from "@mui/material";
+import { FormControl, FormHelperText } from "@mui/material";
 import { Notify } from "notiflix";
 import { SocketContext } from "../../../context/SocketContext";
 import {FaArrowLeft} from 'react-icons/fa'
@@ -25,7 +24,7 @@ export default function CandidateLogin(){
         password : string
     }
 
-    const { handleSubmit, formState:{errors}, control, setError} = useForm<Inputs>({
+    const { handleSubmit, formState:{errors}, control} = useForm<Inputs>({
         defaultValues:{
             email:"",
             password:""
@@ -35,108 +34,115 @@ export default function CandidateLogin(){
 
 
     const [validationerrortext, setvalidationerrortext] = useState("")
-    const [loading, setloading] = useState(false)
 
     const dispatcher = useDispatch()
     const navigateTo = useNavigate()
 
-    async function onSubmit(data : Inputs){
-        setloading(true)
+    async function loginOnSubmit(data : Inputs){
+        //alert('testing')
         const {email, password} = data
         try {
             const result = await candidateLogin(email, password)
             console.log('Result from the backend', result?.result)
 
             if(result?.success){
-                //dispatcher(loginSuccess({user:result?.result?.user, userToken:result?.result?.token, userRole:result?.result?.role}))
-                // dispatcher(loginSuccess({
-                //     user:result?.user,
-                //     userToken:result?.accessToken,
-                //     userRole:result?.role
-                // }))
                 dispatcher(loginSuccess({
                     user:result?.result?.user,
                     userToken:result?.result?.accessToken,
                     userRole:result?.result?.role
                 }))
                 socket?.emit('register_user', result?.result?.user?._id)
-                setloading(false)
                 navigateTo('/')
             }else{
-                setloading(false)
                 setvalidationerrortext(result.message)
             }
         } catch (error : unknown) {
             Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:1200})
-            setloading(false)
         }
     }
 
     return(
-        <div className="w-full min-h-screen">
-            <div className="brand aspiro-container !py-10">
-        <Link to="/">
-          <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
-        </Link>
-      </div>
-        <div className="flex items-center justify-center w-full">
-            {loading ? <Loader /> : null}
-            <div className="candidate-register-form-wrapper w-full max-w-md p-5">
-                <h2 className="text-center font-bold">Login</h2>
-                <p className="text-center text-xs mt-1" id="login-switch">Dont have an account? <span><Link className="link" to={'/candidate/register'}>Sign Up</Link></span></p>
-                <form className="form w-full" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex items-center justify-center">
-                        <label htmlFor="" className="error-label mt-2" style={{textAlign:"center"}}>{validationerrortext}</label>
-                    </div>
-                    <FormControl fullWidth sx={{marginTop:'10px'}}>
+        <>
+        <div className="w-full bg-gradient-to-br from-white to-indigo-100 min-h-screen flex flex-col justify-center items-center">
+            <div className="brand w-full !my-5">
+                <p className="text-center font-medium cursor-pointer text-2xl">Aspiro</p>
+            </div>
+            <div className="bg-white w-sm md:w-md shadow-lg border border-gray-200 rounded-md !p-5">
+                <div className="w-full">
+                    <button onClick={() => navigateTo(-1)} className="text-gray-500 text-sm flex gap-2 items-center ">
+                        <FaArrowLeft />
+                        Back
+                    </button>
+                </div>
+                <div className="w-full my-5">
+                    <p className="text-center">Welcome back</p>
+                    <p className="text-center mt-3 text-sm text-black font-light">Dont have an account? 
+                        <Link to='/register'>
+                            <span className="font-medium text-blue-500 cursor-pointer">Sign Up</span>
+                        </Link>
+                    </p>
+                </div>
+                <div>
+                    <p className="text-center text-red-500 text-sm font-medium">{validationerrortext}</p>
+                </div>
+                <form onSubmit={handleSubmit(loginOnSubmit)}>
+                    <FormControl fullWidth error={Boolean(errors.email)}>
+                        <label htmlFor="" className="!text-black text-xs font-medium">Email</label>
                         <Controller
                             name="email"
                             control={control}
                             rules={{
-                                required:{value:true, message:'Please enter your email'}
+                                required:{value:true, message:'Please enter email'}
                             }}
-                            render={({field}) => {
-                                return <TextField
-                                    {...field}
-                                    label="Email"
-                                    error={Boolean(errors.email)}
-                                    helperText={errors.email?.message}
-                                />
-                            }}
+                            render={({field}) => (
+                                <div className="bg-gray-100 rounded-md flex items-center !px-2 !py-2 gap-3">
+                                    <HiOutlineEnvelope color="gray" />
+                                    <input className="w-full outline-none" type="text" placeholder="Enter your email address"
+                                     {...field}
+                                    />
+                                </div>
+                            )}
                         />
+                        <FormHelperText>{errors.email?.message}</FormHelperText>
                     </FormControl>
-                    
-                    <FormControl fullWidth sx={{marginTop:'10px'}}>
-                        <Controller 
+
+                    <FormControl fullWidth className="!mt-3" error={Boolean(errors.password)}>
+                        <div className="flex justify-between">
+                            <label htmlFor="" className="!text-black text-sm font-medium">Password</label>
+                            <Link to='/forgot-password'><p className="text-blue-500 text-xs">Forgot password?</p></Link>
+                        </div>
+                        <Controller
                             name="password"
                             control={control}
                             rules={{
-                                required:{value:true, message:'Please enter your password'}
+                                required:{value:true, message:'Please enter password'}
                             }}
-                            render={({field}) => {
-                                return <TextField
-                                    {...field}
-                                    label="Password"
-                                    error={Boolean(errors.password)}
-                                    helperText={errors.password?.message}
-                                />
-                            }}
+                            render={({field}) => (
+                                <div className="bg-gray-100 rounded-md flex items-center !px-2 !py-2 gap-3">
+                                    <GoLock color="gray" />
+                                    <input className="w-full outline-none" type="text" placeholder="Enter your password"
+                                     {...field}
+                                    />
+                                </div>
+                            )}
                         />
+                        <FormHelperText>{errors.password?.message}</FormHelperText>
                     </FormControl>
-                    <Link to='/forgot-password'><p className="text-blue-500 text-sm !mt-2">Forgot password?</p></Link>
-                    <div className="mt-3">
-                        <button type="submit" id="register-button" className="bg-blue-600 rounded-sm w-full py-2 text-xs transition transform active:scale-95" style={{cursor:"pointer"}}>Login</button>
+                    <div className="w-full mt-3">
+                        <button type="submit" className="bg-black text-white text-sm w-full !p-2 rounded-md">Sign In</button>
                     </div>
                 </form>
-                <div className="flex items-center justify-center w-full mt-2">
-                    <p>OR</p>
+                <div className="flex !my-3 justify-between gap-2 items-center">
+                    <div className="border-b border-gray-300 w-full"></div>
+                    <p className="text-sm font-light">OR</p>
+                    <div className="border-b border-gray-300 w-full"></div>
                 </div>
-                <div className="social-auth w-full flex justify-between mt-2 gap-3">
-                    <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={facebookIcon} className="inline-block" alt="" /> Sign In with facebook</button>
-                    <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button>
+                <div className="flex flex-col gap-2">
+                    <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={facebookIcon} className="inline-block w-7" alt="" /> Sign In with facebook</button>
+                    <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={googleIcon} className="inline-block w-7" alt="" /> Sign up with google </button>
                 </div>
             </div>
         </div>
-        </div>
+        </>
     )
 }

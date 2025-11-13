@@ -1,23 +1,61 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import InfinitySpinner from "../../../components/common/InfinitySpinner";
 import { resendOtp, verify } from "../../../services/userServices";
-import { Controller, useForm } from "react-hook-form";
-import { FormControl, TextField } from "@mui/material";
 import { Notify } from "notiflix";
+import { HiOutlineEnvelope } from "react-icons/hi2";
 
 export default function VerificationPage(){
 
-    type Inputs = {
-        otp : string
-    }
+    const digit1Ref = useRef<HTMLInputElement | null>(null)
+    const digit2Ref = useRef<HTMLInputElement | null>(null)
+    const digit3Ref = useRef<HTMLInputElement | null>(null)
+    const digit4Ref = useRef<HTMLInputElement | null>(null)
+    const digit5Ref = useRef<HTMLInputElement | null>(null)
+    const digit6Ref = useRef<HTMLInputElement | null>(null)
 
-    const {handleSubmit, formState:{errors}, control, setError} = useForm<Inputs>({defaultValues:{otp:""}})
+    const [digit1, setDigit1] = useState('')
+    const [digit2, setDigit2] = useState('')
+    const [digit3, setDigit3] = useState('')
+    const [digit4, setDigit4] = useState('')
+    const [digit5, setDigit5] = useState('')
+    const [digit6, setDigit6] = useState('')
+
+
+    const [valuesFilled, setValuesFilled] = useState(false)
+    const [otpError, setOtpError] = useState('')
+
+    useEffect(() => {
+        if(digit1){
+            digit2Ref.current?.focus()
+        }
+
+        if(digit2){
+            digit3Ref.current?.focus()
+        }
+
+        if(digit3){
+            digit4Ref.current?.focus()
+        }
+
+        if(digit4){
+            digit5Ref.current?.focus()
+        }
+
+        if(digit5){
+            digit6Ref.current?.focus()
+        }
+
+        if(digit1 && digit2 && digit3 && digit4 && digit5 && digit6){
+            setValuesFilled(true)
+        }else{
+            setValuesFilled(false)
+        }
+    
+    }, [digit1, digit2, digit3, digit4, digit5, digit6])
 
     const OTP_EXPIRY_SECONDS = 120;
 
-    const [loading, setloading] = useState(false)
     const [remainingtime, setreminingtime] = useState(OTP_EXPIRY_SECONDS)
     const [resendenabled, setresendenabled] = useState(false)
 
@@ -25,10 +63,6 @@ export default function VerificationPage(){
     const {email, id} = location.state || {}
 
     const navigate = useNavigate()
-
-    // if(!email || !id){
-    //     navigate('/error')
-    // }
 
     const startTimer = () => {
         setresendenabled(false);
@@ -78,13 +112,34 @@ export default function VerificationPage(){
         return Math.round(time % 60)
     }
 
-    async function onSubmit(data : Inputs) {
-        const {otp} = data
+    async function verifyOnSubmit() {
+        alert('testing')
+
+        if(
+            isNaN(parseInt(digit1)) ||
+            isNaN(parseInt(digit2)) ||
+            isNaN(parseInt(digit3)) ||
+            isNaN(parseInt(digit4)) ||
+            isNaN(parseInt(digit5)) ||
+            isNaN(parseInt(digit6))
+        ){
+            setOtpError('OTP can only contain digits')
+            return
+        }else{
+            setOtpError('')
+        }
+        
+        const otp = `${digit1}${digit2}${digit3}${digit4}${digit5}${digit6}`
+
+        if(otp.length !== 6){
+            setOtpError('OTP length must be 6')
+            return
+        }
+
         if(!id){
             Notify.failure('Something went wrong', {timeout:1400})
             return
         }
-        setloading(true)
 
         const result = await verify(id, otp)
 
@@ -95,6 +150,8 @@ export default function VerificationPage(){
                 text:'Email verified successfully',
                 showConfirmButton:true,
                 showCancelButton:false,
+                allowOutsideClick:false,
+                allowEscapeKey:false,
                 confirmButtonText:"Login"
             }).then((result) => {
                 if(result.isConfirmed){
@@ -103,9 +160,8 @@ export default function VerificationPage(){
                 return
             })
         }else{
-            setError("otp", { type: "manual", message: result.message || "Invalid OTP" });
+            setOtpError(result.message)
         }
-        setloading(false);
     }
 
     async function handleResendOtp() {
@@ -113,11 +169,8 @@ export default function VerificationPage(){
             Notify.failure('Email not found. Cannot resend OTP.', {timeout: 2000});
             return;
         }
-        setloading(true);
-        // const result = await resendOtpService(email); // Assuming you have a service for this
-        // For demonstration, let's simulate a successful resend
+        
         const result = await resendOtp(email, id)
-        setloading(false);
 
         if (result.success) {
             Notify.success('A new OTP has been sent to your email.', {timeout: 2000});
@@ -128,40 +181,60 @@ export default function VerificationPage(){
     }
 
     return(
-        <div className="main w-full h-screen flex items-center justify-center">
-            {loading ? <InfinitySpinner /> : null}
-            <div className="verification-wrapper">
-                <h2 className="text-center">Email Verification</h2>
-                <p className="text-center text-gray-500 font-medium mt-2 text-xs">We have sent a verification code to your email {email}</p>
-                <form className="form-otp" onSubmit={handleSubmit(onSubmit)}>
-                <FormControl fullWidth>
-                    <Controller
-                        name="otp"
-                        control={control}
-                        rules={{
-                            required:{value:true, message:'Enter otp before continuing'},
-                            minLength:{value:6, message:'OTP length must have 6'},
-                            maxLength:{value:6, message:'OTP length maximum 6'},
-                            pattern:{value:/^\d+$/, message:'OTP can only contain digits'}
-                        }}
-                        render={({field}) => {
-                            return <TextField
-                                {...field}
-                                variant="outlined"
-                                label="OTP"
-                                error={Boolean(errors.otp)}
-                                helperText={errors.otp?.message}
-                            />
-                        }}
-                    />
-                </FormControl>
-                <button type="submit" className="mt-3 text-white font-medium p-2 w-full max-w-2xl bg-gradient-to-br from-blue-500 to-indigo-600 rounded-sm">Submit</button>
-                </form>
-                <p className="text-center text-sm mt-2">OTP will expire in {getMinute(remainingtime)}:{getSecond(remainingtime)}</p>
-                <div className="resend-otp">
-                    <p className="text-center text-sm mt-2">Didn't receive any code? <button onClick={handleResendOtp} disabled={!resendenabled} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
+        <>
+            <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex flex-col items-center justify-center">
+                <div className="shadow-lg w-sm md:w-md bg-white border border-gray-200 rounded-md p-7 md:p-10">
+                    <div className="flex justify-center w-full items-center">
+                        <div className="bg-blue-100 rounded-full w-13 h-13 flex justify-center items-center">
+                            <HiOutlineEnvelope color="blue" size={23} />
+                        </div>
+                    </div>
+                    <div className="!my-5">
+                        <p className="text-center">Email verification</p>
+                        <p className="text-center text-gray-700 font-light text-sm mt-2">We have sent a verification code to your email {email || 'test@gmail.com'}</p>
+                    </div>
+                    <form>
+                        <p className="text-center text-sm text-gray-700">Enter 6 digit code</p>
+                        <div className="flex gap-2 w-full justify-center mt-3">
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit1} onChange={(e) => setDigit1(e.target.value)} ref={digit1Ref} />
+                            </div>
+
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit2} onChange={(e) => setDigit2(e.target.value)} ref={digit2Ref} />
+                            </div>
+
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit3} onChange={(e) => setDigit3(e.target.value)} ref={digit3Ref} />
+                            </div>
+
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit4} onChange={(e) => setDigit4(e.target.value)} ref={digit4Ref} />
+                            </div>
+
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit5} onChange={(e) => setDigit5(e.target.value)} ref={digit5Ref} />
+                            </div>
+
+                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
+                                <input min={1} max={1} className="w-[100%] " type="text" value={digit6} onChange={(e) => setDigit6(e.target.value)} ref={digit6Ref} />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-center text-xs !my-4 text-red-500">{otpError}</p>
+                        </div>
+                        <div>
+                            <p className="text-center text-sm mt-3 text-gray-500">OTP will expire in <span className="text-blue-500">{getMinute(remainingtime)}:{getSecond(remainingtime)}</span></p>
+                        </div>
+                        <div className="mt-3 w-full">
+                            <button type="button" onClick={verifyOnSubmit} disabled={!valuesFilled} className={`w-full bg-${valuesFilled ? 'black' : 'gray-400'} text-sm text-white rounded-sm py-2`}>Verify & continue</button>
+                        </div>
+                        <div className="resend-otp">
+                          <p className="text-center text-sm mt-3">Didn't receive any code? <button onClick={handleResendOtp} disabled={!resendenabled} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

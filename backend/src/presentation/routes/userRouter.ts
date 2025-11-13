@@ -181,7 +181,7 @@ userRouter.get(
     testMiddleware,
     userController.editEducation.bind(userController)
   );
-  userRouter.get(
+  userRouter.post(
     '/reset-password/link/send',
     userController.sendResetPasswordLink.bind(userController)
   )

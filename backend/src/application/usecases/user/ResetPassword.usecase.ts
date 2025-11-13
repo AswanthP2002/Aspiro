@@ -6,6 +6,7 @@ import UserDTO from "../../DTOs/user/user.dto";
 import IDataHashService from "../../interfaces/services/IDataHashService";
 import { InvalidUserError } from "../../../domain/errors/AppError";
 import mapUserToUserDTO from "../../mappers/user/mapUserToUserDTO.mapper";
+import { verifyToken } from "../../../services/jwt";
 
 @injectable()
 export default class ResetPasswordUsecase implements IResetPasswordUsecase {
@@ -15,8 +16,11 @@ export default class ResetPasswordUsecase implements IResetPasswordUsecase {
     ) {}
 
     async execute(resetPasswordDto: ResetPasswordDTO): Promise<UserDTO | null> {
-        const {email, password} = resetPasswordDto
+        const {token, password} = resetPasswordDto
 
+        //decode token & find email
+        const result = await verifyToken(token)
+        const {email} = result as {email: string}
         //find user
         const user = await this._userRepository.findByEmail(email)
         if(!user){

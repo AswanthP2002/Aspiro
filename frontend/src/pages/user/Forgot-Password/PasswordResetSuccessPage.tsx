@@ -1,18 +1,8 @@
-import { FormControl, FormHelperText } from '@mui/material'
-import { Controller, useForm } from 'react-hook-form'
-import {HiOutlineEnvelope} from 'react-icons/hi2'
-import {FaArrowLeft} from 'react-icons/fa'
 import { FaRegCircleCheck } from 'react-icons/fa6'
-import {GoLock} from 'react-icons/go'
+import { useNavigate } from 'react-router-dom'
 
 export default function PasswordResetSuccessPage(){
-
-    type FormInput = {
-        password: string
-        confirmPassword: string
-    }
-
-    const {control, handleSubmit, formState:{errors}, reset} = useForm<FormInput>()
+    const navigate = useNavigate()
 
     return(
         <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex justify-center items-center">
@@ -31,7 +21,7 @@ export default function PasswordResetSuccessPage(){
                 </div>
                 
                 <div className="action !mt-5">
-                    <button className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Login</button>
+                    <button onClick={() => navigate('/login')} className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Login</button>
                 </div>
     
             </div>

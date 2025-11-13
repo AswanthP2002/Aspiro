@@ -1,18 +1,61 @@
 import { FormControl, FormHelperText } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
-import {HiOutlineEnvelope} from 'react-icons/hi2'
 import {FaArrowLeft} from 'react-icons/fa'
-import { FaRegCircleCheck } from 'react-icons/fa6'
 import {GoLock} from 'react-icons/go'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { resetPassword } from '../../../services/userServices'
+import Swal from 'sweetalert2'
 
 export default function PasswordResetPage(){
+
+    //access token from the url
+    const [searchParams, setSearchParams] = useSearchParams()
+    const navigate = useNavigate()
+    const token = searchParams.get('token')
 
     type FormInput = {
         password: string
         confirmPassword: string
     }
 
-    const {control, handleSubmit, formState:{errors}, reset} = useForm<FormInput>()
+    const {control, watch, handleSubmit, formState:{errors}} = useForm<FormInput>()
+
+    const typedPassword = watch('password')
+
+    async function resetPasswordOnSubmit(data: FormInput){
+        const {password} = data
+        
+        try {
+            const result = await resetPassword(token as string, password)
+        if(result?.success){
+            navigate('/password-reset/success')
+        }else{
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:result?.message,
+                showConfirmButton:true,
+                confirmButtonText:'Ok',
+                allowOutsideClick:false,
+                allowEscapeKey:false,
+                showCancelButton:false
+            }).then(() => {
+                navigate('/login')
+            })
+        }
+        } catch (error: unknown) {
+            Swal.fire({
+                icon:'error',
+                title:'Error',
+                text:'Something went wrong',
+                showConfirmButton:true,
+                confirmButtonText:'Ok',
+                allowEscapeKey:false,
+                allowOutsideClick:false,
+                showCancelButton:false
+            }).then(() => navigate('/login'))
+        }
+    }
 
     return(
         <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex justify-center items-center">
@@ -32,12 +75,16 @@ export default function PasswordResetPage(){
                     <p className="text-center text-gray-700">Reset password</p>
                     <p className='text-center !my-5 text-sm text-black font-light'>Enter your new password and confirm it</p>
                 </div>
-                <form>
+                <form onSubmit={handleSubmit(resetPasswordOnSubmit)}>
                     <FormControl fullWidth>
                         <label htmlFor="" className='!text-black font-medium text-sm !mb-1'>New Password</label>
                         <Controller
                             name='password'
                             control={control}
+                            rules={{
+                                required:{value:true, message:'Enter new password'},
+                                pattern:{value:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, message:'Password must contain one special character, uppercase, lowercase, digit'}
+                            }}
                             render={({field}) => (
                                 <div className="flex gap-2 !px-2 !py-2 bg-gray-100 rounded-md items-center">
                                     <GoLock color='gray' />
@@ -48,7 +95,7 @@ export default function PasswordResetPage(){
                                 </div>
                             )}
                         />
-                        <FormHelperText>Password must be at least 8 charecters long</FormHelperText>
+                        <FormHelperText>{errors.password?.message || 'Pasword must be atleast 8 characters long'}</FormHelperText>
                     </FormControl>
 
                     <FormControl fullWidth className='!mt-5'>
@@ -56,6 +103,12 @@ export default function PasswordResetPage(){
                         <Controller
                             name='confirmPassword'
                             control={control}
+                            rules={{
+                                validate: (value) => {
+                                    return value === typedPassword ? true : "Password doesn't match";
+                                },
+                                required: { value: true, message: 'Confirm your password' },
+                            }}
                             render={({field}) => (
                                 <div className="flex gap-2 !px-2 !py-2 bg-gray-100 rounded-md items-center">
                                     <GoLock color='gray' />
@@ -66,11 +119,13 @@ export default function PasswordResetPage(){
                                 </div>
                             )}
                         />
+                        <FormHelperText>{errors.confirmPassword?.message}</FormHelperText>
                     </FormControl>
+                    <div className="action !mt-5">
+                        <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button>
+                    </div>
                 </form>
-                <div className="action !mt-5">
-                    <button className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button>
-                </div>
+                
     
             </div>
         </div>

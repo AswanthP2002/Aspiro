@@ -80,6 +80,24 @@ export const passwordResetLinkSend = async (email: string) => {
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
+            return err.response.data
+        }
+    }
+}
+
+export const resetPassword = async (token: string, password: string) => {
+    try {
+        const response = await axiosInstance.post('/reset-password', 
+            {token, password},
+            {
+                headers:{'Content-Type':'application/json'}
+            }
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error
         }
     }
