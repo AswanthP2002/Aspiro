@@ -74,6 +74,7 @@ import { upload } from '../../utilities/multer';
 import { StatusCodes } from '../statusCodes';
 import Validator from '../../validation/validator.zod';
 import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.zod';
+import { loginSchema } from '../schemas/user/userLogin.schema';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -87,7 +88,10 @@ function createUserRouter() {
     allowResendOtp,
     userController.resendOTP.bind(userController)
   )
-  userRouter.post('/login', userController.userLogin.bind(userController))
+  userRouter.post(
+    '/login',
+    Validator(loginSchema),
+    userController.userLogin.bind(userController))
   userRouter.post('/logout', userController.userLogout.bind(userController))
   userRouter.get('/token/refresh', refreshAccessToken)
   // candidateRouter.post(

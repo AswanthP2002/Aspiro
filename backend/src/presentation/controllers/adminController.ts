@@ -20,7 +20,6 @@ import IUnblockJobUseCase from '../../application/usecases/admin/interfaces/IUnb
 import IUnrejectJobUseCase from '../../application/usecases/admin/interfaces/IUnrejectJob.usecase';
 import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
 import IFindCandidateByCandidateIdUseCase from '../../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
-import { userLoginSchema } from '../schemas/user/userLogin.schema';
 import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
 import ILoadUsersAdminUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
 import { loadUsersSchema } from '../schemas/admin/loadUsers.schema';
@@ -59,8 +58,7 @@ export class AdminController {
 
   async adminLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const validateInput = userLoginSchema.parse(req.body);
-      const dto = mapToUserLoginDTO({ ...validateInput });
+      const dto = mapToUserLoginDTO(req.body);
       const result: any = await this._adminLoginUC.execute(dto);
       const { refreshToken } = result;
 

@@ -68,7 +68,6 @@ import { verifyUserInputsSchema } from '../schemas/user/verifyUserInputs.schema'
 import IResendOTPUseCase from '../../application/interfaces/usecases/user/IResendOTP.usecase';
 import { resendOtpSchema } from '../schemas/user/resendOtp.schema';
 import IUserLoginUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase';
-import { userLoginSchema } from '../schemas/user/userLogin.schema';
 import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
 import ILoadUserProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase';
 import { userIdSchema } from '../schemas/user/userId.schema';
@@ -210,8 +209,7 @@ export class UserController {
   async userLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     //candidate  login
     try {
-      const validateInput = userLoginSchema.parse(req.body);
-      const dto = mapToUserLoginDTO({ ...validateInput });
+      const dto = mapToUserLoginDTO(req.body);
       const result = await this._userLoginUC.execute(dto);
       const { refreshToken } = result;
 

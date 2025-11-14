@@ -31,6 +31,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { AdminController } from '../controllers/adminController';
 import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
+import Validator from '../../validation/validator.zod';
+import { loginSchema } from '../schemas/user/userLogin.schema';
 
 function createAdminRouter() {
   const adminRouter = express.Router();
@@ -77,7 +79,10 @@ function createAdminRouter() {
   //   // unrejectJobUC
   // );
 
-  adminRouter.post('/login', adminController.adminLogin.bind(adminController));
+  adminRouter.post(
+    '/login',
+    Validator(loginSchema),
+    adminController.adminLogin.bind(adminController));
   adminRouter.get('/users',
     centralizedAuthentication,
     authorization(['admin']),
