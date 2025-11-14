@@ -23,7 +23,7 @@ export const UserSchema = new Schema<User>(
     isBlocked:{type:Boolean, default:false},
     isVerified:{type:Boolean, default:false},
     name:{type:String, required:true},
-    password:{type:String, required:true},
+    password:{type:String},
     location:{
       city:{type:String},
       district:{type:String},

@@ -13,6 +13,7 @@ import { SocketContext } from "../../../context/SocketContext";
 import {FaArrowLeft} from 'react-icons/fa'
 import {HiOutlineEnvelope} from 'react-icons/hi2'
 import {GoLock} from 'react-icons/go'
+import GoogleLoginButton from "../../../components/common/GoogleLoginButton";
 
 
 export default function CandidateLogin(){
@@ -139,7 +140,7 @@ export default function CandidateLogin(){
                 </div>
                 <div className="flex flex-col gap-2">
                     <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={facebookIcon} className="inline-block w-7" alt="" /> Sign In with facebook</button>
-                    <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={googleIcon} className="inline-block w-7" alt="" /> Sign up with google </button>
+                    <GoogleLoginButton />
                 </div>
             </div>
         </div>

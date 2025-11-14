@@ -136,6 +136,11 @@ import IDataHashService from '../application/interfaces/services/IDataHashServic
 import DataHashService from '../infrastructure/services/DataHashService';
 import IResetPasswordUsecase from '../application/interfaces/usecases/user/IResetPassword.usecase';
 import ResetPasswordUsecase from '../application/usecases/user/ResetPassword.usecase';
+import IGoogleAuthService from '../application/interfaces/services/IGoogleAuthService';
+import GoogleAuthService from '../infrastructure/services/GoogleAuthService';
+import IGoogleLoginUseCase from '../application/interfaces/usecases/user/IGoogleLogin.usecase';
+import GoogleLoginUseCase from '../application/usecases/GoogleLogin.usecase';
+import OAuthController from '../presentation/controllers/oAuthController';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -209,6 +214,8 @@ container.registerSingleton<IAdminLoadUserDetailsUsecase>('IAdminLoadUserDetails
 container.registerSingleton<IGetFavoriteJobUseCase>('IGetFavoriteJobsUsecase', GetFavoriteJobUseCase)
 container.registerSingleton<ISendResetPassworLinkUsecase>('ISendResetPasswordLinkUsecase', SendResetPassworLinkUsecase)
 container.registerSingleton<IResetPasswordUsecase>('IResetPasswordUsecase', ResetPasswordUsecase)
+container.registerSingleton<IGoogleLoginUseCase>('IGoogleLoginUsecase', GoogleLoginUseCase)
+
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
@@ -232,8 +239,10 @@ container.registerSingleton(AdminController);
 container.registerSingleton(PostController)
 container.registerSingleton(RecruiterController);
 container.registerSingleton(FollowController)
+container.registerSingleton(OAuthController)
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
 container.registerSingleton<ICloudStroageService>('ICloudStorageService', CloudStorageService)
 container.registerSingleton<IDataHashService>('IDataHashService', DataHashService)
+container.registerSingleton<IGoogleAuthService>('IGoogleAuthService', GoogleAuthService)

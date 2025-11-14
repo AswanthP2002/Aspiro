@@ -4,8 +4,8 @@ import { googleLogin } from "../../services/commonServices";
 import InfinitySpinner from "./InfinitySpinner";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loginSucess } from "../../redux-toolkit/candidateAuthSlice";
 import { useState } from "react";
+import { loginSuccess } from "../../redux-toolkit/userAuthSlice";
 
 export default function GoogleLoginButton(){
     const dispatcher = useDispatch()
@@ -21,7 +21,12 @@ export default function GoogleLoginButton(){
         const result = await googleLogin(googleToken)
 
         if(result?.success){
-            dispatcher(loginSucess({user:result?.result?.user, token:result?.result?.token}))
+            dispatcher(loginSuccess({
+                user:result?.result?.user,
+                userToken:result?.result?.token,
+                userRole:result?.result?.role
+            }))
+            //dispatcher(loginSucess({user:result?.result?.user, token:result?.result?.token}))
             setLoading(false)
             navigateTo('/')
         }

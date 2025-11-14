@@ -1,11 +1,11 @@
 import GoogleTokenVerificationDTO from '../../application/DTOs/googleTokenVerification.dto';
-import IVerifyGoogleTokenUseCase from '../../application/usecases/interfaces/IVerifyGoogleToken.usecase';
 import { OAuth2Client } from 'google-auth-library';
 import { InvalidGoogleTokenError } from '../../domain/errors/AppError';
+import IGoogleAuthService from '../../application/interfaces/services/IGoogleAuthService';
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
-export default class GoogleAuthService implements IVerifyGoogleTokenUseCase {
+export default class GoogleAuthService implements IGoogleAuthService {
   client: OAuth2Client;
   constructor() {
     this.client = new OAuth2Client(googleClientId);

@@ -83,7 +83,7 @@ async function main() {
   app.use('/api', followRouter);
   app.use('/api', postRouter);
   app.use('/api', chatRouter);
-  app.use('/api/auth', oAuthRouter); // OAuth routes are for authentication
+  app.use('/api', oAuthRouter); // OAuth for google signup
   app.use('/api', jobRouter);
 
   app.use(exceptionhandle); //centralized exception handling
