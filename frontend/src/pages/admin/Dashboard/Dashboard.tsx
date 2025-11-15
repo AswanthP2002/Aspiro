@@ -2,9 +2,17 @@ import {FaBriefcase, FaUsers} from 'react-icons/fa'
 import {MdShowChart} from 'react-icons/md'
 import {FaChartSimple} from 'react-icons/fa6'
 import {PiBuildingOfficeFill} from 'react-icons/pi'
+import {RiBuildingLine} from 'react-icons/ri'
 import ApexCharts from 'apexcharts'
 import { useEffect, useState } from 'react'
 import { Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material'
+import { CiHome, CiLogout, CiCreditCard1 } from 'react-icons/ci';
+import { FaUserTie, FaRegChartBar, FaHome } from 'react-icons/fa';
+import { LuUser, LuUsers } from 'react-icons/lu';
+import { AiOutlineRise } from 'react-icons/ai'
+import { CiCalendar } from 'react-icons/ci'
+import {FiDownload} from 'react-icons/fi'
+
 
 const tableDataDemo = [
   {title:'Job Title Here', industry:'Job Industry', company:'Company name', date:'Posted date'},
@@ -14,10 +22,10 @@ const tableDataDemo = [
 
 const Dashboard = () => {
   const demoTileData = [
-    {id:1, title:'Revenue', value:3500, hike:50, icon:<FaChartSimple className='hover:scale-110 transition' color='white' size={30} />, iconTilecolor:'gray'},
-    {id:2, title:'Users', value:3500, hike:50, icon:<FaUsers className='hover:scale-110 transition' color='white' size={30} />, iconTilecolor:'blue'},
-    {id:3, title:'Companies', value:3500, hike:50, icon:<PiBuildingOfficeFill className='hover:scale-110 transition' color='white' size={30} />, iconTilecolor:'orange'},
-    {id:4, title:'Jobs', value:3500, hike:50, icon:<FaBriefcase className='hover:scale-110 transition' color='white' size={30} />, iconTilecolor:'red'}
+    {id:1, title:'Revenue', value:3500, hike:50, icon:<AiOutlineRise size={22} className='hover:scale-110 transition' color='gray' />, iconTilecolor:'gray'},
+    {id:2, title:'Users', value:3500, hike:50, icon:<LuUsers size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'},
+    {id:3, title:'Companies', value:3500, hike:50, icon:<FaUserTie size={22} className='hover:scale-110 transition' color='orange' />, iconTilecolor:'orange'},
+    {id:4, title:'Jobs', value:3500, hike:50, icon:<FaBriefcase size={22} className='hover:scale-110 transition' color='red' />, iconTilecolor:'red'}
   ]
 
   const [options, setOptions] = useState({
@@ -42,32 +50,53 @@ const Dashboard = () => {
   }, [options])
 
   return (
-    <div className="px-6">
-      <h1 className="mb-4 text-xl font-semibold">Admin Dashboard</h1>
-      <div className="grid w-full grid-cols-4 gap-6 mt-5">
+    <div className="px-6 !py-6">
+      <p className='font-medium text-gray-700'>Admin Dashboard</p>
+
+      <section className=''>
+        <div className="grid grid-cols-12 w-full gap-5">
+          <div className="col-span-12 lg:col-span-9">
+            <div className="grid w-full grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-3">
         {
           demoTileData.map((data, index : number) => {
-            return <div className='bg-white shadow rounded-md p-3 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 ease-in-out' key={index}>
-              <div className="flex gap-3">
-                <div className={`bg-${data.iconTilecolor}-500 w-[80px] flex justify-center items-center rounded-md`}>{data.icon}</div>
+            return <div className='bg-white border border-gray-200 rounded-md !p-5' key={index}>
+              <div className="flex justify-between">
                 <div>
-                  <p className='font-medium text-base'>{data.title}</p>
-                  <p className='text-sm text-gray-500 mt-2'>{data.value}</p>
-                  <span className='flex items-center gap-2 mt-2'>
-                    <MdShowChart color='orange' />
-                    <p className='text-xs text-orange-500'>{data.hike}</p>
-                  </span>
+                  <p className='text-gray-500 font-medium text-sm'>{data.title}</p>
+                  <p className='font-normal text-xl mt-2'>{data.value}</p>
                 </div>
+                <div className={`bg-${data.iconTilecolor}-100 w-12 h-12 rounded-md flex items-center justify-center`}>
+                  {data.icon}
+                </div>
+              </div>
+              <div>
+                <p className='text-xs text-green-600 font-medium mt-1'>+ {data.hike}% from previous month</p>
               </div>
             </div>
           })
         }
-      </div>
-
-      <section className='mt-10'>
-        <div className="grid grid-cols-12 w-full gap-5">
-          <div className="col-span-8">
-            <div id='chart' className='p-2 bg-white shadow-sm rounded-md'></div>
+      </div>  
+            {/* Chart has been hidden to test index layering */}
+            <div className='mt-5 bg-white'>
+              <div className="chart-header flex justify-between !p-3">
+                <div>
+                  <p className='text-sm text-gray-700'>Analytics Overview</p>
+                  <p className='text-xs text-gray-500 mt-1'>Montly performance metrics</p>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-gray-200 flex items-center gap-2 !px-2 py-1 rounded-md text-xs'>
+                    <CiCalendar />
+                    <select name="" id="">
+                      <option value="">6</option>
+                    </select>
+                  </div>
+                  <button>
+                    <FiDownload />
+                  </button>
+                </div>
+              </div>
+              <div id='chart' className='bg-white shadow-sm rounded-md'></div>
+            </div>
             <div className='shadow-sm p-3 bg-white rounded-md mt-5 hover:shadow-xl transition'>
                 <TableContainer component={Paper}>
                   <Table>
@@ -106,19 +135,19 @@ const Dashboard = () => {
                 </TableContainer>
             </div>
           </div>
-          <div className="col-span-4">
-            <div className="card bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
+          <div className="col-span-3 hidden lg:block">
+            <div className="card p-3 bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
               <div className="card-header p-3">
-                <p className='text-xl font-semibold'>Top Jobs</p>
+                <p className='text-base font-medium'>Top Jobs</p>
               </div>
               <div className="card-body">
                 {
                   Array.from(new Array(3).fill(1)).map((data : number, index : number) => {
-                    return <div className="border-b p-2 flex items-center border-gray-300 flex gap-2">
-                            <div className='bg-green-400 w-[40px] h-[40px] flex justify-center items-center rounded'><FaBriefcase color='white' /></div>
+                    return <div className=" px-3 py-2 flex items-center border-gray-300 flex gap-2">
+                            <div className='bg-green-200 w-[40px] h-[40px] flex justify-center items-center rounded'><FaBriefcase color='green' /></div>
                             <div>
-                              <p className='text-base'>Job Title</p>
-                              <p className='text-sm text-gray-500'>{data} Applications</p>
+                              <p className='text-sm font-medium'>Job Title</p>
+                              <p className='text-xs text-gray-700'>{data} Applications</p>
                             </div>
                           </div>
                   })
@@ -126,18 +155,18 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="card mt-5 bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
+            <div className="card mt-5 p-3 bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
               <div className="card-header p-3">
-                <p className='text-xl font-semibold'>Top Industries</p>
+                <p className='text-base font-medium'>Top Industries</p>
               </div>
               <div className="card-body">
                 {
                   Array.from(new Array(3).fill(1)).map((data : number, index : number) => {
-                    return <div key={index} className="border-b p-2 flex items-center border-gray-300 flex gap-2">
-                            <div className='bg-green-400 w-[40px] h-[40px] flex justify-center items-center rounded'><FaBriefcase color='white' /></div>
+                    return <div key={index} className="p-2 flex items-center border-gray-300 flex gap-2">
+                            <div className='bg-blue-200 w-[40px] h-[40px] flex justify-center items-center rounded'><RiBuildingLine color='blue' /></div>
                             <div>
-                              <p className='text-base'>Industry</p>
-                              <p className='text-sm text-gray-500'>{data} Hirings</p>
+                              <p className='text-sm font-medium'>Industry</p>
+                              <p className='text-xs text-gray-700'>{data} Hirings</p>
                             </div>
                           </div>
                   })
@@ -145,18 +174,18 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="card mt-5 bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
+            <div className="card mt-5 p-3 bg-white shadow rounded-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
               <div className="card-header p-3">
-                <p className='text-xl font-semibold'>Top Companies</p>
+                <p className='text-base font-medium'>Top Recruiters</p>
               </div>
               <div className="card-body">
                 {
                   Array.from(new Array(3).fill(1)).map((data : number, index : number) => {
-                    return <div className="border-b p-2 flex items-center border-gray-300 flex gap-2">
-                            <div className='bg-green-400 w-[40px] h-[40px] flex justify-center items-center rounded'><FaBriefcase color='white' /></div>
+                    return <div className="p-2 flex items-center border-gray-300 flex gap-2">
+                            <div className='bg-orange-200 w-[40px] h-[40px] flex justify-center items-center rounded'><FaUserTie color='orange' /></div>
                             <div>
-                              <p className='text-base'>Job Title</p>
-                              <p className='text-sm text-gray-500'>{data} Applications</p>
+                              <p className='text-sm font-medium'>Recruiter </p>
+                              <p className='text-xs text-gray-700'>{data} Applications</p>
                             </div>
                           </div>
                   })
