@@ -10,6 +10,10 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
 
+const checkPresentPath = (path: string) => {
+  return window.location.pathname.includes(path)
+}
+
 
 export default function Sidebar(){
   const {adminSidebarOpen, setAdminSidebarOpen, windowSize} = useContext(appContext)
@@ -60,7 +64,7 @@ export default function Sidebar(){
         </div>
         <div className='!p-5 flex-1'>
           <ul className='flex flex-col'>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
+            <li className={`group ${checkPresentPath('dashboard') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
               <Link to="/admin/dashboard" className='flex items-center gap-2 text-orange-500'>
                 <CiHome size={23} color='gray' className='group-hover:!text-orange-500' />
                 <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Home</p>
@@ -78,7 +82,7 @@ export default function Sidebar(){
                 <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiters</p>
               </Link>
             </li>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
+            <li className={`group ${checkPresentPath('users') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
               <Link to="/admin/users" className='flex items-center gap-2'>
               <LuUsers size={21} color='gray' className='group-hover:!text-orange-400'/>
               <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Users</p>

@@ -120,10 +120,12 @@ function App() {
         {/* Admin specific routes */}
         <Route path='/admin/login' element={<AdminLoginPage />} />
         <Route path='/admin' element={<AdminLayout />}>
+          <Route element={<AdminProtectedRoutes />}>
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='users' element={<Users />} />
           <Route path='candidate/details/:id' element={<CandidateDetails />} />
           <Route path='jobs' element={<Jobs />} />
+          </Route>
         </Route>
 
 

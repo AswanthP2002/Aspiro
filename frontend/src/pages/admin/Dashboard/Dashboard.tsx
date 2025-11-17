@@ -95,7 +95,7 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-              <div id='chart' className='bg-white shadow-sm rounded-md'></div>
+              <div id='chart' className='bg-white shadow-sm rounded-md w-full'></div>
             </div>
             <div className='shadow-sm p-3 bg-white rounded-md mt-5 hover:shadow-xl transition'>
                 <TableContainer component={Paper}>

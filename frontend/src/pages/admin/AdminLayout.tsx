@@ -3,7 +3,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar/Sidebar';
 import TopBar from '../../components/admin/TopBar';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { appContext } from '../../context/AppContext';
 
 // Trying to way to handle sidebar and outlet components
@@ -12,31 +12,28 @@ import { appContext } from '../../context/AppContext';
 
 export default function AdminLayout(){
   const {adminSidebarOpen, windowSize, setAdminSidebarOpen} = useContext(appContext)
-  const [marginStart, setMarginStart] = useState('0')
-
-  useEffect(() => {
-
-      if(adminSidebarOpen && windowSize.width < 768){
-        setMarginStart('0')
-      }else if(windowSize.width < 768){
-        setMarginStart('0')
-      }else{
-        setMarginStart('64')
-      }
-  }, [adminSidebarOpen, windowSize])
   
   return (
     <>
-      <div className="w-full min-h-screen grid grid-cols-12">
+      <div className="w-full min-h-screen bg-gray-100">
       {
-        adminSidebarOpen || windowSize.width > 768 ? (
-          <div className={`col-span-2 ${windowSize.width < 768 && adminSidebarOpen ? '!bg-black !w-full' : ''} h-screen border border-gray-200 fixed top-0 left-0`}>
+        // On medium screens and up, sidebar is always visible.
+        // On smaller screens, it's controlled by adminSidebarOpen.
+        (adminSidebarOpen || windowSize.width >= 768) && (
+          <div className={`
+            w-64 h-screen border-r border-gray-200 fixed top-0 left-0 bg-white
+            ${windowSize.width < 768 ? 'z-50' : ''}
+            ${adminSidebarOpen ? 'block' : 'hidden'} md:block
+          `}>
             <Sidebar />
           </div>
         )
-        : null
       }
-      <div className={`col-span-12 ms-${marginStart} bg-gray-100`}>
+      {/* Overlay for mobile when sidebar is open */}
+      {adminSidebarOpen && windowSize.width < 768 && (
+        <div onClick={() => setAdminSidebarOpen(false)} className="fixed inset-0 bg-black opacity-50 z-40"></div>
+      )}
+      <div className="md:ml-64">
         <TopBar />
         <Outlet />
       </div>
@@ -46,13 +43,6 @@ export default function AdminLayout(){
         <Outlet />
       </div> */}
     </div>
-    {/* // <div className="flex h-screen">
-    //   <Sidebar />
-    //   <div className="flex-1 p-6 bg-[#fef7f2] overflow-y-auto">
-    //     <Outlet /> 
-    //   </div>
-    // </div> */}
     </>
   );
 };
-
