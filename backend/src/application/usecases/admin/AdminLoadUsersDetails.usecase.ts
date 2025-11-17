@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import IAdminLoadUserDetailsUsecase from '../../interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
 import userProfileAggregatedAdminDTO from '../../DTOs/admin/userProfileAggregatedAdminDTO';
 import mapToUserProfileAggregatedAdminDTO from '../../mappers/admin/mapToUserProfileAggregatedAdminDTO';

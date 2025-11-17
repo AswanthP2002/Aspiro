@@ -129,14 +129,13 @@ export class AdminController {
     }
   }
 
-  async loadCandidateDetails(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async loadUserDetails(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const { userId } = req.params;
     console.log('candidate id from the frontend', userId);
     //return
     try {
-      const validatedUserId = userIdSchema.parse({ id: userId });
 
-      const result = await this._loadUserDetails.execute(validatedUserId.id);
+      const result = await this._loadUserDetails.execute(userId);
       if (!result) {
         res
           .status(StatusCodes.BAD_REQUEST)
@@ -145,7 +144,7 @@ export class AdminController {
       }
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Candidate Details fetched successfully',
+        message: 'Users Details fetched successfully',
         result,
       });
 

@@ -9,6 +9,7 @@ import { IoLocation } from 'react-icons/io5';
 import { CiCalendar } from 'react-icons/ci';
 import { CgClose } from 'react-icons/cg';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 
 //im certain that sharmi message me today
@@ -29,6 +30,8 @@ interface FilterOptions {
 
 export default function Users() {
   
+  const navigate = useNavigate()
+
   const [users, setUsers] = useState<UserType[]>([]);
   const [page, setPage] = useState(1); 
   const [limit, setLimit] = useState(10); 
@@ -378,6 +381,9 @@ export default function Users() {
                     <p className='text-center text-gray-500 text-sm'>No map data available</p>
                   )
                 }
+                </div>
+                <div className='mt-2'>
+                  <button onClick={() => navigate(`details/${selectedUser?._id}`)} className='w-full bg-gradient-to-br from-orange-400 to-orange-500 text-white !p-1 rounded-md'>View</button>
                 </div>
               </div>
           </div>

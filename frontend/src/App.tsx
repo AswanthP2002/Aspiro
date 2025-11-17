@@ -123,7 +123,7 @@ function App() {
           <Route element={<AdminProtectedRoutes />}>
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='users' element={<Users />} />
-          <Route path='candidate/details/:id' element={<CandidateDetails />} />
+          <Route path='users/details/:id' element={<CandidateDetails />} />
           <Route path='jobs' element={<Jobs />} />
           </Route>
         </Route>

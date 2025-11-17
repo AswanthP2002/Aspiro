@@ -19,6 +19,8 @@ export default class UserRepository extends BaseRepository<User> implements IUse
   }
 
   async getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null> {
+    if(!mongoose.isValidObjectId(userId)) return null
+
     const result = await UserDAO.aggregate([
       {$match:{_id:new mongoose.Types.ObjectId(userId)}},
       {
@@ -61,21 +63,21 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           as: 'posts',
         },
       },
-      {
-        $lookup:{
-          from:'recruiters',
-          localField:'userId',
-          foreignField:'_id',
-          as:'recruiterProfile'
-        }
-      },
-      {$unwind:'$recruiterProfile'},
-      {$lookup:{
-        from:'jobs',
-        localField:'recruiterId',
-        foreignField:'_id',
-        as:'jobs'
-      }}
+      // {
+      //   $lookup:{
+      //     from:'recruiters',
+      //     localField:'userId',
+      //     foreignField:'_id',
+      //     as:'recruiterProfile'
+      //   }
+      // },
+      // {$unwind:'$recruiterProfile'},
+      // {$lookup:{
+      //   from:'jobs',
+      //   localField:'recruiterId',
+      //   foreignField:'_id',
+      //   as:'jobs'
+      // }}
     ]);
 
     return result[0]

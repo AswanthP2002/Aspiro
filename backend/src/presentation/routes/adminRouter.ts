@@ -99,7 +99,7 @@ function createAdminRouter() {
     '/users/details/:userId',
     centralizedAuthentication,
     authorization(['admin']),
-    adminController.loadCandidateDetails.bind(adminController)
+    adminController.loadUserDetails.bind(adminController)
   );
   adminRouter.patch(
     '/user/block/:userId',

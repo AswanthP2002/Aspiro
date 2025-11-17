@@ -244,13 +244,15 @@ export const centralizedAuthentication = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  console.log('Checking fresh request------------------------------------------------')
+  console.log('checking request headers', req.headers)
   const auth = req.headers.authorization; //access the token from header
-  console.log('This is auth', auth);
+  //console.log('This is auth', auth);
   if (!auth) {
-    console.log('No authorization header');
-    res.status(StatusCodes.UNAUTHORIZED).json({
+    console.log('---No authorization header---');
+    res.status(406).json({
       success: false,
-      message: 'Unauthorized Action',
+      message: 'No authorization header provided, please login again',
     });
     return;
   }

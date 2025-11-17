@@ -267,19 +267,11 @@ export const getUserDetails = async (userId : any) => {
 
         return response.data
     } catch (error : unknown) {
-        const err = error as AxiosError
+       const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
-        console.log('Error occured while geting candidate details', err)
+       if(err.response && err.response.status < 500 && err.response.status !== 403){
+        throw error
+       }
     }
 }
 
