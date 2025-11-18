@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import AddExperienceForm from "../../../components/candidate/Forms/ExperienceAdd";
-import {IoSchoolSharp}  from 'react-icons/io5'
+import {IoLocate, IoLocation, IoSchoolSharp}  from 'react-icons/io5'
 import Swal from "sweetalert2";
 import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEdit";
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
@@ -12,6 +12,10 @@ import { Education, Experience, Skills } from "../../../types/entityTypes";
 import CandidateExperienceCard from "../../../components/candidate/Cards/ExperienceCard";
 import CandidateEducationCard from "../../../components/candidate/Cards/EducationCard";
 import { Notify } from "notiflix";
+import { FaGraduationCap, FaPlus, FaSuitcase, FaTrash } from "react-icons/fa";
+import { FaCircleXmark, FaPencil } from "react-icons/fa6";
+import { CiCalendar } from "react-icons/ci";
+import formatDate from "../../../services/util/formatDate";
 
 
 export default function ExperiencePage(){
@@ -190,7 +194,137 @@ export default function ExperiencePage(){
 
     return(
         <>
-        <div className="container px-5 py-5">
+        <div className="p-5 md:p-10">
+            <section className="">
+                <div className="w-full flex justify-between items-center">
+                    <p className="font-light">Experiences</p>
+                    <button onClick={() => toggleModal('experienceAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
+                        <FaPlus />
+                        Add experience
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 mt-5 w-full gap-3">
+                    {
+                        experiences.map((exp: any, index: number) => (
+                            <div key={index} className="border flex gap-3 border-gray-200 bg-white p-5 rounded-md">
+                                <div className="bg-blue-100 w-10 h-10 flex items-center justify-center rounded-md">
+                                    <FaSuitcase color="blue" />
+                                </div>
+                                <div>
+                                  <p className="text-gray-700">{exp.jobRole}</p>
+                                  <p className="text-sm font-light text-gray-700 mt-1">{exp.organization}</p>
+                                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
+                                    <span className="flex items-center gap-1">
+                                        <IoLocation />
+                                        {exp.location}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <CiCalendar />
+                                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-2 mt-2">
+                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">On-site</span>
+                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">Full-time</span>
+                                  </div>
+                                </div>
+                                <div className="flex-1 flex gap-5 justify-end items-start">
+                                    <button onClick={() => selecteEditableExperience(index)}><FaPencil size={12} color="gray" /></button>
+                                    <button onClick={() => deleteExperience(exp._id)}><FaTrash size={12} color="gray" /></button>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+                {
+                    experiences.length === 0 && (
+                        <p className="text-center text-xs text-gray-500">No Experience added</p>
+                    )
+                }
+            </section>
+            <div className="border-b border-gray-300 w-full my-10"></div>
+
+            <section className="">
+                <div className="w-full flex justify-between items-center">
+                    <p className="font-light">Educations</p>
+                    <button onClick={() => toggleModal('educationAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
+                        <FaPlus />
+                        Add Education
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 mt-5 w-full gap-3">
+                    {
+                        education.map((edu: any, index: number) => (
+                            <div key={index} className="border flex gap-3 border-gray-200 bg-white p-5 rounded-md">
+                                <div className="bg-rose-100 w-10 h-10 flex items-center justify-center rounded-md">
+                                    <FaGraduationCap color="indigo" />
+                                </div>
+                                <div>
+                                  <p className="text-gray-700">{edu.educationStream}</p>
+                                  <p className="text-xs rounded-md font-light text-black mt-1 bg-gray-200 w-fit px-2 font-medium">{edu.educationLevel}</p>
+                                    <p className="text-sm mt-2 font-light">{edu.institution}</p>
+                                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
+                                    <span className="flex items-center gap-1">
+                                        <IoLocation />
+                                        {edu.location}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <CiCalendar />
+                                        {formatDate(edu.startYear)} - {edu.endYear ? formatDate(edu.endYear) : 'Present'}
+                                    </span>
+                                  </div>
+                                  {/* <div className="flex gap-2 mt-2">
+                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">On-site</span>
+                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">Full-time</span>
+                                  </div> */}
+                                </div>
+                                <div className="flex-1 flex gap-5 justify-end items-start">
+                                    <button onClick={() => selecteEditableEducation(index)}><FaPencil size={12} color="gray" /></button>
+                                    <button onClick={() => deleteEducation(edu._id)}><FaTrash size={12} color="gray" /></button>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+                {
+                    education.length === 0 && (
+                        <p className="text-center text-xs text-gray-500">No Education added</p>
+                    )
+                }
+            </section>
+            <div className="border-b border-gray-300 w-full my-10"></div>
+
+            <section className="">
+                <div className="w-full flex justify-between items-center">
+                    <p className="font-light">Skills</p>
+                    <button onClick={() => toggleModal('skillsAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
+                        <FaPlus />
+                        Add Skills
+                    </button>
+                </div>
+                <div className="w-full flex flex-wrap gap-3 mt-5">
+                    {
+                        skills.map((skill: Skills, index: number) => (
+                            <div key={index} className="text-xs flex items-center gap-2 font-medium bg-gray-200 rounded-full !px-3 !py-1">
+                                <p>{skill.skill}</p>
+                                <button onClick={() => deleteSkill(skill._id as string, skill.skill)}>
+                                    <FaCircleXmark size={15} color="gray" />
+                                </button>
+                            </div>
+                        ))
+                    }
+                    
+                </div>
+                {
+                    skills.length === 0 && (
+                        <p className="text-center text-xs text-gray-500">No Skills added</p>
+                    )
+                }
+            </section>
+            <div className="border-b border-gray-300 w-full my-10"></div>
+            
+        </div>
+        {/* <div className="container px-5 py-5">
             <section className="experience">
                 <div className="w-full flex justify-between">
                     <div><p className="font-bold">Experiences</p></div>
@@ -273,7 +407,7 @@ export default function ExperiencePage(){
                     }
                 </div>
             </section>
-        </div>
+        </div> */}
         {/* Experience Modal */}
 
         <AddExperienceForm onAddExperience={onAddExperience} token={token} experiencemodalopen={modals.experienceAdd} closeModal={() => toggleModal('experienceAdd', false)} />

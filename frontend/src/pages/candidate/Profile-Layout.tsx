@@ -93,8 +93,8 @@ export default function ProfileLayout(){
                 </Link>
               </li>
 
-              <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('skills-experiences') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
-                <Link to='/profile/personal'>
+              <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('skills-experience') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
+                <Link to='/profile/skills-experience'>
                   <div className="flex items-center gap-2">
                     <PiMedal color="white" size={25} />
                     <p className="text-white text-sm font-light">Skills & Experiences</p>

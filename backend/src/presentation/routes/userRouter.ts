@@ -77,6 +77,8 @@ import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.d
 import { loginSchema } from '../schemas/user/userLogin.schema';
 import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';
+import { userExperienceSchema } from '../schemas/user/userExperience.schema';
+import { addUserEducationSchema } from '../schemas/user/createUserEducation.schema';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -122,6 +124,7 @@ userRouter.get(
     '/experience/add',
     centralizedAuthentication,
     authorization(['user']),
+    Validator(userExperienceSchema),
     userController.addExperience.bind(userController)
   );
   userRouter.get(
@@ -140,7 +143,7 @@ userRouter.get(
     '/experience/edit/:experienceId',
     centralizedAuthentication,
     authorization(['user']),
-    testMiddleware,
+    Validator(userExperienceSchema),
     userController.editExperience.bind(userController)
   );
   userRouter.post(
@@ -166,6 +169,7 @@ userRouter.get(
     '/education/add',
     centralizedAuthentication,
     authorization(['user']),
+    Validator(addUserEducationSchema),
     userController.addEducation.bind(userController)
   );
   userRouter.get(
@@ -184,7 +188,7 @@ userRouter.get(
     '/education/:educationId',
     centralizedAuthentication,
     authorization(['user']),
-    testMiddleware,
+    Validator(addUserEducationSchema),
     userController.editEducation.bind(userController)
   );
   userRouter.post(

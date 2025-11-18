@@ -288,9 +288,7 @@ export class UserController {
   async addExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
     try {
-      const validateUserId = userIdSchema.parse({ id: userId });
-      const validateData = userExperienceSchema.parse(req.body);
-      const dto = MapToAddExperienceDTO({ userId: validateUserId.id, ...validateData });
+      const dto = MapToAddExperienceDTO({ userId: userId, ...req.body });
 
       const result = await this._addUserExperience.execute(dto);
 
@@ -343,11 +341,10 @@ export class UserController {
     const { experienceId } = req.params;
 
     try {
-      const validatedExperienceId = experienceIdSchema.parse({ id: experienceId });
-      const validateData = userExperienceSchema.parse(req.body);
+      
       const dto = mapToEditExperienceDTO({
-        experienceId: validatedExperienceId.id,
-        ...validateData,
+        experienceId: experienceId,
+        ...req.body,
       });
 
       const result = await this._editUserExperienceUC.execute(dto);
@@ -465,12 +462,10 @@ export class UserController {
     const userId = req.user.id;
 
     try {
-      const validateId = userIdSchema.parse({ id: userId });
-      const validateData = addUserEducationSchema.parse(req.body);
 
       const dto = mapToCreateEducationDTOFromRequest({
-        userId: validateId.id,
-        ...validateData,
+        userId: userId,
+        ...req.body,
       });
 
       const result = await this._addUserEducationUC.execute(dto);
@@ -522,11 +517,10 @@ export class UserController {
     const { educationId } = req.params;
 
     try {
-      const validateId = educationIdSchema.parse({ id: educationId });
-      const validateData = addUserEducationSchema.parse(req.body);
+      
       const dto = mapToUpdateEducationDTOFromRequest({
-        id: validateId.id,
-        ...validateData,
+        id: educationId,
+        ...req.body,
       });
 
       const result = await this._editUserEducationUC.execute(dto);
