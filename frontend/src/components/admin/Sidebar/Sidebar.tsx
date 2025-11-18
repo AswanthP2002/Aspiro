@@ -9,6 +9,8 @@ import { LuUser, LuUsers } from 'react-icons/lu';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
+import { logoutAdmin } from '../../../services/adminServices';
+import { Notify } from 'notiflix';
 
 const checkPresentPath = (path: string) => {
   return window.location.pathname.includes(path)
@@ -21,30 +23,26 @@ export default function Sidebar(){
   const dispatcher = useDispatch()
   const navigate = useNavigate()
 
-  async function triggerAdminLogout(){
-    Swal.fire({
-      icon:'info',
-      title:'Logout?',
-      text:'Are you sure you want to logout?',
-      showConfirmButton:true,
-      confirmButtonText:'Yes',
-      showCancelButton:true,
-      cancelButtonText:'No',
-      allowOutsideClick:false
-    }).then(async (result) => {
-      if(result?.isConfirmed){
-        const logoutResult = await userLogout(dispatcher, navigate)
-        Swal.fire({
-        icon:'success',
-        title:'Logout Successful',
-        showConfirmButton:false,
-        showCancelButton:false,
-        timer:2000
-      }).then(() =>  navigate('/admin/login'))
+ async function adminLogout(){
+  Swal.fire({
+    icon:'warning',
+    title:'Logout?',
+    text:'Are you sure to logout',
+    showConfirmButton:true,
+    confirmButtonText:'Logout',
+    showCancelButton:true
+  }).then(async (result) => {
+    if(result?.isConfirmed){
+      const logoutResult = await logoutAdmin(dispatcher, navigate)
+      if(!logoutResult){
+        Notify.failure('Can not logout right now', {timeout:1500})
+        return
       }
-    })     
-     
-  }
+    }else{
+      return
+    }
+  })
+ }
 
   const token = useSelector((state : any) => {
     return state.userAuth.userToken
@@ -103,7 +101,7 @@ export default function Sidebar(){
           </ul>
         </div>
         <div className='!p-5 border-t border-gray-300'>
-          <button className='text-orange-500 font-medium flex items-cneter gap-2'>
+          <button onClick={adminLogout} className='text-orange-500 font-medium flex items-cneter gap-2'>
             <CiLogout color='orange' />
             <p className='!m-0'>Logout</p>
           </button>

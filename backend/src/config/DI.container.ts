@@ -141,6 +141,8 @@ import GoogleAuthService from '../infrastructure/services/GoogleAuthService';
 import IGoogleLoginUseCase from '../application/interfaces/usecases/user/IGoogleLogin.usecase';
 import GoogleLoginUseCase from '../application/usecases/GoogleLogin.usecase';
 import OAuthController from '../presentation/controllers/oAuthController';
+import IAdminDeleteUserUsecase from '../application/interfaces/usecases/admin/IAdminDeleteUser.usecase';
+import AdminDeleteUserUsecase from '../application/usecases/admin/AdminDeleteUser.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -215,6 +217,7 @@ container.registerSingleton<IGetFavoriteJobUseCase>('IGetFavoriteJobsUsecase', G
 container.registerSingleton<ISendResetPassworLinkUsecase>('ISendResetPasswordLinkUsecase', SendResetPassworLinkUsecase)
 container.registerSingleton<IResetPasswordUsecase>('IResetPasswordUsecase', ResetPasswordUsecase)
 container.registerSingleton<IGoogleLoginUseCase>('IGoogleLoginUsecase', GoogleLoginUseCase)
+container.registerSingleton<IAdminDeleteUserUsecase>('IAdminDeleteUserUsecase', AdminDeleteUserUsecase)
 
 
 

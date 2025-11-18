@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import IBlockCandidateUseCase from '../../interfaces/usecases/admin/IAdminBlockUser.usecase';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import IAdminBlockUserUsecase from '../../interfaces/usecases/admin/IAdminBlockUser.usecase';
 import UserDTO from '../../DTOs/user/user.dto';

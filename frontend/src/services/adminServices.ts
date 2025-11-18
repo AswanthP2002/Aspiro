@@ -1,6 +1,8 @@
 import { AxiosError } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import Swal from "sweetalert2"
+import { Notify } from "notiflix"
+import { logout } from "../redux-toolkit/userAuthSlice"
 
 
 export const adminLogin = async (email : string, password : string) => {
@@ -23,14 +25,19 @@ export const adminLogin = async (email : string, password : string) => {
     }
 }
 
-export const logoutAdmin = async () => {
+export const logoutAdmin = async (dispatch: Function, navigate: Function) => {
     try {
         const result = await axiosInstance.post('/admin/logout', null, {
             sendCookie:true,
             sendAuthToken:true
         } as AxiosRequest)
 
-        return result.data
+        Notify.info(result?.data?.message, {timeout:1500})
+
+        setTimeout(() => {
+            dispatch(logout())
+            navigate('/admin/login')
+        }, 1500);
     } catch (error : unknown) {
         const err = error as AxiosError
         if(err.response && err.response.status < 500) return err.response.data
@@ -306,6 +313,24 @@ export const userUnblock = async (userId : string) => {
         }
 
         console.log('Error occured while unblocking the candidate', err)
+    }
+}
+
+export const deleteUser = async (userId: string) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/user/${userId}`, 
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 

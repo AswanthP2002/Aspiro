@@ -6,7 +6,6 @@ import FollowUseruseCse from '../../application/usecases/FollowUser.usecase';
 import UnfollowUserUseCase from '../../application/usecases/UnfollowUser.usecase';
 import GetFollowersUseCase from '../../application/usecases/GetFollowers.usecase';
 import GetFollowingUseCase from '../../application/usecases/GetFollowing.usecase';
-import { userAuth } from '../../middlewares/auth';
 import CreateNotification from '../../application/usecases/common/useCases/CreateNotification.usecase';
 import NotificationRepository from '../../infrastructure/repositories/notificationRepository';
 
@@ -30,26 +29,26 @@ function createFollowRouter() {
     createNotificationUseCase
   );
 
-  followRouter.post(
-    '/follow/:id',
-    userAuth,
-    followcontroller.followUser.bind(followcontroller)
-  );
-  followRouter.delete(
-    '/follow/:id',
-    userAuth,
-    followcontroller.unfollowUser.bind(followcontroller)
-  );
-  followRouter.get(
-    '/followers',
-    userAuth,
-    followcontroller.getFollowers.bind(followcontroller)
-  );
-  followRouter.get(
-    '/following',
-    userAuth,
-    followcontroller.getFollowing.bind(followcontroller)
-  );
+//   followRouter.post(
+//     '/follow/:id',
+//     userAuth,
+//     followcontroller.followUser.bind(followcontroller)
+//   );
+//   followRouter.delete(
+//     '/follow/:id',
+//     userAuth,
+//     followcontroller.unfollowUser.bind(followcontroller)
+//   );
+//   followRouter.get(
+//     '/followers',
+//     userAuth,
+//     followcontroller.getFollowers.bind(followcontroller)
+//   );
+//   followRouter.get(
+//     '/following',
+//     userAuth,
+//     followcontroller.getFollowing.bind(followcontroller)
+//   );
 
   return followRouter;
 }

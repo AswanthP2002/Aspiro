@@ -31,6 +31,7 @@ import IAdminUnblockUserUsecase from '../../application/interfaces/usecases/admi
 import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
 import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
+import IAdminDeleteUserUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteUser.usecase';
 
 @injectable()
 export class AdminController {
@@ -40,9 +41,9 @@ export class AdminController {
     @inject('IAdminLoadUserDetailsUsecase') private _loadUserDetails: IAdminLoadUserDetailsUsecase, // @inject('ILoadCandidatesUseCase')
     @inject('IAdminBlockUserUsecase') private _blockUser: IAdminBlockUserUsecase, // private _loadCandidatesUC: ILoadCandidateUseCase, //usecase interface
     @inject('IAdminUnblockUserUsecase') private _unblockUser: IAdminUnblockUserUsecase,
-    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
-  ) // // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
-  // @inject('ILoadCandidateDetailsUseCase')
+    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase, // // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
+    @inject('IAdminDeleteUserUsecase') private _deleteUser: IAdminDeleteUserUsecase
+  ) // @inject('ILoadCandidateDetailsUseCase')
   // private _loadCandidateDetailsUC: ILoadCandidateDetailsUseCase, //usecase interface
 
   // private _blockCandidateUC: IBlockCandidateUseCase, //usecase interface
@@ -80,25 +81,21 @@ export class AdminController {
     }
   } //common middleware
 
-  // async logoutAdmin(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     res.clearCookie('refreshToken', {
-  //       httpOnly: true,
-  //       secure: false,
-  //       sameSite: 'lax',
-  //     });
-
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Admin logout successfull' });
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // }
+  async logoutAdmin(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    console.log('request in the controller')
+    try {
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+      });
+      
+      console.log('succesfully cleared the cookie, sending response back to the user')
+      res.status(StatusCodes.OK).json({ success: true, message: 'Admin logout successfull' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
   async loadUsers(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
@@ -134,7 +131,6 @@ export class AdminController {
     console.log('candidate id from the frontend', userId);
     //return
     try {
-
       const result = await this._loadUserDetails.execute(userId);
       if (!result) {
         res
@@ -190,13 +186,10 @@ export class AdminController {
   // //   }
   // // }
 
-  async blockCandidate(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async blockUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
       const { userId } = req.params;
-
-      const validateUserId = userIdSchema.parse({ id: userId });
-
-      const result = await this._blockUser.execute(validateUserId.id);
+      const result = await this._blockUser.execute(userId);
 
       if (!result) {
         res
@@ -215,18 +208,33 @@ export class AdminController {
   async unblockCandidate(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
       const { userId } = req.params;
-      const validateUserId = userIdSchema.parse({id: userId})
-      
-      const result = await this._unblockUser.execute(validateUserId.id)
-      
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
-        return
+      const validateUserId = userIdSchema.parse({ id: userId });
+
+      const result = await this._unblockUser.execute(validateUserId.id);
+
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
+        return;
       }
-      res.status(StatusCodes.OK)
+      res
+        .status(StatusCodes.OK)
         .json({ success: true, message: 'Candidate unblocked successfully' });
     } catch (error: any) {
       next(error);
+    }
+  }
+
+  async deleteUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {userId} = req.params
+
+      await this._deleteUser.execute(userId)
+
+      res.status(StatusCodes.OK).json({success:true, message:'User deleted successfully'})
+    } catch (error: unknown) {
+      next(error)
     }
   }
 
@@ -341,31 +349,38 @@ export class AdminController {
   // //     }
   // //   }
 
-    async loadJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
-      const search = (req.query.search as string) || '';
-          const page = parseInt(req.query.page as string) || 1;
-          const limit = parseInt(req.query.limit as string) || 3;
-          const sortOption = (req.query.sort as string) || 'Newest';
-          const filter = JSON.parse(req.query.filter as string) || {}
-          
-      
-          try {
-            const valdiateQueryData = recruiterJobsSchema.parse({search, page, limit, sortOption, filter})
-            const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData)
-            const result = await this._loadJobs.execute(dto)
-            
-            if(!result){
-              res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
-              return
-            }
-            
-            res
-              .status(StatusCodes.OK)
-              .json({ success: true, message: 'Jobs fetched successfully', result });
-          } catch (error: unknown) {
-            next(error)
-          }
+  async loadJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 3;
+    const sortOption = (req.query.sort as string) || 'Newest';
+    const filter = JSON.parse(req.query.filter as string) || {};
+
+    try {
+      const valdiateQueryData = recruiterJobsSchema.parse({
+        search,
+        page,
+        limit,
+        sortOption,
+        filter,
+      });
+      const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData);
+      const result = await this._loadJobs.execute(dto);
+
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
+        return;
+      }
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Jobs fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
     }
+  }
 
   // //   async loadJObDetails(req: AdminAuth, res: Response): Promise<Response> {
   // //     try {

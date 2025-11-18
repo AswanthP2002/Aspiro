@@ -105,7 +105,7 @@ function createAdminRouter() {
     '/user/block/:userId',
     centralizedAuthentication,
     authorization(['admin']),
-    adminController.blockCandidate.bind(adminController)
+    adminController.blockUser.bind(adminController)
   );
   adminRouter.patch(
     '/user/unblock/:userId',
@@ -113,6 +113,12 @@ function createAdminRouter() {
     authorization(['admin']),
     adminController.unblockCandidate.bind(adminController)
   );
+  adminRouter.delete(
+    '/user/:userId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteUser.bind(adminController)
+  )
   // // adminRouter.get(
   // //   '/admin/company/details/:companyId',
   // //   adminAuth,
@@ -166,12 +172,10 @@ function createAdminRouter() {
   // // );
 
   //adminRouter.post('/token/refresh', refreshAccessToken);
-  // adminRouter.post(
-  //   '/admin/logout',
-  //   centralizedAuthentication,
-  //   authorization(['admin']),
-  //   adminController.logoutAdmin
-  // );
+  adminRouter.post(
+    '/logout',
+    adminController.logoutAdmin
+  );
 
 
 
@@ -179,9 +183,7 @@ function createAdminRouter() {
 }
 
 function testMiddleware(req : Request, res : Response, next : NextFunction){
-  console.log(req.body)
-  console.log(req.query?.filter)
-  //console.log('Checking request values filter', JSON.parse(req?.query?.filterOptions as string))
+  console.log('testing logout flow')
   next()
 }
 
