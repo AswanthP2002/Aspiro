@@ -1,6 +1,6 @@
-import CandidateDTO from '../../../DTOs/candidate -LEGACY/candidate.dto';
-import UpdateCandidateDTO from '../../../DTOs/candidate -LEGACY/updateCandidate.dto';
+import UpdateUserDTO from '../../../DTOs/user/updateUser.dto';
+import UserDTO from '../../../DTOs/user/user.dto';
 
 export default interface IEditProfileUseCase {
-  execute(updateCandidateDto: UpdateCandidateDTO): Promise<CandidateDTO | null>;
+  execute(editUserDto: UpdateUserDTO): Promise<UserDTO | null>;
 }

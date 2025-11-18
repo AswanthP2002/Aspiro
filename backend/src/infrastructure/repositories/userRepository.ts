@@ -162,4 +162,28 @@ export default class UserRepository extends BaseRepository<User> implements IUse
 
     return { users, total };
   }
+
+  async addSocialLink(userId: string, socialLink: { domain: string; url: string; }): Promise<User | null> {
+    if(!mongoose.isValidObjectId(userId)) return null
+
+    const result = await UserDAO.findOneAndUpdate(
+      {_id: new mongoose.Types.ObjectId(userId)},
+      {$push:{socialLinks:socialLink}},
+      {returnDocument:'after'}
+    )
+
+    return result
+  }
+
+  async removeSocialLink(userId: string, domain: string): Promise<User | null> {
+    if(!mongoose.isValidObjectId(userId)) return null
+
+    const result = await UserDAO.findOneAndUpdate(
+      {_id:new mongoose.Types.ObjectId(userId)},
+      {$pull:{socialLinks:{domain:domain}}},
+      {returnDocument:'after'}
+    )
+
+    return result
+  }
 }

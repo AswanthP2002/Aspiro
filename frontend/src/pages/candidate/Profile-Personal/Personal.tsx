@@ -10,7 +10,7 @@ import { Box, FormControl, Modal, TextField, Typography } from '@mui/material';
 import { logout } from '../../../redux-toolkit/candidateAuthSlice';
 import {
   addSocialmediaLinks,
-  editUsersProfile,
+  editUserProfile,
   getCandidateProfileData,
   removeSocialLink,
   saveBasicDetails,
@@ -25,6 +25,11 @@ import { SocialLinks, UserType } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
 import { Textarea } from '@mui/joy';
 import RecruiterInfoCard from '../../../components/recruiter/RecruiterInfoCard';
+import { IoLocation } from 'react-icons/io5';
+import { FaEye, FaGithub, FaInstagram, FaLinkedin, FaPlus } from 'react-icons/fa';
+import { MdOutlineCall } from 'react-icons/md';
+import { BsEnvelope } from 'react-icons/bs';
+import { FaCircleXmark } from 'react-icons/fa6';
 
 interface ProfileFormState {
   name?: string;
@@ -70,6 +75,18 @@ export default function ProfilePersonal() {
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [activeProfileSection, setActiveProfileSection] = useState('personal');
 
+  const getSocialMediaIcons = (domain: string) => {
+    if(domain.includes('linkedin')){
+      return <FaLinkedin color='blue' size={20} />
+    }else if(domain.includes('instagram')){
+      return <FaInstagram color='red' size={20} />
+    }else if(domain.includes('github')){
+      return <FaGithub color='black' size={20}/>
+    }else{
+      return
+    }
+  }
+
   const {
     control,
     handleSubmit,
@@ -111,21 +128,31 @@ export default function ProfilePersonal() {
 
   const navigateTo = useNavigate();
 
-  async function onSubmit(data: ProfileFormState) {
+  async function profileEditOnSubmit(data: ProfileFormState) {
     const { name, headline, city, district, state, country, summary, pincode } = data;
     handCloseProfileEdit();
 
     //const { name, headline, city, district, state, country, summary, pincode } = formState;
     try {
-      const result = await saveBasicDetails(
-        headline as string,
-        city as string,
-        district as string,
-        state as string,
-        country as string,
-        pincode as string,
-        summary as string
-      );
+      // const result = await saveBasicDetails(
+      //   headline as string,
+      //   city as string,
+      //   district as string,
+      //   state as string,
+      //   country as string,
+      //   pincode as string,
+      //   summary as string
+      // );
+      const result = await editUserProfile(
+        name,
+        headline,
+        city,
+        district,
+        state,
+        country,
+        summary,
+        pincode
+      )
 
       if (result?.success) {
         Swal.fire({
@@ -156,12 +183,11 @@ export default function ProfilePersonal() {
           });
         });
       } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Something went wrong',
-        });
+        Notify.failure(result?.message, { timeout: 1500 })
       }
-    } catch (error) {}
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : "Something went wrong", {timeout:1700})
+    }
   }
 
   const profilePictureOnSave = (url: string) => {
@@ -302,50 +328,256 @@ export default function ProfilePersonal() {
 
     const result = await addSocialmediaLinks(socialmediaurl);
 
-    if (result.success) {
-      Notify.success(result?.message, { timeout: 1000 });
-      setUser((prv) => {
-        if (!prv) return null;
-        return {
-          ...prv, //social links changed optional to required
-          socialLinks: [...prv.socialLinks, { domain: url.hostname, url: socialmediaurl }],
-        };
-      });
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops!',
-        text: result?.message,
-      });
+    try {
+      if (result.success) {
+        Notify.success(result?.message, { timeout: 1000 });
+        setUser((prv) => {
+          if (!prv) return null;
+          return {
+            ...prv, //social links changed optional to required
+            socialLinks: [...prv.socialLinks, { domain: url.hostname, url: socialmediaurl }],
+          };
+        });
+        setsocialmediaurl('');
+        setIsAddLinkButtonClicked(false);
+      } else {
+        Notify.failure(result?.message, { timeout: 1000 });
+      }
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error?.message : 'Something went wrong', {timeout:1500})
     }
   }
 
   async function deleteSocialLink(domain: string) {
-    const result = await removeSocialLink(domain);
-
-    if (result?.success) {
-      Notify.success(result?.message, { timeout: 1000 });
-      setUser((prv) => {
-        if (!prv) return null;
-        return {
-          ...prv,
-          socialLinks: prv.socialLinks.filter((link: SocialLinks) => link.domain !== domain),
-        };
-      });
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops',
-        text: result?.message,
-      });
+    Swal.fire({
+      icon:'warning',
+      title:'Delete Link?',
+      showConfirmButton:true,
+      confirmButtonText:'Delete',
+      showCancelButton:true,
+      allowOutsideClick:false,
+    }).then(async (result) => {
+      if(result.isConfirmed){
+        try {
+      const result = await removeSocialLink(domain);
+  
+      if (result?.success) {
+        Notify.success(result?.message, { timeout: 1500 });
+        setUser((prv) => {
+          if (!prv) return null;
+          return {
+            ...prv,
+            socialLinks: prv.socialLinks.filter((link: SocialLinks) => link.domain !== domain),
+          };
+        });
+      } else {
+        Notify.failure(result?.message, { timeout: 1500 });
+      }
+    } catch (error: unknown) {
+        Notify.failure(error instanceof Error ? error?.message : 'Something went wrong', {timeout:1500})
     }
+      }else{
+        return
+      }
+    })
   }
 
   return (
     <>
-      {loading ? <Loader /> : null}
-      <div className="container px-10 py-5">
-        <div className="profile-card !p-5 relative height-fit border border-gray-200 shadow-md rounded-lg">
+      {/* {loading ? <Loader /> : null} */}
+      <div className="p-0 md:p-5 lg:p-10">
+        <div className="profile-card bg-white border border-gray-100">
+          <div className="relative banner rounded-t-md bg-gradient-to-br from-blue-500 to-indigo-600 w-full h-40">
+            {
+              user?.coverPhoto?.cloudinaryPublicId && (
+                <img style={{objectFit:'cover'}} className='w-full h-full' src={user?.coverPhoto?.cloudinarySecureUrl} alt="" />
+              )
+            }
+            <i
+                onClick={openCoverphoto}
+                className="fa-solid fa-pen-to-square cursor-pointer absolute right-2 bottom-2"
+              ></i>
+          </div>
+          <div className="flex flex-col md:flex-row px-3 gap-3" style={{marginTop:'-50px'}}>
+            <div className="profile">
+              <div className="relative flex items-center justify-center w-25 h-25 p-1 bg-white shadow-lg rounded-full">
+                {
+                  user?.profilePicture?.cloudinaryPublicId
+                      ? (
+                        <img style={{width:'100%', height:'100%', objectFit:'cover'}} className='rounded-full' src={user?.profilePicture?.cloudinarySecureUrl} alt="" />
+                      )
+                      : (
+                        <div className="w-full h-full rounded-full flex justify-center items-center bg-gradient-to-br from-blue-500 to-indigo-600">
+                          <p className='text-white text-2xl'>C</p>
+                        </div>
+                      )
+                }
+                <i
+                  onClick={openProfilePhoto}
+                  className="cursor-pointer fa-solid fa-pen-to-square absolute -bottom-1 left-10"
+                ></i>
+              </div>
+            </div>
+            <div className="details">
+              <p className='mt-3 md:mt-6 text-gray-700'>{user?.name}</p>
+              <p className='mt-1 text-gray-700 text-sm font-light'>{user?.headline}</p>
+              <div className="flex items-center gap-1 text-gray-500 text-xs mt-2">
+                <IoLocation />
+                <p>{user?.location?.district}, {user?.location?.state}, {user?.location?.country}</p>
+              </div>
+            </div>
+            <div className="action flex-1 flex md:justify-end items-end">
+              <button
+                onClick={handleOpenProfileEdit}
+                className="border border-2 rounded-md text-sm px-2 flex items-center gap-2 py-1 text-blue-500 border-blue-500 "
+              >
+                Edit profile <i className="!text-sm !text-blue-500 fa-solid fa-pen-to-square"></i>
+              </button>
+            </div>
+          </div>
+          <div className="border-t-2 py-3 border-gray-200 w-full flex justify-between mt-5">
+            <div className='flex flex-col items-center justify-center w-1/3'>
+              <p>12</p>
+              <p className='text-sm text-gray-500'>Applications</p>
+            </div>
+            <div className='border-x border-gray-200 flex flex-col items-center justify-center w-1/3'>
+              <p>8</p>
+              <p className='text-sm text-gray-500'>Saved Jobs</p>
+            </div>
+            <div className='flex flex-col items-center justify-center w-1/3'>
+              <span className='flex items-center gap-2'>
+                <FaEye />
+                14
+              </span>
+              <p className='text-sm text-gray-500'>Profile views</p>
+            </div>
+          </div>
+        </div>
+
+        <div className='grid grid-cols-1 gap-3 p-3'>
+          <div className="border border-gray-100 rounded-md p-5 bg-white">
+              <p className='text-sm font-medium'>About</p>
+              <p className='mt-3 text-xs text-gray-500 leading-relaxed'>
+                {user?.summary}
+              </p>
+          </div>
+
+          <div className="border border-gray-100 rounded-md p-5 bg-white ">
+              <p className='text-sm font-medium'>Contact Information</p>
+              <div className="grid grid-cols-1 md w-full md:grid-cols-3 gap-5 mt-3">
+                <div className='flex gap-2'>
+                  <div><BsEnvelope color='gray' /></div>
+                  <div>
+                    <p className='text-xs text-gray-500'>Email</p>
+                    <p className='text-sm mt-1'>{user?.email}</p>
+                  </div>
+                </div>
+                <div className='flex gap-2'>
+                  <div><MdOutlineCall color='gray' /></div>
+                  <div>
+                    <p className='text-xs text-gray-500'>Phone</p>
+                    <p className='text-sm mt-1'>{user?.phone}</p>
+                  </div>
+                </div>
+                <div className='flex gap-2'>
+                  <div><IoLocation color='gray' /></div>
+                  <div>
+                    <p className='text-xs text-gray-500'>Location</p>
+                    <p className='text-sm mt-1'>{user?.location?.city}, {user?.location?.district}, {user?.location?.state}, {user?.location?.country}</p>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+          <div className="social-links p-5 bg-white border border-gray-100 rounded-md">
+            <div className="w-full flex justify-between items-center">
+              <p className='text-sm font-medium'>Social Links</p>
+              <button onClick={() => setIsAddLinkButtonClicked(prv => !prv)} className='text-xs flex items-center justify-center gap-2 border border-gray-300 rounded-md p-2'>
+                <FaPlus />
+                Add link
+              </button>
+            </div>
+            <div>
+              {
+                isAddLinkButtonClicked && (
+                  <>
+                  <div className="w-full bg-gray-200 flex px-2 py-1 mt-3 items-center gap-2 border border-gray-200 rounded-md ">
+                    <input value={socialmediaurl} onChange={(e) => setsocialmediaurl(e.target.value)} placeholder='Enter url' type="text" className='flex-1' />
+                    <button onClick={addSocialMedialink} className='border border-gray-200 text-xs !py-1 px-3 rounded-md bg-blue-200'>Add</button>
+                  </div>
+                  <label htmlFor="" className="absolute error-label !text-xs text-red block">
+                       {socialmediaurlerror}
+                  </label>
+                  </>
+                  // <div className="mt-2 mb-2 flex items-center">
+                  //   <div className="relative">
+                  //     <input
+                  //       value={socialmediaurl}
+                  //       onChange={(event) => setsocialmediaurl(event.target.value)}
+                  //       type="text"
+                  //       placeholder="enter url"
+                  //       className="border w-[400px] border-gray-300 rounded p-1"
+                  //     />
+                  //     <label htmlFor="" className="absolute error-label text-xs text-red block">
+                  //       {socialmediaurlerror}
+                  //     </label>
+                  //   </div>
+                  //   <button
+                  //     onClick={addSocialMedialink}
+                  //     className="text-sm bg-black text-white rounded px-2 py-1 ms-1"
+                  //   >
+                  //     Add
+                  //   </button>
+                  //   <button
+                  //     onClick={() => setIsAddLinkButtonClicked(false)}
+                  //     className="text-sm border border-gray-300 rounded ms-1 py-1 px-2"
+                  //   >
+                  //     <i className="fa-solid fa-xmark-circle"></i>
+                  //   </button>
+                  // </div>
+                )
+              }
+            </div>
+            <div className="grid grid-cols-1 gap-2 mt-5">
+              {
+                user?.socialLinks?.map((link: {domain: string, url: string}, index: number) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <div className='bg-blue-100 w-10 h-10 flex justify-center items-center'>
+                      {getSocialMediaIcons(link.domain)}
+                    </div>
+                    <div>
+                      <p className='text-xs font-medium text-gray-500 '>{link.domain.split(".").slice(1, 2)}</p>
+                      <p className='text-xs text-gray-700'>{link.url}</p>
+                    </div>
+                    <div className="flex-1 flex justify-end text-gray-700 items-center">
+                      <button onClick={() => deleteSocialLink(link.domain)}><FaCircleXmark size={15} /></button>
+                    </div>
+                  </div>
+                ))
+              }
+              {
+                user?.socialLinks?.length === 0 && (
+                  <p className='text-center text-xs text-gray-500'>No links added</p>
+                )
+              }
+            </div>
+          </div>
+
+          <div className="social-links p-5 bg-white border border-gray-100 rounded-md">
+            <div className="w-full flex justify-between items-center">
+              <p className='text-sm font-medium'>Posts</p>
+              <button className='text-xs flex items-center justify-center gap-2 border border-gray-300 rounded-md p-2'>
+                <FaPlus />
+                Create Post
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-2 mt-5 bg-gray-100 p-5 rounded-md">
+              <p className='text-center text-xs text-gray-500'>No posts created</p>
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="profile-card !p-5 relative height-fit border border-gray-200 shadow-md rounded-lg">
           <div className="relative">
             <div className="cover-photo">
               <img
@@ -406,9 +638,9 @@ export default function ProfilePersonal() {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="border-b grid grid-cols-2 border-gray-300 w-full !mt-10">
+        {/* <div className="border-b grid grid-cols-2 border-gray-300 w-full !mt-10">
           <div
             className={`${
               activeProfileSection === 'personal' ? 'border-b border-blue-500 shadow-lg' : ''
@@ -441,11 +673,11 @@ export default function ProfilePersonal() {
               Recruiter Profile
             </p>
           </div>
-        </div>
+        </div> */}
 
         {/* To show personal/user related details */}
-        {activeProfileSection === 'personal' && (
-          <section className="mt-8">
+
+          {/* <section className="mt-8">
             <div>
               <p className="title font-semibold">About</p>
               <p className="mt-3 text-sm text-gray-500">{user?.summary}</p>
@@ -542,129 +774,9 @@ export default function ProfilePersonal() {
                 )}
               </div>
             </div>
-          </section>
-        )}
+          </section> */}
 
-        {
-            activeProfileSection === 'recruiter' && (
-              <section className="!mt-8">
-            
-              {showDummyRecruiterProfile
-                ? <>
-                    <div>
-                      <RecruiterInfoCard 
-                        recruiterDetails={dummyUserWithRecruiterDetails?.recruiterDetails} 
-                      />
-                      <div className="mt-8">
-                          <h3 className="text-xl font-semibold mb-4">Manage Jobs</h3>
-                          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-6">
-                              {/* Recruiter Metrics Section */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                  {/* Active Jobs */}
-                                  <div className="bg-blue-100 border border-blue-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-blue-800 font-semibold">Active Jobs</p>
-                                          <p className="text-2xl font-bold text-blue-900">0</p>
-                                      </div>
-                                      <div className="bg-blue-500 text-white p-3 rounded-full"><i className="fa-solid fa-briefcase !text-white"></i></div>
-                                  </div>
-                                  {/* Total Job Views */}
-                                  <div className="bg-orange-100 border border-orange-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-orange-800 font-semibold">Total Job Views</p>
-                                          <p className="text-2xl font-bold text-orange-900">0</p>
-                                      </div>
-                                      <div className="bg-orange-500 text-white p-3 rounded-full"><i className="fa-solid fa-eye !text-white"></i></div>
-                                  </div>
-                                  {/* Jobs Expiring Soon */}
-                                  <div className="bg-green-100 border border-green-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-green-800 font-semibold">Jobs Expiring Soon</p>
-                                          <p className="text-2xl font-bold text-green-900">0</p>
-                                      </div>
-                                      <div className="bg-green-500 text-white p-3 rounded-full"><i className="fa-solid fa-clock !text-white"></i></div>
-                                  </div>
-                                  {/* Total Hires */}
-                                  <div className="bg-indigo-100 border border-indigo-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-indigo-800 font-semibold">Total Hires</p>
-                                          <p className="text-2xl font-bold text-indigo-900">0</p>
-                                      </div>
-                                      <div className="bg-indigo-500 text-white p-3 rounded-full"><i className="fa-solid fa-handshake !text-white"></i></div>
-                                    </div>
-                              </div>
-
-                              <div className="text-center mt-6">
-                                {false && (<p className="text-gray-600 mb-4">You haven't posted any jobs yet.</p>)}
-                                
-                                <div className="border-t border-gray-200 pt-4 mt-4 !mb-4">
-                                  {/* This is a single job card. You can map over an array of jobs to display multiple. */}
-                                  {
-                                    Array.from(new Array(3)).map((_, index) => {
-                                      return (
-                                        <div className="grid grid-cols-12 items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
-                                      {/* Job Title and Info */}
-                                      <div className="col-span-12 md:col-span-5 flex items-center gap-4">
-                                          <img src={defaultProfile} className="w-12 h-12 rounded-lg object-cover" alt="Company Logo" />
-                                          <div>
-                                              <p className="font-semibold text-gray-800 text-lg">{'Data Entry Operator'}</p>
-                                              <div className="flex items-center text-sm text-gray-500 gap-3 mt-1">
-                                                  <span className="inline-flex items-center gap-1">
-                                                      <i className="fa-solid fa-location-dot text-xs"></i> Remote
-                                                  </span>
-                                                  <span className="inline-flex items-center gap-1">
-                                                      <i className="fa-solid fa-clock text-xs"></i> 24 days left
-                                                  </span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      {/* Status */}
-                                      <div className="col-span-6 md:col-span-2 flex items-center justify-start md:justify-center mt-2 md:mt-0">
-                                          <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full">
-                                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                              Active
-                                          </span>
-                                      </div>
-                                      {/* Applicants */}
-                                      <div className="col-span-6 md:col-span-2 flex items-center justify-start md:justify-center mt-2 md:mt-0">
-                                          <p className="text-gray-700 font-medium text-sm">{12} Applicants</p>
-                                      </div>
-                                      {/* Action Button */}
-                                      <div className="col-span-12 md:col-span-3 flex justify-end mt-4 md:mt-0">
-                                          <button className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto">View Applicants</button>
-                                      </div>
-                                  </div>
-                                      )
-                                    })
-                                  }
-                                </div>
-                                
-                                <button onClick={() => navigateTo('/profile/recruiter/post-job')} className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                                  Post a New Job
-                                </button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                </>
-                  
-              : <>
-                  <div className="text-center bg-white p-8 rounded-lg shadow-md border border-gray-200">
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Unlock Your Recruiting Potential</h3>
-                      <p className="text-gray-600 mb-6">
-                          Join our network to find top-tier talent, post job openings, and manage applications seamlessly.
-                      </p>
-                      <Link to="/profile/recruiter/register">
-                          <button className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
-                              Become a Recruiter Now
-                          </button>
-                      </Link>
-                  </div>
-                </>
-            }
-          </section>
-            )
-        }
+      
       </div>
 
       {/* Prfile edit modal */}
@@ -687,7 +799,7 @@ export default function ProfilePersonal() {
             p: 4,
           }}
         >
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(profileEditOnSubmit)}>
             <div className="w-full flex justify-end">
               <button onClick={handCloseProfileEdit} type="button" className="">
                 <i className="fa-solid fa-close"></i>

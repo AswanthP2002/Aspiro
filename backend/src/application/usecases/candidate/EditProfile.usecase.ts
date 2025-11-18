@@ -1,30 +1,22 @@
-import CandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
-import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
-import UpdateCandidateDTO from '../../DTOs/candidate -LEGACY/updateCandidate.dto';
-import mapToCandidateDTO from '../../mappers/user/mapToCandidateDTO.mapper';
-import mapUpdateCandidateDtoToEntity from '../../mappers/user/mapUpdateCandidateDtoToEntity.mapper';
+import { inject, injectable } from 'tsyringe';
 import IEditProfileUseCase from './interface/IEditProfile.usecase';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
+import UpdateUserDTO from '../../DTOs/user/updateUser.dto';
+import UserDTO from '../../DTOs/user/user.dto';
+import mapUpdateUserDtoToUser from '../../mappers/user/mapUpdateUserDtoToUser.refactored.mapper';
+import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 
+@injectable()
 export default class EditProfileUseCase implements IEditProfileUseCase {
-  constructor(private _iCandidateRepo: CandidateRepo) {}
+  constructor(@inject('IUserRepository') private userRepo: IUserRepository) {}
 
-  async execute(
-    updateCandidateDto: UpdateCandidateDTO
-  ): Promise<CandidateDTO | null> {
-    //const candidate = await this._iCandidateRepo.findByUserId(updateCandidateDto._id)
-    const updateData = mapUpdateCandidateDtoToEntity({
-      _id: updateCandidateDto._id,
-      ...updateCandidateDto,
-    });
+  async execute(editUserDto: UpdateUserDTO): Promise<UserDTO | null> {
+    const updatedUser = mapUpdateUserDtoToUser(editUserDto)
 
-    const result = await this._iCandidateRepo.update(
-      updateData._id?.toString(),
-      updateData
-    );
+    const result = await this.userRepo.update(updatedUser._id as string, updatedUser)
 
     if (result) {
-      const dto = mapToCandidateDTO(result);
-      return dto;
+      const userDto = mapUserToUserDTO(result)
     }
     return null;
   }

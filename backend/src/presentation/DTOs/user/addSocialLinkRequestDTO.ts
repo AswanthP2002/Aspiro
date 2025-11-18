@@ -1,5 +1,5 @@
 export default interface AddSocialLinkRequestDTO {
-    candidateId? : string
+    userId? : string
     domain : string
     url : string
 }

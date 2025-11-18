@@ -143,6 +143,12 @@ import GoogleLoginUseCase from '../application/usecases/GoogleLogin.usecase';
 import OAuthController from '../presentation/controllers/oAuthController';
 import IAdminDeleteUserUsecase from '../application/interfaces/usecases/admin/IAdminDeleteUser.usecase';
 import AdminDeleteUserUsecase from '../application/usecases/admin/AdminDeleteUser.usecase';
+import IAddSocialLinkUsecase from '../application/interfaces/usecases/user/IAddSocialLink.usecase';
+import AddSocialLinkUseCase from '../application/usecases/user/AddSocialLink.usecase';
+import IDeleteSocialLinkUseCase from '../application/interfaces/usecases/user/IDeleteSocialLink.usecase';
+import DeleteSocialLinkUseCase from '../application/usecases/user/DeleteSocialLink.usecase';
+import IEditProfileUseCase from '../application/usecases/candidate/interface/IEditProfile.usecase';
+import EditProfileUseCase from '../application/usecases/candidate/EditProfile.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -218,7 +224,9 @@ container.registerSingleton<ISendResetPassworLinkUsecase>('ISendResetPasswordLin
 container.registerSingleton<IResetPasswordUsecase>('IResetPasswordUsecase', ResetPasswordUsecase)
 container.registerSingleton<IGoogleLoginUseCase>('IGoogleLoginUsecase', GoogleLoginUseCase)
 container.registerSingleton<IAdminDeleteUserUsecase>('IAdminDeleteUserUsecase', AdminDeleteUserUsecase)
-
+container.registerSingleton<IAddSocialLinkUsecase>('IAddSocialLinkUsecase', AddSocialLinkUseCase)
+container.registerSingleton<IDeleteSocialLinkUseCase>('IDeleteSocialLinkUsecase', DeleteSocialLinkUseCase)
+container.registerSingleton<IEditProfileUseCase>('IEditProfileUsecase', EditProfileUseCase)
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(

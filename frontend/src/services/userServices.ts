@@ -194,10 +194,10 @@ export const getCandidateProfileData = async () => {
     }
 }
 
-export const editUsersProfile = async (name?: string, role?: string, city?: string, district?: string, state?: string, country?: string, about?: string, pincode? : string) => {
+export const editUserProfile = async (name?: string, headline?: string, city?: string, district?: string, state?: string, country?: string, summary?: string, pincode? : string) => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile',
-            {name, role, city, district, state, country, about, pincode},
+        const response = await axiosInstance.patch('/user/profile',
+            {name, headline, city, district, state, country, summary, pincode},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -209,7 +209,7 @@ export const editUsersProfile = async (name?: string, role?: string, city?: stri
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+           throw error
         }
 
         console.log('Error occured while editing candidate data', err)
@@ -642,7 +642,7 @@ export const checkIsSaved = async (jobId : string) => {
 
 export const addSocialmediaLinks = async (url : string) => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile/links',
+        const response = await axiosInstance.patch('/user/profile/links',
             {url},
             {
                 headers:{'Content-Type':'application/json'},
@@ -654,15 +654,15 @@ export const addSocialmediaLinks = async (url : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-
-        console.log('Error occured while adding social media links')
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
     }
 }
 
 export const removeSocialLink = async (domain : string) => {
     try {
-        const response = await axiosInstance.patch('/candidate/profile/links/remove',
+        const response = await axiosInstance.patch('/user/profile/links/remove',
             {domain},
             {
                 headers:{'Content-Type':'application/json'},
@@ -674,7 +674,9 @@ export const removeSocialLink = async (domain : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
 
         console.log('Error occured while deleting the social link', err)
     }

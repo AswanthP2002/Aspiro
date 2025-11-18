@@ -75,6 +75,8 @@ import { StatusCodes } from '../statusCodes';
 import Validator from '../../validation/validator.zod';
 import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.zod';
 import { loginSchema } from '../schemas/user/userLogin.schema';
+import { UrlSchema } from '../schemas/user/url.schema';
+import { EditProfileSchema } from '../schemas/user/editProfile.schema';
 
 function createUserRouter() {
   const userRouter = express.Router();
@@ -231,12 +233,13 @@ userRouter.get(
   //   candidateController.loadResume.bind(candidateController)
   // );
 
-  // candidateRouter.patch(
-  //   '/candidate/profile',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.editCandidateProfile.bind(candidateController)
-  // ); //need updation
+  userRouter.patch(
+    '/user/profile',
+    centralizedAuthentication,
+    authorization(['user']),
+    Validator(EditProfileSchema),
+    userController.editUserProfile.bind(userController)
+  ); //need updation
 
   // candidateRouter.post(
   //   '/candidate/job/:jobId/apply',
@@ -283,18 +286,19 @@ userRouter.get(
   //   candidateAuth,
   //   candidateController.unsaveJob.bind(candidateController)
   // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/links',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.addSocialLink.bind(candidateController)
-  // );
-  // candidateRouter.patch(
-  //   '/candidate/profile/links/remove',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.deleteSocialLink.bind(candidateController)
-  // );
+  userRouter.patch(
+    '/user/profile/links',
+    centralizedAuthentication,
+    authorization(['user']),
+    Validator(UrlSchema),
+    userController.addSocialLink.bind(userController)
+  );
+  userRouter.patch(
+    '/user/profile/links/remove',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.deleteSocialLink.bind(userController)
+  );
   userRouter.patch(
     '/profile/picture/update',
     centralizedAuthentication,

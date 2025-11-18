@@ -12,6 +12,8 @@ export default interface IUserRepository extends IBaseRepo<User> {
   unblockUser(userId: string): Promise<boolean>;
   findUsersWithQuery(query : FindUsersQuery) : Promise<{users: User[], total: number} | null>
   getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null>
+  addSocialLink(userId: string, socialLink: {domain: string, url: string}): Promise<User | null>
+  removeSocialLink(userId: string, domain: string): Promise<User | null>
   //removeProfilePicture(id? : string) : Promise<User | null>
   //removeCoverPhoto(id? : string) : Promise<User | null>
 }

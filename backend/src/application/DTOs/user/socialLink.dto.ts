@@ -1,12 +1,12 @@
 //candidateId: string, domain: string, url: string
 
 export default interface AddSocialLinkDTO {
-    candidateId? : string
+    userId? : string
     domain : string
     url : string
 }
 
 export interface RemoveSocialLinkDTO {
-    candidateId?: string
+    userId?: string
     domain: string
 }

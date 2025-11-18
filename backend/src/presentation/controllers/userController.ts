@@ -33,8 +33,8 @@ import ISaveFavoriteJobUseCase from '../../application/usecases/candidate/interf
 import ICheckIsJobSavedUseCase from '../../application/usecases/candidate/interface/ICheckIsJobSaved.usecase';
 import IGetFavoriteJobUseCase from '../../application/interfaces/usecases/user/IGetFavoriteJobs.usecase';
 import IUnsaveJobUseCase from '../../application/usecases/candidate/interface/IUnsaveJob.usecase';
-import IAddSocialLinkUsecase from '../../application/usecases/candidate/interface/IAddSocialLink.usecase';
-import IDeleteSocialLinkUseCase from '../../application/usecases/candidate/interface/IDeleteSocialLink.usecase';
+import IAddSocialLinkUsecase from '../../application/interfaces/usecases/user/IAddSocialLink.usecase';
+import IDeleteSocialLinkUseCase from '../../application/interfaces/usecases/user/IDeleteSocialLink.usecase';
 import IRemoveProfilePictureUseCase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
 import IUploadCoverPhotoUseCase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
 import IGetCandidatesUseCase from '../../application/usecases/interfaces/IGetCandidates.usecase';
@@ -52,12 +52,12 @@ import mapToUploadProfilePictureDTOFromRequest from '../mappers/user/mapToUpload
 import mapToUploadCoverPhotoDTOFromRequest from '../mappers/user/mapToUploadcoverphotoDTOFromRequest';
 import IRemoveCoverphotoUseCase from '../../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase';
 import mapToFindCandidatesDTOFromRequest from '../mappers/candidate/mapToFindCandidatesDTOFromRequest';
-import mapToAddsocialLinkDTOFromRequest from '../mappers/candidate/mapToAddSocialLinkDTOFromRequest';
+import mapToAddsocialLinkDTOFromRequest from '../mappers/user/mapToAddSocialLinkDTOFromRequest';
 import IUpdateNotificationReadStatus from '../../application/usecases/candidate/interface/IUpdateNotificationReadStatus.usecase';
 import mapToEditExperienceDTO from '../mappers/user/mapToEditExperienceDTO';
 import ISaveBasicsCandidateUseCase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase';
 import mapRequestDtoToUpdateCandidateDTO from '../mappers/candidate/mapRequestDtoToUpdateCandidateDTO';
-import mapEditProfileRequestToUpdateDTO from '../mappers/candidate/mapEditProfileRequestToUpdateDTO';
+import mapEditProfileRequestToUpdateDTO from '../mappers/user/mapEditProfileRequestToUpdateDTO';
 import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase';
 import mapToCandidateDTO from '../../application/mappers/user/mapToCandidateDTO.mapper';
 import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
@@ -132,10 +132,13 @@ export class UserController {
     private _deleteUserEducationUC: IDeleteUserEducationUsecase,
     @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase,
     @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase,
-    @inject('ISendResetPasswordLinkUsecase') private _sendResetPasswordLink: SendResetPassworLinkUsecase,
-    @inject('IResetPasswordUsecase') private _resetPassword: ResetPasswordUsecase
+    @inject('ISendResetPasswordLinkUsecase')
+    private _sendResetPasswordLink: SendResetPassworLinkUsecase,
+    @inject('IResetPasswordUsecase') private _resetPassword: ResetPasswordUsecase,
+    @inject('IAddSocialLinkUsecase') private _addSocialLink: IAddSocialLinkUsecase,
+    @inject('IDeleteSocialLinkUsecase') private _deleteSocialLink: IDeleteSocialLinkUseCase,
+    @inject('IEditProfileUsecase') private _editProfile: IEditProfileUseCase
   ) {}
-
 
   /**
    * 1. Controller gets validated data from the router
@@ -235,7 +238,7 @@ export class UserController {
     const id = req.user.id as string;
 
     try {
-      const validatedId = userIdSchema.parse({ id }); 
+      const validatedId = userIdSchema.parse({ id });
       const validatedData = SaveUserBasicsSchema.parse(req.body);
       const dto = mapToUpdateUserDTO({ id: validatedId.id, ...validatedData });
 
@@ -291,8 +294,10 @@ export class UserController {
 
       const result = await this._addUserExperience.execute(dto);
 
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
       }
 
       res.status(StatusCodes.CREATED).json({
@@ -309,9 +314,9 @@ export class UserController {
     const { experienceId } = req.params;
 
     try {
-      const validatedId = experienceIdSchema.parse({id:experienceId})
+      const validatedId = experienceIdSchema.parse({ id: experienceId });
       await this._deleteUserExperienceUC.execute(experienceId);
-      
+
       res.status(StatusCodes.OK).json({ success: true, message: 'Experience deleted' });
     } catch (error: unknown) {
       next(error);
@@ -338,16 +343,20 @@ export class UserController {
     const { experienceId } = req.params;
 
     try {
-      const validatedExperienceId = experienceIdSchema.parse({id:experienceId})
+      const validatedExperienceId = experienceIdSchema.parse({ id: experienceId });
       const validateData = userExperienceSchema.parse(req.body);
-      const dto = mapToEditExperienceDTO({ experienceId: validatedExperienceId.id, ...validateData });
-      
-      const result = await this._editUserExperienceUC.execute(dto)
+      const dto = mapToEditExperienceDTO({
+        experienceId: validatedExperienceId.id,
+        ...validateData,
+      });
 
-      if(!result){
+      const result = await this._editUserExperienceUC.execute(dto);
+
+      if (!result) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          success:false, message:'Something went wrong'
-        })
+          success: false,
+          message: 'Something went wrong',
+        });
       }
       res.status(StatusCodes.OK).json({ success: true, message: 'Edited', result });
       return;
@@ -361,24 +370,31 @@ export class UserController {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 3;
     const sortOption = (req.query.sort as string) || 'Newest';
-    const filter = JSON.parse(req.query.filter as string) || {}
-    
+    const filter = JSON.parse(req.query.filter as string) || {};
 
     try {
-      const valdiateQueryData = recruiterJobsSchema.parse({search, page, limit, sortOption, filter})
-      const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData)
-      const result = await this._loadJobs.execute(dto)
-      
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
-        return
+      const valdiateQueryData = recruiterJobsSchema.parse({
+        search,
+        page,
+        limit,
+        sortOption,
+        filter,
+      });
+      const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData);
+      const result = await this._loadJobs.execute(dto);
+
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
+        return;
       }
-      
+
       res
         .status(StatusCodes.OK)
         .json({ success: true, message: 'Jobs fetched successfully', result });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   } //reworked
 
@@ -451,17 +467,18 @@ export class UserController {
     try {
       const validateId = userIdSchema.parse({ id: userId });
       const validateData = addUserEducationSchema.parse(req.body);
-      
+
       const dto = mapToCreateEducationDTOFromRequest({
-        userId:validateId.id,
-        ...validateData
-      })
+        userId: validateId.id,
+        ...validateData,
+      });
 
       const result = await this._addUserEducationUC.execute(dto);
-      if(!result){
+      if (!result) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          success:false, message:'Something went wrong'
-        })
+          success: false,
+          message: 'Something went wrong',
+        });
       }
 
       res.status(StatusCodes.OK).json({
@@ -505,7 +522,7 @@ export class UserController {
     const { educationId } = req.params;
 
     try {
-      const validateId = educationIdSchema.parse({id:educationId})
+      const validateId = educationIdSchema.parse({ id: educationId });
       const validateData = addUserEducationSchema.parse(req.body);
       const dto = mapToUpdateEducationDTOFromRequest({
         id: validateId.id,
@@ -514,10 +531,11 @@ export class UserController {
 
       const result = await this._editUserEducationUC.execute(dto);
 
-      if(!result){
+      if (!result) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          success:false, message:'Something went wrong'
-        })
+          success: false,
+          message: 'Something went wrong',
+        });
       }
       res.status(StatusCodes.OK).json({ success: true, message: 'Education edited', result });
     } catch (error: unknown) {
@@ -529,27 +547,29 @@ export class UserController {
     const { email } = req.body;
 
     try {
-      await this._sendResetPasswordLink.execute(email)
+      await this._sendResetPasswordLink.execute(email);
 
-      res.status(StatusCodes.OK).json({success:true, message:'Email sent successfully'})
+      res.status(StatusCodes.OK).json({ success: true, message: 'Email sent successfully' });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
   async resetPassword(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
-      const dto = mapResetPasswordDtoMapper(req.body)
-      const result = await this._resetPassword.execute(dto)
-      
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
-        return
+      const dto = mapResetPasswordDtoMapper(req.body);
+      const result = await this._resetPassword.execute(dto);
+
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
+        return;
       }
 
-      res.status(StatusCodes.OK).json({success:true, message:'Password reset successfully'})
+      res.status(StatusCodes.OK).json({ success: true, message: 'Password reset successfully' });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
@@ -728,29 +748,33 @@ export class UserController {
   // //   }
   // // }
 
-  // async editCandidateProfile(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const id = req.user.id;
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(id);
-  //     const dto = mapEditProfileRequestToUpdateDTO({
-  //       id: candidate?._id,
-  //       ...req.body,
-  //     });
-  //     const result = await this._editCandidateProfileUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Profile details updated successfully',
-  //       result,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked void
+  async editUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user.id;
+    try {
+      
+      const dto = mapEditProfileRequestToUpdateDTO({
+        userId:id,
+        ...req.body
+      });
+
+      const result = await this._editProfile.execute(dto)
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false,
+          message:'Something went wrong'
+        })
+        return
+      }
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Profile details updated successfully',
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked void
 
   // async getNotifications(req: Auth, res: Response): Promise<Response> {
   //   const userId = req.user.id;
@@ -859,53 +883,50 @@ export class UserController {
   //   }
   // }
 
-  // async addSocialLink(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userId = req.user?.id;
-  //   const urlObj = url.parse(req.body?.url);
-  //   const domain = urlObj?.hostname as string;
+  async addSocialLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const urlObj = url.parse(req.body?.url);
+    const domain = urlObj?.hostname as string;
 
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userId);
-  //     const dto = mapToAddsocialLinkDTOFromRequest({
-  //       candidateId: candidate?._id,
-  //       domain,
-  //       url: req.body?.url,
-  //     });
-  //     const result = await this._addSocialLinkUC.execute(dto);
+    try {
+      const dto = mapToAddsocialLinkDTOFromRequest({ domain, userId, ...req.body });
+      const result = await this._addSocialLink.execute(dto);
 
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Social link added' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      if (!result) {
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: 'Something went wrong',
+        });
+        return;
+      }
 
-  // async deleteSocialLink(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const userid = req.user?.id;
-  //   const domain = req.body?.domain as string;
+      res.status(StatusCodes.OK).json({ success: true, message: 'Social link added' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //   try {
-  //     const candidate = await this._findCandidateByUserIdUC.execute(userid);
-  //     const result = await this._deleteSocialLinkUC.execute({
-  //       candidateId: candidate?._id,
-  //       domain,
-  //     });
-  //     res.status(StatusCodes.OK).json({ success: true, message: 'Removed' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async deleteSocialLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id;
+    const domain = req.body?.domain as string;
+
+    try {
+      const result = await this._deleteSocialLink.execute({ userId, domain })
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({
+          success:false,
+          message:'Something went wrong'
+        })
+        return;
+      }
+
+      res.status(StatusCodes.OK).json({ success: true, message: 'Removed' });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   async uploadProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
