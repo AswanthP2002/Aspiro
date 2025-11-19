@@ -130,7 +130,7 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
             } as AxiosRequest
         )
 
-        Notify.info('Logout successfully, redirecting to login page', {timeout:2000})
+        Notify.info('Logout successfull, redirecting to login page', {timeout:2000})
         setTimeout(() => {
             dispatch(logout())
             navigate('/login')

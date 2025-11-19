@@ -54,7 +54,7 @@ export default function Sidebar(){
                             <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-white text-xs items-center justify-center">{notificationsCount}</span>
                         </span>
                     )}
-                    <Link to={'/'} className='flex items-center gap-2'><IoIosNotifications size={25} /> <span className='font-normal'>Notifications</span></Link>
+                    <Link to={'/notifications'} className='flex items-center gap-2'><IoIosNotifications size={25} /> <span className='font-normal'>Notifications</span></Link>
                 </li>
                 <li onClick={openCreatePostModal} className="nav-link hover:bg-white transition-all ease-in-out !p-2 text-sm text-white font-semibold cursor-pointer hover:text-blue-500">
                     <div className='flex items-center gap-2'><IoIosAddCircle size={25} /> <span className='font-normal'>Create a post</span></div>

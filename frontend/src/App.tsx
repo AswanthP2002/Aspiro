@@ -62,7 +62,7 @@ import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
 import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
 import EditJobForm from './pages/recruiter/EditJob/EditJob';
 
-import { SocketProvider } from './context/SocketContext';
+import SocketProvider from './context/SocketContext';
 import ForgotPasswordPage from './pages/user/Forgot-Password/ForgotPassword';
 import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
 import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
@@ -84,6 +84,7 @@ function App() {
             <Route element={<CommonLayout />}>
               <Route path='/feed' element={<Feed />} />
               <Route path='/jobs' element={<JobListing />} />
+              <Route path='/notifications' element={<NotificationPage />} />
             </Route>
           </Route>
 

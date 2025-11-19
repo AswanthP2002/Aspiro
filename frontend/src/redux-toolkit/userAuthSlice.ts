@@ -50,7 +50,7 @@ const userAuthSlice = createSlice({
       state.user = null;
       state.userToken = null;
       state.userRole = null;
-      //['user', 'userRole', 'userToken'].forEach((key) => localStorage.removeItem(key));
+      ['user', 'userRole'].forEach((key) => localStorage.removeItem(key));
     },
     tokenRefresh: (state, action: PayloadAction<{ userToken: string | null }>) => {
       state.userToken = action.payload.userToken;

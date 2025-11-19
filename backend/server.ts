@@ -24,9 +24,10 @@ import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
 import createUserRouter from './src/presentation/routes/userRouter';
-import connectRedis from './src/infrastructure/redis/redisClient';
+// import connectRedis from './src/infrastructure/redis/redisClient';
 import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
-import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
+import { initSocket } from './src/infrastructure/socketio/socket';
+// import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
   const app = express();
@@ -89,7 +90,8 @@ async function main() {
   app.use(exceptionhandle); //centralized exception handling
 
   const expressServer = http.createServer(app)
-  initalizeSocket(expressServer)
+  initSocket(expressServer)
+  // initalizeSocket(expressServer)
 
   expressServer.listen(port, () => {
     logger.info(`Server started running on port ${port}`);

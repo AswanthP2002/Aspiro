@@ -1,29 +1,33 @@
-import React, { createContext, useEffect, useState } from "react";
+
+import { Notify } from "notiflix";
+import React, {createContext, useEffect, useState} from "react";
 import { useSelector } from "react-redux";
 import { io, Socket } from "socket.io-client";
 
 export const SocketContext = createContext<{socket: Socket | null}>({socket: null})
 
-export const SocketProvider = ({children}: {children: React.ReactNode}) => {
+export default function SocketProvider({children}: {children: React.ReactNode}){
+
     const [socket, setSocket] = useState<Socket | null>(null)
-    const user = useSelector((state: any) => {
+    const logedUser = useSelector((state: any) => {
         return state.userAuth.user
     })
 
     useEffect(() => {
-        if(user?._id){
-            const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-                path: '/socket.io' // Match the server path
-            });
-            setSocket(newSocket)
+        if(logedUser?.id){
+            console.log('---- checking if a user exist or not ---- user exist !!!!!!!!')
+            const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000')
 
-            newSocket.emit('register_user', user._id)
+            setSocket(newSocket)
+            newSocket.on('message', (data) => {
+                Notify.success(data)
+            })
 
             return () => {
                 newSocket.close()
             }
         }
-    }, [user])
+    }, [logedUser])
 
     return <SocketContext.Provider value={{socket}}>
         {children}
