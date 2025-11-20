@@ -1,12 +1,14 @@
 export default interface Post {
   _id?: string
-  creatorId?: string                 
-  media : {
+  userId?: string                 
+  media? : {
     cloudUrl : string
     publicId : string
   }
   description : string
-  likes?: any[]       
+  likes?: string[]
+  shares?: string[]
+  views?: string[]    
   createdAt?: string
   updatedAt?: string
 }

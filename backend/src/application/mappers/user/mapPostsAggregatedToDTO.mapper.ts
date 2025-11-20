@@ -7,12 +7,14 @@ export default function mapPostsAggregatedToDTO(
   return {
     _id: postAggregated._id,
     description: postAggregated.description,
-    creatorId: postAggregated.creatorId,
+    userId: postAggregated.creatorId,
     likes: postAggregated.likes,
     media: postAggregated.media,
     userDetails: postAggregated.userDetails,
     createdAt: postAggregated.createdAt,
     updatedAt: postAggregated.updatedAt,
-    comments: postAggregated.comments
+    comments: postAggregated.comments,
+    shares: postAggregated.shares,
+    views: postAggregated.views,
   };
 }

@@ -81,7 +81,7 @@ export default class PostRespository
     const result = await PostDAO.aggregate([
       {$lookup:{
         from:'users',
-        localField:'creatorId',
+        localField:'userId',
         foreignField:'_id',
         as:'userDetails'
       }},

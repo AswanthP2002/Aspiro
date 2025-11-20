@@ -1,5 +1,5 @@
 import { Notify } from "notiflix"
-import { addComment, deleteComment, likePost, unlikePost } from "../../services/userServices"
+import { addComment, deleteComment, likeUserPost, unlikeUserPost } from "../../services/userServices"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { FaHeart } from "react-icons/fa6"
@@ -92,7 +92,7 @@ export default function Post({ postData, loading }: any) {
             }, 600);
             
             try {
-                const result = await likePost(postId)
+                const result = await likeUserPost(postId)
                 if(!result?.success){
                     Notify.failure('Something went wrong', {timeout:2000})
                 }
@@ -109,7 +109,7 @@ export default function Post({ postData, loading }: any) {
             }, 600);
             
             try {
-                const result = await unlikePost(postId)
+                const result = await unlikeUserPost(postId)
                 if(!result?.success){
                     Notify.failure('Something went wrong', {timeout:2000})
                 }

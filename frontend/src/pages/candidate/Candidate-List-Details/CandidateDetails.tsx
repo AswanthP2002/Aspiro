@@ -11,7 +11,7 @@ import Swal from 'sweetalert2'
 import GeneralModal from '../../../components/common/Modal'
 import ChatApp from '../../common/Chat/Chat'
 
-export default function CandidatePublicProfile() {
+export default function UserPublicProfile() {
     const location = useLocation()
     const { candidateId } = location.state || {}
     const [candidateDetails, setCandidateDetails] = useState<any>({})
@@ -67,7 +67,7 @@ export default function CandidatePublicProfile() {
             const result = await getCandidateDetails(candidateId)
             console.log('Candidate details from the backend', result)
             setCandidateDetails(result?.candidateDetails)
-        })()
+        })
     }, [])
 
     const isFollowing = (userId : string) => {

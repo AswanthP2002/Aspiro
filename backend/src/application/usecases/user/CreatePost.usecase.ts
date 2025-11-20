@@ -14,19 +14,24 @@ export default class CreatePostUseCase implements ICreatePostUsecase {
   ) {}
 
   async execute(createPostDto: CreatePostDTO): Promise<PostDTO | null> {
-    const {description, creatorId, media, likes} = createPostDto
+    const {description, userId, media} = createPostDto
+
+    //only upload if a media exist
+    let uploadResult
+    if(media){
+      uploadResult = await this._cloudStorage.upload(media, 'posts')
+    }
     
-    const uploadResult = await this._cloudStorage.upload(media, 'posts')
-    const { secure_url, public_id } = uploadResult;
+    
+    //const { secure_url, public_id } = uploadResult;
 
     const newPost = mapCreatePostDtoToPost({
-      creatorId:creatorId as string,
+      userId:userId as string,
       description:description,
       media:{
-        cloudUrl:secure_url,
-        publicId:public_id
-      },
-      likes:[]
+        cloudUrl:uploadResult?.secure_url || '',
+        publicId:uploadResult?.public_id || ''
+      }
     })
 
     const result = await this._postRepo.create(newPost)
@@ -38,3 +43,6 @@ export default class CreatePostUseCase implements ICreatePostUsecase {
     return null;
   }
 }
+
+
+//stoped at post implementation

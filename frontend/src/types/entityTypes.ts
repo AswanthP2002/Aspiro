@@ -220,16 +220,18 @@ export interface Recruiter {
 export interface UserPosts {
   _id?: string;
   description: string;
-  creatorId: string;
+  userId: string;
   likes: string[];
-  media: {
+  media?: {
     cloudUrl: string;
     publicId: string;
   };
+  shares: string[];
+  views: string[];
   createdAt: string | Date;
   updatedAt: string | Date;
   userDetails: UserType;
-  comments: Comments[]
+  comments: Comments[];
 }
 
 export interface Comments {

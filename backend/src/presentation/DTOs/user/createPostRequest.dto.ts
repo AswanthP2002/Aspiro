@@ -1,5 +1,5 @@
 export default interface CreatePostRequestDto {
-  creatorId?: string                 
+  userId?: string                 
   media : Buffer
   description : string 
 }

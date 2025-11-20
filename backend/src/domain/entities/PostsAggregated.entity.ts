@@ -6,10 +6,12 @@ export default interface PostsAggregated {
   description: string;
   creatorId: string;
   likes: string[];
-  media: {
+  media?: {
     cloudUrl: string;
     publicId: string;
   };
+  shares: string[];
+  views: string[];
   createdAt: string | Date;
   updatedAt: string | Date;
   userDetails: User;

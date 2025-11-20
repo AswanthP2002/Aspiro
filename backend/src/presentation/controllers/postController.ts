@@ -38,16 +38,17 @@ export default class PostController {
   // stoped at create post validation
 
   async createPost(req: Auth, res: Response, next : NextFunction): Promise<void> {
-    const creatorId = req.user.id;
+    const userId = req.user.id;
     const media = req.file?.buffer;
     
     try {
-      const validatedData = createPostSchema.parse({creatorId, media, ...req.body})
-      const dto = mapCreatePostReqToDTO({...validatedData})
+      // const validatedData = createPostSchema.parse({creatorId, media, ...req.body})
+      const dto = mapCreatePostReqToDTO({userId:userId, ...req.body, media})
       const result = await this._createPost.execute(dto);
       
       if(!result){
         res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        return
       }
 
       res.status(StatusCodes.CREATED).json({success:true, message:'Post Created successfully', result})
@@ -80,8 +81,7 @@ export default class PostController {
     //const creatorId = req.params.creatorId;
     
     try {
-      const validateUserId = userIdSchema.parse({id:userId})
-      const result = await this._likePost.execute(postId, validateUserId.id)
+      const result = await this._likePost.execute(postId, userId)
 
       if (!result) {
         res
@@ -103,8 +103,7 @@ export default class PostController {
     const userId = req.user.id;
     
     try {
-      const validateUserId = userIdSchema.parse({id:userId})
-      const result = await this._unlikePost.execute(postId, validateUserId.id);
+      const result = await this._unlikePost.execute(postId, userId);
       
       if(!result){
         res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
@@ -117,7 +116,6 @@ export default class PostController {
       next(error)
     }
   }
-
 
   //geting all posts for feed beta implementation without any priority (geting all posts without any mutual, follow, follwoing, interested)
   async getPosts(req: Auth, res: Response, next : NextFunction): Promise<void> {
@@ -147,6 +145,7 @@ export default class PostController {
 
       if(!result){
         res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        return
       }
 
       res.status(StatusCodes.CREATED).json({success:true, message:'Comment created successfully', result})
@@ -155,7 +154,7 @@ export default class PostController {
     }
   }
 
-  async DeleteCommentUsecase(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async deleteComment(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
       await this._deleteComment.execute(req.params?.commentId)
       res.status(StatusCodes.OK).json({success:true, message:'Comment deleted successfully'})

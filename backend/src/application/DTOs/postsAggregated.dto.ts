@@ -4,12 +4,14 @@ import User from '../../domain/entities/user/User';
 export default interface PostsAggregatedDTO {
   _id: string;
   description: string;
-  creatorId: string;
+  userId: string;
   likes: string[];
-  media: {
+  media?: {
     cloudUrl: string;
     publicId: string;
   };
+  shares: string[];
+  views: string[];
   createdAt: string | Date;
   updatedAt: string | Date;
   userDetails: User

@@ -1,21 +1,36 @@
 export default interface CreatePostDTO {
-  creatorId?: string                 
+  userId?: string                 
   media : Buffer
-  description: string
-  likes?: string[]         
+  description: string        
 }
 
 export interface PostDTO {
   _id?: string
-  creatorId?: string                 
-  media : {
+  userId?: string                 
+  media? : {
     cloudUrl : string
     publicId : string
   }
   description: string
-  likes?: string[]         
+  likes?: string[]   
+  shares?: string[]
+  views?: string[]     
   createdAt?: string
   updatedAt?: string
 }
 
 
+/**
+ *  _id?: string
+  userId?: string                 
+  media : {
+    cloudUrl : string
+    publicId : string
+  }
+  description : string
+  likes?: string[]
+  shares?: string[]
+  views?: string[]    
+  createdAt?: string
+  updatedAt?: string
+ */

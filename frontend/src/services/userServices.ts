@@ -858,7 +858,7 @@ export const getPosts = async () => {
     }
 }
 
-export const likePost = async (postId : string) => {
+export const likeUserPost = async (postId : string) => {
     try {
         const response = await axiosInstance.patch(`post/like/${postId}`, {},
             {sendAuthToken:true} as AxiosRequest
@@ -873,7 +873,7 @@ export const likePost = async (postId : string) => {
     }
 }
 
-export const unlikePost = async (postId : string) => {
+export const unlikeUserPost = async (postId : string) => {
     try {
         const response = await axiosInstance.patch(`/post/unlike/${postId}`, {},
             {
@@ -903,8 +903,10 @@ export const addComment = async (postId: string, text: string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-        console.log('error occured while adding comment', err)
-        throw error
+        
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 

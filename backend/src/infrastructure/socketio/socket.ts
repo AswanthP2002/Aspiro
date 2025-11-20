@@ -1,6 +1,7 @@
 //connection for socket
 
 import { Server } from "socket.io"
+import { container } from "tsyringe"
 
 
 export const initSocket = (server: any) => {
@@ -12,6 +13,9 @@ export const initSocket = (server: any) => {
             credentials:true
         }
     })
+
+    //regsiter socket in di container
+    container.registerInstance('socketIO', io)
 
     //socket connection
     io.on('connection', (socket) => {

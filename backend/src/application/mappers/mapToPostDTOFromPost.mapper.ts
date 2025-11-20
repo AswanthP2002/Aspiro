@@ -9,6 +9,6 @@ export default function mapToPostDTOFromPost(post: Post): PostDTO {
     likes: post.likes,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
-    creatorId: post.creatorId,
+    userId: post.userId,
   };
 }

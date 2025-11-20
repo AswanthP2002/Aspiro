@@ -8,6 +8,8 @@ import { upload } from '../../utilities/multer';
 import { StatusCodes } from '../statusCodes';
 import { container } from 'tsyringe';
 import PostController from '../controllers/postController';
+import Validator from '../../validation/validator.zod';
+import { createPostSchema } from '../schemas/user/createPost.schema';
 
 function createPostRouter() {
   const postRouter = express.Router();
@@ -20,6 +22,7 @@ function createPostRouter() {
     centralizedAuthentication,
     authorization(['user']),
     upload.single('media'),
+    Validator(createPostSchema),
     postController.createPost.bind(postController)
   );
   // postRouter.delete(
@@ -62,7 +65,7 @@ function createPostRouter() {
     '/post/:postId/comment/:commentId',
     centralizedAuthentication,
     authorization(['user']),
-    postController.DeleteCommentUsecase.bind(postController)
+    postController.deleteComment.bind(postController)
   )
 
   return postRouter;

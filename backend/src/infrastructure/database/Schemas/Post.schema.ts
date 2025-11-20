@@ -4,9 +4,11 @@ import Post from '../../../domain/entities/user/Post';
 export const PostSchema = new Schema<Post>({
   description:{type:String},
   media:{
-    cloudUrl:{type:String, required:true},
-    publicId:{type:String, required:true}
+    cloudUrl:{type:String},
+    publicId:{type:String}
   },
-  creatorId:{type:Schema.Types.ObjectId, required:true, ref:'users'},
-  likes:{type:[Schema.Types.ObjectId], ref:'users'}
+  userId:{type:Schema.Types.ObjectId, required:true, ref:'users'},
+  likes:{type:[Schema.Types.ObjectId], ref:'users'},
+  shares:{type:[Schema.Types.ObjectId], ref:'users'},
+  views:{type:[Schema.Types.ObjectId], ref:'users'}
 }, {timestamps:true})

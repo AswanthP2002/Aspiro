@@ -149,6 +149,8 @@ import IDeleteSocialLinkUseCase from '../application/interfaces/usecases/user/ID
 import DeleteSocialLinkUseCase from '../application/usecases/user/DeleteSocialLink.usecase';
 import IEditProfileUseCase from '../application/usecases/candidate/interface/IEditProfile.usecase';
 import EditProfileUseCase from '../application/usecases/candidate/EditProfile.usecase';
+import IRealTimeEventEmitter from '../application/interfaces/services/IRealTimeEventEmitter';
+import { RealTimeEventEmitterService } from '../infrastructure/services/RealTimeEventEmitterService';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -257,3 +259,6 @@ container.registerSingleton<IEmailService>('IEmailService', EmailService); //ema
 container.registerSingleton<ICloudStroageService>('ICloudStorageService', CloudStorageService)
 container.registerSingleton<IDataHashService>('IDataHashService', DataHashService)
 container.registerSingleton<IGoogleAuthService>('IGoogleAuthService', GoogleAuthService)
+container.registerSingleton<IRealTimeEventEmitter>('IRealTimeEventEmitter', RealTimeEventEmitterService)
+
+//register socket

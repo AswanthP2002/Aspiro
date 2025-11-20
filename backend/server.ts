@@ -1,6 +1,6 @@
-import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import '../backend/src/config/DI.container';
+import express, { NextFunction, Request, Response } from 'express';
 import http from 'http'
 import cors from 'cors';
 import session from 'express-session';
@@ -61,6 +61,9 @@ async function main() {
   //connect redis
   //await connectRedis()
 
+  const expressServer = http.createServer(app)
+  initSocket(expressServer)
+
   const userRouter = createUserRouter();
   const recruiterRouter = createRecruiterRouter()
   const adminRouter = createAdminRouter();
@@ -76,6 +79,8 @@ async function main() {
     next();
   });
 
+
+
   // Group all API routes under the /api prefix for better organization
   app.use('/api', userRouter);
   // app.use('/api', authRouter); // Consider moving login/verify routes here
@@ -89,8 +94,7 @@ async function main() {
 
   app.use(exceptionhandle); //centralized exception handling
 
-  const expressServer = http.createServer(app)
-  initSocket(expressServer)
+  
   // initalizeSocket(expressServer)
 
   expressServer.listen(port, () => {
