@@ -15,7 +15,11 @@ export class RealTimeEventEmitterService implements IRealTimeEventEmitter {
     
     }
 
-    deletePostComment(postId: string, commentId: string): void {
-        this._io.emit('commentDeleted', {postId, commentId})
+    addPostComment(postId: string, userId: string, commentId: string, text: string): void {
+        this._io.emit('commentAdded', {postId, userId, commentId, text})
+    }
+
+    deletePostComment(postId: string, commentId: string, userId: string): void {
+        this._io.emit('commentDeleted', {postId, commentId, userId})
     }
 }

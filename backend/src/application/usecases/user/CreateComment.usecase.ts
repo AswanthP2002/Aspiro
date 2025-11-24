@@ -4,10 +4,14 @@ import ICommentRepository from "../../../domain/interfaces/IComment.repository";
 import CommentsDTO, { CreateCommentDto } from "../../DTOs/comments.dto";
 import mapCreateCommentDtoToComment from "../../mappers/user/mapCreateCommentDtoToComment.mapper";
 import mapCommentToCommentDTO from "../../mappers/user/mapCommentToCommentDTO.mapper";
+import IRealTimeEventEmitter from "../../interfaces/services/IRealTimeEventEmitter";
 
 @injectable()
 export default class CreateCommentUsecase implements ICreateCommentUsecase {
-    constructor(@inject('ICommentRepository') private _commentRepo: ICommentRepository) {}
+    constructor(
+        @inject('IRealTimeEventEmitter') private _realTimeEventEmitter: IRealTimeEventEmitter,
+        @inject('ICommentRepository') private _commentRepo: ICommentRepository
+    ) {}
 
     async execute(createCommentDto: CreateCommentDto): Promise<CommentsDTO | null> {
        // console.log('comment data before mapping', createCommentDto)
@@ -17,6 +21,12 @@ export default class CreateCommentUsecase implements ICreateCommentUsecase {
 
         if(result){
             const commentDto = mapCommentToCommentDTO(result)
+            this._realTimeEventEmitter.addPostComment(
+                commentDto.postId as string, 
+                commentDto.userId as string,
+                commentDto._id as string,
+                commentDto.text
+            )
             return commentDto
         }
 

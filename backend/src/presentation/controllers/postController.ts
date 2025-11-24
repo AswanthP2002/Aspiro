@@ -148,15 +148,16 @@ export default class PostController {
         return
       }
 
-      res.status(StatusCodes.CREATED).json({success:true, message:'Comment created successfully', result})
+      res.status(StatusCodes.CREATED).json({success:true, message:'Comment created successfully', comment:result})
     } catch (error : unknown) {
       next(error)
     }
   }
 
   async deleteComment(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id
     try {
-      await this._deleteComment.execute(req.params?.commentId)
+      await this._deleteComment.execute(req.params?.commentId, req.params.postId, userId)
       res.status(StatusCodes.OK).json({success:true, message:'Comment deleted successfully'})
     } catch (error: unknown) {
       next(error)

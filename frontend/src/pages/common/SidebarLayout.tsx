@@ -120,7 +120,7 @@ export default function CommonLayout(){
                         </div>
                     </div>
             )}
-                    <div className="flex-1 mt-15">
+                    <div className="flex-1">
                         <Outlet />
                     </div>
                 

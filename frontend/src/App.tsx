@@ -68,11 +68,13 @@ import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
 import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
 import PasswordResetSuccessPage from './pages/user/Forgot-Password/PasswordResetSuccessPage';
 import UserPublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
+import PostProvider from './context/PostContext';
 
 function App() {
   return (
     <BrowserRouter>
       <SocketProvider>
+        <PostProvider>
       <Routes>
         <Route path='/' element={<Layouts />}>
           <Route index element={
@@ -172,6 +174,7 @@ function App() {
         <Route path='*' element={<NotFoundPage />} />
 
       </Routes>
+      </PostProvider>
       </SocketProvider>
     </BrowserRouter>
     // <BrowserRouter>

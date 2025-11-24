@@ -1,3 +1,3 @@
 export default interface IDeleteCommentUsecase {
-    execute(commentId : string) : Promise<void>
+    execute(commentId : string, postId: string, userId: string) : Promise<void>
 }
