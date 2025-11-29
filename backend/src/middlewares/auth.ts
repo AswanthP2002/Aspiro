@@ -219,14 +219,22 @@ export const refreshAccessToken = async (req: Auth, res: Response, next: NextFun
       logger.error({ error }, 'Error occured  while issuing new access token');
       switch (error.name) {
         case 'TokenExpiredError':
-           res.status(StatusCodes.LOGIN_TIMEOUT_NON_STANDARD).json({
+           res.status(StatusCodes.UNAUTHORIZED).json({
             success: false,
             message: 'Your session has expired, please login again to continue',
+            errors: {
+              code: 'REFRESH_TOKEN_EXPIRED',
+              message: 'Refresh token expired, please login again'
+            }
           });
         case 'JsonWebTokenError':
-           res.status(StatusCodes.BAD_REQUEST).json({
+           res.status(StatusCodes.UNAUTHORIZED).json({
             success: false,
             message: 'Invalid Token, please login again',
+            errors: {
+              code: 'INVALID_TOKEN',
+              message: 'Invalid token, please login again'
+            }
           });
         default:
           logger.error('Token verification failed');

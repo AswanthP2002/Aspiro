@@ -114,13 +114,11 @@ import IDeleteJobUsecase from '../application/interfaces/usecases/recruiter/IDel
 import DeleteJobUsecase from '../application/usecases/recruiter/DeleteJob.usecase';
 import ILoadJobsAggregatedUsecase from '../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 import LoadJobsAggregatedUsecase from '../application/usecases/user/LoadJobsAggregated.usecase';
-import INotificationRepo from '../domain/interfaces/INotificationRepo';
-import NotificationRepository from '../infrastructure/repositories/notificationRepository';
 import IFollowRepo from '../domain/interfaces/IFollowRepo';
 import FollowRepository from '../infrastructure/repositories/FollowRepository';
 import FollowController from '../presentation/controllers/followController';
 import ICreateNotificationUsecase from '../application/interfaces/usecases/shared/ICreateNotification.usecase';
-import CreateNotificationUsecase from '../application/usecases/common/useCases/CreateNotification.usecase';
+import CreateNotificationUsecase from '../application/usecases/shared/CreateNotification.usecase';
 import IFollowUserUseCase from '../application/interfaces/usecases/user/IFollowUser.usecase';
 import FollowUseruseCse from '../application/usecases/FollowUser.usecase';
 import IAdminLoadUserDetailsUsecase from '../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
@@ -151,6 +149,17 @@ import IEditProfileUseCase from '../application/usecases/candidate/interface/IEd
 import EditProfileUseCase from '../application/usecases/candidate/EditProfile.usecase';
 import IRealTimeEventEmitter from '../application/interfaces/services/IRealTimeEventEmitter';
 import { RealTimeEventEmitterService } from '../infrastructure/services/RealTimeEventEmitterService';
+import IGetUserSpecificNotificationUsecase from '../application/interfaces/usecases/shared/IGetUserSpecificNotifications.usecase';
+import GetUserSpecificNotificationsUsecase from '../application/usecases/shared/GetUserSpecificNotifications.usecase';
+import NotificationController from '../presentation/controllers/notificationController';
+import INotificationRepo from '../domain/interfaces/INotificationRepo';
+import NotificationRepository from '../infrastructure/repositories/notificationRepository';
+import ILoadUserAggregatedProfileUsecase from '../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase';
+import LoadUserAggregatedProfileUsecase from '../application/usecases/user/LoadUserAggregatedProfile.usecase';
+import ILoadUserMetaDataUsecase from '../application/interfaces/usecases/user/ILoadUserMetaData.usecase';
+import LoadUserMetaData from '../application/usecases/user/LoadUserMetaData.usecase';
+import IUnFollowUserUsercase from '../application/usecases/interfaces/IUnFollowUser.usecase';
+import UnfollowUserUseCase from '../application/usecases/UnfollowUser.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -162,9 +171,9 @@ container.registerSingleton<ISkillRepo>('ISkillRepository', SkillRepsitory)
 container.registerSingleton<IPostRepo>('IPostRepository', PostRespository)
 container.registerSingleton<ICommentRepository>('ICommentRepository', CommentRepository)
 container.registerSingleton<IJobRepo>('IJobRepository', JobRepository)
-container.registerSingleton<INotificationRepo>('INotificationRepository', NotificationRepository)
 container.registerSingleton<IFollowRepo>('IFollowRepository', FollowRepository)
 container.registerSingleton<IFavoriteJobsRepo>('IFavoriteJobRepository', FavoriteJobsRepsitory)
+container.registerSingleton<INotificationRepo>('INotificationRepository', NotificationRepository)
 
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
@@ -220,6 +229,7 @@ container.registerSingleton<IDeleteJobUsecase>('IDeleteJobUsecase', DeleteJobUse
 container.registerSingleton<ILoadJobsAggregatedUsecase>('ILoadJobsAggregatedUsecase', LoadJobsAggregatedUsecase)
 container.registerSingleton<ICreateNotificationUsecase>('ICreateNotificationUsecase', CreateNotificationUsecase)
 container.registerSingleton<IFollowUserUseCase>('IFollowUserUsecase', FollowUseruseCse)
+container.registerSingleton<IUnFollowUserUsercase>('IUnfollowUserUsecase', UnfollowUserUseCase)
 container.registerSingleton<IAdminLoadUserDetailsUsecase>('IAdminLoadUserDetailsUsecase', AdminLoadUsersDetailsUsecase)
 container.registerSingleton<IGetFavoriteJobUseCase>('IGetFavoriteJobsUsecase', GetFavoriteJobUseCase)
 container.registerSingleton<ISendResetPassworLinkUsecase>('ISendResetPasswordLinkUsecase', SendResetPassworLinkUsecase)
@@ -229,6 +239,9 @@ container.registerSingleton<IAdminDeleteUserUsecase>('IAdminDeleteUserUsecase', 
 container.registerSingleton<IAddSocialLinkUsecase>('IAddSocialLinkUsecase', AddSocialLinkUseCase)
 container.registerSingleton<IDeleteSocialLinkUseCase>('IDeleteSocialLinkUsecase', DeleteSocialLinkUseCase)
 container.registerSingleton<IEditProfileUseCase>('IEditProfileUsecase', EditProfileUseCase)
+container.registerSingleton<IGetUserSpecificNotificationUsecase>('IGetUserSpecificNotificationsUsecase', GetUserSpecificNotificationsUsecase)
+container.registerSingleton<ILoadUserAggregatedProfileUsecase>('ILoadUserAggregatedProfileUsecase', LoadUserAggregatedProfileUsecase)
+container.registerSingleton<ILoadUserMetaDataUsecase>('ILoadUserMetaDataUsecase', LoadUserMetaData)
 
 
 container.registerSingleton<ILoginRecruiterrUseCase>(
@@ -253,6 +266,7 @@ container.registerSingleton(PostController)
 container.registerSingleton(RecruiterController);
 container.registerSingleton(FollowController)
 container.registerSingleton(OAuthController)
+container.registerSingleton(NotificationController)
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service

@@ -5,7 +5,7 @@ import { UserDAO } from '../database/DAOs/user.dao.refactored';
 import BaseRepository from './baseRepository';
 import { injectable } from 'tsyringe';
 import { FindUsersQuery } from '../../application/queries/users.query';
-import UserProfileAggregatedAdmin from '../../domain/entities/admin/userProfileAggregatedAdmin';
+import UserProfileAggregatedAdmin from '../../domain/entities/userProfileAggregated';
 
 @injectable()
 export default class UserRepository extends BaseRepository<User> implements IUserRepository {
@@ -63,6 +63,14 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           as: 'posts',
         },
       },
+      {
+        $lookup: {
+          from:'follows',
+          localField:'_id',
+          foreignField:'following',
+          as:'followers'
+        }
+      }
       // {
       //   $lookup:{
       //     from:'recruiters',

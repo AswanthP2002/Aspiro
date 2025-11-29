@@ -25,5 +25,6 @@ export default function mapUserToUserDTO(user: User): UserDTO {
     googleId:user.googleId,
     headline:user.headline,
     summary:user.summary,
+    connections:user.connections
   };
 }

@@ -1,5 +1,5 @@
 import { FindUsersQuery } from '../../application/queries/users.query';
-import UserProfileAggregatedAdmin from '../entities/admin/userProfileAggregatedAdmin';
+import UserProfileAggregatedAdmin from '../entities/userProfileAggregated';
 import User from '../entities/user/User';
 import IBaseRepo from './IBaseRepo';
 

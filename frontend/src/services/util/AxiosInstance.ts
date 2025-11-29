@@ -65,8 +65,21 @@ axiosInstance.interceptors.response.use(
         if(response && response.status === 500){
             Swal.fire({
                 icon:'error', 
-                title:'Error', 
-                text:'Internal server error, please try again after some time'
+                title:'Server Error', 
+                text:'We encountered an unexpected issue while processing your request. This is usually a temporary problem on our side',
+                showConfirmButton:true,
+                confirmButtonText:'Retry',
+                showCancelButton:true,
+                cancelButtonText:'Home',
+                allowOutsideClick:false,
+                allowEscapeKey:false
+            }).then((result) => {
+                if(result.isConfirmed){
+                    window.location.reload()
+                    return
+                }else{
+                    window.location.replace('http://localhost:5173')
+                }
             })
         }else if(response && response.status === 406){
             window.location.replace('http://localhost:5173/token/expired')
@@ -91,7 +104,12 @@ axiosInstance.interceptors.response.use(
             //     })
 
             // })
-        }else if(response && response.status === 401 && !originalRequest?._retry) {//automatically retrying request after refreshing the token
+        }else if(
+            response && 
+            response.status === 401 &&
+            (response?.data?.errors?.code === 'ACCESS_TOKEN_EXPIRED' || response?.data?.errors?.code === 'INVALID_ACCESS_TOKEN') &&
+            !originalRequest?._retry
+        ) {//automatically retrying request after refreshing the token
             originalRequest._retry = true
 
             try {
@@ -109,6 +127,8 @@ axiosInstance.interceptors.response.use(
                 // Handle refresh token failure (e.g., redirect to login)
                 return Promise.reject(refreshError);
             }
+        }else if(response && response.status === 401){
+            
         }
 
         return Promise.reject(error)

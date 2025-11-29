@@ -16,6 +16,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useContext, useEffect, useState } from 'react';
 import { PostContext } from '../../context/PostContext';
 import { useSelector } from 'react-redux'; 
+import { useNavigate } from 'react-router-dom';
 
 export default function Post({ postData, loading }: { postData: UserPosts; loading: any }) {
     
@@ -123,7 +124,15 @@ export default function Post({ postData, loading }: { postData: UserPosts; loadi
   //     }
   //   };
 
-  //   const navitateTo = useNavigate();
+    const navigate = useNavigate();
+
+    const navigateToPublicProfile = (userId: string) => {
+      if(logedUser.id === userId){
+        return navigate('/profile/personal')
+      }else{
+        return navigate(`/users/${userId}}`, {state:{userId}})
+      }
+    }
   //   console.log(logedUser);
   //   console.log('this is loged user id', logedUser?.id);
 
@@ -225,7 +234,7 @@ export default function Post({ postData, loading }: { postData: UserPosts; loadi
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-10 h-10 rounded-full flex items-center justify-center text-white">
             <p>{postData?.userDetails?.name ? postData?.userDetails?.name[0] : 'Aspiro User'}</p>
           </div>
-          <div className="flex-1">
+          <div onClick={() => navigateToPublicProfile(postData?.userDetails?._id as string)} className="flex-1 cursor-pointer">
             <p className="font-light text-sm">{postData?.userDetails?.name}</p>
             <p className="text-sm text-gray-700 font-light">
               {postData?.userDetails?.headline || 'User'}

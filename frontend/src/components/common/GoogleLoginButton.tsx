@@ -21,6 +21,7 @@ export default function GoogleLoginButton(){
         const result = await googleLogin(googleToken)
 
         if(result?.success){
+            console.log('--testing user object from the server ---', result?.result)
             dispatcher(loginSuccess({
                 user:result?.result?.user,
                 userToken:result?.result?.token,

@@ -23,6 +23,7 @@ export default interface User {
   googleId?: string;
   facebookId?: string;
   linkedinId?: string;
+  connections?: string[]
   profilePicture?: {
     cloudinaryPublicId: string;
     cloudinarySecureUrl: string;

@@ -31,6 +31,7 @@ export const UserSchema = new Schema<User>(
       country:{type:String},
       pincode:{type:String}
     },
+    connections:{type: [Schema.Types.ObjectId], ref:'users'},
     phone:{type:String},
     profilePicture:{
       cloudinaryPublicId:{type:String},

@@ -27,6 +27,7 @@ import createUserRouter from './src/presentation/routes/userRouter';
 // import connectRedis from './src/infrastructure/redis/redisClient';
 import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
+import createNotificationRouter from './src/presentation/routes/notificationRouter';
 // import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
@@ -72,6 +73,7 @@ async function main() {
   const chatRouter = createChatRouter();
   const oAuthRouter = CreateOAuthRouter();
   const jobRouter = CreateJobRouter();
+  const notificationRouter = createNotificationRouter()
 
   const port = process.env.PORT || 5000;
   app.use('/', (req: Request, res: Response, next: NextFunction) => {
@@ -91,6 +93,7 @@ async function main() {
   app.use('/api', chatRouter);
   app.use('/api', oAuthRouter); // OAuth for google signup
   app.use('/api', jobRouter);
+  app.use('/api', notificationRouter)
 
   app.use(exceptionhandle); //centralized exception handling
 

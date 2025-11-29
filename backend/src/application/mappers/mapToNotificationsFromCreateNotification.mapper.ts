@@ -5,12 +5,14 @@ export default function mapToNotificationsFromCreateNotification(
   createNotification: CreateNotificationDTO
 ): Notification {
   return {
-    description: createNotification.description,
-    senderId: createNotification.senderId,
-    receiverId: createNotification.receiverId,
-    title:createNotification.title,
-    link:createNotification.link,
     type:createNotification.type,
-    typeRelatedId:createNotification.typeRelatedId
+    category:createNotification.category,
+    actorId:createNotification.actorId,
+    targetType:createNotification.targetType,
+    targetId:createNotification.targetId,
+    message:createNotification.message,
+    isRead:createNotification.isRead,
+    metaData:createNotification.metaData,
+    recepientId:createNotification.recepientId
   };
 }

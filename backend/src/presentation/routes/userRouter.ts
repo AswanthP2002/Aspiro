@@ -93,9 +93,9 @@ function createUserRouter() {
     userController.resendOTP.bind(userController)
   )
   userRouter.post(
-    '/login',
-    Validator(loginSchema),
-    userController.userLogin.bind(userController))
+  '/login',
+  Validator(loginSchema),
+  userController.userLogin.bind(userController))
   userRouter.post('/logout', userController.userLogout.bind(userController))
   userRouter.get('/token/refresh', refreshAccessToken)
   // candidateRouter.post(
@@ -329,6 +329,18 @@ userRouter.get(
     authorization(['user']),
     userController.removeCoverphoto.bind(userController)
   );
+  userRouter.get(
+    '/users/:userId',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadUserAggregatedProfile.bind(userController)
+  )
+  userRouter.get(
+    '/user/metadata///flaged', //route flaged due to authenticated user related issues
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadUserMetaData.bind(userController)
+  )
   // candidateRouter.get(
   //   '/candidates',
   //   candidateController.getCandidates.bind(candidateController)

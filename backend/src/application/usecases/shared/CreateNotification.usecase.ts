@@ -1,10 +1,9 @@
-import INotificationRepo from '../../../../domain/interfaces/INotificationRepo';
-import ICreateNotification from '../../../interfaces/usecases/shared/ICreateNotification.usecase';
-import mapToNotificationsFromCreateNotification from '../../../mappers/mapToNotificationsFromCreateNotification.mapper';
-import CreateNotificationDTO, { NotificationDTO } from '../../../DTOs/notifications.dto';
-import mapToNotificationDTO from '../../../mappers/mapToCreateNotificationDTO.mapper';
+import mapToNotificationsFromCreateNotification from '../../mappers/mapToNotificationsFromCreateNotification.mapper';
+import CreateNotificationDTO, { NotificationDTO } from '../../DTOs/notifications.dto';
+import mapToNotificationDTO from '../../mappers/mapToCreateNotificationDTO.mapper';
 import { inject, injectable } from 'tsyringe';
-import ICreateNotificationUsecase from '../../../interfaces/usecases/shared/ICreateNotification.usecase';
+import ICreateNotificationUsecase from '../../interfaces/usecases/shared/ICreateNotification.usecase';
+import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
 
 @injectable()
 export default class CreateNotificationUsecase implements ICreateNotificationUsecase {

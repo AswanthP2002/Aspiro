@@ -5,7 +5,7 @@ import CandidateRegister from './pages/user/Register/Register';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
 import VerificationPage from './pages/user/Verification/Verification';
-import CandidateLogin from './pages/user/Login/Login';
+import CandidateLogin from './pages/user/Login-FIX/Login';
 import ProfileLayout from './pages/candidate/Profile-Layout';
 import ProfilePersonal from './pages/candidate/Profile-Personal/Personal';
 import StoreDetails from './pages/candidate/Basic Details Storing Page/StoreDetails';

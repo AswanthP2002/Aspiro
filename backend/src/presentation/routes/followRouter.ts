@@ -6,39 +6,28 @@ import FollowUseruseCse from '../../application/usecases/FollowUser.usecase';
 import UnfollowUserUseCase from '../../application/usecases/UnfollowUser.usecase';
 import GetFollowersUseCase from '../../application/usecases/GetFollowers.usecase';
 import GetFollowingUseCase from '../../application/usecases/GetFollowing.usecase';
-import CreateNotification from '../../application/usecases/common/useCases/CreateNotification.usecase';
+import CreateNotification from '../../application/usecases/shared/CreateNotification.usecase';
 import NotificationRepository from '../../infrastructure/repositories/notificationRepository';
+import { container } from 'tsyringe';
+import { authorization, centralizedAuthentication } from '../../middlewares/auth';
 
 function createFollowRouter() {
   const followRouter = express.Router();
 
-  const followRepo = new FollowRepository();
-  const notificationRepo = new NotificationRepository();
+  const followController = container.resolve(FollowController)
 
-  const followUseCase = new FollowUseruseCse(followRepo);
-  const unfolloUseCase = new UnfollowUserUseCase(followRepo);
-  const getFollowersUseCse = new GetFollowersUseCase(followRepo);
-  const getFollowingUseCase = new GetFollowingUseCase(followRepo);
-  const createNotificationUseCase = new CreateNotification(notificationRepo);
-
-  const followcontroller = new FollowController(
-    followUseCase,
-    unfolloUseCase,
-    getFollowersUseCse,
-    getFollowingUseCase,
-    createNotificationUseCase
+  followRouter.post(
+    '/follow/:id',
+    centralizedAuthentication,
+    authorization(['user']),
+    followController.followUser.bind(followController)
   );
-
-//   followRouter.post(
-//     '/follow/:id',
-//     userAuth,
-//     followcontroller.followUser.bind(followcontroller)
-//   );
-//   followRouter.delete(
-//     '/follow/:id',
-//     userAuth,
-//     followcontroller.unfollowUser.bind(followcontroller)
-//   );
+  followRouter.post(
+    '/unfollow/:id',
+    centralizedAuthentication,
+    authorization(['user']),
+    followController.unfollowUser.bind(followController)
+  );
 //   followRouter.get(
 //     '/followers',
 //     userAuth,

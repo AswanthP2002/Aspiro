@@ -103,7 +103,7 @@ export const resetPassword = async (token: string, password: string) => {
     }
 }
 
-export const candidateLogin = async (email : string, password : string) => {
+export const userLogin = async (email : string, password : string) => {
     try {
         const response = await axiosInstance.post('/login', 
             {email, password},
@@ -531,9 +531,9 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
 
 export const getNotifications = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/notifications',
+        const response = await axiosInstance.get('/notifications',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -541,8 +541,9 @@ export const getNotifications = async () => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-        console.log('Error occured while geting candidate notifications', error)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
 
         
     }
@@ -844,8 +845,6 @@ export const createPost = async (formdata : any) => {
     }
 }
 
-
-
 export const getPosts = async () => {
     try {
         const response = await axiosInstance.get('/post', {
@@ -926,12 +925,15 @@ export const deleteComment = async (postId: string, commentId: string) => {
     }
 }
 
-export const followUser = async (userId : string, userType : string = 'candidate') => {
+export const followUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
     try {
-        const response = await axiosInstance.post(`/follow/${userId}`, {userType},
+        const response = await axiosInstance.post(`/follow/${userId}`, {
+            acted_by,
+            acted_user_avatar
+        },
             {   
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -943,12 +945,15 @@ export const followUser = async (userId : string, userType : string = 'candidate
     }
 }
 
-
-export const unfollowUser = async (userId : string) => {
+export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
     try {
-        const response = await axiosInstance.delete(`/follow/${userId}`, 
+        const response = await axiosInstance.post(`/unfollow/${userId}`, {
+            acted_by,
+            acted_user_avatar
+        },
             {
-                sendAuthTokenCandidate:true
+                headers:{"Content-Type":'application/json'},
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
@@ -970,10 +975,38 @@ export const getUserPosts = async () => {
     }
 }
 
-// export const sendMessage = (receiver : string, sender : string, message : string) => {
-//     try {
-//         const response = await axiosInstance.post()
-//     } catch (error) {
-        
-//     }
-// }
+export const loadUserPublicProfile = async (userId: string) => {
+    try {
+        const response = await axiosInstance.get(`/users/${userId}`,
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const loadUserMetaData = async () => {
+    try {
+        const response = await axiosInstance.get('/user/metadata', 
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}

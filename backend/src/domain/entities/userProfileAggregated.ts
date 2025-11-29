@@ -1,14 +1,15 @@
-import Job from "../recruiter/job.entity";
-import Recruiter from "../recruiter/recruiter.entity";
-import SocialLinks from "../SocialLinks";
-import Certificates from "../user/certificates.entity";
-import Education from "../user/educations.entity";
-import Experience from "../user/experience.entity";
-import Post from "../user/Post";
-import Skills from "../user/skills.entity";
-import { Role } from "../user/User";
+import Follow from "./follow.entity";
+import Job from "./recruiter/job.entity";
+import Recruiter from "./recruiter/recruiter.entity";
+import SocialLinks from "./SocialLinks";
+import Certificates from "./user/certificates.entity";
+import Education from "./user/educations.entity";
+import Experience from "./user/experience.entity";
+import Post from "./user/Post";
+import Skills from "./user/skills.entity";
+import { Role } from "./user/User";
 
-export default interface UserProfileAggregatedAdmin {
+export default interface UserProfileAggregated {
     _id?: string;
       name?: string;
       headline?: string;
@@ -52,4 +53,5 @@ export default interface UserProfileAggregatedAdmin {
       posts: Post[]
       recruiterProfile:Recruiter,
       jobs:Job[]
+      followers: Follow[]
 }

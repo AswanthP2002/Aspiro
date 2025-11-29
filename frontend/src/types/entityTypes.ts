@@ -58,18 +58,18 @@ export interface Skills {
 }
 
 export interface Experience {
-  _id?: string;
-  candidateId?: string;
-  role: string;
-  jobtype: string;
-  organization: string;
-  startDate: any;
-  ispresent: boolean;
-  endDate: string;
-  location: string;
-  locationtype: string;
-  createdAt?: string;
-  updatedAt?: string;
+   _id? : string
+    userId? : string
+    jobRole : string
+    jobType : string
+    organization : string
+    startDate? : string
+    isPresent : boolean
+    endDate? : string //for checking
+    location : string
+    workMode : string
+    createdAt? : string
+    updatedAt? : string
 }
 
 export interface Education {
@@ -97,12 +97,13 @@ export interface Follow {
 
 export interface Post {
   _id?: string
-  creatorId?: string                 
-  media : {
+  userId?: string                 
+  media? : {
     cloudUrl : string
     publicId : string
   }
   description : string
+  
   likes?: any[]       
   createdAt?: string
   updatedAt?: string
@@ -137,6 +138,7 @@ export interface UserType {
     cloudinaryPublicId?: string;
     cloudinarySecureUrl?: string;
   };
+  connections?: string[]
   isBlocked?: boolean;
   isVerified?: boolean;
   isAdmin?: boolean;
@@ -232,6 +234,30 @@ export interface UserPosts {
   updatedAt: string | Date;
   userDetails: UserType;
   comments: Comments[];
+}
+
+export interface UserMetaData {
+  _id?: string;
+  name?: string;
+  headline?: string;
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+}
+
+export interface Notification {
+  _id?: string
+  recepientId?: string
+  type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
+  category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
+  actorId?: string
+  targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
+  targetId?: string
+  message?: string
+  isRead?: boolean
+  createdAt?: string
+  metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
 }
 
 export interface Comments {
@@ -390,9 +416,58 @@ export interface UserProfileAggrgatedAdmin {
       educations: Education[]
       certificates: Certificates[]
       skills: Skills[]
+      connections?: string[]
       posts: Post[]
       recruiterProfile:Recruiter
       jobs:Job[]
+}
+
+export interface UserProfileAggregated {
+  _id?: string;
+      name?: string;
+      headline?: string;
+      summary?: string;
+      password?: string;
+      dateOfBirth?: string;
+      socialLinks?: SocialLinks[];
+      location?: {
+        city: string;
+        district: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+      role?: Role[];
+      phone?: string;
+      email?: string;
+      googleId?: string;
+      facebookId?: string;
+      linkedinId?: string;
+      profilePicture?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      coverPhoto?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      connections?: string[]
+      isBlocked?: boolean;
+      isVerified?: boolean;
+      isAdmin?: boolean;
+      isRecruiter?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+      verificationToken?: string;
+      otpExpiresAt?: Date;
+      experiences: Experience[]
+      educations: Education[]
+      certificates: Certificates[]
+      skills: Skills[]
+      posts: UserPosts[]
+      recruiterProfile:Recruiter
+      jobs:Job[]
+      followers: string[]
 }
 
 

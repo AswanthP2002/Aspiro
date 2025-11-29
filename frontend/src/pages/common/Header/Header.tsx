@@ -80,28 +80,44 @@ export default function Header(){
     }, [user])
     
     return(
-        <div className="w-full sticky top-0 left-0 bg-white shadow z-59">
-            <div className="w-full px-2 md:px-20 py-5 shadow-sm">
-                <div className="navbar flex items-center justify-between gap-10">
+        <div className="w-full sticky top-0 left-0 bg-white border-b border-gray-200 z-59">
+            <div className="flex items-center justify-between p-5 w-full md:px-20">
+                <div className="brand">
+                    <p className="text-2xl font-light">Aspiro</p>
+                </div>
+                <div className=" hidden md:block">
+                    <ul className="flex gap-8 text-sm text-gray-700">
+                    <li className="cursor-pointer">Expolore</li>
+                    <li className="cursor-pointer">Find Opportunities</li>
+                    <li className="cursor-pointer">Network</li>
+                    <li className="cursor-pointer">Recruiters</li>
+                </ul>
+                </div>
+                <div>
+                    <button onClick={() => navigate('/login')} className="border border-blue-500 rounded-md text-xs text-blue-500 px-5 py-2">Sign In</button>
+                </div>
+            </div>
+            {/* <div className="w-full px-2 md:px-20 py-5 shadow-sm">
+                <div className="navbar bg-green-200 flex items-center justify-between gap-10">
                     <div className="brand">
                         <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
-                    </div>
+                    </div> */}
                     {/* if user exist then show the authorized navigations */}
                     
-                    {
+                    {/* {
                         user
                             ? <>
                                 <div className="border border-gray-300 w-100 relative rounded-full !py-2">
                                     <input type="text" className="w-full !ps-10 !pe-3" placeholder="Search for people" />
                                     <i className="fa-solid fa-search absolute absolute left-3 bottom-3 !text-gray-400"></i>
-                                </div>
+                                </div> */}
                                 {/* <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
                                     <i className="absolute top-1 fa-solid fa-search !text-sm"></i>
                                     <input type="text" placeholder="search in community" className="w-full !px-5 text-sm" />
                                     <button type="button" className="text-xs bg-white w-[20px] rounded">/</button>
                                 </div> */}
 
-                                <div className="flex items-center gap-3">
+                                {/* <div className="flex items-center gap-3">
                                     <button className="relative"><span className="absolute bg-red-500 !w-[7px] !h-[7px] rounded-full"></span> <IoMdNotificationsOutline size={20} /></button>
                                     <button onClick={openCreatePostModal}><FaCirclePlus size={30} color="blue" /></button>
                                     <div className="group relative">
@@ -116,8 +132,8 @@ export default function Header(){
                                         </div>
                                     </div>
                                 </div>
-                              </>
-                            : <>
+                              </> */}
+                            {/* : <>
                                  <div className="flex items-center gap-10">
                                  <ul className="nav-links flex gap-10">
                                     <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
@@ -129,9 +145,9 @@ export default function Header(){
                                 <button onClick={() => navigate('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                                 </div>
                               </>
-                    }
-                </div>
-            </div>
+                    } */}
+                {/* </div>
+            </div> */}
         </div>
     )
 }

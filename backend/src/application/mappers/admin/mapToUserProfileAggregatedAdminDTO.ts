@@ -1,7 +1,7 @@
-import UserProfileAggregatedAdmin from "../../../domain/entities/admin/userProfileAggregatedAdmin";
-import userProfileAggregatedAdminDTO from "../../DTOs/admin/userProfileAggregatedAdminDTO";
+import UserProfileAggregatedAdmin from "../../../domain/entities/userProfileAggregated";
+import userProfileAggregatedAdminDTO from "../../DTOs/userProfileAggregatedDTO";
 
-export default function mapToUserProfileAggregatedAdminDTO(data: UserProfileAggregatedAdmin): userProfileAggregatedAdminDTO {
+export default function mapToUserProfileAggregatedDTO(data: UserProfileAggregatedAdmin): userProfileAggregatedAdminDTO {
     return {
      _id: data._id,
      certificates:data.certificates,
@@ -33,6 +33,7 @@ export default function mapToUserProfileAggregatedAdminDTO(data: UserProfileAggr
      updatedAt:data.updatedAt,
      verificationToken:data.verificationToken,
      jobs:data.jobs,
-     recruiterProfile:data.recruiterProfile
+     recruiterProfile:data.recruiterProfile,
+     followers:data.followers
     }
 }

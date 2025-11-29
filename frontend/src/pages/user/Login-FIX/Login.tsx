@@ -1,10 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import facebookIcon from '/icons/icons8-facebook-48.png'
-import googleIcon from '/icons/icons8-google-48.png'
 import './Login.css'
 import { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
-import { candidateLogin } from "../../../services/userServices";
+import { userLogin } from "../../../services/userServices";
 import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
 import { Controller, useForm } from "react-hook-form";
 import { FormControl, FormHelperText } from "@mui/material";
@@ -32,8 +31,6 @@ export default function CandidateLogin(){
         }
     })
 
-
-
     const [validationerrortext, setvalidationerrortext] = useState("")
 
     const dispatcher = useDispatch()
@@ -43,7 +40,7 @@ export default function CandidateLogin(){
         //alert('testing')
         const {email, password} = data
         try {
-            const result = await candidateLogin(email, password)
+            const result = await userLogin(email, password)
             console.log('Result from the backend', result?.result)
 
             if(result?.success){

@@ -99,6 +99,8 @@ import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFr
 import SendResetPassworLinkUsecase from '../../application/usecases/user/SendPasswordResetLink.usecase';
 import ResetPasswordUsecase from '../../application/usecases/user/ResetPassword.usecase';
 import mapResetPasswordDtoMapper from '../../application/mappers/user/mapResetPasswordDto.mapper';
+import ILoadUserAggregatedProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase';
+import ILoadUserMetaDataUsecase from '../../application/interfaces/usecases/user/ILoadUserMetaData.usecase';
 
 
 @injectable()
@@ -137,7 +139,9 @@ export class UserController {
     @inject('IResetPasswordUsecase') private _resetPassword: ResetPasswordUsecase,
     @inject('IAddSocialLinkUsecase') private _addSocialLink: IAddSocialLinkUsecase,
     @inject('IDeleteSocialLinkUsecase') private _deleteSocialLink: IDeleteSocialLinkUseCase,
-    @inject('IEditProfileUsecase') private _editProfile: IEditProfileUseCase
+    @inject('IEditProfileUsecase') private _editProfile: IEditProfileUseCase,
+    @inject('ILoadUserAggregatedProfileUsecase') private _loadUserAggregatedProfile: ILoadUserAggregatedProfileUsecase,
+    @inject('ILoadUserMetaDataUsecase') private _loadUserMetaData: ILoadUserMetaDataUsecase
   ) {}
 
   /**
@@ -233,6 +237,17 @@ export class UserController {
       next(error);
     }
   } //reworked : void
+
+  async loadUserMetaData(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id
+
+    try{
+      const result = await this._loadUserMetaData.execute(userId)
+      res.status(StatusCodes.OK).json({success:true, message:'Metadata fetched successfully', result})
+    }catch(error: unknown){
+
+    }
+  }
 
   async saveUsersBasics(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id as string;
@@ -394,6 +409,22 @@ export class UserController {
       next(error);
     }
   } //reworked
+
+  async loadUserAggregatedProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const {userId} = req.params
+    try {
+      const result = await this._loadUserAggregatedProfile.execute(userId)
+
+      if(!result){
+        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+        return
+      }
+
+      res.status(StatusCodes.OK).json({success:true, message:'Profile fetched successfully', result})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
 
   // // async loadJobDetails(
   // //   req: Request,

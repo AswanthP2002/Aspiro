@@ -23,6 +23,7 @@ export default interface UserDTO {
     email?: string;
     googleId?: string;
     facebookId?: string;
+    connections?: string[]
     linkedinId?: string;
     profilePicture?: {
       cloudinaryPublicId: string;

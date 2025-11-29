@@ -44,7 +44,7 @@ export default class GoogleLoginUseCase implements IGoogleLoginUseCase {
     return {
       token,
       refreshToken,
-      user: { id: createdUser?._id?.toString(), email: email },
+      user: { id: createdUser?._id?.toString() || 'no id', email: email },
       role: 'user',
     };
   }

@@ -10,6 +10,8 @@ export default class OAuthController {
   async googleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const result: any = await this._googleLoginUsecase.execute(req.body?.googleToken);
+
+      console.log('Checking result before sending response', result)
       const { refreshToken } = result;
       res
         .status(StatusCodes.ACCEPTED)

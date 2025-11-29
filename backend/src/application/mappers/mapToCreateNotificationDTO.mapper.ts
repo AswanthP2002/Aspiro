@@ -5,15 +5,16 @@ export default function mapToNotificationDTO(
   notification: Notification
 ): NotificationDTO {
   return {
-    _id:notification._id,
-    title:notification.title,
-    description:notification.description,
-    senderId:notification.senderId,
-    receiverId:notification.receiverId,
+   _id:notification._id,
+    recepientId:notification.recepientId,
     type:notification.type,
+    category:notification.category,
+    actorId:notification.actorId,
+    targetType:notification.targetType,
+    targetId:notification.targetId,
+    message:notification.message,
     isRead:notification.isRead,
     createdAt:notification.createdAt,
-    link:notification.link,
-    typeRelatedId:notification.typeRelatedId
+    metaData:notification.metaData
   };
 }
