@@ -1,32 +1,37 @@
 import CreateRecruiterDTO from '../../../application/DTOs/recruiter/recruiter.dto';
-import CreateRecruiterRequestDto from '../../DTOs/recruiter/createRecruiterRequestDTO';
+import { CreateRecruiterRequestDto } from '../../schemas/recruiter/createRecruiter.schema';
 
 export default function mapToCreateRecruiterDTOFromRequest(
   requestDto: CreateRecruiterRequestDto
 ): CreateRecruiterDTO {
   //map data based on conditions
-  const {organizationDetails} = requestDto
+  // const {organizationDetails} = requestDto
 
-  if(organizationDetails?.organizationName){
+  if(requestDto.employerType === 'company'){
     return {
       userId: requestDto.userId,
       employerType: requestDto.employerType,
       organizationDetails: {
-        organizationName: organizationDetails?.organizationName,
-        organizationType: organizationDetails?.organizationType,
-        industry: organizationDetails?.industry,
-        organizationContactNumber: organizationDetails?.organizationContactNumber,
-        organizationEmail: organizationDetails?.organizationEmail,
-        teamStrength: organizationDetails?.teamStrength,
-        aboutCompany: organizationDetails?.aboutCompany,
-        website: organizationDetails?.website,
-        vision: organizationDetails?.vision
-      }
+        organizationName: requestDto.organizationName,
+        organizationType: requestDto.organizationType,
+        industry: requestDto.industry,
+        organizationContactNumber: requestDto?.organizationContactNumber,
+        organizationEmail: requestDto?.organizationEmail,
+        teamStrength: requestDto?.teamStrength,
+        website: requestDto?.website,
+        linkedinUrl: requestDto.linkedinUrl
+      },
+      focusingIndustries:requestDto.focusingIndustries as string[],
+      recruitingExperience:requestDto.recruitingExperience,
+      summary:requestDto.summary
     }
   }else{
     return {
       userId: requestDto.userId,
-      employerType: requestDto.employerType
+      employerType: requestDto.employerType,
+      focusingIndustries:requestDto.focusingIndustries as string[],
+      recruitingExperience:requestDto.recruitingExperience,
+      summary:requestDto.summary
     };
   }
 }

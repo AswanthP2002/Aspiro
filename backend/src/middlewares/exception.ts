@@ -71,6 +71,6 @@ export default function exceptionhandle(
       break;
   }
 
-  res.status(code).json({ success: false, message: responseMessage });
+  res.status(code).json({ success: false, message: responseMessage, errors });
   return;
 }

@@ -1,5 +1,4 @@
 import Job from '../../../domain/entities/recruiter/job.entity';
-import SocialLinks from '../../../domain/entities/SocialLinks';
 import User from '../../../domain/entities/user/User';
 
 export default interface RecruiterProfilelOverviewDataDTO {
@@ -12,18 +11,16 @@ export default interface RecruiterProfilelOverviewDataDTO {
     industry?: string;
     organizationContactNumber?: string;
     organizationEmail?: string;
-    socialLinks?: SocialLinks[];
     teamStrength?: string;
-    aboutCompany?: string;
-    foundIn?: string;
     website?: string;
-    vision?: string;
-    benefit?: String;
+
   };
-  socialLinks?: SocialLinks[];
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  currentSubscription?: string;
   userProfile: User;
   jobs: Job[];
 }

@@ -25,14 +25,16 @@ export const recruiterRegister = async (fullName : string, email : string, phone
 }
 
 export const createRecruiterService = async (
-    employerType: string, industry?: string, organizationName?: string, organizationType?: string,
-    teamStrength?: string, aboutCompany?: string, website?: string, vision?: string, 
-    organizationContactNumber?: string, organizationEmail?: string
+    employerType: string, industry: string, organizationName: string, organizationType: string,
+    teamStrength: string, summary: string, website: string, organizationContactNumber: string, 
+    organizationEmail: string, focusingIndustries: any[], recruitingExperience: string, 
+    linkedinUrl: string
 ) => {
     try {
         const response = await axiosInstance.post('/recruiter/create', {
-            employerType, industry, organizationName, 
-            organizationType, teamStrength, aboutCompany, website, vision, 
+            employerType, industry, organizationName,
+            focusingIndustries, summary, recruitingExperience, linkedinUrl,
+            organizationType, teamStrength, website, 
             organizationContactNumber, organizationEmail
         },
         {

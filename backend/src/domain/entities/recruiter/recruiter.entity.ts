@@ -1,4 +1,3 @@
-import SocialLinks from '../SocialLinks';
 
 export default interface Recruiter {
   _id?: string;
@@ -10,16 +9,14 @@ export default interface Recruiter {
     industry?: string;
     organizationContactNumber?: string;
     organizationEmail?: string;
-    socialLinks?: SocialLinks[];
+    linkedinUrl?: string
     teamStrength?: string;
-    aboutCompany?: string;
-    foundIn? : string;
     website?: string;
-    vision?: string;
-    benefit?: String;
   };
-  socialLinks?: SocialLinks[];
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  currentSubscription?: string;
 }

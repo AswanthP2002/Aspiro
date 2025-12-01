@@ -169,7 +169,7 @@ function App() {
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
         <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
 
-        <Route path='/test' element={<PostAJobForm />} />
+        <Route path='/test' element={<RecruiterRegisterPage />} />
 
         <Route path='*' element={<NotFoundPage />} />
 

@@ -61,6 +61,7 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const {response} = error
+        console.log('---checking response from the server --- inspect error code ---', response)
         const originalRequest = error.config
         if(response && response.status === 500){
             Swal.fire({
@@ -128,7 +129,9 @@ axiosInstance.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }else if(response && response.status === 401){
-            
+            window.location.replace('http://localhost:5173/token/expired')
+        }else if(response && response.status === 404){
+            window.location.replace('http://localhost:5173/404')
         }
 
         return Promise.reject(error)

@@ -139,7 +139,7 @@ export default class RecruiterRespository
 
   async getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null> {
     if(!ObjectId.isValid(recruiterId)) return null
-
+   // console.log('---request id reached in the repo ---', recruiterId)
     const result = await RecruiterDAO.aggregate([
       {$match:{userId:new ObjectId(recruiterId)}},
       {$lookup:{
@@ -157,7 +157,8 @@ export default class RecruiterRespository
       }}
     ])
 
-    return result[0]
+    //console.log('--- result before sending back to client ---', result)
+    return result.length > 0 ? result[0] : null
   }
 
   // async aggregateRecruiterProfile(

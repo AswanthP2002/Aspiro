@@ -3,6 +3,8 @@ import { container } from 'tsyringe';
 import RecruiterController from '../../controllers/recruiterController';
 import { StatusCodes } from '../../statusCodes';
 import { authorization, centralizedAuthentication } from '../../../middlewares/auth';
+import Validator from '../../../validation/validator.zod';
+import { CreateRecruiterSchema } from '../../schemas/recruiter/createRecruiter.schema';
 
 // const express = require('express');
 // import { Request, Response, NextFunction } from 'express';
@@ -44,7 +46,8 @@ function createRecruiterRouter() {
     '/recruiter/create',
     centralizedAuthentication,
     authorization(['user']),
-    recruiterController.CreateRecruiter.bind(recruiterController)
+    Validator(CreateRecruiterSchema),
+    recruiterController.createRecruiter.bind(recruiterController)
   );
   // recruiterRouter.post(
   //   '/recruiter/verify',

@@ -3,6 +3,28 @@ import Recruiter from './recruiter.entity';
 import SocialLinks from '../SocialLinks';
 import User, { Role } from '../user/User';
 
+/**
+ * _id?: string;
+  userId?: string;
+  employerType?: string;
+  organizationDetails?: {
+    organizationName?: string;
+    organizationType?: string;
+    industry?: string;
+    organizationContactNumber?: string;
+    organizationEmail?: string;
+    linkedinUrl?: string
+    teamStrength?: string;
+    website?: string;
+  };
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+ */
+
 export default interface RecruiterProfileOverviewData {
   _id?: string;
   userId?: string;
@@ -13,18 +35,38 @@ export default interface RecruiterProfileOverviewData {
     industry?: string;
     organizationContactNumber?: string;
     organizationEmail?: string;
-    socialLinks?: SocialLinks[];
+    linkedinUrl?: string
     teamStrength?: string;
-    aboutCompany?: string;
-    foundIn?: string;
     website?: string;
-    vision?: string;
-    benefit?: String;
   };
-  socialLinks?: SocialLinks[];
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  currentSubscription?: string;
   userProfile: User;
   jobs: Job[];
 }
+
+/**
+ * _id?: string;
+  userId?: string;
+  employerType?: string;
+  organizationDetails?: {
+    organizationName?: string;
+    organizationType?: string;
+    industry?: string;
+    organizationContactNumber?: string;
+    organizationEmail?: string;
+    linkedinUrl?: string
+    teamStrength?: string;
+    website?: string;
+  };
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+ */

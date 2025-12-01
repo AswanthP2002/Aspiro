@@ -34,7 +34,6 @@ import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVeri
 import { VerifyUserValidator } from '../../application/validators/verifyUser.validator';
 import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
 import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
-import { CreateRecruiterValidator } from '../schemas/recruiter/createRecruiter.schema';
 import { CreateJobSchema } from '../schemas/recruiter/createJob.schema';
 import ILoadRecruiterJobsUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterJobs.usecase';
 import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
@@ -65,34 +64,19 @@ export default class RecruiterController {
   // private _loadRecruiterProfileUC: ILoadRecruiterProfileUseCase // private _createJobUseCase: ICreateJobUseCase, //usecase interface //usecase interface // private _verifyRecruiterUC: IVerifyRecruiterUseCase, //usecase interface // private _loginRecruiterUC: ILoginRecruiterrUseCase, //usecase interface // private _saveBasicsUC: ISaveBasicsUseCase, //usecase interface // private _loadCompanyProfileUseCase: ILoadRecruiterProfileUseCase, //usecase interface // private _getJobApplications: IGetJobApplicationsUseCase, //usecase interface // private _rejectCandidateJobApplicationUseCase: IRejectCandidateUseCase, // private _createNotificationUseCase: ICreateNotification, // // private _saveShortlistUseCase : IFinalizeShortlist, // // private _getFinalizedShortlistDataUC : IGetFinalizedShortlistData, // private _getJobApplicationDetailsUC: IGetJobApplicationDetailsUseCase
   {}
 
-  async CreateRecruiter(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async createRecruiter(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req?.user?.id;
     try {
-      const validatedData = CreateRecruiterValidator.parse({ userId, ...req.body });
-      console.log('Data after parsing from controller-----', validatedData);
+      // console.log('Data after validating from validator-----', req.body);
+      // res.status(StatusCodes.NOT_FOUND).json({success:false, message:'Not found'})
+      // return
 
-      const dto = mapToCreateRecruiterDTOFromRequest({
-        organizationDetails: {
-          organizationName: validatedData.organizationName,
-          organizationType: validatedData.organizationType,
-          industry: validatedData.industry,
-          organizationContactNumber: validatedData.organizationContactNumber,
-          organizationEmail: validatedData.organizationEmail,
-          teamStrength: validatedData.teamStrength,
-          aboutCompany: validatedData.aboutCompany,
-          website: validatedData.website,
-          vision: validatedData.vision,
-        },
-        ...validatedData,
-      });
+      const dto = mapToCreateRecruiterDTOFromRequest({userId, ...req.body})
 
       const result = await this._createRecruiter.execute(dto);
 
       if (!result) {
-        res.status(StatusCodes.BAD_REQUEST).json({
-          success: false,
-          message: 'Something went',
-        });
+        throw new Error('Something went wrong');
       }
 
       res.status(StatusCodes.CREATED).json({
@@ -199,10 +183,11 @@ export default class RecruiterController {
     try {
       const result = await this._loadRecruiterProfileOverview.execute(id)
 
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'something went wrong'})
-      }
-
+      // if(!result){
+      //   res.status(StatusCodes.NOT_FOUND).json({success:false, message:'something went wrong'})
+      //   return
+      // }
+      //console.log('---- result ----', result)
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Recruiter details fetched successfully',

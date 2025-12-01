@@ -9,8 +9,9 @@ export class LoadRecruiterProfileOverviewUsecase implements ILoadRecruiterProfil
   constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {}
 
   async execute(recruiterId: string): Promise<RecruiterProfilelOverviewDataDTO | null> {
+    //console.log('--checking recruiter / user id from the usecase ---', recruiterId)
     const result = await this._recruiterRepo.getRecruiterProfileOverview(recruiterId);
-
+   // console.log('--checking result from the usecase--', result)
     if (result) {
       const dto = mapProfileOverviewDataToDTO(result)
       return dto;

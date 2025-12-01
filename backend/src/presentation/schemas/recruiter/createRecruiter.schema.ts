@@ -1,7 +1,7 @@
 import z from 'zod';
 
-export const CreateRecruiterValidator = z.object({
-  userId: z.string().regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid user id' }),
+export const CreateRecruiterSchema = z.object({
+  userId: z.string().optional(),
   employerType: z.string(),
   organizationName: z.string().optional(),
   organizationType: z.string().optional(),
@@ -9,7 +9,13 @@ export const CreateRecruiterValidator = z.object({
   organizationContactNumber: z.string().optional(),
   organizationEmail: z.string().optional(),
   teamStrength: z.string().optional(),
-  aboutCompany: z.string().optional(),
-  vision: z.string().optional(),
-  website: z.string().optional()
+  summary: z.string().optional(),
+  website: z.string().optional(),
+  focusingIndustries:z.array(z.string().optional()).optional(),
+  linkedinUrl: z.string().optional(),
+  recruitingExperience: z.string().optional()
 });
+
+export type CreateRecruiterRequestDto = z.infer<typeof CreateRecruiterSchema>
+
+

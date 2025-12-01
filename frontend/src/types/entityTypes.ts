@@ -315,18 +315,16 @@ export interface RecruiterProfileData {
     industry?: string;
     organizationContactNumber?: string;
     organizationEmail?: string;
-    socialLinks?: SocialLinks[];
     teamStrength?: string;
-    aboutCompany?: string;
-    foundIn?: string;
     website?: string;
-    vision?: string;
-    benefit?: String;
+
   };
-  socialLinks?: SocialLinks[];
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  currentSubscription?: string;
   userProfile: User;
   jobs: Job[];
 }

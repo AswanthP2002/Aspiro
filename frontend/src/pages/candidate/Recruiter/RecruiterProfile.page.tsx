@@ -8,6 +8,9 @@ import { Notify } from "notiflix";
 import getReminingDays from "../../../helpers/DateTime.helper";
 import InfinitySpinner from "../../../components/common/InfinitySpinner";
 import ThreeDotLoading from "../../../components/common/ThreeDotLoading";
+import { PiClock } from "react-icons/pi";
+import { BsQuestionCircle } from "react-icons/bs";
+import { FaCircleXmark } from "react-icons/fa6";
 
 
 const dummyUserWithRecruiterDetails = {
@@ -39,6 +42,7 @@ export default function RecruiterProfilePage(){
     const [profileData, setProfileData] = useState<RecruiterProfileData | null>(null)
     const [isRecruiterProfileExist, setIsRecruiterProfileExist] = useState<boolean>(false)
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<boolean>(false)
 
     const getStatusPill = (status: Job['status']) => {
         switch (status) {
@@ -61,7 +65,11 @@ export default function RecruiterProfilePage(){
             setLoading(true)
             try {
                 const result = await getProfileOverview()
+                console.log('---checking recruiter profile oveervei data---', result)
                 if(result?.success){
+                    if(!result?.result){
+                        return navigateTo('/profile/recruiter/register')
+                    }
                     setIsRecruiterProfileExist(true)
                    setProfileData(result?.result)
                 }else{
@@ -70,6 +78,7 @@ export default function RecruiterProfilePage(){
                     Notify.failure(result?.message, {timeout:2000})
                 }
             } catch (error: unknown) {
+                setError(true)
                 Notify.failure('Something went wrong', {timeout:2000})
             } finally {
                 setLoading(false)
@@ -80,9 +89,9 @@ export default function RecruiterProfilePage(){
         <>
         {loading && (<ThreeDotLoading />)}
         {!loading && (
-        <section className="!mt-8">
+        <section className="p-5 md:px-10 xl:px-20">
             
-              {isRecruiterProfileExist
+              {profileData?.profileStatus === 'approved'
                 ? <>
                     <div>
                       <RecruiterInfoCard 
@@ -182,7 +191,78 @@ export default function RecruiterProfilePage(){
                 </>
                   
               : <>
-                  <div className="text-center bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                  {
+                    profileData?.profileStatus === 'pending' && (
+                        <div className="border flex gap-5 border-orange-500 p-5 bg-orange-50 rounded-md">
+                            <div>
+                                <div className="w-12 h-12 flex items-center justify-center rounded-md bg-orange-500">
+                                    <PiClock color="white" size={25} />
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-xl">Application Under Review</p>
+                                <p className="mt-2 text-xs text-gray-700 leading-relaxed">Thank you for submitting your recruiter application!. Our team is currently reviewing your
+                                    Application. This process typically takes 2-3 business days.
+                                </p>
+                                <div className="mt-5 border border-orange-500 p-3 bg-white rounded-md">
+                                    <div className="flex items-center gap-3">
+                                        <BsQuestionCircle color="red" size={20} />
+                                        <p className="text-sm">What happens next?</p>
+                                    </div>
+                                    <ul className="!list-disc space-y-2 ms-5 mt-3">
+                                        <li className="text-xs text-gray-500">We will verify your application and your profile</li>
+                                        <li className="text-xs text-gray-500">You will recive an email notification once the review is completed</li>
+                                        <li className="text-xs text-gray-500">If approved you will gain immediate access to the recruiter dashboard</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                  }
+                  {
+                    profileData?.profileStatus === 'rejected' && (
+                        <div className="border mt-10 flex gap-5 border-red-500 p-5 bg-red-50 rounded-md">
+                            <div>
+                                <div className="w-12 h-12 flex items-center justify-center rounded-md bg-red-500">
+                                    <FaCircleXmark color="white" size={25} />
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-xl">Application Not Approved</p>
+                                <p className="mt-2 text-xs text-gray-700 leading-relaxed">
+                                    Thank you for your interest in becoming an Aspiro recruiter. After careful review, we've determined
+                                    that your application doesn't meet our current requirements at this time.
+                                </p>
+                                <div className="mt-5 border border-orange-500 p-3 bg-white rounded-md">
+                                    <div className="flex items-center gap-3">
+                                        <BsQuestionCircle color="red" size={20} />
+                                        <p className="text-sm">Common reason for rejection?</p>
+                                    </div>
+                                    <ul className="!list-disc space-y-2 ms-5 mt-3">
+                                        <li className="text-xs text-gray-500">Insufficient recruiting experience in specified industries</li>
+                                        <li className="text-xs text-gray-500">Incomplete or inaccurate information provided</li>
+                                        <li className="text-xs text-gray-500">Professional credentials could not be verified</li>
+                                    </ul>
+                                </div>
+                                <div className="mt-3 w-full p-3 border border-blue-500 bg-blue-50 rounded-md">
+                                    <p className="text-xs text-gray-700 leading-relaxed">
+                                        <span className="font-semibold !text-black">You can apply again after 30 days.</span>
+                                        We encourage you to gain more experience in your target industries and 
+                                        ensure all information is accurate before resubmitting.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                  }
+                  {
+                    error && (
+                        <div className="w-full h-screen flex items-center justify-center">
+                            <p className="text-gray-500 text-xs">Oops! Something went wrong. Please try again later.</p>
+                        </div>
+                    )
+                  }
+                  {/* <div className="text-center bg-white p-8 rounded-lg shadow-md border border-gray-200">
                       <h3 className="text-2xl font-bold text-gray-800 mb-2">Unlock Your Recruiting Potential</h3>
                       <p className="text-gray-600 mb-6">
                           Join our network to find top-tier talent, post job openings, and manage applications seamlessly.
@@ -192,7 +272,7 @@ export default function RecruiterProfilePage(){
                               Become a Recruiter Now
                           </button>
                       </Link>
-                  </div>
+                  </div> */}
                 </>
             }
           </section>
