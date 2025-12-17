@@ -69,8 +69,45 @@ import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
 import PasswordResetSuccessPage from './pages/user/Forgot-Password/PasswordResetSuccessPage';
 import UserPublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
 import PostProvider from './context/PostContext';
+import RecruiterApplications from './pages/admin/Recruiter-applications/RecruiterApplications';
+import RecruiterApplicationDetailsPage from './pages/admin/Recruiter-applications/RecruiterApplicationDetailsPage';
+import { useEffect } from 'react';
+import { Notify } from 'notiflix';
+import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
+import JobApplyPage from './pages/candidate/Job-apply/Apply';
+import MyApplications from './pages/candidate/My-applications/Applications';
+import ChatPage from './pages/common/Chat/Chat';
 
 function App() {
+
+  // useEffect(() => {
+  //   const handleNetworkConnectionLoss = () => {
+  //     window.location.href = '/network-error'
+  //   }
+
+  //   window.addEventListener('offline', handleNetworkConnectionLoss)
+
+  //   return () => {
+  //     window.removeEventListener('offline', handleNetworkConnectionLoss)
+  //   }
+  // }, [])
+
+
+  // useEffect(() => {
+  //   const handleOnline = () => Notify.success('Back online!', {timeout:2000})
+  //   window.addEventListener('online', handleOnline)
+
+  //   const timer = setTimeout(() => {
+  //     window.location.reload()
+  //   }, 2000)
+
+  //   return () => {
+  //     window.removeEventListener('online', handleOnline)
+  //     clearTimeout(timer)
+  //   }
+  // }, [])
+
+
   return (
     <BrowserRouter>
       <SocketProvider>
@@ -87,8 +124,11 @@ function App() {
             <Route element={<CommonLayout />}>
               <Route path='/feed' element={<Feed />} />
               <Route path='/jobs' element={<JobListing />} />
+              <Route path='/jobs/:id' element={<JObDetailsCandidateSide />} />
+              <Route path='/jobs/:id/apply' element={<JobApplyPage />} />
               <Route path='/notifications' element={<NotificationPage />} />
               <Route path='/users/:userId' element={<UserPublicProfile />} />
+              <Route path='/chats' element={<ChatPage />} />
             </Route>
           </Route>
 
@@ -103,7 +143,9 @@ function App() {
               <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
               <Route path='recruiter/my-jobs' element={<MyJobs />} />
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
+              <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
               <Route path='favorites' element={<SavedJobs />} />
+              <Route path='my-applications' element={<MyApplications />} />
             </Route>
           </Route>
         </Route>
@@ -127,6 +169,8 @@ function App() {
         <Route path='/admin' element={<AdminLayout />}>
           <Route element={<AdminProtectedRoutes />}>
           <Route path='dashboard' element={<Dashboard />} />
+          <Route path='recruiter/applications' element={<RecruiterApplications />} />
+          <Route path='recruiter/applications/details' element={<RecruiterApplicationDetailsPage />} />
           <Route path='users' element={<Users />} />
           <Route path='users/details/:id' element={<CandidateDetails />} />
           <Route path='jobs' element={<Jobs />} />

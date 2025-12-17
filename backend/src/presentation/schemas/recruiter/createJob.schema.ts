@@ -2,7 +2,7 @@
 import z from 'zod'
 
 export const CreateJobSchema = z.object({
-    recruiterId: z.string().regex(/^[0-9a-fA-F]{24}$/, {message:'Invalid recruiter id'}),
+    //recruiterId: z.string().regex(/^[0-9a-fA-F]{24}$/, {message:'Invalid recruiter id'}),
     jobTitle: z.string(),
     description: z.string(),
     requirements: z.string(),

@@ -1,5 +1,5 @@
 import Education from '../../../domain/entities/user/educations.entity';
-import IEducationRepo from '../../../domain/interfaces/candidate/IEducationRepo';
+import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
 import { EducationDTO } from '../../DTOs/user/education.dto';
 import mapToEducationDTOFromEducation from '../../mappers/user/mapToEducationDTOFromEducation.mapper';
 import IGetUserEducationsUsecase from '../../interfaces/usecases/user/IGetUserEducations.usecase';

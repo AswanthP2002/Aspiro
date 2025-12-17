@@ -18,7 +18,7 @@ import IRejectCandidateUseCase from '../../application/usecases/recruiter/interf
 import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
 import IFinalizeShortlist from '../../application/usecases/recruiter/interface/IFinalizeShortlist.usecase';
 import IGetFinalizedShortlistData from '../../application/usecases/recruiter/interface/IGetFinalizedData.usecase';
-import IGetJobApplicationsUseCase from '../../application/usecases/recruiter/interface/IGetJobApplications.usecase';
+import IGetJobApplicationsUseCase from '../../application/interfaces/usecases/recruiter/IGetJobApplications.usecase';
 import IGetJobApplicationDetailsUseCase from '../../application/usecases/recruiter/interface/IGetJobApplicationDetails.usecase';
 import mapToCreateRecruiterDTOFromRequest from '../mappers/recruiter/mapToCreateRecruiterDTOFromRequest';
 import mapToVerifyRecruiterDTOFromRequest from '../mappers/recruiter/mapToVerifyRecruiterDTOFromRequest';
@@ -43,6 +43,12 @@ import { editJobSchema } from '../schemas/recruiter/editJob.schema';
 import mapToEditJobDTOFromRequest from '../mappers/recruiter/mapToEditJobDTOFromRequest';
 import IDeleteJobUsecase from '../../application/interfaces/usecases/recruiter/IDeleteJob.usecase';
 import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
+import IScheduleInterviewUsecase from '../../application/interfaces/usecases/recruiter/IScheduleInterview.usecase';
+import CreateInterviewDTO from '../../application/DTOs/user/interview.dto';
+import IUpdateCandidateNotes from '../../application/interfaces/usecases/recruiter/IUpdateCandidateNotes.usecase';
+import { JobApplicationDTO } from '../../application/DTOs/candidate -LEGACY/jobApplication.dto';
+import IUpdateJobApplicationStatusUsecase from '../../application/interfaces/usecases/recruiter/IUpdateJobApplicationStatus.usecase';
+import UpdateJobApplicationStatusDTO from '../../application/DTOs/recruiter/UpdateJobApplicationStatus.dto';
 
 @injectable()
 export default class RecruiterController {
@@ -54,6 +60,10 @@ export default class RecruiterController {
     private _loadRecruiterProfileOverview: ILoadRecruiterProfileOverviewUsecase,
     @inject('IEditJobUsecase') private _editJob: IEditJobUsecase,
     @inject('IDeleteJobUsecase') private _deleteJob: IDeleteJobUsecase,
+    @inject('IScheduleInterviewUsecase') private _scheduleInterview: IScheduleInterviewUsecase,
+    @inject('IGetJobApplicationsUsecase') private _getJobApplications: IGetJobApplicationsUseCase,
+    @inject('IUpdateCandidateNotesUsecase') private _updateCandidateNotes: IUpdateCandidateNotes,
+    @inject('IUpdateJobApplicationStatusUsecase') private _updateJobApplicationStatus: IUpdateJobApplicationStatusUsecase
     // @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
   ) // @inject('IRegisterRecruiterUseCase')
   // private _registerRecruiterUC: IRegisterRecruiterUseCase,
@@ -122,6 +132,17 @@ export default class RecruiterController {
     try {
       await this._deleteJob.execute(jobId)
       res.status(StatusCodes.OK).json({success:true, message:'Job deleted successfully'})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  async updateJobApplicationStatus(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const applicationId = req.params.applicationId
+      const result = await this._updateJobApplicationStatus.execute({_id: applicationId, ...req.body} as UpdateJobApplicationStatusDTO)
+
+      res.status(StatusCodes.OK).json({success:true, message:'Updated', result})
     } catch (error: unknown) {
       next(error)
     }
@@ -201,19 +222,15 @@ export default class RecruiterController {
   async createJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
     try {
-      //validate job details using zod
-      const validatedData = CreateJobSchema.parse({ recruiterId: id, ...req.body });
-      const dto = mapToCreateJobDTOFromRequest(validatedData);
+      const dto = mapToCreateJobDTOFromRequest({recruiterId:id, ...req.body});
 
       const createdJob = await this._createJob.execute(dto);
 
       if (!createdJob) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
+       throw new Error('Can not create job')
       }
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'job created', job: createdJob });
+      res.status(StatusCodes.CREATED).json({ success: true, message: 'job created', job: createdJob });
     } catch (error: unknown) {
       next(error);
     }
@@ -236,21 +253,48 @@ export default class RecruiterController {
     }
   }
 
-  // // async getJobApplications(req: Request, res: Response): Promise<Response> {
-  // //   const jobId = req.params.jobId;
+  async scheduleInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const candidateId = req.params.candidateId
+      const jobId = req.params.jobId
+      const result = await this._scheduleInterview.execute({
+        candidateId,
+        jobId,
+        ...req.body as CreateInterviewDTO
+      })
 
-  // //   try {
-  // //     const result = await this._getJobApplications.execute(jobId);
-  // //     return res
-  // //       .status(StatusCodes.OK)
-  // //       .json({ success: true, message: 'success', result });
-  // //   } catch (error: unknown) {
-  // //     console.log(error);
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({ success: false, message: 'internal server error' });
-  // //   }
-  // // }
+      res.status(StatusCodes.CREATED).json({success:true, message:'Interview Scheduled', result})
+
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  async getJobApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const jobId = req.params.jobId;
+
+    try {
+      const result = await this._getJobApplications.execute(jobId);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'success', result });
+    } catch (error: unknown) {
+     next(error)
+    }
+  }
+
+  async updateCandidateNotes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {applicationId} = req.params
+      const result = await this._updateCandidateNotes.execute({_id:applicationId, ...req.body} as JobApplicationDTO)
+
+      res.status(StatusCodes.OK).json({
+        success:true, message:'Notes updated', result
+      })
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
 
   // // async rejectCandidateJobApplication(
   // //   req: Auth,

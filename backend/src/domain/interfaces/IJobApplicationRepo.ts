@@ -16,4 +16,5 @@ export default interface IJobApplicationRepo extends IBaseRepo<JobApplication> {
   getApplicationDetails(
     applicationId: string
   ): Promise<ApplicationDetailsAggregated | null>;
+  
 }

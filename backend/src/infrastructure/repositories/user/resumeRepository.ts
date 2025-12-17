@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Resume from '../../../domain/entities/user/resume.entity';
-import IResumeRepo from '../../../domain/interfaces/candidate/IResumeRepo';
+import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
 import { ResumeDAO } from '../../database/DAOs/user/resume.dao';

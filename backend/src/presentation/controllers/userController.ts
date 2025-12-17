@@ -7,9 +7,9 @@ import IRegisterCandidateUseCase from '../../application/usecases/candidate/inte
 import IAddCertificateUseCase from '../../application/usecases/candidate/interface/IAddCertificate.usecase';
 import IAddEducationUseCase from '../../application/interfaces/usecases/user/IAddUserEducation.usecase';
 import IAddExperience from '../../application/interfaces/usecases/user/IAddUserExperience.usecase';
-import IAddResumeUseCase from '../../application/usecases/candidate/interface/IAddResume.usecase';
+import IAddResumeUseCase from '../../application/interfaces/usecases/user/IAddResume.usecase';
 import IAddSkillsUseCase from '../../application/interfaces/usecases/user/IAddUsersSkill.usecase';
-import ISaveJobApplicationUseCase from '../../application/usecases/candidate/interface/IApplyJob.usecase';
+import ISaveJobApplicationUseCase from '../../application/interfaces/usecases/user/IApplyJob.usecase';
 import ILoadCertificateUseCase from '../../application/usecases/candidate/interface/IGetCeritificates.usecase';
 import IDeleteExperienceUseCase from '../../application/interfaces/usecases/user/IDeleteUserExperience.usecase';
 import IDeleteSkillsUseCase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase';
@@ -29,17 +29,16 @@ import IEditEducationUseCase from '../../application/interfaces/usecases/user/IE
 import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
 import IEditProfileUseCase from '../../application/usecases/candidate/interface/IEditProfile.usecase';
 import IGetNotificationsUseCase from '../../application/usecases/candidate/interface/IGetNotifications.usecase';
-import ISaveFavoriteJobUseCase from '../../application/usecases/candidate/interface/ISaveFavoriteJobs.usecase';
-import ICheckIsJobSavedUseCase from '../../application/usecases/candidate/interface/ICheckIsJobSaved.usecase';
-import IGetFavoriteJobUseCase from '../../application/interfaces/usecases/user/IGetFavoriteJobs.usecase';
-import IUnsaveJobUseCase from '../../application/usecases/candidate/interface/IUnsaveJob.usecase';
+import ISaveFavoriteJobUseCase from '../../application/interfaces/usecases/user/ISaveJob.usecase';
+import ICheckIsJobSavedUseCase from '../../application/interfaces/usecases/user/ICheckIsJobSaved.usecase';
+import IGetFavoriteJobUseCase from '../../application/interfaces/usecases/user/IGetSavedJobs.usecase';
+import IUnsaveJobUseCase from '../../application/interfaces/usecases/user/IUnsaveJob.usecase';
 import IAddSocialLinkUsecase from '../../application/interfaces/usecases/user/IAddSocialLink.usecase';
 import IDeleteSocialLinkUseCase from '../../application/interfaces/usecases/user/IDeleteSocialLink.usecase';
 import IRemoveProfilePictureUseCase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase';
 import IUploadCoverPhotoUseCase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase';
 import IGetCandidatesUseCase from '../../application/usecases/interfaces/IGetCandidates.usecase';
 import IGetCandidateDetailsUseCase from '../../application/usecases/interfaces/IGetCandiateDetails.usecase';
-import IGetCandidateApplicationsUseCase from '../../application/usecases/candidate/interface/IGetCandidateApplications.usecase';
 import mapToCreateCandidateDTO from '../mappers/candidate/mapToCreateCandidateDTO';
 import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
 import mapToLoginCandidateInpDTO from '../mappers/user/mapToUserLoginDTO';
@@ -101,6 +100,11 @@ import ResetPasswordUsecase from '../../application/usecases/user/ResetPassword.
 import mapResetPasswordDtoMapper from '../../application/mappers/user/mapResetPasswordDto.mapper';
 import ILoadUserAggregatedProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase';
 import ILoadUserMetaDataUsecase from '../../application/interfaces/usecases/user/ILoadUserMetaData.usecase';
+import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase';
+import ISaveJobUsecase from '../../application/interfaces/usecases/user/ISaveJob.usecase';
+import IGetSavedJobsUsecase from '../../application/interfaces/usecases/user/IGetSavedJobs.usecase';
+import IApplyJobUsecase from '../../application/interfaces/usecases/user/IApplyJob.usecase';
+import IGetMyApplicationsUsecase from '../../application/interfaces/usecases/user/IGetMyApplications.usecase';
 
 
 @injectable()
@@ -140,8 +144,17 @@ export class UserController {
     @inject('IAddSocialLinkUsecase') private _addSocialLink: IAddSocialLinkUsecase,
     @inject('IDeleteSocialLinkUsecase') private _deleteSocialLink: IDeleteSocialLinkUseCase,
     @inject('IEditProfileUsecase') private _editProfile: IEditProfileUseCase,
-    @inject('ILoadUserAggregatedProfileUsecase') private _loadUserAggregatedProfile: ILoadUserAggregatedProfileUsecase,
-    @inject('ILoadUserMetaDataUsecase') private _loadUserMetaData: ILoadUserMetaDataUsecase
+    @inject('ILoadUserAggregatedProfileUsecase')
+    private _loadUserAggregatedProfile: ILoadUserAggregatedProfileUsecase,
+    @inject('ILoadUserMetaDataUsecase') private _loadUserMetaData: ILoadUserMetaDataUsecase,
+    @inject('IGetJobDetailsUsecase') private _getJobDetails: IGetJobDetailsUseCase,
+    @inject('ISaveJobUsecase') private _saveJob: ISaveJobUsecase,
+    @inject('ICheckIsJobSavedUsecase') private _checkIsJobSaved: ICheckIsJobSavedUseCase,
+    @inject('IUnsaveJobUsecase') private _unsaveJob: IUnsaveJobUseCase,
+    @inject('IGetSavedJobsUsecase') private _getSavedJobs: IGetSavedJobsUsecase,
+    @inject('IApplyJobUsecase') private _applyJob: IApplyJobUsecase,
+    @inject('IAddResumeUsecase') private _addResume: IAddResumeUseCase,
+    @inject('IGetMyApplicationsUsecase') private _getMyApplications: IGetMyApplicationsUsecase
   ) {}
 
   /**
@@ -154,6 +167,7 @@ export class UserController {
     try {
       const validateInput = CreateUserSchema.parse(req.body);
       const createUserDto = mapRequestToCreateUserDTO(validateInput);
+      
       const createUser = await this._createUserUsecase.execute(createUserDto);
 
       res.status(StatusCodes.CREATED).json({
@@ -239,14 +253,14 @@ export class UserController {
   } //reworked : void
 
   async loadUserMetaData(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id
+    const userId = req.user.id;
 
-    try{
-      const result = await this._loadUserMetaData.execute(userId)
-      res.status(StatusCodes.OK).json({success:true, message:'Metadata fetched successfully', result})
-    }catch(error: unknown){
-
-    }
+    try {
+      const result = await this._loadUserMetaData.execute(userId);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Metadata fetched successfully', result });
+    } catch (error: unknown) {}
   }
 
   async saveUsersBasics(req: Auth, res: Response, next: NextFunction): Promise<void> {
@@ -356,7 +370,6 @@ export class UserController {
     const { experienceId } = req.params;
 
     try {
-      
       const dto = mapToEditExperienceDTO({
         experienceId: experienceId,
         ...req.body,
@@ -411,38 +424,38 @@ export class UserController {
   } //reworked
 
   async loadUserAggregatedProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const {userId} = req.params
+    const { userId } = req.params;
     try {
-      const result = await this._loadUserAggregatedProfile.execute(userId)
+      const result = await this._loadUserAggregatedProfile.execute(userId);
 
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
-        return
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
+        return;
       }
 
-      res.status(StatusCodes.OK).json({success:true, message:'Profile fetched successfully', result})
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Profile fetched successfully', result });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
-  // // async loadJobDetails(
-  // //   req: Request,
-  // //   res: Response,
-  // //   next: NextFunction
-  // // ): Promise<void> {
-  // //   const { jobId } = req.params;
+  async loadJobDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { jobId } = req.params;
 
-  // //   try {
-  // //     const jobDetails = await this._loadJobDetailsUC.execute(jobId);
-  // //     res
-  // //       .status(StatusCodes.OK)
-  // //       .json({ success: true, message: 'Job details fetched', jobDetails });
-  // //     return;
-  // //   } catch (error: unknown) {
-  // //     next(error);
-  // //   }
-  // // } //reworked : void
+    try {
+      const jobDetails = await this._getJobDetails.execute(jobId);
+      console.log('--checking job details from the backend--', jobDetails);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Job details fetched', jobDetails });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   async addSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user.id;
@@ -493,7 +506,6 @@ export class UserController {
     const userId = req.user.id;
 
     try {
-
       const dto = mapToCreateEducationDTOFromRequest({
         userId: userId,
         ...req.body,
@@ -548,7 +560,6 @@ export class UserController {
     const { educationId } = req.params;
 
     try {
-      
       const dto = mapToUpdateEducationDTOFromRequest({
         id: educationId,
         ...req.body,
@@ -598,39 +609,31 @@ export class UserController {
     }
   }
 
-  // async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
-  //   const candidateId = req.user.id;
-  //   //testing file
-  //   console.log(
-  //     'Request for uploading resume reached here, controller candididateController.ts'
-  //   );
-  //   try {
-  //     if (req.file) {
-  //       const resume = req.file.buffer;
-  //       const result = await this._addResumeUC.execute({
-  //         file: resume,
-  //         path: req.file?.originalname,
-  //         candidateId: candidateId,
-  //       });
-  //       res.status(StatusCodes.OK).json({
-  //         success: true,
-  //         message: 'Resume added successfully',
-  //         resumeId: result?._id,
-  //       });
-  //       return;
-  //     }
-  //     console.log(
-  //       'A problem occured while saving resume candidateController.ts'
-  //     );
-  //     res
-  //       .status(StatusCodes.BAD_REQUEST)
-  //       .json({ success: false, message: 'Can not add resume' });
-
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    //testing file
+    console.log('Request for uploading resume reached here, controller candididateController.ts');
+    try {
+      if (req.file) {
+        const resume = req.file.buffer;
+        const result = await this._addResume.execute({
+          file: resume,
+          path: req.file?.originalname,
+          candidateId: candidateId,
+        });
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: 'Resume added successfully',
+          resumeId: result?._id,
+        });
+        return;
+      }
+      console.log('A problem occured while saving resume candidateController.ts');
+      res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Can not add resume' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // async loadResume(
   //   req: Auth,
@@ -727,32 +730,24 @@ export class UserController {
   //   }
   // } //reworked : void
 
-  // async saveJobApplication(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   //coverLetterContent, savedResumeId
-  //   const candidateId = req.user.id;
-  //   const { jobId } = req.params;
-  //   const { coverLetterContent, resumeId } = req.body;
+  async saveJobApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    //coverLetterContent, savedResumeId
+    const candidateId = req.user.id;
+    const { jobId } = req.params;
+    const { coverLetterContent, resumeId } = req.body;
 
-  //   try {
-  //     const result = await this._saveJobApplicationUC.execute({
-  //       candidateId,
-  //       jobId,
-  //       coverLetterContent,
-  //       resumeId,
-  //     });
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'success', result });
-
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+    try {
+      const result = await this._applyJob.execute({
+        candidateId,
+        jobId,
+        coverLetterContent,
+        resumeId,
+      });
+      res.status(StatusCodes.OK).json({ success: true, message: 'success', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // // async searchJobFromHomePage(req: Request, res: Response): Promise<Response> {
   // //   const search = (req.query.search as string) || '';
@@ -776,20 +771,19 @@ export class UserController {
   async editUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
     try {
-      
       const dto = mapEditProfileRequestToUpdateDTO({
-        userId:id,
-        ...req.body
+        userId: id,
+        ...req.body,
       });
 
-      const result = await this._editProfile.execute(dto)
+      const result = await this._editProfile.execute(dto);
 
-      if(!result){
+      if (!result) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          success:false,
-          message:'Something went wrong'
-        })
-        return
+          success: false,
+          message: 'Something went wrong',
+        });
+        return;
       }
       res.status(StatusCodes.OK).json({
         success: true,
@@ -841,72 +835,61 @@ export class UserController {
   //   }
   // }
 
-  // async saveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-  //   const candidateId = req.user.id;
-  //   const { jobId } = req.params;
-  //   try {
-  //     const result = await this._saveJobUC.execute({ candidateId, jobId });
-  //     res.status(StatusCodes.OK).json({ success: true, message: 'Job saved' });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async saveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    const { jobId } = req.params;
+    try {
+      const result = await this._saveJob.execute({ candidateId, jobId });
+      if (!result) {
+        throw new Error('Something went wrong');
+      }
 
-  // async checkIsJobSaved(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user.id;
-  //   const jobId = req.query.jobId as string;
-  //   try {
-  //     const result = await this._checkIsJobSavedUC.execute(jobId, candidateId);
+      console.log('--job saved--');
+      res.status(StatusCodes.CREATED).json({ success: true, message: 'Job saved' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'checked', isSaved: result });
+  async checkIsJobSaved(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    const jobId = req.query.jobId as string;
+    try {
+      const result = await this._checkIsJobSaved.execute(jobId, candidateId);
 
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({ success: true, message: 'checked', isSaved: result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async getFavoriteJobs(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user.id;
-  //   try {
-  //     const result = await this._getSavedJobsUC.execute(candidateId);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Favorite jobs fetched sucessfully',
-  //       jobs: result,
-  //     });
+  async getFavoriteJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    try {
+      const result = await this._getSavedJobs.execute(candidateId);
 
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Favorite jobs fetched sucessfully',
+        jobs: result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
-  // async unsaveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-  //   const candidateId = req.user.id;
-  //   const { jobId } = req.params;
+  async unsaveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    const { jobId } = req.params;
 
-  //   try {
-  //     await this._unsaveJobUC.execute(jobId, candidateId);
-  //     //  return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not unsave'})
-  //     res.status(StatusCodes.OK).json({ success: true, message: 'Unsaved' });
-
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // }
+    try {
+      await this._unsaveJob.execute(jobId, candidateId);
+      //  return res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Can not unsave'})
+      res.status(StatusCodes.OK).json({ success: true, message: 'Unsaved' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
   async addSocialLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
@@ -936,13 +919,13 @@ export class UserController {
     const domain = req.body?.domain as string;
 
     try {
-      const result = await this._deleteSocialLink.execute({ userId, domain })
+      const result = await this._deleteSocialLink.execute({ userId, domain });
 
-      if(!result){
+      if (!result) {
         res.status(StatusCodes.BAD_REQUEST).json({
-          success:false,
-          message:'Something went wrong'
-        })
+          success: false,
+          message: 'Something went wrong',
+        });
         return;
       }
 
@@ -1076,26 +1059,20 @@ export class UserController {
   //   }
   // } //reworked : void
 
-  // async getCandidateApplications(
-  //   req: Auth,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.user?.id;
-  //   try {
-  //     const applications = await this._getCandidateApplicationsUC.execute(
-  //       candidateId
-  //     );
-  //     //console.log('-------applications in the contorller', applications);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Applications fetched successfully',
-  //       applications,
-  //     });
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
+  async getCandidateApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id;
+    try {
+      const applications = await this._getMyApplications.execute(candidateId);
+      //console.log('-------applications in the contorller', applications);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Applications fetched successfully',
+        applications,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
 
   // }
 

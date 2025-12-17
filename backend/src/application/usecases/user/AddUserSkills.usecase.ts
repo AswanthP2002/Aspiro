@@ -1,4 +1,4 @@
-import ISkillRepo from '../../../domain/interfaces/candidate/ISkillRepo';
+import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
 import { CreateSkillDTO, SkillDTO } from '../../DTOs/user/skill.dto';
 import mapToSkills from '../../mappers/user/mapToSkills.mapper';
 import mapToSkillDTOFromSkills from '../../mappers/user/mapToSkillsFromSkillDTO.mapper';

@@ -12,3 +12,8 @@ export default interface FindCompaniesQuery {
   limit: number;
   sortOption: {[key: string]: number}
 }
+
+export interface AppliedRecruitersQuery {
+  search: string,
+  profileStatus: string[]
+}

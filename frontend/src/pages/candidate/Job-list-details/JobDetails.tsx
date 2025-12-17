@@ -8,15 +8,25 @@ import { checkIsSaved, saveJob, unsaveJob } from "../../../services/userServices
 import { useSelector } from "react-redux"
 import { formatRelativeTime, transformDate } from "../../../services/util/formatDate"
 import { Notify } from "notiflix"
+import { PiSuitcase } from "react-icons/pi"
+import { BiCheck, BiRupee, BiSave } from "react-icons/bi"
+import { BsSave } from "react-icons/bs"
+import { CiBookmark, CiBookmarkCheck, CiCircleInfo, CiClock1, CiShare1 } from "react-icons/ci"
+import { RiShareLine } from "react-icons/ri"
+import { LuUser, LuUsers } from "react-icons/lu"
+import { JobDetails } from "../../../types/entityTypes"
+import { FaUserTie } from "react-icons/fa"
+import ButtonLoader from "../../../components/common/ButtonLoader"
 
 export default function JObDetailsCandidateSide() {
-    const [jobDetails, setjobDetails] = useState<any>({})
+    const [jobDetails, setjobDetails] = useState<JobDetails | null | undefined>(null)
     const [isJobSaved, setIsJobSaved] = useState(false)
+    const [loading, setIsLoading] = useState(false)
     
     const params = useParams()
     const jobId  = params?.id as string
-    const logedCandidate = useSelector((state : any) => {
-        return state.candidateAuth.token
+    const logedUser = useSelector((state : any) => {
+        return state.userAuth.user
     })
 
     console.log('params is here', jobId)
@@ -29,34 +39,24 @@ export default function JObDetailsCandidateSide() {
 
                 const result = await loadJobDetails(jobId)
                 
-
                 if(result.success){
                     console.log('job details fetched', result)
                     
                     setjobDetails(result?.jobDetails)
                     console.log('job details from the state', jobDetails)
                 }else{
-                    Swal.fire({
-                        icon:'error',
-                        title:'Oops',
-                        text:result?.message
-                    })
+                    Notify.failure('Something went wrong', {timeout:2500})
                 }
 
-                if(logedCandidate){
+                if(logedUser.id){
                     const isSaved = await checkIsSaved(jobId)
                     setIsJobSaved(isSaved)
+                }else{
+                    setIsJobSaved(false)
                 }
 
             } catch (error : unknown) {
-                if(error instanceof Error){
-                    console.log('error occured while geting job details', error)
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:error?.message,
-                    })
-                }
+                Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2500})
             }
         }
 
@@ -70,53 +70,150 @@ export default function JObDetailsCandidateSide() {
     }
 
     function goToApplyPage(jobId : string) {
-        navigator(`apply`, {state:{jobDetails}})
+        navigator(`/jobs/${jobId}/apply`, {state:{jobDetails}})
     }
-    async function addJobToFavorites(jobId : string) {
-        const result = await saveJob(jobId)
-
-        if(result?.success){
-            Notify.success('Saved', {timeout:1200})
-            setTimeout(() => window.location.reload(), 1200)
-        }else{
-            Notify.failure('Can not save job', {timeout:1200})
+    async function saveAJob(jobId : string) {
+        try {
+            setIsLoading(true)
+            const result = await saveJob(jobId)
+    
+            if(result?.success){
+                Notify.success('Saved', {timeout:1200})
+                setTimeout(() => setIsJobSaved(true), 1200)
+            }else{
+                Notify.failure('Can not save job', {timeout:1200})
+            }
+        } catch (error: unknown) {
+            Notify.failure('Something went wrong', {timeout:1200})
+        } finally {
+            setIsLoading(false)
         }
     }
 
-    async function jobUnsave(jobId : string) {
-        const result = await unsaveJob(jobId)
-        if(result?.success){
-            Notify.success('Unsaved', {timeout:1200})
-            setTimeout(() => window.location.reload(), 1200)
-        }else{
-            Notify.failure('Something went wrong', {timeout:1200})
+    async function unsaveAJob(jobId : string) {
+        try {
+            setIsLoading(true)
+            const result = await unsaveJob(jobId)
+            if(result?.success){
+                Notify.success('Unsaved', {timeout:1200})
+                setTimeout(() => setIsJobSaved(false), 1200)
+            }else{
+                Notify.failure('Something went wrong', {timeout:1200})
+            }
+        } catch (error: unknown) {
+            Notify.failure('Something went wrong', {timeout:1200})   
+        } finally {
+            setIsLoading(false)
         }
     }
 
     return (
         <>
-            <div className="job-listing-container w-full">
+            <div className="w-full">
                 <div className="breadcrumbs-header bg-gray-100 w-full">
-                    <div className="aspiro-container">
+                    {/* <div className="">
                         <div className="flex justify-between py-3">
                             <div className="left"><p className="text-sm">Job Details</p></div>
                             <div className="right"><p className="text-sm">Home / Jobs / Job Details</p></div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <section className="jobs mt-5 mb-5">
-                    <div className="aspiro-container">
-                        <div className="border border-gray-300 rounded-md !p-5">
-                            <div className="flex gap-3 items-center">
-                                <div className="border border-gray-300 w-[40px] h-[40px] flex justify-center items-center rounded-full"><i className="!text-gray-300 fa-solid fa-briefcase"></i></div>
+                    <div className="">
+                        <div className="border border-gray-300 bg-white rounded-md !p-5">
+                            <div className="flex gap-2">
                                 <div>
-                                    <p className="font-semibold">{jobDetails?.jobTitle}</p>
-                                    <p className="text-sm text-gray-400 mt-2">{jobDetails?.companyDetails?.companyName} | {jobDetails?.companyDetails?.location?.city}, {jobDetails?.companyDetails?.location?.state}</p>
+                                    <div className="w-12 bg-blue-100 h-12 flex items-center justify-center rounded-full">
+                                        <PiSuitcase color="blue" size={22} />
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-xl font-light">{jobDetails?.jobTitle}</p>
+                                    <div className="flex gap-4 items-center">
+                                        <p className="text-xs text-gray-500">Posted by: {jobDetails?.userProfile?.name}</p>,
+                                        {jobDetails?.workMode === 'On-site' || jobDetails?.workMode === 'Hybrid' ? (jobDetails?.location) : null}
+                                    </div>
+                                    <div className="flex gap-2 mt-2">
+                                        <div className="border border-blue-500 bg-blue-100 text-xs text-blue-500 rounded-md px-2 py-1">
+                                            {jobDetails?.jobType}
+                                        </div>
+                                        <div className="border border-green-500 bg-green-100 text-xs text-green-500 rounded-md px-2 py-1">
+                                            {jobDetails?.workMode}
+                                        </div>
+                                        <div className="border border-violet-500 bg-violet-100 text-xs text-violet-500 rounded-md px-2 py-1">
+                                            {jobDetails?.jobLevel}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center grid grid-cols-1 lg:grid-cols-2 mt-3 mb-3 gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <CiCircleInfo color="blue" />
+                                        <p className="text-xs text-blue-500">Apply  by {transformDate(jobDetails?.expiresAt)}</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <CiClock1 />
+                                        <p className="text-xs text-gray-500">Posted {formatRelativeTime(jobDetails?.createdAt || new Date())}</p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5">
+                                        {
+                                            jobDetails?.candidateIds.includes(logedUser.id) 
+                                                ? <>
+                                                    <button className="bg-gradient-to-br from-blue-500 text-sm to-indigo-600 text-white flex items-center gap-2 px-3 py-2 rounded-md">
+                                                        Applied
+                                                        <BiCheck color="white" size={21} />
+                                                    </button>
+                                                  </>
+                                                : <>
+                                                    <button onClick={() => goToApplyPage(jobDetails?._id as string)} className="bg-gradient-to-br from-blue-500 text-sm to-indigo-600 text-white flex items-center gap-2 px-3 py-2 rounded-md">
+                                                        Apply Now
+                                                        <CiShare1 color="white" size={21} />
+                                                    </button>
+                                                  </>
+
+                                        }
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    {
+                                        isJobSaved
+                                            ? <>
+                                                {
+                                                    loading
+                                                        ? <ButtonLoader />
+                                                        : <>
+                                                            <button onClick={() => unsaveAJob(jobDetails?._id as string)} className="bg-gray-200 w-8 h-8 flex items-center justify-center rounded-md gap-2">
+                                                                <CiBookmarkCheck />
+                                                            </button>
+                                                          </>
+                                                }
+                                              </>
+                                            : <>
+                                                {
+                                                    loading
+                                                        ? <ButtonLoader />
+                                                        : <>
+                                                            <button onClick={() => saveAJob(jobDetails?._id as string)} className="bg-gray-200 w-8 h-8 flex items-center justify-center rounded-md gap-2">
+                                                                <CiBookmark />
+                                                            </button>
+                                                          </>
+                                                }
+                                              </>
+                                    }
+                                    <button className="bg-gray-200 w-8 h-8 flex items-center justify-center rounded-md gap-2">
+                                        <RiShareLine />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="flex justify-between mt-5">
+                            {/* <div className="flex gap-3 items-center">
+                                <div className="border border-gray-300 w-[40px] h-[40px] flex justify-center items-center rounded-full"><i className="!text-gray-300 fa-solid fa-briefcase"></i></div>
                                 <div>
-                                    <p className="text-blue-500 text-sm">Apply by {transformDate(jobDetails?.expiresAt)} | Posted {formatRelativeTime(jobDetails?.createdAt)}</p>
+                                    <p className="font-semibold">Job title</p>
+                                    <p className="text-sm text-gray-400 mt-2">Company name, locality, state</p>
+                                </div>
+                            </div> */}
+                            {/* <div className="flex justify-between mt-5">
+                                <div>
+                                    <p className="text-blue-500 text-sm">Apply by {transformDate(jobDetails?.expiresAt)} | Posted {formatRelativeTime(jobDetails?.createdAt || new Date())}</p>
                                 </div>
                                 <div className="flex gap-5">
                                     {
@@ -127,37 +224,116 @@ export default function JObDetailsCandidateSide() {
                                     <button><i className="fa-solid fa-share-nodes !text-xl"></i></button>
                                     <button onClick={() => goToApplyPage(jobDetails?._id)} className="text-sm bg-blue-500 rounded-md text-white !px-5 !py-2">Apply Now</button>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
 
-                        <div className="border rounded-md !p-5 flex justify-between border-gray-300 rounde-md mt-5">
-                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
-                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-wallet me-2"></i>Pay</p>
-                                <p className="font-semibold">&#8377; {jobDetails?.minSalary} - {jobDetails?.maxSalary}</p>
+                        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mt-5">
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
+                                <p className="text-xs text-gray-500 "><i className="!text-sm !text-gray-400 fa-solid fa-wallet me-2"></i>Pay</p>
+                                <p className="text-sm mt-1">
+                                    <p className="flex items-center">
+                                        {jobDetails?.salaryCurrency === 'INR' ? <BiRupee /> : null}
+                                        {jobDetails?.minSalary} - {jobDetails?.maxSalary}
+                                    </p>
+                                </p>
                             </div>
-                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
-                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-clock me-2"></i>Duration</p>
-                                <p className="font-semibold">{jobDetails?.jobType}</p>
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
+                                <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-clock me-2"></i>Job Type</p>
+                                <p className="text-sm mt-1">{jobDetails?.jobType}</p>
                             </div>
-                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
                                 <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-suitcase me-2"></i>Work Mode</p>
-                                <p className="font-semibold">{jobDetails?.locationType}</p>
+                                <p className="text-sm mt-1">{jobDetails?.workMode}</p>
                             </div>
-                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
                                 <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-users me-2"></i>Vacancies</p>
-                                <p className="font-semibold">{jobDetails?.vacancies}</p>
+                                <p className="text-sm mt-1">{jobDetails?.vacancies} Openings</p>
                             </div>
-                            <div className="border-r !px-5 flex-grow-1 border-gray-300">
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
                                 <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-location-dot me-2"></i>Office Location</p>
-                                <p className="font-semibold">{jobDetails?.companyDetails?.location?.city}, {jobDetails?.companyDetails?.location?.state}</p>
+                                <p className="text-sm mt-1">{jobDetails?.workMode === 'On-site' || jobDetails?.workMode === 'Hybrid' ? jobDetails?.location : 'NA'}</p>
                             </div>
-                            <div className="!px-5">
+                            <div className="bg-white border border-gray-300 rounded-md p-2">
                                 <p className="text-xs text-gray-500"><i className="!text-sm !text-gray-400 fa-solid fa-layer-group me-2"></i>Job Level</p>
-                                <p className="font-semibold">{jobDetails?.jobLevel}</p>
+                                <p className="text-sm mt-1">{jobDetails?.jobLevel}</p>
                             </div>
                         </div>
-                        <div className="mt-5 grid grid-cols-12 gap-10">
-                            <div className="col-span-7 border border-gray-300 rounded-md p-5">
+                        <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-12">
+                            <div className="lg:col-span-8 grid grid-cols-1 gap-3">
+                                <div className="border p-3 border-gray-200 bg-white roundded-md">
+                                    <p className="font-light">Description</p>
+                                    <p className="mt-3 text-xs leading-relaxed text-gray-500">{jobDetails?.description}</p>
+                                </div>
+
+                                <div className="border p-3 border-gray-200 bg-white roundded-md">
+                                    <p className="font-light">Requirements</p>
+                                    <p className="mt-3 text-xs leading-relaxed text-gray-500">{jobDetails?.description}</p>
+                                </div>
+
+                                <div className="border p-3 border-gray-200 bg-white roundded-md">
+                                    <p className="font-light">Responsibilities</p>
+                                    <p className="mt-3 text-xs leading-relaxed text-gray-500">{jobDetails?.description}</p>
+                                </div>
+                            </div>
+                            <div className="lg:col-span-4 grid grid-cols-1 gap-3">
+                                <div className="bg-white p-3 border border-gray-200 rounded-md">
+                                        <p className="font-light">Required skills</p>
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {
+                                            jobDetails?.requiredSkills?.map((skill : string, index : number) => {
+                                                return <div key={index} className="bg-gray-200 rounded-full !px-3 !py-1">
+                                                    <p className="text-xs text-gray-500">{skill}</p>
+                                                </div>
+                                            })
+                                        }
+                                    </div>
+                                    </div>
+
+                                    <div className="bg-white border p-3 border-gray-200 rounded-md">
+                                                <p className="font-light">Optional</p>
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {
+                                                        jobDetails?.optionalSkills?.map((skill: string, index: number) => {
+                                                            return <div key={index} className="bg-gray-200 rounded-full !px-3 !py-1">
+                                                                <p className="text-xs text-gray-500">{skill}</p>
+                                                            </div>
+                                                        })
+                                                    }
+                                                </div>
+                                    </div>
+
+                                    <div className="border border-blue-500 p-3 bg-blue-100 rounded-md flex gap-2">
+                                        <div className="bg-blue-500 rounded-md w-10 h-10 flex items-center justify-center">
+                                            <LuUsers color="white" size={20} />
+                                        </div>
+                                        <div>
+                                            <p>{jobDetails?.applicationsCount}</p>
+                                            <p className="text-sm font-light">Total Applicants</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border p-3 border-gray-200 bg-white rounded-md">
+                                        <p className="font-light">About Recruiter</p>
+                                        <div className="flex items-center mt-3 gap-2">
+                                            <div>
+                                                <FaUserTie />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-700">{jobDetails?.userProfile?.name}</p>
+                                                <p className="text-xs text-gray-500">{jobDetails?.userRecruiterProfile?.employerType} Recruiter</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-5">
+                                            <p className="text-sm text-gray-700">About</p>
+                                            <p className="mt-2 text-xs text-gray-500">{jobDetails?.userRecruiterProfile.summary}</p>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        {/*  */}
+                        
+                        {/* <div className="mt-5 grid grid-cols-12 gap-5">
+                            <div className="col-span-7 bg-white border border-gray-300 rounded-md p-5">
                                 <div>
                                     <p className="font-semibold">Description</p>
                                     <p className="mt-3 text-sm text-gray-500">{jobDetails?.description}</p>
@@ -172,7 +348,7 @@ export default function JObDetailsCandidateSide() {
                                 </div>
                             </div>
                             <div className="col-span-5">
-                                <div className="border border-gray-300 rounded-md !p-5">
+                                <div className="border bg-white border-gray-300 rounded-md !p-5">
                                     <div>
                                         <p className="font-semibold">Required skills</p>
                                     <div className="flex gap-3 mt-3">
@@ -202,13 +378,13 @@ export default function JObDetailsCandidateSide() {
                                         )
                                     }
                                 </div>
-                                <div className="border p-5 border-gray-300 mt-5 rounded-md">
+                                <div className="border bg-white p-5 border-gray-300 mt-5 rounded-md">
                                     <p className="font-semibold">Benefits</p>
                                     <p className="text-sm text-gray-500 mt-3">{jobDetails?.companyDetails?.benefit}</p>
                                 </div>
                             </div>
-                        </div>
-                        <div className="mt-5 border border-gray-300 rounded-md p-5">
+                        </div> */}
+                        {/* <div className="mt-5 border bg-white border-gray-300 rounded-md p-5">
                             <div className="flex gap-3 items-center">
                                 <div className="border border-gray-300 w-[40px] h-[40px] flex justify-center items-center rounded-full"><i className="!text-gray-300 fa-solid fa-building"></i></div>
                                 <div>
@@ -216,7 +392,7 @@ export default function JObDetailsCandidateSide() {
                                     <p className="text-sm text-gray-400 mt-2">{jobDetails?.companyDetails?.industry}</p>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Existing */}
                         {/* <div className="header w-full flex justify-between items-center">

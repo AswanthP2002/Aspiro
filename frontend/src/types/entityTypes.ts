@@ -269,6 +269,7 @@ export interface Comments {
   userDetails?: UserType;
 }
 
+
 export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary';
 export type WorkMode = 'On-site' | 'Remote' | 'Hybrid';
 export type JobLevel = 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager';
@@ -317,7 +318,7 @@ export interface RecruiterProfileData {
     organizationEmail?: string;
     teamStrength?: string;
     website?: string;
-
+    linkedinUrl?: string
   };
   recruitingExperience?: string
   focusingIndustries?:string[]
@@ -325,7 +326,7 @@ export interface RecruiterProfileData {
   summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  userProfile: User;
+  userProfile: UserType;
   jobs: Job[];
 }
 
@@ -466,6 +467,80 @@ export interface UserProfileAggregated {
       recruiterProfile:Recruiter
       jobs:Job[]
       followers: string[]
+}
+
+export interface JobDetails {
+   _id?: string;
+  recruiterId?: string; 
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; 
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; 
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; 
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; 
+  rejectionReason?: string; 
+  views?: number; 
+  applicationsCount?: number; 
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
+  userProfile:UserType;
+  userRecruiterProfile:RecruiterProfileData
+  candidateIds: string[]
+}
+
+export interface ApplicationsAggregated {
+  _id?: string;
+    candidateId: string;
+    jobId: string;
+    coverLetterContent: string;
+    resumeId: string;
+    status: 'applied' | 'opened' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected';
+    createdAt: Date;
+    updatedAt: Date;
+    job: Job
+    applicant: UserType;
+    resume: any;
+    experiences: Experience[];
+    educations: Education[]
+    skills: Skills[]
+}
+
+export interface FavoriteJob {
+  _id?: string;
+  candidateId?: string;
+  jobId?: string;
+  createdAt?: string;
+  jobDetails: Job;
+  postedBy: UserType;
+  recruiterProfile: Recruiter
+}
+
+export interface MyApplications {
+  _id: string;
+  coverLetterContent: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: string;
+  candidateId: string;
+  jobId: string;
+  resumeId: string;
+  jobDetails: Job;
+  recruiterProfile: Recruiter;
+  recruiterUserProfile: UserType
 }
 
 

@@ -1,17 +1,14 @@
 import { Db } from 'mongodb';
 import Favorites from '../../../domain/entities/user/favorites.entity';
-import IFavoriteJobsRepo from '../../../domain/interfaces/candidate/IFavoriteJobRepo';
-import IFavoriteJobs from '../../../domain/interfaces/candidate/IFavoriteJobRepo';
+import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
+import IFavoriteJobs from '../../../domain/interfaces/user/IFavoriteJobRepo';
 import BaseRepository from '../baseRepository';
 import FavoriteJobs from '../../../domain/entities/user/favoriteJobs.entity';
 import mongoose from 'mongoose';
 import { FavoriteJobsDAO } from '../../database/DAOs/user/faovriteJobs.dao';
 import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
 
-export default class FavoriteJobsRepsitory
-  extends BaseRepository<FavoriteJobs>
-  implements IFavoriteJobsRepo
-{
+export default class FavoriteJobsRepsitory extends BaseRepository<FavoriteJobs> implements IFavoriteJobsRepo {
   constructor() {
     super(FavoriteJobsDAO);
   }
@@ -23,9 +20,7 @@ export default class FavoriteJobsRepsitory
   //     this.collection = 'favoriteJobs'
   // }
 
-  async getFavoriteJobWithDetails(
-    candidateId: string
-  ): Promise<FavoriteJobsAggregated[] | null> {
+  async getFavoriteJobWithDetails(candidateId: string): Promise<FavoriteJobsAggregated[] | null> {
     const result = await FavoriteJobsDAO.aggregate([
       { $match: { candidateId: new mongoose.Types.ObjectId(candidateId) } },
       {
@@ -37,6 +32,24 @@ export default class FavoriteJobsRepsitory
         },
       },
       { $unwind: '$jobDetails' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'jobDetails.recruiterId',
+          foreignField: '_id',
+          as: 'postedBy',
+        },
+      },
+      { $unwind: '$postedBy' },
+      {
+        $lookup: {
+          from: 'recruiters',
+          localField: 'postedBy._id',
+          foreignField: 'userId',
+          as: 'recruiterProfile',
+        },
+      },
+      { $unwind: '$recruiterProfile' },
     ]);
 
     return result;

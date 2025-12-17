@@ -1,5 +1,5 @@
 import Comments from './user/comments.entity';
-import User from './user/User';
+import User from './user/User.FIX';
 
 export default interface PostsAggregated {
   _id: string;

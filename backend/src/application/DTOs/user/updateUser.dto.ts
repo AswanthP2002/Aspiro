@@ -1,4 +1,4 @@
-import { Role } from "../../../domain/entities/user/User";
+import { Role } from "../../../domain/entities/user/User.FIX";
 import SocialLinks from "../../../domain/entities/SocialLinks";
 
 export default interface UpdateUserDTO {

@@ -414,22 +414,20 @@ export const deleteUserEducation = async (educationId? : string) => {
 
 export const addCandidateResume = async (formData : any) => {
     try {
-        const response = await axiosInstance.post('/candidate/resume/upload',formData,
+        const response = await axiosInstance.post('/resume/upload',formData,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
         return response.data
     } catch (error : unknown) {
-        console.log('Error occured while uploading candidate resume candidateServices.ts', error instanceof Error ? error.message : null)
         const err = error as AxiosError
-
+        console.log('--Error occured while adding resume--', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+           throw error
         }
 
-        console.log('Error occured while adding resume', err)
     }
 }
 
@@ -513,10 +511,11 @@ export const refreshCandidateToken = async () => {
 export const candidateApplyJob = async (jobId : string, coverLetterContent : string, resumeId : string) => {
     try {
 
-        const response = await axiosInstance.post(`/candidate/job/${jobId}/apply`,
+        const response = await axiosInstance.post(`/job/${jobId}/apply`,
             {coverLetterContent, resumeId}, 
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true,
+                headers:{"Content-Type":'application/json'}
             } as AxiosRequest
         )
 
@@ -524,8 +523,10 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
         
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while applying for job', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 
@@ -568,55 +569,55 @@ export const getCandidateFavoriteJobs = async () => {
 
 export const saveJob = async (jobId : string) => {
     try {
-        const response = await axiosInstance.post(`/candidate/job/${jobId}/save`, null,
+        const response = await axiosInstance.post(`/job/${jobId}/save`, null,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--job save error ---', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+            throw error
         }
-
-        console.log('Error occured while saving the job')
     }
 }
 
 export const unsaveJob = async (jobId : string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/job/${jobId}/unsave`,
+        const response = await axiosInstance.delete(`/job/${jobId}/unsave`,
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--job unsave error ---', err)
          if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+            throw error
         }
     }
 }
 
 export const getSavedJobs = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/job/saved',
+        const response = await axiosInstance.get('/job/saved',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        console.log('--error occured while geting saved jobs--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
 
         console.log('Error occured while geting the favorite jobs', err)
     }
@@ -624,20 +625,20 @@ export const getSavedJobs = async () => {
 
 export const checkIsSaved = async (jobId : string) => {
     try {
-        const response = await axiosInstance.get('/candidate/job/saved/check',
+        const response = await axiosInstance.get('/job/saved/check',
             {
                 params:{jobId},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
         return response.data.isSaved
     } catch (error : unknown) {
         const  err = error as AxiosError
-
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-
-        console.log('Error occured while checking if job is saved or not', err)
+        console.log('--check job saved error --', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
     }
 }
 
@@ -804,16 +805,19 @@ export const getJobs = async (search: string, locationSearch: string, page: numb
 
 export const getMyApplications = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/applications',
+        const response = await axiosInstance.get('/applications',
             {
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-        console.log('Error occured while geting my applicatios', err)
-        return err.response?.data
+        console.log('--error occured while geting my applications--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        
+        }
     }
 }
 

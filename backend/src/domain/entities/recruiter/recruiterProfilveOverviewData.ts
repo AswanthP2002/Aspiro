@@ -1,7 +1,7 @@
 import Job from './job.entity';
 import Recruiter from './recruiter.entity';
 import SocialLinks from '../SocialLinks';
-import User, { Role } from '../user/User';
+import User, { Role } from '../user/User.FIX';
 
 /**
  * _id?: string;

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import ISkillRepo from '../../../domain/interfaces/candidate/ISkillRepo';
+import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
 import IDeleteUserSkillUsecase from '../../interfaces/usecases/user/IDeleteUserSkill.usecase';
 
 

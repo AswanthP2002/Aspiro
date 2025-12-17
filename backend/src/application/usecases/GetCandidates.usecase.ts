@@ -1,5 +1,5 @@
 import Candidate from '../../domain/entities/user/candidates.LEGACY';
-import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
+import ICandidateRepo from '../../domain/interfaces/user/ICandidateRepo';
 import { FindCandidatesDTO } from '../DTOs/candidate -LEGACY/candidate.dto';
 import CandidatePaginatedDTO from '../DTOs/candidate -LEGACY/candidatePaginated.dto';
 import mapToCandidatePaginatedDTO from '../mappers/user/mapToCandidatePaginatedDTO.mapper';

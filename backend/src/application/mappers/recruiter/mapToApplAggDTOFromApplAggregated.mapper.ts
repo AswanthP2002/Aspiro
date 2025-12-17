@@ -6,7 +6,7 @@ export default function mapToApplicationAggregatedDTOFromAggregated(
 ): ApplicationsAggregatedDTO {
   return {
     _id: applicationAggregated._id,
-    applicantDetails: applicationAggregated.applicantDetails,
+    applicant: applicationAggregated.applicant,
     candidateId: applicationAggregated.candidateId,
     coverLetterContent: applicationAggregated.coverLetterContent,
     jobId: applicationAggregated.jobId,
@@ -15,5 +15,10 @@ export default function mapToApplicationAggregatedDTOFromAggregated(
     resumeId: applicationAggregated.resumeId,
     createdAt: applicationAggregated.createdAt,
     updatedAt: applicationAggregated.updatedAt,
+    job:applicationAggregated.job,
+    experiences: applicationAggregated.experiences,
+    educations: applicationAggregated.educations,
+    skills: applicationAggregated.skills,
+    notes: applicationAggregated.notes
   };
 }

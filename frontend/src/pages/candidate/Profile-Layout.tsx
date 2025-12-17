@@ -84,8 +84,8 @@ export default function ProfileLayout(){
                 </Link>
               </li>
 
-              <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('my-applications') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
-                <Link to='/profile/personal'>
+              <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('/profile/my-applications') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
+                <Link to='/profile/my-applications'>
                   <div className="flex items-center gap-2">
                     <PiSuitcaseLight color="white" size={25} />
                     <p className="text-white text-sm font-light">My Applications</p>
@@ -103,7 +103,7 @@ export default function ProfileLayout(){
               </li>
 
               <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('saved') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
-                <Link to='/profile/personal'>
+                <Link to='/profile/favorites'>
                   <div className="flex items-center gap-2">
                     <CiHeart color="white" size={25} />
                     <p className="text-white text-sm font-light">Saved Jobs</p>

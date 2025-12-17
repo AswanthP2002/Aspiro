@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { generateCode } from '../../../utilities/generateCode';
 import { sendEmail } from '../../../utilities/sendmail';
 import IRegisterCandidateUseCase from './interface/IRegisterCandidate.usecase';
-import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
+import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo';
 import CreateCandidateDTO from '../../DTOs/candidate -LEGACY/createCandidate.dto';
 import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
 import mapToCandidate from '../../mappers/user/mapToCandidate.mapper';

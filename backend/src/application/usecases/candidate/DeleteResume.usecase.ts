@@ -1,4 +1,4 @@
-import IResumeRepo from '../../../domain/interfaces/candidate/IResumeRepo';
+import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
 import cloudinary from '../../../utilities/cloudinary';
 import { DeleteResumeDTO } from '../../DTOs/candidate -LEGACY/resume.dto';
 import IDeleteResumeUseCase from './interface/IDeleteResume.usecase';

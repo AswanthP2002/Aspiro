@@ -1,14 +1,19 @@
-import IResumeRepo from '../../../domain/interfaces/candidate/IResumeRepo';
+import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
 import cloudinary from '../../../utilities/cloudinary';
 import streamifier from 'streamifier';
 import { v4 } from 'uuid';
-import IAddResumeUseCase from './interface/IAddResume.usecase';
+import IAddResumeUseCase from '../../interfaces/usecases/user/IAddResume.usecase';
 import { UploadApiResponse } from 'cloudinary';
 import mapToResumeDTOFromResume from '../../mappers/user/mapToResumeDTOFromResume.mapper';
 import ResumeDTO, { CreateResumeDTO } from '../../DTOs/candidate -LEGACY/resume.dto';
+import { inject, injectable } from 'tsyringe';
 
+
+@injectable()
 export default class AddResumeUseCase implements IAddResumeUseCase {
-  constructor(private _iResumeRepo: IResumeRepo) {}
+  constructor(
+    @inject('IResumeRepository') private _iResumeRepo: IResumeRepo
+  ) {}
 
   async execute(addResumeDto: CreateResumeDTO): Promise<ResumeDTO | null> {
     const result: UploadApiResponse | undefined = await new Promise(

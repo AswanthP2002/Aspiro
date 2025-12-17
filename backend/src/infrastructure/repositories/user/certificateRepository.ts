@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Certificates from '../../../domain/entities/user/certificates.entity';
-import ICertificateRepo from '../../../domain/interfaces/candidate/ICertificateRepo';
+import ICertificateRepo from '../../../domain/interfaces/user/ICertificateRepo';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
 import { CertificateDAO } from '../../database/DAOs/user/certificate.dao';

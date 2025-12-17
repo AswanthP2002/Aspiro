@@ -5,6 +5,7 @@ import { StatusCodes } from '../../statusCodes';
 import { authorization, centralizedAuthentication } from '../../../middlewares/auth';
 import Validator from '../../../validation/validator.zod';
 import { CreateRecruiterSchema } from '../../schemas/recruiter/createRecruiter.schema';
+import { CreateJobSchema } from '../../schemas/recruiter/createJob.schema';
 
 // const express = require('express');
 // import { Request, Response, NextFunction } from 'express';
@@ -74,6 +75,7 @@ function createRecruiterRouter() {
     '/recruiter/job/create',
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
+    Validator(CreateJobSchema),
     recruiterController.createJob.bind(recruiterController)
   );
   recruiterRouter.put(
@@ -95,10 +97,31 @@ function createRecruiterRouter() {
     authorization(['user', 'recruiter']),
     recruiterController.LoadRecruiterJobs.bind(recruiterController)
   )
-  // // recruiterRouter.get(
-  // //   '/recruiter/job/:jobId/application/details',
-  // //   recruiterController.getJobApplications.bind(recruiterController)
-  // // );
+
+  recruiterRouter.post(
+    '/recruiter/schedule-interview/:candidateId/job/:jobId/',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter'])
+  )
+  recruiterRouter.get(
+    '/recruiter/job/:jobId/application/details',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.getJobApplications.bind(recruiterController)
+  );
+  recruiterRouter.patch(
+    '/recruiter/application/:applicationId',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    testMiddleware,
+    recruiterController.updateCandidateNotes.bind(recruiterController)
+  )
+  recruiterRouter.patch(
+    '/recruiter/application/:applicationId/status',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.updateJobApplicationStatus.bind(recruiterController)
+  )
   // // recruiterRouter.get(
   // //   '/recruiter/application/:applicationId',
   // //   recruiterAuth,
@@ -139,6 +162,7 @@ function createRecruiterRouter() {
   function testMiddleware(req: Request, res: Response, next: NextFunction){
     console.log('checking request body', req.body)
     next()
+    // res.status(200).json({success:true, message:'Ok'})
 
   }
 

@@ -1,4 +1,4 @@
-import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
+import ICandidateRepo from '../../domain/interfaces/user/ICandidateRepo';
 import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { generateRefreshToken, generateToken } from '../../services/jwt';
 import { UserLoginOutpDTO } from '../DTOs/user/userLogin.dto';

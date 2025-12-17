@@ -7,7 +7,8 @@ export default function mapTojobApplicationAggregatedDTOFromAggregatedData(
   return {
     _id: aggregatedData._id,
     candidateId: aggregatedData.candidateId,
-    companyDetails: aggregatedData.companyDetails,
+    recruiterProfile: aggregatedData.recruiterProfile,
+    recruiterUserProfile: aggregatedData.recruiterUserProfile,
     coverLetterContent: aggregatedData.coverLetterContent,
     jobDetails: aggregatedData.jobDetails,
     jobId: aggregatedData.jobId,

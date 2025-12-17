@@ -126,7 +126,7 @@ export default function PostAJobForm(){
                     allowOutsideClick:false,
                     allowEscapeKey:false,
                     timer:2500
-                }).then(() => navigator('/recruiter/jobs'))
+                }).then(() => navigator('/profile/recruiter/my-jobs'))
             }else{
                 setloading(false)
                 Notify.failure(result?.message, {timeout:2000})
@@ -141,8 +141,8 @@ export default function PostAJobForm(){
 
     return(
         <>
-        <div className="">
-            <form onSubmit={handleSubmit(submitJob)} className="border border-gray-200 shadow-md max-w-4xl !mx-auto !my-10 rounded-md !py-5 !px-5">
+        <div className="bg-white">
+            <form onSubmit={handleSubmit(submitJob)} className="border border-gray-200 shadow-xl max-w-4xl !mx-auto !my-10 rounded-md !py-5 !px-5">
                 <p className="text-center font-bold text-2xl">Create a New Job Posting</p>
                 <p className="text-sm mt-3 text-gray-700 text-center">Fill out the details below to find your next great hirie.</p>
 

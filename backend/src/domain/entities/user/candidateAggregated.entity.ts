@@ -1,6 +1,6 @@
 import Follow from '../follow.entity';
 import Post from './Post';
-import User from './User';
+import User from './User.FIX';
 import SocialLinks from '../SocialLinks';
 import Certificates from './certificates.entity';
 import Education from './educations.entity';

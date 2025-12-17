@@ -8,9 +8,13 @@ import { Notify } from "notiflix";
 import getReminingDays from "../../../helpers/DateTime.helper";
 import InfinitySpinner from "../../../components/common/InfinitySpinner";
 import ThreeDotLoading from "../../../components/common/ThreeDotLoading";
-import { PiClock } from "react-icons/pi";
-import { BsQuestionCircle } from "react-icons/bs";
+import { PiClock, PiEye, PiSuitcase } from "react-icons/pi";
+import { BsQuestionCircle, BsThreeDotsVertical } from "react-icons/bs";
 import { FaCircleXmark } from "react-icons/fa6";
+import { LuUserCheck } from "react-icons/lu";
+import { IoLocation } from "react-icons/io5";
+import { formatRelativeTime } from "../../../services/util/formatDate";
+import { FaPlus } from "react-icons/fa";
 
 
 const dummyUserWithRecruiterDetails = {
@@ -60,6 +64,10 @@ export default function RecruiterProfilePage(){
         }
     };
 
+    const goToApplicantManagePage = (jobId: string) => {
+        return navigateTo(`/profile/recruiter/applications/${jobId}`, {state:{jobId}})
+    }
+
     useEffect(() => {
         (async () => {
             setLoading(true)
@@ -93,101 +101,185 @@ export default function RecruiterProfilePage(){
             
               {profileData?.profileStatus === 'approved'
                 ? <>
-                    <div>
-                      <RecruiterInfoCard 
-                        recruiterDetails={profileData} 
-                      />
-                      <div className="mt-8">
-                          <h3 className="text-xl font-semibold mb-4">Manage Jobs</h3>
-                          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-6">
-                              {/* Recruiter Metrics Section */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                  {/* Active Jobs */}
-                                  <div className="bg-blue-100 hover:shadow-lg hover:-translate-y-1 transition-all ease-in-out border border-blue-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-blue-800 font-semibold">Active Jobs</p>
-                                          <p className="text-2xl font-bold text-blue-900">{profileData?.jobs?.length}</p>
-                                      </div>
-                                      <div className="bg-blue-500 text-white p-3 rounded-full"><i className="fa-solid fa-briefcase !text-white"></i></div>
-                                  </div>
-                                  {/* Total Job Views */}
-                                  <div className="bg-orange-100 hover:shadow-lg hover:-translate-y-1 transition-all ease-in-out border border-orange-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-orange-800 font-semibold">Total Job Views</p>
-                                          <p className="text-2xl font-bold text-orange-900">0</p>
-                                      </div>
-                                      <div className="bg-orange-500 text-white p-3 rounded-full"><i className="fa-solid fa-eye !text-white"></i></div>
-                                  </div>
-                                  {/* Jobs Expiring Soon */}
-                                  <div className="bg-green-100 hover:shadow-lg hover:-translate-y-1 transition-all ease-in-out border border-green-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-green-800 font-semibold">Jobs Expiring Soon</p>
-                                          <p className="text-2xl font-bold text-green-900">0</p>
-                                      </div>
-                                      <div className="bg-green-500 text-white p-3 rounded-full"><i className="fa-solid fa-clock !text-white"></i></div>
-                                  </div>
-                                  {/* Total Hires */}
-                                  <div className="bg-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all ease-in-out border border-indigo-200 p-4 rounded-lg flex items-center justify-between">
-                                      <div>
-                                          <p className="text-sm text-indigo-800 font-semibold">Total Hires</p>
-                                          <p className="text-2xl font-bold text-indigo-900">0</p>
-                                      </div>
-                                      <div className="bg-indigo-500 text-white p-3 rounded-full"><i className="fa-solid fa-handshake !text-white"></i></div>
-                                    </div>
-                              </div>
-
-                              <div className=" mt-6">
-                                {profileData?.jobs?.length === 0 && (<p className="text-gray-600 mb-4 text-center">You haven't posted any jobs yet.</p>)}
-                                
-                                <div className="border-t border-gray-200 pt-4 mt-4 !mb-4">
-                                    <p className="mt-2 mb-1 font-semibold text-base">Recently Posted Jobs</p>
-                                  {
-                                    profileData?.jobs.map((job: Job, index: number) => {
-                                      return (
-                                        <div key={index} className="grid grid-cols-12 items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
-                                      {/* Job Title and Info */}
-                                      <div className="col-span-12 md:col-span-5 flex items-center gap-4">
-                                          <img src={defaultProfile} className="w-12 h-12 rounded-lg object-cover" alt="Company Logo" />
-                                          <div>
-                                              <p className="font-semibold text-gray-800 text-lg">{job?.jobTitle}</p>
-                                              <div className="flex items-center text-sm text-gray-500 gap-3 mt-1">
-                                                  <span className="inline-flex items-center gap-1">
-                                                      <i className="fa-solid fa-location-dot text-xs"></i> {job?.workMode}
-                                                  </span>
-                                                  <span className="inline-flex items-center gap-1">
-                                                      <i className="fa-solid fa-clock text-xs"></i> {getReminingDays(job?.expiresAt as string)} Days left
-                                                  </span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      {/* Status */}
-                                      <div className="col-span-6 md:col-span-2 flex items-center justify-start md:justify-center mt-2 md:mt-0">
-                                          {getStatusPill(job?.status as Job['status'])}
-                                      </div>
-                                      {/* Applicants */}
-                                      <div className="col-span-6 md:col-span-2 flex items-center justify-start md:justify-center mt-2 md:mt-0">
-                                          <p className="text-gray-700 font-medium text-sm">{job?.applicationsCount || 0} Applicants</p>
-                                      </div>
-                                      {/* Action Button */}
-                                      <div className="col-span-12 md:col-span-3 flex justify-end mt-4 md:mt-0">
-                                          <button className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto">View Applicants</button>
-                                      </div>
-                                  </div>
-                                      )
-                                    })
-                                  }
-                                  <Link to='/profile/recruiter/my-jobs'>
-                                    <p className="mt-1 text-sm font-semibold text-blue-500 text-end">See all Jobs</p>
-                                  </Link>
+                    <p className="text-2xl font-light">Dashboard</p>
+                    <p className="text-sm text-gray-500 mt-2">Welcome back!, Here is an overview of your recruiting activity</p>
+                    <div className="mt-5 border border-gray-200 bg-white rounded-md p-5">
+                        <div className="w-full flex jusityf-between">
+                            <div className="flex gap-3">
+                                <div className="w-13 bg-gradient-to-br text-white text-lg from-blue-500 to-indigo-600 h-13 flex items-center justify-center rounded-md">
+                                    <p>{profileData?.userProfile?.name ? profileData?.userProfile?.name[0] : 'U'}</p>
                                 </div>
-                                
-                                <button onClick={() => navigateTo('/profile/recruiter/post-a-job')} className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-                                  Post a New Job
-                                </button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                                <div>
+                                    <p className="text-lg font-light">{profileData?.userProfile?.name}</p>
+                                    <span className="text-xs bg-blue-200 text-violet-700 px-3 rounded-full">{profileData?.employerType} Recruiter</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-5 grid grid-cols-2 gap-5">
+                            {
+                                profileData?.employerType === 'company' && (
+                                    <>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Business Name</p>
+                                            <p className="text-sm text-gray-700">{profileData?.organizationDetails?.organizationName}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Business Type</p>
+                                            <p className="text-sm text-gray-700">{profileData?.organizationDetails?.organizationType}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Industry</p>
+                                            <p className="text-sm text-gray-700">{profileData?.organizationDetails?.industry}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Team Strength</p>
+                                            <p className="text-sm text-gray-700">{profileData?.organizationDetails?.industry}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Recruiting Experience</p>
+                                            <p className="text-sm text-gray-700">{profileData?.recruitingExperience}</p>
+                                        </div>
+                                        {
+                                            profileData?.organizationDetails?.linkedinUrl && (
+                                                <div>
+                                                <p className="text-xs text-gray-500">Linkedin Profile</p>
+                                                <a href={profileData?.organizationDetails?.linkedinUrl} className="text-sm text-blue-700">Profile</a>
+                                                </div>
+                                            )
+                                        }
+                                        {
+                                            profileData?.organizationDetails?.website && (
+                                                <div>
+                                                <p className="text-xs text-gray-500">Website</p>
+                                                <a href={profileData?.organizationDetails?.website} className="text-sm text-blue-700">Go to Website</a>
+                                                </div>
+                                            )
+                                        }
+                                        <div>
+                                                <p className="text-xs text-gray-500">Organization Email</p>
+                                                <p className="text-sm text-gray-700">{profileData?.organizationDetails?.organizationEmail}</p>
+                                                </div>
+                                        <div>
+                                                <p className="text-xs text-gray-500">Organization Contact</p>
+                                                <p className="text-sm text-gray-700">{profileData?.organizationDetails?.organizationContactNumber}</p>
+                                                </div>
+                                    </>
+                                )
+                            }
+                            {
+                                profileData?.employerType === 'selft' && (
+                                    <>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Contact Email</p>
+                                            <p className="text-sm text-gray-700">{profileData?.userProfile?.email}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Contact Number</p>
+                                            <p className="text-sm text-gray-700">{profileData?.userProfile?.phone}</p>
+                                        </div>
+                                        
+                                    </>
+                                )
+                            }
+                        </div>
+                        <div className="mt-5 border-t border-gray-200">
+                            <p className="mt-5 text-sm">Summary</p>
+                            <p className="text-xs text-gray-500 mt-2">{profileData?.summary}</p>
+                        </div>
+                    </div>
+
+                    <div className="my-5">
+                        <p className="text-lg">Manage Jobs</p>
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 xl:grid-cols-4">
+                            <div className="border border-blue-500 bg-blue-100 p-5 flex gap-3 rounded-md">
+                                <div>
+                                    <p className="text-sm text-blue-600">Active Jobs</p>
+                                    <p className="mt-2 text-xl">0</p>
+                                </div>
+                                <div className="flex-1 flex justify-end">
+                                    <PiSuitcase color="blue" size={25} />
+                                </div>
+                            </div>
+
+                            <div className="border border-orange-500 bg-orange-100 p-5 flex gap-3 rounded-md">
+                                <div>
+                                    <p className="text-sm text-orange-600">Average Job Views</p>
+                                    <p className="mt-2 text-xl">0</p>
+                                </div>
+                                <div className="flex-1 flex justify-end">
+                                    <PiEye color="orange" size={25} />
+                                </div>
+                            </div>
+
+                            <div className="border border-green-500 bg-green-100 p-5 flex gap-3 rounded-md">
+                                <div>
+                                    <p className="text-sm text-green-600">Jobs Expiring Soon</p>
+                                    <p className="mt-2 text-xl">0</p>
+                                </div>
+                                <div className="flex-1 flex justify-end">
+                                    <PiClock color="green" size={25} />
+                                </div>
+                            </div>
+
+                            <div className="border border-violet-500 bg-violet-50 p-5 flex gap-3 rounded-md">
+                                <div>
+                                    <p className="text-sm text-violet-600">Total Hires</p>
+                                    <p className="mt-2 text-xl">0</p>
+                                </div>
+                                <div className="flex-1 flex justify-end">
+                                    <LuUserCheck color="violet" size={25} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="my-5">
+                        <div className="flex justify-between">
+                            <p className="text-lg">Recent Jobs</p>
+                            <button>
+                                <p className="text-xs text-blue-500">See all</p>
+                            </button>
+                        </div>
+                        <div className="mt-5 grid grid-cols-1 gap-3">
+                            {
+                                profileData?.jobs?.length > 0 && (
+                                    profileData?.jobs.map((job: Job, index: number) => (
+                                        <>
+                                            <div key={index} className="bg-white rounded-md hover:border hover:border-blue-200 hover:shadow-lg p-5">
+                                        <div className="flex justify-between gap-2">
+                                            <div className="flex gap-3">
+                                                <div>
+                                                    <PiSuitcase />
+                                                </div>
+                                                <div>
+                                                    <p>{job?.jobTitle}</p>
+                                                    <div className="flex gap-3 items-center">
+                                                        <span className="flex text-xs text-gray-500 gap-1 items-center"><IoLocation /> {job.workMode}</span>
+                                                        <span className="flex text-xs text-gray-500 gap-1 items-center"><PiClock /> {getReminingDays(job.expiresAt)} Day left</span>
+                                                    </div>
+                                                    <div className="flex gap-2 items-center mt-2">
+                                                        {getStatusPill(job?.status as Job['status'])}
+                                                        <p className="text-xs">{job.applicationsCount || 0} Applications</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col justify-between items-end">
+                                                <button><BsThreeDotsVertical color="gray" size={15} /></button>
+                                                <button onClick={() => goToApplicantManagePage(job._id as string)} className="bg-blue-500 text-white rounded-md text-xs py-2 px-3">Manage</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        </>
+                                    ))
+                                )
+                            }
+                        </div>
+
+                        <button onClick={() => navigateTo('/profile/recruiter/post-a-job')} className="flex gap-2 items-center justify-center mt-5 text-white bg-blue-500 rounded-md w-full py-2">
+                            <FaPlus color="white" size={14} />
+                            <p>Post new job</p>
+                        </button>
+                    </div>
                 </>
                   
               : <>

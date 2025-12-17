@@ -1,4 +1,4 @@
-import User from "../../../domain/entities/user/User";
+import User from "../../../domain/entities/user/User.FIX";
 import UserMetaData from "../../DTOs/user/userMetaData.dto";
 
 export default function mapToUserMetaData(user: User): UserMetaData {

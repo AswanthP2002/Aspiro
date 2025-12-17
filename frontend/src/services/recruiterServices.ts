@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosInterceptorManager } from "axios";
 import axios from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
@@ -176,26 +176,50 @@ export const getProfileOverview = async () => {
     }
 }
 
+export const scheduleInterview = async (
+    candidateId: string, jobId: string,
+    interviewType: string, interviewersName: string,
+    interviewDate: string,
+    interviewTime: string,
+    gmeetUrl: string,
+    note?: string
+) => {
+    try {
+        const response = await axiosInstance.post(`/recruiter/schedule-interview/${candidateId}/job/${jobId}/`,
+            {
+                interviewType, interviewersName, interviewDate, interviewTime, gmeetUrl, note
+            },
+            {
+                sendAuthToken:true,
+                headers:{"Content-Type":'application/json'}
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        console.log('--- error occured while scheduling interview ---', err)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
 /**
- * jobTitle: string,
-     description: string,
-     requirements: string,
-     responsibilities: string,
-     duration: string,
-     jobType: 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary' | '',
-     workMode: 'On-site' | 'Remote' | 'Hybrid' | '',
-     location: string,
-     minSalary: number | '',
-     maxSalary: number | '',
-     salaryCurrency: string,
-     salaryPeriod: 'annually' | 'monthly' | 'weekly' | 'hourly' | '',
-     vacancies: number | '',
-     qualification: string,
-     experienceInYears: number | '',
-     jobLevel: 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager' | '',
-     requiredSkills: string[],
-     optionalSkills: string[],
-     expiresAt: Dayjs | null;
+ * _id?: string
+    candidateId?: string
+    jobId?: string
+    interviewersName?: string
+    interviewType?: 'Technical' | 'HR' | 'Mnaegirial' | 'General'
+    interviewDate?: string | Date
+    interviewTime?: string
+    gmeetUrl?: string
+    note?: string
+    status?: "Scheduled" | "Completed" | "Cancelled"
+    createdAt?: string | Date
+    upddatedAt?: string | Date
  */
 
 export const postJob = async (
@@ -297,24 +321,17 @@ export const getJobs = async (search: string, page: number, limit: number = 3, s
 export const getApplicationDetails = async (jobId : string) => {
     try {
         const response = await axiosInstance.get(`/recruiter/job/${jobId}/application/details`, {
-            sendAuthTokenRecruiter:true
+            sendAuthToken:true
         } as AxiosRequest)
     
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
+        console.log('--error occured while geting job applications--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
         }
-
-        console.log('Error occured while geting application details', err)
     }
 } 
 
@@ -420,3 +437,48 @@ export const rejectCandidateJobApplication = async (title : string, description 
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
     }
 }
+
+export const updateCandidateNotes = async (applicationId: string, notes: string) => {
+    try {
+        const response = await axiosInstance.patch(`/recruiter/application/${applicationId}`, {
+            notes
+        },
+        {
+            sendAuthToken:true,
+            headers:{"Content-Type":'application/json'}
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+
+export const updateJobApplicationStatus = async (
+    applicationId: string, status: string, candidateName: string, candidateEmail: string, jobTitle: string
+) => {
+    try {
+        const response = await axiosInstance.patch(`/recruiter/application/${applicationId}/status`,
+            {status},
+            {
+                sendAuthToken:true,
+                headers:{"Content-Type":'application/json'}
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
+        }
+    }
+}
+///// stopped here, need to connect this api with page

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import IEducationRepo from '../../../domain/interfaces/candidate/IEducationRepo';
+import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
 import IDeleteUserEducationUsecase from '../../interfaces/usecases/user/IDeleteUserEducation.usecase';
 
 @injectable()

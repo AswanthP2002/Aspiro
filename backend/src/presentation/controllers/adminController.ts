@@ -32,6 +32,9 @@ import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/us
 import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
 import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
 import IAdminDeleteUserUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteUser.usecase';
+import IGetRecruiterApplicationsUsecase from '../../application/interfaces/usecases/admin/IGetRecruiterApplications.usecase';
+import IRejectRecruiterApplication from '../../application/interfaces/usecases/admin/IRejectRecruiterApplication.usecase';
+import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/admin/IApproveRecruiterApplication.usecase';
 
 @injectable()
 export class AdminController {
@@ -42,7 +45,10 @@ export class AdminController {
     @inject('IAdminBlockUserUsecase') private _blockUser: IAdminBlockUserUsecase, // private _loadCandidatesUC: ILoadCandidateUseCase, //usecase interface
     @inject('IAdminUnblockUserUsecase') private _unblockUser: IAdminUnblockUserUsecase,
     @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase, // // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
-    @inject('IAdminDeleteUserUsecase') private _deleteUser: IAdminDeleteUserUsecase
+    @inject('IAdminDeleteUserUsecase') private _deleteUser: IAdminDeleteUserUsecase,
+    @inject('IGetRecruiterApplicationsUsecase') private _getRecruiterApplications: IGetRecruiterApplicationsUsecase,
+    @inject('IRejectRecruiterApplication') private _rejectRecruiterApplication: IRejectRecruiterApplication,
+    @inject('IApproveRecruiterApplicationUsecase') private _approveRecruiterApplication: IApproveRecruiterApplicationUsecase
   ) // @inject('ILoadCandidateDetailsUseCase')
   // private _loadCandidateDetailsUC: ILoadCandidateDetailsUseCase, //usecase interface
 
@@ -59,6 +65,7 @@ export class AdminController {
 
   async adminLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+
       const dto = mapToUserLoginDTO(req.body);
       const result: any = await this._adminLoginUC.execute(dto);
       const { refreshToken } = result;
@@ -87,7 +94,7 @@ export class AdminController {
       res.clearCookie('refreshToken', {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax',
+        sameSite: 'lax', //max age
       });
       
       console.log('succesfully cleared the cookie, sending response back to the user')
@@ -147,6 +154,51 @@ export class AdminController {
       return;
     } catch (error: any) {
       next(error);
+    }
+  }
+
+  async loadRecruiterApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      console.log('--request params for testing--', req.query.profileStatus)
+      const search = req.query.search as string || ''
+      const profileStatus = req.query.profileStatus as string || 'All'
+      
+      const result = await this._getRecruiterApplications.execute({search, profileStatus})
+     // console.log('--result from the controller--', result)
+      res.status(StatusCodes.OK).json({success:true, message:'Recruiter applications fetched successfully', result})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  async rejectRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {recruiterId} = req.params
+      const result = await this._rejectRecruiterApplication.execute({id: recruiterId, ...req.body})
+
+      if(!result){
+        throw new Error('Can not reject application right now, please try again later')
+      }
+
+      res.status(StatusCodes.OK).json({success:true, message:'Recruiter application rejected successfully', result})
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  async approveRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {recruiterId} = req.params
+      const result = await this._approveRecruiterApplication.execute(recruiterId)
+
+      if(!result){
+        throw new Error('Can not approve application right now, please try again later')
+      }
+
+
+      res.status(StatusCodes.OK).json({success:true, message:'Recruiter application approved successfully', result})
+    } catch (error: unknown) {
+      next(error)
     }
   }
 

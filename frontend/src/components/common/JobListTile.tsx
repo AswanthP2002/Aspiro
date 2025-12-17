@@ -18,7 +18,7 @@ export default function JobListTile({data} : {data : JobAggregatedData}){
     })
 
     function viewJobDetails(jobId : string) {
-        navigateTo(`${jobId}`)
+        navigateTo(`/jobs/${jobId}`, {state:{jobDetails:data}})
     }
 
     async function saveTheJob(jobId : string){
@@ -41,6 +41,10 @@ export default function JobListTile({data} : {data : JobAggregatedData}){
         }else{
             Notify.failure('Something went wrong', {timeout:1500})
         }
+    }
+
+    function goToJobApplyPage(jobId: string){
+        navigateTo(`/jobs/${jobId}/apply`, {state:{jobDetails:data}})
     }
 
     useEffect(() => {
@@ -100,7 +104,7 @@ export default function JobListTile({data} : {data : JobAggregatedData}){
             <div className='flex justify-between !mt-5'>
                 <div className="flex gap-5">
                     <button onClick={() => viewJobDetails(data._id as string)} className='text-xs border border-gray-300 rounded-md !px-4 !py-2 text-blue-500'>View Details</button>
-                    <button className='text-xs bg-blue-500 text-white rounded-md !px-4 !py-2'>Apply Now</button>
+                    <button onClick={() => goToJobApplyPage(data._id as string)} className='text-xs bg-blue-500 text-white rounded-md !px-4 !py-2'>Apply Now</button>
                 </div>
                 <div className="flex justify-end gap-5">
                     {

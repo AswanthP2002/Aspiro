@@ -33,6 +33,7 @@ import { AdminController } from '../controllers/adminController';
 import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
 import Validator from '../../validation/validator.zod';
 import { loginSchema } from '../schemas/user/userLogin.schema';
+import { LoadRecruiterApplicationSchem } from '../schemas/admin/loadRecruiterApplications';
 
 function createAdminRouter() {
   const adminRouter = express.Router();
@@ -119,6 +120,26 @@ function createAdminRouter() {
     authorization(['admin']),
     adminController.deleteUser.bind(adminController)
   )
+  adminRouter.get(
+    '/recruiter/applications',
+    centralizedAuthentication,
+    authorization(['admin']),
+    // Validator(LoadRecruiterApplicationSchem),
+    adminController.loadRecruiterApplications.bind(adminController)
+  )
+  adminRouter.patch(
+    '/recruiter/application/:recruiterId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.rejectRecruiterApplication.bind(adminController)
+  )
+  adminRouter.patch(
+    '/recruiter/application/approve/:recruiterId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.approveRecruiterApplication.bind(adminController)
+  )
+
   // // adminRouter.get(
   // //   '/admin/company/details/:companyId',
   // //   adminAuth,

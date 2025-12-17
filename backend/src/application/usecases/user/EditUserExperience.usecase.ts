@@ -1,4 +1,4 @@
-import IExperienceRepo from '../../../domain/interfaces/candidate/IExperienceRepo';
+import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
 import { EditExperienceDTO, ExperienceDTO } from '../../DTOs/user/experience.dto';
 import mapToEditExperienceFromDTO from '../../mappers/user/mapToEditExperienceFromDTO.mapper';
 import mapToExperienceDTO from '../../mappers/user/mapToExperienceDTO.mapper';

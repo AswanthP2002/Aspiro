@@ -13,9 +13,10 @@ export const JobApplicationSchema = new Schema<JobApplication>(
     resumeId: { type: Schema.Types.ObjectId, ref: 'resumes', required: true },
     status: {
       type: String,
-      enum: ['applied', 'opened', 'rejected', 'shortlisted'],
+      enum: ['applied', 'opened', 'screening', 'interview', 'offer', 'rejected', 'hired'],
       default: 'applied',
     },
+    notes:{type: String}
   },
   { timestamps: true }
 );

@@ -34,7 +34,8 @@ export default function UserPublicProfile() {
 
     const location = useLocation()
     const {userId} = location.state || {}
-
+    console.log('---checking data for testability---', location)
+    Notify.success(`get userid from the recruiter side page ${userId}`)
     const followAUser = async () => {
         setFollowed(true)
 
@@ -94,7 +95,7 @@ export default function UserPublicProfile() {
         //Notify.success(userId as string, {timeout:3000})
         (async function(){
             // console.log('user id', userId)
-            // Notify.info(userId, {timeout:3000})
+            Notify.info(userId, {timeout:3000})
             try {
                 const result = await loadUserPublicProfile(userId)
 

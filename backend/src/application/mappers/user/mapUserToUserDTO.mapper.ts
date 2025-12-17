@@ -1,4 +1,4 @@
-import User, { Role } from '../../../domain/entities/user/User';
+import User, { Role } from '../../../domain/entities/user/User.FIX';
 import UserDTO from '../../DTOs/user/user.dto';
 
 export default function mapUserToUserDTO(user: User): UserDTO {

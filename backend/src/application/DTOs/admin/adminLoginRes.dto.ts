@@ -1,4 +1,4 @@
-import { Role } from "../../../domain/entities/user/User";
+import { Role } from "../../../domain/entities/user/User.FIX";
 
 export default interface AdminLoginResDTO {
   token: string;

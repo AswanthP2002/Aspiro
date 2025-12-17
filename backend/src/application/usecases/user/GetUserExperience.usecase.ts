@@ -1,5 +1,5 @@
 import Experience from '../../../domain/entities/user/experience.entity';
-import IExperienceRepo from '../../../domain/interfaces/candidate/IExperienceRepo';
+import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
 import { ExperienceDTO } from '../../DTOs/user/experience.dto';
 import mapToExperienceDTO from '../../mappers/user/mapToExperienceDTO.mapper';
 import IGetUserExperiencesUsecase from '../../interfaces/usecases/user/IGetUserExperiences.usecase';

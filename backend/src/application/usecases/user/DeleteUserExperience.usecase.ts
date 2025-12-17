@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import IExperienceRepo from '../../../domain/interfaces/candidate/IExperienceRepo';
+import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
 import IDeleteUserExperienceUsecase from '../../interfaces/usecases/user/IDeleteUserExperience.usecase';
 
 @injectable()

@@ -6,7 +6,7 @@ import Resume from '../../../domain/entities/user/resume.entity';
 import Skills from '../../../domain/entities/user/skills.entity';
 import Follow from '../../../domain/entities/follow.entity';
 import Post from '../../../domain/entities/user/Post';
-import User from '../../../domain/entities/user/User';
+import User from '../../../domain/entities/user/User.FIX';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 
 export default interface CandidateAggregatedDTO {

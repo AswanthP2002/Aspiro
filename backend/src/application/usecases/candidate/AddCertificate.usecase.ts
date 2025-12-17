@@ -1,4 +1,4 @@
-import ICertificateRepo from '../../../domain/interfaces/candidate/ICertificateRepo';
+import ICertificateRepo from '../../../domain/interfaces/user/ICertificateRepo';
 import streamifier from 'streamifier';
 import cloudinary from '../../../utilities/cloudinary';
 import { v4 } from 'uuid';

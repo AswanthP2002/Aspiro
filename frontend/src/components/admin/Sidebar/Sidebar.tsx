@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { userLogout } from '../../../services/userServices';
 import { CiHome, CiLogout, CiCreditCard1 } from 'react-icons/ci';
 import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome } from 'react-icons/fa';
-import { LuUser, LuUsers } from 'react-icons/lu';
+import { LuUser, LuUsers, LuUserSearch } from 'react-icons/lu';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
@@ -96,6 +96,12 @@ export default function Sidebar(){
               <Link to="/admin/users" className='flex items-center gap-2'>
               <CiCreditCard1 size={21} color='gray' className='group-hover:!text-orange-400'/>
               <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Billings & Subscriptions</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
+              <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
+              <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>
+              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiter Applications</p>
               </Link>
             </li>
           </ul>

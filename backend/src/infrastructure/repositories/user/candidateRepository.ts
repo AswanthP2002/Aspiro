@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
-import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
+import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo';
 import BaseRepository from '../baseRepository';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 import { CandidateDAO } from '../../database/DAOs/user/candidateDAO';

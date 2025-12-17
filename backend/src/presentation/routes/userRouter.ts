@@ -79,35 +79,27 @@ import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';
 import { userExperienceSchema } from '../schemas/user/userExperience.schema';
 import { addUserEducationSchema } from '../schemas/user/createUserEducation.schema';
+import parsePdf from '../../middlewares/parsePdf';
 
 function createUserRouter() {
   const userRouter = express.Router();
-  
+
   const userController = container.resolve(UserController);
- 
+
   userRouter.post('/register', userController.registerUser.bind(userController));
   userRouter.post('/verify', userController.verifyUser.bind(userController));
-  userRouter.post(
-    '/otp/resend',
-    allowResendOtp,
-    userController.resendOTP.bind(userController)
-  )
-  userRouter.post(
-  '/login',
-  Validator(loginSchema),
-  userController.userLogin.bind(userController))
-  userRouter.post('/logout', userController.userLogout.bind(userController))
-  userRouter.get('/token/refresh', refreshAccessToken)
+  userRouter.post('/otp/resend', allowResendOtp, userController.resendOTP.bind(userController));
+  userRouter.post('/login', Validator(loginSchema), userController.userLogin.bind(userController));
+  userRouter.post('/logout', userController.userLogout.bind(userController));
+  userRouter.get('/token/refresh', refreshAccessToken);
   // candidateRouter.post(
   //   '/login',
   //   candidateController.loginCandidate.bind(candidateController)
   // );
-userRouter.get(
-  '/jobs',
-  userController.loadJobs.bind(userController)
-)
+  userRouter.get('/jobs', userController.loadJobs.bind(userController));
 
-  //candidateRouter.get('/jobs/details/:jobId', candidateController.loadJobDetails.bind(candidateController))
+  userRouter.get('/jobs/details/:jobId', userController.loadJobDetails.bind(userController));
+
   userRouter.post(
     '/personal/details/save',
     centralizedAuthentication,
@@ -194,13 +186,13 @@ userRouter.get(
   userRouter.post(
     '/reset-password/link/send',
     userController.sendResetPasswordLink.bind(userController)
-  )
+  );
 
   userRouter.post(
     '/reset-password',
     Validator(ResetPasswordSchema),
     userController.resetPassword.bind(userController)
-  )
+  );
   // candidateRouter.delete(
   //   '/candidate/resume/:resumeId',
   //   candidateAuth,
@@ -222,13 +214,14 @@ userRouter.get(
 
   // //candidateRouter.get('/home/jobs', testMiddleWare, candidateController.searchJobFromHomePage.bind(candidateController))
 
-  // candidateRouter.post(
-  //   '/candidate/resume/upload',
-  //   candidateAuth,
-  //   upload.single('resume'),
-  //   parsePdf,
-  //   candidateController.addResume.bind(candidateController)
-  // );
+  userRouter.post(
+    '/resume/upload',
+    centralizedAuthentication,
+    authorization(['user']),
+    upload.single('resume'),
+    parsePdf,
+    userController.addResume.bind(userController)
+  );
 
   // candidateRouter.get(
   //   '/candidate/resumes',
@@ -245,11 +238,12 @@ userRouter.get(
     userController.editUserProfile.bind(userController)
   ); //need updation
 
-  // candidateRouter.post(
-  //   '/candidate/job/:jobId/apply',
-  //   candidateAuth,
-  //   candidateController.saveJobApplication.bind(candidateController)
-  // );
+  userRouter.post(
+    '/job/:jobId/apply',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.saveJobApplication.bind(userController)
+  );
 
   // candidateRouter.get('/candidate/token/refresh', refreshAccessToken); //only checking refresh token
   // candidateRouter.post(
@@ -269,27 +263,30 @@ userRouter.get(
   //   candidateAuth,
   //   candidateController.updateNotificationReadStatus.bind(candidateController)
   // );
-  // candidateRouter.post(
-  //   '/candidate/job/:jobId/save',
-  //   candidateAuth,
-  //   candidateController.saveJob.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/job/saved/check',
-  //   candidateAuth,
-  //   candidateController.checkIsJobSaved.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/job/saved',
-  //   candidateAuth,
-  //   candidateController.getFavoriteJobs.bind(candidateController)
-  // );
-  // candidateRouter.delete(
-  //   '/candidate/job/:jobId/unsave',
-  //   testMiddleWare,
-  //   candidateAuth,
-  //   candidateController.unsaveJob.bind(candidateController)
-  // );
+  userRouter.post(
+    '/job/:jobId/save',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.saveJob.bind(userController)
+  );
+  userRouter.get(
+    '/job/saved/check',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.checkIsJobSaved.bind(userController)
+  );
+  userRouter.get(
+    '/job/saved',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getFavoriteJobs.bind(userController)
+  );
+  userRouter.delete(
+    '/job/:jobId/unsave',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.unsaveJob.bind(userController)
+  );
   userRouter.patch(
     '/user/profile/links',
     centralizedAuthentication,
@@ -334,13 +331,13 @@ userRouter.get(
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUserAggregatedProfile.bind(userController)
-  )
+  );
   userRouter.get(
     '/user/metadata///flaged', //route flaged due to authenticated user related issues
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUserMetaData.bind(userController)
-  )
+  );
   // candidateRouter.get(
   //   '/candidates',
   //   candidateController.getCandidates.bind(candidateController)
@@ -349,16 +346,17 @@ userRouter.get(
   //   '/candidates/:candidateId',
   //   candidateController.getCandidateDetails.bind(candidateController)
   // );
-  // candidateRouter.get(
-  //   '/candidate/applications',
-  //   candidateAuth,
-  //   candidateController.getCandidateApplications.bind(candidateController)
-  // );
+  userRouter.get(
+    '/applications',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getCandidateApplications.bind(userController)
+  );
 
-  function testMiddleware(req : Request, res : Response, next : NextFunction){
-    console.log('inspecting request body')
-    console.log(req.body)
-    next()
+  function testMiddleware(req: Request, res: Response, next: NextFunction) {
+    console.log('inspecting request body');
+    console.log(req.body);
+    next();
     ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }
 

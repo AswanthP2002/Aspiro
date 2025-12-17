@@ -1,5 +1,5 @@
 import Skills from '../../../domain/entities/user/skills.entity';
-import ISkillRepo from '../../../domain/interfaces/candidate/ISkillRepo';
+import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
 import { SkillDTO } from '../../DTOs/user/skill.dto';
 import mapToSkillDTOFromSkills from '../../mappers/user/mapToSkillsFromSkillDTO.mapper';
 import IGetUserSkillsUsecase from '../../interfaces/usecases/user/IGetUserSkills.usecase';

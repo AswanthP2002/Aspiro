@@ -1,6 +1,6 @@
 import { FindUsersQuery } from '../../application/queries/users.query';
 import UserProfileAggregatedAdmin from '../entities/userProfileAggregated';
-import User from '../entities/user/User';
+import User from '../entities/user/User.FIX';
 import IBaseRepo from './IBaseRepo';
 
 export default interface IUserRepository extends IBaseRepo<User> {

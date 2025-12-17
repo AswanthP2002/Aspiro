@@ -7,7 +7,7 @@ import Education from "../../domain/entities/user/educations.entity";
 import Experience from "../../domain/entities/user/experience.entity";
 import Post from "../../domain/entities/user/Post";
 import Skills from "../../domain/entities/user/skills.entity";
-import { Role } from "../../domain/entities/user/User";
+import { Role } from "../../domain/entities/user/User.FIX";
 
 
 export default interface UserProfileAggregatedDTO {

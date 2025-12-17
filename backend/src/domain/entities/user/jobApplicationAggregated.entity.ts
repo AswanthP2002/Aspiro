@@ -1,5 +1,6 @@
 import Job from '../recruiter/job.entity';
 import Recruiter from '../recruiter/recruiter.entity';
+import User from './User.FIX';
 
 export default interface JobApplicationAggregated {
   _id: string;
@@ -11,5 +12,6 @@ export default interface JobApplicationAggregated {
   jobId: string;
   resumeId: string;
   jobDetails: Job;
-  companyDetails: Recruiter;
+  recruiterUserProfile: User;
+  recruiterProfile:Recruiter
 }

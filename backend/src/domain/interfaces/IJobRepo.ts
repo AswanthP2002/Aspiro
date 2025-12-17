@@ -21,4 +21,6 @@ export default interface IJobRepo extends IBaseRepo<Job> {
   unblockJob(id: string): Promise<boolean>;
   rejectJob(id: string): Promise<boolean>;
   unrejectJob(id: string): Promise<boolean>;
+  incraseApplicationCount(id: string): Promise<Job | null>
+  
 }

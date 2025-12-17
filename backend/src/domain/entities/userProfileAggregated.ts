@@ -7,7 +7,7 @@ import Education from "./user/educations.entity";
 import Experience from "./user/experience.entity";
 import Post from "./user/Post";
 import Skills from "./user/skills.entity";
-import { Role } from "./user/User";
+import { Role } from "./user/User.FIX";
 
 export default interface UserProfileAggregated {
     _id?: string;

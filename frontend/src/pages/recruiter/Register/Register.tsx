@@ -238,7 +238,7 @@ export default function RecruiterRegister(){
                     <p>OR</p>
                 </div>
                 <div className="social-auth w-full flex justify-between mt-2 gap-3">
-                    <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={facebookIcon} className="inline-block" alt="" /> Sign In with facebook</button>
+                    {/* <button type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={facebookIcon} className="inline-block" alt="" /> Sign In with facebook</button> */}
                     <button onClick={googleAuth} type="button" className="border border-gray-300 text-xs w-1/2 py-2"><img src={googleIcon} className="inline-block" alt="" /> Sign up with google </button>
                 </div>
             </div>

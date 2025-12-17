@@ -1,5 +1,5 @@
 import CheckCandidateBlockStatusUseCase from '../application/usecases/candidate/CheckCandidateBlockStatus.usecase';
-import CandidateRepository from '../infrastructure/repositories/candidate/candidateRepository';
+import CandidateRepository from '../infrastructure/repositories/user/candidateRepository';
 import { StatusCodes } from '../presentation/statusCodes';
 import { generateToken, verifyToken } from '../services/jwt';
 import { Request, Response, NextFunction } from 'express';

@@ -1,5 +1,5 @@
 import Job from '../../../domain/entities/recruiter/job.entity';
-import User from '../../../domain/entities/user/User';
+import User from '../../../domain/entities/user/User.FIX';
 
 export default interface RecruiterProfilelOverviewDataDTO {
   _id?: string;

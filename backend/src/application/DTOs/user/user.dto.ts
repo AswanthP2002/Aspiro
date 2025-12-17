@@ -1,5 +1,6 @@
-import { Role } from "../../../domain/entities/user/User";
+import { Role } from "../../../domain/entities/user/User.FIX";
 import SocialLinks from "../../../domain/entities/SocialLinks";
+import {IsNotEmpty, isEmail, minLength, maxLength, IsOptional, isDefined} from 'class-validator'
 
 export default interface UserDTO {
   _id?: string;
@@ -17,7 +18,6 @@ export default interface UserDTO {
       pincode: string;
     };
 
-//export type Role = 'user' | 'recruiter' | 'admin';
     role?: Role[];
     phone?: string;
     email?: string;

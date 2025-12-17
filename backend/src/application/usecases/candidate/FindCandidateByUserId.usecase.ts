@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import ICandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo';
+import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo';
 import CandidateDTO from '../../DTOs/candidate -LEGACY/candidate.dto';
 import mapToCandidateDTO from '../../mappers/user/mapToCandidateDTO.mapper';
 import IFindCandidateByUserIdUseCase from './interface/IFindCandidateByUserId.usecase';

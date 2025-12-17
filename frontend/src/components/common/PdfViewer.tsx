@@ -1,6 +1,7 @@
 import { Document, Page, pdfjs } from 'react-pdf';
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min?url';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Notify } from 'notiflix';
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -20,6 +21,11 @@ export default function ViewPDFDocument({
   const onDocumentLoadSuccess = ({ numPages }: any) => {
     setNumberOfPages(numPages);
   };
+
+  useEffect(() => {
+    Notify.info(fileUrl)
+    console.log('--checking pdf file url from the component--', fileUrl)
+  }, [])
 
   return (
     <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>

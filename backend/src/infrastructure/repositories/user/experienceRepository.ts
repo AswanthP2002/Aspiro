@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Experience from '../../../domain/entities/user/experience.entity';
-import IExperienceRepo from '../../../domain/interfaces/candidate/IExperienceRepo';
-import { SaveExperience } from '../../../domain/interfaces/candidate/saveResponses';
+import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
+import { SaveExperience } from '../../../domain/interfaces/user/saveResponses';
 import BaseRepository from '../baseRepository';
 import { Db } from 'mongodb';
 const { ObjectId } = mongoose.Types;

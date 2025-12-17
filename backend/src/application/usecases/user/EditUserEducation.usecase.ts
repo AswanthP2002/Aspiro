@@ -1,4 +1,4 @@
-import IEducationRepo from '../../../domain/interfaces/candidate/IEducationRepo';
+import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
 import { EducationDTO, UpdateEducationDTO } from '../../DTOs/user/education.dto';
 import mapToEducationDTOFromEducation from '../../mappers/user/mapToEducationDTOFromEducation.mapper';
 import mapToEducationFromUpdateEducationDTO from '../../mappers/user/mapToEducationFromUpdateEducationDTO.mapper';

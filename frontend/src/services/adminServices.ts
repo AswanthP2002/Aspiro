@@ -342,3 +342,60 @@ export const refreshAdminToken = async () => {
         console.log('Error occured while refreshing admin access token', error)
     }
 }
+
+export const loadRecruiterApplications = async (search: string, profileStatus: string) => {
+    try {
+        const response = await axiosInstance.get('/admin/recruiter/applications', {
+            params:{search, profileStatus},
+            sendAuthToken:true
+        } as AxiosRequest
+
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const rejectRecruiterApplication = async (recruiterId: string, reason: string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/recruiter/application/${recruiterId}`, 
+            {reason},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const approveRecruiterApplication = async (recruiterId: string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/recruiter/application/approve/${recruiterId}`, {},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}

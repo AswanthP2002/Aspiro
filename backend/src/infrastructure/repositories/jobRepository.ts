@@ -153,18 +153,50 @@ export default class JobRepository
 
   async getJobDetails(id: string): Promise<JobAggregated | null> {
     const result = await JobDAO.aggregate([
-      {
-        $lookup: {
-          from: 'recruiters',
-          localField: 'companyId',
-          foreignField: '_id',
-          as: 'companyDetails',
-        },
-      },
-      { $unwind: '$companyDetails' },
+      // {
+      //   $lookup: {
+      //     from: 'recruiters',
+      //     localField: 'companyId',
+      //     foreignField: '_id',
+      //     as: 'companyDetails',
+      //   },
+      // },
+      // { $unwind: '$companyDetails' },
+      {$lookup: {
+    from: 'users',
+    localField: 'recruiterId',
+    foreignField: '_id',
+    as: 'userProfile'
+  }},
+  {$unwind:'$userProfile'},
+  {$lookup: {
+    from: 'recruiters',
+    localField: 'userProfile._id',
+    foreignField: 'userId',
+    as: 'userRecruiterProfile'
+  }},
+  {$unwind:'$userRecruiterProfile'},
+  {$lookup: {
+    from: 'jobapplications',
+    localField: '_id',
+    foreignField: 'jobId',
+    as: 'applications'
+  }},
+  {$addFields:{
+    candidateIds:{
+      $map:{
+        input:'$applications',
+        as:'app',
+        in:'$$app.candidateId'
+      }
+    }
+  }},
+  {$project:{
+    applications:0
+  }},
       { $match: { _id: new ObjectId(id) } },
     ]);
-    return result[0];
+    return result[0] || null;
   }
 
   async blockJob(id: string): Promise<boolean> {
@@ -218,6 +250,17 @@ export default class JobRepository
     );
 
     return result.acknowledged;
+  }
+
+  async incraseApplicationCount(id: string): Promise<Job | null> {
+    if(!ObjectId.isValid(id)) return null
+    const result = await JobDAO.findOneAndUpdate(
+      {_id: new ObjectId(id)},
+      {$inc: {applicationsCount: 1}},
+      {returnDocument:'after'}
+    )
+
+    return result
   }
 
   async searchJobsFromHome(

@@ -1,6 +1,6 @@
 import { JobType, WorkMode, SalaryPeriod, JobLevel, JobStatus } from "../../../domain/entities/recruiter/job.entity";
 import Recruiter from "../../../domain/entities/recruiter/recruiter.entity";
-import User from "../../../domain/entities/user/User";
+import User from "../../../domain/entities/user/User.FIX";
 
 export interface JobAggregatedDTO {
    _id?: string;
@@ -30,6 +30,6 @@ export interface JobAggregatedDTO {
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: String;
-  userDetails:User;
-  recruiterProfile:Recruiter
+  userProfile:User;
+  userRecruiterProfile:Recruiter
 }

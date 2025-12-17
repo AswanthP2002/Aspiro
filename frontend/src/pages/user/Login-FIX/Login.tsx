@@ -136,7 +136,7 @@ export default function CandidateLogin(){
                     <div className="border-b border-gray-300 w-full"></div>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={facebookIcon} className="inline-block w-7" alt="" /> Sign In with facebook</button>
+                    {/* <button type="button" className="border border-gray-300 rounded-md text-xs w-full !py-1"><img src={facebookIcon} className="inline-block w-7" alt="" /> Sign In with facebook</button> */}
                     <GoogleLoginButton />
                 </div>
             </div>
