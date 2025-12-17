@@ -1,300 +1,324 @@
 import defaultProfilePicture from '/default-img-instagram.png'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import { useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { getCandidateDetails } from '../../../services/commonServices'
 import formatDate, { transformDate } from '../../../services/util/formatDate'
-import { followUser, unfollowUser } from '../../../services/candidateServices'
+import { followUser, loadUserPublicProfile, unfollowUser } from '../../../services/userServices'
 import { Notify } from 'notiflix'
 import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import GeneralModal from '../../../components/common/Modal'
 import ChatApp from '../../common/Chat/Chat'
+import { IoChatbubbleOutline, IoLocation } from 'react-icons/io5'
+import { LuUserCheck, LuUserPlus, LuUsers } from 'react-icons/lu'
+import { AiOutlineCheck, AiOutlineMessage, AiOutlineStar } from 'react-icons/ai'
+import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs'
+import { FaGraduationCap, FaLinkedin } from 'react-icons/fa'
+import { PiShareNetworkDuotone, PiSuitcase } from 'react-icons/pi'
+import { CiCalendar, CiHeart } from 'react-icons/ci'
+import claraImage from '/klara.jpg'
+import Post from '../../../components/common/Post'
+import { Education, Experience, Skills, SocialLinks, UserPosts, UserProfileAggregated } from '../../../types/entityTypes'
+import { appContext } from '../../../context/AppContext'
 
-export default function CandidatePublicProfile() {
-    const location = useLocation()
-    const { candidateId } = location.state || {}
-    const [candidateDetails, setCandidateDetails] = useState<any>({})
+export default function UserPublicProfile() {
+    const {userMetaData} = useContext(appContext)
 
-    const [openModal, setOpenModal] = useState(false)
-
-    const modalOpen = () => setOpenModal(true)
-    const modalClose = () => setOpenModal(false)
-    
-
-    const logedUser = useSelector((state : any) => {
-        return state?.candidateAuth.user
+    const [userDetails, setUserDetails] = useState<UserProfileAggregated | undefined>()
+    const logedUser = useSelector((state: any) => {
+        return state?.userAuth?.user
     })
+    const [followed, setFollowed] = useState<boolean>(false)
 
-    const parsedLogedUser = JSON.parse(logedUser)
 
-    const userFollow = async (userId : string) => {
-        const result = await followUser(userId)
-        if(result?.success){
-            Notify.success('followed', {timeout:1000})
-            setTimeout(() => window.location.reload(), 1000)
-        }else{
-            Notify.failure('Something went wrong', {timeout:1200})
+    const location = useLocation()
+    const {userId} = location.state || {}
+    console.log('---checking data for testability---', location)
+    Notify.success(`get userid from the recruiter side page ${userId}`)
+    const followAUser = async () => {
+        setFollowed(true)
+
+        try {
+            //call api first: since no other feedback showing 
+            // in the frontend like count expect connections
+            const result = await followUser(userDetails?._id as string, userMetaData.name, userMetaData.profilePicture.cloudinarySecureUrl)
+
+            if(!result?.success){
+                Notify.failure(result?.message, {timeout:2000})
+                return
+            }
+
+            Notify.success(result?.message, {timeout:2000})
+            //update ui without refresh
+            setUserDetails((details: UserProfileAggregated | undefined) => {
+                if(!details) return undefined
+                return {
+                    ...details,
+                    followers:[...details.followers, logedUser.id]
+                }
+            })
+
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:5000})
         }
     }
 
-    const userUnfollow = async (userId : string) => {
-        Swal.fire({
-            icon:'warning',
-            title:'Unfollow?',
-            text:'Do you want to unfollow this user?',
-            showConfirmButton:true,
-            confirmButtonText:'Unfollow',
-            showCancelButton:true
-        }).then(async (result) => {
-            if(result?.isConfirmed){
-                const unfollowResult = await unfollowUser(userId)
-                if(unfollowResult?.success){
-                    Notify.success('Unfollowed', {timeout:1000})
-                    setTimeout(() => window.location.reload(), 1000)
-                }else{
-                    Notify.failure('Something went wrong', {timeout:1000})
-                }
+    const unfollowAUser = async () => {
+        setFollowed(false)
+
+        try {
+            const result = await unfollowUser(userDetails?._id as string, userMetaData.name, userMetaData.profilePicture.cloudinarySecureUrl)
+        
+            if(!result?.success){
+                Notify.failure(result?.message, {timeout:2000})
+                return
             }
-            return
-        })
+
+            Notify.success(result?.message, {timeout:2000})
+
+            //update ui
+            setUserDetails((details: UserProfileAggregated | undefined) => {
+                if(!details) return undefined
+                
+                return {
+                    ...details,
+                    followers: details.followers.filter((id: string) => id !== logedUser.id)
+                }
+            })
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:5000})
+        }
     }
 
-    console.log('This is lloged user id', parsedLogedUser?.id, typeof logedUser)
-    console.log('thi is  followers list ', candidateDetails?.followers)
     useEffect(() => {
-        (async function () {
-            const result = await getCandidateDetails(candidateId)
-            console.log('Candidate details from the backend', result)
-            setCandidateDetails(result?.candidateDetails)
+        //Notify.success(userId as string, {timeout:3000})
+        (async function(){
+            // console.log('user id', userId)
+            Notify.info(userId, {timeout:3000})
+            try {
+                const result = await loadUserPublicProfile(userId)
+
+                if(!result?.success){
+                    Notify.failure(result?.message, {timeout:3000})
+                    return
+                }
+                console.log('----user detail----', result?.result)
+                setUserDetails(result?.result)
+            } catch (error: unknown) {
+                Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:10000})
+            }
         })()
     }, [])
 
-    const isFollowing = (userId : string) => {
-        const userFollowing = candidateDetails?.followers?.find((data : any) => {
-            return data?.follower === userId
-        })
-
-        return Object.entries(userFollowing || []).length > 0
-    }
-
     return (
         <>
-        <div className="candidate-details-container w-full">
-            <div className="breadcrumbs-header bg-gray-100 w-full">
-                <div className="aspiro-container">
-                    <div className="flex justify-between py-3">
-                        <div className="left"><p className="text-sm">Job Details</p></div>
-                        <div className="right"><p className="text-sm">Home / Candidates / Candidate Details</p></div>
+        <div className="w-full min-h-screen">
+            <div className="w-full h-40 bg-gradient-to-br from-blue-500 to-indigo-600"></div>
+            <div className='-mt-10'>
+                <div className='px-5 md:px-10'>
+                <div className="profile-card flex gap-3 border border-gray-300 bg-white rounded-md p-5">
+                    <div className='shadow-lg rounded-full w-25 h-25 bg-white p-1 flex items-center justify-center'>
+                        <div className='bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white w-full h-full rounded-full'>
+                            <p className='text-2xl'>{userDetails?.name ? userDetails?.name[0] : 'A'}</p>
+                        </div>
+                    </div>
+                    <div className='flex-1'>
+                        <p className='text-xl'>{userDetails?.name}</p>
+                        <p className='text-gray-700'>{userDetails?.headline}</p>
+                        <div className='flex gap-2 flex-col mt-3'>
+                            <span className='flex text-xs text-gray-500 items-center gap-2'>
+                                <IoLocation />
+                                <p>{userDetails?.location?.district}, {userDetails?.location?.state}</p>
+                            </span>
+                            <span className='flex text-xs text-gray-500 items-center gap-2'>
+                                <LuUsers />
+                                233 Connections
+                            </span>
+                        </div>
+                        <p className='text-blue-500 text-xs mt-2'>23 mutual connections</p>
+                        <div className="flex gap-2 items-center w-full mt-3">
+                            {
+                                userDetails?.connections?.includes(logedUser?.id)
+                                    ? <>
+                                        <button className='flex hover:bg-gray-100 text-gray-500 items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                                            <LuUserCheck color='gray' />
+                                            Connected
+                                        </button>
+                                      </>
+                                    : <>
+                                        <button className='flex hover:bg-gray-100 text-black flex-1 items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                                            <LuUserPlus color='black' />
+                                            Connect
+                                        </button>
+                                      </>
+                            }
+                            {
+                                userDetails?.followers?.includes(logedUser.id) || followed
+                                    ? <>
+                                        <button onClick={unfollowAUser} className='flex bg-gray-500 hover:bg-black flex-1 text-white items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                                            <AiOutlineCheck />
+                                            Following
+                                        </button>
+                                      </>
+                                    : <>
+                                        <button onClick={followAUser} className='flex bg-black hover:bg-gray-500 flex-1 text-white items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                                            <AiOutlineStar />
+                                            Follow
+                                        </button>
+                                      </>
+                            }
+                            <button className='flex flex-1 items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                                <AiOutlineMessage />
+                                Message
+                            </button>
+                        </div>
+                        <button className='mt-2 border border-gray-300 text-xs rounded-md flex items-center justify-center px-2 py-1'>
+                            <BsThreeDots />
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div className="section-details">
-                <div className="aspiro-container">
-                    <div className="relative w-full">
-                        <div className="coverphoto bg-green-400">
-                            <img className='w-full h-[200px]' style={{ objectFit: 'cover' }}
-                                src={candidateDetails?.profilePicture?.cloudinarySecureUrl ? candidateDetails?.coverPhoto?.cloudinarySecureUrl : defaultProfilePicture} alt=""
-                            />
+                </div>
+
+                <div className="w-full mt-5 grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className=''>
+                        <div className="about-card h-fit border border-gray-300 rounded-md p-5 bg-white">
+                            <p className=''>About</p>
+                            <p className='mt-3 text-sm text-gray-500'>
+                                {userDetails?.summary}
+                            </p>
                         </div>
-                        <div className="flex justify-center bottom-[-50px] absolute w-full">
-                            <div className="flex justify-between items-center bg-white p-5 w-3/4 border border-gray-200">
-                                <div className="flex gap-3 profile items-center">
-                                    <img
-                                        src={candidateDetails?.coverPhoto?.cloudinarySecureUrl ? candidateDetails?.profilePicture?.cloudinarySecureUrl : defaultCoverPhoto}
-                                        className='w-[80px] h-[80px] rounded-full' style={{objectFit:'cover'}} alt=""
-                                    />
-                                    <div>
-                                        <p className='font-semibold'>{candidateDetails?.name}</p>
-                                        <p className='text-sm text-gray-500 mt-1'>{candidateDetails?.role}</p>
-                                    </div>
-                                </div>
-                                <div className="actions flex gap-5">
-                                    {
-                                        isFollowing(parsedLogedUser?.id)
-                                            ? <button onClick={() => userUnfollow(candidateDetails?._id)} className='bg-blue-500 text-white text-sm !px-5 rounded'>Following</button>
-                                            : <button onClick={() => userFollow(candidateDetails?._id)} className='bg-blue-500 text-white text-sm !px-5 rounded'>Follow</button>
-                                    }
-                                    <button onClick={modalOpen}><i className="fa-solid fa-message !text-2xl"></i></button>
-                                </div>
+                        <div className="social-card mt-3 border border-gray-300 rounded-md p-5 bg-white">
+                            <p className=''>Social Links</p>
+                            <div className="mt-3 grid grid-cols-1 gap-5">
+                                {
+                                    userDetails?.socialLinks?.map((socialLink: SocialLinks, index: number) => (
+                                        <div key={index} className='flex gap-2 items-center'>
+                                            <div className='bg-blue-100 w-10 h-10 rounded-md flex items-center justify-center'>
+                                                <FaLinkedin size={20} color='blue' />
+                                            </div>
+                                            <div>
+                                                <p className='text-sm'>{socialLink.domain.split('.')[1]}</p>
+                                                <p className='text-xs text-gray-700'>{socialLink.url}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <div className="skills-card mt-3 border border-gray-300 rounded-md p-5 bg-white">
+                            <p>Skills</p>
+                            <div className="mt-3 flex flex-wrap gap-1">
+                                {
+                                    userDetails?.skills?.map((skill: Skills, index: number) => (
+                                        <span key={index} className='bg-gray-200 text-gray-700 text-xs rounded-full px-2 py-1'><p>{skill.skill}</p></span>
+                                    ))
+                                }
                             </div>
                         </div>
                     </div>
-                    <div className="mt-20 mb-10">
-                        <div className="grid grid-cols-2 gap-10">
-                            <div className="about">
-                                <p className="text-sm font-semibold">About</p>
-                                <p className="mt-4 text-xs text-gray-500">
-                                    {candidateDetails?.about}
-                                </p>
+                    <div className='grid grid-cols-1 gap-2'>
+                        <div className="experience-card border border-gray-300 rounded-md p-5 bg-white">
+                            <div className='flex items-center gap-2'>
+                                <PiSuitcase size={20} />
+                                <p>Experiences</p>
                             </div>
-                            <div className='border border-gray-300 rounded-md p-4'>
-                                <div className="w-full flex justify-between">
-                                    
-                                    <div>
-                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.followers?.length}</p>
-                                        <p className="text-xs text-gray-500 mt-1">Followers</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.following?.length}</p>
-                                        <p className="text-xs text-gray-500 mt-1">Following</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-sm mt-3">{candidateDetails?.posts?.length}</p>
-                                        <p className="text-xs text-gray-500 mt-1">Posts</p>
-                                    </div>
-                                    <div>
-                                        <i className="fa-solid fa-timeline !text-2xl"></i>
-                                        <p className='font-semibold text-sm mt-3'>Joined</p>
-                                        <p className='text-xs text-gray-500 mt-1'>{transformDate(candidateDetails?.createdAt)}</p>
-                                    </div>
-                                    <div>
-                                        <i className="fa-solid fa-location-dot !text-2xl"></i>
-                                        <p className='font-semibold text-sm mt-3'>Location</p>
-                                        <p className='text-xs text-gray-500 mt-1'>{candidateDetails?.location?.state}, {candidateDetails?.location?.country}</p>
-                                    </div>
-
-                                </div>
-                                <div className='mt-3'>
-                                    <i className="fa-solid fa-envelope"></i>
-                                    <label htmlFor="" className='text-xs ms-3'>{candidateDetails?.email}</label>
-                                </div>
-                                <div className="mt-4">
-                                    <p className='font-semibold text-sm'>Quick links</p>
-                                    <div className="flex gap-4 mt-2">
-                                        {
-                                            candidateDetails?.socialLinks?.map((socialmedia: any, index: number) => {
-                                                return (
-                                                    <button key={index}>
-                                                        {socialmedia?.domain.includes('linkedin') && <i className={`!text-xl fa-brands fa-linkedin`}></i>}
-                                                        {socialmedia?.domain.includes('facebook') && <i className={`!text-xl fa-brands fa-facebook`}></i>}
-                                                        {socialmedia?.domain.includes('instagram') && <i className={`!text-xl fa-brands fa-instagram`}></i>}
-                                                        {socialmedia?.domain.includes('twitter') && <i className={`!text-xl fa-brands fa-twitter`}></i>}
-                                                    </button>
-                                                )
-                                            })
-                                        }
-
-                                    </div>
-                                </div>
+                            <div className="mt-5 grid grid-cols-1 gap-5">
+                                {
+                                    userDetails?.experiences?.map((experience: Experience, index: number) => (
+                                        <div key={index} className='flex gap-3 relative z-5'>
+                                            <div className='bg-blue-100 relative z-7 w-8 h-8 rounded-md flex items-center justify-center'>
+                                                <PiSuitcase size={18} color='blue' />
+                                            </div>
+                                            <div className="absolute border-l-2 h-[120%] left-4 border-gray-300">
+                                                
+                                            </div>
+                                            <div>
+                                                <p className='text-sm'>{experience.jobRole}</p>
+                                                <p className="text-sm font-light">{experience.organization}</p>
+                                                <div className="flex gap-2 items-center lg:flex-col lg:items-start mt-2">
+                                                    <span className='flex items-center gap-1 text-xs text-gray-500'>
+                                                        <IoLocation />
+                                                        <p>{experience.location}</p>
+                                                    </span>
+                                                    <span className='flex items-center gap-1 text-xs text-gray-500'>
+                                                        <CiCalendar />
+                                                        <p>
+                                                            {formatDate(experience.startDate as string)} - {experience.isPresent ? 'Present' : formatDate(experience.endDate as string)}
+                                                        </p>
+                                                    </span>
+                                                </div>
+                                                <div className="flex gap-2 items-center mt-2">
+                                                    <span className='text-xs bg-blue-100 text-blue-600 px-2 rounded-md'>{experience.workMode}</span>
+                                                    <span className='text-xs bg-blue-100 text-blue-600 px-2 rounded-md'>{experience.jobType}</span>
+                                                </div>
+                                                <p className='text-xs text-gray-700 mt-2'>Descriptions if any</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-10 mt-5">
-                            <div>
-                                <div className='w-full'>
-                                    <p className='font-semibold text-sm'>Experience</p>
-                                    {
-                                        candidateDetails?.experience?.length > 0
-                                            ? <>
-                                                <table className="mt-3 w-full">
-                                                    <thead>
-                                                        <tr className='bg-gray-300'>
-                                                            <td className='text-xs p-1'>Role</td>
-                                                            <td className='text-xs p-1'>From</td>
-                                                            <td className='text-xs p-1'>To</td>
-                                                            <td className='text-xs p-1'>Duration</td>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {
-                                                            candidateDetails?.experience.map((exp : any, index : number) => {
-                                                                return(
-                                                                    <tr key={index} className='border-b border-gray-300'>
-                                                            <td className='p-1'>
-                                                                <div className="flex gap-3">
-                                                                    <div className="bg-blue-100 w-[50px] h-[50px]"></div>
-                                                                    <div className=''>
-                                                                        <p className='text-xs font-semibold'>{exp?.role} <span className='font-normal bg-blue-200 px-2 rounded-full ms-2'>{exp?.role?.locationType}</span></p>
-                                                                        <p className='mt-3 text-xs text-gray-500'><span>{exp?.organization}</span> <span className='ms-5'><i className="fa-solid fa-location-dot !text-xs me-1"></i>{exp?.location}</span></p>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className='text-xs'>{exp?.startdate}</td>
-                                                            <td className='text-xs'>{exp?.isPresent ? "Present" : exp?.endDate}</td>
-                                                            <td className='text-xs'>2 years</td>
-                                                        </tr>
-                                                                )
-                                                            })
-                                                        }
-                                                    </tbody>
-                                                </table>
-                                            </>
-                                            : <p className='text-center text-gray-400 text-sm'>No experience added</p>
-                                    }
-                                </div>
-                                <div className='mt-5'>
-                                    <p className='font-semibold text-sm'>Education</p>
-                                    {
-                                        candidateDetails?.education?.length > 0
-                                            ? <>
-                                                <div className="border-b border-gray-300 mt-2 flex items-center gap-3">
-                                                    {
-                                                        candidateDetails?.education?.map((edu : any, index : any) => {
-                                                            return(
-                                                                <>
-                                                                    <div key={index} className='bg-blue-100 w-[50px] h-[50px]'></div>
-                                                                    <div>
-                                                                        <p className="text-xs font-bold">{edu?.stream}</p>
-                                                                        <p className="text-xs text-gray-500">{edu?.level}</p>
-                                                                        <p className='text-xs text-gray-500'>{edu?.organization}, {edu?.location}</p>
-                                                                        <p className="text-xs text-gray-500">{edu?.startYear}-{edu?.isPresent ? "Present" : edu?.endYear}</p>
-                                                                    </div>
-                                                                </>
-                                                            )
-                                                        })
-                                                    }
-                                                </div>
-                                            </>
-                                            : <p className="text-center text-sm text-gray-400">No Education added</p>
-                                    }
-                                </div>
-                                <div className="mt-5">
-                                    <p className="font-semibold text-sm">Technical Skills</p>
-                                    {
-                                        candidateDetails?.skills?.length > 0
-                                            ? <>
-                                                <div className="flex gap-3 mt-3">
-                                                    {
-                                                        candidateDetails?.skills?.map((skill : any, index : number) => {
-                                                            return<>{skill?.type === 'Technical-Skill' && (<span key={index} className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
-                                                        })
-                                                    }
-                                                </div>
-                                              </>
-                                            : <p className='text-center text-sm text-gray-400'>No skills added</p>
-                                    }
-                                </div>
-                                <div className="mt-5">
-                                    <p className="font-semibold text-sm">Soft Skills</p>
-                                    {
-                                        candidateDetails?.skills?.length > 0
-                                            ? <>
-                                                <div className="flex gap-3 mt-3">
-                                                    {
-                                                        candidateDetails?.skills?.map((skill : any, index : number) => {
-                                                            return<>{skill?.type === 'Soft-Skill' && (<span key={index} className='text-xs border border-gray-400 px-2 py-1 rounded-full'>{skill?.skill}</span>)}</>
-                                                        })
-                                                    }
-                                                </div>
-                                              </>
-                                            : <p className='text-center text-sm text-gray-400'>No skills added</p>
-                                    }
-                                </div>
+
+                        <div className="experience-card border border-gray-300 rounded-md p-5 bg-white">
+                            <div className='flex items-center gap-2'>
+                                <FaGraduationCap size={20} />
+                                <p>Education</p>
                             </div>
-                            <div>
-                                <p className="text-sm font-semibold">Related Candidates</p>
+                            <div className="mt-5 grid grid-cols-1 gap-5">
+                                {
+                                    userDetails?.educations?.map((education: Education, index: number) => (
+                                        <div key={index} className='flex gap-3 relative z-5'>
+                                            <div className='bg-orange-100 relative z-7 w-8 h-8 rounded-md flex items-center justify-center'>
+                                                <FaGraduationCap size={18} color='red' />
+                                            </div>
+                                            <div className="absolute border-l-2 h-[120%] left-4 border-gray-300">
+                                                
+                                            </div>
+                                            <div>
+                                                <p className='text-sm'>{education.educationStream}</p>
+                                                <span className='text-xs text-gray-700 bg-gray-200 px-2 rounded-full'>{education.educationLevel}</span>
+                                                <p className='text-sm font-light mt-2'>{education.institution}</p>
+                                                <div className="flex gap-2 items-center lg:flex-col lg:items-start mt-2">
+                                                    <span className='flex items-center gap-1 text-xs text-gray-500'>
+                                                        <IoLocation />
+                                                        <p>{education.location}</p>
+                                                    </span>
+                                                    <span className='flex items-center gap-1 text-xs text-gray-500'>
+                                                        <CiCalendar />
+                                                        <p>{education.startYear} - {education.endYear ? education.endYear : 'Present'}</p>
+                                                    </span>
+                                                </div>
+                                                <p className='text-xs text-gray-700 mt-2'>Descriptions if any</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
+
+                            
+                        </div>
+                        <div className='activities mt-3'>
+                            <p>Activities</p>
+                            <div className="grid grid-cols-1 gap-2">
+                                {
+                                    userDetails && userDetails?.posts.length > 0 && (
+                                    userDetails?.posts?.map((post: UserPosts, index: number) => (
+                                        <Post key={index} postData={post} loading={false} />
+                                    ))
+                                )
+                                }
+                            </div>
+                            {
+                                userDetails?.posts.length === 0 && <div className="w-full border border-gray-300 bg-white rounded-md p-5 flex justify-center">
+                                    <p className='text-xs text-gray-500'>No posts yet</p>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <GeneralModal
-            openModal={openModal}
-            children={<ChatApp />}
-            closeModal={modalClose}
-            size='medium'
-        />
         </>
     )
 }

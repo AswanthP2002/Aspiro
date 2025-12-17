@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import { getCompanies } from '../../../services/adminServices';

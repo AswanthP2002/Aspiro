@@ -2,313 +2,584 @@ import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { postJob } from "../../../services/recruiterServices"
+import { Dayjs } from "dayjs"
+import { Controller, useForm } from "react-hook-form"
+import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Textarea } from "@mui/joy"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
+import { DateField } from "@mui/x-date-pickers/DateField"
+import { Notify } from "notiflix"
 
 interface JobDetails {
     jobTitle: string,
-    jobType: string,
+    description: string,
+    requirements: string,
+    responsibilities: string,
+    duration: string,
+    jobType: 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary' | '',
+    workMode: 'On-site' | 'Remote' | 'Hybrid' | '',
     location: string,
-    locationType: string,
-    minSalary: string,
-    maxSalary: string,
-    vacancies: string,
+    minSalary: number | '',
+    maxSalary: number | '',
+    salaryCurrency: string,
+    salaryPeriod: 'annually' | 'monthly' | 'weekly' | 'hourly' | '',
+    vacancies: number | '',
     qualification: string,
-    experience: string,
-    jobLevel: string,
-    expiresAt: string,
-    description: string
-    requirements: string
-    responsibilities: string
-    duration: string
+    experienceInYears: number | '',
+    jobLevel: 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager' | '',
     requiredSkills: string[],
-    optionalSkills: string[]
+    optionalSkills: string[],
+    expiresAt: Dayjs | null;
 }
+
 export default function PostAJobForm(){
 
-    const [requiredSkills, setRequiredSkills] = useState<any[]>([])
+    const [requiredSkills, setRequiredSkills] = useState<string[]>([])
     const requiredSkillRef = useRef<HTMLInputElement | null>(null)
-    const [optionalSkills, setOptionalSkills] = useState<any[]>([])
+    const [optionalSkills, setOptionalSkills] = useState<string[]>([])
     const optionalSkillRef = useRef<HTMLInputElement | null>(null)
+    const navigator = useNavigate()
+    const [loading, setloading] = useState(false)
 
-    const [details, setdetails] = useState<JobDetails>({
-        jobTitle:"",
-        jobType:"",
-        location:"",
-        locationType:"",
-        minSalary:"",
-        maxSalary:"",
-        vacancies:"",
-        qualification:"",
-        experience:"",
-        jobLevel:"",
-        expiresAt:"",
-        description:"",
-        requirements:"",
-        responsibilities:"",
-        duration:"",
-        requiredSkills:[],
-        optionalSkills:[]
+    const {control, watch, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
+        defaultValues: {
+            jobTitle: "",
+            description: "",
+            requirements: "",
+            responsibilities: "",
+            duration: "",
+            jobType: "",
+            workMode: "On-site",
+            location: "",
+            minSalary: "",
+            maxSalary: "",
+            salaryCurrency: "INR",
+            salaryPeriod: "annually",
+            vacancies: "",
+            qualification: "",
+            experienceInYears: "",
+            jobLevel: "Entry-level",
+            requiredSkills: [],
+            optionalSkills: [],
+            expiresAt: null
+        }
     })
 
-    
+    const enteredJobType = watch('jobType')
+    const enteredWorkMode = watch('workMode')
 
     const addRequiredSkill = (event : any) => {
         event.preventDefault()
         const skill = requiredSkillRef.current?.value
         if(!skill) return
-        setdetails(prv => {
-            return {...prv, requiredSkills:[...prv.requiredSkills, skill]}
-        })
+        setValue('requiredSkills', [...getValues('requiredSkills'), skill]);
         if(requiredSkillRef.current) requiredSkillRef.current.value = ""
     }
     
     const removeRequiredSkill = (event : any, skill : string) => {
         event.preventDefault()
-        setdetails(prv => {
-            return {...prv, requiredSkills:prv.requiredSkills.filter((s : string) => s !== skill)}
-        })
+        const updatedSkills = getValues('requiredSkills').filter((s: string) => skill.toLocaleLowerCase() !== s.toLocaleLowerCase());
+        setValue('requiredSkills', updatedSkills);
     }
 
     const addOptionalSkill = (event : any) => {
         event.preventDefault()
         const skill = optionalSkillRef.current?.value
         if(!skill) return
-        setdetails(prv => {
-            return {...prv, optionalSkills:[...prv.optionalSkills, skill]}
-        })
+        setValue('optionalSkills', [...getValues('optionalSkills'), skill]);
         if(optionalSkillRef.current) optionalSkillRef.current.value = ""
         
     }
 
     const removeOptionalSkill = (event : any, skill : string) => {
         event.preventDefault()
-        setdetails(prv => {
-            return {...prv, optionalSkills:prv.optionalSkills.filter((s : string) => s !== skill)}
-        })
+        const updatedSkills = getValues('optionalSkills').filter((s: string) => skill.toLowerCase() !== s.toLocaleLowerCase());
+        setValue('optionalSkills', updatedSkills);
     }
 
-    const [titleError, settitlerror] = useState("")
-    const [jobTypeError, setjobtyperror] = useState("")
-    const [locationError, setlocationerror] = useState("")
-    const [locationTypeError, setlocationtypeerror] = useState("")
-    const [durationError, setDurationError] = useState("")
-    const [minsalaryError, setminsalaryerror] = useState("")
-    const [maxsalaryError, setmaxsalaryerror] = useState("")
-    const [vacanicesError, setvacancieserror] = useState("")
-    const [qualificationError, setqualificationerror] = useState("")
-    const [experienceError, setexperienceerror] = useState("")
-    const [expiresAtError, setexpiresaterror] = useState("")
-    const [descriptionError, setdescriptionerror] = useState("")
-    const [requirementsError, setrequirementserror] = useState("")
-    const [responsibilitiesError, setresponsibilitieserror] = useState("")
-    
-    const navigator = useNavigate()
-
-    function handleData(event : any){
-        setdetails((prevState) => {
-            return{
-                ...prevState,
-                [event.target.name]:event.target.value
-            }
-        })
-    }
-
-    async function submitJob(event : any){
-        event?.preventDefault()
-
-        const titlerror = !details.jobTitle || !/^[A-Za-z0-9\s\-.,]{2,100}$/.test(details.jobTitle) || false
-        const jobtyperror = !details.jobType || false
-        const locationerror = !details.location || !/^[A-Za-z\s,.-]{2,100}$/.test(details.location) || false
-        const joblevelerror = !details.jobLevel || false
-        const locationtyperror = !details.locationType || false
-        const minsalaryerror = !details.minSalary || !/^\d{1,7}$/.test(details.minSalary)  || false
-        const maxsalaryerror = !details.maxSalary || !/^\d{1,7}$/.test(details.maxSalary) || false
-        const vacancyerror = !details.vacancies || !/^\d{1,3}$/.test(details.vacancies) || false
-        const qualificationerror = !details.qualification || !/^(?!\d+$)(?!.*\d$)[A-Za-z.,()\-]+(?:\s[A-Za-z.,()\-]+)*$/.test(details.qualification) || false
-        const experienceerror = !details.experience || !/^(?!\d+$)(?!.*\d$)[A-Za-z0-9]+(?:[ -][A-Za-z0-9]+)*$/i.test(details.experience) || false
-        const descriptionerror = !details.description || !/^.{10,1000}$/.test(details.description) || false
-        const requirementserror = !details.requirements || !/^.{10,1000}$/.test(details.requirements) || false
-        const responsibilitieserror = !details.responsibilities || !/^.{10,1000}$/.test(details.responsibilities) || false
-        const expiresaterror = !details.expiresAt
-
-        titlerror ? settitlerror('Enter valid job title') : settitlerror("")
-        locationerror ? setlocationerror('Enter valid location') : setlocationerror("")
-        minsalaryerror ? setminsalaryerror('Enter a valid salary') : setminsalaryerror('')
-        maxsalaryerror ? setmaxsalaryerror('Enter valid salary') : setmaxsalaryerror('')
-        vacancyerror ? setvacancieserror('Enter valid vacancies') : setvacancieserror('')
-        qualificationerror ? setqualificationerror('Enter qualifications') : setqualificationerror('')
-        experienceerror ? setexperienceerror('Enter valid experience') : setexperienceerror('')
-        descriptionerror ? setdescriptionerror('Enter valid description') : setdescriptionerror('')
-        requirementserror ? setrequirementserror('Enter valid requirements') : setrequirementserror('')
-        responsibilitieserror ? setresponsibilitieserror('Enter valid responsiblities') : setresponsibilitieserror("")
-        expiresaterror ? setexpiresaterror('Enter expiry date') : setexpiresaterror("")
-        jobtyperror ? setjobtyperror('Select Job type') : setjobtyperror("")
-        locationtyperror ? setlocationtypeerror('select location type') : setlocationtypeerror("")
-
-
-        if(expiresaterror || jobtyperror || locationtyperror || titlerror || locationerror || minsalaryerror || maxsalaryerror || vacancyerror || qualificationerror || experienceerror || descriptionerror ||requirementserror|| responsibilitieserror){
-            return
-        }
-        console.log('required skills', requiredSkills)
-        console.log('optional skills', optionalSkills)
-
-        //check the values that are going to backend
-            await postJob(details)
+    async function submitJob(data: JobDetails){
+        setloading(true)
+        console.log("Form Data on Submit:", data);
+        const payload = {
+            ...data,
+            minSalary: Number(data.minSalary),
+            maxSalary: Number(data.maxSalary),
+            vacancies: Number(data.vacancies),
+            experienceInYears: Number(data.experienceInYears),
+            expiresAt: data.expiresAt ? data.expiresAt.toDate() : new Date()
+        };
+        console.log('testing data', payload)
+        
+        try {
+            const result = await postJob(payload)
             
+            if(result?.success){
+                setloading(false)
                 Swal.fire({
                     icon:'success',
-                    title:'Posted',
-                    text:'Job created successfully',
-                    showConfirmButton:true,
-                    confirmButtonText:'Jobs'
-                }).then((result) => {
-                    if(result.isConfirmed){
-                        navigator('/recruiter/profile/overview') 
-                    }
-                })
+                    title:'Job Created',
+                    text:result?.message,
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    allowOutsideClick:false,
+                    allowEscapeKey:false,
+                    timer:2500
+                }).then(() => navigator('/profile/recruiter/my-jobs'))
+            }else{
+                setloading(false)
+                Notify.failure(result?.message, {timeout:2000})
+            }
+
+        } catch (error: unknown) {
+            Notify.failure('Something went wrong', {timeout:2000})
+            setloading(false)
+        }
     
     }
 
     return(
         <>
-        <div className="container px-10 py-5">
-            
-            <p className="text-2xl font-bold">Post a Job</p>
-            <form className="job-post-form mt-5" onSubmit={(event) => submitJob(event)}>
-                <div className="flex w-full gap-10">
-                <div className="w-1/3">
-                    <label htmlFor="">Job Title</label>
-                    <input value={details.jobTitle} onChange={(event) => handleData(event)} type="text" name="jobTitle" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                    <label htmlFor="" className="error-label">{titleError}</label>
-                </div>
-                <div className="w-1/3">
-                    <label htmlFor="">Job Type</label>
-                    <select  name="jobType" id="" className="w-full p-2 rounded-sm border border-gray-200 text-sm" value={details.jobType} onChange={(event) => handleData(event)}>
-                        <option value="">--Select Job Type--</option>
-                        <option value="Full-Time">Full-Time</option>
-                        <option value="Part-Time">Part-Time</option>
-                        <option value="Internship">Internship</option>
-                    </select>
-                    <label htmlFor="" className="error-label">{jobTypeError}</label>
-                </div>
-                <div className="w-1/3">
-                    <label htmlFor="">Duration</label>
-                    <input disabled={details?.jobType === 'Internship' ? false : true} value={details.duration} onChange={(event) => handleData(event)} type="text" name="duration" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                    <label htmlFor="" className="error-label">{titleError}</label>
-                </div>
-                </div>
-                <div className="mt-2 flex justify-between gap-10">
-                    <div className="w-1/3">
-                        <label htmlFor="">Office Location</label>
-                        <input value={details.location} onChange={(event)  => handleData(event)} type="text" name="location" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{locationError}</label>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Work Mode</label>
-                        <select name="locationType" id="" className="w-full p-2 text-sm rounded-sm border border-gray-200" value={details.locationType} onChange={(event) => handleData(event)}>
-                            <option value="">--Select Location Type--</option>
-                            <option value="In-Office">In-Office</option>
-                            <option value="Remote">Remote</option>
-                        </select>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Vacancies</label>
-                        <input value={details.vacancies} onChange={(event) => handleData(event)} type="number" name="vacancies" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{vacanicesError}</label>
-                    </div>
-                </div>
-                <div className="mt-2 w-full flex justify-between gap-10">
-                    <div className="w-1/3">
-                        <label htmlFor="">Minimum Salary</label>
-                        <input value={details.minSalary} onChange={(event) => handleData(event)} type="number" name="minSalary" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{minsalaryError}</label>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Maximum Salary</label>
-                        <input value={details.maxSalary} onChange={(event) => handleData(event)} type="number" name="maxSalary" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{maxsalaryError}</label>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Job Level</label>
-                        <select name="jobLevel" id="" className="w-full p-2 rounded-sm border text-sm border-gray-200" value={details.jobLevel} onChange={(event) => handleData(event)}>
-                            <option value="">--Select job level--</option>
-                            <option value="Entry Level">Entry Level</option>
-                            <option value="Experienced">Experienced</option>
-                        </select>
-                    </div>
-                </div>
-                <div className="flex mt-2 gap-10 w-full">
-                    <div className="w-1/3">
-                        <label htmlFor="">Qualification</label>
-                        <input type="text" value={details.qualification} onChange={(event) => handleData(event)} name="qualification" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{qualificationError}</label>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Experience</label>
-                        <input type="" value={details.experience} onChange={(event) => handleData(event)} name="experience" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{experienceError}</label>
-                    </div>
-                    <div className="w-1/3">
-                        <label htmlFor="">Expires At</label>
-                        <input value={details.expiresAt} onChange={(event) => handleData(event)} type="date" name="expiresAt" id="" className="w-full p-2 rounded-sm border border-gray-400" />
-                        <label htmlFor="" className="error-label">{expiresAtError}</label>
+        <div className="bg-white">
+            <form onSubmit={handleSubmit(submitJob)} className="border border-gray-200 shadow-xl max-w-4xl !mx-auto !my-10 rounded-md !py-5 !px-5">
+                <p className="text-center font-bold text-2xl">Create a New Job Posting</p>
+                <p className="text-sm mt-3 text-gray-700 text-center">Fill out the details below to find your next great hirie.</p>
+
+                <div className="form-group border border-gray-200 rounded-md mt-5 !p-5">
+                    <p className="font-medium text-lg">Core Job Details</p>
+                    <FormControl fullWidth sx={{marginTop:'15px'}}>
+                        <Controller
+                            name="jobTitle"
+                            control={control}
+                            rules={{
+                                required: { value: true, message: 'Job Title can not be empty' },
+                                pattern: { value: /^[A-Za-z0-9\s\-.,()]{3,100}$/, message: 'Enter a valid job title (3-100 characters)' }
+                            }}
+                            render={({field}) => (
+                                <TextField
+                                    {...field}
+                                    variant="outlined"
+                                    label="Job title"
+                                    error={Boolean(errors.jobTitle)}
+                                    helperText={errors?.jobTitle?.message}
+                                
+                                />
+                            )}
+                        />
+                    </FormControl>
+
+                    <div className="w-full flex gap-10 justify-between">
+                        <FormControl error={Boolean(errors.jobType)} fullWidth sx={{marginTop:'15px'}}>
+                        <InputLabel id="job-type-label">Job Type</InputLabel>
+                        <Controller
+                            name="jobType"
+                            control={control}
+                            rules={{required:{value:true, message:'Job type can not be empty'}}}
+                            render={({field}) => (
+                                <Select
+                                    {...field}
+                                    label="Job Type"
+                                    labelId="job-type-label"
+                                    variant="outlined"
+                                    error={Boolean(errors.jobType)}
+                                >
+                                    <MenuItem value="Full-time">Full-time</MenuItem>
+                                    <MenuItem value="Part-time">Part-time</MenuItem>
+                                    <MenuItem value="Contract">Contract</MenuItem>
+                                    <MenuItem value="Internship">Internship</MenuItem>
+                                    <MenuItem value="Temporary">Temporary</MenuItem>
+                                </Select>
+                            )}
+                        />
+                        <FormHelperText>{errors?.jobType?.message}</FormHelperText>
+                    </FormControl>
+
+                    <FormControl fullWidth sx={{marginTop:'15px'}}>
+                        <Controller
+                            name="duration"
+                            control={control}
+                            rules={{
+                                required:{value:enteredJobType === 'Contract' || enteredJobType === 'Internship' ? true : false, message:'Please specify the job duration'},
+                                pattern:{value:/^[A-Za-z0-9\s-]{3,30}$/, message:'Enter a valid duration (e.g., "6 months", "1 year")'}
+                            }}
+                            render={({field}) => (
+                                <TextField
+                                  {...field}
+                                  disabled={enteredJobType !== 'Contract' && enteredJobType !== 'Internship' ? true : false}
+                                  variant="outlined"
+                                  label="Duration (Internships & Contracts only)"
+                                  error={Boolean(errors.duration)}
+                                  helperText={errors?.duration?.message}
+                                />
+                            )}
+                        />
+                    </FormControl>
                     </div>
                 </div>
-                <div className="mt-2">
-                    <label htmlFor="">Job Description</label>
-                    <textarea value={details.description} onChange={(event) => handleData(event)} name="description" id="" className="w-full p-2 rounded-sm border border-gray-400"></textarea>
-                    <label htmlFor="" className="error-label">{descriptionError}</label>
+
+                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                    <p className="font-medium text-lg">Location & Logistics</p>
+                    <div className="flex gap-10 justify-between mt-5 w-full">
+                        <FormControl fullWidth>
+                            <Controller
+                                name="vacancies"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Vacancies can not be empty'},                                    
+                                    pattern:{value:/^[1-9]/, message:'Enter a valid number'}
+                                }}
+                                render={({field}) => (
+                                    <TextField
+                                        {...field}
+                                        variant="outlined"
+                                        label="Vacancies"
+                                        type="number"
+                                        error={Boolean(errors.vacancies)}
+                                        helperText={errors?.vacancies?.message}
+                                     />
+                                )}
+                            />
+                        </FormControl>
+
+                        <FormControl error={Boolean(errors.workMode)} fullWidth>
+                        <InputLabel id="work-mode-label">Work Mode</InputLabel>
+                        <Controller
+                            name="workMode"
+                            control={control}
+                            rules={{required:{value:true, message:'Please select work mode'}}}
+                            render={({field}) => (
+                                <Select
+                                    {...field}
+                                    label="Work Mode"
+                                    labelId="word-mode-label"
+                                    variant="outlined"
+                                    error={Boolean(errors.workMode)}
+                                >
+                                    <MenuItem value="On-site">On-site</MenuItem>
+                                    <MenuItem value="Remote">Remote</MenuItem>
+                                    <MenuItem value="Hybrid">Hybrid</MenuItem>
+                                </Select>
+                            )}
+                        />
+                        <FormHelperText>{errors?.workMode?.message}</FormHelperText>
+                    </FormControl>
+
+                    <FormControl fullWidth>
+                        <Controller
+                            name="location"
+                            control={control}
+                            rules={{
+                                required:{value:enteredWorkMode === 'Remote' ? false : true, message:'Please provide working location'},
+                                pattern:{value:/^[A-Za-z\s,.-]{2,100}$/, message:'Enter a valid location'}
+                            }}
+                            render={({field}) => (
+                                <TextField
+                                    {...field}
+                                    variant="outlined"
+                                    label="Location"
+                                    disabled={enteredWorkMode === 'Remote' ? true : false}
+                                    error={Boolean(errors.location)}
+                                    helperText={errors?.location?.message}
+                                />
+                            )}
+                        />
+                    </FormControl>
+                    </div>
                 </div>
-                <div className="mt-2">
-                    <label htmlFor="">Requirements</label>
-                    <textarea value={details.requirements} onChange={(event) => handleData(event)} name="requirements" id="" className="w-full p-2 rounded-sm border border-gray-400"></textarea>
-                    <label htmlFor="" className="error-label">{requirementsError}</label>
+
+                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                    <p className="font-medium text-lg">Compensation</p>
+                    <div className="flex gap-10 justify-between mt-5 w-full">
+                        <FormControl fullWidth>
+                            <Controller
+                                name="minSalary"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Please provide minimum eliible salary'},
+                                    pattern:{value:/^\d{1,8}$/, message:'Please enter a valid salary'}
+                                }}
+                                render={({field}) => (
+                                    <TextField
+                                        {...field}
+                                        variant="outlined"
+                                        label="Minimum Salary"
+                                        type="number"
+                                        error={Boolean(errors.minSalary)}
+                                        helperText={errors?.minSalary?.message}
+                                    />
+                                )}
+                            />
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <Controller
+                                name="maxSalary"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Please profide maximum eligibel salary'},
+                                    pattern:{value:/^\d{1,8}$/, message:'Please enter a valid salary'}
+                                }}
+                                render={({field}) => (
+                                    <TextField
+                                        {...field}
+                                        variant="outlined"
+                                        label="Maximum Salary"
+                                        type="number"
+                                        error={Boolean(errors.maxSalary)}
+                                        helperText={errors?.maxSalary?.message}
+                                    />
+                                )}
+                            />
+                        </FormControl>
+
+                        <FormControl fullWidth error={Boolean(errors.salaryCurrency)}>
+                            <InputLabel id="salary-currency-label">Salary Currency</InputLabel>
+                            <Controller 
+                                name="salaryCurrency"
+                                control={control}
+                                rules={{ required: { value: true, message: 'Currency is required' } }}
+                                render={({field}) => (
+                                    <Select
+                                        {...field}
+                                        label="Salary Currency"
+                                        labelId="salary-currency-label"
+                                        variant="outlined"
+                                        error={Boolean(errors.salaryCurrency)}
+                                    >
+                                        <MenuItem value="INR">INR</MenuItem>
+                                        <MenuItem value="USD">USD</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                            <FormHelperText>{errors?.salaryCurrency?.message}</FormHelperText>
+                        </FormControl>
+
+                        <FormControl fullWidth error={Boolean(errors.salaryPeriod)}>
+                            <InputLabel id="salary-period-label">Salary Period</InputLabel>
+                            <Controller
+                                name="salaryPeriod"
+                                control={control}
+                                rules={{ required: { value: true, message: 'Salary period is required' } }}
+                                render={({field}) => (
+                                    <Select
+                                        {...field}
+                                        label="Salary Period"
+                                        labelId="salary-period-label"
+                                        variant="outlined"
+                                        error={Boolean(errors.salaryPeriod)}
+                                    >
+                                        <MenuItem value="annually">Annually</MenuItem>
+                                        <MenuItem value="monthly">Monthly</MenuItem>
+                                        <MenuItem value="weekly">Weekly</MenuItem>
+                                        <MenuItem value="hourly">Hourly</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                            <FormHelperText>{errors?.salaryPeriod?.message}</FormHelperText>
+                        </FormControl>
+                    </div>
                 </div>
-                <div className="mt-2">
-                    <label htmlFor="">Responsibilities</label>
-                    <textarea value={details.responsibilities} onChange={(event) => handleData(event)} name="responsibilities" id="" className="w-full p-2 rounded-sm border border-gray-400"></textarea>
-                    <label htmlFor="" className="error-label">{responsibilitiesError}</label>
+
+                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                    <p className="font-medium text-lg">Candidate Requirements</p>
+                    <div className="flex gap-10 justify-between mt-5 w-full">
+                        <FormControl fullWidth error={Boolean(errors.jobLevel)}>
+                            <InputLabel id="job-level-id">Job Level</InputLabel>
+                            <Controller 
+                                name="jobLevel"
+                                control={control}
+                                rules={{ required: { value: true, message: 'Job level is required' } }}
+                                render={({field}) => (
+                                    <Select
+                                        {...field}
+                                        label="Job Level"
+                                        labelId="job-level-id"
+                                        variant="outlined"
+                                        error={Boolean(errors.jobLevel)}
+                                    >
+                                        <MenuItem value="Entry-level">Entry-level</MenuItem>
+                                        <MenuItem value="Mid-level">Mid-level</MenuItem>
+                                        <MenuItem value="Senior-level">Senior-level</MenuItem>
+                                        <MenuItem value="Lead">Lead</MenuItem>
+                                        <MenuItem value="Manager">Manager</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                            <FormHelperText>{errors?.jobLevel?.message}</FormHelperText>
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <Controller
+                                name="qualification"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Enter Qualifications, if nothing enter any'},
+                                    pattern: { value: /^(?!\d+$)(?!.*\d$)[A-Za-z.,()\-]+(?:\s[A-Za-z.,()\-]+)*$/, message: 'Enter valid qualifications' }
+                                }}
+                                render={({field}) => (
+                                    <TextField 
+                                        {...field}
+                                        variant="outlined"
+                                        label="Qualification"
+                                        error={Boolean(errors.qualification)}
+                                        helperText={errors?.qualification?.message}
+                                    />
+                                )}
+                            />
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <Controller 
+                                name="experienceInYears"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Enter expereince in years'},
+                                    pattern:{value:/^[0-9]+$/, message:'Please provide a valid experience'}
+                                }}
+                                render={({field}) => (
+                                    <TextField 
+                                        {...field}
+                                        variant="outlined"
+                                        label="Experience (in years)"
+                                        type="number"
+                                        error={Boolean(errors.experienceInYears)}
+                                        helperText={errors?.experienceInYears?.message}
+                                    />
+                                )}
+                            />
+                        </FormControl>
+                    </div>
                 </div>
-                <div className="mt-2">
-                    <div>
-                        <label htmlFor="">Required Skills</label>
-                        <div className="flex gap-2">
-                            <input ref={requiredSkillRef} id="required-skill" type="text" className="border border-gray-200 rounded-sm !p-2" />
-                            <button onClick={(event) => addRequiredSkill(event)} className="text-sm text-blue-500 border border-blue-500 rounded-sm px-3 py-1">Add</button>
+
+                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                    <p className="font-medium text-lg">Job Descriptions</p>
+                    <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.description)}>
+                        <Controller 
+                            name="description"
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Job Description can nob be empty'},
+                                minLength: { value: 20, message: 'Description must be at least 20 characters' }
+                            }}
+                            render={({field}) => (
+                                <Textarea
+                                 minRows={5}
+                                  {...field}
+                                  placeholder="About the job"
+                                  error={Boolean(errors.description)}
+                                  
+                                />
+                            )}
+                        />
+                        <FormHelperText>{errors?.description?.message}</FormHelperText>
+                    </FormControl>
+
+                    <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.requirements)}>
+                        <Controller 
+                            name="requirements"
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Requirements can nob be empty'},
+                                minLength: { value: 20, message: 'Requirements must be at least 20 characters' }
+                            }}
+                            render={({field}) => (
+                                <Textarea
+                                 minRows={5}
+                                  {...field}
+                                  placeholder="Requirements"
+                                  error={Boolean(errors.requirements)}
+                                  
+                                />
+                            )}
+                        />
+                        <FormHelperText>{errors?.requirements?.message}</FormHelperText>
+                    </FormControl>
+
+                    <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.responsibilities)}>
+                        <Controller 
+                            name="responsibilities"
+                            control={control}
+                            rules={{
+                                required:{value:true, message:'Responsibilities can nob be empty'},
+                                minLength: { value: 20, message: 'Responsibilities must be at least 20 characters' }
+                            }}
+                            render={({field}) => (
+                                <Textarea
+                                 minRows={5}
+                                  {...field}
+                                  placeholder="Responsibilities"
+                                  error={Boolean(errors.responsibilities)}
+                                  
+                                />
+                            )}
+                        />
+                        <FormHelperText>{errors?.responsibilities?.message}</FormHelperText>
+                    </FormControl>
+                </div>
+
+                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                    <div className="flex gap-10 w-full">
+                        <div className="w-full">
+                            <label htmlFor="">Required Skills</label>
+                            <div className="flex mt-1 gap-2">
+                            <input ref={requiredSkillRef} type="text" name="" placeholder="eg., React" className="w-full border h-[40px] p-2 rounded-md" id="" />
+                            <button onClick={addRequiredSkill} type="button" className="text-xs bg-blue-500 text-white !px-5 !py-2 rounded-md cursor-pointer">Add</button>
+                            </div>
+
+                            <div className="skills !mt-2 flex flex-wrap gap-2">
+                                {
+                                    watch('requiredSkills').map((skill: string, index: number) => {
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeRequiredSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                    })
+                                }
+                            </div>
                         </div>
-                        <div className="flex skill-preview gap-3 mt-3">
-                            {details.requiredSkills.map((skill : string) => {
-                                return <div className="flex gap-2 items-center bg-gray-200 rounded-full !px-3 !py-1">
-                                            <p className="text-xs text-gray-500">{skill}</p>
-                                            <button onClick={(event) => removeRequiredSkill(event, skill)}><i className="!text-gray-400 fa-solid fa-circle-xmark"></i></button>
-                                        </div>
-                                })
-                            }
+                        <div className="w-full">
+                            <label htmlFor="">Optional Skills</label>
+                            <div className="flex mt-1 gap-2">
+                            <input ref={optionalSkillRef} type="text" name="" placeholder="eg., GraphQL" className="w-full border h-[40px] p-2 rounded-md" id="" />
+                            <button onClick={addOptionalSkill} type="button" className="text-xs bg-blue-500 text-white !px-5 !py-2 rounded-md cursor-pointer">Add</button>
+                            </div>
+
+                            <div className="skills !mt-2 flex flex-wrap gap-2">
+                                {
+                                    watch('optionalSkills').map((skill: string, index: number) => {
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeOptionalSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                    })
+                                }
+                            </div>
                         </div>
-                        <label htmlFor="" className="error-label"></label>
-                    </div>
+                    </div>                    
                 </div>
-                <div className="mt-2">
-                    <div>
-                        <label htmlFor="">Optional Skills</label>
-                        <div className="flex gap-2">
-                            <input ref={optionalSkillRef} id="optional-skill" type="text" className="border border-gray-200 rounded-sm !p-2" />
-                            <button onClick={(event) => addOptionalSkill(event)} className="text-sm text-blue-500 border border-blue-500 rounded-sm px-3 py-1">Add</button>
-                        </div>
-                        <div className="flex skill-preview gap-3 mt-3">
-                            {details.optionalSkills.map((skill : string) => {
-                                return <div className="flex gap-2 items-center bg-gray-200 rounded-full !px-3 !py-1">
-                                            <p className="text-xs text-gray-500">{skill}</p>
-                                            <button onClick={(event) => removeOptionalSkill(event, skill)}><i className="!text-gray-400 fa-solid fa-circle-xmark"></i></button>
-                                        </div>
-                                })
-                            }
-                        </div>
-                        <label htmlFor="" className="error-label"></label>
-                    </div>
+                
+                <div className="form-group border border-gray-200 rounded-md mt-10 flex items-center justify-between !p-5">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={['DateField']}>
+                            <FormControl error={Boolean(errors.expiresAt)}>
+                                <Controller
+                                name="expiresAt"
+                                control={control}
+                                rules={{
+                                    required:{value:true, message:'Expiry date is madatory'}
+                                }}
+                                render={({field}) => (
+                                    <DateField
+                                        label="Application Deadline"
+                                        variant="outlined"
+                                        {...field}
+                                        onChange={(pickerValue) => field.onChange(pickerValue)}
+                                        value={field.value}                                    />
+                                )}
+                            />
+                            <FormHelperText>{errors.expiresAt?.message as string}</FormHelperText>
+                            </FormControl>
+                        </DemoContainer>
+                    </LocalizationProvider>
+
+                    <Button type="submit" variant="contained" loading={loading}>Post Job</Button>      
                 </div>
-                <div className="mt-4">
-                    <button type="submit" className="bg-blue-400 rounded-sm p-2 w-[120px]">Post</button>
-                </div>
+                
             </form>
         </div>
         </>

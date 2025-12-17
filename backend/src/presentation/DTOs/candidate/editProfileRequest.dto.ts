@@ -1,10 +1,9 @@
-import { StringMappingType } from "typescript"
 
 export default interface EditProfileRequestDTO {
-    id : string
+    userId : string
     name : string
-    role : string
-    about : string
+    headline : string
+    summary : string
     city : string
     district : string
     state : string

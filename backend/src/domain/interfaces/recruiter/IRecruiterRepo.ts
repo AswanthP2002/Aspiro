@@ -1,6 +1,7 @@
 import RecruiterProfileAggregated from '../../../application/DTOs/recruiter/recruiterProfileAggregatedData.dto';
-import FindCompaniesQuery from '../../../application/queries/recruiter.query';
+import FindCompaniesQuery, { AppliedRecruitersQuery } from '../../../application/queries/recruiter.query';
 import Recruiter from '../../entities/recruiter/recruiter.entity';
+import RecruiterProfileOverviewData from '../../entities/recruiter/recruiterProfilveOverviewData';
 import IBaseRepo from '../IBaseRepo';
 import { SaveRecruiter } from './createRecruiterRequest';
 
@@ -30,7 +31,6 @@ export default interface IRecruiterRepo extends IBaseRepo<Recruiter> {
   blockRecruiter(id: string): Promise<boolean>;
   unblockRecruiter(id: string): Promise<boolean>;
   deleteRecruiter(id: string): Promise<boolean>;
-  aggregateRecruiterProfile(
-    id: string
-  ): Promise<RecruiterProfileAggregated | null>; //change strict later
+  getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null>
+  getAppliedRecruitersData(query: AppliedRecruitersQuery): Promise<RecruiterProfileOverviewData[] | null>
 }

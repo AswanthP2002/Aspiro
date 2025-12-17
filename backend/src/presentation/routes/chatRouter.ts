@@ -2,7 +2,6 @@ const express = require('express');
 import ChatController from '../controllers/chatController';
 import CreateMessageUseCase from '../../application/usecases/CreateMessage.usecase';
 import MessageRepository from '../../infrastructure/repositories/MessageRepository';
-import { userAuth } from '../../middlewares/auth';
 
 function createChatRouter() {
   const chatRouter = express.Router();
@@ -15,7 +14,6 @@ function createChatRouter() {
 
   chatRouter.post(
     '/chat/send',
-    userAuth,
     chatController.sendMessage.bind(chatController)
   );
 

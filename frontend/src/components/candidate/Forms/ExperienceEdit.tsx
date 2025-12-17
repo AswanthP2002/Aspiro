@@ -4,7 +4,6 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  Input,
   InputLabel,
   MenuItem,
   Modal,
@@ -14,14 +13,14 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { editCandidateExperience } from '../../../services/candidateServices';
-import { Experience } from '../../../types/entityTypes';
+import { editUserExperience } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
+import { Notify } from 'notiflix';
 
 export default function EditExperienceForm({
   experience,
@@ -37,6 +36,7 @@ export default function EditExperienceForm({
     endDate: any;
     location: string;
     workMode: string;
+    isPresent: boolean;
   };
 
   const {
@@ -47,44 +47,22 @@ export default function EditExperienceForm({
     formState: { errors },
   } = useForm<Inputs>();
 
-  const [editableRole, setEditableRole] = useState('');
-  const [editableRoleError, setEditableRoleError] = useState('');
-  const [editableJobType, setEditableJobType] = useState('');
-  const [editableJobTypeError, setEditableJobTypeError] = useState('');
-  const [editableOrganization, setEditableOrganization] = useState('');
-  const [editableOrganizationError, setEditableOrganizationError] =
-    useState('');
   const [editableIsPresent, setEditableIsPresent] = useState(false);
-  const [editableStartDate, setEditableStartDate] = useState('');
-  const [editableStartDateError, setEditableStartDateError] = useState('');
-  const [editableEndDate, setEditableEndDate] = useState('');
-  const [editableEndDateError, setEditableEndDateError] = useState('');
-  const [editableLocation, setEditableLocation] = useState('');
-  const [editableLocationError, setEditableLocationError] = useState('');
-  const [editableLocationType, setEditableLocationType] = useState('');
-  const [editableLocationTypeError, setEditableLocationTypeError] =
-    useState('');
+
 
   useEffect(() => {
     if (experience) {
-      setEditableRole(experience.role);
-      setEditableJobType(experience.jobtype);
-      setEditableOrganization(experience.organization);
-      setEditableIsPresent(experience.ispresent);
-      setEditableStartDate(experience.startdate);
-      setEditableEndDate(experience.enddate);
-      setEditableLocation(experience.location);
-      setEditableLocationType(experience.locationtype);
-
+      
       reset({
-        role:experience.role,
-        jobType:experience.jobtype,
-        organization:experience.organization,
-        startDate:dayjs(experience.startDate),
-        endDate:dayjs(experience.enddate),
-        location:experience.location,
-        workMode:experience.locationtype
-      })
+        role: experience.jobRole,
+        jobType: experience.jobType,
+        organization: experience.organization,
+        startDate: dayjs(experience.startDate),
+        endDate: dayjs(experience.endDate),
+        location: experience.location,
+        isPresent: experience.isPresent ? true : false,
+        workMode: experience.workMode,
+      });
     }
   }, [experience]);
 
@@ -105,76 +83,33 @@ export default function EditExperienceForm({
     setEditableIsPresent((prevState) => !prevState);
   }
 
-  async function validateEditExperience(experienceId: string) {
-    const roleerror =
-      !editableRole || !/^[a-zA-Z\s]{2,50}$/.test(editableRole) || false;
-    const organizationerror =
-      !editableOrganization ||
-      !/^[a-zA-Z0-9\s\.,&-]{2,100}$/.test(editableOrganization) ||
-      false;
-    const jobtypeerror = !editableJobType || false;
-    const startdateerror = !editableStartDate || false;
-    let enddateerror = false;
-    const locationerror =
-      !location || !/^[a-zA-Z\s,]{2,100}$/.test(editableLocation) || false;
-    const locationtypeerror = !editableLocationType;
+  const currentWorkingStatus = watch('isPresent');
 
-    if (!editableIsPresent) {
-      enddateerror = !editableEndDate || false;
-    }
 
-    roleerror
-      ? setEditableRoleError('Please enter a valid job role')
-      : setEditableRoleError('');
-    jobtypeerror
-      ? setEditableJobTypeError('Please select job type')
-      : setEditableJobTypeError('');
-    organizationerror
-      ? setEditableOrganizationError('Please enter a valid organization name')
-      : setEditableOrganizationError('');
-    startdateerror
-      ? setEditableStartDateError('Please provide a starting date')
-      : setEditableStartDateError('');
-    enddateerror
-      ? setEditableEndDateError('Please provide a ending date')
-      : setEditableEndDateError('');
-    locationerror
-      ? setEditableLocationError('Please provide company location')
-      : setEditableLocationError('');
-    locationtypeerror
-      ? setEditableLocationTypeError('Please select location type')
-      : setEditableLocationTypeError('');
-
-    if (
-      roleerror ||
-      organizationerror ||
-      jobtypeerror ||
-      startdateerror ||
-      enddateerror ||
-      locationerror ||
-      locationtypeerror
-    ) {
-      console.log(
-        'checking booleans',
-        roleerror,
-        organizationerror,
-        jobtypeerror,
-        locationerror,
-        locationtypeerror,
-        startdateerror,
-        enddateerror
-      );
-      return;
-    }
-
-    await editExperience(experienceId);
-  }
-
-  async function editExperience(experienceId?: string) {
-    console.log('editable data', )
-    const {role, jobType, organization, startDate, endDate, location, workMode} = watch()
-    await editCandidateExperience(experienceId as string, role, jobType, organization, editableIsPresent, startDate, endDate, location, workMode)
+  async function editExperienceOnSubmit(data : Inputs) {
+    console.log('editable data');
+    const { role, jobType, organization, startDate, endDate, location, workMode } = data;
+    const formatedStartDate = startDate.format("YYYY-MM-DD")
+    const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
+    
+    try {
+      const result = await editUserExperience(
+      experience?._id as string,
+      role,
+      jobType,
+      organization,
+      editableIsPresent,
+      formatedStartDate,
+      formatedEndDate,
+      location,
+      workMode
+    );
     closeExpEditModal();
+    if(!result?.success){
+      Notify.failure(result?.message, {timeout:2000})
+      return
+    }
+
     Swal.fire({
       icon: 'success',
       title: 'Edited',
@@ -183,17 +118,21 @@ export default function EditExperienceForm({
       timer: 2000,
     }).then(() => {
       onEditExperience({
-        _id: experienceId,
-        role: role,
+        _id: experience?._id,
+        jobRole: role,
         organization: organization,
-        jobtype: jobType,
+        jobType: jobType,
         location: location,
-        locationtype: workMode,
-        startdate: startDate,
-        enddate: endDate,
+        workMode: workMode,
+        startDate: formatedStartDate,
+        endDate: formatedEndDate,
         ispresent: editableIsPresent,
       });
     });
+    } catch (error : unknown) {
+      Notify.failure('Something went wrong', {timeout:2000})
+
+    }
   }
 
   return (
@@ -207,7 +146,7 @@ export default function EditExperienceForm({
         <Typography variant="h6" component="h2" sx={{ textAlign: ' center' }}>
           Edit Experience
         </Typography>
-        <form onSubmit={handleSubmit(() => editExperience(experience?._id))}>
+        <form onSubmit={handleSubmit(editExperienceOnSubmit)}>
           <Box sx={{ width: '100%' }}>
             <FormControl fullWidth>
               <Controller
@@ -238,9 +177,7 @@ export default function EditExperienceForm({
           </Box>
           <Box sx={{ width: '100%', marginTop: '10px' }}>
             <FormControl fullWidth error={Boolean(errors.jobType)}>
-              <InputLabel id="employment-type-label">
-                Employment Type
-              </InputLabel>
+              <InputLabel id="employment-type-label">Employment Type</InputLabel>
               <Controller
                 name="jobType"
                 control={control}
@@ -252,11 +189,7 @@ export default function EditExperienceForm({
                 }}
                 render={({ field }) => {
                   return (
-                    <Select
-                      {...field}
-                      labelId="employment-type-label"
-                      label="Employment Type"
-                    >
+                    <Select {...field} labelId="employment-type-label" label="Employment Type">
                       <MenuItem value="Full-time">Full-time</MenuItem>
                       <MenuItem value="Part-time">Part-time</MenuItem>
                       <MenuItem value="Internship">Internship</MenuItem>
@@ -295,14 +228,15 @@ export default function EditExperienceForm({
             </FormControl>
           </Box>
           <Box sx={{ width: '100%', marginTop: '10px' }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  defaultChecked={editableIsPresent ? true : false}
-                  onChange={toggleIsPresent}
+            <Controller
+              name="isPresent"
+              control={control}
+              render={({field}) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} checked={field.value} />}
+                  label="I am currently working here"
                 />
-              }
-              label="I am currently working in this role"
+              )}
             />
           </Box>
           <Box sx={{ width: '100%', display: 'flex', gap: '20px' }}>
@@ -327,9 +261,7 @@ export default function EditExperienceForm({
                   );
                 }}
               />
-              <FormHelperText>
-                {errors.startDate?.message as string}
-              </FormHelperText>
+              <FormHelperText>{errors.startDate?.message as string}</FormHelperText>
             </FormControl>
             <FormControl fullWidth error={Boolean(errors.endDate)}>
               <Controller
@@ -337,7 +269,7 @@ export default function EditExperienceForm({
                 control={control}
                 rules={{
                   required: {
-                    value: editableIsPresent ? false : true,
+                    value: currentWorkingStatus ? false : true,
                     message: 'Dates can not be empty',
                   },
                 }}
@@ -346,7 +278,7 @@ export default function EditExperienceForm({
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={['DateField']}>
                         <DateField
-                        disabled={editableIsPresent ? true : false}
+                          disabled={currentWorkingStatus}
                           error={Boolean(errors.endDate)}
                           {...field}
                           label="End Date"
@@ -356,9 +288,7 @@ export default function EditExperienceForm({
                   );
                 }}
               />
-              <FormHelperText>
-                {errors.endDate?.message as string}
-              </FormHelperText>
+              <FormHelperText>{errors.endDate?.message as string}</FormHelperText>
             </FormControl>
           </Box>
 
@@ -404,27 +334,18 @@ export default function EditExperienceForm({
                 }}
                 render={({ field }) => {
                   return (
-                    <Select
-                      {...field}
-                      label="Work Mode"
-                      labelId="work-mode-label"
-                    >
+                    <Select {...field} label="Work Mode" labelId="work-mode-label">
                       <MenuItem value="In-office">In-office</MenuItem>
                       <MenuItem value="Remote">Remote</MenuItem>
                     </Select>
                   );
                 }}
               />
-              <FormHelperText>
-                {errors.workMode?.message as string}
-              </FormHelperText>
+              <FormHelperText>{errors.workMode?.message as string}</FormHelperText>
             </FormControl>
           </Box>
           <Box sx={{ width: '100%', marginTop: '10px' }}>
-            <button
-              type="submit"
-              className="bg-blue-400 rounded w-full p-1 text-white"
-            >
+            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">
               Edit
             </button>
           </Box>

@@ -1,14 +1,14 @@
-import { CreateEducationDTO } from '../../../application/DTOs/candidate/education.dto';
+import { CreateEducationDTO } from '../../../application/DTOs/user/education.dto';
 import AddEducationRequestDTO from '../../DTOs/candidate/addEducationRequestDTO';
 
 export default function mapToCreateEducationDTOFromRequest(
   requestDto: AddEducationRequestDTO
 ): CreateEducationDTO {
   return {
-    candidateId: requestDto.candidateId,
-    stream: requestDto.stream,
-    level: requestDto.level,
-    organization: requestDto.organization,
+    userId: requestDto.userId,
+    educationStream: requestDto.educationStream,
+    educationLevel: requestDto.educationLevel,
+    institution: requestDto.institution,
     location: requestDto.location,
     isPresent: requestDto.isPresent,
     startYear: requestDto.startYear,

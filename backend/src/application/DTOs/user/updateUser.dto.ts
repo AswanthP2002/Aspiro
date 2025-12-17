@@ -1,0 +1,36 @@
+import { Role } from "../../../domain/entities/user/User.FIX";
+import SocialLinks from "../../../domain/entities/SocialLinks";
+
+export default interface UpdateUserDTO {
+  _id?: string;
+    name?: string;
+    headline?: string;
+    summary?: string;
+    dateOfBirth?: string;
+    socialLinks?: SocialLinks[];
+    location?: {
+      city: string;
+      district: string;
+      state: string;
+      country: string;
+      pincode: string;
+    };
+    role?: Role[];
+    phone?: string;
+    email?: string;
+    googleId?: string;
+    facebookId?: string;
+    linkedinId?: string;
+    profilePicture?: {
+      cloudinaryPublicId: string;
+      cloudinarySecureUrl: string;
+    };
+    coverPhoto?: {
+      cloudinaryPublicId: string;
+      cloudinarySecureUrl: string;
+    };
+    isBlocked?: boolean;
+    isVerified?: boolean;
+    isAdmin?: boolean;
+    isRecruiter?: boolean;
+}

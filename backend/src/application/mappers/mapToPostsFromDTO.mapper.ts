@@ -1,4 +1,4 @@
-import Post from '../../domain/entities/Post.entity';
+import Post from '../../domain/entities/user/Post';
 import CreatePostDTO from '../DTOs/post.dto';
 
 export default function mapToPostFromDTO(createPostDto: CreatePostDTO): Post {

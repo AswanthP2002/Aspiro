@@ -1,9 +1,8 @@
 import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { candidateService } from "../../../services/commonServices";
 import { Controller, useForm } from "react-hook-form";
-import { addCandidateSkill } from "../../../services/candidateServices";
+import { addUserSkill } from "../../../services/userServices";
 
 export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal, onAddSkill, onRemoveSkill} : any){
     const [type, setskillType] = useState("")
@@ -56,7 +55,7 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
         const {skill, skillLevel, skillType} = watch()
                
         try {
-            const result = await addCandidateSkill(skillType, skill, skillLevel)
+            const result = await addUserSkill(skillType, skill, skillLevel)
             closeSkillsModal()
             if(result.success){
                 Swal.fire({

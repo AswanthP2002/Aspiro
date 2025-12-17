@@ -1,4 +1,4 @@
-import Post from '../../domain/entities/Post.entity';
+import Post from '../../domain/entities/user/Post';
 import IPostRepo from '../../domain/interfaces/IPostRepo';
 import BaseRepository from './baseRepository';
 import { PostDAO } from '../database/DAOs/post.dao';
@@ -33,50 +33,75 @@ export default class PostRespository
   }
 
   async getPosts(): Promise<PostsAggregated[] | null> {
+    // const result = await PostDAO.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: 'users',
+    //       localField: 'creatorId',
+    //       foreignField: '_id',
+    //       as: 'createdUserDetails',
+    //     },
+    //   },
+    //   { $unwind: '$createdUserDetails' },
+    //   {
+    //     $lookup: {
+    //       from: 'recruiters',
+    //       localField: 'creatorId',
+    //       foreignField: 'userId',
+    //       as: 'recruiterProfile',
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'candidates',
+    //       localField: 'creatorId',
+    //       foreignField: 'userId',
+    //       as: 'candidateProfile',
+    //     },
+    //   },
+    //   {
+    //     $addFields: {
+    //       profileDetails: {
+    //         $cond: [
+    //           { $gt: [{ $size: '$candidateProfile' }, 0] },
+    //           { $arrayElemAt: ['$candidateProfile', 0] },
+    //           { $arrayElemAt: ['$recruiterProfile', 0] },
+    //         ],
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       recruiterProfile: 0,
+    //       candidateProfile: 0,
+    //     },
+    //   },
+    // ]);
+
     const result = await PostDAO.aggregate([
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'creatorId',
-          foreignField: '_id',
-          as: 'createdUserDetails',
-        },
-      },
-      { $unwind: '$createdUserDetails' },
-      {
-        $lookup: {
-          from: 'recruiters',
-          localField: 'creatorId',
-          foreignField: 'userId',
-          as: 'recruiterProfile',
-        },
-      },
-      {
-        $lookup: {
-          from: 'candidates',
-          localField: 'creatorId',
-          foreignField: 'userId',
-          as: 'candidateProfile',
-        },
-      },
-      {
-        $addFields: {
-          profileDetails: {
-            $cond: [
-              { $gt: [{ $size: '$candidateProfile' }, 0] },
-              { $arrayElemAt: ['$candidateProfile', 0] },
-              { $arrayElemAt: ['$recruiterProfile', 0] },
-            ],
-          },
-        },
-      },
-      {
-        $project: {
-          recruiterProfile: 0,
-          candidateProfile: 0,
-        },
-      },
-    ]);
+      {$lookup:{
+        from:'users',
+        localField:'userId',
+        foreignField:'_id',
+        as:'userDetails'
+      }},
+      {$unwind:'$userDetails'},
+      {$lookup:{
+        from:'comments',
+        localField:'_id',
+        foreignField:'postId',
+        as:'comments',
+        pipeline:[
+          {$lookup:{
+            from:'users',
+            localField:'userId',
+            foreignField:'_id',
+            as:'userDetails'
+          }},
+          {$unwind:'$userDetails'}
+        ]
+      }}
+    ])
 
     return result;
   }

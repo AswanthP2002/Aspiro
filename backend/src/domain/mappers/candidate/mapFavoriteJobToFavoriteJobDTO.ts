@@ -1,5 +1,5 @@
-import FavoriteJobDTO from '../../../application/DTOs/candidate/favoriteJob.dto';
-import FavoriteJobs from '../../entities/candidate/favoriteJobs.entity';
+import FavoriteJobDTO from '../../../application/DTOs/candidate -LEGACY/favoriteJob.dto';
+import FavoriteJobs from '../../entities/user/favoriteJobs.entity';
 
 export default function mapFavoriteJobToFavoriteJobDTO(
   favoriteJob: FavoriteJobs

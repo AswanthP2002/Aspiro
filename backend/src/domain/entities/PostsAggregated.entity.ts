@@ -1,17 +1,19 @@
-import User, { Role } from './shared/User.entitty';
+import Comments from './user/comments.entity';
+import User from './user/User.FIX';
 
 export default interface PostsAggregated {
   _id: string;
-  content: string;
+  description: string;
   creatorId: string;
-  creatorType: Role;
   likes: string[];
-  media: {
-    url: string;
-    publidId: string;
+  media?: {
+    cloudUrl: string;
+    publicId: string;
   };
+  shares: string[];
+  views: string[];
   createdAt: string | Date;
   updatedAt: string | Date;
-  createdUserDetails: User;
-  profileDetails: any;
+  userDetails: User;
+  comments: Comments[]
 }

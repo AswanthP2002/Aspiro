@@ -1,5 +1,5 @@
 import { JobApplicationDTO } from '../../../presentation/controllers/dtos/candidate/jobApplicationDTO';
-import JobApplication from '../../entities/candidate/jobApplication.entity';
+import JobApplication from '../../entities/user/jobApplication.entity';
 
 export function createJobApplicationFromDTO(
   dto: JobApplicationDTO

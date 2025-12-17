@@ -5,7 +5,7 @@ import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCirclePlus} from 'react-icons/fa6'
 import { logout } from "../../../redux-toolkit/userAuthSlice"
 import Swal from "sweetalert2"
-import { candidateLogout, getNotifications } from "../../../services/candidateServices"
+import { userLogout, getNotifications } from "../../../services/userServices"
 import { useContext, useEffect, useState } from "react"
 import { appContext } from "../../../context/AppContext"
 import { Notify } from "notiflix"
@@ -18,7 +18,7 @@ export default function Header(){
     const [notifications, setNotifications] = useState<any[]>([])
     // let notificationstest : any[] = []
     const dispatch = useDispatch()
-    const navigateTo = useNavigate()
+    const navigate = useNavigate()
     const user = useSelector((state : any) => {
         return state.userAuth.user
     })
@@ -26,26 +26,42 @@ export default function Header(){
         return state.userAuth.userRole
     })
     
+    
 
     console.log('This is loged user', user)
 
-    async function logoutCandidate(){
-        const logoutResult = await candidateLogout(dispatch, navigateTo)
-        dispatch(logout())
+    async function logoutUser(){
         Swal.fire({
-            icon:'success',
-            title:logoutResult.message,
-            showConfirmButton:false,
-            showCancelButton:false,
-            timer:2000
-        }).then(() => navigateTo('/'))
+            icon:'info',
+            title:'Logout?',
+            text:'Are your sure your want to logout?',
+            showConfirmButton:true,
+            confirmButtonText:'Yes',
+            showCancelButton:true,
+            cancelButtonText:'No'
+        }).then(async (result) => {
+            if(result?.isConfirmed){
+                const logoutResult = await userLogout(dispatch, navigate)
+                dispatch(logout())
+                Swal.fire({
+                    icon:'success',
+                    title:'Logout',
+                    text:'You have successfully logged out',
+                    showConfirmButton:false,
+                    showCancelButton:false,
+                    timer:1500
+                }).then(() => navigate('/'))
+            }else{
+                return
+            }
+        })
+        
+        
     }
 
     function goToProfile(){
-        if(userRole === 'candidate'){
-            navigateTo('/candidate/profile/personal')
-        }else if(userRole === 'recruiter'){
-            navigateTo('/recruiter/profile/overview')
+        if(userRole === 'user'){
+            navigate('/profile/personal')
         }else{
             Notify.failure('Something went wrong', {timeout:1400})
         }
@@ -64,24 +80,44 @@ export default function Header(){
     }, [user])
     
     return(
-        <div className="w-full sticky top-0 left-0 bg-white shadow z-59">
-            <div className="w-full px-2 md:px-20 py-3 shadow-sm">
-                <div className="navbar flex items-center justify-between gap-10">
+        <div className="w-full sticky top-0 left-0 bg-white border-b border-gray-200 z-59">
+            <div className="flex items-center justify-between p-5 w-full md:px-20">
+                <div className="brand">
+                    <p className="text-2xl font-light">Aspiro</p>
+                </div>
+                <div className=" hidden md:block">
+                    <ul className="flex gap-8 text-sm text-gray-700">
+                    <li className="cursor-pointer">Expolore</li>
+                    <li className="cursor-pointer">Find Opportunities</li>
+                    <li className="cursor-pointer">Network</li>
+                    <li className="cursor-pointer">Recruiters</li>
+                </ul>
+                </div>
+                <div>
+                    <button onClick={() => navigate('/login')} className="border border-blue-500 rounded-md text-xs text-blue-500 px-5 py-2">Sign In</button>
+                </div>
+            </div>
+            {/* <div className="w-full px-2 md:px-20 py-5 shadow-sm">
+                <div className="navbar bg-green-200 flex items-center justify-between gap-10">
                     <div className="brand">
                         <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
-                    </div>
+                    </div> */}
                     {/* if user exist then show the authorized navigations */}
                     
-                    {
+                    {/* {
                         user
                             ? <>
-                                <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
+                                <div className="border border-gray-300 w-100 relative rounded-full !py-2">
+                                    <input type="text" className="w-full !ps-10 !pe-3" placeholder="Search for people" />
+                                    <i className="fa-solid fa-search absolute absolute left-3 bottom-3 !text-gray-400"></i>
+                                </div> */}
+                                {/* <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
                                     <i className="absolute top-1 fa-solid fa-search !text-sm"></i>
                                     <input type="text" placeholder="search in community" className="w-full !px-5 text-sm" />
                                     <button type="button" className="text-xs bg-white w-[20px] rounded">/</button>
-                                </div>
+                                </div> */}
 
-                                <div className="flex items-center gap-3">
+                                {/* <div className="flex items-center gap-3">
                                     <button className="relative"><span className="absolute bg-red-500 !w-[7px] !h-[7px] rounded-full"></span> <IoMdNotificationsOutline size={20} /></button>
                                     <button onClick={openCreatePostModal}><FaCirclePlus size={30} color="blue" /></button>
                                     <div className="group relative">
@@ -91,13 +127,13 @@ export default function Header(){
                                                 <p className="text-sm">Profile</p>
                                             </div>
                                             <div className="mt-2">
-                                                <span onClick={() => logoutCandidate()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
+                                                <span onClick={logoutUser} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                              </>
-                            : <>
+                              </> */}
+                            {/* : <>
                                  <div className="flex items-center gap-10">
                                  <ul className="nav-links flex gap-10">
                                     <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
@@ -106,12 +142,12 @@ export default function Header(){
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
                                     <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
                                 </ul>
-                                <button onClick={() => navigateTo('/candidate/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
+                                <button onClick={() => navigate('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
                                 </div>
                               </>
-                    }
-                </div>
-            </div>
+                    } */}
+                {/* </div>
+            </div> */}
         </div>
     )
 }

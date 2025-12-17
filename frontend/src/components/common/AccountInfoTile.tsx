@@ -6,7 +6,7 @@ export function TileRegisterAsCandidate(){
     return(
         <div className="hover:shadow-lg transition-all duration-200 ease-in-out hover:-translate-y-1 tile p-10 relative card rounded-lg w-full bg-gradient-to-br from-blue-500 to-indigo-600">
             <div className="contents w-full h-full">
-                <p className="mt-5 title text-2xl font-semibold text-white">Join as a Candidate</p>
+                <p className="mt-5 title text-2xl font-semibold text-white">Join as a User</p>
                 <p className="mt-3 text-base text-white">lorem lorem lorem lorem lore</p>
                 <Link to={'/register'}>
                 <button className="mt-5 btn-register bg-white rounded-sm text-blue-400 text-xs p-2">Register now <i className="ms-2 fa-solid fa-arrow-right"></i></button>

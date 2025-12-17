@@ -1,6 +1,6 @@
-import Candidate from '../candidate/candidates.LEGACY';
-import Resume from '../candidate/resume.entity';
-import Job from '../job.entity';
+import Candidate from '../user/candidates.LEGACY';
+import Resume from '../user/resume.entity';
+import Job from './job.entity';
 import Recruiter from './recruiter.entity';
 
 export default interface ApplicationDetailsAggregated {

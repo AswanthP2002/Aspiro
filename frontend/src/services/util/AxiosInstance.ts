@@ -1,7 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
 import store from '../../redux-toolkit/store';
-import { candidateLogout } from '../candidateServices';
 import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
 import { refreshAccessToken } from '../commonServices';
 
@@ -31,9 +30,12 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
     }
 
     if(customeRequest.sendAuthToken){
-        const token = JSON.parse(localStorage.getItem('userToken') || "")
-        console.log('This is from browser token', token)
-        customeRequest.headers.Authorization = `Bearer ${token}`
+        const token = store.getState().userAuth.userToken
+        if (token) {
+            customeRequest.headers.Authorization = `Bearer ${token}`
+        }else{
+            customeRequest.headers.Authorization = `Bearer ${token}`
+        }
     }
     
     //legacy : no more needed since authentication is centralized now
@@ -59,19 +61,34 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const {response} = error
+        console.log('---checking response from the server --- inspect error code ---', response)
         const originalRequest = error.config
         if(response && response.status === 500){
             Swal.fire({
                 icon:'error', 
-                title:'Error', 
-                text:'Internal server error, please try again after some time'
+                title:'Server Error', 
+                text:'We encountered an unexpected issue while processing your request. This is usually a temporary problem on our side',
+                showConfirmButton:true,
+                confirmButtonText:'Retry',
+                showCancelButton:true,
+                cancelButtonText:'Home',
+                allowOutsideClick:false,
+                allowEscapeKey:false
+            }).then((result) => {
+                if(result.isConfirmed){
+                    window.location.reload()
+                    return
+                }else{
+                    window.location.replace('http://localhost:5173')
+                }
             })
         }else if(response && response.status === 406){
-            Swal.fire({
-                icon:'error',
-                title:'Not Acceptable',
-                text:'Access denied, No token provided or token malformed'
-            })
+            window.location.replace('http://localhost:5173/token/expired')
+            // Swal.fire({
+            //     icon:'error',
+            //     title:'Not Acceptable',
+            //     text:'Access denied, No token provided or token malformed'
+            // })
         }else if(response && response.status === 403){
             Swal.fire({
                 icon:'info',
@@ -81,38 +98,40 @@ axiosInstance.interceptors.response.use(
                 showCancelButton:false,
                 allowOutsideClick:false,
                 timer:4000
-            }).then(async () => {
-                const dispatch = store.dispatch
-                await candidateLogout(dispatch,() => {
-                    window.location.replace('http://localhost:5173/login')
-                })
+            })//.then(async () => {
+            //     const dispatch = store.dispatch
+            //     await userLogout(dispatch,() => {
+            //         window.location.replace('http://localhost:5173/login')
+            //     })
 
-            })
-        }else if(response && response.status === 401 && !originalRequest?._retry) {//automatically retrying request after refreshing the token
+            // })
+        }else if(
+            response && 
+            response.status === 401 &&
+            (response?.data?.errors?.code === 'ACCESS_TOKEN_EXPIRED' || response?.data?.errors?.code === 'INVALID_ACCESS_TOKEN') &&
+            !originalRequest?._retry
+        ) {//automatically retrying request after refreshing the token
             originalRequest._retry = true
 
-            const requestUrl : string = originalRequest.url
-
-            //get new access token
-            const newAccessToken = await refreshAccessToken()
-
-            //set new access token
-            store.dispatch(tokenRefresh({userToken:newAccessToken}))
-
-            //legacy code no more needed
-        
-            // if(requestUrl.startsWith('/candidate')){
-            //     const accessToken = await refreshCandidateToken()
-            //     store.dispatch(tokenRefresh({token:accessToken}))
-            // }else if(requestUrl.startsWith('/recruiter')){
-            //     const accessToken = await refreshRecruiterToken()
-            //     store.dispatch(recruiterTokenRefresh({token:accessToken}))
-            // }else if(requestUrl.startsWith('/admin')){
-            //     const accessToken = await refreshAdminToken()
-            //     store.dispatch(adminTokenRefresh({token:accessToken}))
-            // }
-            axiosInstance(originalRequest)
-
+            try {
+                //get new access token
+                const newAccessToken = await refreshAccessToken()
+                
+                if (newAccessToken) {
+                    //set new access token in Redux store
+                    store.dispatch(tokenRefresh({userToken:newAccessToken}))
+                    // Update the header of the original request and retry it
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return axiosInstance(originalRequest); // Return the promise of the retried request
+                }
+            } catch (refreshError) {
+                // Handle refresh token failure (e.g., redirect to login)
+                return Promise.reject(refreshError);
+            }
+        }else if(response && response.status === 401){
+            window.location.replace('http://localhost:5173/token/expired')
+        }else if(response && response.status === 404){
+            window.location.replace('http://localhost:5173/404')
         }
 
         return Promise.reject(error)

@@ -1,6 +1,8 @@
 import { AxiosError } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import Swal from "sweetalert2"
+import { Notify } from "notiflix"
+import { logout } from "../redux-toolkit/userAuthSlice"
 
 
 export const adminLogin = async (email : string, password : string) => {
@@ -23,14 +25,19 @@ export const adminLogin = async (email : string, password : string) => {
     }
 }
 
-export const logoutAdmin = async () => {
+export const logoutAdmin = async (dispatch: Function, navigate: Function) => {
     try {
         const result = await axiosInstance.post('/admin/logout', null, {
             sendCookie:true,
             sendAuthToken:true
         } as AxiosRequest)
 
-        return result.data
+        Notify.info(result?.data?.message, {timeout:1500})
+
+        setTimeout(() => {
+            dispatch(logout())
+            navigate('/admin/login')
+        }, 1500);
     } catch (error : unknown) {
         const err = error as AxiosError
         if(err.response && err.response.status < 500) return err.response.data
@@ -242,35 +249,42 @@ export const deleteCompany = async (companyId : string) => { //delete / close co
     }
 }
 
-export const getCandidates = async (search: string, page: number, sort : string, filter : any) => {
+export const getUsers = async (search: string, page: number, sort : string, filter : any) => {
     try {
-        const response = await axiosInstance.get('/admin/candidates/data', {
+        const response = await axiosInstance.get('/admin/users', {
             params:{search, page, sort, filter:JSON.stringify(filter)},
             sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
-        console.log('Error occured while geting candidate list', err)
+        // Log the error for debugging purposes
+        console.log('Error occurred while getting user list', error);
+        // Re-throw the error to be handled by the calling function's catch block
+        // or the global Axios error interceptor.
+        throw error;
     }
 }
 
-export const getCandidateDetails = async (candidateId : any) => {
+export const getUserDetails = async (userId : any) => {
     try {
-        const response = await axiosInstance.get('/admin/candidate/details', {
-            params:{candidateId},
+        const response = await axiosInstance.get(`/admin/users/details/${userId}`, {
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+       const err = error as AxiosError
+
+       if(err.response && err.response.status < 500 && err.response.status !== 403){
+        throw error
+       }
+    }
+}
+
+export const userBlock = async (userId : string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/user/block/${userId}`, null, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -278,47 +292,15 @@ export const getCandidateDetails = async (candidateId : any) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
-        console.log('Error occured while geting candidate details', err)
-    }
-}
-
-export const candidateBlock = async (candidateId : string) => {
-    try {
-        const response = await axiosInstance.patch(`/admin/candidate/block/${candidateId}`, null, {
-            sendAuthToken:true
-        } as AxiosRequest)
-
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+        if(err.response && err.response.status < 500  && err.response.status !== 403) throw error
 
         console.log('Error occured while blocking the candidate', err)
     }
 }
 
-export const candidateUnblock = async (candidateId : string) => {
+export const userUnblock = async (userId : string) => {
     try {
-        const response = await axiosInstance.patch(`/admin/candidate/unblock/${candidateId}`, null, {
+        const response = await axiosInstance.patch(`/admin/user/unblock/${userId}`, null, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -326,17 +308,29 @@ export const candidateUnblock = async (candidateId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
         }
 
         console.log('Error occured while unblocking the candidate', err)
+    }
+}
+
+export const deleteUser = async (userId: string) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/user/${userId}`, 
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 
@@ -346,5 +340,62 @@ export const refreshAdminToken = async () => {
         return response.data?.accessToken
     } catch (error : unknown) {
         console.log('Error occured while refreshing admin access token', error)
+    }
+}
+
+export const loadRecruiterApplications = async (search: string, profileStatus: string) => {
+    try {
+        const response = await axiosInstance.get('/admin/recruiter/applications', {
+            params:{search, profileStatus},
+            sendAuthToken:true
+        } as AxiosRequest
+
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const rejectRecruiterApplication = async (recruiterId: string, reason: string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/recruiter/application/${recruiterId}`, 
+            {reason},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const approveRecruiterApplication = async (recruiterId: string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/recruiter/application/approve/${recruiterId}`, {},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }

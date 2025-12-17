@@ -10,6 +10,7 @@ export default function exceptionhandle(
 ) {
   let responseMessage: string;
   let code: number;
+  let errors: any
 
   console.error(err.stack);
 
@@ -41,25 +42,35 @@ export default function exceptionhandle(
       break;
     case 'WRONG_PASSWORD':
       responseMessage = 'Incorrect password';
-      code = StatusCodes.BAD_REQUEST;
+      code = StatusCodes.UNAUTHORIZED;
       break;
 
     //jwt based errors
     case 'TokenExpiredError' :
       responseMessage = 'Your session has expired, please re login'
       code = StatusCodes.UNAUTHORIZED
+      errors = {
+        code:'ACCESS_TOKEN_EXPIRED',
+        message:'Access Token Expired, required refresh'
+      }
       break;
     
     case 'JsonWebTokenError':
-      responseMessage = 'Invalid token, please re login again'
-      code = StatusCodes.BAD_REQUEST
-
+      console.log('json web token error executed') //debugging
+      responseMessage = 'Invalid token'
+      code = StatusCodes.UNAUTHORIZED
+      errors = {
+        code:'INVALID_ACCESS_TOKEN',
+        message:'Invalid toke or jwt token malformed'
+      }
+      break;
     default:
+      console.log('Internal server error executed') // debugging
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;
   }
 
-  res.status(code).json({ success: false, message: responseMessage });
+  res.status(code).json({ success: false, message: responseMessage, errors });
   return;
 }

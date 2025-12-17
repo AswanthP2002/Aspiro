@@ -1,7 +1,6 @@
-import Notifications from '../entities/notifications.entity';
+import Notification from '../entities/notification.entity';
 import IBaseRepo from './IBaseRepo';
 
-export default interface INotificationRepo extends IBaseRepo<Notifications> {
-  getNotifications(userId: string): Promise<Notifications[] | null>;
-  updateReadStatus(id: string): Promise<Notifications | null>;
+export default interface INotificationRepo extends IBaseRepo<Notification> {
+  getNotificationsByUserId(userId: string): Promise<Notification[] | null>
 }

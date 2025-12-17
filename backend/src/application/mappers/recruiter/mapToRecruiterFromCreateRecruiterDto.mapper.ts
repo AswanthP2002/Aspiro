@@ -5,7 +5,6 @@ export default function mapToRecruiterFromCreateRecruiterDTO(
   createRecruiterDto: CreateRecruiterDTO
 ): Recruiter {
   return {
-    name: createRecruiterDto.name,
-    userId: createRecruiterDto.userId,
+    ...createRecruiterDto
   };
 }

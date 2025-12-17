@@ -1,5 +1,5 @@
-import { FindCandidatesDTO } from '../../DTOs/candidate/candidate.dto';
-import CandidatePaginatedDTO from '../../DTOs/candidate/candidatePaginated.dto';
+import { FindCandidatesDTO } from '../../DTOs/candidate -LEGACY/candidate.dto';
+import CandidatePaginatedDTO from '../../DTOs/candidate -LEGACY/candidatePaginated.dto';
 
 export default interface IGetCandidatesUseCase {
   execute(

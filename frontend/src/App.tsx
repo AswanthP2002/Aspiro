@@ -1,64 +1,117 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import LoginPage from './pages/admin/Login/Login';
-import CandidateRegister from './pages/candidate/Register/Register';
+// import LoginPage from './pages/admin/Login/Login';
+import CandidateRegister from './pages/user/Register/Register';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
-import VerificationPage from './pages/common/Verification/Verification';
-import CandidateLogin from './pages/candidate/Login/Login';
+import VerificationPage from './pages/user/Verification/Verification';
+import CandidateLogin from './pages/user/Login-FIX/Login';
 import ProfileLayout from './pages/candidate/Profile-Layout';
 import ProfilePersonal from './pages/candidate/Profile-Personal/Personal';
 import StoreDetails from './pages/candidate/Basic Details Storing Page/StoreDetails';
-import AuthSuccess from './components/common/AuthSuccessGoogle';
-import RecruiterLogin from './pages/recruiter/Login/Login';
-import RecruiterRegister from './pages/recruiter/Register/Register';
-import RecruiterVerificationPage from './pages/recruiter/Verification';
+// import AuthSuccess from './components/common/AuthSuccessGoogle';
+// import RecruiterLogin from './pages/recruiter/Login/Login';
+// import RecruiterRegister from './pages/recruiter/Register/Register';
+// import RecruiterVerificationPage from './pages/recruiter/Verification';
 import RecruiterLayouts from './pages/recruiter/Layouts';
 import RecruiterHome from './pages/recruiter/Home/Home';
 import RecruiterProfileLayout from './pages/recruiter/ProfileLayout';
 import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Personal';
 import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute';
 import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form';
+import MyJobs from './pages/recruiter/Profile-Personal/MyJobs';
 import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob';
 import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard/Dashboard';
-import Companies from './pages/admin/Company-list/Companies';
-import Candidates from './pages/admin/Candidate-list/Candidate-list';
-import CandidateDetails from './pages/admin/CandidateDetails/CandidateDetails';
-import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
+// import Companies from './pages/admin/Company-list/Companies';
+import Users from './pages/admin/Users-List/Users';
+import CandidateDetails from './pages/admin/CandidateDetails/UserDetails';
+// import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
 import Jobs from './pages/admin/Job-list/JobList';
-import JobDetails from './pages/admin/JobDetails/JobDetails';
+// import JobDetails from './pages/admin/JobDetails/JobDetails';
 import ExperiencePage from './pages/candidate/Skills & Experience/SkillsExperience';
 import JobListing from './pages/candidate/Job-list-details/JobList';
-import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
+// import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
 import DocumentsPage from './pages/candidate/Documents Page/Documents';
-import JobApplyPage from './pages/candidate/Job-apply/Apply';
+// import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsManage';
 import AdminProtectedRoutes from './components/admin/AdminProtectedRoutes';
-import AdminLogedIn from './components/admin/AdminLogedInRoute';
-import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn';
+// import AdminLogedIn from './components/admin/AdminLogedInRoute';
+// import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn';
 //import CandidateProtectedRoute from './components/candidate/CandidateProtectedRoutes';
 import SavedJobs from './pages/SavedJobs/SavedJobs';
 import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList';
-import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
-import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList';
-import MyApplications from './pages/candidate/My-applications/Applications';
+// import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
+// import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList';
+// import MyApplications from './pages/candidate/My-applications/Applications';
 import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication';
 import NotificationPage from './pages/candidate/Notification-Page/Notifications';
 import Feed from './pages/common/Feed/Feed';
-import SidebarLayout from './pages/common/SidebarLayout';
-import Chat from './pages/common/Chat/Chat';
-import ArcLoader from './components/candidate/Loader';
-import CircularSpinner from './components/common/CircularSpinner';
-import InfinitySpinner from './components/common/InfinitySpinner';
+import CommonLayout from './pages/common/SidebarLayout';
+// import Chat from './pages/common/Chat/Chat';
+// import ArcLoader from './components/candidate/Loader';
+// import CircularSpinner from './components/common/CircularSpinner';
+// import InfinitySpinner from './components/common/InfinitySpinner';
 import PublicRoute from './components/route-components/PublicRoute';
-import CandidateProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
+// import CandidateProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
 import NotFoundPage from './pages/shared/NotFound';
 import AdminLoginPage from './pages/admin/Login/Login';
+import UserProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
+import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
+import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
+import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
+import EditJobForm from './pages/recruiter/EditJob/EditJob';
+
+import SocketProvider from './context/SocketContext';
+import ForgotPasswordPage from './pages/user/Forgot-Password/ForgotPassword';
+import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
+import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
+import PasswordResetSuccessPage from './pages/user/Forgot-Password/PasswordResetSuccessPage';
+import UserPublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
+import PostProvider from './context/PostContext';
+import RecruiterApplications from './pages/admin/Recruiter-applications/RecruiterApplications';
+import RecruiterApplicationDetailsPage from './pages/admin/Recruiter-applications/RecruiterApplicationDetailsPage';
+import { useEffect } from 'react';
+import { Notify } from 'notiflix';
+import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
+import JobApplyPage from './pages/candidate/Job-apply/Apply';
+import MyApplications from './pages/candidate/My-applications/Applications';
+import ChatPage from './pages/common/Chat/Chat';
 
 function App() {
+
+  // useEffect(() => {
+  //   const handleNetworkConnectionLoss = () => {
+  //     window.location.href = '/network-error'
+  //   }
+
+  //   window.addEventListener('offline', handleNetworkConnectionLoss)
+
+  //   return () => {
+  //     window.removeEventListener('offline', handleNetworkConnectionLoss)
+  //   }
+  // }, [])
+
+
+  // useEffect(() => {
+  //   const handleOnline = () => Notify.success('Back online!', {timeout:2000})
+  //   window.addEventListener('online', handleOnline)
+
+  //   const timer = setTimeout(() => {
+  //     window.location.reload()
+  //   }, 2000)
+
+  //   return () => {
+  //     window.removeEventListener('online', handleOnline)
+  //     clearTimeout(timer)
+  //   }
+  // }, [])
+
+
   return (
     <BrowserRouter>
+      <SocketProvider>
+        <PostProvider>
       <Routes>
         <Route path='/' element={<Layouts />}>
           <Route index element={
@@ -67,25 +120,46 @@ function App() {
             </PublicRoute>
           } />
 
-          <Route path='/feed' element={<SidebarLayout />}>
-            <Route index element={<Feed />} />
+          <Route element={<UserProtectedRoute />}>
+            <Route element={<CommonLayout />}>
+              <Route path='/feed' element={<Feed />} />
+              <Route path='/jobs' element={<JobListing />} />
+              <Route path='/jobs/:id' element={<JObDetailsCandidateSide />} />
+              <Route path='/jobs/:id/apply' element={<JobApplyPage />} />
+              <Route path='/notifications' element={<NotificationPage />} />
+              <Route path='/users/:userId' element={<UserPublicProfile />} />
+              <Route path='/chats' element={<ChatPage />} />
+            </Route>
           </Route>
 
-          <Route path='/candidate/profile' element={<CandidateProtectedRoute />}>
+          <Route path='/profile' element={<UserProtectedRoute />}>
             <Route element={<ProfileLayout />}>
               <Route path='personal' index element={<ProfilePersonal />} />
               <Route path='documents' element={<DocumentsPage />} />
-              <Route path='experience' element={<ExperiencePage />} />
+              <Route path='skills-experience' element={<ExperiencePage />} />
+              <Route path='recruiter/register' element={<RecruiterRegisterPage />} />
+              <Route path='recruiter/post-job' element={<PostAJobForm />} />
+              <Route path='recruiter/post-a-job' element={<PostAJobForm />} />
+              <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
+              <Route path='recruiter/my-jobs' element={<MyJobs />} />
+              <Route path='recruiter/edit-job' element={<EditJobForm />} />
+              <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
+              <Route path='favorites' element={<SavedJobs />} />
+              <Route path='my-applications' element={<MyApplications />} />
             </Route>
           </Route>
         </Route>
 
         <Route path='/verify' element={<VerificationPage />} />
-        
+        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/password-reset-link/send' element={<ResetLinkSendPage />} />
+        <Route path='/password-reset' element={<PasswordResetPage />} />
+        <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
+
         {/* Candidate specific routes not applicable header & sidebar & footer */}
-        <Route path='/candidate/login' element={<CandidateLogin />} />
-        <Route path='/candidate/register' element={<CandidateRegister />} />
-        <Route path='/candidate/store/details' element={<StoreDetails />} />
+        <Route path='/login' element={<CandidateLogin />} />
+        <Route path='/register' element={<CandidateRegister />} />
+        <Route path='/store/details' element={<StoreDetails />} />
 
         {/* Recruiter specific routes not applicable header & sidebar & footer */}
 
@@ -93,15 +167,20 @@ function App() {
         {/* Admin specific routes */}
         <Route path='/admin/login' element={<AdminLoginPage />} />
         <Route path='/admin' element={<AdminLayout />}>
+          <Route element={<AdminProtectedRoutes />}>
           <Route path='dashboard' element={<Dashboard />} />
-          <Route path='candidates' element={<Candidates />} />
-          <Route path='candidate/details/:id' element={<CandidateDetails />} />
+          <Route path='recruiter/applications' element={<RecruiterApplications />} />
+          <Route path='recruiter/applications/details' element={<RecruiterApplicationDetailsPage />} />
+          <Route path='users' element={<Users />} />
+          <Route path='users/details/:id' element={<CandidateDetails />} />
+          <Route path='jobs' element={<Jobs />} />
+          </Route>
         </Route>
 
 
         {/* Recruiter login */}
-        <Route path='/recruiter/login' element={<RecruiterLogin />} />
-        <Route path='/recruiter/register' element={<RecruiterRegister />} />
+        {/* <Route path='/recruiter/login' element={<RecruiterLogin />} />
+        <Route path='/recruiter/register' element={<RecruiterRegister />} /> */}
 
         <Route path="/recruiter" element={<RecruiterLayouts />}>
            <Route index element={<RecruiterHome />} />
@@ -113,6 +192,7 @@ function App() {
                 index
                 element={<RecruiterProfilePersonal />}
               />
+              <Route path="my-jobs" element={<MyJobs />} />
               <Route path="post-a-job" element={<PostAJobForm />} />
               <Route
                 path="applications/:jobId"
@@ -131,11 +211,15 @@ function App() {
         </Route>
 
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
+        <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
 
-        
+        <Route path='/test' element={<RecruiterRegisterPage />} />
+
         <Route path='*' element={<NotFoundPage />} />
 
       </Routes>
+      </PostProvider>
+      </SocketProvider>
     </BrowserRouter>
     // <BrowserRouter>
     //   <Routes>

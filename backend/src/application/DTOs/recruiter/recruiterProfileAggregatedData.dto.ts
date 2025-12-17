@@ -1,5 +1,4 @@
-import Job from '../../../domain/entities/job.entity';
-import SocialLinks from '../../../domain/entities/socialLinks.entity';
+import SocialLinks from '../../../domain/entities/SocialLinks';
 
 export default interface RecruiterProfileAggregated {
   _id?: string;

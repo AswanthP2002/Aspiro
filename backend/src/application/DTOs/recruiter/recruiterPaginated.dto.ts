@@ -1,8 +1,8 @@
-import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
+import { RecruiterDTO } from './recruiter.dto';
 
 export default interface RecruiterPaginatedDTO {
-  recruiters: Recruiter[];
+  recruiters: RecruiterDTO[];
   page: number;
   totalPages: number;
-  currentSort: any;
+  currentSort: {[key: string]:number};
 }

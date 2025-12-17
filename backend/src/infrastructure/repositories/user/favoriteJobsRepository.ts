@@ -1,0 +1,72 @@
+import { Db } from 'mongodb';
+import Favorites from '../../../domain/entities/user/favorites.entity';
+import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
+import IFavoriteJobs from '../../../domain/interfaces/user/IFavoriteJobRepo';
+import BaseRepository from '../baseRepository';
+import FavoriteJobs from '../../../domain/entities/user/favoriteJobs.entity';
+import mongoose from 'mongoose';
+import { FavoriteJobsDAO } from '../../database/DAOs/user/faovriteJobs.dao';
+import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
+
+export default class FavoriteJobsRepsitory extends BaseRepository<FavoriteJobs> implements IFavoriteJobsRepo {
+  constructor() {
+    super(FavoriteJobsDAO);
+  }
+  // db : Db
+  // collection : string
+  // constructor(db : Db){
+  //     super(db, 'favoriteJobs')
+  //     this.db = db
+  //     this.collection = 'favoriteJobs'
+  // }
+
+  async getFavoriteJobWithDetails(candidateId: string): Promise<FavoriteJobsAggregated[] | null> {
+    const result = await FavoriteJobsDAO.aggregate([
+      { $match: { candidateId: new mongoose.Types.ObjectId(candidateId) } },
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'jobId',
+          foreignField: '_id',
+          as: 'jobDetails',
+        },
+      },
+      { $unwind: '$jobDetails' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'jobDetails.recruiterId',
+          foreignField: '_id',
+          as: 'postedBy',
+        },
+      },
+      { $unwind: '$postedBy' },
+      {
+        $lookup: {
+          from: 'recruiters',
+          localField: 'postedBy._id',
+          foreignField: 'userId',
+          as: 'recruiterProfile',
+        },
+      },
+      { $unwind: '$recruiterProfile' },
+    ]);
+
+    return result;
+  }
+
+  async deleteFavoriteJob(jobId: string, candidateId: string): Promise<void> {
+    const result = await FavoriteJobsDAO.deleteOne({
+      candidateId: new mongoose.Types.ObjectId(candidateId),
+      jobId: new mongoose.Types.ObjectId(jobId),
+    });
+    console.log('result object', result);
+  }
+
+  async findWithCandidateId(id: string): Promise<FavoriteJobs[] | null> {
+    const result = await FavoriteJobsDAO.find({
+      candidateId: new mongoose.Types.ObjectId(id),
+    });
+    return result;
+  }
+}

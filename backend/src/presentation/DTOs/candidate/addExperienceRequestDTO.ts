@@ -1,11 +1,11 @@
 export default interface addExperienceRequestDTO {
-    candidateId : string
-    role : string
-    jobtype : string
+    userId : string
+    jobRole : string
+    jobType : string
     organization : string
-    startdate : string
-    ispresent : boolean
-    enddate : string //for checking
+    startDate : string
+    isPresent : boolean
+    endDate? : string //for checking
     location : string
-    locationtype : string
+    workMode : string
 }

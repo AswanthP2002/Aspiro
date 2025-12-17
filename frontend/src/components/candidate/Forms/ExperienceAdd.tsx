@@ -1,13 +1,12 @@
 import { Modal, Box, Typography, FormControl, TextField, InputLabel, Select, MenuItem, FormHelperText, Checkbox, FormControlLabel } from "@mui/material";
-import { useState } from "react";
 import Swal from "sweetalert2";
-import { addCandidateExperience } from "../../../services/candidateServices";
-import { Dayjs } from "dayjs";
+import { addUserExperience } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateField } from "@mui/x-date-pickers/DateField";
+import { Dayjs } from "dayjs";
 
 export default function AddExperienceForm({experiencemodalopen, closeModal, onAddExperience} : any){
   
@@ -15,84 +14,31 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
     role:string
     jobType:string
     organization:string
-    startDate:any
+    startDate:Dayjs
     endDate : any
     location:string
     workMode : string
+    isPresent: boolean 
   }
 
   const {watch, reset, control, handleSubmit, formState:{errors}} = useForm<Inputs>({
-
+    defaultValues:{
+      role:'',
+      jobType:'',
+      organization:'',
+      location:'',
+      workMode:'',
+      isPresent:false
+    }
   })
-  
-  const [role, setrole] = useState("")
-    // const [jobtype, setjobtype] = useState("")
-    // const [organization, setorganization] = useState("")
-    const [ispresent, setispresent] = useState(false)
-    // const [startdate, setstartdate] = useState("")
-    // const [enddate, setendate] = useState("")
-    // const [location, setlocation] = useState("")
-    // const [locationtype, setlocationtype] = useState("")
-    const [roleError, setrolerror] = useState("")
-    const [jobeTypeError, setjobtypeerror] = useState("")
-    const [startdateError, setstartdateerror] = useState("")
-    const [endDateError, setenddateerror] = useState("")
-    const [organizationError, setorganizationerror] = useState("")
-    const [locationError, setlocationerror] = useState("")
-    const [locationTypeError, setlocationtyperror] = useState("")
-
-    // async function validateExperienceAddingForm(){
-    //         const roleerror = !role || !/^[a-zA-Z\s]{2,50}$/.test(role) || false
-    //         const organizationerror = !organization || !/^[a-zA-Z0-9\s\.,&-]{2,100}$/.test(organization) || false
-    //         const jobtypeerror = !jobtype || false
-    //         const startdateerror = !startdate || false
-    //         let enddateerror = false
-    //         const locationerror = !location || !/^[a-zA-Z\s,]{2,100}$/.test(location) || false
-    //         const locationtypeerror = !locationtype
-    
-    //         if(!ispresent){
-    //             enddateerror = !enddate || false
-    //         }
-    
-    //         roleerror ? setrolerror('Please enter a valid job role') : setrolerror("")
-    //         jobtypeerror ? setjobtypeerror('Please select job type') : setjobtypeerror("")
-    //         organizationerror ? setorganizationerror('Please enter a valid organization name') : setorganizationerror("")
-    //         startdateerror ? setstartdateerror('Please provide a starting date') : setstartdateerror("")
-    //         enddateerror ? setenddateerror('Please provide a ending date') : setenddateerror("")
-    //         locationerror ? setlocationerror('Please provide company location') : setlocationerror("")
-    //         locationtypeerror ? setlocationtyperror('Please select location type') : setlocationtyperror("")
-
-    //         if(roleerror || jobtypeerror || organizationerror || startdateerror || enddateerror || locationerror || locationTypeError){
-    //             closeModal() //close form before sweet alert
-    //             Swal.fire({
-    //                 icon:'error',
-    //                 title:'Test',
-    //                 text:'Validation fails'
-    //             }).then(() => window.location.reload())
-
-
-    //             return
-    //         }
-
-    //         await addExperience()
-    // }
-    
-        async function addExperience(){
-          alert('validation success')
-          console.log(watch())
-          const {role, jobType, organization, startDate, endDate, location, workMode, } = watch()
-    
-                const result = await addCandidateExperience(role, jobType, location, workMode, organization, ispresent, startDate.format("YYYY-MM-DD"), endDate ? endDate.format("YYYY-MM-DD") : "")
+      
+        async function addExperience(data : Inputs){
+          const {role, jobType, organization, startDate, endDate, location, workMode, isPresent } = data
+          console.log(data)
+          const formatedStartDate = startDate.format("YYYY-MM-DD")
+          const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
+                const result = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
                 closeModal()//closing form
-                // reset({
-                //   role:"",
-                //   jobType:"",
-                //   organization:"",
-                //   startDate:"",
-                //   endDate:"",
-                //   location:"",
-                //   workMode:""
-                // })
                     Swal.fire({
                         icon:'success',
                         title:'Added',
@@ -101,13 +47,21 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
                         showCancelButton:false,
                         timer:3000
                     }).then(() => {
-                      onAddExperience({role, jobType, location, workMode, organization, ispresent, startDate, endDate})
+                      onAddExperience({role, jobType, location, workMode, organization, isPresent, startDate:formatedStartDate, endDate:formatedEndDate})
+                      reset({
+                        jobType:'',
+                        role:'',
+                        organization:'',
+                        startDate:'',
+                        endDate:'',
+                        location:'',
+                        workMode:'',
+                        isPresent:false
+                      })
                     })
         }
 
-    function toggleIsPresent(){
-        setispresent(prevState => !prevState)
-    }
+    const currentWorkingStatus = watch('isPresent')
     
     const style = {
         position: 'absolute',
@@ -192,24 +146,22 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
                 }}
               />
             </FormControl>
-            {/* <label htmlFor="">Organization</label>
-            <input value={organization} onChange={(event) => setorganization(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            <label className='error-label'>{organizationError}</label> */}
+            
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <FormControlLabel
-              control={<Checkbox
-                  defaultChecked={ispresent ? true : false}
-                  onChange={toggleIsPresent}
-                />}
-              label="Im currently working here"
+            <Controller
+              name="isPresent"
+              control={control}
+              render={({field}) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox {...field} checked={field.value} />
+                  }
+                  label="I am currently working here"
+                />
+              }}
             />
-            {/* <div className="flex items-center mt-2">
-                <input onChange={toggleIsPresent} checked={ispresent ? true : false} type="checkbox" name="name" id="name" className="outline-none border border-gray-400 me-2 rounded" />
-                <label htmlFor="">I am currently working in this role</label>
             
-            </div>
-            <label className='error-label'></label> */}
           </Box>
           <Box sx={{width:'100%', display:'flex', gap:'20px'}}>
             <FormControl fullWidth error={Boolean(errors.startDate)}>
@@ -234,29 +186,19 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
               name="endDate"
                 control={control}
                 rules={{
-                  required:{value:ispresent ? false : true, message:'Dates can not be empty'}
+                  required:{value:currentWorkingStatus ? false : true, message:'Dates can not be empty'}
                 }}
                 render={({field}) => {
                   return <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={["DateField"]}>
-                        <DateField error={Boolean(errors.endDate)} {...field} label="End Date" />
+                        <DateField disabled={currentWorkingStatus} error={Boolean(errors.endDate)} {...field} label="End Date" />
                     </DemoContainer>
                   </LocalizationProvider>
                 }}
               />
               <FormHelperText>{errors.endDate?.message as string}</FormHelperText>
             </FormControl>
-            {/* <div className="w-full">
-                <label htmlFor="">Start Date</label>
-                <input value={startdate} onChange={(event) => setstartdate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                <label className='error-label'>{startdateError}</label>
-            </div>
-
-            <div className="w-full">
-                <label htmlFor="">End Date</label>
-                <input disabled={ispresent ? true : false} value={enddate} onChange={(event) => setendate(event.target.value)} type="date" name="name" id="name" className="outline-none border border-gray-400 w-full mt-2 block p-2 rounded" />
-                <label className='error-label'>{endDateError}</label>
-            </div> */}
+            
           </Box>
 
           <Box sx={{width:'100%', marginTop:'10px'}}>
@@ -279,9 +221,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
                 }}
               />
             </FormControl>
-            {/* <label htmlFor="">Location</label>
-            <input value={location} onChange={(event) => setlocation(event.target.value)} type="text" name="name" id="name" className="outline-none border border-gray-400 w-full md:w-200 mt-2 block p-2 rounded" />
-            <label className='error-label'>{locationError}</label> */}
+            
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
             <FormControl fullWidth error={Boolean(errors.workMode)}>
@@ -301,13 +241,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
               />
               <FormHelperText>{errors.workMode?.message as string}</FormHelperText>
             </FormControl>
-            {/* <label htmlFor="">Location Type</label>
-            <select value={locationtype} onChange={(event) => setlocationtype(event.target.value)} name="" id="" className="border border-gray-400 outline-none text-sm text-gray-500 w-full rounded p-2">
-                <option value="">--Select Type--</option>
-                <option value="In-office">In-office</option>
-                <option value="Remote">Remote</option>
-            </select>
-            <label htmlFor="" className="error-label">{locationTypeError}</label> */}
+            
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
             <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">Add</button>

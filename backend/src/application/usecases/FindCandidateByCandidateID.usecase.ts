@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import IFindCandidateByCandidateIdUseCase from './interfaces/IFindCandidateByCandidateID.usecase';
-import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
-import CandidateDTO from '../DTOs/candidate/candidate.dto';
-import mapToCandidateDTO from '../mappers/candidate/mapToCandidateDTO.mapper';
+import ICandidateRepo from '../../domain/interfaces/user/ICandidateRepo';
+import CandidateDTO from '../DTOs/candidate -LEGACY/candidate.dto';
+import mapToCandidateDTO from '../mappers/user/mapToCandidateDTO.mapper';
 
 @injectable()
 export default class FindCandidateByCandidateIDUseCase

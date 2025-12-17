@@ -1,16 +1,14 @@
 import { Schema } from 'mongoose';
-import Post from '../../../domain/entities/Post.entity';
+import Post from '../../../domain/entities/user/Post';
 
-export const PostSchema = new Schema<Post>(
-  {
-    content: { type: String },
-    creatorId: { type: Schema.Types.ObjectId },
-    creatorType: { type: String, enum: ['candidate', 'recruiter'] },
-    likes: { type: [Schema.Types.ObjectId] },
-    media: {
-      url: { type: String },
-      publidId: { type: String },
-    },
+export const PostSchema = new Schema<Post>({
+  description:{type:String},
+  media:{
+    cloudUrl:{type:String},
+    publicId:{type:String}
   },
-  { timestamps: true }
-);
+  userId:{type:Schema.Types.ObjectId, required:true, ref:'users'},
+  likes:{type:[Schema.Types.ObjectId], ref:'users'},
+  shares:{type:[Schema.Types.ObjectId], ref:'users'},
+  views:{type:[Schema.Types.ObjectId], ref:'users'}
+}, {timestamps:true})

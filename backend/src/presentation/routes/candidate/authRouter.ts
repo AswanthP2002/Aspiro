@@ -1,8 +1,8 @@
 import express, {Router, Request, Response, NextFunction} from 'express'
 import { generateToken } from '../../../services/jwt'
-import CandidateRepo from '../../../domain/interfaces/candidate/ICandidateRepo'
+import CandidateRepo from '../../../domain/interfaces/user/ICandidateRepo'
 import passport from 'passport'
-import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository'
+import CandidateRepository from '../../../infrastructure/repositories/user/candidateRepository'
 
 const authRouter : Router = express.Router()
 

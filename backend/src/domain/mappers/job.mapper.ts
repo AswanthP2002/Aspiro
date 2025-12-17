@@ -1,5 +1,5 @@
 import { CreateJobDTO } from '../../presentation/controllers/dtos/jobDTO';
-import Job from '../entities/job.entity';
+import Job from '../entities/recruiter/job.entity';
 
 export function createJobFromDTO(dto: CreateJobDTO): Job {
   return {

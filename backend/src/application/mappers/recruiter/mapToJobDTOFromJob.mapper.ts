@@ -1,30 +1,34 @@
-import Job from '../../../domain/entities/job.entity';
+import Job from '../../../domain/entities/recruiter/job.entity';
 import { JobDTO } from '../../DTOs/recruiter/createJob.dto';
 
 export default function mapToJobDTOFromJob(job: Job): JobDTO {
   return {
-    description: job.description,
-    experience: job.experience,
-    expiresAt: job.expiresAt,
-    jobLevel: job.jobLevel,
+    _id: job._id,
+    recruiterId: job.recruiterId,
     jobTitle: job.jobTitle,
-    jobType: job.jobType,
-    location: job.location,
-    locationType: job.location,
-    maxSalary: job.maxSalary,
-    minSalary: job.minSalary,
-    qualification: job.qualification,
+    description: job.description,
     requirements: job.requirements,
     responsibilities: job.responsibilities,
-    vacancies: job.vacancies,
-    _id: job._id,
-    companyId: job.companyId,
-    createdAt: job.createdAt,
-    isBlocked: job.isBlocked,
-    isRejected: job.isRejected,
-    updatedAt: job.updatedAt,
     duration: job.duration,
+    jobType: job.jobType,
+    workMode: job.workMode,
+    location: job.location,
+    minSalary: job.minSalary,
+    maxSalary: job.maxSalary,
+    salaryCurrency: job.salaryCurrency,
+    salaryPeriod: job.salaryPeriod,
+    vacancies: job.vacancies,
+    qualification: job.qualification,
+    experienceInYears: job.experienceInYears,
+    jobLevel: job.jobLevel,
     requiredSkills: job.requiredSkills,
     optionalSkills: job.optionalSkills,
+    status: job.status,
+    rejectionReason: job.rejectionReason,
+    views: job.views,
+    applicationsCount: job.applicationsCount,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    expiresAt: job.expiresAt
   };
 }

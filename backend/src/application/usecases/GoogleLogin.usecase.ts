@@ -1,23 +1,23 @@
-import ICandidateRepo from '../../domain/interfaces/candidate/ICandidateRepo';
-import IUserRepository from '../../domain/interfaces/IUserRepo.refactored';
+import ICandidateRepo from '../../domain/interfaces/user/ICandidateRepo';
+import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { generateRefreshToken, generateToken } from '../../services/jwt';
-import { LoginCandidateOutDTO } from '../DTOs/candidate/candidateLogin.dto';
-import mapToCandidate from '../mappers/candidate/mapToCandidate.mapper';
-import IGoogleLoginUseCase from './interfaces/IGoogleLogin.usecase';
-import IVerifyGoogleTokenUseCase from './interfaces/IVerifyGoogleToken.usecase';
+import { UserLoginOutpDTO } from '../DTOs/user/userLogin.dto';
+import mapToCandidate from '../mappers/user/mapToCandidate.mapper';
+import IGoogleLoginUseCase from '../interfaces/usecases/user/IGoogleLogin.usecase';
+import IVerifyGoogleTokenUseCase from '../interfaces/services/IGoogleAuthService';
+import { inject, injectable } from 'tsyringe';
+import IGoogleAuthService from '../interfaces/services/IGoogleAuthService';
 
+@injectable()
 export default class GoogleLoginUseCase implements IGoogleLoginUseCase {
   constructor(
-    private _repo: ICandidateRepo,
-    private _tokenVerify: IVerifyGoogleTokenUseCase,
-    private _userRepo: IUserRepository
+    @inject('IGoogleAuthService') private _googleAuthService: IGoogleAuthService,
+    @inject('IUserRepository') private _userRepo: IUserRepository
   ) {}
 
-  async execute(googleToken: string): Promise<LoginCandidateOutDTO | null> {
+  async execute(googleToken: string): Promise<UserLoginOutpDTO> {
     //verify the token first
-    const { googleId, email, name } = await this._tokenVerify.verify(
-      googleToken
-    );
+    const { googleId, email, name } = await this._googleAuthService.verify(googleToken)
 
     //check if any user exist with the email id
     const isUserExist = await this._userRepo.findByEmail(email);
@@ -25,29 +25,27 @@ export default class GoogleLoginUseCase implements IGoogleLoginUseCase {
     //if no user exist, create a new user
     let createdUser;
     if (!isUserExist) {
-      const newUser = mapToCandidate({ email, name, googleid: googleId });
-      createdUser = await this._repo.create(newUser);
+      createdUser = await this._userRepo.create({name, email, googleId})
     }
 
     //create token
     const token = await generateToken({
-      id: createdUser?._id,
-      name: createdUser?.name,
-      email: 'createdUser?.email',
-      role: 'Candidate',
+      id: createdUser?._id as string,
+      email: createdUser?.email as string,
+      role: 'user'
     });
 
     const refreshToken = await generateRefreshToken({
-      id: createdUser?._id,
-      name: createdUser?.name,
-      email: 'createdUser?.email',
-      role: 'Candidate',
+      id: createdUser?._id as string,
+      email: createdUser?.email as string,
+      role: 'user',
     });
 
     return {
       token,
       refreshToken,
-      user: { id: createdUser?._id?.toString(), email: email },
+      user: { id: createdUser?._id?.toString() || 'no id', email: email },
+      role: 'user',
     };
   }
 }

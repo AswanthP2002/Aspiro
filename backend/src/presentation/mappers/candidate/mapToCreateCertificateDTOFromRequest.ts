@@ -1,4 +1,4 @@
-import { CreateCertificateDTO } from '../../../application/DTOs/candidate/certificate.dto';
+import { CreateCertificateDTO } from '../../../application/DTOs/candidate -LEGACY/certificate.dto';
 import { AddCertificateRequestDTO } from '../../DTOs/candidate/addCertificateRequestDTO';
 
 export default function mapToCreateCertificateDTOFromRequest(

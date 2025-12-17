@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy, Profile} from "passport-google-oauth20";
 import dotenv from 'dotenv'
-import CandidateRepository from "../infrastructure/repositories/candidate/candidateRepository";
+import CandidateRepository from "../infrastructure/repositories/user/candidateRepository";
 import { RegisterGoogleAuthCandidateSchema } from "../presentation/controllers/dtos/candidate/registerGoogleAuthCandidate";
 import { createCandidatefromDTO, createGoogleAutCandidatefromDTO } from "../domain/mappers/candidate/candidate.mapper";
 import { join } from "path";

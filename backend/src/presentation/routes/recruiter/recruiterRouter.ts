@@ -1,89 +1,55 @@
-const express = require('express');
-import { Request, Response, NextFunction } from 'express';
-import RecruiterController from '../../controllers/recruiter/recruiterController';
-import {
-  authorization,
-  centralizedAuthentication,
-  recruiterAuth,
-  refreshAccessToken,
-} from '../../../middlewares/auth';
-import { StatusCodes } from '../../statusCodes';
-import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository';
-import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository';
-import RegisterRecruiterUseCase from '../../../application/usecases/recruiter/RegisterRecruiter.usecase';
-import VerifyRecruiterUseCase from '../../../application/usecases/recruiter/VerifyRecruiter.usecase';
-import { LoginRecruiterUseCase } from '../../../application/usecases/recruiter/LoginRecruiter.usecase';
-import SaveBasicsUseCase from '../../../application/usecases/recruiter/SaveBasicsRecruiter.usecase';
-import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/LoadRecruiterProfile.usecase';
-import CreateJobUseCase from '../../../application/usecases/recruiter/CreateJob.usecase';
-import JobRepository from '../../../infrastructure/repositories/jobRepository';
-import JObApplicationRepository from '../../../infrastructure/repositories/JobApplicationRepository';
-import { Db } from 'mongodb';
-import NotificationRepository from '../../../infrastructure/repositories/notificationRepository';
-import RejectCandidateUseCase from '../../../application/usecases/recruiter/RejectCandidate.usecase';
-import CreateNotification from '../../../application/usecases/common/useCases/CreateNotification.usecase';
-import ShortlistRepository from '../../../infrastructure/repositories/recruiter/shortlistRepository';
-import FinalizeShortlistUseCase from '../../../application/usecases/recruiter/FinalizeShortlist.usecase';
-import GetFinalizedDataUseCase from '../../../application/usecases/recruiter/GetFinalizedData.usecase';
-import GetJobApplicationsUseCase from '../../../application/usecases/recruiter/GetJobApplications.usecase';
-import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/GetJobApplicationDetails.usecase';
+import express, { NextFunction, Request, Response } from 'express'
 import { container } from 'tsyringe';
+import RecruiterController from '../../controllers/recruiterController';
+import { StatusCodes } from '../../statusCodes';
+import { authorization, centralizedAuthentication } from '../../../middlewares/auth';
+import Validator from '../../../validation/validator.zod';
+import { CreateRecruiterSchema } from '../../schemas/recruiter/createRecruiter.schema';
+import { CreateJobSchema } from '../../schemas/recruiter/createJob.schema';
+
+// const express = require('express');
+// import { Request, Response, NextFunction } from 'express';
+// import RecruiterController from '../../controllers/recruiter/recruiterController';
+// import {
+//   authorization,
+//   centralizedAuthentication,
+//   recruiterAuth,
+//   refreshAccessToken,
+// } from '../../../middlewares/auth';
+// import { StatusCodes } from '../../statusCodes';
+// import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository';
+// import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository';
+// import RegisterRecruiterUseCase from '../../../application/usecases/recruiter/RegisterRecruiter.usecase';
+// import VerifyRecruiterUseCase from '../../../application/usecases/recruiter/VerifyRecruiter.usecase';
+// import { LoginRecruiterUseCase } from '../../../application/usecases/recruiter/LoginRecruiter.usecase';
+// import SaveBasicsUseCase from '../../../application/usecases/recruiter/SaveBasicsRecruiter.usecase';
+// import { LoadRecruiterProfileDataUseCase } from '../../../application/usecases/recruiter/LoadRecruiterProfile.usecase';
+// import CreateJobUseCase from '../../../application/usecases/recruiter/CreateJob.usecase';
+// import JobRepository from '../../../infrastructure/repositories/jobRepository';
+// import JObApplicationRepository from '../../../infrastructure/repositories/JobApplicationRepository';
+// import { Db } from 'mongodb';
+// import NotificationRepository from '../../../infrastructure/repositories/notificationRepository';
+// import RejectCandidateUseCase from '../../../application/usecases/recruiter/RejectCandidate.usecase';
+// import CreateNotification from '../../../application/usecases/common/useCases/CreateNotification.usecase';
+// import ShortlistRepository from '../../../infrastructure/repositories/recruiter/shortlistRepository';
+// import FinalizeShortlistUseCase from '../../../application/usecases/recruiter/FinalizeShortlist.usecase';
+// import GetFinalizedDataUseCase from '../../../application/usecases/recruiter/GetFinalizedData.usecase';
+// import GetJobApplicationsUseCase from '../../../application/usecases/recruiter/GetJobApplications.usecase';
+// import GetJobApplicationDetailsUseCase from '../../../application/usecases/recruiter/GetJobApplicationDetails.usecase';
+// import { container } from 'tsyringe';
 
 function createRecruiterRouter() {
   const recruiterRouter = express.Router();
 
-  const recruiterRepo = new RecruiterRespository();
-  const candiateRepo = new CandidateRepository();
-  const jobRepo = new JobRepository();
-  const jobApplicationRepo = new JObApplicationRepository();
-  const notificationRepo = new NotificationRepository();
-  // const shortlsitRepo = new ShortlistRepository(db)
+  const recruiterController = container.resolve(RecruiterController)
 
-  // const registerRecruiterUC = new RegisterRecruiterUseCase(
-  //   recruiterRepo,
-  //   candiateRepo
-  // );
-  //const verifyRecruiterUC = new VerifyRecruiterUseCase(recruiterRepo);
-  //const loginRecruiterUC = new LoginRecruiterUseCase(recruiterRepo);
-  const saveBasicsUC = new SaveBasicsUseCase(recruiterRepo);
-  const loadRecruiterProfileDataUC = new LoadRecruiterProfileDataUseCase(
-    recruiterRepo
+  recruiterRouter.post(
+    '/recruiter/create',
+    centralizedAuthentication,
+    authorization(['user']),
+    Validator(CreateRecruiterSchema),
+    recruiterController.createRecruiter.bind(recruiterController)
   );
-  const createJobUC = new CreateJobUseCase(jobRepo);
-  const getJobApplicationsUC = new GetJobApplicationsUseCase(
-    jobApplicationRepo
-  );
-  const rejectCandidateApplicationUC = new RejectCandidateUseCase(
-    jobApplicationRepo
-  );
-  const createNotificationUC = new CreateNotification(notificationRepo);
-  // const finalizeShortlistUC = new FinalizeShortlistUseCase(shortlsitRepo)
-  // const getFinalizedDataUC = new GetFinalizedDataUseCase(shortlsitRepo)
-  const getJobApplicationDetailsUC = new GetJobApplicationDetailsUseCase(
-    jobApplicationRepo
-  );
-
-  const recruiterController = container.resolve(RecruiterController);
-
-  // const recruiterController = new RecruiterController(
-  //   registerRecruiterUC,
-  //   verifyRecruiterUC,
-  //   loginRecruiterUC,
-  //   saveBasicsUC,
-  //   loadRecruiterProfileDataUC,
-  //   createJobUC,
-  //   getJobApplicationsUC,
-  //   rejectCandidateApplicationUC,
-  //   createNotificationUC,
-  //   // finalizeShortlistUC,
-  //   // getFinalizedDataUC,
-  //   getJobApplicationDetailsUC
-  // );
-
-  // recruiterRouter.post(
-  //   '/recruiter/register',
-  //   recruiterController.registerRecruiter.bind(recruiterController)
-  // );
   // recruiterRouter.post(
   //   '/recruiter/verify',
   //   recruiterController.verifyRecruiter.bind(recruiterController)
@@ -99,20 +65,63 @@ function createRecruiterRouter() {
   //   testMIddleware
   //   //recruiterController.saveIntroDetailsRecruiter.bind(recruiterController)
   // );
-  // recruiterRouter.get(
-  //   '/recruiter/profile/overview',
-  //   recruiterAuth,
-  //   recruiterController.loadRecruiterProfileData.bind(recruiterController)
-  // );
-  // // recruiterRouter.post(
-  // //   '/recruiter/job/create',
-  // //   recruiterAuth,
-  // //   recruiterController.createJob.bind(recruiterController)
-  // // );
-  // // recruiterRouter.get(
-  // //   '/recruiter/job/:jobId/application/details',
-  // //   recruiterController.getJobApplications.bind(recruiterController)
-  // // );
+  recruiterRouter.get(
+    '/recruiter/profile/overview',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.loadRecruiterProfileData.bind(recruiterController)
+  );
+  recruiterRouter.post(
+    '/recruiter/job/create',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    Validator(CreateJobSchema),
+    recruiterController.createJob.bind(recruiterController)
+  );
+  recruiterRouter.put(
+    '/recruiter/job/edit',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.editJob.bind(recruiterController)
+  )
+  recruiterRouter.delete(
+    '/recruiter/job/delete/:jobId',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.deleteJob.bind(recruiterController)
+  )
+  
+  recruiterRouter.get(
+    '/recruiter/jobs',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.LoadRecruiterJobs.bind(recruiterController)
+  )
+
+  recruiterRouter.post(
+    '/recruiter/schedule-interview/:candidateId/job/:jobId/',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter'])
+  )
+  recruiterRouter.get(
+    '/recruiter/job/:jobId/application/details',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.getJobApplications.bind(recruiterController)
+  );
+  recruiterRouter.patch(
+    '/recruiter/application/:applicationId',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    testMiddleware,
+    recruiterController.updateCandidateNotes.bind(recruiterController)
+  )
+  recruiterRouter.patch(
+    '/recruiter/application/:applicationId/status',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.updateJobApplicationStatus.bind(recruiterController)
+  )
   // // recruiterRouter.get(
   // //   '/recruiter/application/:applicationId',
   // //   recruiterAuth,
@@ -149,6 +158,13 @@ function createRecruiterRouter() {
   //     .status(StatusCodes.ACCEPTED)
   //     .json({ success: true, message: 'Testing job creating path' });
   // }
+
+  function testMiddleware(req: Request, res: Response, next: NextFunction){
+    console.log('checking request body', req.body)
+    next()
+    // res.status(200).json({success:true, message:'Ok'})
+
+  }
 
   return recruiterRouter;
 }

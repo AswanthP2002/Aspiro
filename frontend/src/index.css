@@ -87,3 +87,6 @@ button{
 input:read-only{
   background: rgba(98, 93, 93, 0.582);
 }
+.footer-bg-dark{
+  background: rgb(3, 3, 36)
+}

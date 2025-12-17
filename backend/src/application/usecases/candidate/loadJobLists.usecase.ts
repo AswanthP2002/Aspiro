@@ -1,6 +1,6 @@
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import LoadJobDTO, { LoadJobResDTO } from '../../DTOs/loadJob.dto';
-import ILoadJobCandidateSideUseCase from './interface/ILoadJobCandidateSide.usecase';
+import ILoadJobCandidateSideUseCase from '../../interfaces/usecases/user/IloadJobsAggregated.usecase';
 
 export default class LoadJobsCandidateSideUseCase
   implements ILoadJobCandidateSideUseCase

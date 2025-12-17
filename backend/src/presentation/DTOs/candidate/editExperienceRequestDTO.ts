@@ -1,11 +1,11 @@
 export default interface EditExperienceRequestDTO {
   experienceId: string;
-  editableRole: string;
-  editableJobType: string;
-  editableOrganization: string;
-  editableIsPresent: boolean;
-  editableStartDate: string;
-  editableEndDate: string;
-  editableLocation: string;
-  editableLocationType: string;
+  jobRole: string;
+  jobType: string;
+  organization: string;
+  isPresent: boolean;
+  startDate: string;
+  endDate?: string;
+  location: string;
+  workMode: string;
 }

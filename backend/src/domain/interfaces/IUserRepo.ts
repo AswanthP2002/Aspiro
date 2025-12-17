@@ -1,0 +1,19 @@
+import { FindUsersQuery } from '../../application/queries/users.query';
+import UserProfileAggregatedAdmin from '../entities/userProfileAggregated';
+import User from '../entities/user/User.FIX';
+import IBaseRepo from './IBaseRepo';
+
+export default interface IUserRepository extends IBaseRepo<User> {
+  findByEmail(email?: string): Promise<User | null>;
+  findByPhone(phone?: string): Promise<User | null>;
+  updateVerify(id?: string): Promise<User | null>;
+  isUserBlocked(id?: string): Promise<boolean | null>;
+  blockUser(userId: string): Promise<boolean>;
+  unblockUser(userId: string): Promise<boolean>;
+  findUsersWithQuery(query : FindUsersQuery) : Promise<{users: User[], total: number} | null>
+  getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null>
+  addSocialLink(userId: string, socialLink: {domain: string, url: string}): Promise<User | null>
+  removeSocialLink(userId: string, domain: string): Promise<User | null>
+  //removeProfilePicture(id? : string) : Promise<User | null>
+  //removeCoverPhoto(id? : string) : Promise<User | null>
+}

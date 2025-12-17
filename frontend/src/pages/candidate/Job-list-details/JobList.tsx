@@ -3,7 +3,12 @@ import Swal from 'sweetalert2';
 import JobListTile from '../../../components/common/JobListTile';
 import { useNavigate } from 'react-router-dom';
 import JobFilterCandidateSide from '../../../components/candidate/JobFiltersCandidateSide';
-import { getJobs } from '../../../services/candidateServices';
+import { getJobs } from '../../../services/userServices';
+import { MdProductionQuantityLimits } from 'react-icons/md';
+import { Notify } from 'notiflix';
+import { JobAggregatedData } from '../../../types/entityTypes';
+import { BsSearch } from 'react-icons/bs';
+import { IoLocation } from 'react-icons/io5';
 interface filterState {
   industry: string[];
   jobType: string[];
@@ -13,11 +18,18 @@ interface filterState {
 }
 
 export default function JobListing() {
-  const [jobs, setjobs] = useState<any[]>([]);
+  const [jobs, setjobs] = useState<JobAggregatedData[]>([]);
   const [search, setsearch] = useState('');
+  const [locationSearch, setLoctionSearch] = useState('')
   const [page, setpage] = useState(1);
   const [totalPages, settotalpages] = useState(0);
   const [pagination, setpagination] = useState<any[]>([]);
+
+  const [statusFilter, setStatusFilter] = useState('active')
+  const [workModeFilter, setWorkModeFilter] = useState('all')
+  const [jobLevelFilter, setJobLevelFilter] = useState('all')
+  const [jobTypeFilter, setJobTypeFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('Newest')
 
   const [industryFilterOpen, setIndustryFilterOpen] = useState(false);
   const [jobTyeFilterOpen, setJobTypeFilterOpen] = useState(false);
@@ -151,15 +163,7 @@ export default function JobListing() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const result = await getJobs(
-          search,
-          page,
-          sortvalue,
-          filter,
-          minSalary,
-          maxSalary
-        );
-        console.log('Result of job fetching candidate side', result);
+        const result = await getJobs(search, locationSearch, page, sortBy, statusFilter, workModeFilter, jobLevelFilter, jobTypeFilter)
 
         if (result.success) {
           console.log('Result from the backend :: jobs', result.result);
@@ -168,21 +172,16 @@ export default function JobListing() {
           settotalpages(result?.result?.totalPages);
           setCurrentSort(result?.result?.currentSort);
           setpagination(new Array(result?.result?.totalPages).fill(0));
+        }else{
+          Notify.failure(result?.message, {timeout:2000})
         }
       } catch (error: unknown) {
-        console.log('Error occured while fetching the jobs', error);
-        if (error instanceof Error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error?.message,
-          });
-        }
+        Notify.failure('Something went wrong', {timeout:2000})
       }
     }
 
     fetchJobs();
-  }, [search, page, sortvalue, filter, minSalary, maxSalary]);
+  }, [search, page, sortBy, statusFilter, workModeFilter, jobLevelFilter, jobTypeFilter, locationSearch]);
 
   const nextPage = () => setpage((prev) => prev + 1);
   const previousPage = () => setpage((prev) => prev - 1);
@@ -192,6 +191,11 @@ export default function JobListing() {
   function searchJobs(event: any) {
     setsearch(event.target.value);
   }
+  function locationSearchJobs(event: any) {
+    setLoctionSearch(event.target.value);
+  }
+
+
   function debouncedSearch(fn: Function, dealy: number) {
     let timer: any;
     return function (...args: any) {
@@ -203,6 +207,8 @@ export default function JobListing() {
   }
 
   const dSearch = debouncedSearch(searchJobs, 500);
+  const dLocationSearch = debouncedSearch(locationSearchJobs, 700);
+
 
   useEffect(() => {
     console.log('this happened ot filter', filter);
@@ -210,129 +216,74 @@ export default function JobListing() {
 
   return (
     <>
-      <div className="job-listing-container w-full">
-        <div className="breadcrumbs-header bg-gray-100 w-full">
-          <div className="aspiro-container">
-            <div className="flex justify-between py-3">
-              <div className="left">
-                <p className="text-sm">Find Jobs</p>
-              </div>
-              <div className="right">
-                <p className="text-sm">Home / Jobs</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="job-listing-container border border-gray-200 rounded-md w-full bg-white">
         <section className="jobs mt-5">
-          <div className="aspiro-container">
+          <div className="p-5 lg:p-10">
             {/* Simplified filter implementation */}
             <div className="relative filter-wrapper mb-3 flex gap-3">
-              <div className="">
-                <button
-                  onClick={toggleIndustryFilter}
-                  className={`${
-                    industryFilterOpen ? 'bg-blue-500 text-white' : null
-                  } text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}
-                >
-                  Industry{' '}
-                  {filter?.industry?.length > 0
-                    ? `(${filter?.industry?.length})`
-                    : null}
-                </button>
-                <JobFilterCandidateSide
-                  openFilter={industryFilterOpen}
-                  filter={filter}
-                  filterType="Industry"
-                  handleFilterApply={handleIndustryChange}
-                />
+              <div>
+                <p className='text-xs text-gray-500 block'>Work Mode</p>
+              <select value={workModeFilter} onChange={(event) => setWorkModeFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="workMode-filter">
+                <option value="all">All</option>
+                <option value="On-site">On-site</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
               </div>
               <div>
-                <button
-                  onClick={toggleJobTypeFilter}
-                  className={`${
-                    jobTyeFilterOpen ? 'bg-blue-500 text-white' : null
-                  } text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}
-                >
-                  Job Type{' '}
-                  {filter?.jobType?.length > 0
-                    ? `(${filter?.jobType?.length})`
-                    : null}
-                </button>
-                <JobFilterCandidateSide
-                  openFilter={jobTyeFilterOpen}
-                  filter={filter}
-                  filterType="Jobtype"
-                  handleFilterApply={handleJobTypeChange}
-                />
+                <p className='text-xs text-gray-500 block'>Job Level</p>
+                <select value={jobLevelFilter} onChange={(event) => setJobLevelFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="jobLevel-filter">
+                  <option value="all">All</option>
+                  <option value="Entry-level">Entry Level</option>
+                  <option value="Mid-level">Mid Level</option>
+                  <option value="Senior-level">Senior Level</option>
+                  <option value="Lead">Lead</option>
+                  <option value="Manager">Manager</option>
+                </select>
               </div>
               <div>
-                <button
-                  onClick={toggleLocationFilter}
-                  className={`${
-                    locationTypeFilterOpen ? 'bg-blue-500 text-white' : null
-                  } text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2`}
-                >
-                  Location Type{' '}
-                  {filter?.locationType?.length > 0
-                    ? `(${filter?.locationType?.length})`
-                    : null}
-                </button>
-                <JobFilterCandidateSide
-                  openFilter={locationTypeFilterOpen}
-                  filter={filter}
-                  filterType="Locationtype"
-                  handleFilterApply={handleLocationType}
-                />
+                <p className='text-xs text-gray-500 block'>Job Type</p>
+                <select value={jobTypeFilter} onChange={(event) => setJobTypeFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="jobType-filter">
+                  <option value="all">All</option>
+                  <option value="Full-time">Full Time</option>
+                  <option value="Part-time">Part Time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Temporary">Temporary</option>
+                </select>
               </div>
               {/* <button className="text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2">Salary</button> */}
               <div className="flex items-center gap-3">
                 <div>
-                  <input
-                    type="text"
-                    id="minSalary"
-                    placeholder="Minimum Salary"
-                    className="border border-gray-400 rounded-sm !text-xs px-2 py-1"
-                  />
-                  <label
-                    htmlFor=""
-                    style={{
-                      color: 'red',
-                      display: 'block',
-                      fontSize: '0.7rem',
-                    }}
-                  >
-                    {minSalaryError}
-                  </label>
                 </div>
                 <div>
-                  <input
-                    type="text"
-                    id="maxSalary"
-                    placeholder="Minimum Salary"
-                    className="border border-gray-400 rounded-sm !text-xs px-2 py-1"
-                  />
-                  <label
-                    htmlFor=""
-                    style={{
-                      color: 'red',
-                      display: 'block',
-                      fontSize: '0.7rem',
-                    }}
-                  >
-                    {maxSalaryError}
-                  </label>
                 </div>
-                <button
-                  onClick={filterSalary}
-                  className="bg-blue-500 text-white text-xs px-3 py-1 rounded"
-                >
-                  Apply salary filter
-                </button>
               </div>
             </div>
-            <div className="search-header w-full">
-              <div className="search-wrapper-w-full flex justify-between bg-white p-2 rounded-sm items-center border border-gray-300">
-                <div className="search bg-white flex gap-3">
+            <div className="w-full bg-white rounded-md p-2 border border-gray-200 grid grid-cols-1 gap-2 lg:grid-cols-12">
+              <div className="flex lg:col-span-5 border px-3 py-2 border-gray-300 rounded-md items-center gap-2">
+                <BsSearch size={12} color='gray'/>
+                <input onKeyUp={(event) => dSearch(event)} type="text" placeholder='Job title keywords or company' className='w-full !text-xs' />
+              </div>
+
+              <div className="flex lg:col-span-5 border px-3 py-2 border-gray-300 rounded-md items-center gap-2">
+                <IoLocation size={12} color='gray'/>
+                <input onKeyUp={(event) => dSearch(event)} type="text" placeholder='City state or remote' className='w-full !text-xs' />
+              </div>
+
+              <div className="action lg:col-span-2 !text-xs">
+                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className='w-full !text-xs border border-gray-300 outline-none !px-3 !py-1 rounded'>
+                      <option value="Newest">Newly Posted</option>
+                      <option value="Oldest">Oldest</option>
+                      <option value="Salry-low">Salary low</option>
+                      <option value="Salary-high">Salary high</option>
+                  </select>
+                  </div>
+          {/* stoped herer */}
+            </div>
+            {/* <div className="search-header w-full">
+              <div className="search-wrapper-w-full flex justify-between bg-white p-1 rounded-sm items-center border border-gray-300">
+                <div className="rounded-md grid grid-cols-1">
                   <div className="job-title-search relative">
                     <i className="fa-solid fa-magnifying-glass absolute top-3 !text-blue-300"></i>
                     <input
@@ -349,6 +300,7 @@ export default function JobListing() {
                     <input
                       type="text"
                       name=""
+                      onKeyUp={(event) => dSearch(event)}
                       className="px-7 py-2"
                       id=""
                       placeholder="Search by locations"
@@ -356,85 +308,20 @@ export default function JobListing() {
                   </div>
                 </div>
                 <div className="actions relative">
-                  <button
-                    onClick={toggleSortVisibility}
-                    type="button"
-                    className="px-3 py-1 btn sort bg-blue-400 text-white rounded"
-                  >
-                    <i className="me-2 fa-solid fa-sort !text-sm"></i>Sort
-                  </button>
-
-                  {/* sort */}
-                  {visibleSort ? (
-                    <div className="sort shadow absolute right-0 w-full bg-blue-200 p-3">
-                      <ul>
-                        <li>
-                          <input
-                            checked={
-                              currentSort === 'salary-high' ? true : false
-                            }
-                            onChange={() => setsortvalue('salary-high')}
-                            type="radio"
-                            name="job-sort"
-                            id=""
-                          />{' '}
-                          <label htmlFor="" className="text-xs">
-                            Salry high to low
-                          </label>
-                        </li>
-                        <li>
-                          <input
-                            checked={
-                              currentSort === 'salary-low' ? true : false
-                            }
-                            onChange={() => setsortvalue('salary-low')}
-                            type="radio"
-                            name="job-sort"
-                            id=""
-                          />{' '}
-                          <label htmlFor="" className="text-xs">
-                            Salry low to high
-                          </label>
-                        </li>
-                        <li>
-                          <input
-                            checked={
-                              currentSort === 'job-latest' ? true : false
-                            }
-                            onChange={() => setsortvalue('job-latest')}
-                            type="radio"
-                            name="job-sort"
-                            id=""
-                          />{' '}
-                          <label htmlFor="" className="text-xs">
-                            Job latest
-                          </label>
-                        </li>
-                        <li>
-                          <input
-                            checked={
-                              currentSort === 'job-oldest' ? true : false
-                            }
-                            onChange={() => setsortvalue('job-oldest')}
-                            type="radio"
-                            name="job-sort"
-                            id=""
-                          />{' '}
-                          <label htmlFor="" className="text-xs">
-                            Job oldest
-                          </label>
-                        </li>
-                      </ul>
-                    </div>
-                  ) : null}
+                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className='border border-gray-500 text-sm !px-3 !py-1 rounded'>
+                      <option value="Newest">Newly Posted</option>
+                      <option value="Oldest">Oldest</option>
+                      <option value="Salry-low">Salary low</option>
+                      <option value="Salary-high">Salary high</option>
+                  </select>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="job-list mt-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="grid grid-cols-1">
                 {jobs.length > 0 ? (
                   <>
-                    {jobs.map((job: any, index: number) => {
+                    {jobs.map((job: JobAggregatedData, index: number) => {
                       return (
                         <>
                           <JobListTile key={index} data={job} />
@@ -443,9 +330,7 @@ export default function JobListing() {
                     })}
                   </>
                 ) : (
-                  <p className="text-sm text-gray-500 text-center absolute">
-                    No jobs posted
-                  </p>
+                  <p className='text-xs text-gray-500 text-center'>No jobs available</p>
                 )}
               </div>
             </div>

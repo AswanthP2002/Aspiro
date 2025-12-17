@@ -5,23 +5,25 @@ export default function mapToCreateJobDTOFromRequest(
   requestDTO: CreateJobRequestDTO
 ): CreateJobDTO {
   return {
-    companyId: requestDTO.companyId,
-    description: requestDTO.description,
-    experience: requestDTO.experience,
-    expiresAt: requestDTO.expiresAt,
-    jobLevel: requestDTO.jobLevel,
+    recruiterId: requestDTO.recruiterId,
     jobTitle: requestDTO.jobTitle,
-    jobType: requestDTO.jobType,
-    location: requestDTO.location,
-    locationType: requestDTO.locationType,
-    maxSalary: requestDTO.maxSalary,
-    minSalary: requestDTO.minSalary,
-    qualification: requestDTO.qualification,
+    description: requestDTO.description,
     requirements: requestDTO.requirements,
     responsibilities: requestDTO.responsibilities,
-    vacancies: requestDTO.vacancies,
     duration: requestDTO.duration,
+    jobType: requestDTO.jobType,
+    workMode: requestDTO.workMode,
+    location: requestDTO.location,
+    minSalary: requestDTO.minSalary,
+    maxSalary: requestDTO.maxSalary,
+    salaryCurrency: requestDTO.salaryCurrency,
+    salaryPeriod: requestDTO.salaryPeriod,
+    vacancies: requestDTO.vacancies,
+    qualification: requestDTO.qualification,
+    experienceInYears: requestDTO.experienceInYears,
+    jobLevel: requestDTO.jobLevel,
     requiredSkills: requestDTO.requiredSkills,
     optionalSkills: requestDTO.optionalSkills,
+    expiresAt:requestDTO.expiresAt
   };
 }

@@ -36,9 +36,9 @@ export default function CandidateExperienceCard({
           </div>
         </div>
         <div>
-          <p className="text-xs">{formatDate(exp.startdate)}</p>
+          <p className="text-xs">{formatDate(exp.startDate)}</p>
           <p className="text-xs mt-2">
-            {exp.enddate ? formatDate(exp.enddate) : 'Present'}
+            {exp.endDate ? formatDate(exp.endDate) : 'Present'}
           </p>
           <p className="text-xs mt-2 bg-blue-100 w-fit text-gray-500 rounded !px-2">
             {exp.locationtype}

@@ -51,33 +51,33 @@ export interface SocialLinks {
 
 export interface Skills {
   _id?: string;
-  type: string;
+  skillType: string;
   skill: string;
-  level: string;
-  candidateId?: string;
+  skillLevel: string;
+  userId?: string;
 }
 
 export interface Experience {
-  _id?: string;
-  candidateId?: string;
-  role: string;
-  jobtype: string;
-  organization: string;
-  startdate: string;
-  ispresent: boolean;
-  enddate: string;
-  location: string;
-  locationtype: string;
-  createdAt?: string;
-  updatedAt?: string;
+   _id? : string
+    userId? : string
+    jobRole : string
+    jobType : string
+    organization : string
+    startDate? : string
+    isPresent : boolean
+    endDate? : string //for checking
+    location : string
+    workMode : string
+    createdAt? : string
+    updatedAt? : string
 }
 
 export interface Education {
   _id?: string;
-  candidateId?: string;
-  stream: string; //particular group of education
-  level: string;
-  organization: string;
+  userId?: string;
+  educationStream: string; //particular group of education
+  educationLevel: string;
+  institution: string;
   location: string;
   startYear: string;
   isPresent: boolean;
@@ -96,20 +96,61 @@ export interface Follow {
 }
 
 export interface Post {
+  _id?: string
+  userId?: string                 
+  media? : {
+    cloudUrl : string
+    publicId : string
+  }
+  description : string
+  
+  likes?: any[]       
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface UserType {
   _id?: string;
-  creatorId?: string;
-  creatorType: 'candidate' | 'recruiter';
-  media: {
-    url: string;
-    publidId: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  password?: string;
+  dateOfBirth?: string;
+  socialLinks: SocialLinks[];
+  location?: {
+    city?: string;
+    district?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
   };
-  content: string;
-  likes?: any[];
+  role?: Role[];
+  phone?: string;
+  email?: string;
+  googleId?: string;
+  facebookId?: string;
+  linkedinId?: string;
+  profilePicture?: {
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
+  };
+  coverPhoto?: {
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
+  };
+  connections?: string[]
+  isBlocked?: boolean;
+  isVerified?: boolean;
+  isAdmin?: boolean;
+  isRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  verificationToken?: string;
+  otpExpiresAt?: Date;
 }
 
 export interface CandidatePersonalData {
+  //LEGACY
   _id?: string;
   name: string;
   userId: string;
@@ -177,3 +218,369 @@ export interface Recruiter {
   updatedAt?: Date;
   currentSubscription?: string;
 }
+
+export interface UserPosts {
+  _id?: string;
+  description: string;
+  userId: string;
+  likes: string[];
+  media?: {
+    cloudUrl: string;
+    publicId: string;
+  };
+  shares: string[];
+  views: string[];
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  userDetails: UserType;
+  comments: Comments[];
+}
+
+export interface UserMetaData {
+  _id?: string;
+  name?: string;
+  headline?: string;
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+}
+
+export interface Notification {
+  _id?: string
+  recepientId?: string
+  type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
+  category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
+  actorId?: string
+  targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
+  targetId?: string
+  message?: string
+  isRead?: boolean
+  createdAt?: string
+  metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
+}
+
+export interface Comments {
+  _id?: string;
+  postId?: string;
+  userId?: string;
+  text: string;
+  createdAt?: string | Date;
+  userDetails?: UserType;
+}
+
+
+export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary';
+export type WorkMode = 'On-site' | 'Remote' | 'Hybrid';
+export type JobLevel = 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager';
+export type SalaryPeriod = 'annually' | 'monthly' | 'weekly' | 'hourly';
+export type JobStatus = 'draft' | 'active' | 'expired' | 'closed' | 'rejected' | 'blocked';
+
+export interface Job {
+   _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
+}
+
+export interface RecruiterProfileData {
+   _id?: string;
+  userId?: string;
+  employerType?: string;
+  organizationDetails?: {
+    organizationName?: string;
+    organizationType?: string;
+    industry?: string;
+    organizationContactNumber?: string;
+    organizationEmail?: string;
+    teamStrength?: string;
+    website?: string;
+    linkedinUrl?: string
+  };
+  recruitingExperience?: string
+  focusingIndustries?:string[]
+  profileStatus?: 'pending' | 'approved' | 'rejected'
+  summary?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  userProfile: UserType;
+  jobs: Job[];
+}
+
+export interface JobAggregatedData {
+   _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
+  userDetails:UserType;
+  recruiterProfile:Recruiter
+}
+
+
+export interface Certificates {
+    _id? : string
+    candidateId? : string
+    issuedOrganization : string
+    issuedDate : Date
+    certificateId? : string
+    certificateUrl? : string
+    certificatePublicId? : string,
+    createdAt? : Date
+}
+
+export interface UserProfileAggrgatedAdmin {
+  _id?: string;
+      name?: string;
+      headline?: string;
+      summary?: string;
+      password?: string;
+      dateOfBirth?: string;
+      socialLinks?: SocialLinks[];
+      location?: {
+        city: string;
+        district: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+      role?: Role[];
+      phone?: string;
+      email?: string;
+      googleId?: string;
+      facebookId?: string;
+      linkedinId?: string;
+      profilePicture?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      coverPhoto?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      isBlocked?: boolean;
+      isVerified?: boolean;
+      isAdmin?: boolean;
+      isRecruiter?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+      verificationToken?: string;
+      otpExpiresAt?: Date;
+      experiences: Experience[]
+      educations: Education[]
+      certificates: Certificates[]
+      skills: Skills[]
+      connections?: string[]
+      posts: Post[]
+      recruiterProfile:Recruiter
+      jobs:Job[]
+}
+
+export interface UserProfileAggregated {
+  _id?: string;
+      name?: string;
+      headline?: string;
+      summary?: string;
+      password?: string;
+      dateOfBirth?: string;
+      socialLinks?: SocialLinks[];
+      location?: {
+        city: string;
+        district: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+      role?: Role[];
+      phone?: string;
+      email?: string;
+      googleId?: string;
+      facebookId?: string;
+      linkedinId?: string;
+      profilePicture?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      coverPhoto?: {
+        cloudinaryPublicId: string;
+        cloudinarySecureUrl: string;
+      };
+      connections?: string[]
+      isBlocked?: boolean;
+      isVerified?: boolean;
+      isAdmin?: boolean;
+      isRecruiter?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+      verificationToken?: string;
+      otpExpiresAt?: Date;
+      experiences: Experience[]
+      educations: Education[]
+      certificates: Certificates[]
+      skills: Skills[]
+      posts: UserPosts[]
+      recruiterProfile:Recruiter
+      jobs:Job[]
+      followers: string[]
+}
+
+export interface JobDetails {
+   _id?: string;
+  recruiterId?: string; 
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; 
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; 
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; 
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; 
+  rejectionReason?: string; 
+  views?: number; 
+  applicationsCount?: number; 
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: String;
+  userProfile:UserType;
+  userRecruiterProfile:RecruiterProfileData
+  candidateIds: string[]
+}
+
+export interface ApplicationsAggregated {
+  _id?: string;
+    candidateId: string;
+    jobId: string;
+    coverLetterContent: string;
+    resumeId: string;
+    status: 'applied' | 'opened' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected';
+    createdAt: Date;
+    updatedAt: Date;
+    job: Job
+    applicant: UserType;
+    resume: any;
+    experiences: Experience[];
+    educations: Education[]
+    skills: Skills[]
+}
+
+export interface FavoriteJob {
+  _id?: string;
+  candidateId?: string;
+  jobId?: string;
+  createdAt?: string;
+  jobDetails: Job;
+  postedBy: UserType;
+  recruiterProfile: Recruiter
+}
+
+export interface MyApplications {
+  _id: string;
+  coverLetterContent: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: string;
+  candidateId: string;
+  jobId: string;
+  resumeId: string;
+  jobDetails: Job;
+  recruiterProfile: Recruiter;
+  recruiterUserProfile: UserType
+}
+
+
+/**
+ *  _id?: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  password?: string;
+  dateOfBirth?: string;
+  socialLinks?: SocialLinks[];
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+  };
+  role?: Role[];
+  phone?: string;
+  email?: string;
+  googleId?: string;
+  facebookId?: string;
+  linkedinId?: string;
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  coverPhoto?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  isBlocked?: boolean;
+  isVerified?: boolean;
+  isAdmin?: boolean;
+  isRecruiter?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  verificationToken?: string;
+  otpExpiresAt?: Date;
+ */
+
+  //user entity as per backend

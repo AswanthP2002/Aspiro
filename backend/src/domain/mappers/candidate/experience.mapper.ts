@@ -1,5 +1,5 @@
 import { ExperienceDTO } from '../../../presentation/controllers/dtos/candidate/experienceDTO';
-import Experience from '../../entities/candidate/experience.entity';
+import Experience from '../../entities/user/experience.entity';
 
 export default function createExperienceFromExperienceDTO(
   dto: ExperienceDTO

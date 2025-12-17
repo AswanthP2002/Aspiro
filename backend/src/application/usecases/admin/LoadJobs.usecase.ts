@@ -1,4 +1,4 @@
-import Job from '../../../domain/entities/job.entity';
+import Job from '../../../domain/entities/recruiter/job.entity';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import ILoadJobsUseCase from './interfaces/ILoadJobs.usecase';
 

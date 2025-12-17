@@ -1,0 +1,44 @@
+import mongoose from 'mongoose';
+import Resume from '../../../domain/entities/user/resume.entity';
+import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
+import BaseRepository from '../baseRepository';
+import { Db } from 'mongodb';
+import { ResumeDAO } from '../../database/DAOs/user/resume.dao';
+
+export default class ResumeRepository
+  extends BaseRepository<Resume>
+  implements IResumeRepo
+{
+  constructor() {
+    super(ResumeDAO);
+  }
+  async findWithCandidateId(id?: string): Promise<Resume[] | null> {
+    const result = await ResumeDAO.find({
+      candidateId: new mongoose.Types.ObjectId(id),
+    });
+    return result;
+  }
+  // private _collection
+  // constructor(db : Db){
+  //     super(db, 'resume')
+  //     this._collection = 'resume'
+  // }
+
+  // async addResume(resume: Resume): Promise<boolean> {
+  //     const db = await connectDb()
+  //     const result = await db.collection<Resume>(this._collection).insertOne(resume)
+  //     return result.acknowledged
+  // }
+
+  // async loadResumes(candidateId: string): Promise<Resume[] | null> {
+  //     const db = await connectDb()
+  //     const result = await db.collection<Resume>(this._collection).find({candidateId:new mongoose.Types.ObjectId(candidateId)}).toArray()
+  //     return result
+  // }
+
+  // async deleteResume(resumeId: string): Promise<boolean> {
+  //     const db = await connectDb()
+  //     const result = await db.collection<Resume>(this._collection).deleteOne({_id:new mongoose.Types.ObjectId(resumeId)})
+  //     return result.acknowledged
+  // }
+}

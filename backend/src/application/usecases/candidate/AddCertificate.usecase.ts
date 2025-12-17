@@ -1,13 +1,13 @@
-import ICertificateRepo from '../../../domain/interfaces/candidate/ICertificateRepo';
+import ICertificateRepo from '../../../domain/interfaces/user/ICertificateRepo';
 import streamifier from 'streamifier';
 import cloudinary from '../../../utilities/cloudinary';
 import { v4 } from 'uuid';
 import IAddCertificateUseCase from './interface/IAddCertificate.usecase';
 import CertificateDTO, {
   CreateCertificateDTO,
-} from '../../DTOs/candidate/certificate.dto';
+} from '../../DTOs/candidate -LEGACY/certificate.dto';
 import { UploadApiResponse } from 'cloudinary';
-import mapToCertificateDTOFromCertificate from '../../mappers/candidate/mapToCertificateDTOFromCertificate.mapper';
+import mapToCertificateDTOFromCertificate from '../../mappers/user/mapToCertificateDTOFromCertificate.mapper';
 
 export default class AddCertificateUseCase implements IAddCertificateUseCase {
   constructor(private _iCertificateRepo: ICertificateRepo) {}

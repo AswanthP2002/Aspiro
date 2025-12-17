@@ -19,7 +19,7 @@ import {
   mastersDegree,
   diploma,
 } from '../../../assets/data/educationalStreamsData';
-import { addCandidateEducation } from '../../../services/candidateServices';
+import { addUserEducation } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { Notify } from 'notiflix';
 
@@ -45,19 +45,23 @@ export default function AddEducationForm({
     control,
     reset,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    defaultValues:{
+      educationLevel:"",
+      educationStream:"",
+      educationInstitution:"",
+      isPresent:false,
+      startYear:"",
+      endYear:"",
+      location:""
+    }
+  });
 
-  const addEducation = async (data: any) => {
+  const addEducation = async (data: Inputs) => {
     setLoading(true);
-    const {
-      educationInstitution,
-      educationLevel,
-      educationStream,
-      startYear,
-      endYear,
-      location,
-    } = data;
-    const result = await addCandidateEducation(
+    const { educationInstitution, educationLevel, isPresent, educationStream, startYear, endYear, location } =
+      data;
+    const result = await addUserEducation(
       educationLevel,
       educationStream,
       educationInstitution,
@@ -75,18 +79,18 @@ export default function AddEducationForm({
       setLoading(false);
       closeEducationModal();
       reset({
-        educationLevel:"",
-        educationStream:"",
-        educationInstitution:"",
-        isPresent:false,
-        startYear:"",
-        endYear:"",
-        location:""
-      })
+        educationLevel: '',
+        educationStream: '',
+        educationInstitution: '',
+        isPresent: false,
+        startYear: '',
+        endYear: '',
+        location: '',
+      });
       onAddEducation({
-        level: educationLevel,
-        stream: educationStream,
-        organization: educationInstitution,
+        educationLevel: educationLevel,
+        educationStream: educationStream,
+        institution: educationInstitution,
         isPresent: isPresent,
         location: location,
         startYear: startYear,
@@ -96,6 +100,7 @@ export default function AddEducationForm({
   };
 
   const eduLevel = watch('educationLevel');
+  const currentEducationStatus = watch('isPresent')
 
   const [loading, setLoading] = useState(false);
   const [isPresent, setIspresent] = useState(false);
@@ -131,11 +136,7 @@ export default function AddEducationForm({
           Add Education
         </Typography>
         <form onSubmit={handleSubmit(addEducation)}>
-          <FormControl
-            fullWidth
-            sx={{ marginTop: '20px' }}
-            error={Boolean(errors.educationLevel)}
-          >
+          <FormControl fullWidth sx={{ marginTop: '20px' }} error={Boolean(errors.educationLevel)}>
             <InputLabel id="education-level-label">Education Level</InputLabel>
             <Controller
               name="educationLevel"
@@ -164,11 +165,7 @@ export default function AddEducationForm({
             <FormHelperText>{errors.educationLevel?.message}</FormHelperText>
           </FormControl>
 
-          <FormControl
-            fullWidth
-            sx={{ marginTop: '20px' }}
-            error={Boolean(errors.educationStream)}
-          >
+          <FormControl fullWidth sx={{ marginTop: '20px' }} error={Boolean(errors.educationStream)}>
             {eduLevel === 'other' ? (
               <TextField
                 variant="outlined"
@@ -190,9 +187,7 @@ export default function AddEducationForm({
               />
             ) : (
               <>
-                <InputLabel id="education-stream-label">
-                  Education Stream
-                </InputLabel>
+                <InputLabel id="education-stream-label">Education Stream</InputLabel>
                 <Controller
                   name="educationStream"
                   control={control}
@@ -203,19 +198,13 @@ export default function AddEducationForm({
                     },
                   }}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      labelId="education-stream-label"
-                      label="Education Stream"
-                    >
+                    <Select {...field} labelId="education-stream-label" label="Education Stream">
                       {eduLevel === 'higherSecondary' &&
-                        higherSecondaryEducation.map(
-                          (stream, index: number) => (
-                            <MenuItem key={index} value={stream}>
-                              {stream}
-                            </MenuItem>
-                          )
-                        )}
+                        higherSecondaryEducation.map((stream, index: number) => (
+                          <MenuItem key={index} value={stream}>
+                            {stream}
+                          </MenuItem>
+                        ))}
                       {eduLevel === 'bachelors' &&
                         bachelorsDegree.map((stream, index: number) => (
                           <MenuItem key={index} value={stream}>
@@ -237,9 +226,7 @@ export default function AddEducationForm({
                     </Select>
                   )}
                 />
-                <FormHelperText>
-                  {errors.educationStream?.message}
-                </FormHelperText>
+                <FormHelperText>{errors.educationStream?.message}</FormHelperText>
               </>
             )}
           </FormControl>
@@ -264,14 +251,15 @@ export default function AddEducationForm({
             />
           </FormControl>
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                defaultChecked={isPresent ? true : false}
-                onChange={toggleIsPresent}
+          <Controller
+            name="isPresent"
+            control={control}
+            render={({field}) => (
+              <FormControlLabel
+                control={<Checkbox {...field} value={field.value} />}
+                label="Im currently studying here"
               />
-            }
-            label="I am currently studying here"
+            )}
           />
 
           <Box
@@ -305,10 +293,10 @@ export default function AddEducationForm({
               <TextField
                 variant="outlined"
                 label="End year"
-                disabled={isPresent ? true : false}
+                disabled={currentEducationStatus}
                 {...register('endYear', {
                   required: {
-                    value: isPresent ? false : true,
+                    value: currentEducationStatus ? false : true,
                     message: 'End year can not be empty',
                   },
                   pattern: {
@@ -322,25 +310,30 @@ export default function AddEducationForm({
             </FormControl>
           </Box>
 
-          <Box sx={{width:'100%', marginTop:'10px'}}>
+          <Box sx={{ width: '100%', marginTop: '10px' }}>
             <FormControl fullWidth error={Boolean(errors.location)}>
               <Controller
-                name='location'
+                name="location"
                 control={control}
                 rules={{
-                  required:{value:true, message:'Please enter location'},
-                  minLength:{value:5, message:'Minimum 5 charecters'},
-                  maxLength:{value:50, message:'Maximum 50 charecters'},
-                  pattern:{value:/^[\w\s-]+(?:,\s*[\w\s-]+){0,3}$/, message:'Enter a valid location'}
+                  required: { value: true, message: 'Please enter location' },
+                  minLength: { value: 5, message: 'Minimum 5 charecters' },
+                  maxLength: { value: 50, message: 'Maximum 50 charecters' },
+                  pattern: {
+                    value: /^[\w\s-]+(?:,\s*[\w\s-]+){0,3}$/,
+                    message: 'Enter a valid location',
+                  },
                 }}
-                render={({field}) => {
-                  return <TextField
-                    {...field}
-                    label="Location"
-                    variant='outlined'
-                    error={Boolean(errors.location)}
-                    helperText={errors.location?.message}
-                  />
+                render={({ field }) => {
+                  return (
+                    <TextField
+                      {...field}
+                      label="Location"
+                      variant="outlined"
+                      error={Boolean(errors.location)}
+                      helperText={errors.location?.message}
+                    />
+                  );
                 }}
               />
             </FormControl>

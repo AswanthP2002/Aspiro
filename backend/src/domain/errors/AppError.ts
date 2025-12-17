@@ -58,3 +58,9 @@ export class InvalidGoogleTokenError extends AppError {
     super('INVALID_GOOGLE_TOKEN', 'Google Token is not valid')
   }
 }
+
+export class UserAlreadyVerifiedError extends AppError {
+  constructor() {
+    super('USER_ALREADY_VERIFIED', 'User is already verified')
+  }
+}

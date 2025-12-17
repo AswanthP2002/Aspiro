@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import JobApplication from '../../domain/entities/candidate/jobApplication.entity';
+import JobApplication from '../../domain/entities/user/jobApplication.entity';
 import IJobApplicationRepo from '../../domain/interfaces/IJobApplicationRepo';
 import BaseRepository from './baseRepository';
-import { JobApplicationDAO } from '../database/DAOs/candidate/jobApplication.dao';
-import JobApplicationAggregated from '../../domain/entities/candidate/jobApplicationAggregated.entity';
+import { JobApplicationDAO } from '../database/DAOs/user/jobApplication.dao';
+import JobApplicationAggregated from '../../domain/entities/user/jobApplicationAggregated.entity';
 import ApplicationsAggregated from '../../domain/entities/recruiter/jobApplicationsAggregated.entity';
 import ApplicationDetailsAggregated from '../../domain/entities/recruiter/jobApplicationDetailsAggregated.entity';
 
@@ -28,23 +28,46 @@ export default class JObApplicationRepository
     const result = await JobApplicationDAO.aggregate([
       { $match: { jobId: new mongoose.Types.ObjectId(jobId) } },
       {
-        $lookup: {
-          from: 'candidates',
-          localField: 'candidateId',
-          foreignField: '_id',
-          as: 'applicantDetails',
-        },
-      },
-      {
-        $lookup: {
-          from: 'resumes',
-          localField: 'resumeId',
-          foreignField: '_id',
-          as: 'resume',
-        },
-      },
-      { $unwind: '$applicantDetails' },
-      { $unwind: '$resume' },
+    $lookup: {
+      from: "jobs",
+      localField: "jobId",
+      foreignField: "_id",
+      as: "job"
+    }
+  },
+  {$unwind:'$job'},
+  {$lookup: {
+    from: 'users',
+    localField: 'candidateId',
+    foreignField: '_id',
+    as: 'applicant'
+  }},
+  {$unwind:'$applicant'},
+  {$lookup: {
+    from: 'resumes',
+    localField: 'resumeId',
+    foreignField: '_id',
+    as: 'resume'
+  }},
+  {$unwind:'$resume'},
+  {$lookup:{
+    from:'experiences',
+    localField:'userId',
+    foreignField:'applicant.id',
+    as:'experiences'
+  }},
+  {$lookup: {
+    from: 'educations',
+    localField: 'userId',
+    foreignField: 'applicant.id',
+    as: 'educations'
+  }},
+  {$lookup:{
+    from:'skills',
+    localField:'userId',
+    foreignField:'applicant.id',
+    as:'skills'
+  }}
     ]);
     return result;
   }
@@ -67,24 +90,27 @@ export default class JObApplicationRepository
     console.log('id int he rep', candidateId);
     const applications = await JobApplicationDAO.aggregate([
       { $match: { candidateId: new mongoose.Types.ObjectId(candidateId) } },
-      {
-        $lookup: {
-          from: 'jobs',
-          localField: 'jobId',
-          foreignField: '_id',
-          as: 'jobDetails',
-        },
-      },
-      { $unwind: '$jobDetails' },
-      {
-        $lookup: {
-          from: 'recruiters',
-          localField: 'jobDetails.companyId',
-          foreignField: '_id',
-          as: 'companyDetails',
-        },
-      },
-      { $unwind: '$companyDetails' },
+      {$lookup: {
+    from: 'jobs',
+    localField: 'jobId',
+    foreignField: '_id',
+    as: 'jobDetails'
+  }},
+  {$unwind:'$jobDetails'},
+  {$lookup: {
+    from: 'users',
+    localField: 'jobDetails.recruiterId',
+    foreignField: '_id',
+    as: 'recruiterUserProfile'
+  }},
+  {$unwind:'$recruiterUserProfile'},
+  {$lookup: {
+    from: 'recruiters',
+    localField: 'recruiterUserProfile._id',
+    foreignField: 'userId',
+    as: 'recruiterProfile'
+  }},
+  {$unwind:'$recruiterProfile'},
       { $sort: { createdAt: -1 } },
     ]);
     console.log('applications before sending', applications);

@@ -1,4 +1,4 @@
-import Post from '../entities/Post.entity';
+import Post from '../entities/user/Post';
 import PostsAggregated from '../entities/PostsAggregated.entity';
 import IBaseRepo from './IBaseRepo';
 

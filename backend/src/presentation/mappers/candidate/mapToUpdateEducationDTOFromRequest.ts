@@ -1,4 +1,4 @@
-import { UpdateEducationDTO } from '../../../application/DTOs/candidate/education.dto';
+import { UpdateEducationDTO } from '../../../application/DTOs/user/education.dto';
 import { UpdateEducationRequestDto } from '../../DTOs/candidate/updateEducationRequestDTO';
 
 export default function mapToUpdateEducationDTOFromRequest(
@@ -6,9 +6,9 @@ export default function mapToUpdateEducationDTOFromRequest(
 ): UpdateEducationDTO {
   return {
     _id: requestDto.id,
-    stream: requestDto.stream,
-    level: requestDto.level,
-    organization: requestDto.organization,
+    educationStream: requestDto.educationStream,
+    educationLevel: requestDto.educationLevel,
+    institution: requestDto.institution,
     location: requestDto.location,
     isPresent: requestDto.isPresent,
     startYear: requestDto.startYear,

@@ -509,8 +509,10 @@ export const loadJobDetails = async (jobId : string) => {
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-        console.log('Error occured while geting job details')
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            console.log('-- error occured while loading job details --', err)
+            throw error
+        }
     }
 }
 export const getCandidates = async (search : string, page : number, limit : number, sort : string, filter : any) => {

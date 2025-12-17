@@ -3,7 +3,8 @@ import { Notify } from 'notiflix'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
 import { CircularProgress } from '@mui/material'
 import CropComponent from '../common/CropComponent'
-import { removeCoverphoto, updateCoverPhoto } from '../../services/candidateServices'
+import { removeCoverphoto, updateCoverPhoto } from '../../services/userServices'
+import Swal from 'sweetalert2'
 
 export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto, onSaveCoverPhoto, onDeleteCoverPhoto} : any) {
     const fileRef = useRef<HTMLInputElement>(null)
@@ -88,19 +89,34 @@ export default function EditCoverphotoComponent({coverPhoto = defaultCoverPhoto,
     }
 
     const deleteCoverphoto = async (publidId : string) => {
-        setLoding(true)
-        const result = await removeCoverphoto(publidId)
+        Swal.fire({
+            icon:'info',
+            title:'Delete cover photo?',
+            text:'Are you sure you want to delete your cover photo?',
+            showCancelButton:true,
+            confirmButtonText:'Yes',
+            cancelButtonText:'No',
+            allowOutsideClick:false
+        }).then(async (response) => {
+            if(response.isConfirmed){
+                setLoding(true)
+                const result = await removeCoverphoto(publidId)
 
-        if(result?.success){
-            Notify.success(result?.message, {timeout:2000})
-            setTimeout(() => {
-                setLoding(false)
-                onDeleteCoverPhoto()
-            }, 2000);
-        }else{
-            setLoding(false)
-            Notify.failure(result?.message, {timeout:2000})
-        }
+                if(result?.success){
+                    Notify.success(result?.message, {timeout:2000})
+                setTimeout(() => {
+                        setLoding(false)
+                        onDeleteCoverPhoto()
+                    }, 2000);
+                }else{
+                    setLoding(false)
+                    Notify.failure(result?.message, {timeout:2000})
+                }
+            }else{
+                return
+            }
+        })
+        
     }
 
     return (

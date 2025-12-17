@@ -1,4 +1,4 @@
-import { EditCandidateDTO } from '../../../application/DTOs/candidate/candidate.dto';
+import { EditCandidateDTO } from '../../../application/DTOs/candidate -LEGACY/candidate.dto';
 import { EditCandidateRequestDTO } from '../../DTOs/candidate/editCandidateRequestDTO';
 
 export default function mapToEditCandidateDTOFromRequest(

@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux"
-import { candidateLogout } from "../services/candidateServices"
+import { candidateLogout } from "../services/userServices"
 import { useNavigate } from "react-router-dom"
 export default function useCandidateLogout(){
 
