@@ -24,6 +24,13 @@ export const initSocket = (server: any) => {
         //message to the client for testing
         socket.emit('message', 'hello from server')
 
+        //event listening for message sended
+        socket.on('message-send', (message: string) => {
+            console.log(message)
+        })
+
+        socket.to('socketcid').emit('message', "hi")
+
         socket.on('disconnect', () => {
             console.log('user disconnected', socket.id)
         })
