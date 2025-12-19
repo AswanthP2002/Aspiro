@@ -543,44 +543,40 @@ export interface MyApplications {
   recruiterUserProfile: UserType
 }
 
+export interface ConversationParticipants {
+    userId?: string;
+    joinedAt?: string | Date
+}
+export interface Conversation {
+    _id?: string;
+    type?: "private" | "group";
+    participants?:ConversationParticipants[];
+    lastMessage?:{
+        text?: string,
+        senderId?: string,
+        sendAt?: string | Date
+    }
+    userInfo?: UserType
+    createdAt?: string
+    updatedAt?: string
+}
 
-/**
- *  _id?: string;
-  name?: string;
-  headline?: string;
-  summary?: string;
-  password?: string;
-  dateOfBirth?: string;
-  socialLinks?: SocialLinks[];
-  location?: {
-    city: string;
-    district: string;
-    state: string;
-    country: string;
-    pincode: string;
-  };
-  role?: Role[];
-  phone?: string;
-  email?: string;
-  googleId?: string;
-  facebookId?: string;
-  linkedinId?: string;
-  profilePicture?: {
-    cloudinaryPublicId: string;
-    cloudinarySecureUrl: string;
-  };
-  coverPhoto?: {
-    cloudinaryPublicId: string;
-    cloudinarySecureUrl: string;
-  };
-  isBlocked?: boolean;
-  isVerified?: boolean;
-  isAdmin?: boolean;
-  isRecruiter?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  verificationToken?: string;
-  otpExpiresAt?: Date;
- */
+export interface MessageReadBy {
+    userId?: string
+    readAt?: string | Date
+}
+export interface Message {
+    _id?: string
+    conversationId?: string
+    senderId?: string
+    content?: {
+        text?: string,
+        attachments?: any[]
+    }
+    readBy?: MessageReadBy[]
+    isDeleted?: boolean
+    createdAt?: string | Date
+    updatedAt?: string | Date
+}
 
   //user entity as per backend

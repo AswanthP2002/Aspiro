@@ -1,6 +1,6 @@
 import defaultProfilePicture from '/default-img-instagram.png'
 import defaultCoverPhoto from '/default-cover-photo.jpg'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
 import { getCandidateDetails } from '../../../services/commonServices'
 import formatDate, { transformDate } from '../../../services/util/formatDate'
@@ -31,6 +31,7 @@ export default function UserPublicProfile() {
     })
     const [followed, setFollowed] = useState<boolean>(false)
 
+    const navigateTo = useNavigate()
 
     const location = useLocation()
     const {userId} = location.state || {}
@@ -62,6 +63,10 @@ export default function UserPublicProfile() {
         } catch (error: unknown) {
             Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:5000})
         }
+    }
+
+    const navigateToUserChat = () => {
+       return navigateTo(`/chats`, {state:{_id: userDetails?._id, name: userDetails?.name, email: userDetails?.email}})
     }
 
     const unfollowAUser = async () => {
@@ -168,7 +173,7 @@ export default function UserPublicProfile() {
                                         </button>
                                       </>
                             }
-                            <button className='flex flex-1 items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
+                            <button onClick={navigateToUserChat} className='flex flex-1 items-center text-xs border border-gray-300 rounded-md justify-center gap-1 py-1'>
                                 <AiOutlineMessage />
                                 Message
                             </button>
