@@ -30,7 +30,11 @@ import express, { NextFunction, Request, Response } from 'express';
 // import UserRepository from '../../../infrastructure/repositories/userRepository';
 import { container } from 'tsyringe';
 import { AdminController } from '../controllers/adminController';
-import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
+import {
+  authorization,
+  centralizedAuthentication,
+  refreshAccessToken,
+} from '../../middlewares/auth';
 import Validator from '../../validation/validator.zod';
 import { loginSchema } from '../schemas/user/userLogin.schema';
 import { LoadRecruiterApplicationSchem } from '../schemas/admin/loadRecruiterApplications';
@@ -38,64 +42,28 @@ import { LoadRecruiterApplicationSchem } from '../schemas/admin/loadRecruiterApp
 function createAdminRouter() {
   const adminRouter = express.Router();
 
-  // const candidateRepo = new CandidateRepository();
-  // const recruiterRepo = new RecruiterRespository();
-  // const jobRepo = new JobRepository();
-  // const userRepo = new UserRepository();
-
-  //const adminLoginUC = new AdminLoginUseCase(candidateRepo, userRepo);
-  // const loadCandidatesUC = new LoadCandidatesUseCase(candidateRepo);
-  // const loadCompaniesUC = new LoadCompaniesUseCase(recruiterRepo);
-  // const loadCandidateDetailsUC = new LoadCandidateDetailsUseCase(candidateRepo);
-  // //const blockCandidateUC = new BlockCandidateUseCase(candidateRepo);
-  // //const unblockCandidateUC = new UnblockCandidateUseCase(candidateRepo);
-  // const loadCompanyDetailsUC = new LoadCompanyDetailsUseCase(recruiterRepo);
-  // const blockCompanyUC = new BlockCompanyUseCase(recruiterRepo);
-  // const unblockCompanyUC = new UnblockCompanyUseCase(recruiterRepo);
-  // const closeCompanyUC = new CloseCompanyUseCase(recruiterRepo);
-  // const loadJobsUC = new LoadJobsUseCase(jobRepo);
-  // const loadJobDetailsUC = new LoadJobDetailsUseCase(jobRepo);
-  // const blockJobUC = new BlockJobUseCase(jobRepo);
-  // const unblockJobUC = new UnblockJobUseCase(jobRepo);
-  // const rejectJobUC = new RejectJobUseCase(jobRepo);
-  // const unrejectJobUC = new UnRejectJobUseCase(jobRepo);
-
   const adminController = container.resolve(AdminController);
-
-  // const adminController = new AdminController(
-  //   // loadCandidatesUC,
-  //   // loadCompaniesUC,
-  //   // loadCandidateDetailsUC,
-  //   // blockCandidateUC,
-  //   // unblockCandidateUC,
-  //   // loadCompanyDetailsUC,
-  //   // blockCompanyUC,
-  //   // unblockCompanyUC,
-  //   // closeCompanyUC,
-  //   // loadJobsUC,
-  //   // loadJobDetailsUC,
-  //   // blockJobUC,
-  //   // unblockJobUC,
-  //   // rejectJobUC,
-  //   // unrejectJobUC
-  // );
 
   adminRouter.post(
     '/login',
     Validator(loginSchema),
-    adminController.adminLogin.bind(adminController));
-  adminRouter.get('/users',
+    testMiddleware,
+    adminController.adminLogin.bind(adminController)
+  );
+  adminRouter.get(
+    '/users',
     centralizedAuthentication,
     authorization(['admin']),
     testMiddleware,
     adminController.loadUsers.bind(adminController)
-  )
-  // // adminRouter.get(
-  // //   '/companies/data',
-  // //   adminAuth,
-  // //   testMiddleware,
-  // //   adminController.loadCompanies.bind(adminController)
-  // // );
+  );
+  adminRouter.get(
+    '/recruiters/data',
+    centralizedAuthentication,
+    authorization(['admin']),
+    testMiddleware,
+    adminController.loadCompanies.bind(adminController)
+  );
   adminRouter.get(
     '/users/details/:userId',
     centralizedAuthentication,
@@ -119,52 +87,86 @@ function createAdminRouter() {
     centralizedAuthentication,
     authorization(['admin']),
     adminController.deleteUser.bind(adminController)
-  )
+  );
   adminRouter.get(
     '/recruiter/applications',
     centralizedAuthentication,
     authorization(['admin']),
     // Validator(LoadRecruiterApplicationSchem),
     adminController.loadRecruiterApplications.bind(adminController)
-  )
+  );
   adminRouter.patch(
     '/recruiter/application/:recruiterId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.rejectRecruiterApplication.bind(adminController)
-  )
+  );
   adminRouter.patch(
     '/recruiter/application/approve/:recruiterId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.approveRecruiterApplication.bind(adminController)
-  )
+  );
 
   // // adminRouter.get(
   // //   '/admin/company/details/:companyId',
   // //   adminAuth,
   // //   adminController.loadCompanyDetails.bind(adminController)
   // // );
-  // // adminRouter.put(
-  // //   '/admin/company/block/:companyId',
-  // //   adminAuth,
-  // //   adminController.blockRecruiter.bind(adminController)
-  // // );
-  // // adminRouter.put(
-  // //   '/admin/company/unblock/:companyId',
-  // //   adminAuth,
-  // //   adminController.unblockRecruiter.bind(adminController)
-  // // );
-  // // adminRouter.delete(
-  // //   '/admin/company/close/:companyId',
-  // //   adminAuth,
-  // //   adminController.closeCompany.bind(adminController)
-  // // );
+  adminRouter.patch(
+    '/recruiter/block/:companyId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    testMiddleware,
+    adminController.blockRecruiter.bind(adminController)
+  );
+  adminRouter.patch(
+    '/recruiter/unblock/:companyId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.unblockRecruiter.bind(adminController)
+  );
+  adminRouter.patch(
+    '/recruiter/close/:companyId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.closeCompany.bind(adminController)
+  );
   adminRouter.get(
     '/jobs/data',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.loadJobs.bind(adminController)
+  );
+
+  adminRouter.get(
+    '/skills',
+    centralizedAuthentication,
+    authorization(['admin', 'user', 'recruiter']),
+    testMiddleware,
+    adminController.getSkills.bind(adminController)
+  );
+
+  adminRouter.post(
+    '/skills',
+    centralizedAuthentication,
+    authorization(['admin']),
+    testMiddleware,
+    adminController.addSkills.bind(adminController)
+  );
+
+  adminRouter.patch(
+    '/skills/:skillId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.updateSkills.bind(adminController)
+  );
+
+  adminRouter.delete(
+    '/skills/:skillId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteSkills.bind(adminController)
   );
   // // adminRouter.get(
   // //   '/admin/job/details/:jobId',
@@ -193,19 +195,16 @@ function createAdminRouter() {
   // // );
 
   //adminRouter.post('/token/refresh', refreshAccessToken);
-  adminRouter.post(
-    '/logout',
-    adminController.logoutAdmin
-  );
-
-
+  adminRouter.post('/logout', adminController.logoutAdmin);
 
   return adminRouter;
 }
 
-function testMiddleware(req : Request, res : Response, next : NextFunction){
-  console.log('testing logout flow')
-  next()
+function testMiddleware(req: Request, res: Response, next: NextFunction) {
+  console.log('testing logout flow');
+  console.log('--req url for testing--', req.url);
+  console.log(req.body);
+  next();
 }
 
 export default createAdminRouter;

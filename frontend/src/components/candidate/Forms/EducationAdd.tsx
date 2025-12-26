@@ -61,42 +61,50 @@ export default function AddEducationForm({
     setLoading(true);
     const { educationInstitution, educationLevel, isPresent, educationStream, startYear, endYear, location } =
       data;
-    const result = await addUserEducation(
-      educationLevel,
-      educationStream,
-      educationInstitution,
-      isPresent,
-      startYear,
-      endYear,
-      location
-    );
-    setTimeout(() => {
-      if (result?.success) {
-        Notify.success('Education added', { timeout: 2000 });
-      } else {
-        Notify.failure(result?.message, { timeout: 2000 });
-      }
-      setLoading(false);
-      closeEducationModal();
-      reset({
-        educationLevel: '',
-        educationStream: '',
-        educationInstitution: '',
-        isPresent: false,
-        startYear: '',
-        endYear: '',
-        location: '',
-      });
-      onAddEducation({
-        educationLevel: educationLevel,
-        educationStream: educationStream,
-        institution: educationInstitution,
-        isPresent: isPresent,
-        location: location,
-        startYear: startYear,
-        endYear: endYear,
-      });
-    }, 2000);
+    try {
+      const result = await addUserEducation(
+        educationLevel,
+        educationStream,
+        educationInstitution,
+        isPresent,
+        startYear,
+        endYear,
+        location
+      );
+      
+        if (result?.success) {
+          Notify.success('Education added', { timeout: 2000 });
+        } else {
+          Notify.failure(result?.message, { timeout: 2000 });
+          return
+        }
+       // closeEducationModal();
+       
+        onAddEducation({
+          educationLevel: educationLevel,
+          educationStream: educationStream,
+          institution: educationInstitution,
+          isPresent: isPresent,
+          location: location,
+          startYear: startYear,
+          endYear: endYear,
+        });
+    
+    } catch (error: unknown) {
+        Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+    } finally {
+       reset({
+          educationLevel: '',
+          educationStream: '',
+          educationInstitution: '',
+          isPresent: false,
+          startYear: '',
+          endYear: '',
+          location: '',
+        });
+      closeEducationModal()
+      setLoading(false)
+    }
   };
 
   const eduLevel = watch('educationLevel');

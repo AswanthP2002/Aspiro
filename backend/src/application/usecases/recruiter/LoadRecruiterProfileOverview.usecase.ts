@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import ILoadRecruiterProfileOverviewUsecase from '../../interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
 import mapProfileOverviewDataToDTO from '../../mappers/recruiter/mapProfileOvervieDataToDTO.mapper';
-import RecruiterProfilelOverviewDataDTO from '../../DTOs/recruiter/recruiterProfileOverviewData.dto';
+import RecruiterProfilelOverviewDataDTO from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
 
 @injectable()
 export class LoadRecruiterProfileOverviewUsecase implements ILoadRecruiterProfileOverviewUsecase {

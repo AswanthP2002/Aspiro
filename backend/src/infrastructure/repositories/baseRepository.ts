@@ -21,28 +21,31 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return null; // Return null if the ID format is invalid
     }
-    const result = await this._model.findOne({
-      _id: new mongoose.Types.ObjectId(id),
-    }); // Use .lean() for better performance and a plain object
-    return result;
+    const result = await this._model
+      .findOne({
+        _id: new mongoose.Types.ObjectId(id),
+      })
+      .lean(); // Use .lean() for better performance and a plain object
+    return result as T | null;
   }
 
   async update(id: string, updateEntity: Partial<T>): Promise<T | null> {
     if (!id || !updateEntity) {
       return null;
     }
-    const result = await this._model.findOneAndUpdate(
-      { _id: new mongoose.Types.ObjectId(id) },
-      { $set: updateEntity },
-      { returnDocument: 'after' }
-    );
-    return result;
+    const result = await this._model
+      .findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateEntity },
+        { returnDocument: 'after' }
+      )
+      .lean();
+    return result as T | null;
   }
 
   async delete(id: string): Promise<void> {
-    console.log('delete profposed id', id)
+    console.log('delete profposed id', id);
     const result = await this._model.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
-    console.log('is dleted or not', result.deletedCount)
-
+    console.log('is dleted or not', result.deletedCount);
   }
 }

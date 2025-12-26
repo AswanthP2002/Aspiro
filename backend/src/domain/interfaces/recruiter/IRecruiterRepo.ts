@@ -1,5 +1,8 @@
 import RecruiterProfileAggregated from '../../../application/DTOs/recruiter/recruiterProfileAggregatedData.dto';
-import FindCompaniesQuery, { AppliedRecruitersQuery } from '../../../application/queries/recruiter.query';
+import FindRecruitersDBQuery from '../../../application/queries/recruiter.query';
+import FindCompaniesQuery, {
+  AppliedRecruitersQuery,
+} from '../../../application/queries/recruiter.query';
 import Recruiter from '../../entities/recruiter/recruiter.entity';
 import RecruiterProfileOverviewData from '../../entities/recruiter/recruiterProfilveOverviewData';
 import IBaseRepo from '../IBaseRepo';
@@ -10,8 +13,11 @@ export default interface IRecruiterRepo extends IBaseRepo<Recruiter> {
   findByEmail(email: string): Promise<Recruiter | null>;
   findById(id: string): Promise<Recruiter | null>;
   findByUserName(username: string): Promise<Recruiter | null>;
-  findRecruiters(query: FindCompaniesQuery): Promise<Recruiter[] | null>; //change for strict later
+  findRecruiters(query: FindRecruitersDBQuery): Promise<Recruiter[] | null>; //change for strict later
   verifyRecruiter(email: string): Promise<Recruiter | null>;
+  findRecruitersPaginated(
+    query: FindRecruitersDBQuery
+  ): Promise<{ recruiters: RecruiterProfileOverviewData[]; totalPages: number } | null>;
   updateIntroDetails(
     id: string,
     companyName: string,
@@ -31,6 +37,8 @@ export default interface IRecruiterRepo extends IBaseRepo<Recruiter> {
   blockRecruiter(id: string): Promise<boolean>;
   unblockRecruiter(id: string): Promise<boolean>;
   deleteRecruiter(id: string): Promise<boolean>;
-  getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null>
-  getAppliedRecruitersData(query: AppliedRecruitersQuery): Promise<RecruiterProfileOverviewData[] | null>
+  getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null>;
+  getAppliedRecruitersData(
+    query: AppliedRecruitersQuery
+  ): Promise<RecruiterProfileOverviewData[] | null>;
 }

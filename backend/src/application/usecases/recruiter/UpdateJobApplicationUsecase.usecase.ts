@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import IUpdateJobApplicationStatusUsecase from "../../interfaces/usecases/recruiter/IUpdateJobApplicationStatus.usecase";
-import { JobApplicationDTO } from "../../DTOs/candidate -LEGACY/jobApplication.dto";
+import { JobApplicationDTO } from "../../DTOs/candidate -LEGACY/jobApplication.dto.FIX";
 import IJobApplicationRepo from "../../../domain/interfaces/IJobApplicationRepo";
 import mapToJobApplicationDTOFromJobApplication from "../../mappers/user/mapToJobApplicationDTOFromJobApplication.mapper";
 import IEmailService from "../../interfaces/services/IEmailService";

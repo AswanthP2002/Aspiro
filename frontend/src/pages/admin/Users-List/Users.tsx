@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix';
-import { getUsers } from '../../../services/adminServices';
+import { getUsers, userBlock, userUnblock } from '../../../services/adminServices';
 import { UserType } from '../../../types/entityTypes';
 import { FaSortAmountUp, FaSearch } from 'react-icons/fa';
 import { FiFilter } from 'react-icons/fi';
@@ -10,17 +10,8 @@ import { CiCalendar } from 'react-icons/ci';
 import { CgClose } from 'react-icons/cg';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-
-
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-
+import Swal from 'sweetalert2';
+import { BiBlock } from 'react-icons/bi';
 
 interface FilterOptions {
   status: boolean[]; 
@@ -75,6 +66,77 @@ export default function Users() {
 
   const openFilter = () => setFilterVisible(true);
   const closeFilter = () => setFilterVisible(false);
+
+  const bloackUser = async (id: string) => {
+    if(!id) return
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Block ?',
+      text: 'Are you sure, you want to block this user ?',
+      showConfirmButton: true, 
+      confirmButtonText: 'Block',
+      showCancelButton: true,
+      cancelButtonText: 'No',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+      await userBlock(id)
+      Notify.success('User blocked Successfully', {timeout: 2000})
+      setUsers((prvUsers: UserType[]) => {
+        return prvUsers.map((user: UserType) => {
+          if(user._id === id){
+            return {...user, isBlocked: true}
+          }else {
+            return user
+          }
+        })
+      })
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+    }
+      }else{
+        return
+      }
+    })
+  }
+  const unblockUser = async (id: string) => {
+    if(!id) return
+
+    Swal.fire({
+      icon:'warning',
+      title: 'Unblock ?',
+      text: 'Are you sure, you want to unblock this user ?',
+      showConfirmButton: true, 
+      confirmButtonText: 'Unblock',
+      showCancelButton: true,
+      cancelButtonText: 'No',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+      await userUnblock(id)
+      Notify.success('User Unblocked', {timeout: 3000})
+      setUsers((prvUsers: UserType[]) => {
+        return prvUsers.map((user: UserType) => {
+          if(user._id === id){
+            return {...user, isBlocked: false}
+          }else{
+            return user
+          }
+        })
+      })
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+    }
+      }else {
+        return
+      }
+    })
+  }
 
 
   useEffect(() => {
@@ -277,6 +339,7 @@ export default function Users() {
                    <td className='!p-2'>Role</td>
                    <td className='!p-2'>Joined</td>
                    <td className='!p-2'>Status</td>
+                   <td className='!p-2'>Action</td>
                  </tr>
                </thead>
                <tbody>
@@ -305,6 +368,17 @@ export default function Users() {
                       user?.isBlocked
                           ? <span className='text-xs text-red-500 bg-red-100 rounded-full !px-2'>Blocked</span>
                           : <span className='text-xs text-green-500 bg-green-100 rounded-full !px-2'>Active</span>
+                    }
+                  </td>
+                  <td>
+                    {
+                      user.isBlocked
+                        ? <>
+                            <button onClick={() => unblockUser(user._id)} className='text-xs border border-blue-500 rounded-full text-blue-500 px-3 py-1 flex gap-2 items-center'>Unblock</button>
+                          </>
+                        : <>
+                            <button onClick={() => bloackUser(user._id)} className='text-xs border border-red-500 rounded-full text-red-500 px-3 py-1 flex gap-2 items-center'>Block <BiBlock /></button>
+                          </>
                     }
                   </td>
                 </tr>

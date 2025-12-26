@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -48,6 +49,7 @@ export default function EditExperienceForm({
   } = useForm<Inputs>();
 
   const [editableIsPresent, setEditableIsPresent] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false)
 
 
   useEffect(() => {
@@ -87,6 +89,7 @@ export default function EditExperienceForm({
 
 
   async function editExperienceOnSubmit(data : Inputs) {
+    setLoading(true)
     console.log('editable data');
     const { role, jobType, organization, startDate, endDate, location, workMode } = data;
     const formatedStartDate = startDate.format("YYYY-MM-DD")
@@ -104,7 +107,7 @@ export default function EditExperienceForm({
       location,
       workMode
     );
-    closeExpEditModal();
+    //closeExpEditModal();
     if(!result?.success){
       Notify.failure(result?.message, {timeout:2000})
       return
@@ -130,8 +133,10 @@ export default function EditExperienceForm({
       });
     });
     } catch (error : unknown) {
-      Notify.failure('Something went wrong', {timeout:2000})
-
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
+    } finally {
+      closeExpEditModal()
+      setLoading(false)
     }
   }
 
@@ -345,9 +350,7 @@ export default function EditExperienceForm({
             </FormControl>
           </Box>
           <Box sx={{ width: '100%', marginTop: '10px' }}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">
-              Edit
-            </button>
+            <Button type='submit' fullWidth variant='contained' loading={loading}>Edit</Button>
           </Box>
         </form>
       </Box>

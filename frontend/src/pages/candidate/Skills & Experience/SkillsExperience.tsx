@@ -205,7 +205,7 @@ export default function ExperiencePage(){
                 </div>
                 <div className="grid grid-cols-1 mt-5 w-full gap-3">
                     {
-                        experiences.map((exp: any, index: number) => (
+                        experiences.map((exp: Experience, index: number) => (
                             <div key={index} className="border flex gap-3 border-gray-200 bg-white p-5 rounded-md">
                                 <div className="bg-blue-100 w-10 h-10 flex items-center justify-center rounded-md">
                                     <FaSuitcase color="blue" />

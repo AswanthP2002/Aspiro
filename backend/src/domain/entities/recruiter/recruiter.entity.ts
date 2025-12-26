@@ -1,4 +1,3 @@
-
 export default interface Recruiter {
   _id?: string;
   userId?: string;
@@ -9,13 +8,15 @@ export default interface Recruiter {
     industry?: string;
     organizationContactNumber?: string;
     organizationEmail?: string;
-    linkedinUrl?: string
+    linkedinUrl?: string;
     teamStrength?: string;
     website?: string;
   };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
+  recruitingExperience?: string;
+  focusingIndustries?: string[];
+  isSuspended?: boolean;
+  isDeleted?: boolean;
+  profileStatus?: 'pending' | 'approved' | 'rejected' | 'suspended' | 'closed';
   summary?: string;
   createdAt?: Date;
   updatedAt?: Date;

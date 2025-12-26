@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { userLogout } from '../../../services/userServices';
 import { CiHome, CiLogout, CiCreditCard1 } from 'react-icons/ci';
-import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome } from 'react-icons/fa';
+import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome, FaTools } from 'react-icons/fa';
 import { LuUser, LuUsers, LuUserSearch } from 'react-icons/lu';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
@@ -33,10 +33,11 @@ export default function Sidebar(){
     showCancelButton:true
   }).then(async (result) => {
     if(result?.isConfirmed){
-      const logoutResult = await logoutAdmin(dispatcher, navigate)
-      if(!logoutResult){
-        Notify.failure('Can not logout right now', {timeout:1500})
-        return
+      try {
+        await logoutAdmin(dispatcher, navigate)
+
+      } catch (error: unknown) {
+        Notify.failure(error instanceof Error ? error.message : 'Can not logout right now, please try again after some time', {timeout: 3000})
       }
     }else{
       return
@@ -75,7 +76,7 @@ export default function Sidebar(){
               </Link>
             </li>
             <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/companies" className='flex items-center gap-2'>
+              <Link to="/admin/recruiters" className='flex items-center gap-2'>
                 <FaUserTie size={21} color='gray' className='group-hover:!text-orange-500' />
                 <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiters</p>
               </Link>
@@ -102,6 +103,12 @@ export default function Sidebar(){
               <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
               <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>
               <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiter Applications</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('skills-manage') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
+              <Link to="/admin/skills-manage" className='flex items-center gap-2'>
+              <FaTools size={21} color='gray' className='group-hover:!text-orange-400'/>
+              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Skills</p>
               </Link>
             </li>
           </ul>
@@ -134,5 +141,3 @@ export default function Sidebar(){
     // </div>
   );
 };
-
-

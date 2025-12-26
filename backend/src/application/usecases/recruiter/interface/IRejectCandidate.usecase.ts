@@ -1,4 +1,4 @@
-import { JobApplicationDTO } from '../../../DTOs/candidate -LEGACY/jobApplication.dto';
+import { JobApplicationDTO } from '../../../DTOs/candidate -LEGACY/jobApplication.dto.FIX';
 
 export default interface IRejectCandidateUseCase {
   execute(applicationId: string): Promise<JobApplicationDTO | null>;

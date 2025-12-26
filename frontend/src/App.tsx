@@ -77,6 +77,8 @@ import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetai
 import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import MyApplications from './pages/candidate/My-applications/Applications';
 import ChatPage from './pages/common/Chat/Chat';
+import Companies from './pages/admin/Company-list/Companies';
+import AdminSkillManagementPage from './pages/admin/Company-list/SkillsManagement';
 
 function App() {
 
@@ -174,6 +176,8 @@ function App() {
           <Route path='users' element={<Users />} />
           <Route path='users/details/:id' element={<CandidateDetails />} />
           <Route path='jobs' element={<Jobs />} />
+          <Route path='recruiters/' element={<Companies />} />
+          <Route path='skills-manage' element={<AdminSkillManagementPage />} />
           </Route>
         </Route>
 

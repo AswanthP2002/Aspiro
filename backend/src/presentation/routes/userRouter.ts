@@ -1,7 +1,7 @@
 // import { upload } from '../../utilities/multer';
 // import { NextFunction, Request, Response } from 'express';
 import express, { NextFunction, Request, Response } from 'express';
-import { UserController } from '../controllers/userController';
+import { UserController } from '../controllers/UserController';
 // import {
 //   authorization,
 //   candidateAuth,
@@ -69,26 +69,40 @@ import { UserController } from '../controllers/userController';
 // import FindCandidateByUserIdUseCase from '../../application/usecases/candidate/FindCandidateByUserId.usecase';
 import { container } from 'tsyringe';
 import allowResendOtp from '../../middlewares/OtpRequestLimitCheck';
-import { authorization, centralizedAuthentication, refreshAccessToken } from '../../middlewares/auth';
+import {
+  authorization,
+  centralizedAuthentication,
+  refreshAccessToken,
+} from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
 import { StatusCodes } from '../statusCodes';
 import Validator from '../../validation/validator.zod';
-import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.zod';
+import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.FIX';
 import { loginSchema } from '../schemas/user/userLogin.schema';
 import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';
 import { userExperienceSchema } from '../schemas/user/userExperience.schema';
 import { addUserEducationSchema } from '../schemas/user/createUserEducation.schema';
 import parsePdf from '../../middlewares/parsePdf';
+import { CreateUserSchema } from '../schemas/user/createUser.schema';
+import { verifyUserInputsSchema } from '../schemas/user/verifyUserInputs.schema';
 
 function createUserRouter() {
   const userRouter = express.Router();
 
   const userController = container.resolve(UserController);
 
-  userRouter.post('/register', userController.registerUser.bind(userController));
-  userRouter.post('/verify', userController.verifyUser.bind(userController));
-  userRouter.post('/otp/resend', allowResendOtp, userController.resendOTP.bind(userController));
+  userRouter.post(
+    '/register',
+    Validator(CreateUserSchema),
+    userController.registerUser.bind(userController) //added zod validation before controller
+  );
+  userRouter.post(
+    '/verify',
+    Validator(verifyUserInputsSchema),
+    userController.verifyUser.bind(userController)
+  );
+  userRouter.post('/otp/resend', userController.resendOTP.bind(userController)); //removed resend otp sending limit currently for testing :allowresendotp
   userRouter.post('/login', Validator(loginSchema), userController.userLogin.bind(userController));
   userRouter.post('/logout', userController.userLogout.bind(userController));
   userRouter.get('/token/refresh', refreshAccessToken);
@@ -96,7 +110,7 @@ function createUserRouter() {
   //   '/login',
   //   candidateController.loginCandidate.bind(candidateController)
   // );
-  userRouter.get('/jobs', userController.loadJobs.bind(userController));
+  userRouter.get('/jobs', userController.loadJobs.bind(userController)); //no zod validation for load jobs query
 
   userRouter.get('/jobs/details/:jobId', userController.loadJobDetails.bind(userController));
 
@@ -136,6 +150,7 @@ function createUserRouter() {
     centralizedAuthentication,
     authorization(['user']),
     Validator(userExperienceSchema),
+    testMiddleware,
     userController.editExperience.bind(userController)
   );
   userRouter.post(
@@ -155,6 +170,7 @@ function createUserRouter() {
     '/skills/:skillId',
     centralizedAuthentication,
     authorization(['user']),
+    testMiddleware,
     userController.deleteSkill.bind(userController)
   );
   userRouter.post(
@@ -193,24 +209,25 @@ function createUserRouter() {
     Validator(ResetPasswordSchema),
     userController.resetPassword.bind(userController)
   );
-  // candidateRouter.delete(
-  //   '/candidate/resume/:resumeId',
-  //   candidateAuth,
-  //   candidateController.deleteResume.bind(candidateController)
-  // );
-  // candidateRouter.post(
-  //   '/candidate/certificate',
-  //   upload.single('certificate'),
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.addCertificate.bind(candidateController)
-  // );
-  // candidateRouter.get(
-  //   '/candidate/certificate',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.getCertificates.bind(candidateController)
-  // );
+  userRouter.delete(
+    '/resume/:resumeId',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.deleteResume.bind(userController)
+  );
+  userRouter.post(
+    '/certificate',
+    upload.single('certificate'),
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.addCertificate.bind(userController)
+  );
+  userRouter.get(
+    '/certificate',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getCertificates.bind(userController)
+  );
 
   // //candidateRouter.get('/home/jobs', testMiddleWare, candidateController.searchJobFromHomePage.bind(candidateController))
 
@@ -223,12 +240,12 @@ function createUserRouter() {
     userController.addResume.bind(userController)
   );
 
-  // candidateRouter.get(
-  //   '/candidate/resumes',
-  //   centralizedAuthentication,
-  //   authorization(['candidate']),
-  //   candidateController.loadResume.bind(candidateController)
-  // );
+  userRouter.get(
+    '/resumes',
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadResume.bind(userController)
+  );
 
   userRouter.patch(
     '/user/profile',
@@ -333,7 +350,7 @@ function createUserRouter() {
     userController.loadUserAggregatedProfile.bind(userController)
   );
   userRouter.get(
-    '/user/metadata///flaged', //route flaged due to authenticated user related issues
+    '/user/metadata', //route flaged due to authenticated user related issues
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUserMetaData.bind(userController)

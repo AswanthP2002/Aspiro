@@ -1,4 +1,4 @@
-import { Modal, Box, Typography, FormControl, TextField, InputLabel, Select, MenuItem, FormHelperText, Checkbox, FormControlLabel } from "@mui/material";
+import { Modal, Box, Typography, FormControl, TextField, InputLabel, Select, MenuItem, FormHelperText, Checkbox, FormControlLabel, Button } from "@mui/material";
 import Swal from "sweetalert2";
 import { addUserExperience } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
@@ -7,6 +7,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { Dayjs } from "dayjs";
+import { useState } from "react";
+import { Notify } from "notiflix";
 
 export default function AddExperienceForm({experiencemodalopen, closeModal, onAddExperience} : any){
   
@@ -21,6 +23,8 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
     isPresent: boolean 
   }
 
+  const [loading, setLoading] = useState<boolean>(false)
+
   const {watch, reset, control, handleSubmit, formState:{errors}} = useForm<Inputs>({
     defaultValues:{
       role:'',
@@ -33,32 +37,40 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
   })
       
         async function addExperience(data : Inputs){
+          setLoading(true)
           const {role, jobType, organization, startDate, endDate, location, workMode, isPresent } = data
           console.log(data)
           const formatedStartDate = startDate.format("YYYY-MM-DD")
           const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
-                const result = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
-                closeModal()//closing form
-                    Swal.fire({
-                        icon:'success',
-                        title:'Added',
-                        text:result?.message,
-                        showConfirmButton:false,
-                        showCancelButton:false,
-                        timer:3000
-                    }).then(() => {
-                      onAddExperience({role, jobType, location, workMode, organization, isPresent, startDate:formatedStartDate, endDate:formatedEndDate})
-                      reset({
-                        jobType:'',
-                        role:'',
-                        organization:'',
-                        startDate:'',
-                        endDate:'',
-                        location:'',
-                        workMode:'',
-                        isPresent:false
+                try {
+                  const result = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
+                  //closeModal()//closing form
+                      Swal.fire({
+                          icon:'success',
+                          title:'Added',
+                          text:result?.message,
+                          showConfirmButton:false,
+                          showCancelButton:false,
+                          timer:3000
+                      }).then(() => {
+                        onAddExperience({role, jobType, location, workMode, organization, isPresent, startDate:formatedStartDate, endDate:formatedEndDate})
+                        reset({
+                          jobType:'',
+                          role:'',
+                          organization:'',
+                          startDate:'',
+                          endDate:'',
+                          location:'',
+                          workMode:'',
+                          isPresent:false
+                        })
                       })
-                    })
+                } catch (error: unknown) {
+                  Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                } finally {
+                  setLoading(false)
+                  closeModal()
+                }
         }
 
     const currentWorkingStatus = watch('isPresent')
@@ -244,7 +256,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
             
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">Add</button>
+            <Button type="submit" fullWidth variant="contained" color="info" loading={loading}>Add Experience</Button>
           </Box>
           </form>
         </Box>

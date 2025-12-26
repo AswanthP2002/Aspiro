@@ -1,4 +1,4 @@
-import UpdateUserDTO from "../../../application/DTOs/user/updateUser.dto";
+import UpdateUserDTO from "../../../application/DTOs/user/updateUser.dto.FIX";
 import SaveUsersBasicsRequestDto from "../../DTOs/user/saveUsersBasicsRequest.dto";
 
 export default function mapToUpdateUserDTO(requestDto : SaveUsersBasicsRequestDto) : UpdateUserDTO {

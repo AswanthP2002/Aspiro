@@ -5,8 +5,12 @@ import { Db, ObjectId } from 'mongodb';
 import BaseRepository from '../baseRepository';
 import { RecruiterDAO } from '../../database/DAOs/recruiter/recruiter.dao';
 import RecruiterProfileAggregated from '../../../application/DTOs/recruiter/recruiterProfileAggregatedData.dto';
-import FindCompaniesQuery, { AppliedRecruitersQuery } from '../../../application/queries/recruiter.query';
+import FindCompaniesQuery, {
+  AppliedRecruitersQuery,
+} from '../../../application/queries/recruiter.query';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
+import FindRecruitersDBQuery from '../../../application/queries/recruiter.query';
+import { PipelineStage } from 'mongoose';
 
 export default class RecruiterRespository
   extends BaseRepository<Recruiter>
@@ -26,16 +30,80 @@ export default class RecruiterRespository
     return result;
   }
 
-  async findRecruiters(query: FindCompaniesQuery): Promise<Recruiter[] | null> {
-    const { search, sortOption, limit, page } = query;
+  async findRecruitersPaginated(
+    query: FindRecruitersDBQuery
+  ): Promise<{ recruiters: RecruiterProfileOverviewData[]; totalPages: number } | null> {
+    const { search, page, sortOption, employer_type_filter, employer_status_filter, limit } = query;
     const skip = (page - 1) * limit;
-    const searchQuery = search
-      ? { companyName: { $regex: new RegExp(search, 'i') } }
-      : {};
+    let searchQuery = {};
+    const aggPipeline: any[] = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userProfile',
+        },
+      },
+      { $unwind: '$userProfile' },
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'userId',
+          foreignField: 'recruiterId',
+          as: 'jobs',
+        },
+      },
+      {
+        $addFields: {
+          isSuspended: { $ifNull: ['$isSuspended', false] },
+          isDeleted: { $ifNull: ['$isDeleted', false] },
+        },
+      },
+    ];
+
+    if (search) {
+      searchQuery = {
+        $or: [
+          { 'userProfile.name': { $regex: new RegExp(search, 'i') } },
+          { 'userProfile.email': { $regex: new RegExp(search, 'i') } },
+          { organizationDetails: { $regex: new RegExp(search, 'i') } },
+        ],
+      };
+    }
+
+    const filterQuery = {
+      employerType: { $in: employer_type_filter },
+      ...employer_status_filter,
+    };
+    const totalDocs = await RecruiterDAO.aggregate([
+      ...aggPipeline,
+      { $match: searchQuery },
+      { $match: filterQuery },
+      { $count: 'totalRecruiters' },
+    ]);
+    aggPipeline.push(
+      { $match: searchQuery },
+      { $match: filterQuery },
+      { $skip: skip },
+      { $limit: limit }
+    );
+    const docs = await RecruiterDAO.aggregate(aggPipeline);
+    const totalPages = Math.ceil((totalDocs[0]?.totalRecruiters ?? 0) / limit) || 0;
+
+    return { recruiters: docs, totalPages };
+  }
+
+  async findRecruiters(query: FindRecruitersDBQuery): Promise<Recruiter[] | null> {
+    const { search, sortOption, limit, page, employer_type_filter } = query;
+    const skip = (page - 1) * limit;
+    const searchQuery = search ? { companyName: { $regex: new RegExp(search, 'i') } } : {};
+    const filterQuery = { employerType: { $in: employer_type_filter } };
     const currentSort = sortOption;
     const pipeLine: any = [];
 
     pipeLine.push({ $match: searchQuery });
+    pipeLine.push({ $match: filterQuery });
     pipeLine.push({ $sort: sortOption });
     pipeLine.push({ $skip: skip });
     pipeLine.push({ $limit: limit });
@@ -110,6 +178,7 @@ export default class RecruiterRespository
       {
         $set: {
           isBlocked: true,
+          isSuspended: true,
         },
       }
     );
@@ -123,6 +192,7 @@ export default class RecruiterRespository
       {
         $set: {
           isBlocked: false,
+          isSuspended: false,
         },
       }
     );
@@ -131,73 +201,88 @@ export default class RecruiterRespository
   }
 
   async deleteRecruiter(id: string): Promise<boolean> {
-    const deleteResult = await RecruiterDAO.deleteOne({
-      _id: new ObjectId(id),
-    });
+    const deleteResult = await RecruiterDAO.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          isDeleted: true,
+        },
+      }
+    );
     return deleteResult.acknowledged;
   }
 
-  async getRecruiterProfileOverview(recruiterId: string): Promise<RecruiterProfileOverviewData | null> {
-    if(!ObjectId.isValid(recruiterId)) return null
-   // console.log('---request id reached in the repo ---', recruiterId)
+  async getRecruiterProfileOverview(
+    recruiterId: string
+  ): Promise<RecruiterProfileOverviewData | null> {
+    if (!ObjectId.isValid(recruiterId)) return null;
+    // console.log('---request id reached in the repo ---', recruiterId)
     const result = await RecruiterDAO.aggregate([
-      {$match:{userId:new ObjectId(recruiterId)}},
-      {$lookup:{
-        from:'users',
-        localField:'userId',
-        foreignField:'_id',
-        as:'userProfile'
-      }},
-      {$unwind:'$userProfile'},
-      {$lookup:{
-        from:'jobs',
-        localField:'recruiterId',
-        foreignField:'userProfile._id',
-        as:'jobs'
-      }}
-    ])
+      { $match: { userId: new ObjectId(recruiterId) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userProfile',
+        },
+      },
+      { $unwind: '$userProfile' },
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'recruiterId',
+          foreignField: 'userProfile._id',
+          as: 'jobs',
+        },
+      },
+    ]);
 
     //console.log('--- result before sending back to client ---', result)
-    return result.length > 0 ? result[0] : null
+    return result.length > 0 ? result[0] : null;
   }
 
-  async getAppliedRecruitersData(query: AppliedRecruitersQuery): Promise<RecruiterProfileOverviewData[] | null> {
-    const {search, profileStatus} = query
-    console.log('-- query inside the repo --', query)
-    let matchFilter: any = {}
+  async getAppliedRecruitersData(
+    query: AppliedRecruitersQuery
+  ): Promise<RecruiterProfileOverviewData[] | null> {
+    const { search, profileStatus } = query;
+    console.log('-- query inside the repo --', query);
+    let matchFilter: any = {};
     //manage search for username or email or organization name
-    
-    if(search){
+
+    if (search) {
       matchFilter = {
-        $or:[
-          {'userProfile.name':{$regex:new RegExp(search, 'i')}},
-          {'userProfile.email':{$regex:new RegExp(search, 'i')}},
-          {'organizationDetails.organizationName':{$regex:new RegExp(search, 'i')}}
+        $or: [
+          { 'userProfile.name': { $regex: new RegExp(search, 'i') } },
+          { 'userProfile.email': { $regex: new RegExp(search, 'i') } },
+          { 'organizationDetails.organizationName': { $regex: new RegExp(search, 'i') } },
         ],
-        profileStatus:{$in:profileStatus}
-      }
-    }else{
+        profileStatus: { $in: profileStatus },
+      };
+    } else {
       matchFilter = {
-        profileStatus:{$in:profileStatus}
-      }
+        profileStatus: { $in: profileStatus },
+      };
     }
 
     const piepeLine: any[] = [
-      {$lookup:{
-        from:'users',
-        localField:'userId',
-        foreignField:'_id',
-        as:'userProfile'
-      }},
-      {$unwind:'$userProfile'},
-      {$match:matchFilter}
-    ]
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userProfile',
+        },
+      },
+      { $unwind: '$userProfile' },
+      { $match: matchFilter },
+      { $sort: { createdAt: -1 } },
+    ];
 
-    const result = await RecruiterDAO.aggregate(piepeLine)
+    const result = await RecruiterDAO.aggregate(piepeLine);
     //console.log('---recruiter data ---', result)
-    return result
+    return result;
   }
-  
 
   // async aggregateRecruiterProfile(
   //   id: string

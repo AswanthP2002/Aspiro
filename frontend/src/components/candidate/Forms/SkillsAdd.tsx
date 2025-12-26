@@ -1,8 +1,9 @@
-import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { Controller, useForm } from "react-hook-form";
 import { addUserSkill } from "../../../services/userServices";
+import { Notify } from "notiflix";
 
 export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal, onAddSkill, onRemoveSkill} : any){
     const [type, setskillType] = useState("")
@@ -18,7 +19,8 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
         skillLevel:string
     }
 
-    const {handleSubmit, watch, formState:{errors}, control, register} = useForm<Inputs>()
+    const {handleSubmit, reset, watch, formState:{errors}, control, register} = useForm<Inputs>()
+    const [loading, setLoading] = useState<boolean>(false)
 
     const style = {
         position: 'absolute',
@@ -51,12 +53,12 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
 
 
     async function addSkill(){
-        console.log(watch())
+        setLoading(true)
         const {skill, skillLevel, skillType} = watch()
                
         try {
             const result = await addUserSkill(skillType, skill, skillLevel)
-            closeSkillsModal()
+           // closeSkillsModal()
             if(result.success){
                 Swal.fire({
                     icon:'success',
@@ -67,24 +69,22 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
                     timer:2000,
                 }).then(() => {
                     onAddSkill(skill, type, level)
-                    closeSkillsModal()
+                    //closeSkillsModal()
                 })
             }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:result?.message
-                })
+                Notify.failure('Something went wrong', {timeout: 2000})
             }
         } catch (error : unknown) {
             console.log(error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    //text:error?.message
-                })
-            }
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+        } finally {
+            reset({
+                skill:'',
+                skillLevel:'',
+                skillType:''
+            })
+            setLoading(false)
+            closeSkillsModal()
         }
     }
 
@@ -181,7 +181,7 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
             <label htmlFor="" className="error-label">{levelError}</label> */}
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">Add</button>
+            <Button type="submit" variant="contained" loading={loading} fullWidth>Add Skill</Button>
           </Box>
           </form>
         </Box>

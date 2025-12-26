@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import RecruiterController from '../../controllers/recruiterController';
 import { StatusCodes } from '../../statusCodes';
@@ -41,7 +41,7 @@ import { CreateJobSchema } from '../../schemas/recruiter/createJob.schema';
 function createRecruiterRouter() {
   const recruiterRouter = express.Router();
 
-  const recruiterController = container.resolve(RecruiterController)
+  const recruiterController = container.resolve(RecruiterController);
 
   recruiterRouter.post(
     '/recruiter/create',
@@ -83,26 +83,26 @@ function createRecruiterRouter() {
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     recruiterController.editJob.bind(recruiterController)
-  )
+  );
   recruiterRouter.delete(
     '/recruiter/job/delete/:jobId',
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     recruiterController.deleteJob.bind(recruiterController)
-  )
-  
+  );
+
   recruiterRouter.get(
     '/recruiter/jobs',
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     recruiterController.LoadRecruiterJobs.bind(recruiterController)
-  )
+  );
 
   recruiterRouter.post(
     '/recruiter/schedule-interview/:candidateId/job/:jobId/',
     centralizedAuthentication,
     authorization(['user', 'recruiter'])
-  )
+  );
   recruiterRouter.get(
     '/recruiter/job/:jobId/application/details',
     centralizedAuthentication,
@@ -115,13 +115,20 @@ function createRecruiterRouter() {
     authorization(['user', 'recruiter']),
     testMiddleware,
     recruiterController.updateCandidateNotes.bind(recruiterController)
-  )
+  );
   recruiterRouter.patch(
     '/recruiter/application/:applicationId/status',
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     recruiterController.updateJobApplicationStatus.bind(recruiterController)
-  )
+  );
+
+  recruiterRouter.get(
+    '/recruiter/recent/jobs',
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.getRecentJobs.bind(recruiterController)
+  );
   // // recruiterRouter.get(
   // //   '/recruiter/application/:applicationId',
   // //   recruiterAuth,
@@ -159,11 +166,10 @@ function createRecruiterRouter() {
   //     .json({ success: true, message: 'Testing job creating path' });
   // }
 
-  function testMiddleware(req: Request, res: Response, next: NextFunction){
-    console.log('checking request body', req.body)
-    next()
+  function testMiddleware(req: Request, res: Response, next: NextFunction) {
+    console.log('checking request body', req.body);
+    next();
     // res.status(200).json({success:true, message:'Ok'})
-
   }
 
   return recruiterRouter;

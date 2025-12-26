@@ -1,5 +1,5 @@
 import IJobRepo from '../../domain/interfaces/IJobRepo';
-import LoadJobDTO, { LoadJobResDTO } from '../DTOs/loadJob.dto';
+import LoadJobDTO, { LoadJobResDTO } from '../DTOs/job/loadJob.dto.FIX';
 import mapLoadJobResToDTO from '../mappers/mapLoadJobResToDTO.mapper';
 import IGetJobsUseCase from './interfaces/IGetJobs.usecase';
 

@@ -1,7 +1,7 @@
 import JobAggregated from '../../domain/entities/jobAggregated.entity';
 import IJobRepo from '../../domain/interfaces/IJobRepo';
 import mapJobAggregatedToJobDetailsDTO from '../../domain/mappers/mapJobAggToJobDetailsDTO';
-import JobAggregatedDTO from '../DTOs/jobDetails.dto';
+import JobAggregatedDTO from '../DTOs/job/jobDetails.dto.FIX';
 import ISearchJobsFromHomeUseCase from './interfaces/ISearchJobsFromHome.usecase';
 
 export default class SearchJobsFromHomeUseCase

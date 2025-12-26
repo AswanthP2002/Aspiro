@@ -318,6 +318,26 @@ export const getJobs = async (search: string, page: number, limit: number = 3, s
     }
 }
 
+export const getRecentJobs = async () => {
+    try {
+        const response = await axiosInstance.get('/recruiter/recent/jobs',
+            {
+                sendAuthToken:true,
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+
+        
+    }
+}
+
 export const getApplicationDetails = async (jobId : string) => {
     try {
         const response = await axiosInstance.get(`/recruiter/job/${jobId}/application/details`, {

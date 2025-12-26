@@ -1,4 +1,4 @@
-import LoadJobDTO, { LoadJobRes, LoadJobResDTO } from '../DTOs/loadJob.dto';
+import LoadJobDTO, { LoadJobRes, LoadJobResDTO } from '../DTOs/job/loadJob.dto.FIX';
 
 export default function mapLoadJobResToDTO(jobRes: LoadJobRes): LoadJobResDTO {
   return {

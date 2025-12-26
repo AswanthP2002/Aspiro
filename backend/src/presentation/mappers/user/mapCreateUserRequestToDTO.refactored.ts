@@ -1,4 +1,4 @@
-import CreateUserDTO from '../../../application/DTOs/user/createUser.dto';
+import CreateUserDTO from '../../../application/DTOs/user/createUser.dto.FIX';
 import CreateUserRequestDTO from '../../DTOs/user/CreateUserRequest.dto.refactored';
 
 export default function mapRequestToCreateUserDTO(requestDto: CreateUserRequestDTO): CreateUserDTO {

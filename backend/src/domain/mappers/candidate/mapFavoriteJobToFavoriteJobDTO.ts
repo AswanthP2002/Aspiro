@@ -1,4 +1,4 @@
-import FavoriteJobDTO from '../../../application/DTOs/candidate -LEGACY/favoriteJob.dto';
+import FavoriteJobDTO from '../../../application/DTOs/user/favoriteJob.dto.FIX';
 import FavoriteJobs from '../../entities/user/favoriteJobs.entity';
 
 export default function mapFavoriteJobToFavoriteJobDTO(

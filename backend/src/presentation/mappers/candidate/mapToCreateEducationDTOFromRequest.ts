@@ -1,4 +1,4 @@
-import { CreateEducationDTO } from '../../../application/DTOs/user/education.dto';
+import { CreateEducationDTO } from '../../../application/DTOs/user/education.dto.FIX';
 import AddEducationRequestDTO from '../../DTOs/candidate/addEducationRequestDTO';
 
 export default function mapToCreateEducationDTOFromRequest(

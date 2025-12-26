@@ -1,20 +1,20 @@
 import { inject, injectable } from 'tsyringe';
-import { PaginatedUsersDTO } from '../../DTOs/admin/loadUsersAdminside.dto';
+import { PaginatedUsersDTO } from '../../DTOs/admin/loadUsersAdminside.dto.FIX';
 import {
   FindUsersQuery,
   UserJoinDateSortQuery,
   UsersNameSortQuery,
 } from '../../queries/users.query';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import LoadUsersQueryDTO from '../../DTOs/admin/loadUsersAdminside.dto';
-import UserDTO from '../../DTOs/user/user.dto';
+import LoadUsersQueryDTO from '../../DTOs/admin/loadUsersAdminside.dto.FIX';
+import UserDTO, { UserDto } from '../../DTOs/user/user.dto.FIX';
 import User from '../../../domain/entities/user/User.FIX';
-import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
-import ILoadUsersAdminUseCase from '../../interfaces/usecases/admin/ILoadUsersAdmin.usecase';
+import ILoadUsersAdminUseCase from '../../interfaces/usecases/admin/ILoadUsersAdmin.usecase.FIX';
+import { plainToInstance } from 'class-transformer';
 
 @injectable()
 export class LoadUsersAdminUsecase implements ILoadUsersAdminUseCase {
-  constructor(@inject('IUserRepository') private _userRepository : IUserRepository) {}
+  constructor(@inject('IUserRepository') private _userRepository: IUserRepository) {}
 
   async execute(loadUsersQueryDto: LoadUsersQueryDTO): Promise<PaginatedUsersDTO | null> {
     const { search, page, limit, sort, filter } = loadUsersQueryDto;
@@ -50,23 +50,22 @@ export class LoadUsersAdminUsecase implements ILoadUsersAdminUseCase {
       sortOption: sortOption,
     };
 
-    const result = await this._userRepository.findUsersWithQuery(query)
+    const result = await this._userRepository.findUsersWithQuery(query);
 
-    if(result && result.users){
-      const userDto : UserDTO[] = []
-      result.users.forEach((user : User) => {
-        userDto.push(mapUserToUserDTO(user))
-      })
+    if (result && result.users) {
+      const userDto: UserDTO[] = [];
+      result.users.forEach((user: User) => {
+        userDto.push(plainToInstance(UserDto, user));
+      });
 
       return {
-        users : userDto,
+        users: userDto,
         page,
-        totalPages : Math.ceil(result.total / limit),
-        currentSort : sort
-      }
+        totalPages: Math.ceil(result.total / limit),
+        currentSort: sort,
+      };
     }
 
-    return null
-    
+    return null;
   }
 }

@@ -2,7 +2,7 @@ import express from 'express'
 import JobController from '../controllers/jobController'
 import GetJobsUseCase from '../../application/usecases/GetJobs.usecase'
 import JobRepository from '../../infrastructure/repositories/jobRepository'
-import GetJobDetailsUseCase from '../../application/usecases/GetJobDetails.usecase'
+import GetJobDetailsUseCase from '../../application/usecases/GetJobDetails.usecase.FIX'
 import SearchJobsFromHomeUseCase from '../../application/usecases/SearchJobsFromHome.usecase'
 
 function CreateJobRouter(){

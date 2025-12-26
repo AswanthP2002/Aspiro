@@ -10,7 +10,7 @@ export default function exceptionhandle(
 ) {
   let responseMessage: string;
   let code: number;
-  let errors: any
+  let errors: any; //es lint warning for using any need to fix later NEED_FIX
 
   console.error(err.stack);
 
@@ -43,34 +43,42 @@ export default function exceptionhandle(
     case 'WRONG_PASSWORD':
       responseMessage = 'Incorrect password';
       code = StatusCodes.UNAUTHORIZED;
+      errors = {
+        code: 'AUTH_FAILED',
+        message: 'User entered wrong password',
+      };
+      break;
+    case 'BAD_REQUEST':
+      responseMessage = 'Your request contains incorrect data';
+      code = StatusCodes.BAD_REQUEST;
       break;
 
     //jwt based errors
-    case 'TokenExpiredError' :
-      responseMessage = 'Your session has expired, please re login'
-      code = StatusCodes.UNAUTHORIZED
+    case 'TokenExpiredError':
+      responseMessage = 'Your session has expired, please re login';
+      code = StatusCodes.UNAUTHORIZED;
       errors = {
-        code:'ACCESS_TOKEN_EXPIRED',
-        message:'Access Token Expired, required refresh'
-      }
+        code: 'ACCESS_TOKEN_EXPIRED',
+        message: 'Access Token Expired, required refresh',
+      };
       break;
-    
+
     case 'JsonWebTokenError':
-      console.log('json web token error executed') //debugging
-      responseMessage = 'Invalid token'
-      code = StatusCodes.UNAUTHORIZED
+      console.log('json web token error executed'); //debugging
+      responseMessage = 'Invalid token';
+      code = StatusCodes.UNAUTHORIZED;
       errors = {
-        code:'INVALID_ACCESS_TOKEN',
-        message:'Invalid toke or jwt token malformed'
-      }
+        code: 'INVALID_ACCESS_TOKEN',
+        message: 'Invalid toke or jwt token malformed',
+      };
       break;
     default:
-      console.log('Internal server error executed') // debugging
+      console.log('Internal server error executed', err); // debugging
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;
   }
 
-  res.status(code).json({ success: false, message: responseMessage, errors });
+  res.status(code).json({ success: false, message: responseMessage, errors }); //leave this error now, debug later NEED-FIX
   return;
 }

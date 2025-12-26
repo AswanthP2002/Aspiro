@@ -1,16 +1,17 @@
-import { useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { postJob } from "../../../services/recruiterServices"
 import { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
-import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { Textarea } from "@mui/joy"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import { Notify } from "notiflix"
+import axiosInstance, { AxiosRequest } from "../../../services/util/AxiosInstance"
 
 interface JobDetails {
     jobTitle: string,
@@ -36,12 +37,10 @@ interface JobDetails {
 
 export default function PostAJobForm(){
 
-    const [requiredSkills, setRequiredSkills] = useState<string[]>([])
-    const requiredSkillRef = useRef<HTMLInputElement | null>(null)
-    const [optionalSkills, setOptionalSkills] = useState<string[]>([])
-    const optionalSkillRef = useRef<HTMLInputElement | null>(null)
     const navigator = useNavigate()
     const [loading, setloading] = useState(false)
+    const [skillOptions, setSkillOptions] = useState<string[]>([])
+    const [skillsLoading, setSkillsLoading] = useState(false)
 
     const {control, watch, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
         defaultValues: {
@@ -70,34 +69,39 @@ export default function PostAJobForm(){
     const enteredJobType = watch('jobType')
     const enteredWorkMode = watch('workMode')
 
-    const addRequiredSkill = (event : any) => {
-        event.preventDefault()
-        const skill = requiredSkillRef.current?.value
-        if(!skill) return
-        setValue('requiredSkills', [...getValues('requiredSkills'), skill]);
-        if(requiredSkillRef.current) requiredSkillRef.current.value = ""
-    }
-    
-    const removeRequiredSkill = (event : any, skill : string) => {
-        event.preventDefault()
-        const updatedSkills = getValues('requiredSkills').filter((s: string) => skill.toLocaleLowerCase() !== s.toLocaleLowerCase());
-        setValue('requiredSkills', updatedSkills);
-    }
+    const fetchSkillSuggestions = async (query: string) => {
+        if (!query) return;
+        setSkillsLoading(true);
+        try {
+            // Assuming you have a route for recruiters to search skills. 
+            // If not, you might need to create one or use a common route.
+            const response = await axiosInstance.get('/admin/skills', {
+                params: { search: query },
+                sendAuthToken: true
+            } as AxiosRequest);
+            
+            if (response.data?.success) {
+                // Adjust based on your actual API response structure
+                const skills = response.data.result.skills.map((s: any) => s.skills);
+                setSkillOptions(skills);
+            }
+        } catch (error) {
+            console.error("Failed to fetch skills", error);
+        } finally {
+            setSkillsLoading(false);
+        }
+    };
 
-    const addOptionalSkill = (event : any) => {
-        event.preventDefault()
-        const skill = optionalSkillRef.current?.value
-        if(!skill) return
-        setValue('optionalSkills', [...getValues('optionalSkills'), skill]);
-        if(optionalSkillRef.current) optionalSkillRef.current.value = ""
-        
-    }
+    // Debounce function for search
+    const debounce = (func: Function, delay: number) => {
+        let timer: any;
+        return (...args: any[]) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => func(...args), delay);
+        };
+    };
 
-    const removeOptionalSkill = (event : any, skill : string) => {
-        event.preventDefault()
-        const updatedSkills = getValues('optionalSkills').filter((s: string) => skill.toLowerCase() !== s.toLocaleLowerCase());
-        setValue('optionalSkills', updatedSkills);
-    }
+    const debouncedFetchSkills = debounce(fetchSkillSuggestions, 500);
 
     async function submitJob(data: JobDetails){
         setloading(true)
@@ -521,34 +525,66 @@ export default function PostAJobForm(){
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
                     <div className="flex gap-10 w-full">
                         <div className="w-full">
-                            <label htmlFor="">Required Skills</label>
-                            <div className="flex mt-1 gap-2">
-                            <input ref={requiredSkillRef} type="text" name="" placeholder="eg., React" className="w-full border h-[40px] p-2 rounded-md" id="" />
-                            <button onClick={addRequiredSkill} type="button" className="text-xs bg-blue-500 text-white !px-5 !py-2 rounded-md cursor-pointer">Add</button>
-                            </div>
-
-                            <div className="skills !mt-2 flex flex-wrap gap-2">
-                                {
-                                    watch('requiredSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeRequiredSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
-                                    })
-                                }
-                            </div>
+                            <Controller
+                                name="requiredSkills"
+                                control={control}
+                                rules={{ required: "At least one skill is required" }}
+                                render={({ field: { onChange, value } }) => (
+                                    <Autocomplete
+                                        multiple
+                                        freeSolo
+                                        options={skillOptions}
+                                        loading={skillsLoading}
+                                        value={value || []}
+                                        onInputChange={(_, newInputValue) => debouncedFetchSkills(newInputValue)}
+                                        onChange={(_, newValue) => onChange(newValue)}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Required Skills"
+                                                variant="outlined"
+                                                placeholder="Select or type skills"
+                                                error={!!errors.requiredSkills}
+                                                helperText={errors.requiredSkills?.message}
+                                                InputProps={{
+                                                    ...params.InputProps,
+                                                    endAdornment: (
+                                                        <>
+                                                            {skillsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                            {params.InputProps.endAdornment}
+                                                        </>
+                                                    ),
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                )}
+                            />
                         </div>
                         <div className="w-full">
-                            <label htmlFor="">Optional Skills</label>
-                            <div className="flex mt-1 gap-2">
-                            <input ref={optionalSkillRef} type="text" name="" placeholder="eg., GraphQL" className="w-full border h-[40px] p-2 rounded-md" id="" />
-                            <button onClick={addOptionalSkill} type="button" className="text-xs bg-blue-500 text-white !px-5 !py-2 rounded-md cursor-pointer">Add</button>
-                            </div>
-
-                            <div className="skills !mt-2 flex flex-wrap gap-2">
-                                {
-                                    watch('optionalSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeOptionalSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
-                                    })
-                                }
-                            </div>
+                            <Controller
+                                name="optionalSkills"
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <Autocomplete
+                                        multiple
+                                        freeSolo
+                                        options={skillOptions}
+                                        loading={skillsLoading}
+                                        value={value || []}
+                                        onInputChange={(_, newInputValue) => debouncedFetchSkills(newInputValue)}
+                                        onChange={(_, newValue) => onChange(newValue)}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Optional Skills"
+                                                variant="outlined"
+                                                placeholder="Select or type skills"
+                                            />
+                                        )}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>                    
                 </div>

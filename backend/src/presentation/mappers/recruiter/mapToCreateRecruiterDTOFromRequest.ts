@@ -1,4 +1,4 @@
-import CreateRecruiterDTO from '../../../application/DTOs/recruiter/recruiter.dto';
+import CreateRecruiterDTO from '../../../application/DTOs/recruiter/recruiter.dto.FIX';
 import { CreateRecruiterRequestDto } from '../../schemas/recruiter/createRecruiter.schema';
 
 export default function mapToCreateRecruiterDTOFromRequest(

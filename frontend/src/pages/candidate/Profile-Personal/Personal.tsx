@@ -6,7 +6,7 @@ import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
 import Loader from '../../../components/candidate/Loader';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, FormControl, Modal, TextField, Typography } from '@mui/material';
+import { Box, FormControl, FormHelperText, Modal, TextField, Typography } from '@mui/material';
 import { logout } from '../../../redux-toolkit/candidateAuthSlice';
 import {
   addSocialmediaLinks,
@@ -817,6 +817,12 @@ export default function ProfilePersonal() {
               <Controller
                 name="name"
                 control={control}
+                rules={{
+                  required:{value: true, message: 'Name can not be empty'},
+                  minLength:{value: 3, message:'Minimum 3 charecters'},
+                  maxLength:{value: 30, message: 'Maximum 30 charecters'},
+                  pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message:'Please enter a valid name'}
+                }}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -835,6 +841,10 @@ export default function ProfilePersonal() {
               <Controller
                 name="headline"
                 control={control}
+                rules={{
+                  required:{value:true, message:'Headline can not be emtpy'},
+                  pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message: 'Please enter a valid headline'}
+                }}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -861,6 +871,10 @@ export default function ProfilePersonal() {
                 <Controller
                   name="city"
                   control={control}
+                  rules={{
+                    required:{value:true, message: 'City name can not be emtpy'},
+                    pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message:'Please enter a valid city name'}
+                  }}
                   render={({ field }) => {
                     return (
                       <TextField
@@ -879,6 +893,10 @@ export default function ProfilePersonal() {
                 <Controller
                   name="district"
                   control={control}
+                  rules={{
+                    required:{value: true, message:'District name can not be emtpy'},
+                    pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message: 'Please enter a valid district name'}
+                  }}
                   render={({ field }) => {
                     return (
                       <TextField
@@ -897,6 +915,10 @@ export default function ProfilePersonal() {
                 <Controller
                   name="state"
                   control={control}
+                  rules={{
+                    required:{value: true, message: 'State name can not be emtpy'},
+                    pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message: 'Please enter a valid state name'}
+                  }}
                   render={({ field }) => {
                     return (
                       <TextField
@@ -916,6 +938,10 @@ export default function ProfilePersonal() {
                 <Controller
                   name="country"
                   control={control}
+                  rules={{
+                    required:{value: true, message: 'Country name can not be emtpy'},
+                    pattern:{value: /^[a-zA-ZÀ-ÿ-'.]+(?: [a-zA-ZÀ-ÿ-'.]+)*$/, message: 'Enter a valid country name'}
+                  }}
                   render={({ field }) => {
                     return (
                       <TextField
@@ -933,6 +959,11 @@ export default function ProfilePersonal() {
               <FormControl fullWidth sx={{ marginTop: '10px' }}>
                 <Controller
                   name="pincode"
+                  rules={{
+                    required:{value: true, message: 'Pincode can not be empty'},
+                    minLength:{value: 6, message: 'Enter a valid pincode'},
+                    maxLength: {value: 6, message: 'Enter a valid pincode'}
+                  }}
                   control={control}
                   render={({ field }) => {
                     return (
@@ -948,16 +979,21 @@ export default function ProfilePersonal() {
                 />
               </FormControl>
             </Box>
-            <FormControl fullWidth sx={{ marginTop: '10px' }}>
+            <FormControl error={Boolean(errors.summary)} fullWidth sx={{ marginTop: '10px' }}>
               <Controller
                 name="summary"
                 control={control}
+                rules={{
+                  required: {value: true, message: 'Summary can not be empty'},
+                  minLength: {value: 30, message: 'Minimum 30 charecters'}
+                }}
                 render={({ field }) => {
                   return (
                     <Textarea minRows={5} {...field} placeholder="Enter a little about you..." />
                   );
                 }}
               />
+              <FormHelperText>{errors.summary?.message}</FormHelperText>
             </FormControl>
             <Box sx={{ width: '100%', marginTop: '10px' }}>
               <button

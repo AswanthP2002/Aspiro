@@ -6,14 +6,16 @@ export type RecruiterJoinedDateQuery = {
   createdAt: 1 | -1;
 };
 
-export default interface FindCompaniesQuery {
+export default interface FindRecruitersDBQuery {
   search: string;
   page: number;
   limit: number;
-  sortOption: {[key: string]: number}
+  employer_type_filter: string[];
+  employer_status_filter?: any;
+  sortOption: { [key: string]: number };
 }
 
 export interface AppliedRecruitersQuery {
-  search: string,
-  profileStatus: string[]
+  search: string;
+  profileStatus: string[];
 }

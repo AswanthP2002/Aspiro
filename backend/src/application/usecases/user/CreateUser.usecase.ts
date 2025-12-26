@@ -2,23 +2,27 @@ import { inject, injectable } from 'tsyringe';
 import { DuplicateEmailError, DuplicateMobileError } from '../../../domain/errors/AppError';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateCode } from '../../../utilities/generateCode';
-import CreateUserDTO from '../../DTOs/user/createUser.dto';
-import UserDTO from '../../DTOs/user/user.dto';
-import mapCreateUserDtoToUser from '../../mappers/user/mapCreateUserDtoToUser.mapper';
-import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
+import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
+import { UserDto } from '../../DTOs/user/user.dto.FIX';
 import hashPassword from '../../Services/hashPassword';
-import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase';
+import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase.FIX';
 import IEmailService from '../../interfaces/services/IEmailService';
+import { plainToInstance } from 'class-transformer';
+import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()
 export default class CreateUserUseCase implements ICreateUserUseCase {
+  private _mapper: UserMapper;
   constructor(
     @inject('IUserRepository') private readonly _repo: IUserRepository,
     @inject('IEmailService') private _emailService: IEmailService
-  ) {}
+  ) {
+    this._mapper = new UserMapper();
+  }
 
-  async execute(createUserDto: CreateUserDTO): Promise<UserDTO | null> {
-    let newUser = mapCreateUserDtoToUser(createUserDto);
+  async execute(createUserDto: CreateUserDto): Promise<UserDto | null> {
+    const newUser = this._mapper.dtoToUser(createUserDto);
+
     //check if the email is already linked with another user
     const isExistingEmail = await this._repo.findByEmail(newUser.email);
     if (isExistingEmail) {
@@ -62,13 +66,16 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
     const result = await this._repo.create(newUser);
 
     // 2. Then, send the verification email.
-    const info = await this._emailService.sendEmail(newUser.email as string, subject, content);
+    await this._emailService.sendEmail(newUser.email as string, subject, content);
 
     if (result) {
-      const dto = mapUserToUserDTO(result);
+      const dto = plainToInstance(UserDto, result);
       return dto;
     }
 
     return null;
   }
 }
+
+//tested from this :: need to complete all existing code transoformation tomorrow itself!
+//important

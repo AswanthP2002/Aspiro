@@ -1,4 +1,4 @@
-import { UploadProfilePictureDTO } from '../../../application/DTOs/candidate -LEGACY/uploadProfilePicture.dto';
+import { UploadProfilePictureDTO } from '../../../application/DTOs/user/uploadProfilePicture.dto.FIX';
 import { uploadProfilePictureRequestDTO } from '../../DTOs/user/uploadProfilePictureRequestDTO';
 
 export default function mapToUploadProfilePictureDTOFromRequest(

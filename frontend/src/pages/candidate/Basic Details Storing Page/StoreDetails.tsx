@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import {motion, AnimatePresence} from 'motion/react'
-import { getLocationDetails, saveBasicDetails } from "../../../services/userServices";
+import { saveBasicDetails } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
-import { FormControl, FormHelperText, TextField } from "@mui/material";
+import { Button, FormControl, FormHelperText, TextField } from "@mui/material";
 import { Textarea } from "@mui/joy";
 
 interface FormState {
@@ -32,8 +32,11 @@ export default function StoreDetails(){
         }
     })
 
+
+    const [loading, setLoading] = useState<boolean>(false)
     
     async function onSubmit(data : FormState){
+        setLoading(true)
         const {headline, city, district, state, country, pincode, summary} = data
         try {
             const result = await saveBasicDetails(headline, city    , district, state, country, pincode, summary)
@@ -56,7 +59,10 @@ export default function StoreDetails(){
                 Swal.fire({icon:'error', title:'Save Failed', text:result?.message})
             }
         } catch (error : unknown) {
+            console.log('--error--', error instanceof Error ? error.message : error)
             Swal.fire({icon:'error', title:'Oops', text:'Something went wrong'})
+        } finally {
+            setLoading(false)
         }
 
           
@@ -310,7 +316,7 @@ export default function StoreDetails(){
                                     <textarea value={formData.summary} onChange={handleFormChange} name="summary" id="summary" className="text-sm mt-2 border border-gray-400 outline-none rounded w-full h-[200px] text-black p-2"></textarea>
                                     {errors.summary && <label style={errorLabelStyle}>{errors.summary}</label>}
                                 </div> */}
-                                <button className="!mt-5 w-fit bg-gradient-to-br from-blue-500 to-indigo-600 text-white !px-5 !py-2 rounded" type="submit">Save and continue</button>
+                                <Button type="submit" className="!text-xs !px-5 !py-2 !mt-3" color="info" variant="contained" loading={loading}>Save and Continue</Button>
                             </div>
 
                             </form>

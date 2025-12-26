@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import logger from "../../utilities/logger";
+import logger from "../../../logger";
 
 const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017"
 const dbName = process.env.DB_NAME || "aspiroDB"

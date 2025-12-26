@@ -1,13 +1,14 @@
 import 'reflect-metadata';
 import '../backend/src/config/DI.container';
 import express, { NextFunction, Request, Response } from 'express';
-import http from 'http'
+import http from 'http';
 import cors from 'cors';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
-import logger from './src/utilities/logger';
+import { pinoHttp } from 'pino-http';
+import logger from './logger';
 //import candidateRouter from './src/presentation/routes/candidate/candidateRouter'
 //import recruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
 //import adminRouter from './src/presentation/routes/admin/adminRouter'
@@ -23,8 +24,8 @@ import createChatRouter from './src/presentation/routes/chatRouter';
 import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
-import createUserRouter from './src/presentation/routes/userRouter';
-// import connectRedis from './src/infrastructure/redis/redisClient';
+import createUserRouter from './src/presentation/routes/UserRouter';
+//import connectRedis from './src/infrastructure/redis/redisClient';
 import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
@@ -42,6 +43,7 @@ async function main() {
       allowedHeaders: ['Content-Type', 'Authorization'],
     })
   );
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
@@ -60,20 +62,20 @@ async function main() {
 
   await connectToDb();
   //connect redis
-  //await connectRedis()
+  //await connectRedis(); closed right now for testing :
 
-  const expressServer = http.createServer(app)
-  initSocket(expressServer)
+  const expressServer = http.createServer(app);
+  initSocket(expressServer); 
 
   const userRouter = createUserRouter();
-  const recruiterRouter = createRecruiterRouter()
+  const recruiterRouter = createRecruiterRouter();
   const adminRouter = createAdminRouter();
   const followRouter = createFollowRouter();
   const postRouter = createPostRouter();
   const chatRouter = createChatRouter();
   const oAuthRouter = CreateOAuthRouter();
   const jobRouter = CreateJobRouter();
-  const notificationRouter = createNotificationRouter()
+  const notificationRouter = createNotificationRouter();
 
   const port = process.env.PORT || 5000;
   app.use('/', (req: Request, res: Response, next: NextFunction) => {
@@ -81,7 +83,8 @@ async function main() {
     next();
   });
 
-
+  //to automatically log all apis
+  //app.use(pinoHttp({ logger }));
 
   // Group all API routes under the /api prefix for better organization
   app.use('/api', userRouter);
@@ -93,19 +96,20 @@ async function main() {
   app.use('/api', chatRouter);
   app.use('/api', oAuthRouter); // OAuth for google signup
   app.use('/api', jobRouter);
-  app.use('/api', notificationRouter)
+  app.use('/api', notificationRouter);
 
   app.use(exceptionhandle); //centralized exception handling
 
-  
   // initalizeSocket(expressServer)
 
-  expressServer.listen(port, () => {
-    logger.info(`Server started running on port ${port}`);
-  }).on('error', (error) => {
-    logger.error({ error }, 'Error occurred while starting the server');
-    process.exit(1);
-  });
+  expressServer
+    .listen(port, () => {
+      logger.info(`Server started running on port ${port}`);
+    })
+    .on('error', (error) => {
+      logger.error({ error }, 'Error occurred while starting the server');
+      process.exit(1);
+    });
 
   process.on('uncaughtException', (error: unknown) => {
     logger.error({ error }, 'Uncaught Error occured');

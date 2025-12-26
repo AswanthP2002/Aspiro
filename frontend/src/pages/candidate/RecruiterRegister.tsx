@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Notify } from 'notiflix';
 import { Controller, useForm } from 'react-hook-form';
-import { FormControl, FormHelperText, Input, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Button, FormControl, FormHelperText, Input, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Textarea } from '@mui/joy';
 import { industryTypes, companyType } from '../../assets/data/companyDetailsArrayData';
 import { createRecruiterService } from '../../services/recruiterServices';
@@ -89,10 +89,16 @@ export default function RecruiterRegisterPage() {
         }
     }
 
+    const timeConsuming = () => {
+        return new Promise((res) =>{
+            setTimeout(() => res(true), 3000)
+        })
+    }
+
     const handleApplicationSubmit = async (data: Inputs) => {
-        Notify.success('Path is clear', {timeout:3000})
+        //Notify.success('Path is clear', {timeout:3000})
         console.log('Application data', data)
-        // setLoading(true);
+        setLoading(true);
         // console.log(data)
         const {
             summary, employerType, industry, organizationName, organizationType, 
@@ -100,14 +106,14 @@ export default function RecruiterRegisterPage() {
             focusingIndustries, linkedinUrl, recruitingExperience
         } = data
         try {
+            //await timeConsuming()
             const result = await createRecruiterService(
                 employerType, industry, organizationName, organizationType, teamStrength,
                 summary, website, organizationContactNumber, organizationEmail, focusingIndustries,
                 recruitingExperience, linkedinUrl
             )
 
-            if(result?.success){
-                Swal.fire({
+               Swal.fire({
                     icon:'success',
                     title:'Submitted',
                     text:result?.message || 'Application for enabling recruiter profile submitted',
@@ -117,10 +123,11 @@ export default function RecruiterRegisterPage() {
                     allowOutsideClick:false,
                     timer:2000
                 }).then(() => navigate('/profile/recruiter/overview'))
-            }
         } catch (error: unknown) {
-            Notify.failure('Something went wrong', {timeout: 2000})
-            setLoading(false);
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 2000})
+            
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -518,7 +525,8 @@ export default function RecruiterRegisterPage() {
                                             
                                         </div>
                                 <div className="w-full flex justify-end mt-5">
-                                    <button type='submit' className='text-xs bg-gradient-to-br from-blue-500 to-indigo-700 text-white px-3 py-2 rounded-md'>Submit Application</button>
+                                    {/* <button type='submit' className='text-xs bg-gradient-to-br from-blue-500 to-indigo-700 text-white px-3 py-2 rounded-md'>Submit Application</button> */}
+                                    <Button type='submit' variant='contained' loading={loading}>Submit Application</Button>
                                 </div>
 
                             </form>

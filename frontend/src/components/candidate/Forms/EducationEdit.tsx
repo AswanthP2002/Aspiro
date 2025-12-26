@@ -1,4 +1,4 @@
-import { Box, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material"
+import { Box, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
 import Swal from "sweetalert2";
@@ -33,6 +33,7 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
     const educationLevelOnWatch = watch('educationLevel')
 
     const [isPresent, setIspresent] = useState(false)
+    const [loading, setLoading] = useState<boolean>(false)
     
     useEffect(() => {
         console.log('Selected education', selectedEducation)
@@ -64,9 +65,10 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
 
 
     async function editEducation(data : Inputs) {
+        setLoading(true)
         const {educationLevel, stream, institution, location, startDate, endDate} = data
         
-        closeEditEducationModal()
+        //closeEditEducationModal()
 
             try {
                 const result = await editUserEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
@@ -93,7 +95,10 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
                 Notify.failure(result?.message, {timeout:2000})
             }
             } catch (error : unknown) {
-                Notify.failure('Something went wrong', {timeout:2000})
+                Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
+            } finally {
+                closeEditEducationModal()
+                setLoading(true)
             }
     }
 
@@ -313,7 +318,7 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
           </Box>
           
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">Add</button>
+            <Button fullWidth type="submit" color="info" variant="contained" loading={loading}>Save Changes</Button>
           </Box>
           </form>
         </Box>

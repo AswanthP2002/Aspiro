@@ -1,4 +1,4 @@
-import { UpdateRecriterDTO } from '../../../application/DTOs/recruiter/recruiter.dto';
+import { UpdateRecriterDTO } from '../../../application/DTOs/recruiter/recruiter.dto.FIX';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 
 export default function mapUpdateRecruiterDTOToRecruiter(

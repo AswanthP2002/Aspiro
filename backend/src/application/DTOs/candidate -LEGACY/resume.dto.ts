@@ -1,19 +1,46 @@
-export default interface ResumeDTO {
-  _id?: string;
-  candidateId?: string;
+import { Exclude, Expose } from 'class-transformer';
+import { IsDefined, IsString } from 'class-validator';
+
+@Exclude()
+export default class ResumeDTO {
+  @Expose()
+  _id!: string;
+
+  @Expose()
+  candidateId!: string;
+
+  @Expose()
   resumeFileName?: string;
-  resumeUrlCoudinary: string;
-  resumePublicIdCloudinary: string;
+
+  @Expose()
+  resumeUrlCoudinary!: string;
+
+  @Expose()
+  resumePublicIdCloudinary!: string;
+
+  @Expose()
   createdAt?: Date;
 }
 
-export interface CreateResumeDTO {
-  candidateId?: string;
-  file: any;
-  path: string;
+export class CreateResumeDTO {
+  @IsDefined()
+  @IsString()
+  candidateId!: string;
+
+  @IsDefined()
+  file!: any; //need to change file type later : NEED_FIX
+
+  @IsDefined()
+  @IsString()
+  path!: string;
 }
 
-export interface DeleteResumeDTO {
-  resumeId: string;
-  cloudinaryPublicId: string;
+export class DeleteResumeDTO {
+  @IsDefined()
+  @IsString()
+  resumeId!: string;
+
+  @IsDefined()
+  @IsDefined()
+  cloudinaryPublicId!: string;
 }

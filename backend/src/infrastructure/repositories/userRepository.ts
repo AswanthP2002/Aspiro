@@ -19,10 +19,10 @@ export default class UserRepository extends BaseRepository<User> implements IUse
   }
 
   async getUserAggregatedProfile(userId: string): Promise<UserProfileAggregatedAdmin | null> {
-    if(!mongoose.isValidObjectId(userId)) return null
+    if (!mongoose.isValidObjectId(userId)) return null;
 
     const result = await UserDAO.aggregate([
-      {$match:{_id:new mongoose.Types.ObjectId(userId)}},
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
           from: 'certificates',
@@ -65,12 +65,12 @@ export default class UserRepository extends BaseRepository<User> implements IUse
       },
       {
         $lookup: {
-          from:'follows',
-          localField:'_id',
-          foreignField:'following',
-          as:'followers'
-        }
-      }
+          from: 'follows',
+          localField: '_id',
+          foreignField: 'following',
+          as: 'followers',
+        },
+      },
       // {
       //   $lookup:{
       //     from:'recruiters',
@@ -88,7 +88,7 @@ export default class UserRepository extends BaseRepository<User> implements IUse
       // }}
     ]);
 
-    return result[0]
+    return result[0];
   }
 
   async findByPhone(phone?: string): Promise<User | null> {
@@ -171,27 +171,30 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     return { users, total };
   }
 
-  async addSocialLink(userId: string, socialLink: { domain: string; url: string; }): Promise<User | null> {
-    if(!mongoose.isValidObjectId(userId)) return null
+  async addSocialLink(
+    userId: string,
+    socialLink: { domain: string; url: string }
+  ): Promise<User | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
 
     const result = await UserDAO.findOneAndUpdate(
-      {_id: new mongoose.Types.ObjectId(userId)},
-      {$push:{socialLinks:socialLink}},
-      {returnDocument:'after'}
-    )
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $push: { socialLinks: socialLink } },
+      { returnDocument: 'after' }
+    ).lean();
 
-    return result
+    return result as User | null;
   }
 
   async removeSocialLink(userId: string, domain: string): Promise<User | null> {
-    if(!mongoose.isValidObjectId(userId)) return null
+    if (!mongoose.isValidObjectId(userId)) return null;
 
     const result = await UserDAO.findOneAndUpdate(
-      {_id:new mongoose.Types.ObjectId(userId)},
-      {$pull:{socialLinks:{domain:domain}}},
-      {returnDocument:'after'}
-    )
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $pull: { socialLinks: { domain: domain } } },
+      { returnDocument: 'after' }
+    ).lean();
 
-    return result
+    return result as User | null;
   }
 }

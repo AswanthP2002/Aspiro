@@ -1,4 +1,4 @@
-import { UpdateEducationDTO } from '../../../application/DTOs/user/education.dto';
+import { UpdateEducationDTO } from '../../../application/DTOs/user/education.dto.FIX';
 import { UpdateEducationRequestDto } from '../../DTOs/candidate/updateEducationRequestDTO';
 
 export default function mapToUpdateEducationDTOFromRequest(

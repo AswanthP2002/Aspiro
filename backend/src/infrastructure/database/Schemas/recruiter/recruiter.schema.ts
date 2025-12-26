@@ -22,10 +22,16 @@ export const RecruiterSchema = new Schema<Recruiter>(
       organizationEmail: { type: String },
       industry: { type: String },
     },
-    focusingIndustries:{type: [String]},
-    profileStatus:{type: String, enum:['pending', 'approved', 'rejected'], default:'pending'},
-    recruitingExperience:{type:String},
-    summary:{type:String}
+    focusingIndustries: { type: [String] },
+    profileStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'suspended', 'closed'],
+      default: 'pending',
+    },
+    isDeleted: { type: Boolean, default: false },
+    isSuspended: { type: Boolean, default: false },
+    recruitingExperience: { type: String },
+    summary: { type: String },
   },
   { timestamps: true }
 );

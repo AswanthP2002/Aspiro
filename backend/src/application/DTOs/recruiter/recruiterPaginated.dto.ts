@@ -1,8 +1,17 @@
-import { RecruiterDTO } from './recruiter.dto';
+import { Exclude, Expose } from 'class-transformer';
+import RecruiterProfilelOverviewDataDTO from './recruiterProfileOverviewData.dto.FIX';
 
-export default interface RecruiterPaginatedDTO {
-  recruiters: RecruiterDTO[];
-  page: number;
-  totalPages: number;
-  currentSort: {[key: string]:number};
+@Exclude()
+export default class RecruiterPaginatedDTO {
+  @Expose()
+  recruiters!: RecruiterProfilelOverviewDataDTO[];
+
+  @Expose()
+  page!: number;
+
+  @Expose()
+  totalPages!: number;
+
+  @Expose()
+  currentSort!: string;
 }

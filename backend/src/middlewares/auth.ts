@@ -3,7 +3,7 @@ import CandidateRepository from '../infrastructure/repositories/user/candidateRe
 import { StatusCodes } from '../presentation/statusCodes';
 import { generateToken, verifyToken } from '../services/jwt';
 import { Request, Response, NextFunction } from 'express';
-import logger from '../utilities/logger';
+import logger from '../../logger';
 import UserRepository from '../infrastructure/repositories/userRepository';
 
 let candidateRepo;

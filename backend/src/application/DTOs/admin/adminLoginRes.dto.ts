@@ -1,13 +1,22 @@
-import { Role } from "../../../domain/entities/user/User.FIX";
+import { Role } from '../../../domain/entities/user/User.FIX';
+import { Exclude, Expose } from 'class-transformer';
 
-export default interface AdminLoginResDTO {
-  token: string;
-  refreshToken: string;
-  user: {
+@Exclude()
+export default class AdminLoginResponseDTO {
+  @Expose()
+  token!: string;
+
+  @Expose()
+  refreshToken!: string;
+
+  @Expose()
+  user!: {
     id: any;
     email?: string;
   };
-  role?: Role;
+
+  @Expose()
+  role!: Role;
 }
 
 export interface AdminLoginDTO {

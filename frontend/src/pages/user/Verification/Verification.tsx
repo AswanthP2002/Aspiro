@@ -113,8 +113,7 @@ export default function VerificationPage(){
     }
 
     async function verifyOnSubmit() {
-        alert('testing')
-
+        
         if(
             isNaN(parseInt(digit1)) ||
             isNaN(parseInt(digit2)) ||

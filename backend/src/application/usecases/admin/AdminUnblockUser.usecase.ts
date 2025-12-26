@@ -1,22 +1,18 @@
 import { inject, injectable } from 'tsyringe';
-import IUnblockCandidateUseCase from '../../interfaces/usecases/admin/IAdminUnblockUser.usecase';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import IAdminUnblockUserUsecase from '../../interfaces/usecases/admin/IAdminUnblockUser.usecase';
-import UserDTO from '../../DTOs/user/user.dto';
-import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
+import IAdminUnblockUserUsecase from '../../interfaces/usecases/admin/IAdminUnblockUser.usecase.FIX';
+import { UserDto } from '../../DTOs/user/user.dto.FIX';
+import { plainToInstance } from 'class-transformer';
 
 @injectable()
 export class AdminUnblockUserUsecase implements IAdminUnblockUserUsecase {
-  constructor(
-    @inject('IUserRepository') private _userRepository: IUserRepository
-  ) {}
+  constructor(@inject('IUserRepository') private _userRepository: IUserRepository) {}
 
-  async execute(userId: string): Promise<UserDTO | null> {
-    const result = await this._userRepository.update(userId, {isBlocked:false})
+  async execute(userId: string): Promise<UserDto | null> {
+    const result = await this._userRepository.update(userId, { isBlocked: false });
 
-    if(result){
-      const userDto = mapUserToUserDTO(result)
-      return userDto
+    if (result) {
+      return plainToInstance(UserDto, result);
     }
     return result;
   }

@@ -2,12 +2,19 @@ import { useEffect, useState } from 'react';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import { getCompanies } from '../../../services/adminServices';
+import { BiSearch } from 'react-icons/bi';
+import { Notify } from 'notiflix';
+import { RecruiterProfileData } from '../../../types/entityTypes';
+import { BsEye, BsThreeDotsVertical } from 'react-icons/bs';
+import RecruiterOverviewModal from './RecruiterOverviewModal';
 
 
 export default function Companies() {
   
-  const [company, setcompany] = useState<any[]>([])
-  const [selectedcompany, setselectedcompany] = useState<any>({})
+  const [recruiters, setRecruiters] = useState<RecruiterProfileData[]>([])
+  const [selectedcompany, setselectedcompany] = useState<RecruiterProfileData | null | undefined>(null)
+  const [employerTypeFilter, setEmployerTypeFilter] = useState<string>('All')
+  const [employerStatusFilter, setEmployerStatusFilter] = useState<string>('All')
   const [page, setpage] = useState(1)
   const [totalPage, settotalpage] = useState(0)
   const [search, setsearch] = useState("")
@@ -16,6 +23,16 @@ export default function Companies() {
   const [sortVisibility, setSortVisibility] = useState(false)
   const [sort, setSort] = useState('')
   const [currentSort, setCurrentSort] = useState('joined-latest')
+  const [selectedRecruiter, setSelectedRecruiter] = useState<RecruiterProfileData | null>(null)
+  const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState<boolean>(false)
+  const toggleOptionsMenu = () => setIsOptionsMenuOpen(prv => !prv)
+  const [recruiterOverviewModalOpen, setRecruiterOverviewModalOpen] = useState<boolean>(false)
+  const openRecruiterOverviewModal = (id: string) => {
+    const recruiter = recruiters.find((recruiter: RecruiterProfileData) => recruiter._id === id)
+    setSelectedRecruiter(recruiter as RecruiterProfileData)
+    setRecruiterOverviewModalOpen(true)
+  }
+  const closeRecruiterOverviewModal = () => setRecruiterOverviewModalOpen(false)
 
   const openSort = () => setSortVisibility(true)
   const closeSort = () => setSortVisibility(false)
@@ -32,23 +49,28 @@ export default function Companies() {
   useEffect(() => {
     async function fetchCompanyList(){
 
-        const result = await getCompanies(search, page, sort)
-        
-          console.log('Data from the backend company list fetch result', result?.result)
-          setcompany(result.result?.recruiters)
-          setselectedcompany(result?.result?.recruiters[0])
-          setpage(result?.result?.page)
-          settotalpage(result?.result?.totalPages)
-          setpagination(new Array(result?.result?.totalPages).fill(0))
-          setCurrentSort(result?.result?.currentSort)
+        try {
+          const result = await getCompanies(search, page, sort, employerTypeFilter, employerStatusFilter)
+          
+            console.log('Data from the backend company list fetch result', result?.result)
+            setRecruiters(result.result?.recruiters)
+            setselectedcompany(result?.result?.recruiters[0])
+            setpage(result?.result?.page)
+            settotalpage(result?.result?.totalPages)
+            setpagination(new Array(result?.result?.totalPages).fill(0))
+            setCurrentSort(result?.result?.currentSort) 
+        } catch (error: unknown) {
+          Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+        }
         
     }
 
     fetchCompanyList()
-  }, [search, page, sort])
+  }, [search, page, sort, employerTypeFilter, employerStatusFilter])
 
   function searchCompany(event : any){
     setsearch(event.target.value)
+    //Notify.info(event.target.value, {timeout: 3000})
   }
 
   function debouncedSearch(fn : Function, delay : number){
@@ -79,145 +101,139 @@ export default function Companies() {
 
   return (
     <>
-    <div className="px-6 flex gap-20">
-      <h2 className='font-bold'>Comapnies</h2>
-      <div className="bg-white search-wrapper rounded-full w-[400px] relative">
-        <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
-        <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
-      </div>
-    </div>
-    {
-      company.length > 0
-          ? <div className="flex gap-6 p-6 bg-[#fff7f1] min-h-screen">
-      {/* Company List Section */}
-      <div className="flex-1 bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-end items-center mb-4 relative">
-          <div className="flex gap-3">
-            <button className="text-sm text-gray-500">Filter</button>
-            <button onClick={openSort} className="text-sm text-gray-500">Sort</button>
+    <div className="w-full p-3 lg:p-10">
+      <div className="bg-white p-3 rounded-md bg-white">
+        <div className="border px-2 border-gray-300 rounded-md flex items-center">
+          <BiSearch color='gray' />
+          <input
+            onKeyUp={(e) => dSearch(e)}
+            type="text"
+            placeholder='Search recruiter name, company name, email'
+            className='p-2 text-xs font-light w-full'
+          />
+        </div>
+
+        <div className="mt-5 flex flex-col lg:flex-row lg:gap-20 gap-5">
+          <div>
+            <p className='text-xs font-light text-gray-500'>Employer Type</p>
+            <div className='mt-2 flex gap-2'>
+              <button onClick={() => setEmployerTypeFilter('All')} className={`${employerTypeFilter === 'All' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>All</button>
+              <button onClick={() => setEmployerTypeFilter('Self')} className={`${employerTypeFilter === 'Self' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>Self</button>
+              <button onClick={() => setEmployerTypeFilter('Company')} className={`${employerTypeFilter === 'Company' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>Company</button>
+            </div>
           </div>
-          {
-            sortVisibility && (
-              <div className="absolute sort !p-3 shadow rounded right-0 top-0 bg-white w-[200px]">
-                <div className='flex justify-end'>
-                  <i onClick={closeSort} className="fa-solid fa-circle-xmark cursor-pointer"></i>
+          <div>
+            <p className='text-xs font-light text-gray-500'>Status</p>
+            <div className='mt-2 flex gap-2'>
+              <button onClick={() => setEmployerStatusFilter('All')} className={`${employerStatusFilter === 'All' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>All</button>
+              <button onClick={() => setEmployerStatusFilter('Active')} className={`${employerStatusFilter === 'Active' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>Active</button>
+              <button onClick={() => setEmployerStatusFilter('Suspended')} className={`${employerStatusFilter === 'Suspended' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>Suspended</button>
+              <button onClick={() => setEmployerStatusFilter('Closed')} className={`${employerStatusFilter === 'Closed' ? 'bg-black text-white' : 'bg-white text-gray-600'} text-sm rounded-md px-3 py-2 border border-gray-300`}>Closed</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white mt-5 rounded-md">
+        <div className="overflow-y-auto mt-3">
+                      
+                      <table className="text-sm w-full text-left overflow-x-auto">
+                       <thead className="text-gray-500 font-medium border-t border-gray-300">
+                         <tr className='border-b border-gray-300'> 
+                           <td className='!p-2'>Recruiter</td>
+                           <td className='!p-2'>Type</td>
+                           <td className='!p-2'>Company</td>
+                           <td className='!p-2'>Status</td>
+                           <td className='!p-2'>Action</td>
+                         </tr>
+                       </thead>
+                       <tbody>
+                        {
+                          recruiters.length > 0 && (
+                            recruiters.map((recruiter: RecruiterProfileData) => (
+                              <tr className='border-b border-gray-300' key={recruiter._id}>
+                                <td className='p-1'>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100 text-blue-500">
+                                      <p>{recruiter.userProfile.name[0]}</p>
+                                    </div>
+                                    <p className='text-xs'>{recruiter.userProfile.name}</p>
+                                  </div>
+                                </td>
+                                <td>
+                                  <p className="text-xs">{recruiter.employerType}</p>
+                                </td>
+                                <td>
+                                  <p className="text-xs">
+                                    {
+                                      recruiter.employerType === 'company'
+                                        ? recruiter.organizationDetails?.organizationName
+                                        : 'NA'
+                                    }
+                                  </p>
+                                </td>
+                                <td>
+                                  <p className={`text-xs ${recruiter.isDeleted ? 'text-gray-500' : recruiter.isSuspended ? 'text-red-500' : 'text-green-500'}`}>
+                                    {recruiter.isDeleted ? 'Closed' : recruiter.isSuspended ? 'Suspended' : 'Active'}
+                                  </p>
+                                </td>
+                                <td className='p-1'>
+                                  <div className="flex gap-3">
+                                    <button onClick={() => openRecruiterOverviewModal(recruiter._id as string)}><BsEye color='blue' /></button>
+                                    <button><BsThreeDotsVertical /></button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          )
+                        }
+                        
+                      </tbody>
+                  </table>
+
+                        {
+                          recruiters.length === 0 && (
+                            <div className='w-full flex mt-3 justify-center'>
+                              <p className='text-xs text-gray-500 text-center'>No Recruiters found</p>
+                            </div>
+                          )
+                        }
+                    </div>
+                    <div className="flex items-center justify-between text-xs p-3">
+                   <span>Showing {page} of {totalPage} Page</span>
+                   <div className="flex gap-2">
+                     {
+                      page > 1 && <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button>
+                    }
+                    {
+                      pagination.map((pageNumber, pageIndex: number) => { 
+                        return(
+                            <button onClick={() => changePage(pageIndex + 1)} key={pageIndex} className={pageIndex + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{pageIndex + 1}</button>
+                        )
+                      })
+                    }
+                    {
+                      page < totalPage && <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">Next</button>
+                    }
+                  </div>
                 </div>
-                <ul>
-                  <li><input type="radio" onChange={() => setSort('name-a-z')} name="sort" id="" checked={currentSort === 'name-a-z' ? true : false} /><label htmlFor="" className="ms-2">Name A - Z</label></li>
-                  <li><input type="radio" onChange={() => setSort('name-z-a')} name="sort" id="" checked={currentSort === 'name-z-a' ? true : false} /><label htmlFor="" className="ms-2">Name Z - A</label></li>
-                  <li><input type="radio" onChange={() => setSort('joined-latest')} name="sort" id="" checked={currentSort === 'joined-latest' ? true : false} /><label htmlFor="" className="ms-2">Joined latest</label></li>
-                  <li><input type="radio" onChange={() => setSort('joined-oldest')} name="sort" id="" checked={currentSort === 'joined-oldest' ? true : false} /><label htmlFor="" className="ms-2">Joined oldest</label></li>
-                </ul>
-              </div>
-            )
-          }
-        </div>
-
-        <div className="overflow-auto max-h-[400px]">
-          <table className="w-full text-sm text-left">
-            <thead className="text-gray-500 font-medium border-t">
-              <tr>
-                <th className="p-3">Name</th>
-                <th>Based</th>
-                <th>No. Employees</th>
-                <th>Joined</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {company.map((company : any, idx : number) => (
-                <tr
-                  key={idx}
-                  onClick={() => setselectedcompany(company)}
-                  className={`${selectedcompany?._id === company?._id ? "bg-orange-300" : "bg-white"} rounded rounded-sm`}
-                >
-                  <td className="p-3 flex items-center gap-2">
-                    <img src={company.logo ? company.logo : defautImage} alt="logo" className="w-8 h-8 rounded-full" />
-                    {company.companyName}
-                  </td>
-                  <td>{company.location.city}</td>
-                  <td>{company.teamStrength} Employees</td>
-                  <td>{formatDate(company.createdAt)}</td>
-                  <td>
-                    <span className="text-green-500 font-medium">{company.isBlocked ? <label>Blocked</label> : <label>Active</label>}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        
-        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing {page} of {totalPage} pages</span>
-          <div className="flex gap-2">
-            {
-              page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
-            }
-            {
-              pagination.map((_, index) => {
-                return(
-                    <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
-                )
-              })
-            }
-            {
-              page < totalPage ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
-            }
-          </div>
-        </div>
-      </div>
-
-    
-      <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
-        <div className="text-sm text-gray-400 text-center">{selectedcompany.industryType ? selectedcompany.industryType : "Not specified"}</div>
-        <img src={selectedcompany.logo ? selectedcompany.logo : defautImage} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
-        <div className="text-center">
-          <h3 className="font-semibold">{selectedcompany.companyName}</h3>
-          <p className="text-sm text-gray-500">{selectedcompany.location?.city}, {selectedcompany.localhost?.state}</p>
-        </div>
-
-        <div className="mt-4">
-          <h4 className="font-medium text-sm text-gray-600 mb-1">About</h4>
-          <p className="text-xs text-gray-500">
-            {selectedcompany.about}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 text-xs gap-2 mt-2 text-gray-600">
-          <div>
-            <span className="font-medium">Found In</span>
-            <p>{selectedcompany.foundIn}</p>
-          </div>
-          <div>
-            <span className="font-medium">Type</span>
-            <p>{selectedcompany.companyType}</p>
-          </div>
-          <div>
-            <span className="font-medium">Size</span>
-            <p>{selectedcompany.teamStrength} Employees</p>
-          </div>
-          <div>
-            <span className="font-medium">Location</span>
-            <p>{selectedcompany?.location?.city}, {selectedcompany?.location?.state}, {selectedcompany?.location?.country}</p>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <iframe
-          width="100%"
-          height="200"
-          style={{ borderRadius: "10px" }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedcompany.location?.city}, ${selectedcompany.location?.state}, ${selectedcompany.location?.country}`)}&output=embed`}
-          ></iframe>
-          </div>
-
-        <button onClick={() => viewCompanyDetails(selectedcompany?._id)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
       </div>
     </div>
-      : <p className='text-center mt-10 font-normal text-sm'>No Companies found</p>
+
+
+
+    {/* Recruiter overview modal */}
+    {
+      recruiterOverviewModalOpen &&
+      selectedRecruiter && (
+        <RecruiterOverviewModal 
+        open={recruiterOverviewModalOpen} 
+        onclose={closeRecruiterOverviewModal}
+        data={selectedRecruiter}
+        setRecruiters={setRecruiters}
+        setSelectedRecruiter={setSelectedRecruiter}
+    />
+      )
     }
     </>
   );

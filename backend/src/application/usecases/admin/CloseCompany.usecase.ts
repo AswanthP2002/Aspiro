@@ -1,11 +1,18 @@
+import { inject, injectable } from 'tsyringe';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import ICloseCompanyUseCase from './interfaces/ICloseCompany.usecase';
+import IDeleteRecruiterUsecase from './interfaces/ICloseCompany.usecase';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { plainToInstance } from 'class-transformer';
 
-export default class CloseCompanyUseCase implements ICloseCompanyUseCase {
-  constructor(private _recruiterRepo: IRecruiterRepo) {}
+@injectable()
+export default class DeleteRecruiterUsecaase implements IDeleteRecruiterUsecase {
+  constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {}
 
-  async execute(id: string): Promise<boolean> {
-    const deleteResult = await this._recruiterRepo.deleteRecruiter(id);
+  async execute(id: string): Promise<RecruiterDTO | null> {
+    const deleteResult = await this._recruiterRepo.update(id, { isDeleted: true });
+    if (deleteResult) {
+      return plainToInstance(RecruiterDTO, deleteResult);
+    }
     return deleteResult;
   }
 }

@@ -1,4 +1,4 @@
-import { EditExperienceDTO } from '../../../application/DTOs/user/experience.dto';
+import { EditExperienceDTO } from '../../../application/DTOs/user/experience.dto.FIX';
 import EditExperienceRequestDTO from '../../DTOs/candidate/editExperienceRequestDTO';
 
 export default function mapToEditExperienceDTO(

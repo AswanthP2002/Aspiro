@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from '../statusCodes';
 import IGetJobsUseCase from '../../application/usecases/interfaces/IGetJobs.usecase';
-import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase';
+import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase.FIX';
 import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
 export default class JobController {
   constructor(

@@ -1,5 +1,5 @@
 import Experience from '../../../domain/entities/user/experience.entity';
-import { EditExperienceDTO } from '../../DTOs/user/experience.dto';
+import { EditExperienceDTO } from '../../DTOs/user/experience.dto.FIX';
 
 export default function mapToEditExperienceFromDTO(
   dto: EditExperienceDTO

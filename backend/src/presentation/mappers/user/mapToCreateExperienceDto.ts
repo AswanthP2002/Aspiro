@@ -1,4 +1,4 @@
-import CreateExperienceDTO from '../../../application/DTOs/user/experience.dto';
+import CreateExperienceDTO from '../../../application/DTOs/user/experience.dto.FIX';
 import addExperienceRequestDTO from '../../DTOs/candidate/addExperienceRequestDTO';
 
 export default function MapToAddExperienceDTO(

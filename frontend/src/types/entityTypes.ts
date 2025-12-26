@@ -204,7 +204,7 @@ export interface Recruiter {
     foundIn?: string;
     website?: string;
     vision?: string;
-    benefit?: String;
+    benefit?: string;
   };
   location?: {
     city: string;
@@ -303,7 +303,7 @@ export interface Job {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
 }
 
 export interface RecruiterProfileData {
@@ -323,6 +323,8 @@ export interface RecruiterProfileData {
   recruitingExperience?: string
   focusingIndustries?:string[]
   profileStatus?: 'pending' | 'approved' | 'rejected'
+  isSuspended?: boolean;
+  isDeleted?: boolean
   summary?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -357,7 +359,7 @@ export interface JobAggregatedData {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
   userDetails:UserType;
   recruiterProfile:Recruiter
 }
@@ -496,7 +498,7 @@ export interface JobDetails {
   applicationsCount?: number; 
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
   userProfile:UserType;
   userRecruiterProfile:RecruiterProfileData
   candidateIds: string[]

@@ -1,11 +1,19 @@
+import { inject, injectable } from 'tsyringe';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import IBlockCompanyUseCase from './interfaces/IBlockCompany.usecase';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import IBlockRecruiterUsecase from './interfaces/IBlockCompany.usecase.FIX';
+import { plainToInstance } from 'class-transformer';
 
-export default class BlockCompanyUseCase implements IBlockCompanyUseCase {
-  constructor(private _recruiterRepo: IRecruiterRepo) {}
+@injectable()
+export default class BlockRecruiterUsecase implements IBlockRecruiterUsecase {
+  constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {}
 
-  async execute(id: string): Promise<boolean> {
-    const result = await this._recruiterRepo.blockRecruiter(id);
+  async execute(id: string): Promise<RecruiterDTO | null> {
+    const result = await this._recruiterRepo.update(id, { isSuspended: true });
+    if (result) {
+      const dto = await plainToInstance(RecruiterDTO, result);
+      return dto;
+    }
     return result;
   }
 }

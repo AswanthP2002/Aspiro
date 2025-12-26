@@ -1,4 +1,4 @@
-import LoadJobsAggregatedQueryDTO from "../../../application/DTOs/user/loadJobsAggregatedQuery.dto"
+import LoadJobsAggregatedQueryDTO from "../../../application/DTOs/job/loadJobsAggregatedQuery.dto.FIX"
 
 export default function mapToLoadJobsQueryDTOFromRequest(
     data: {

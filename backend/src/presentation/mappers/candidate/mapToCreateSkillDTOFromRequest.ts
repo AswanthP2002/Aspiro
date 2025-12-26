@@ -1,4 +1,4 @@
-import { CreateSkillDTO } from '../../../application/DTOs/user/skill.dto';
+import { CreateSkillDTO } from '../../../application/DTOs/user/skill.dto.FIX';
 import AddSkillRequestDTO from '../../DTOs/candidate/addSkillReuestDTO';
 
 export default function mapToCreateSkillDTOFromRequest(

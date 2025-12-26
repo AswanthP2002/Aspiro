@@ -1,5 +1,5 @@
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
-import JobAggregatedDTO from '../../DTOs/jobDetails.dto';
+import JobAggregatedDTO from '../../DTOs/job/jobDetails.dto.FIX';
 import ILoadJobDetailsUseCase from './interfaces/ILoadJobDetails.usecase';
 
 export class LoadJobDetailsUseCase implements ILoadJobDetailsUseCase {

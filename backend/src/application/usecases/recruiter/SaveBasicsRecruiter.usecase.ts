@@ -3,7 +3,7 @@ import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo'
 import {
   RecruiterDTO,
   UpdateRecriterDTO,
-} from '../../DTOs/recruiter/recruiter.dto';
+} from '../../DTOs/recruiter/recruiter.dto.FIX';
 import SaveIntroDetailsDTO from '../../DTOs/recruiter/saveIntroDetails.dto';
 import mapToRecruiterDtoFromRecruiter from '../../mappers/recruiter/mapToRecruiterDtoFromRecruiter.mapper';
 import ISaveBasicsUseCase from './interface/ISaveBasicsRecruiter.usecase';

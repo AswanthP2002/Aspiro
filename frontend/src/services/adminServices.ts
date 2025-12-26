@@ -1,4 +1,4 @@
-import { AxiosError } from "axios"
+import { AxiosError, AxiosInterceptorManager } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import Swal from "sweetalert2"
 import { Notify } from "notiflix"
@@ -40,8 +40,10 @@ export const logoutAdmin = async (dispatch: Function, navigate: Function) => {
         }, 1500);
     } catch (error : unknown) {
         const err = error as AxiosError
-        if(err.response && err.response.status < 500) return err.response.data
-        console.log(error)
+        console.log('--error--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw err
+        }
     }
 }
 
@@ -148,28 +150,20 @@ export const rejectJobUnrejectJob = async (jobId : string, operation : string) =
     }
 }
 
-export const getCompanies = async (search: string, page: number, sort : string) => {
+export const getCompanies = async (search: string, page: number, sort : string, employerTypeFilter: string, employerStatusFilter: string) => {
     try {
-        const response = await axiosInstance.get('/admin/companies/data', {
-            params:{search, page, sort},
-            sendAuthTokenAdmin:true
+        const response = await axiosInstance.get('/admin/recruiters/data', {
+            params:{search, page, sort, employerTypeFilter, employerStatusFilter},
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
         console.log('Error occured while geting company details', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
+        }
     }
 }
 
@@ -199,53 +193,35 @@ export const getCompanyDetails = async (companyId : string) => {
 export const blockCompanyUnblockCompany = async (companyId : string, operation : string) => {
     let url: string = ''
     url = operation === 'Block'
-        ? `/admin/company/block/${companyId}`
-        : `/admin/company/unblock/${companyId}`
+        ? `/admin/recruiter/block/${companyId}`
+        : `/admin/recruiter/unblock/${companyId}`
 
     try {
-        const response = await axiosInstance.put(url, null, {
-            sendAuthTokenAdmin:true
+        const response = await axiosInstance.patch(url, null, {
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
         console.log('Error occured while blocking / unblocking the company', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
 export const deleteCompany = async (companyId : string) => { //delete / close company should also delete company jobs
     try {
-        const response = await axiosInstance.delete(`/admin/company/close/${companyId}`, {
-            sendAuthTokenAdmin:true
+        const response = await axiosInstance.delete(`/admin/recruiter/close/${companyId}`, {
+            sendAuthToken:true
         } as AxiosRequest)
 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-
-        console.log('Error occured while closing the company data', err)
+         console.log('Error occured while closing the company data', err)
+         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
@@ -396,6 +372,84 @@ export const approveRecruiterApplication = async (recruiterId: string) => {
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error
+        }
+    }
+}
+
+export const adminAddSkill = async (skills: string) => {
+    try {
+        const response = await axiosInstance.post('/admin/skills',
+            {skills},
+            {
+                headers:{"Content-Type":'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
+        }
+    }
+}
+
+export const adminUpdateSkill = async (skillId: string, skills: string, isVerified: boolean) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/skills/${skillId}`,
+            {skills, isVerified},
+            {
+                headers:{"Content-Type":'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
+        }
+    }
+}
+
+export const adminGetSkills = async (search: string, limit: number, page: number) => {
+    try {
+        const response = await axiosInstance.get('/admin/skills',
+            {
+                params:{search, limit, page},
+                headers:{"Content-Type":'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
+        }
+    }
+}
+
+export const adminDeleteSkills = async (skillId: string) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/skills/${skillId}`,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw err
         }
     }
 }
