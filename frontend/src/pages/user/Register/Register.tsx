@@ -1,15 +1,23 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 import { useState } from 'react';
-import { registerCandiate } from '../../../services/userServices';
+import { registerUser } from '../../../services/userServices';
 import GoogleLoginButton from '../../../components/common/GoogleLoginButton';
 import { Controller, useForm } from 'react-hook-form';
-import { FormControl, FormHelperText} from '@mui/material';
+import { Button, FormControl, FormHelperText} from '@mui/material';
 import {FaArrowLeft} from 'react-icons/fa'
 import {HiOutlineEnvelope, HiOutlinePhone, HiOutlineLockClosed, HiOutlineUser} from 'react-icons/hi2'
+import { BsEye } from 'react-icons/bs';
+import { FiEyeOff } from 'react-icons/fi';
 
+type registerResultPayload = {
+  success: boolean,
+  message: string,
+  userId: string,
+  userEmail: string
+}
 
-export default function CandidateRegister() {
+export default function UserRegister(): React.ReactNode {
   type Inputs = {
     name: string;
     email: string;
@@ -33,23 +41,29 @@ export default function CandidateRegister() {
     },
   });
 
-  const [validationerrortext, setvalidationerrortext] = useState('');
+  const [validationerrortext, setvalidationerrortext] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
+
+  const togglePasswordVisibility = () => setIsPasswordVisible(prv => !prv)
 
   const navigate = useNavigate();
 
-  async function registerOnSubmit(data: Inputs) {
+  async function registerOnSubmit(data: Inputs): Promise<void> {
+    setLoading(true)
     const { name, email, phone, password } = data;
 
     try {
-      const result = await registerCandiate(name, email, phone, password);
+      const result: registerResultPayload = await registerUser(name, email, phone, password);
       if (result.success) {
-        navigate(`/verify`, { state: { email: result?.userEmail, id: result?.userId } });
+        navigate(`/verify`, { state: { email: result.userEmail, id: result.userId } });
       } else {
         setvalidationerrortext(result.message);
       }
     } catch (error : unknown) {
       setvalidationerrortext(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
+      setLoading(false)
       console.log('done')
     }
   }
@@ -169,9 +183,17 @@ export default function CandidateRegister() {
                   },
                 }}
                 render={({field}) => (
-                  <div className='flex items-center gap-3 bg-gray-100 !p-2 rounded-md'>
+                  <div className='flex items-center gap-3 bg-gray-100 !p-2 rounded-md relative'>
                     <HiOutlineLockClosed color='gray' />
-                    <input {...field} type="password" placeholder='Enter your password' className='outline-none w-full' />
+                    <input {...field} type={isPasswordVisible ? "text" : "password"} placeholder='Enter your password' className='outline-none w-full' />
+                    <div className="absolute right-4">
+                      {
+                        isPasswordVisible
+                          ? <button type='button' onClick={togglePasswordVisibility}><FiEyeOff /></button>
+                          : <button type='button' onClick={togglePasswordVisibility}><BsEye /></button>
+                          
+                      }
+                    </div>
                   </div>
                 )}
               />
@@ -211,7 +233,17 @@ export default function CandidateRegister() {
               <label htmlFor="" className='text-xs font-light'>I have read and agree with your terms and conditions</label>
             </div>
             <div>
-              <button type='submit' className='bg-black text-white text-sm w-full !p-2 rounded-md !mt-2'>Create Account</button>
+              <Button 
+                type='submit' 
+                variant='contained' 
+                fullWidth loading={loading}
+                sx={{
+                  marginTop:'5px',
+                  bgcolor:'black'
+                }}
+              >
+                  Crate Account
+              </Button>
             </div>
           </form>
           <div className="flex gap-2 justify-between items-center !mt-3">

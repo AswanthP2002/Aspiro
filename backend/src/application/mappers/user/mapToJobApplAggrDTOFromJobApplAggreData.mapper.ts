@@ -1,5 +1,5 @@
 import JobApplicationAggregated from '../../../domain/entities/user/jobApplicationAggregated.entity';
-import JobApplicationAggregatedDTO from '../../DTOs/candidate -LEGACY/jobApplicationAggregated.dto';
+import JobApplicationAggregatedDTO from '../../DTOs/job/jobApplicationAggregated.dto.FIX';
 
 export default function mapTojobApplicationAggregatedDTOFromAggregatedData(
   aggregatedData: JobApplicationAggregated

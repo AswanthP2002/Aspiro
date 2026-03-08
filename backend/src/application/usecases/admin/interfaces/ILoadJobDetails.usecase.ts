@@ -1,5 +1,5 @@
-import JobAggregatedDTO from "../../../DTOs/jobDetails.dto";
+import { AdminJobDetailsDTO } from '../../../DTOs/job/jobDetails.dto.FIX';
 
-export default interface ILoadJobDetailsUseCase {
-    execute(id : string) : Promise<JobAggregatedDTO | null>
+export default interface IAdminLoadJobDetailsUseCase {
+  execute(id: string): Promise<AdminJobDetailsDTO | null>;
 }

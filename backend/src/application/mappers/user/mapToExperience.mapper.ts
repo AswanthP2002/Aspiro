@@ -1,5 +1,5 @@
 import Experience from '../../../domain/entities/user/experience.entity';
-import CreateExperienceDTO from '../../DTOs/user/experience.dto';
+import CreateExperienceDTO from '../../DTOs/user/experience.dto.FIX';
 
 export default function mapToExperience(dto: CreateExperienceDTO): Experience {
   return {

@@ -1,21 +1,22 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import Swal from 'sweetalert2';
-import store from '../../redux-toolkit/store';
-import { tokenRefresh } from '../../redux-toolkit/userAuthSlice';
-import { refreshAccessToken } from '../commonServices';
+import store from '../../redux/store';
+import { tokenRefresh, updateUserMetaData } from '../../redux/userAuthSlice';
+import { reAuthenticate } from '../commonServices';
 
 const baseUrl = import.meta.env.VITE_SERVER_URL
 
 interface customeRequest extends InternalAxiosRequestConfig {
     sendCookie : boolean
     sendAuthToken : boolean
-    sendAuthTokenCandidate : boolean
-    sendAuthTokenRecruiter : boolean
-    sendAuthTokenAdmin : boolean
 }
 
 export type AxiosRequest = customeRequest & InternalAxiosRequestConfig
 
+interface ReAuthenticateResult {
+    accessToken: string,
+    userData: any
+}
 
 const axiosInstance = axios.create({
     baseURL:baseUrl,
@@ -38,21 +39,7 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
         }
     }
     
-    //legacy : no more needed since authentication is centralized now
-    if(customeRequest?.sendAuthTokenCandidate){
-        const token = localStorage.getItem('candidateToken')
-        customeRequest.headers.Authorization = `Bearer ${token}`
-    } else if(customeRequest?.sendAuthTokenRecruiter){
-        const token = localStorage.getItem('recruiterToken')
-        customeRequest.headers.Authorization = `Bearer ${token}`
-    } else if(customeRequest?.sendAuthTokenAdmin){
-        console.log('Send admin token exist')
-        const token = localStorage.getItem('adminToken')
-        console.log('Admin token before sending', token)
-        customeRequest.headers.Authorization = `Bearer ${token}`
-    }
-
-    console.log('Final request before sending', customeRequest)
+    console.log('Final request before sending', customeRequest.headers)
 
     return customeRequest
 })
@@ -63,6 +50,11 @@ axiosInstance.interceptors.response.use(
         const {response} = error
         console.log('---checking response from the server --- inspect error code ---', response)
         const originalRequest = error.config
+
+        //If refresh method failed -> user need to login again
+        if(originalRequest.url.includes('/token/refresh')){
+            return Promise.reject(error)
+        }
         if(response && response.status === 500){
             Swal.fire({
                 icon:'error', 
@@ -79,17 +71,21 @@ axiosInstance.interceptors.response.use(
                     window.location.reload()
                     return
                 }else{
-                    window.location.replace('http://localhost:5173')
+                    const role = store.getState().userAuth.userRole
+                    if(role === 'user'){
+                        window.location.replace('http://localhost:5173')
+                    }else{
+                        window.location.replace('http://localhost:5173/admin/dashboard')
+                    }
+                    
                 }
             })
-        }else if(response && response.status === 406){
-            window.location.replace('http://localhost:5173/token/expired')
-            // Swal.fire({
-            //     icon:'error',
-            //     title:'Not Acceptable',
-            //     text:'Access denied, No token provided or token malformed'
-            // })
-        }else if(response && response.status === 403){
+        }
+        else if(response && response.status === 406 && !originalRequest.url.includes('login')){
+           window.location.replace(`/action/termination?message=${response.data.message}`)
+           return
+       }
+        else if(response && response.status === 403){
             Swal.fire({
                 icon:'info',
                 title:'Blocked',
@@ -115,23 +111,27 @@ axiosInstance.interceptors.response.use(
 
             try {
                 //get new access token
-                const newAccessToken = await refreshAccessToken()
+                const reAuthenticateResult: ReAuthenticateResult = await reAuthenticate()
                 
-                if (newAccessToken) {
+                if (reAuthenticateResult.accessToken) {
                     //set new access token in Redux store
-                    store.dispatch(tokenRefresh({userToken:newAccessToken}))
+                    store.dispatch(tokenRefresh({userToken:reAuthenticateResult.accessToken}))
+                    store.dispatch(updateUserMetaData({user: reAuthenticateResult.userData}))
                     // Update the header of the original request and retry it
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    originalRequest.headers.Authorization = `Bearer ${reAuthenticateResult.accessToken}`;
                     return axiosInstance(originalRequest); // Return the promise of the retried request
                 }
             } catch (refreshError) {
                 // Handle refresh token failure (e.g., redirect to login)
                 return Promise.reject(refreshError);
-            }
-        }else if(response && response.status === 401){
+            }   //given an auth failed flag, which is for wrong password
+        }else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
+            // alert(`This one is still executing ${response.data.errors.code}`)
+            // console.log('not executed')
             window.location.replace('http://localhost:5173/token/expired')
-        }else if(response && response.status === 404){
-            window.location.replace('http://localhost:5173/404')
+        }else if(response && response.status === 404 && !window.location.href.includes('/login')){
+            console.log('--checking 404 error--', response)
+            //window.location.replace('http://localhost:5173/404') //only if it is not in the login page
         }
 
         return Promise.reject(error)

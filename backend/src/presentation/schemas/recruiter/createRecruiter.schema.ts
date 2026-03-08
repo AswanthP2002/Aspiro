@@ -11,11 +11,9 @@ export const CreateRecruiterSchema = z.object({
   teamStrength: z.string().optional(),
   summary: z.string().optional(),
   website: z.string().optional(),
-  focusingIndustries:z.array(z.string().optional()).optional(),
+  focusingIndustries: z.array(z.string().optional()).optional(),
   linkedinUrl: z.string().optional(),
-  recruitingExperience: z.string().optional()
+  recruitingExperience: z.string().optional(),
 });
 
-export type CreateRecruiterRequestDto = z.infer<typeof CreateRecruiterSchema>
-
-
+export type CreateRecruiterRequestDto = z.infer<typeof CreateRecruiterSchema>;

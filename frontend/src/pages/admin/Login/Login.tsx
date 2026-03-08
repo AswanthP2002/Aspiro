@@ -1,15 +1,26 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './Login.css'
 import { useState } from 'react'
-import InfinitySpinner from '../../../components/common/InfinitySpinner'
 import { useDispatch } from 'react-redux'
 import { adminLogin} from '../../../services/adminServices'
 import { Controller, useForm } from 'react-hook-form'
-import { FormControl, FormHelperText, IconButton, InputAdornment, TextField } from '@mui/material'
-import { loginSuccess } from '../../../redux-toolkit/userAuthSlice'
+import { FormControl, FormHelperText} from '@mui/material'
+import { loginSuccess } from '../../../redux/userAuthSlice'
 import {LuShieldCheck} from 'react-icons/lu'
 import { HiOutlineEnvelope } from 'react-icons/hi2'
 import { GoLock } from 'react-icons/go'
+import { BsEye } from 'react-icons/bs'
+import { FiEyeOff } from 'react-icons/fi'
+
+interface AdminLoginResponsePayload {
+    success: boolean;
+    message: string;
+    result: {
+        user: {id: string, email: string},
+        role: string,
+        accessToken: string
+    }
+}
 
 export default function AdminLoginPage(){
 
@@ -37,14 +48,14 @@ export default function AdminLoginPage(){
         setLoginErrorText("")
         const {email, password} = data
         
-        const result = await adminLogin(email, password)
+        const result: AdminLoginResponsePayload = await adminLogin(email, password)
 
         if(result?.success){
             console.log('admin login result', result) //debuging result
             dispatcher(loginSuccess({
-                user:result?.result?.user,
-                userToken:result?.result?.accessToken,
-                userRole:result?.result?.role
+                user: result.result.user,
+                userToken: result.result.accessToken,
+                userRole: result.result.role
             }))
             // dispatcher(loginSuccess({
             //     user:result?.result?.user,
@@ -67,7 +78,7 @@ export default function AdminLoginPage(){
                 <div className="left flex flex-col items-center justify-center">
                     <div className='w-sm'>
                         <div className='flex gap-2 items-center'>
-                            <LuShieldCheck size={24} color='orange' />
+                            <LuShieldCheck size={24} color='blue' />
                             <p className='text-gray-700'>Aspiro</p>
                         </div>
                         <div className='mt-2'>
@@ -111,23 +122,27 @@ export default function AdminLoginPage(){
                                         required:{value:true, message:'Enter your password'}
                                     }}
                                     render={({field}) => (
-                                        <div className='bg-gray-100 flex gap-2 !p-2 items-center'>
+                                        <div className='bg-gray-100 relative flex gap-2 !p-2 items-center'>
                                             <GoLock color='gray' />
-                                            <input type="password" 
+                                            <input type={`${showPassword ? "text": "password"}`} 
                                                 {...field}
                                                 placeholder='Enter your password'
                                             />
+                                            {showPassword
+                                                ? <button type='button' onClick={() => setShowPassword(false)} className="absolute right-3"><FiEyeOff /></button>
+                                                : <button type='button' onClick={() => setShowPassword(true)} className="absolute right-3"><BsEye /></button>
+                                            }
                                         </div>
                                     )}
                                 />
                                 <FormHelperText>{errors.password?.message}</FormHelperText>
                             </FormControl>
                             <div className='mt-4'>
-                                <button type='submit' className='bg-orange-500 w-full !p-2 rounded-sm text-sm text-white'>Sign In</button>
+                                <button type='submit' className='bg-gradient-to-br from-blue-500 to-indigo-700 w-full !p-2 rounded-sm text-sm text-white'>Sign In</button>
                             </div>
                         </form>
-                        <div className="info !mt-10 bg-orange-50 !p-3 flex gap-2">
-                            <div><LuShieldCheck color='orange' size={23} /></div>
+                        <div className="info !mt-10 bg-blue-50 !p-3 flex gap-2">
+                            <div><LuShieldCheck color='blue' size={23} /></div>
                             <div>
                                 <p className='text-sm font-medium'>Secure Admin Access</p>
                                 <p className='mt-2 text-gray-700 text-xs'>This area is restricted to authorized admins only.
@@ -137,26 +152,26 @@ export default function AdminLoginPage(){
                         </div>
                     </div>
                 </div>
-                <div className=" relative right hidden md:flex flex-col items-center justify-center bg-gradient-to-br from-orange-400 to-red-500">
+                <div className=" relative right hidden md:flex flex-col items-center justify-center bg-gradient-to-br from-blue-800 via-blue-300 to-blue-800">
                     <div className="!z-10 w-full flex flex-col justify-center items-center">
                         <p className='text-white'>Welcome Back</p>
-                    <p className='mt-5 text-gray-200 text-center text-sm'>Manage your platform with powerful admin tools and insights</p>
+                    <p className='mt-5 text-white text-center text-sm'>Manage your platform with powerful admin tools and insights</p>
                     <div className="cards flex gap-3 mt-10">
-                        <div className='bg-orange-500 shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
+                        <div className='bg-gradient-to-br from-blue-500 to-indigo- shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
                             <p className='font-medium text-lg'>24/7</p>
                             <p className='text-sm font-light'>Monitoring</p>
                         </div>
-                        <div className='bg-orange-500 shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
+                        <div className='bg-gradient-to-br from-blue-500 to-indigo- shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
                             <p className='font-medium text-lg'>100%</p>
                             <p className='text-sm font-light'>Secure</p>
                         </div>
-                        <div className='bg-orange-500 shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
+                        <div className='bg-gradient-to-br from-blue-500 to-indigo- shadow-lg hover:-translate-y-1 transition-all duration-2s ease-in-out rounded-md text-center !px-5 !py-3 w-1/3 text-white'>
                             <p className='font-medium text-lg'>00</p>
                             <p className='text-sm font-light'>Control</p>
                         </div>
                     </div>
                     </div>
-                    <div className="rounded-full bg-orange-500 w-[300px] h-[300px] absolute">
+                    <div className="rounded-full bg-indigo-400 w-[300px] h-[300px] absolute">
                     </div>
                 </div>
             </div>

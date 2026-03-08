@@ -44,6 +44,29 @@ export interface User {
   otpExpiresAt?: Date;
 }
 
+export interface MyApplicationsListData {
+   _id?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  jobDetails?: {
+    _id?: string;
+    jobTitle?: string;
+    minSalary?: number;
+    jobType?: string;
+    workMode?: string;
+    jobLevel?: string;
+  };
+  recruiterDetails?: {
+    _id?: string;
+    name?: string;
+  };
+  companyDetails?: {
+    _id?: string;
+    name?: string;
+  };
+}
+
 export interface SocialLinks {
   domain: string;
   url: string;
@@ -142,6 +165,7 @@ export interface UserType {
   isBlocked?: boolean;
   isVerified?: boolean;
   isAdmin?: boolean;
+  isBanned?: boolean;
   isRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -204,7 +228,7 @@ export interface Recruiter {
     foundIn?: string;
     website?: string;
     vision?: string;
-    benefit?: String;
+    benefit?: string;
   };
   location?: {
     city: string;
@@ -228,6 +252,7 @@ export interface UserPosts {
     cloudUrl: string;
     publicId: string;
   };
+  mediaType?: string;
   shares: string[];
   views: string[];
   createdAt: string | Date;
@@ -246,25 +271,45 @@ export interface UserMetaData {
   };
 }
 
+export interface ConnectionRequests {
+    _id?: string;
+  receiver?: string;
+  sender?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Notification {
-  _id?: string
-  recepientId?: string
-  type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
-  category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
-  actorId?: string
-  targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
-  targetId?: string
-  message?: string
-  isRead?: boolean
-  createdAt?: string
-  metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
+  _id?: string;
+  recepientId?: string;
+  category:
+    | 'LIKE'
+    | 'COMMENT'
+    | 'FOLLOW'
+    | 'CONNECTION_REQUEST'
+    | 'CONNECTION_ACCEPTED'
+    | 'COMMENT_REPLY'
+    | 'SHARE';
+  actorId?: string;
+  targetType?: 'USER' | 'POST' | 'COMMENT';
+  targetId?: string;
+  targetUrl?: string;
+  message?: string;
+  isRead?: boolean;
+  metadata?: { [key: string]: any };
+  createdAt?: string;
 }
 
 export interface Comments {
   _id?: string;
   postId?: string;
   userId?: string;
+  parentId?: string | null;
   text: string;
+  depth?: number;
+  likes?: number;
+  replyCount?: number;
   createdAt?: string | Date;
   userDetails?: UserType;
 }
@@ -303,30 +348,279 @@ export interface Job {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
+}
+
+export interface AdminRecruiterListData {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  email?: string;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  companyName?: string
+}
+
+export interface AdminRecruiterDetailsData {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  isPermissionRevoked?:boolean
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
+  };
+  isVerified?: boolean;
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
+  createdAt?: string;
+  updatedAt?: string;
+  companyDetails?: Company;
+  totalJobs?: number;
+  activeJobs?: number;
+  totalApplications: number;
+}
+
+export interface MyJobData {
+  _id?: string;
+  jobTitle: string;
+  jobType?: string;
+  workMode?: string;
+  location?: string;
+  jobLevel?: string;
+  status?: JobStatus;
+  views?: number;
+  applicationsCount?: number;
+  isDeleted?: boolean;
+  isArchived?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+}
+
+export interface AdminJobListsData {
+  _id?: string;
+  jobTitle: string;
+  jobType?: string;
+  workMode?: string;
+  jobLevel?: string;
+  reportsCount?: number;
+  status?: JobStatus;
+  isDeleted?: boolean;
+  isArchived?: boolean;
+  isFlagged?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+  companyName?: string
+  recruiterName?: string
+}
+
+export interface AdminJobDetailsData {
+  _id?: string;
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  jobType?: string;
+  workMode?: string;
+  location?: string;
+  minSalary: number;
+  maxSalary: number;
+  qualification: string;
+  jobLevel?: string;
+  reportsCount?: number;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  isDeleted?: boolean;
+  isArchived?: boolean;
+  isFlagged?: boolean
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+  companyName?: string;
+  recruiterName?: string
+}
+
+export interface LoadJobsForPublicData {
+  _id?: string;
+  recruiterId?: string;
+  companyId?: string;
+  jobTitle: string;
+  duration?: string;
+  jobType?: string;
+  workMode?: string;
+  location?: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string;
+  salaryPeriod?: SalaryPeriod;
+  experience?: string;
+  jobLevel?: string;
+  requiredSkills: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+  companyDetails?: {
+    _id?: string;
+    name?: string;
+  };
+  recruiterDetail?: {
+    _id?: string;
+    recruiterType?: string
+    name?: string;
+    isFlagged?: boolean;
+    isVerified?: boolean;
+  };
+}
+
+export interface JobDetailsForPublicData {
+  _id?: string;
+    recruiterId?: string;
+    companyId?: string; // Renamed from companyId for clarity
+    jobTitle: string;
+    description: string;
+    requirements: string;
+    responsibilities: string;
+    duration?: string; // Good for contract/temporary roles
+    jobType?: string;
+    workMode?: string;
+    location?: string;
+    minSalary: number;
+    maxSalary: number;
+    salaryCurrency: string; // e.g., 'USD', 'INR'
+    salaryPeriod?: SalaryPeriod;
+    vacancies: number;
+    qualification: string;
+    experienceInYears: number; // More queryable than a string
+    jobLevel?: string;
+    requiredSkills: string[];
+    optionalSkills: string[];
+    applicationsCount?: number; // For analytics
+    isFlagged?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    expiresAt?: string;
+    recruiterProfileDetails?: {
+      _id: string;
+      name: string;
+      recruiterType: string;
+      professionalTitle: string;
+    };
+    companyProfileDetails?: {
+      _id: string;
+      name: string;
+    };
+}
+
+export interface MySavedJobData {
+   _id?: string;
+  createdAt?: string;
+  jobDetails: {
+    _id?: string;
+    jobTitle: string;
+    jobType?: string;
+    workMode?: string;
+    location?: string;
+    minSalary: number;
+    maxSalary: number;
+    salaryCurrency: string; // e.g., 'USD', 'INR'
+    salaryPeriod?: SalaryPeriod;
+    vacancies: number;
+    jobLevel?: string;
+    requiredSkills: string[];
+    applicationsCount?: number; // For analytics
+    isFlagged?: boolean;
+    expiresAt?: string;
+  };
+  recruiterDetails: {
+    _id: string;
+    name: string;
+  };
+  companyDetails: {
+    _id: string;
+    name: string;
+  };
+}
+
+export interface JobApplicationsListForRecruiter {
+    _id?: string;
+  status?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  candidateDetails?: {
+    _id?: string;
+    name?: string;
+    email?: string;
+    headline?: string;
+    location?: string;
+    match?: number;
+  };
+}
+
+export interface SingleJobApplicationDetailsData {
+  _id?: string;
+  status?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  candidateDetails?: {
+    _id?: string;
+    name?: string;
+    email?: string;
+    headline?: string;
+    phone?: string;
+    location?: string;
+    match?: number;
+  };
+  experiences?: Experience[];
+  educations?: Education[];
+  skills?: Skills[];
+  notes?: string;
+  resumeDetails?: {
+    _id?: string;
+    url?: string;
+  };
 }
 
 export interface RecruiterProfileData {
-   _id?: string;
+  _id?: string;
   userId?: string;
-  employerType?: string;
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    teamStrength?: string;
-    website?: string;
-    linkedinUrl?: string
+  recruiterType?: 'feelance' | 'corporate';
+  companyId?: string;
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
   };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
-  summary?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  isVerified?: boolean;
+  isJobsHidden?: boolean;
+  isPermissionRevoked?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  rejection?: {
+    reason?: string;
+    feedback?: string;
+  };
+  isRejected?: boolean;
+  applicationResendBufferDate?: Date;
+  verificationHistory?: any;
+  createdAt?: string;
+  updatedAt?: string;
   userProfile: UserType;
+  companyDetails?: Company
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   jobs: Job[];
 }
 
@@ -357,22 +651,109 @@ export interface JobAggregatedData {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
   userDetails:UserType;
   recruiterProfile:Recruiter
 }
 
 
 export interface Certificates {
-    _id? : string
-    candidateId? : string
-    issuedOrganization : string
-    issuedDate : Date
-    certificateId? : string
-    certificateUrl? : string
-    certificatePublicId? : string,
-    createdAt? : Date
+  _id?: string;
+  userId?: string;
+  name?: string;
+  issuedOrganization: string;
+  issuedDate?: string;
+  certificateUrl?: string;
+  certificatePublicId?: string;
+  createdAt?: string;
 }
+
+export interface UserPublicProfileData {
+  _id: string;
+
+  name: string;
+
+  headline: string;
+
+  summary: string;
+
+  socialLinks?: SocialLinks[];
+
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+  };
+
+  role?: Role[];
+
+  email?: string;
+
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+
+  coverPhoto?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+
+  isRecruiter?: boolean;
+
+  createdAt?: string;
+
+  updatedAt?: string;
+
+  experiences: Experience[];
+
+  educations: Education[];
+
+  certificates: Certificates[];
+
+  skills: Skills[];
+
+  posts: Post[];
+
+  recruiterProfile: Recruiter;
+
+  jobs: Job[];
+
+  followers: Follow[];
+
+  following?: Follow[];
+
+  connections: string[];
+
+  connectionRequests: ConnectionRequests[]
+}
+
+export interface Alerts {
+    _id?: string;
+    recipientId?: string;
+    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    type: 'JOB_MATCH' | 'APPLICATION_UPDATE' | 'SYSTEM_SECURITY' | 'EXPIRY';
+    status: 'ACTIVE' | 'RESOLVED' | 'DISMISSED';
+    title: string;
+    body: string;
+    actionUrl?: string;
+    expiresAt?: string;
+    metaData?: { [key: string]: any };
+    createdAt?: string;
+}
+
+export interface Resumes {
+  _id?: string;
+  userId?: string;
+  name?: string;
+  resumeUrlCoudinary?: string;
+  resumePublicIdCloudinary?: string;
+  isPrimary?: boolean;
+  createdAt?: string;
+}
+
 
 export interface UserProfileAggrgatedAdmin {
   _id?: string;
@@ -496,7 +877,7 @@ export interface JobDetails {
   applicationsCount?: number; 
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
   userProfile:UserType;
   userRecruiterProfile:RecruiterProfileData
   candidateIds: string[]
@@ -579,4 +960,165 @@ export interface Message {
     updatedAt?: string | Date
 }
 
-  //user entity as per backend
+export interface Chat {
+   _id?: string;
+  conversationId?: string;
+  senderId?: string;
+  receiverId?: string;
+  text: string;
+  isRead?: boolean;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string
+}
+
+export interface MyProfileDTO {
+    _id?: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  dateOfBirth?: string;
+  socialLinks?: SocialLinks[];
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+  };
+  phone?: string;
+  email?: string;
+  connections?: number
+  profilePicture?: {
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
+  };
+  coverPhoto?: {
+    cloudinaryPublicId?: string;
+    cloudinarySecureUrl?: string;
+  };
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  followers?: number;
+}
+
+export interface UserOverviewForPublic {
+  _id?: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  role?: Role[];
+  connections?: string[];
+  followers?: Follow[];
+  skills?: Skills[]
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  experience?: Experience[]
+  isRecruiter?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
+export interface AdminUserDetailsData {
+  _id: string;
+  name: string;
+  summary: string;
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+    coords: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+  };
+  role?: Role[];
+  email?: string;
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  isRecruiter?: boolean;
+  isBanned?: boolean;
+  isVerified?: boolean;
+  isBlocked?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  experiences: Experience[];
+  educations: Education[];
+  skills: Skills[];
+  posts: Post[];
+  lastLogin?: string | Date;
+}
+
+export interface Company {
+  _id?: string;
+  name: string;
+  slogan?: string;
+  website?: string;
+  linkedin?: string;
+  description?: string;
+  industry?: string;
+  location?: string;
+  logo?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+
+export interface WorkModeData {
+  _id?: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  usageCount?: number
+  createdAt?: string;
+}
+
+export interface JobLevelData {
+  _id?: string;
+  name: string;
+  slug: string;
+  usageCount?: string;
+  isActive: boolean;
+  createdAt?: string;
+}
+
+export interface JobTypesData {
+  _id?: string;
+  name?: string;
+  slug?: string;
+  isActive?: boolean;
+  usageCount?: number;
+  createdAt?: string;
+}
+
+export interface AdminRecruiterApplicationsData {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  professionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
+  };
+  isVerified?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  createdAt?: string;
+  updatedAt?: string;
+  userProfile?: User;
+  companyDetails?: Company;
+}

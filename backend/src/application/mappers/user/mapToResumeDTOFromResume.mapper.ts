@@ -1,5 +1,5 @@
 import Resume from '../../../domain/entities/user/resume.entity';
-import ResumeDTO from '../../DTOs/candidate -LEGACY/resume.dto';
+import ResumeDTO from '../../DTOs/user/resume.dto';
 
 export default function mapToResumeDTOFromResume(resume: Resume): ResumeDTO {
   return {

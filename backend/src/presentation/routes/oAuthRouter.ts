@@ -1,13 +1,17 @@
 import express from 'express';
 import OAuthController from '../controllers/oAuthController';
 import { container } from 'tsyringe';
+import { UserApiRoutes } from '../../constants/Apis/user.routes';
 
 function CreateOAuthRouter() {
   const oAuthRouter = express.Router();
 
-  const oAuthController = container.resolve(OAuthController)
+  const oAuthController = container.resolve(OAuthController);
 
-  oAuthRouter.post('/google/sign-up', oAuthController.googleLogin.bind(oAuthController));
+  oAuthRouter.post(
+    UserApiRoutes.USER_AUTH_MANAGE.GOOGLE_LOGIN,
+    oAuthController.googleLogin.bind(oAuthController)
+  );
 
   return oAuthRouter;
 }

@@ -1,18 +1,17 @@
-import { injectable } from "tsyringe";
-import ICloudStroageService from "../../application/interfaces/services/ICloudStorageService";
-import cloudinary from "../../utilities/cloudinary";
-import streamifier from 'streamifier'
+import { injectable } from 'tsyringe';
+import ICloudStroageService from '../../application/interfaces/services/ICloudStorageService';
+import cloudinary from '../../utilities/cloudinary';
+import streamifier from 'streamifier';
 
 @injectable()
 export default class CloudStorageService implements ICloudStroageService {
-    
-  async upload(file: any, folderName: string, publicId?: string): Promise<any> {
+  async upload(file: Buffer<ArrayBufferLike>, folderName: string, publicId?: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      let stream: any;
+      let stream;
       if (publicId) {
         stream = cloudinary.uploader.upload_stream(
           {
-            resource_type: 'image',
+            resource_type: 'auto',
             folder: folderName,
             public_id: publicId,
             overwrite: true,
@@ -27,7 +26,7 @@ export default class CloudStorageService implements ICloudStroageService {
       } else {
         stream = cloudinary.uploader.upload_stream(
           {
-            resource_type: 'image',
+            resource_type: 'auto',
             folder: folderName,
           },
           (error, result) => {
@@ -42,5 +41,4 @@ export default class CloudStorageService implements ICloudStroageService {
       streamifier.createReadStream(file).pipe(stream);
     });
   }
-
 }

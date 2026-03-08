@@ -1,4 +1,5 @@
 //candidate services :: recruiter services :: adminservices ::
+import { EndPoints } from "../constants/endPoints/user.endpoints"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { AxiosError } from "axios"
 
@@ -23,15 +24,15 @@ export const adminLogin = async (email : string, password : string) => {
     }
 }
 
-export const refreshAccessToken = async () => {
+export const reAuthenticate = async () => {
     try {
-        const response = await axiosInstance.get('/token/refresh', 
+        const response = await axiosInstance.get(EndPoints.RE_AUTHENTICATE, 
             {
                 sendAuthToken:true
             } as AxiosRequest
         )
 
-        return response.data?.accessToken
+        return response.data
     } catch (error : unknown) {
         console.log('Error occured while refreshing the token', error instanceof Error ? error.message : null)
     }
@@ -568,7 +569,7 @@ export const commonService = {
 
 export const googleLogin = async (googleToken : string) => {
     try {
-        const response = await axiosInstance.post('/google/sign-up',
+        const response = await axiosInstance.post(EndPoints.GOOGLE_LOGIN,
             {googleToken},
             {
                 headers:{'Content-Type':'application/json'}

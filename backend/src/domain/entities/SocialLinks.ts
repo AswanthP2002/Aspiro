@@ -1,4 +1,4 @@
 export default interface SocialLinks {
-    domain : string
-    url : string
+  domain: string;
+  url: string;
 }

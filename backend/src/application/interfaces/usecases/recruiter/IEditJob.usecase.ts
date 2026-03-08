@@ -1,5 +1,5 @@
-import { EditJobDTO, JobDTO } from "../../../DTOs/recruiter/createJob.dto";
+import { EditJobDTO, JobDTO } from '../../../DTOs/recruiter/createJob.dto';
 
 export default interface IEditJobUsecase {
-    execute(editJobDto: EditJobDTO): Promise<JobDTO | null>
+  execute(editJobDto: EditJobDTO): Promise<JobDTO | null>;
 }

@@ -10,7 +10,7 @@ export default function exceptionhandle(
 ) {
   let responseMessage: string;
   let code: number;
-  let errors: any
+  let errors: { code: string; message: string } = { code: '', message: '' }; //from any changed to proper structure
 
   console.error(err.stack);
 
@@ -40,37 +40,56 @@ export default function exceptionhandle(
       responseMessage = 'Your account has been blocked by the admin';
       code = StatusCodes.NOT_ACCEPTABLE;
       break;
+    case 'USER_SUSPENDED':
+      responseMessage =
+        'Your Account has been temporarly blocked, check email for further information';
+      code = StatusCodes.NOT_ACCEPTABLE;
+      break;
+    case 'USER_BANNED':
+      responseMessage =
+        'Your account has been permanently banned due to violation of our community guidelines';
+      code = StatusCodes.NOT_ACCEPTABLE;
+      break;
     case 'WRONG_PASSWORD':
       responseMessage = 'Incorrect password';
       code = StatusCodes.UNAUTHORIZED;
+      errors = {
+        code: 'AUTH_FAILED',
+        message: 'User entered wrong password',
+      };
+      break;
+    case 'BAD_REQUEST':
+      responseMessage = 'Your request contains incorrect data';
+      code = StatusCodes.BAD_REQUEST;
       break;
 
     //jwt based errors
-    case 'TokenExpiredError' :
-      responseMessage = 'Your session has expired, please re login'
-      code = StatusCodes.UNAUTHORIZED
+    case 'TokenExpiredError':
+      console.log('--Un Authorized Error Occured in Authentication :: TOKEN EXPIRED--');
+      responseMessage = 'Your session has expired, please re login';
+      code = StatusCodes.UNAUTHORIZED;
       errors = {
-        code:'ACCESS_TOKEN_EXPIRED',
-        message:'Access Token Expired, required refresh'
-      }
+        code: 'ACCESS_TOKEN_EXPIRED',
+        message: 'Access Token Expired, required refresh',
+      };
       break;
-    
+
     case 'JsonWebTokenError':
-      console.log('json web token error executed') //debugging
-      responseMessage = 'Invalid token'
-      code = StatusCodes.UNAUTHORIZED
+      console.log('--Un Authorized Error Occured in Authentication :: JSON WEB TOKEN ERROR--');
+      responseMessage = 'Invalid token';
+      code = StatusCodes.UNAUTHORIZED;
       errors = {
-        code:'INVALID_ACCESS_TOKEN',
-        message:'Invalid toke or jwt token malformed'
-      }
+        code: 'INVALID_ACCESS_TOKEN',
+        message: 'Invalid toke or jwt token malformed',
+      };
       break;
     default:
-      console.log('Internal server error executed') // debugging
+      console.log('Internal server error executed', err); 
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;
   }
 
-  res.status(code).json({ success: false, message: responseMessage, errors });
+  res.status(code).json({ success: false, message: responseMessage, errors: errors });
   return;
 }

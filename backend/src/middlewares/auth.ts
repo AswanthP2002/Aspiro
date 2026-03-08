@@ -1,209 +1,42 @@
-import CheckCandidateBlockStatusUseCase from '../application/usecases/candidate/CheckCandidateBlockStatus.usecase';
-import CandidateRepository from '../infrastructure/repositories/user/candidateRepository';
 import { StatusCodes } from '../presentation/statusCodes';
 import { generateToken, verifyToken } from '../services/jwt';
 import { Request, Response, NextFunction } from 'express';
-import logger from '../utilities/logger';
-import UserRepository from '../infrastructure/repositories/userRepository';
-
-let candidateRepo;
-let checkCandidateBlockStatusUC: any;
-
-(async function () {
-  candidateRepo = new CandidateRepository();
-  const userRepo = new UserRepository();
-  checkCandidateBlockStatusUC = new CheckCandidateBlockStatusUseCase(candidateRepo, userRepo);
-})();
+import logger from '../../logger';
+import { UserDAO } from '../infrastructure/database/DAOs/user.dao.refactored';
+import mongoose from 'mongoose';
+import { UserBannedError, UserBlockedError } from '../domain/errors/AppError';
 
 export interface Auth extends Request {
   user?: any;
+}
+
+type JWTVerificationResultPayload = {
+  id: string
+  name: string
+  role: string
+  email: string
 }
 
 export interface AdminAuth extends Request {
   admin: any;
   candidateId?: string;
 }
-// export const candidateAuth = async (req: Auth, res: Response, next: NextFunction) => {
-//   try {
-//     //check candidate blocked or not??
-//     const authHeader = req.headers.authorization;
 
-//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//       logger.warn('Token is missing or malformed');
-//       return res.status(StatusCodes.BAD_REQUEST).json({
-//         success: false,
-//         message: 'Authorization token is missing or malformed',
-//       });
-//     }
-
-//     const token = authHeader.split(' ')[1];
-//     try {
-//       const decod: any = await verifyToken(token);
-//       const isBlocked = await checkCandidateBlockStatusUC.execute(decod.id);
-//       if (isBlocked)
-//         return res.status(StatusCodes.FORBIDEN).json({
-//           success: false,
-//           message: 'Your account has been blocked by the admin, you will logout shortly..',
-//         });
-//       req.user = decod;
-//       next();
-//     } catch (error: any) {
-//       switch (error.name) {
-//         case 'TokenExpiredError':
-//           logger.error({ error }, 'error occured');
-//           return res.status(StatusCodes.UNAUTHORIZED).json({
-//             success: false,
-//             message: 'Session expired, please login again',
-//           });
-//         case 'JsonWebTokenError':
-//           logger.error({ error }, 'error occured');
-//           return res.status(StatusCodes.BAD_REQUEST).json({
-//             success: false,
-//             message: 'Invalid Token, please login again',
-//           });
-//         default:
-//           logger.error({ error }, 'Token verification failed');
-//           return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//             success: false,
-//             message: 'Something went wrong while verifying the token',
-//           });
-//       }
-//     }
-//   } catch (error: any) {
-//     logger.error({ error }, 'Error occured while authenticating candidate');
-//     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//       success: false,
-//       message: 'Internal server error, please try again after some time',
-//     });
-//   }
-// };
-// export const userAuth = async (req: Auth, res: Response, next: NextFunction) => {
-//   const token = req.headers.authorization;
-//   console.log('token for testing incoming token', token)
-
-//   if (!token) {
-//     logger.warn({}, 'No Token');
-//     return res.status(StatusCodes.NOT_ACCEPTABLE).json({
-//       success: false,
-//       message: 'Access denied, no token provided or token malformed',
-//     });
-//   }
-
-//   try {
-//     const decoded = await verifyToken(token.split(' ')[1]);
-//     req.user = decoded;
-//     next();
-//   } catch (error: unknown) {
-//     if (error instanceof Error) {
-//       switch (error.name) {
-//         case 'TokenExpiredError':
-//           return res.status(StatusCodes.UNAUTHORIZED).json({
-//             success: false,
-//             message: 'Your session has expired, please re login',
-//           });
-//         case 'JsonWebTokenError':
-//           return res.status(StatusCodes.BAD_REQUEST).json({
-//             success: false,
-//             message: 'Invalid token, please re login',
-//           });
-//         default:
-//           return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//             success: false,
-//             message: 'Something went wrong, please try again after some time',
-//           });
-//       }
-//     }
-//   }
-// };
-// export const recruiterAuth = async (req: Auth, res: Response, next: NextFunction) => {
-//   const token = req.headers.authorization;
-
-//   if (!token) {
-//     logger.warn({}, 'NO Token');
-//     return res.status(StatusCodes.NOT_ACCEPTABLE).json({
-//       success: false,
-//       message: 'Access denied, no token provided or token malformed',
-//     });
-//   }
-
-//   try {
-//     const decoded = await verifyToken(token.split(' ')[1]);
-//     req.user = decoded;
-//     next();
-//   } catch (error: unknown) {
-//     if (error instanceof Error) {
-//       switch (error.name) {
-//         case 'TokenExpiredError':
-//           return res.status(StatusCodes.UNAUTHORIZED).json({
-//             success: false,
-//             message: 'Your session has expired, please re login',
-//           });
-//         case 'JsonWebTokenError':
-//           return res.status(StatusCodes.BAD_REQUEST).json({
-//             success: false,
-//             message: 'Invalid token, please re login',
-//           });
-//         default:
-//           return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//             success: false,
-//             message: 'Something went wrong, please try again after some time',
-//           });
-//       }
-//     }
-//   }
-// };
-
-// export const adminAuth = async (req: AdminAuth, res: Response, next: NextFunction) => {
-//   //get token from authorization
-//   const token = req.headers.authorization;
-
-//   //check token existance
-//   if (!token) {
-//     return res.status(StatusCodes.NOT_ACCEPTABLE).json({
-//       success: false,
-//       message: 'Access denied, No token provided or token malformed',
-//     });
-//   }
-
-//   //decode token
-//   try {
-//     const decoded = await verifyToken(token.split(' ')[1]);
-//     req.admin = decoded;
-//     next();
-//   } catch (error: unknown) {
-//     if (error instanceof Error) {
-//       logger.error({ error }, 'Error occured while authenticating admin');
-//       switch (error.name) {
-//         case 'TokenExiredError':
-//           return res.status(StatusCodes.UNAUTHORIZED).json({
-//             success: false,
-//             message: 'Your session has expired, please login',
-//           });
-//         case 'JsonWebTokenError':
-//           return res
-//             .status(StatusCodes.BAD_REQUEST)
-//             .json({ success: false, message: 'Invalid token, please login' });
-//         default:
-//           return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//             success: false,
-//             message: 'Something went wrong, please try again after some time',
-//           });
-//       }
-//     }
-//   }
-// };
-
-export const refreshAccessToken = async (req: Auth, res: Response, next: NextFunction) : Promise<void> => {
+export const refreshAccessToken = async (
+  req: Auth,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const refreshToken = req.cookies?.refreshToken;
 
   if (!refreshToken) {
     res
       .status(StatusCodes.NOT_ACCEPTABLE)
-      .json({ success: false, message: 'No token provided' });
+      .json({ success: false, message: 'No refresh token provided' });
   }
 
   try {
-    const decoded: any = await verifyToken(refreshToken);
+    const decoded = (await verifyToken(refreshToken)) as JWTVerificationResultPayload;
 
     const accessToken = await generateToken({
       id: decoded?.id,
@@ -219,26 +52,28 @@ export const refreshAccessToken = async (req: Auth, res: Response, next: NextFun
       logger.error({ error }, 'Error occured  while issuing new access token');
       switch (error.name) {
         case 'TokenExpiredError':
-           res.status(StatusCodes.UNAUTHORIZED).json({
+          res.status(StatusCodes.UNAUTHORIZED).json({
             success: false,
             message: 'Your session has expired, please login again to continue',
             errors: {
               code: 'REFRESH_TOKEN_EXPIRED',
-              message: 'Refresh token expired, please login again'
-            }
+              message: 'Refresh token expired, please login again',
+            },
           });
+          break;
         case 'JsonWebTokenError':
-           res.status(StatusCodes.UNAUTHORIZED).json({
+          res.status(StatusCodes.UNAUTHORIZED).json({
             success: false,
             message: 'Invalid Token, please login again',
             errors: {
               code: 'INVALID_TOKEN',
-              message: 'Invalid token, please login again'
-            }
+              message: 'Invalid token, please login again',
+            },
           });
+          break;
         default:
           logger.error('Token verification failed');
-           res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong, please try again after some time',
           });
@@ -252,12 +87,8 @@ export const centralizedAuthentication = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  console.log('Checking fresh request------------------------------------------------')
-  console.log('checking request headers', req.headers)
-  const auth = req.headers.authorization; //access the token from header
-  console.log('This is auth', auth);
+  const auth = req.headers.authorization;
   if (!auth) {
-    console.log('---No authorization header---');
     res.status(406).json({
       success: false,
       message: 'No authorization header provided, please login again',
@@ -266,9 +97,20 @@ export const centralizedAuthentication = async (
   }
 
   try {
-    const decoded = await verifyToken(auth.split(' ')[1]);
-    //console.log('Decoded value for debuging', decoded)
+    const decoded = (await verifyToken(auth.split(' ')[1])) as JWTVerificationResultPayload;
+    //check is user blocked or not
+    console.log('-- this user authenticated succesfully --')
+    console.log('-- authenticated user decoded data', decoded)
+    const userData = await UserDAO.findById(new mongoose.Types.ObjectId(decoded.id));
+    if (userData?.isBlocked) {
+      throw new UserBlockedError();
+    }
+    console.log('-- user not blocked --')
+    if (userData?.isBanned) {
+      throw new UserBannedError();
+    }
 
+    console.log('-- user not banned --')
     req.user = decoded;
     next();
   } catch (error: unknown) {
@@ -277,8 +119,7 @@ export const centralizedAuthentication = async (
 };
 
 export const authorization = (roles: string[]) => {
-  return async (req: Auth, res: Response, next: NextFunction) : Promise<void> => {
-    console.log('request reached in the authorization')
+  return async (req: Auth, res: Response, next: NextFunction): Promise<void> => {
     if (!roles.includes(req?.user?.role)) {
       res.status(StatusCodes.FORBIDEN).json({ success: false, message: 'Forbidden request' });
       return;

@@ -1,5 +1,5 @@
 import User from "../../../domain/entities/user/User.FIX";
-import UserMetaData from "../../DTOs/user/userMetaData.dto";
+import UserMetaData from "../../DTOs/user/userMetaData.dto.FIX";
 
 export default function mapToUserMetaData(user: User): UserMetaData {
     return {

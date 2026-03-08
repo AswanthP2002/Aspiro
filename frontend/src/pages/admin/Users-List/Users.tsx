@@ -1,31 +1,69 @@
 import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix';
-import { getUsers } from '../../../services/adminServices';
+import { banUser, deleteUser, getUsers, userBlock, userUnblock } from '../../../services/adminServices';
 import { UserType } from '../../../types/entityTypes';
-import { FaSortAmountUp, FaSearch } from 'react-icons/fa';
+import { FaSortAmountUp } from 'react-icons/fa';
 import { FiFilter } from 'react-icons/fi';
-import { LuUser } from 'react-icons/lu';
-import { IoLocation } from 'react-icons/io5';
-import { CiCalendar } from 'react-icons/ci';
+import { LuShieldBan, LuUser } from 'react-icons/lu';
+import { IoSearchOutline } from 'react-icons/io5';
 import { CgClose } from 'react-icons/cg';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-
-
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-//im certain that sharmi message me today
-
+import Swal from 'sweetalert2';
+import { BiTrash } from 'react-icons/bi';
+import { formattedDateMoment } from '../../../services/util/formatDate';
+import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { MdBlock } from 'react-icons/md';
 
 interface FilterOptions {
   status: boolean[]; 
   roles: string[]; 
   verification: boolean[]; 
+}
+
+export function OptionsMenu({
+  row,
+  onBlock,
+  onUnBlock,
+  onBan,
+  onDelete,
+  navigateUserDetails
+}: {
+  row: UserType,
+  onBlock: (userId: string) => void,
+  onUnBlock: (userId: string) => void,
+  onBan: (userId: string) => void,
+  onDelete: (userId: string) => void,
+  navigateUserDetails: (userId: string) => void
+}){
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
+  const toggleOptionsMenu = () => setIsMenuOpen(prv => !prv)
+
+  return(
+    <>
+      <div className="relative">
+        <button onClick={toggleOptionsMenu}><BsThreeDotsVertical /></button>
+      
+        {isMenuOpen && (
+          <div className='absolute border border-gray-200 rounded-ms shadow-lg z-10 bg-white p-3 right-20'>
+            <ul className='space-y-2 text-xs'>
+              <li onClick={() => {navigateUserDetails(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><LuUser /> View Profile</li>
+              {
+                row.isBlocked
+                  ? (!row.isBanned && (<li onClick={() => {onUnBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><MdBlock /> Unsuspend Account</li>))
+                  : (!row.isBanned && (<li onClick={() => {onBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><MdBlock /> Suspend Account</li>))
+              }
+              {
+                !row.isBanned && (<li onClick={() => {onBan(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><LuShieldBan /> Permanent Ban</li>)
+              }
+              <li onClick={() => {onDelete(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer text-red-500 flex gap-2 items-center'><BiTrash /> Delete User</li>
+            </ul>
+          </div>
+        )}
+      </div>
+    </>
+  )
 }
 
 export default function Users() {
@@ -34,7 +72,6 @@ export default function Users() {
 
   const [users, setUsers] = useState<UserType[]>([]);
   const [page, setPage] = useState(1); 
-  const [limit, setLimit] = useState(10); 
   const [totalPage, setTotalPage] = useState(0); 
   const [search, setSearch] = useState(""); 
   const [pagination, setPagination] = useState<number[]>([]); 
@@ -76,6 +113,144 @@ export default function Users() {
   const openFilter = () => setFilterVisible(true);
   const closeFilter = () => setFilterVisible(false);
 
+  const bloackUser = async (id: string) => {
+    if(!id) return
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Block ?',
+      text: 'Are you sure, you want to block this user ?',
+      showConfirmButton: true, 
+      confirmButtonText: 'Block',
+      showCancelButton: true,
+      cancelButtonText: 'No',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+      await userBlock(id)
+      Notify.success('User blocked Successfully', {timeout: 2000})
+      setUsers((prvUsers: UserType[]) => {
+        return prvUsers.map((user: UserType) => {
+          if(user._id === id){
+            return {...user, isBlocked: true}
+          }else {
+            return user
+          }
+        })
+      })
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+    }
+      }else{
+        return
+      }
+    })
+  }
+  const unblockUser = async (id: string) => {
+    if(!id) return
+
+    Swal.fire({
+      icon:'warning',
+      title: 'Unblock ?',
+      text: 'Are you sure, you want to unblock this user ?',
+      showConfirmButton: true, 
+      confirmButtonText: 'Unblock',
+      showCancelButton: true,
+      cancelButtonText: 'No',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+      await userUnblock(id)
+      Notify.success('User Unblocked', {timeout: 3000})
+      setUsers((prvUsers: UserType[]) => {
+        return prvUsers.map((user: UserType) => {
+          if(user._id === id){
+            return {...user, isBlocked: false}
+          }else{
+            return user
+          }
+        })
+      })
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+    }
+      }else {
+        return
+      }
+    })
+  }
+
+  const banUserPermanently = async (userId: string) => {
+    if(!userId) return
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Ban ?',
+      text: 'Are you sure, you want to ban this user permanently?. This action can not be undone',
+      showConfirmButton: true, 
+      confirmButtonText: 'Ban',
+      showCancelButton: true,
+      cancelButtonText: 'No',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+      const result = await banUser(userId)
+      Notify.success(result.message)
+      setUsers((prvUsers: UserType[]) => {
+        return prvUsers.map((user: UserType) => {
+          if(user._id === userId){
+            return {...user, isBanned: true}
+          }else {
+            return user
+          }
+        })
+      })
+    } catch (error: unknown) {
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+    }
+      }else{
+        return
+      }
+    })
+  }
+
+  const deleteAUser = async (userId: string) => {
+    if(!userId) return
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Delete ?',
+      text: 'Are you sure?. Do you want to delete this user?. This cant be undone',
+      showConfirmButton: true,
+      confirmButtonText: "Delete",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      allowEscapeKey: false,
+      allowOutsideClick: false
+    }).then(async (response) => {
+      if(response.isConfirmed){
+        try {
+          const result = await deleteUser(userId)
+          setUsers((prv: UserType[]) => {
+            return prv.filter((user: UserType) => user._id !== userId)
+          })
+          Notify.success(result.message)
+        } catch (error: unknown) {
+          Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        }
+      }
+    })
+  }
+
+  const navigateToUserDetailsPage = (userId: string) => {
+    return navigate(`details/${userId}`)
+  }
 
   useEffect(() => {
     async function fetchCandidateLists(){
@@ -124,18 +299,6 @@ export default function Users() {
       
   }, [search, page, sort, filter])
 
-  function formatDate(createdAt: Date | string): string {
-    const joined = new Date(createdAt);
-    return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`;
-  }
-
-  function changePage(pageNumber: number) {
-    setPage(pageNumber);
-  }
-
-  const nextPage = () => setPage(prev => prev + 1);
-  const previousPage = () => setPage(prev => prev - 1);
-
   function searchCandidates(event: React.ChangeEvent<HTMLInputElement>) { 
     setSearch(event.target.value);
   }
@@ -153,27 +316,110 @@ export default function Users() {
 
   const dSearch = debouncedSearch(searchCandidates, 600);
 
+  const userTableColumns: TableColumn<UserType>[] = [
+  {
+    key: 'name',
+    header: "USER",
+    render: (row: UserType) => (
+      <div className='flex gap-2'>
+        <div className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-400 rounded-full">{row.name ? row.name[0] : 'U'}</div>
+        <div>
+          <p className='font-medium'>{row.name}</p>
+          <p className='text-xs'>{row.email}</p>
+        </div>
+      </div>
+    )
+  },
+  {
+    header: "JOINED DATE",
+    key: 'createdAt',
+    render: (row: UserType) => (
+      <p className='text-xs'>{formattedDateMoment(row.createdAt as string, "MMM DD YYYY")}</p>
+    )
+  },
+  {
+    header: "ROLE",
+    key: 'role',
+    render: (row: UserType) => (
+      <div className='flex flex-wrap gap-2'>
+        {
+          row.role?.map((r: string, index: number) => (
+            <span className={`${r === 'user' ? 'bg-gray-200 text-gray-500 border-2 border-gray-300' : 'bg-blue-200 text-blue-500 border-2 border-blue-300'} px-2 rounded-md text-xs`} key={index}>{r}</span>
+          ))
+        }
+      </div>
+    )
+  },
+  {
+    header: "STATUS",
+    key: 'isBlocked',
+    render: (row: UserType) => {
+      if(row.isBlocked){
+        return <span className='border-2 border-orange-300 bg-orange-200 text-orange-500 px-2 text-xs rounded-md'>Suspended</span>
+      }
+      if(row.isBanned){
+        return <span className='border-2 border-red-300 bg-red-200 text-red-500 px-2 text-xs rounded-md'>Banned</span>
+      }
+
+      return <span className='border-2 border-green-300 bg-green-200 text-green-500 px-2 text-xs rounded-md'>Active</span>
+    }
+  },
+  {
+    header: "VERIFICATION",
+    key: 'isVerified',
+    render: (row: UserType) => {
+      if(row.isVerified){
+        return <span className='text-xs text-green-500'>Verified</span>
+      }else{
+        return <span className='text-xs text-red-500'>Not Verified</span>
+      }
+    }
+  },
+  {
+    header: "ACTIONS",
+    key: 'actions',
+    render: (row: UserType) => (
+      <OptionsMenu 
+        row={row}
+        onBlock={bloackUser}
+        onUnBlock={unblockUser}
+        onBan={banUserPermanently}
+        onDelete={deleteAUser}
+        navigateUserDetails={navigateToUserDetailsPage}
+      />
+    )
+  }
+]
+
   return (
     <>
-    <div className="w-full min-h-screen bg-gray-100">
-      <div className="w-full px-5 py-5 grid grid-cols-12 gap-3">
-        <div className="col-span-12 lg:col-span-9">
-          <div className="w-full border-border-gray-200 bg-white rounded-md">
-            <div className="header relative flex justify-between items-center p-3">
-              <p>Users</p>
-              <div className="flex gap-3">
-                <button onClick={openFilter} className="text-sm text-gray-500 flex items-center border border-gray-200 rounded-md !px-3 gap-2 !py-1">
+    <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-100">
+      <p className='text-lg font-medium'>User Management</p>
+      <p className='text-xs mt-1 mb-5'>Manaage all users and account security</p>
+      <div className="p-3 border border-gray-200 bg-white rounded-md mb-3 relative">
+        <div className="grid grid-cols-12 gap-2 items-center">
+          <div className="col-span-6 lg:col-span-8">
+            <div className="border border-gray-200 rounded-md px-2 py-1 flex items-center gap-2">
+              <IoSearchOutline color='gray' />
+              <input onKeyUp={(event) => dSearch(event)} type="text" className='!text-xs py-1 w-full' placeholder='Search users' />
+            </div>
+          </div>
+          <div className="col-span-3 lg:col-span-2">
+            <button onClick={openFilter} className="text-sm w-full text-gray-500 flex items-center border border-gray-200 rounded-md !px-3 gap-2 !py-1">
                   <FiFilter />
                   Filter
-                </button>
-                <button onClick={openSort} className="text-sm text-gray-500 flex items-center border border-gray-200 rounded-md !px-3 gap-2 !py-1">
+            </button>
+          </div>
+          <div className="col-span-3 lg:col-span-2">
+            <button onClick={openSort} className="text-sm w-full text-gray-500 flex items-center border border-gray-200 rounded-md !px-3 gap-2 !py-1">
                   <FaSortAmountUp />
                   Sort
-                </button>
-           {/* {Filter} */}
-           {
-            filterVisible && (
-              <div className=" absolute bg-white top-15 w-xs right-20 shadow border border-gray-200 rounded-md">
+            </button>
+          </div>
+        </div>
+
+        {filterVisible && (
+          <div className="absolute z-25 bg-white top-15 w-xs right-20 shadow border border-gray-200 rounded-md">
                 <div className='p-3 border-b border-gray-200 flex justify-between items-center'>
                   <p className='text-sm font-medium'>Filter Users</p>
                   <button onClick={closeFilter}><CgClose /></button>
@@ -243,11 +489,10 @@ export default function Users() {
                     </ul>
                 </div>
               </div>
-            )
-           }
-           {/* Sort */}
-           {sortVisible && (
-                <div className="absolute sort bg-white shadow p-3 top-15 border border-gray-200 rounded-md w-xs right-0">
+        )}
+
+        {sortVisible && (
+          <div className="absolute z-25 sort bg-white shadow p-3 top-15 border border-gray-200 rounded-md w-xs right-0">
                   <div className="flex justify-between items-center">
                     <p className='text-sm'>Sort by</p>
                     <i onClick={closeSort} className="cursor-pointer fa-solid fa-circle-xmark"></i>
@@ -259,136 +504,16 @@ export default function Users() {
                     <li className={`${sort === 'joined-oldest' ? 'bg-orange-200' : 'bg-white'} !p-2 rounded-md`}><button onClick={() => setSort('joined-oldest')} className='text-gray-500 text-xs flex items-center gap-3'><FaArrowDown /> Joined Oldest</button></li>
                   </ul>
                 </div>
-            )}
-              </div>
-            </div>
-            <div className='mt-5 p-3'>
-              <div className='bg-gray-100 flex items-center gap-2 !py-1 px-2 rounded-md '>
-                <FaSearch color='gray' size={16} />
-                <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search Users' />
-              </div>
-            </div>
-            <div className="overflow-y-auto mt-3">
-              <table className="text-sm w-full text-left overflow-x-auto">
-               <thead className="text-gray-500 font-medium border-t border-gray-300">
-                 <tr className='border-b border-gray-300'> 
-                   <td className='!p-2'>Name</td>
-                   <td className='!p-2'>Email</td>
-                   <td className='!p-2'>Role</td>
-                   <td className='!p-2'>Joined</td>
-                   <td className='!p-2'>Status</td>
-                 </tr>
-               </thead>
-               <tbody>
-                 {users.map((user : UserType) => ( 
-                <tr
-                  key={user._id} 
-                  onClick={() => setSelectedUser(user)}
-                  className={`${selectedUser?._id === user?._id ? "bg-orange-100" : "bg-white"} rounded-lg cursor-pointer border-b border-gray-300`} // Added cursor-pointer
-                >
-                  <td className='flex items-center gap-2 p-2'>
-                      <div className='bg-gray-200 w-8 h-8 flex items-center justify-center rounded-full border border-gray-300'>
-                        <p>{user?.name ? user?.name[0] : 'U'}</p>
-                      </div>
-                      <p className='text-xs'>{user.name}</p>
-                  </td>
-                  
-                  <td><p className='text-xs'>{user?.email}</p></td>
-                  <td>{
-                    user?.role?.map((role: string, index: number) => (
-                      <p key={index} className='text-xs'>{role}</p>
-                    ))
-                  }</td>
-                  <td><p className='text-xs'>{formatDate(user?.createdAt as string)}</p></td>
-                  <td>
-                    {
-                      user?.isBlocked
-                          ? <span className='text-xs text-red-500 bg-red-100 rounded-full !px-2'>Blocked</span>
-                          : <span className='text-xs text-green-500 bg-green-100 rounded-full !px-2'>Active</span>
-                    }
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-            </div>
-            <div className="flex items-center justify-between text-xs p-3">
-           <span>Showing {page} of {totalPage} Page</span>
-           <div className="flex gap-2">
-             {
-              page > 1 && <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button>
-            }
-            {
-              pagination.map((pageNumber) => { 
-                return(
-                    <button onClick={() => changePage(pageNumber)} key={pageNumber} className={pageNumber === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{pageNumber}</button>
-                )
-              })
-            }
-            {
-              page < totalPage && <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">Next</button>
-            }
-          </div>
-        </div>
-          </div>
-        </div>
-        <div className="col-span-12 lg:col-span-3">
-          <div className="border border-gray-200 rounded-md bg-white">
-              <div className='p-3 border-b border-gray-300 flex flex-col items-center justify-center'>
-                <div className='w-15 h-15 flex items-center justify-center rounded-full bg-gray-200'>
-                  <p className='text-2xl font-light text-gray-500'>{selectedUser?.name ? selectedUser?.name[0] : 'U'}</p>
-                </div>
-                <p className='mt-3 text-sm'>{selectedUser?.name}</p>
-                <p className='mt-1 text-xs text-gray-700'>{selectedUser?.email}</p>
-              </div>
-              <div className="p-3 border-b border-gray-300">
-                <p className='text-sm'>Summary</p>
-                <p className="text-xs text-gray-700 mt-2">{selectedUser?.summary || 'Not Added'}</p>
-              </div>
-              <div className='p-3'>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                  <span className='text-xs text-gray-700 flex items-center gap-1'><LuUser /> Gender</span>
-                  <p className="text-sm mt-1">{'Male'}</p>
-                </div>
-
-                <div>
-                  <span className='text-xs text-gray-700 flex items-center gap-1'><CiCalendar /> Joined</span>
-                  <p className="text-sm mt-1">{selectedUser?.createdAt ? formatDate(selectedUser?.createdAt as string) : 'Not Added'}</p>
-                </div>
-
-                <div>
-                  <span className='text-xs text-gray-700 flex items-center gap-1'><IoLocation /> Location</span>
-                  <p className="text-sm mt-1">{selectedUser?.location?.city ? `${selectedUser?.location.city}, ${selectedUser?.location.state}, ${selectedUser?.location.country}` : 'Not Added'}</p>
-                </div>
-                </div>
-
-                <div className="mt-4">
-                {
-                  selectedUser?.location?.city && (
-                    <iframe
-                  width="100%"
-                  height="200"
-                  style={{ borderRadius: "10px" }}
-                  loading="lazy"
-                  allowFullScreen
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedUser?.location?.city}, ${selectedUser?.location?.state}, ${selectedUser?.location?.country}`)}&output=embed`}
-                ></iframe>
-                  )
-                }
-                {
-                  !selectedUser?.location?.city && (
-                    <p className='text-center text-gray-500 text-sm'>No map data available</p>
-                  )
-                }
-                </div>
-                <div className='mt-2'>
-                  <button onClick={() => navigate(`details/${selectedUser?._id}`)} className='w-full bg-gradient-to-br from-orange-400 to-orange-500 text-white !p-1 rounded-md'>View</button>
-                </div>
-              </div>
-          </div>
-        </div>
+        )}
       </div>
+      
+      <ReusableTable
+        data={users as UserType[]}
+        columns={userTableColumns}
+        currentPage={page}
+        totalPages={totalPage}
+        onPageChange={(page: number) => setPage(page)}
+      />
     </div>
     </>
   );

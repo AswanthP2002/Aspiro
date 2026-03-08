@@ -1,5 +1,5 @@
 import Skills from '../../../domain/entities/user/skills.entity';
-import { SkillDTO } from '../../DTOs/user/skill.dto';
+import { SkillDTO } from '../../DTOs/user/skill.dto.FIX';
 
 export default function mapToSkillDTOFromSkills(skill: Skills): SkillDTO {
   return {

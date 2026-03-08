@@ -1,5 +1,8 @@
-import { NotificationDTO } from "../../../DTOs/notifications.dto";
+import { NotificationDTO } from '../../../DTOs/notifications.dto';
+import GetNotificationsDTO from '../../../DTOs/user/getNotifications.dto';
 
 export default interface IGetUserSpecificNotificationUsecase {
-    execute(userId: string): Promise<NotificationDTO[] | null>
+  execute(
+    dto: GetNotificationsDTO
+  ): Promise<{ notifications: NotificationDTO[]; unRead: number; hasMore: boolean } | null>;
 }

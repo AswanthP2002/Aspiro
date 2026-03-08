@@ -1,9 +1,9 @@
-
 export default interface Resume {
-    _id? : string
-    candidateId? : string
-    resumeFileName? : string
-    resumeUrlCoudinary : string
-    resumePublicIdCloudinary : string
-    createdAt? : Date
+  _id?: string;
+  userId?: string;
+  name?: string;
+  resumeUrlCoudinary: string;
+  resumePublicIdCloudinary: string;
+  isPrimary?: boolean;
+  createdAt?: Date;
 }

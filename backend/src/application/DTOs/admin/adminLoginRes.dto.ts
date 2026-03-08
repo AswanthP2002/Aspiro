@@ -1,13 +1,13 @@
-import { Role } from "../../../domain/entities/user/User.FIX";
+import { Role } from '../../../domain/entities/user/User.FIX';
 
-export default interface AdminLoginResDTO {
+export default interface AdminLoginResponseDTO {
   token: string;
   refreshToken: string;
   user: {
-    id: any;
-    email?: string;
+    id: string;
+    email: string;
   };
-  role?: Role;
+  role: Role;
 }
 
 export interface AdminLoginDTO {

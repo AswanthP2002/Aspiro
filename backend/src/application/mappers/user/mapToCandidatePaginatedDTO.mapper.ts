@@ -1,4 +1,4 @@
-import CandidatePaginated from '../../../domain/entities/user/candidatePaginated.entity';
+import CandidatePaginated from '../../../domain/entities/user/candidatePaginated.entity.GARBAGE';
 import CandidatePaginatedDTO from '../../DTOs/candidate -LEGACY/candidatePaginated.dto';
 
 export default function mapToCandidatePaginagedDTO(

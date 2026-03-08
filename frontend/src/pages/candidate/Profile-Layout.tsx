@@ -7,6 +7,8 @@ import { useContext, useEffect } from "react";
 import { appContext } from "../../context/AppContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoMenu } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { decreaseAlertsCount, increaseAlertsCount } from "../../redux/alertSlice";
 
 function isActiveTab(path: string){
   return window.location.pathname.includes(path)
@@ -14,6 +16,18 @@ function isActiveTab(path: string){
 
 export default function ProfileLayout(){
     const {windowSize, setWindowSize, userSidebarOpen, setUserSidebarOpen} = useContext(appContext)
+    const unReadAlertsCount = useSelector((state: any) => {
+      return state.alert.unReadAlertsCount
+    })
+    const dispatcher = useDispatch()
+
+    const addAlert = () => {
+      dispatcher(increaseAlertsCount())
+    }
+
+    const readAlert = () => {
+      dispatcher(decreaseAlertsCount())
+    }
 
     useEffect(() => {
       const handleResize = () => {
@@ -112,10 +126,13 @@ export default function ProfileLayout(){
               </li>
 
               <li className={`rounded-md px-2 py-2 hover:bg-blue-500 hover:shadow-lg ${isActiveTab('alerts') ? 'shadow-lg bg-blue-500' : 'shadow-none'}`}>
-                <Link to='/profile/personal'>
-                  <div className="flex items-center gap-2">
+                <Link to='/profile/alerts'>
+                  <div className="flex items-center gap-2 relative">
                     <CiBellOn color="white" size={25} />
                     <p className="text-white text-sm font-light">Alerts</p>
+                    {
+                      unReadAlertsCount > 0 && (<span className="absolute  right-0 text-white bg-red-500 text-xs w-5 h-5 rounded-full flex items-center justify-center">{unReadAlertsCount}</span>)
+                    }
                   </div>
                 </Link>
               </li>
@@ -135,6 +152,10 @@ export default function ProfileLayout(){
                   <p className="text-sm font-medium text-white">Need help?</p>
                   <p className="text-xs mt-2 text-white font-light">Contact support team for assistance.</p>
                   <button className="mt-2 bg-white w-full text-xs text-blue-500 rounded-md p-1">Contact Support</button>
+                  <div className="mt-1 space-x-2">
+                    <button onClick={addAlert} className="text-xs border border-gray-200 rounded-md px-3 py-1">Add Alert</button>
+                    <button onClick={readAlert} className="text-xs border border-gray-200 rounded-md px-3 py-1">Read Alert</button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,73 +1,117 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
-import { AdminAuth, Auth } from '../../middlewares/auth';
+import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
-import IAdminLoginUseCase from '../../application/interfaces/usecases/admin/IAdminLogin.usecase';
-import IBlockCandidateUseCase from '../../application/interfaces/usecases/admin/IAdminBlockUser.usecase';
-import IBlockCompanyUseCase from '../../application/usecases/admin/interfaces/IBlockCompany.usecase';
-import IBlockJobUseCase from '../../application/usecases/admin/interfaces/IBlockJob.usecase';
-import ICloseCompanyUseCase from '../../application/usecases/admin/interfaces/ICloseCompany.usecase';
-import ILoadCandidateDetailsUseCase from '../../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
-import ILoadCandidateUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
-import ILoadCompanyDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadCompanyDetails.usecase';
-import ILoadCompaniesUseCase from '../../application/interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
-import ILoadJobsUseCase from '../../application/usecases/admin/interfaces/ILoadJobs.usecase';
-import ILoadJobDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadJobDetails.usecase';
-import IRejectJobUseCase from '../../application/usecases/admin/interfaces/IRejectJob.usecase';
-import IUnblockCompanyUseCase from '../../application/usecases/admin/interfaces/IUnblockCompany.usecase';
-import IUnblockCandidateUseCase from '../../application/interfaces/usecases/admin/IAdminUnblockUser.usecase';
-import IUnblockJobUseCase from '../../application/usecases/admin/interfaces/IUnblockJob.usecase';
-import IUnrejectJobUseCase from '../../application/usecases/admin/interfaces/IUnrejectJob.usecase';
-import IFindCandidateByUserIdUseCase from '../../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
-import IFindCandidateByCandidateIdUseCase from '../../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
-import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
-import ILoadUsersAdminUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase';
-import { loadUsersSchema } from '../schemas/admin/loadUsers.schema';
-import mapRequestToLoadUsersQueryDto from '../mappers/user/mapRequestToLoadUsersQueryDto';
+import IAdminLoginUseCase from '../../application/interfaces/usecases/admin/IAdminLogin.usecase..FIX';
+import ILoadUsersAdminUseCase from '../../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase.FIX';
 import IAdminLoadUserDetailsUsecase from '../../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
 import { userIdSchema } from '../schemas/user/userId.schema';
-import IAdminBlockUserUsecase from '../../application/interfaces/usecases/admin/IAdminBlockUser.usecase';
-import IAdminUnblockUserUsecase from '../../application/interfaces/usecases/admin/IAdminUnblockUser.usecase';
-import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
-import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
-import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
+import IAdminBlockUserUsecase from '../../application/interfaces/usecases/admin/IAdminBlockUser.usecase.FIX';
+import IAdminUnblockUserUsecase from '../../application/interfaces/usecases/admin/IAdminUnblockUser.usecase.FIX';
 import IAdminDeleteUserUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteUser.usecase';
 import IGetRecruiterApplicationsUsecase from '../../application/interfaces/usecases/admin/IGetRecruiterApplications.usecase';
-import IRejectRecruiterApplication from '../../application/interfaces/usecases/admin/IRejectRecruiterApplication.usecase';
-import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/admin/IApproveRecruiterApplication.usecase';
+import IRejectRecruiterApplication from '../../application/interfaces/usecases/admin/IRejectRecruiterApplication.usecase.FIX';
+import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/admin/IApproveRecruiterApplication.usecase.FIXED';
+import IAdminLoadRecruitersUsecase from '../../application/interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
+import IBlockRecruiterUsecase from '../../application/usecases/admin/interfaces/IBlockCompany.usecase.FIX';
+import IUnblockRecruiterUsecase from '../../application/usecases/admin/interfaces/IUnblockCompany.usecase.FIX';
+import IDeleteRecruiterUsecase from '../../application/usecases/admin/interfaces/ICloseCompany.usecase';
+import IAdminAddSkillUsecase from '../../application/interfaces/usecases/admin/IAdminAddSkill.usecase';
+import IAdminUpdateSkillUsecase from '../../application/interfaces/usecases/admin/IAdminUpdateSkill.usecase';
+import IAdminDeleteSkillUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteSkill.usecase';
+import IAdminGetSkillsUsecase from '../../application/interfaces/usecases/admin/IAdminGetSkills.usecase';
+import IBulckApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/admin/IBulckApproveRecruiterApplication.usecase';
+import IAdminPermanentBanUserUsecase from '../../application/interfaces/usecases/admin/IAdminPermanentBanUser.usecase';
+import IAdminResetUserPasswordUsecase from '../../application/interfaces/usecases/admin/IAdminResetUserPassword.usecase';
+import IAdminRequestResetUserPasswordUsecase from '../../application/interfaces/usecases/admin/IAdminRequestRestPassword.usecase';
+import IAdminLoadRecruiterDetailsUsecase from '../../application/interfaces/usecases/admin/IAdminLoadRecruiterDetails.usecase';
+import IAdminRevokeRecruiterVerification from '../../application/interfaces/usecases/admin/IAdminRevokeRecruiterVerification.usecase';
+import IAdminHandlePermissionRevokingUsecase from '../../application/interfaces/usecases/admin/IAdminHandlePermissionRevoking.usecase';
+import IAdminAddWorkModeUsecase from '../../application/interfaces/usecases/admin/IAdminAddWorkMode.usecase';
+import { IAdminGetWorkModesUsecase } from '../../application/interfaces/usecases/admin/IAdminGetWorkModes.usecase';
+import { IAdminChangeWorkModeStatusUsecase } from '../../application/interfaces/usecases/admin/IAdminChangeWorkmodeStatus.usecase';
+import IAdminDeleteWorkModeUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteWorkMode.usecase';
+import IAdminEditWorkModeUsecase from '../../application/interfaces/usecases/admin/IAdminEditWorkMode.usecase';
+import IAdminAddJobLevelUsecase from '../../application/interfaces/usecases/admin/IAdminAddJobLevel.usecase';
+import IAdminGetJobLevelsUsecase from '../../application/interfaces/usecases/admin/IAdminGetJobLevel.usecase';
+import IAdminEditJobLevelUsecase from '../../application/interfaces/usecases/admin/IAdminEditJobLevel.usecase';
+import IAdminChangeJobLevelStatusUsecase from '../../application/interfaces/usecases/admin/IAdminChangeJobLevelStatus.usecase';
+import IAdminDeleteJobLevelUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteJobLevel.usecase';
+import IAdminAddJobTypeUsecase from '../../application/interfaces/usecases/admin/IAdminAddJobType.usecase';
+import IAdminChangeJobTypeStatusUsecase from '../../application/interfaces/usecases/admin/IAdminChangeJobTypeStatus.usecase';
+import IAdminGetJobTypesUsecase from '../../application/interfaces/usecases/admin/IAdminGetJobType.usecase';
+import IAdminDeleteJobTypeUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteJobType.usecase';
+import IAdminUpdateJobTypeUse from '../../application/interfaces/usecases/admin/IAdminUpdateJobType.usecase';
+import IAdminChangeRecruiterApplicationStatusToUnderReview from '../../application/interfaces/usecases/admin/IAdminChangeRecruiterApplicationStatusToUnderReview.usecase';
+import ILoadJobsUseCase from '../../application/interfaces/usecases/admin/IAdminLoadJobs.usecase';
+import IAdminLoadJobDetailsUseCase from '../../application/usecases/admin/interfaces/ILoadJobDetails.usecase';
+import IAdminDeleteJobUsecase from '../../application/interfaces/usecases/admin/IAdminDeleteJob.usecase';
 
 @injectable()
 export class AdminController {
   constructor(
     @inject('IAdminLoginUseCase') private _adminLoginUC: IAdminLoginUseCase,
     @inject('ILoadUsersAdminUsecase') private _loadUsersAdminUC: ILoadUsersAdminUseCase,
-    @inject('IAdminLoadUserDetailsUsecase') private _loadUserDetails: IAdminLoadUserDetailsUsecase, // @inject('ILoadCandidatesUseCase')
-    @inject('IAdminBlockUserUsecase') private _blockUser: IAdminBlockUserUsecase, // private _loadCandidatesUC: ILoadCandidateUseCase, //usecase interface
+    @inject('IAdminLoadUserDetailsUsecase') private _loadUserDetails: IAdminLoadUserDetailsUsecase,
+    @inject('IAdminBlockUserUsecase') private _blockUser: IAdminBlockUserUsecase,
     @inject('IAdminUnblockUserUsecase') private _unblockUser: IAdminUnblockUserUsecase,
-    @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase, // // private _loadCompaniesUC: ILoadCompaniesUseCase, //usecase interface
     @inject('IAdminDeleteUserUsecase') private _deleteUser: IAdminDeleteUserUsecase,
-    @inject('IGetRecruiterApplicationsUsecase') private _getRecruiterApplications: IGetRecruiterApplicationsUsecase,
-    @inject('IRejectRecruiterApplication') private _rejectRecruiterApplication: IRejectRecruiterApplication,
-    @inject('IApproveRecruiterApplicationUsecase') private _approveRecruiterApplication: IApproveRecruiterApplicationUsecase
-  ) // @inject('ILoadCandidateDetailsUseCase')
-  // private _loadCandidateDetailsUC: ILoadCandidateDetailsUseCase, //usecase interface
-
-  // private _blockCandidateUC: IBlockCandidateUseCase, //usecase interface
-  // @inject('IFindCandidateByUserIdUseCase')
-  // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase,
-  // @inject('IUnblockCandidateUseCase')
-  // private _unblockCandidateUC: IUnblockCandidateUseCase,
-  // @inject('IFindCandidateByCandidateIDUseCase')
-  // private _findCandidateByCandidateIdUC: IFindCandidateByCandidateIdUseCase,
-  // @inject('ILoadCompaniesUseCase')
-  // private _loadComapniesUC: ILoadCompaniesUseCase // private _unblockCandidateUC: IUnblockCandidateUseCase, //usecase interface // private _loadCompanyDetailsUC: ILoadCompanyDetailsUseCase, //usecase interface // private _blockCompanyUC: IBlockCompanyUseCase, //usecase interface // private _unblockCompanyUC: IUnblockCompanyUseCase, //usecase interface // private _closeCompanyUC: ICloseCompanyUseCase, //usecase interface // private _loadJobsUC: ILoadJobsUseCase, //usecase interface // private _loadJobDetails: ILoadJobDetailsUseCase, //usecase interface // private _blockJobUC: IBlockJobUseCase, //usecase interface // private _unblockJobUC: IUnblockJobUseCase, //usecase interface // private _rejectJobUC: IRejectJobUseCase, //usecase interface // private _unrejectJobUC: IUnrejectJobUseCase //usecase interface
-  {}
+    @inject('IGetRecruiterApplicationsUsecase')
+    private _getRecruiterApplications: IGetRecruiterApplicationsUsecase,
+    @inject('IRejectRecruiterApplication')
+    private _rejectRecruiterApplication: IRejectRecruiterApplication,
+    @inject('IApproveRecruiterApplicationUsecase')
+    private _approveRecruiterApplication: IApproveRecruiterApplicationUsecase,
+    @inject('IAdminLoadRecruitersUsecase') private _loadRecruiters: IAdminLoadRecruitersUsecase,
+    @inject('IBlockRecruiterUsecase') private _blockRecruiter: IBlockRecruiterUsecase,
+    @inject('IUnblockRecruiterUsecase') private _unblockRecruiter: IUnblockRecruiterUsecase,
+    @inject('IDeleteRecruiterUsecase') private _deleteRecruiter: IDeleteRecruiterUsecase,
+    @inject('IAdminAddSkillsUsecase') private _addSkills: IAdminAddSkillUsecase,
+    @inject('IAdminUpdateSkillsUsecase') private _updateSkills: IAdminUpdateSkillUsecase,
+    @inject('IAdminDeleteSkillsUsecase') private _deleteSkills: IAdminDeleteSkillUsecase,
+    @inject('IAdminGetSkillsUsecase') private _getSkills: IAdminGetSkillsUsecase,
+    @inject('IBulckApproveRecruiterApplicationsUsecase')
+    private _bulckApproveRecruiterApplication: IBulckApproveRecruiterApplicationUsecase,
+    @inject('IAdminPermanentBanUserUsecase') private _banUser: IAdminPermanentBanUserUsecase,
+    @inject('IAdminResetUserPasswordUsecase')
+    private _resetUserPassword: IAdminResetUserPasswordUsecase,
+    @inject('IAdminRequestUserPasswordResetUsecase')
+    private _requestReset: IAdminRequestResetUserPasswordUsecase,
+    @inject('IAdminLoadRecruiterDetailsUsecase')
+    private _loadRecruiterDetails: IAdminLoadRecruiterDetailsUsecase,
+    @inject('IAdminRevokeRecruiterVerificationUsecase')
+    private _handleVerificationUpdate: IAdminRevokeRecruiterVerification,
+    @inject('IAdminHandlePermissionRevokingUsecase')
+    private _handlePermissionRevoking: IAdminHandlePermissionRevokingUsecase,
+    @inject('IAdminAddWorkModeUsecase') private _addWorkMode: IAdminAddWorkModeUsecase,
+    @inject('IAdminGetWorkModeUsecase') private _getWorkMods: IAdminGetWorkModesUsecase,
+    @inject('IAdminChangeWorkModeStatusUsecase')
+    private _changeWorkmodeStatus: IAdminChangeWorkModeStatusUsecase,
+    @inject('IAdminDeleteWorkModeUsecase') private _deleteWorkMode: IAdminDeleteWorkModeUsecase,
+    @inject('IAdminEditWorkModeUsecase') private _editWorkMode: IAdminEditWorkModeUsecase,
+    @inject('IAdminAddJobLevelUsecase') private _addJobLevel: IAdminAddJobLevelUsecase,
+    @inject('IAdminGetJobLevelUsecase') private _getJobLevels: IAdminGetJobLevelsUsecase,
+    @inject('IAdminEditJobLevelUsecase') private _editJobLevel: IAdminEditJobLevelUsecase,
+    @inject('IAdminChangeJobLevelStatusUsecase')
+    private _changeJobLevelStatus: IAdminChangeJobLevelStatusUsecase,
+    @inject('IAdminDeleteJobLevelUsecase') private _deleteJobLeve: IAdminDeleteJobLevelUsecase,
+    @inject('IAdminAddJobTypeUsecase') private _addJobType: IAdminAddJobTypeUsecase,
+    @inject('IAdminUpdateJobTypeUsecase') private _updateJobType: IAdminUpdateJobTypeUse,
+    @inject('IAdminChangeJobTypeStatusUsecase')
+    private _changeJobTypeStatus: IAdminChangeJobTypeStatusUsecase,
+    @inject('IAdminGetJobTypesUsecase') private _getJobTypes: IAdminGetJobTypesUsecase,
+    @inject('IAdminDeleteJobTypeUsecase') private _deleteJobType: IAdminDeleteJobTypeUsecase,
+    @inject('IAdminChangeRecruiterApplicationStatusToUnderReview')
+    private _statusChangeToUnderReview: IAdminChangeRecruiterApplicationStatusToUnderReview,
+    @inject('IAdminLoadJobsUsecase') private _loadJobs: ILoadJobsUseCase,
+    @inject('IAdminLoadJobDetailsUsecase') private _loadJobDetails: IAdminLoadJobDetailsUseCase,
+    @inject('IAdminDeleteJobUsecase') private _deleteJob: IAdminDeleteJobUsecase
+  ) {}
 
   async adminLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const result = await this._adminLoginUC.execute(req.body);
 
-      const dto = mapToUserLoginDTO(req.body);
-      const result: any = await this._adminLoginUC.execute(dto);
       const { refreshToken } = result;
 
       res
@@ -76,7 +120,7 @@ export class AdminController {
           httpOnly: true,
           secure: false, //will change to true when it ready for production
           sameSite: 'lax',
-          maxAge: 24 * 60 * 60 * 1000,
+          maxAge: parseInt(process.env.COOKIE_MAX_AGE as string),
         })
         .json({
           success: true,
@@ -86,41 +130,31 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //common middleware
+  } //fixed
 
   async logoutAdmin(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    console.log('request in the controller')
     try {
       res.clearCookie('refreshToken', {
         httpOnly: true,
         secure: false,
         sameSite: 'lax', //max age
       });
-      
-      console.log('succesfully cleared the cookie, sending response back to the user')
+
       res.status(StatusCodes.OK).json({ success: true, message: 'Admin logout successfull' });
     } catch (error: unknown) {
       next(error);
     }
-  }
+  } //fixed
 
   async loadUsers(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1; // Removed redundant optional chaining
     const limit = parseInt(req.query.limit as string) || 3; // Removed redundant optional chaining
     const sort = (req.query.sort as string) || ''; // Added default for sort
-    let filter = JSON.parse(req.query?.filter as string) || {}; //: Record<string, unknown> = {}; // Explicitly type filter
+    const filter = JSON.parse(req.query?.filter as string) || {}; //: Record<string, unknown> = {}; // Explicitly type filter
 
     try {
-      const validatedQuery = loadUsersSchema.parse({
-        search,
-        page,
-        limit,
-        sort,
-        filter,
-      });
-      const dto = mapRequestToLoadUsersQueryDto(validatedQuery);
-      const result = await this._loadUsersAdminUC.execute(dto);
+      const result = await this._loadUsersAdminUC.execute({ search, page, limit, sort, filter });
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -131,126 +165,146 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  }
+  } //fixed
 
   async loadUserDetails(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const { userId } = req.params;
-    console.log('candidate id from the frontend', userId);
-    //return
+
     try {
       const result = await this._loadUserDetails.execute(userId);
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went worng' });
-        return;
-      }
+
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Users Details fetched successfully',
         result,
       });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
-      return;
-    } catch (error: any) {
+  async loadRecruiterApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+
+      const result = await this._getRecruiterApplications.execute({ page, limit });
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Recruiter applications fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async rejectRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { recruiterId } = req.params;
+
+      const result = await this._rejectRecruiterApplication.execute({
+        applicationId: recruiterId,
+        ...req.body,
+      });
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Recruiter application rejected successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async approveRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { recruiterId } = req.params;
+      const result = await this._approveRecruiterApplication.execute(recruiterId);
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Recruiter application approved successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async changeStatusToUnderReview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const applicationId = req.params.id;
+
+      const result = await this._statusChangeToUnderReview.execute(applicationId);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Status changed to under review', result });
+    } catch (error) {
       next(error);
     }
   }
 
-  async loadRecruiterApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async bulckApproveRecruiterApplications(
+    req: Auth,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
-      console.log('--request params for testing--', req.query.profileStatus)
-      const search = req.query.search as string || ''
-      const profileStatus = req.query.profileStatus as string || 'All'
-      
-      const result = await this._getRecruiterApplications.execute({search, profileStatus})
-     // console.log('--result from the controller--', result)
-      res.status(StatusCodes.OK).json({success:true, message:'Recruiter applications fetched successfully', result})
-    } catch (error: unknown) {
-      next(error)
-    }
-  }
+      const result = await this._bulckApproveRecruiterApplication.execute();
 
-  async rejectRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Multiple application approved', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async loadRecruiters(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    //company list
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const sort = (req.query.sort as string) || 'joined-latest';
+    const recruiterType = (req.query.recruiterType as string) || 'all';
+    const recruiterStatus = (req.query.recruiterStatus as string) || 'all';
     try {
-      const {recruiterId} = req.params
-      const result = await this._rejectRecruiterApplication.execute({id: recruiterId, ...req.body})
+      const result = await this._loadRecruiters.execute({
+        search,
+        page,
+        limit,
+        sort,
+        recruiterType,
+        employerStatusFilter: recruiterStatus,
+      });
 
-      if(!result){
-        throw new Error('Can not reject application right now, please try again later')
-      }
-
-      res.status(StatusCodes.OK).json({success:true, message:'Recruiter application rejected successfully', result})
+      res.status(201).json({
+        success: true,
+        message: 'Company list fetched successfully',
+        result,
+      });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
-  }
-
-  async approveRecruiterApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const {recruiterId} = req.params
-      const result = await this._approveRecruiterApplication.execute(recruiterId)
-
-      if(!result){
-        throw new Error('Can not approve application right now, please try again later')
-      }
-
-
-      res.status(StatusCodes.OK).json({success:true, message:'Recruiter application approved successfully', result})
-    } catch (error: unknown) {
-      next(error)
-    }
-  }
-
-  // // async loadCompanies(
-  // //   req: Auth,
-  // //   res: Response,
-  // //   next: NextFunction
-  // // ): Promise<void> {
-  // //   //company list
-  // //   const search = (req.query.search as string) || '';
-  // //   const page = parseInt(req.query.page as string) || 1;
-  // //   const limit = parseInt(req.query.limit as string) || 3;
-  // //   const sort = (req.query.sort as string) || 'joined-latest';
-  // //   try {
-  // //     const result = await this._loadComapniesUC.execute(
-  // //       search,
-  // //       page,
-  // //       limit,
-  // //       sort
-  // //     );
-
-  // //     res.status(201).json({
-  // //       success: true,
-  // //       message: 'Company list fetched successfully',
-  // //       result,
-  // //     });
-  // //   } catch (error: unknown) {
-  // //     if (error instanceof Error) {
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'Internal server error, please try again after some time',
-  // //       });
-  // //     }
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({ success: false, message: 'An unknown error occured' });
-  // //   }
-  // // }
+  } //fixed
 
   async blockUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
       const { userId } = req.params;
       const result = await this._blockUser.execute(userId);
 
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
-        return;
-      }
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'User blocked successfully', result });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Candidate blocked successfully' });
+  async deleteJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { jobId } = req.params;
+      const result = await this._deleteJob.execute(jobId);
+
+      res.status(StatusCodes.OK).json({ success: true, message: 'job deleted' });
       return;
     } catch (error: unknown) {
       next(error);
@@ -264,167 +318,143 @@ export class AdminController {
 
       const result = await this._unblockUser.execute(validateUserId.id);
 
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
-        return;
-      }
       res
         .status(StatusCodes.OK)
-        .json({ success: true, message: 'Candidate unblocked successfully' });
-    } catch (error: any) {
+        .json({ success: true, message: 'Candidate unblocked successfully', result });
+    } catch (error: unknown) {
       next(error);
     }
-  }
+  } //fixed
 
   async deleteUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
-      const {userId} = req.params
+      const { userId } = req.params;
 
-      await this._deleteUser.execute(userId)
+      await this._deleteUser.execute(userId);
 
-      res.status(StatusCodes.OK).json({success:true, message:'User deleted successfully'})
+      res.status(StatusCodes.OK).json({ success: true, message: 'User deleted successfully' });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
-  }
+  } //fixed
 
-  // //   async loadCompanyDetails(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { companyId } = req.params;
-  // //     if (!companyId)
-  // //       return res
-  // //         .status(StatusCodes.NOT_ACCEPTABLE)
-  // //         .json({ success: false, message: 'Company id not provided' });
+  async blockRecruiter(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { companyId } = req.params;
 
-  // //     try {
-  // //       const companyDetails = await this._loadCompanyDetailsUC.execute(
-  // //         companyId
-  // //       );
-  // //       return res.status(StatusCodes.OK).json({
-  // //         success: true,
-  // //         message: 'Company details fetched successfully',
-  // //         companyDetails,
-  // //       });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while fetching comapny details', error);
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+    try {
+      const blockResult = await this._blockRecruiter.execute(companyId);
 
-  // //   async blockRecruiter(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { companyId } = req.params;
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Company blocked successfully', result: blockResult });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
-  // //     try {
-  // //       const blockResult = await this._blockCompanyUC.execute(companyId);
-  // //       if (!blockResult) throw new Error('Can not block company');
+  async unblockRecruiter(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { companyId } = req.params;
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'Company blocked successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while blocking company');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+    try {
+      const unblockResult = await this._unblockRecruiter.execute(companyId);
 
-  // //   async unblockRecruiter(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { companyId } = req.params;
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Company unblocked successfully', result: unblockResult });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
-  // //     try {
-  // //       const unblockResult = await this._unblockCompanyUC.execute(companyId);
-  // //       if (!unblockResult) throw new Error('Can not unlblock company');
+  async closeCompany(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const { companyId } = req.params;
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'Company unblocked successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while unblocking company');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+    try {
+      const closeCompanyResult = await this._deleteRecruiter.execute(companyId);
 
-  // //   async closeCompany(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { companyId } = req.params;
-  // //     console.log(
-  // //       'Company id for closing the company',
-  // //       companyId,
-  // //       typeof companyId
-  // //     );
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Company closed successfully',
+        result: closeCompanyResult,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
-  // //     try {
-  // //       const closeCompanyResult = await this._closeCompanyUC.execute(companyId);
-  // //       if (!closeCompanyResult) throw new Error('Can not close company');
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'Company closed successfully' });
-  // //     } catch (error: unknown) {
-  // //       if (error instanceof Error) {
-  // //         console.log('Error occured while closing the company', error);
-  // //         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
+  async addSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._addSkills.execute(req.body);
 
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Skill added successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async updateSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { skillId } = req.params;
+
+      const result = await this._updateSkills.execute({ _id: skillId, ...req.body });
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Skill updated successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async deleteSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { skillId } = req.params;
+      const result = await this._deleteSkills.execute(skillId);
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Skill deleted successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
+
+  async getSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const search = (req.query.search as string) || '';
+
+    try {
+      const result = await this._getSkills.execute({ search, page, limit });
+
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Skills fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //fixed
 
   async loadJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 3;
+    const limit = parseInt(req.query.limit as string) || 5;
     const sortOption = (req.query.sort as string) || 'Newest';
-    const filter = JSON.parse(req.query.filter as string) || {};
+    const statusFilter = (req.query.statusFilter as string) || 'all';
+    const jobTypeFilter = (req.query.jobTypeFilter as string) || 'all';
+    const reportsCount = parseInt(req.query.reportsCount as string) || 0;
 
     try {
-      const valdiateQueryData = recruiterJobsSchema.parse({
+      const result = await this._loadJobs.execute({
         search,
         page,
         limit,
-        sortOption,
-        filter,
+        reportsCount,
+        jobTypeFilter,
+        statusFilter,
       });
-      const dto = mapToLoadJobsQueryDTOFromRequest(valdiateQueryData);
-      const result = await this._loadJobs.execute(dto);
-
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
-        return;
-      }
 
       res
         .status(StatusCodes.OK)
@@ -434,128 +464,271 @@ export class AdminController {
     }
   }
 
-  // //   async loadJObDetails(req: AdminAuth, res: Response): Promise<Response> {
-  // //     try {
-  // //       const { jobId } = req.params;
-  // //       const result = await this._loadJobDetails.execute(jobId);
-  // //       const jobDetails = result;
-  // //       return res.status(StatusCodes.OK).json({
-  // //         success: true,
-  // //         message: 'Job details fetched successfully',
-  // //         jobDetails,
-  // //       });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while fetching job details', error);
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
+  async loadJobDetails(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const jobId = req.params.jobId;
 
-  // //       return res
-  // //         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //         .json({ success: false, message: 'An unknown error occured' });
-  // //     }
-  // //   }
+    try {
+      const result = await this._loadJobDetails.execute(jobId);
 
-  // //   async blockJob(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { jobId } = req.params;
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Jobs details fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //     try {
-  // //       const blockResult = await this._blockJobUC.execute(jobId);
-  // //       if (!blockResult) throw new Error('Can not block job');
+  async userBan(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const authorizedAdminId = req.user.id;
+    const userId = req.params.userId;
+    try {
+      if (authorizedAdminId !== userId) {
+        const result = await this._banUser.execute(userId);
+        res
+          .status(StatusCodes.OK)
+          .json({ success: true, message: 'User banned permanently', result });
+      }
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'job blocked successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while blocking job');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+  async requestReset(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const adminId = req.user.id;
+    try {
+      const result = await this._requestReset.execute(adminId, req.body.email);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Code send to email', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //   async unblockJob(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { jobId } = req.params;
+  async resetUserPassword(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const adminId = req.user.id;
+    const { token, userId, userEmail, code } = req.body;
+    try {
+      const result = await this._resetUserPassword.execute({
+        adminId,
+        userEmail,
+        userId,
+        code,
+        token,
+      });
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Code verification failed' });
 
-  // //     try {
-  // //       const blockResult = await this._unblockJobUC.execute(jobId);
-  // //       if (!blockResult) throw new Error('Can not unblock job');
+        return;
+      }
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Password reset succesfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'job unblocked successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while unblocking job');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+  async recruiterDetails(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const recruiterId = req.params.recruiterId as string;
 
-  // //   async rejectJob(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { jobId } = req.params;
+    try {
+      const result = await this._loadRecruiterDetails.execute(recruiterId);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Recruiter details fetched succesfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //     try {
-  // //       const blockResult = await this._rejectJobUC.execute(jobId);
-  // //       if (!blockResult) throw new Error('Can not block job');
+  async handleRecruiterVerification(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const recruiterId = req.params.recruiterId;
+    const action = req.query.action as 'Verified' | 'Revoked';
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'job rejected successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while rejecting job');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+    try {
+      const result = await this._handleVerificationUpdate.execute(recruiterId, action);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // //   async unrejectJob(req: AdminAuth, res: Response): Promise<Response> {
-  // //     const { jobId } = req.params;
+  async handleRecruiterPermission(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const recruiterId = req.params.recruiterId;
+    const action = req.query.action as 'Revoke' | 'Un-Revoke';
 
-  // //     try {
-  // //       const blockResult = await this._unrejectJobUC.execute(jobId);
-  // //       if (!blockResult) throw new Error('Can not unreject job');
+    try {
+      const result = await this._handlePermissionRevoking.execute(recruiterId, action);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({ success: true, message: 'job unrejected successfully' });
-  // //     } catch (error: unknown) {
-  // //       console.log('Error occured while unrejecting job');
-  // //       if (error instanceof Error) {
-  // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //           success: false,
-  // //           message: 'Internal server error, please try again after some time',
-  // //         });
-  // //       }
-  // //       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //         success: false,
-  // //         message: 'An unknown error occured, please try again after some time',
-  // //       });
-  // //     }
-  // //   }
+  async addWorkMode(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._addWorkMode.execute(req.body);
+      res
+        .status(StatusCodes.CREATED)
+        .json({ success: true, message: 'Work mode created ', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async getWorkModes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const limit = parseInt(req.query.limit as string) || 7;
+    const page = parseInt(req.query.page as string) || 1;
+    try {
+      const result = await this._getWorkMods.execute({ search, page, limit });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Fetched', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changeWorkModeStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const workModeId = req.params.id;
+
+    try {
+      const result = await this._changeWorkmodeStatus.execute({ id: workModeId, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteWorkMode(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const workModeId = req.params.id;
+    try {
+      await this._deleteWorkMode.execute(workModeId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Work mode deleted' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async editWorkMode(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const workModeId = req.params.id;
+    try {
+      const result = await this._editWorkMode.execute({ id: workModeId, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Work Mode updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addJobLevel(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._addJobLevel.execute(req.body);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Job level created', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getJobLevels(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const limit = parseInt(req.query.limit as string) || 7;
+    const page = parseInt(req.query.page as string) || 1;
+
+    try {
+      const result = await this._getJobLevels.execute({ search, limit, page });
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Job Levels fetched succesfully', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async editJobLevel(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const jobLevelId = req.params.id;
+    try {
+      const result = await this._editJobLevel.execute({ id: jobLevelId, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Job Level updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changeJobLevelStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const jobLevelId = req.params.id;
+    try {
+      const result = await this._changeJobLevelStatus.execute(jobLevelId, req.body.isActive);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Job Level Status changed', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteJobLevel(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const jobLevelId = req.params.id;
+
+    try {
+      await this._deleteJobLeve.execute(jobLevelId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addJobType(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._addJobType.execute(req.body);
+      res.status(StatusCodes.CREATED).json({ success: true, message: 'Job type created', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateJobType(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.params.id;
+    try {
+      const result = await this._updateJobType.execute({ id, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Job type updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changeJobTypeStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.params.id;
+    try {
+      const result = await this._changeJobTypeStatus.execute({ id, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Status updated', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getJobTypes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const limit = parseInt(req.query.limit as string) || 7;
+    const page = parseInt(req.query.page as string) || 1;
+
+    try {
+      const result = await this._getJobTypes.execute({ search, page, limit });
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Job Types fetched succesfully', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteJobTypes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.params.id;
+    try {
+      await this._deleteJobType.execute(id);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

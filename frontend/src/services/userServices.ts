@@ -1,37 +1,34 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosProgressEvent } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
-import Swal from "sweetalert2";
 import { Notify } from "notiflix";
-import { logout } from "../redux-toolkit/userAuthSlice";
+import { logout } from "../redux/userAuthSlice";
+import { EndPoints } from "../constants/endPoints/user.endpoints";
+import { toast } from "react-toastify";
 
-//const customeCandidateLogout = useCandidateLogout()
 const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
 console.log('Access token for geocode api', import.meta.env)
 
-export const registerCandiate = async (name: string, email: string, phone: string, password: string) => {
+export const registerUser = async (name: string, email: string, phone: string, password: string) => {
     try {
-        const response = await axiosInstance.post('/register',
+        const response = await axiosInstance.post(EndPoints.REGISTER,
             {name, email, phone, password},
             {
                 headers:{'Content-Type' : 'application/json'}
             } as AxiosRequest
         )
-        console.log('backend resposne for candidate register', response)
-
         return response.data
+
     } catch (error : unknown) {
-        console.log('This is normal error', error)
+        console.log('--User Register Eerror--', error instanceof Error ? error.message : error)
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500) return err.response.data
-
-        console.log('Error occure', err)
     }
 }
 
 export const verify = async (id : string, otp : string) => {
     try {
-        const response = await axiosInstance.post('/verify',
+        const response = await axiosInstance.post(EndPoints.VERIFY,
             {id, otp},
             {
                 headers:{'Content-Type':'application/json'}
@@ -41,16 +38,15 @@ export const verify = async (id : string, otp : string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--Verification Error', err.message)
         if(err.response && err.response.status < 500) return err.response.data
 
-        console.log('Error occured while verifying candidate', err)
     }
 }
 
 export const resendOtp = async (email : string, id : string) => {
     try {
-        const response = await axiosInstance.post('/otp/resend',
+        const response = await axiosInstance.post('/v1/user/otp/resend',
             {email, id},
             {
                 headers:{'Content-Type':'application/json'}
@@ -62,7 +58,7 @@ export const resendOtp = async (email : string, id : string) => {
         const err = error as AxiosError
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+            throw error
         }
     }
 }
@@ -105,7 +101,7 @@ export const resetPassword = async (token: string, password: string) => {
 
 export const userLogin = async (email : string, password : string) => {
     try {
-        const response = await axiosInstance.post('/login', 
+        const response = await axiosInstance.post(EndPoints.LOGIN, 
             {email, password},
             {
                 headers:{'Content-Type':'application/json'}
@@ -115,10 +111,9 @@ export const userLogin = async (email : string, password : string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('-Login Error-', err.message)
         if(err.response && err.response.status < 500) return err.response.data
 
-        console.log('Error occured while candidate login', err)
     }
 }
 
@@ -130,22 +125,9 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
             } as AxiosRequest
         )
 
-        Notify.info('Logout successfull, redirecting to login page', {timeout:2000})
-        setTimeout(() => {
-            dispatch(logout())
-            navigate('/login')
-        }, 2000)
-        // Swal.fire({
-        //     icon:'info',
-        //     title:'Logout Successfull',
-        //     showConfirmButton:false,
-        //     showCancelButton:false,
-        //     allowOutsideClick:false,
-        //     timer:3000
-        // }).then(() => { //calling to clear candidate from redux candidateAuthSlice then navigate to login
-        //     dispatch(logout()) 
-        //     navigate('/login')
-        // })
+        toast.info('Logout successfull')
+        dispatch(logout())
+        navigate('/login')
 
         return response.data
     } catch (error : unknown) {
@@ -155,10 +137,21 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
     }
 }
 
-export const saveBasicDetails = async (headline: string, city: string, district: string, state: string, country: string, pincode: string, summary: string) => {
+export const saveBasicDetails = async (
+    headline: string, 
+    city: string, 
+    district: string, 
+    state: string, 
+    country: string, 
+    pincode: string, 
+    summary: string,
+    long: number,
+    lat: number
+) => {
     try {
-        const response = await axiosInstance.post('/personal/details/save',
-            {headline, city, district, state, country, pincode, summary},
+        console.log('--checking lat and lon in the user services itserlf', lat, long)
+        const response = await axiosInstance.patch('/v1/user/me/store-basics',
+            {headline, city, district, state, country, pincode, summary, long, lat},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -174,9 +167,9 @@ export const saveBasicDetails = async (headline: string, city: string, district:
     }
 }
 
-export const getCandidateProfileData = async () => {
+export const getMyProfileData = async () => {
     try {
-        const response = await axiosInstance.get('/profile/personal/datas',
+        const response = await axiosInstance.get(EndPoints.MY_PROFILE,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -194,10 +187,10 @@ export const getCandidateProfileData = async () => {
     }
 }
 
-export const editUserProfile = async (name?: string, headline?: string, city?: string, district?: string, state?: string, country?: string, summary?: string, pincode? : string) => {
+export const editUserProfile = async (name?: string, headline?: string, city?: string, district?: string, state?: string, country?: string, summary?: string, pincode? : string, phone?: string) => {
     try {
-        const response = await axiosInstance.patch('/user/profile',
-            {name, headline, city, district, state, country, summary, pincode},
+        const response = await axiosInstance.patch(EndPoints.EDIT_PROFILE_DETAILS,
+            {name, headline, city, district, state, country, summary, pincode, phone},
             {
                 headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
@@ -218,7 +211,7 @@ export const editUserProfile = async (name?: string, headline?: string, city?: s
 
 export const getUserExperiences = async () => {
     try {
-        const response = await axiosInstance.get('/experience',
+        const response = await axiosInstance.get(EndPoints.GET_EXPERIENCES,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -227,14 +220,14 @@ export const getUserExperiences = async () => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while geting candidate experiences', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
 export const getUserSkills = async () => {
     try {
-        const response = await axiosInstance.get('/skills',
+        const response = await axiosInstance.get(EndPoints.GET_SKILLS,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -244,13 +237,13 @@ export const getUserSkills = async () => {
         const err = error as AxiosError
 
         console.log('Error occured while geting candidate skills', err)
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const addUserSkill = async (skillType : string, skill : string, skillLevel : string) => {
     try {
-        const response = await axiosInstance.post('/skills/add', 
+        const response = await axiosInstance.post(EndPoints.ADD_SKILL, 
             {skillType, skill, skillLevel},
             {
                 headers:{"Content-Type":'application/json'},
@@ -261,17 +254,16 @@ export const addUserSkill = async (skillType : string, skill : string, skillLeve
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--error occured while adding skill--', err)
         if(err.response && err.response.status < 500 && err.response.status !== 401){
-            console.log('Error occured while adding skill')
-            return err.response.data
+            throw error
         }
     }
 }
 
 export const getUserEducations = async () => {
     try {
-        const response = await axiosInstance.get('/education',
+        const response = await axiosInstance.get(EndPoints.GET_EDUCATIONS,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -282,13 +274,13 @@ export const getUserEducations = async () => {
         const err = error as AxiosError
 
         console.log('Error occured while geting candidate education', err)
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const addUserExperience = async (jobRole: string, jobType: string, location: string, workMode: string, organization: string, isPresent: boolean, startDate: string, endDate: string) => {
     try {
-        const response = await axiosInstance.post('/experience/add',
+        const response = await axiosInstance.post(EndPoints.ADD_EXPERIENCE,
             {jobRole, jobType, location, workMode, organization, isPresent, startDate, endDate},
             {
                 headers:{'Content-Type':'application/json'},
@@ -299,16 +291,14 @@ export const addUserExperience = async (jobRole: string, jobType: string, locati
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while adding candidat experience', err)
-
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
 export const editUserExperience = async (experienceId: string, jobRole: string, jobType: string, organization: string, isPresent: boolean, startDate: string, endDate: string, location: string, workMode: string) => {
     try {
-        const response = await axiosInstance.put(`/experience/edit/${experienceId}`,
+        const response = await axiosInstance.put(EndPoints.EDIT_EXPERIENCE(experienceId),
             {jobRole, jobType, organization, isPresent, startDate, endDate, location, workMode},
             {
                 headers:{'Content-Type':'application/json'},
@@ -318,14 +308,14 @@ export const editUserExperience = async (experienceId: string, jobRole: string, 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while editing candidate experience', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
 export const deleteUserExperience = async (expId? : string) => {
     try {
-        const response = await axiosInstance.delete(`/experience/${expId}`,
+        const response = await axiosInstance.delete(EndPoints.DELETE_EXPERIENCE(expId as string),
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -334,14 +324,14 @@ export const deleteUserExperience = async (expId? : string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while deleting experience', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const deleteUserSkill = async (skillId : string) => {
     try {
-        const response = await axiosInstance.delete(`/skills/${skillId}`,
+        const response = await axiosInstance.delete(`/v1/user/me/skills/${skillId}`,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -352,14 +342,30 @@ export const deleteUserSkill = async (skillId : string) => {
         const err = error as AxiosError
         
         console.log('Error occured while deleting skills', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+    }
+}
 
-        throw error
+export const fetchUserAlerts = async () => {
+    try {
+        const response = await axiosInstance.get('/v1/user/me/alerts',
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('-- Error occured while fetching user alerts --', err.message)
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const addUserEducation = async (educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
-        const response = await axiosInstance.post('/education/add',
+        const response = await axiosInstance.post(EndPoints.ADD_EDUCATION,
             {educationLevel, educationStream, institution, isPresent, startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
@@ -370,15 +376,14 @@ export const addUserEducation = async (educationLevel : string, educationStream 
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while adding candidate education', err)
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const editUserEducation = async (educationId : string, educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
     try {
-        const response = await axiosInstance.put(`/education/${educationId}`,
+        const response = await axiosInstance.put(EndPoints.EDIT_EDUCATION(educationId),
             {educationLevel, educationStream, institution, isPresent, startYear:startYear, endYear, location},
             {
                 headers:{'Content-Type':'application/json'},
@@ -390,14 +395,13 @@ export const editUserEducation = async (educationId : string, educationLevel : s
         const err = error as AxiosError
 
         console.log('Error occured while editing candidate education', err)
-
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const deleteUserEducation = async (educationId? : string) => {
     try {
-        const response = await axiosInstance.delete(`/education/${educationId}`,
+        const response = await axiosInstance.delete(EndPoints.DELETE_EDUCATION(educationId as string),
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -407,15 +411,15 @@ export const deleteUserEducation = async (educationId? : string) => {
         const err = error as AxiosError
 
         console.log('Error occured while deleting education data', err)
-
-        throw error
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
-export const addCandidateResume = async (formData : any) => {
+export const addUserResume = async (formData : any) => {
     try {
-        const response = await axiosInstance.post('/resume/upload',formData,
+        const response = await axiosInstance.post(EndPoints.ADD_RESUME,formData,
             {
+                headers: { 'Content-Type': undefined }, 
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -424,16 +428,15 @@ export const addCandidateResume = async (formData : any) => {
     } catch (error : unknown) {
         const err = error as AxiosError
         console.log('--Error occured while adding resume--', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-           throw error
-        }
-
+        // Return response data if available so frontend can handle the error message
+        if (err.response) return err.response.data;
+        throw error;
     }
 }
 
-export const loadCandidateResumes = async () => {
+export const loadUserResumes = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/resumes',
+        const response = await axiosInstance.get(EndPoints.GET_MY_RESUMES,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -444,28 +447,49 @@ export const loadCandidateResumes = async () => {
         const err = error as AxiosError
 
         console.log('Error occured while loading candidate resumes', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
-export const deleteCandidateResume = async (resumeId : string, cloudinaryPublicId : string) => {
+export const setUserResumePrimary = async (resumeId: string) => {
     try {
-        const response = await axiosInstance.delete(`/candidate/resume/${resumeId}`,
+        const response = await axiosInstance.patch(EndPoints.SET_RESUME_PRIMARY(resumeId), null,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--Error occured while seting resume primary--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const deleteUserResume = async (resumeId : string, cloudinaryPublicId : string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.DELETE_RESUME(resumeId),
             {
                 params:{cloudinaryPublicId},
-                sendAuthTokenCandidate:true
+                sendAuthToken:true
             } as AxiosRequest
         )
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while deleting resume', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 
-export const addCandidateCertificates = async (formData : any) => {
+export const addUserCertificate = async (formData : any) => {
     try {
-        const response = await axiosInstance.post('/candidate/certificate', formData,
+        const response = await axiosInstance.post(EndPoints.ADD_CERTIFICATE, formData,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -474,18 +498,17 @@ export const addCandidateCertificates = async (formData : any) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--Error occured while adding certificate--', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+            throw error
         }
 
-        console.log('Error occured while adding candidate certificates', err)
     }
 }
 
-export const loadCandidateCertificates = async () => {
+export const loadUserCertificates = async () => {
     try {
-        const response = await axiosInstance.get('/candidate/certificate', 
+        const response = await axiosInstance.get(EndPoints.GET_MY_CERTIFICATES, 
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -494,8 +517,27 @@ export const loadCandidateCertificates = async () => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
         console.log('Error occured while geting candidate certificates', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const deleteUserCertificate = async (certificateId: string, cloudinaryPublicId: string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.DELETE_CERTIFICATE(certificateId), 
+            {
+                params:{cloudinaryPublicId},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--Error occured while deleting certificate--', err )
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
     }
 }
 
@@ -511,7 +553,7 @@ export const refreshCandidateToken = async () => {
 export const candidateApplyJob = async (jobId : string, coverLetterContent : string, resumeId : string) => {
     try {
 
-        const response = await axiosInstance.post(`/job/${jobId}/apply`,
+        const response = await axiosInstance.post(EndPoints.APPLY_JOB_BY_JOB_ID(jobId),
             {coverLetterContent, resumeId}, 
             {
                 sendAuthToken:true,
@@ -530,9 +572,28 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
     }
 }
 
-export const getNotifications = async () => {
+export const getNotifications = async (page: number, limit: number, type: string, status: string, offSet: number) => {
     try {
-        const response = await axiosInstance.get('/notifications',
+        const response = await axiosInstance.get(EndPoints.GET_NOTIFICATIONS,
+            {
+                params:{page, limit, type, status, offSet},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting notifications', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }  
+    }
+}
+
+export const getUnReadNotificationsCount = async () => {
+    try {
+        const response = await axiosInstance.get(EndPoints.GET_UNREAD_NOTIFICATIONS_COUNT,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -541,12 +602,58 @@ export const getNotifications = async () => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('Error occured while geting notifications', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403) {
             throw error
-        }
+        }  
+    }
+}
 
-        
+export const changeNotificationStatus = async (notificationId: string) => {
+    try {
+        const response = await axiosInstance.patch(`/v1/notifications/${notificationId}`, null,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--Error occure dwhile changing notification status', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const markAllNotificationRead = async () => {
+    try {
+        const response = await axiosInstance.put(EndPoints.MARK_ALL_NOTIFICATIONS_READ, null,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--Error occure dwhile changing notification status', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const deleteNotification = async (action: string, notificationId?: string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.DELETE_NOTIFICATION, 
+            {   
+                params:{action, notificationId},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('error occured while deleeting notifigication', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
@@ -569,7 +676,7 @@ export const getCandidateFavoriteJobs = async () => {
 
 export const saveJob = async (jobId : string) => {
     try {
-        const response = await axiosInstance.post(`/job/${jobId}/save`, null,
+        const response = await axiosInstance.post(EndPoints.SAVE_JOB(jobId), null,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -585,9 +692,9 @@ export const saveJob = async (jobId : string) => {
     }
 }
 
-export const unsaveJob = async (jobId : string) => {
+export const unsaveJob = async (savedId : string) => {
     try {
-        const response = await axiosInstance.delete(`/job/${jobId}/unsave`,
+        const response = await axiosInstance.delete(EndPoints.UNSAVE_JOB(savedId),
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -603,10 +710,11 @@ export const unsaveJob = async (jobId : string) => {
     }
 }
 
-export const getSavedJobs = async () => {
+export const getSavedJobs = async (search: string, sort: string) => {
     try {
-        const response = await axiosInstance.get('/job/saved',
+        const response = await axiosInstance.get(EndPoints.LOAD_SAVED_JOBS,
             {
+                params:{search, sort},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -625,7 +733,7 @@ export const getSavedJobs = async () => {
 
 export const checkIsSaved = async (jobId : string) => {
     try {
-        const response = await axiosInstance.get('/job/saved/check',
+        const response = await axiosInstance.get(EndPoints.CHECK_IS_JOB_SAVED(jobId),
             {
                 params:{jobId},
                 sendAuthToken:true
@@ -642,9 +750,28 @@ export const checkIsSaved = async (jobId : string) => {
     }
 }
 
+export const checkIsJobApplied = async (jobId : string) => {
+    try {
+        const response = await axiosInstance.get(EndPoints.CHECK_IS_JOB_APPLIED(jobId),
+            {
+                params:{jobId},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error : unknown) {
+        const  err = error as AxiosError
+        console.log('--check job saved error --', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) {
+            throw error
+        }
+    }
+}
+
 export const addSocialmediaLinks = async (url : string) => {
     try {
-        const response = await axiosInstance.patch('/user/profile/links',
+        const response = await axiosInstance.patch(EndPoints.ADD_SOCIAL_MEDIA_LINKS,
             {url},
             {
                 headers:{'Content-Type':'application/json'},
@@ -664,7 +791,7 @@ export const addSocialmediaLinks = async (url : string) => {
 
 export const removeSocialLink = async (domain : string) => {
     try {
-        const response = await axiosInstance.patch('/user/profile/links/remove',
+        const response = await axiosInstance.patch('/v1/user/me/social-links/remove',
             {domain},
             {
                 headers:{'Content-Type':'application/json'},
@@ -686,7 +813,7 @@ export const removeSocialLink = async (domain : string) => {
 
 export const updateProfilePicture = async (formData : any, publicId : string = "") => {
     try {
-        const response = await axiosInstance.patch('/profile/picture/update', formData,
+        const response = await axiosInstance.patch('/v1/user/me/profile-picture', formData,
             {
                 params:{publicId},
                 sendAuthToken:true
@@ -696,16 +823,15 @@ export const updateProfilePicture = async (formData : any, publicId : string = "
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--Proile picture update--', err.message)
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
 
-        console.log('error occured while updating profile picture')
     }
 }
 
 export const removeProfilePicture = async (cloudinaryPublicId : string) => {
     try {
-        const response = await axiosInstance.patch(`/profile/picture/remove/`,
+        const response = await axiosInstance.patch(`/v1/user/me/profile-picture/remove`,
             {cloudinaryPublicId},
             {
                 headers:{'Content-Type':'application/json'},
@@ -715,18 +841,16 @@ export const removeProfilePicture = async (cloudinaryPublicId : string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--Error occured while removing profile picture--', err.message)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             return err.response.data
         }
-
-        console.log('error occured', err)
     }
 }
 
 export const updateCoverPhoto = async (formData : any, publicId : string = "") => {
     try {
-        const response = await axiosInstance.patch('/profile/coverphoto/update', formData,
+        const response = await axiosInstance.patch(EndPoints.UPLOAD_COVER_PHOTO, formData,
             {   params:{publicId},
                 sendAuthToken:true
             } as AxiosRequest
@@ -735,16 +859,14 @@ export const updateCoverPhoto = async (formData : any, publicId : string = "") =
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return
-
-        console.log('Error occured while updating coverphoto', err)
+        console.log('--Error occured while update cover photo--', err.message)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
 export const removeCoverphoto = async (publicId : string) => {
     try {
-        const response = await axiosInstance.patch('/profile/coverphoto/remove', null,
+        const response = await axiosInstance.patch(EndPoints.REMOVE_COVER_PHOTO, null,
             {
                 params:{publicId},
                 sendAuthToken:true
@@ -753,22 +875,21 @@ export const removeCoverphoto = async (publicId : string) => {
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-
+        console.log('--Error occured while removing cover photo--', err.message)
         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-
-        console.log('Error occured while removing the cover photo', err)
     }
 }
 
-export const getLocationDetails = async (lat : number, long : number) => {
+export const getLocationDetails = async (query: string) => {
     try {
-        const response = await axios.get(`https://us1.locationiq.com/v1/reverse`,
+        const response = await axios.get(`https://us1.locationiq.com/v1/search.php`,
             {
                 params:{
                     key:geocodeLocationAccessToken,
-                    lat:lat,
-                    lon:long,
-                    format:"json"
+                    q: query,
+                    format:"json",
+                    addressdetails: 1,
+                    limit: 5
                 }
             }
         )
@@ -781,15 +902,16 @@ export const getLocationDetails = async (lat : number, long : number) => {
     }
 }
 
-export const getJobs = async (search: string, locationSearch: string, page: number, sortOption: string, status: string, workMode: string, jobLevel: string, jobType: string) => {
+export const getJobs = async (search: string, locationSearch: string, page: number, workMode: string, jobLevel: string, jobType: string) => {
     try {
         const response = await axiosInstance.get('/jobs', {
             params:{
                 search,
                 locationSearch,
                 page,
-                sortOption,
-                filter:JSON.stringify({status, workMode, jobLevel, jobType}),
+                jobLevel,
+                workMode,
+                jobType
             }
         } as AxiosRequest)
 
@@ -803,10 +925,11 @@ export const getJobs = async (search: string, locationSearch: string, page: numb
     }
 }
 
-export const getMyApplications = async () => {
+export const getMyApplications = async (search: string, sort: string, page: number, limit: number, status: string) => {
     try {
-        const response = await axiosInstance.get('/applications',
+        const response = await axiosInstance.get(EndPoints.LOAD_MY_APPLICATIONS,
             {
+                params:{search, sort, page, limit, status},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -832,13 +955,18 @@ export const updateNOtificationReadStatus = async (id : string) => {
     }
 }
 
-export const createPost = async (formdata : any) => {
-    console.log('checking data before sending request', formdata)
+export const createPost = async (formdata : any, onProgress?: (percentage: number) => void) => {
     try {
-        const response = await axiosInstance.post('/post',
+        const response = await axiosInstance.post(EndPoints.CREATE_FEED_POST,
             formdata,
             {
-                sendAuthToken:true
+                sendAuthToken:true,
+                onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+                    if(onProgress && progressEvent.total){
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                        onProgress(percentCompleted)
+                    }
+                }
             } as AxiosRequest
         )
         return response.data
@@ -849,9 +977,67 @@ export const createPost = async (formdata : any) => {
     }
 }
 
+export const deletePost = async (postId: string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.DELETE_POST(postId),
+            {
+                sendAuthToken:true,
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while creating the post', err)
+        throw error
+    }
+}
+
+export const hidePost = async (postId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.HIDE_POST(postId), null,
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+         const err = error as AxiosError
+        console.log('Error occured while creating the post', err)
+        throw error
+    }
+}
+
+export const unhidePost = async (postId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.UNHIDE_POST(postId), null,
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+         const err = error as AxiosError
+        console.log('Error occured while creating the post', err)
+        throw error
+    }
+}
+
+export const togglePostSave = async (postId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.SAVE_POST(postId), null,
+    {sendAuthToken: true} as AxiosRequest)
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while creating the post', err)
+        throw error
+    }
+}
+
 export const getPosts = async () => {
     try {
-        const response = await axiosInstance.get('/post', {
+        const response = await axiosInstance.get(EndPoints.GET_FEED_POSTS, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -861,10 +1047,16 @@ export const getPosts = async () => {
     }
 }
 
-export const likeUserPost = async (postId : string) => {
+export const likeUserPost = async (postId : string, ownerId: string, acted_by: string, acted_user_avatar: string) => {
+    console.log('full data  before calling api for likeing user post', postId, ownerId, acted_by, acted_user_avatar)
     try {
-        const response = await axiosInstance.patch(`post/like/${postId}`, {},
-            {sendAuthToken:true} as AxiosRequest
+        const response = await axiosInstance.patch(EndPoints.LIKE_FEED_POST(postId), {
+            ownerId,
+            acted_by,
+            acted_user_avatar
+        },
+            {headers:{'Content-Type':'application/json'},
+            sendAuthToken:true} as AxiosRequest
         )
 
         return response.data
@@ -878,7 +1070,7 @@ export const likeUserPost = async (postId : string) => {
 
 export const unlikeUserPost = async (postId : string) => {
     try {
-        const response = await axiosInstance.patch(`/post/unlike/${postId}`, {},
+        const response = await axiosInstance.patch(EndPoints.UNLIKE_FEED_POST(postId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -893,10 +1085,10 @@ export const unlikeUserPost = async (postId : string) => {
     }
 }
 
-export const addComment = async (postId: string, text: string) => {
+export const addComment = async (postId: string, text: string, parentId?: string | null) => {
     try {
-        const response = await axiosInstance.post(`/post/${postId}/comment`,
-            {text},
+        const response = await axiosInstance.post(EndPoints.COMMENT_FEED_POST(postId),
+            {text, parentId},
             {
                 sendAuthToken:true,
                 headers:{'Content-Type':'application/json'}
@@ -915,7 +1107,7 @@ export const addComment = async (postId: string, text: string) => {
 
 export const deleteComment = async (postId: string, commentId: string) => {
     try {
-        const response = await axiosInstance.delete(`/post/${postId}/comment/${commentId}`,
+        const response = await axiosInstance.delete(EndPoints.DELETE_COMMENT(postId, commentId),
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -929,9 +1121,45 @@ export const deleteComment = async (postId: string, commentId: string) => {
     }
 }
 
-export const followUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
+export const likeComment = async (postId: string, commentId: string, postOwnerId: string) => {
     try {
-        const response = await axiosInstance.post(`/follow/${userId}`, {
+        const response = await axiosInstance.patch(EndPoints.LIKE_COMMENT(commentId),
+            {postId, postOwnerId},
+            {
+                headers:{"Content-Type": "application/json"},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('error occured while liking comment', err)
+        throw error
+    }
+}
+
+export const unlikeComment = async (postId: string, commentId: string, postOwnerId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.UNLIKE_COMMENT(commentId),
+            {postId, postOwnerId},
+            {
+                headers:{"Content-Type": "application/json"},
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('error occured while liking comment', err)
+        throw error
+    }
+}
+
+export const followUser = async (userId : string, acted_by: string, acted_user_avatar: string) => {
+    try {
+        const response = await axiosInstance.post(EndPoints.FOLLOW_A_USER(userId), {
             acted_by,
             acted_user_avatar
         },
@@ -944,14 +1172,128 @@ export const followUser = async (userId : string, acted_by: string, acted_user_a
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
+        console.log('Error occured while following a person', err.message)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+export const sendConnectionRequest = async (receiverId: string, acted_by: string, acted_user_avatar: string) => {
+    try {
+        const response = await axiosInstance.post(`/v1/user/connect-request/${receiverId}`,
+            {acted_by, acted_user_avatar},
+            {
+                headers:{'Content-Type': 'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('error occured while sednign connection request', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const cancelConnectionRequest = async (receiverId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.CANCEL_CONNECTION_REQUEST(receiverId),
+            null,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log(err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const rejectConnectionRequest = async (sender: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.REJECT_CONNECTION_REQUEST,
+            {sender},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const acceptConnectionRequest = async (sender: string, acted_by: string, acted_user_avatar: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.ACCEPT_CONNECTION_REQUEST,
+            {sender, acted_by, acted_user_avatar},
+            {
+                headers:{'Content-Type':'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const getConversations = async () => {
+    try {
+        const response = await axiosInstance.get('/v1/conversations',
+            {sendAuthToken: true} as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+export const initializeConversation = async (receiver: string) => {
+    try {
+        const response = await axiosInstance.post('/v1/conversation/initialize',
+            {receiver},
+            {   
+                headers:{'Content-Type':'application/json'},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+export const getChats = async (conversationId: string) => {
+    try {
+        const response = await axiosInstance.get(`/v1/chats/${conversationId}`,
+            
+            {   
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
 export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
     try {
-        const response = await axiosInstance.post(`/unfollow/${userId}`, {
+        const response = await axiosInstance.post(EndPoints.UNFOLLOW_A_USER(userId), {
             acted_by,
             acted_user_avatar
         },
@@ -963,7 +1305,7 @@ export const unfollowUser = async (userId : string, acted_by: string, acted_user
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
     }
 }
 
@@ -981,7 +1323,7 @@ export const getUserPosts = async () => {
 
 export const loadUserPublicProfile = async (userId: string) => {
     try {
-        const response = await axiosInstance.get(`/users/${userId}`,
+        const response = await axiosInstance.get(`/v1/users/${userId}`,
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -999,7 +1341,7 @@ export const loadUserPublicProfile = async (userId: string) => {
 
 export const loadUserMetaData = async () => {
     try {
-        const response = await axiosInstance.get('/user/metadata', 
+        const response = await axiosInstance.get(EndPoints.LOAD_USER_METADATA, 
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -1008,6 +1350,42 @@ export const loadUserMetaData = async () => {
         return response.data
     } catch (error: unknown) {
         const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }
+    }
+}
+
+export const getSkillsSuggesion = async (search: string) => {
+    try {
+        const response = await axiosInstance.get('/admin/skills', 
+            {
+                params:{search},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while fetching skills suggestions', err)
+        throw err
+    }
+}
+
+export const getUsersForPublic = async (search: string, roleTypeFilter: string, experienceFilter: string, location: string) => {
+    try {
+        const response = await axiosInstance.get(EndPoints.GET_USERS, 
+            {
+                params:{search, roleTypeFilter, experienceFilter, location},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('-- error occured while fetching users list for the public --', err)
 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error

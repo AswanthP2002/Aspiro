@@ -1,5 +1,6 @@
+import Company from '../company.entity';
 import Job from '../recruiter/job.entity';
-import Recruiter from '../recruiter/recruiter.entity';
+import { NewRecruiter } from '../recruiter/recruiter.entity';
 import User from './User.FIX';
 
 export default interface FavoriteJobsAggregated {
@@ -9,5 +10,6 @@ export default interface FavoriteJobsAggregated {
   createdAt?: string;
   jobDetails: Job;
   postedBy: User;
-  recruiterProfile: Recruiter
+  recruiterProfile: NewRecruiter
+  companyDetails: Company
 }

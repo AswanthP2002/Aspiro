@@ -1,12 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import IFollowUserUseCase from '../../application/interfaces/usecases/user/IFollowUser.usecase';
-import IGetFollowersUseCase from '../../application/usecases/interfaces/IGetFollowers.usecase';
-import IGetFollowingUseCase from '../../application/usecases/interfaces/IGetFollowing.usecase';
 import IUnFollowUserUsercase from '../../application/usecases/interfaces/IUnFollowUser.usecase';
 import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
-import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
-import { emitNotification } from '../../infrastructure/socketio/chatSocket';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
@@ -14,9 +10,8 @@ export default class FollowController {
   constructor(
     @inject('IFollowUserUsecase') private _followUseCase: IFollowUserUseCase,
     @inject('IUnfollowUserUsecase') private _unfollowUseCase: IUnFollowUserUsercase //private _unfollowUseCase: IUnFollowUserUsercase,
-  ) //private _getFollowers: IGetFollowersUseCase,
-  //private _getFollowing: IGetFollowingUseCase,
-  {}
+  ) {
+  }
 
   async followUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const followerId = req.user.id;
@@ -47,19 +42,19 @@ export default class FollowController {
   async unfollowUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const followerId = req.user.id;
     const followingId = req.params.id;
-    const {acted_by, acted_user_avatar} = req.body
-    
+    const { acted_by, acted_user_avatar } = req.body;
+
     try {
       await this._unfollowUseCase.execute({
         follower: followerId,
         following: followingId,
         acted_by,
-        acted_user_avatar
+        acted_user_avatar,
       });
 
       res.status(StatusCodes.OK).json({ success: true, message: 'Unfollowed' });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 

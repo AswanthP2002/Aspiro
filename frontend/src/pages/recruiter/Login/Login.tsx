@@ -6,9 +6,9 @@ import './Login.css'
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
-import { recruiterLogedIn } from "../../../redux-toolkit/recruiterAuthSlice";
+import { recruiterLogedIn } from "../../../redux/recruiterAuthSlice";
 import { recruiterLogin } from "../../../services/recruiterServices";
-import { loginSuccess } from "../../../redux-toolkit/userAuthSlice";
+import { loginSuccess } from "../../../redux/userAuthSlice";
 
 export default function RecruiterLogin(){
     const [showpassword, setshowpassword] = useState(false)

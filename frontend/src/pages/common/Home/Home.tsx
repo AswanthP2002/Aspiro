@@ -314,7 +314,7 @@ export default function Home(){
             <div className="w-full flex flex-col items-center justify-center gap-5 px-5 md:px-20 py-20 bg-gradient-to-br from-blue-700 to-indigo-800">
                 <p className='text-3xl text-white text-center'>Ready to start your journey?</p>
                 <p className='text-sm text-white text-center font-light'>Join thousands of users whow are building their careers and growing their networks on Aspiro</p>
-                <button className='bg-white flex items-center gap-2 text-xs text-blue-700 px-5 py-2 rounded-md'>
+                <button onClick={() => navigator('/register')}  className='bg-white flex items-center gap-2 text-xs text-blue-700 px-5 py-2 rounded-md'>
                     Get started for free
                     <BsArrowRight />
                 </button>

@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -21,6 +22,13 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { Notify } from 'notiflix';
+import { Experience } from '../../../types/entityTypes';
+
+interface EditExperienceResponsePayload {
+  success: boolean
+  message: string
+  result: Experience
+}
 
 export default function EditExperienceForm({
   experience,
@@ -48,6 +56,7 @@ export default function EditExperienceForm({
   } = useForm<Inputs>();
 
   const [editableIsPresent, setEditableIsPresent] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false)
 
 
   useEffect(() => {
@@ -79,21 +88,17 @@ export default function EditExperienceForm({
     p: 4,
   };
 
-  function toggleIsPresent() {
-    setEditableIsPresent((prevState) => !prevState);
-  }
-
   const currentWorkingStatus = watch('isPresent');
 
-
   async function editExperienceOnSubmit(data : Inputs) {
+    setLoading(true)
     console.log('editable data');
     const { role, jobType, organization, startDate, endDate, location, workMode } = data;
     const formatedStartDate = startDate.format("YYYY-MM-DD")
     const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
     
     try {
-      const result = await editUserExperience(
+      const result: EditExperienceResponsePayload = await editUserExperience(
       experience?._id as string,
       role,
       jobType,
@@ -104,7 +109,6 @@ export default function EditExperienceForm({
       location,
       workMode
     );
-    closeExpEditModal();
     if(!result?.success){
       Notify.failure(result?.message, {timeout:2000})
       return
@@ -117,21 +121,13 @@ export default function EditExperienceForm({
       showCancelButton: false,
       timer: 2000,
     }).then(() => {
-      onEditExperience({
-        _id: experience?._id,
-        jobRole: role,
-        organization: organization,
-        jobType: jobType,
-        location: location,
-        workMode: workMode,
-        startDate: formatedStartDate,
-        endDate: formatedEndDate,
-        ispresent: editableIsPresent,
-      });
+      onEditExperience(result.result)
     });
     } catch (error : unknown) {
-      Notify.failure('Something went wrong', {timeout:2000})
-
+      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
+    } finally {
+      closeExpEditModal()
+      setLoading(false)
     }
   }
 
@@ -345,9 +341,7 @@ export default function EditExperienceForm({
             </FormControl>
           </Box>
           <Box sx={{ width: '100%', marginTop: '10px' }}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">
-              Edit
-            </button>
+            <Button type='submit' fullWidth variant='contained' loading={loading}>Edit</Button>
           </Box>
         </form>
       </Box>

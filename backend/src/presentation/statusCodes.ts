@@ -19,6 +19,6 @@ export enum StatusCodes {
   REQUEST_TIMEOUT = 408,
   CONFLICT = 409,
   TOO_MANY_REQUESTS = 429,
-  LOGIN_TIMEOUT_NON_STANDARD = 440,//This one is not a standard http status code :: Microsoft
+  LOGIN_TIMEOUT_NON_STANDARD = 440,
   INTERNAL_SERVER_ERROR = 500, 
 }

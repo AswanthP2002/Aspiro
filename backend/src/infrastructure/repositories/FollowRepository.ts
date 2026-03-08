@@ -4,10 +4,7 @@ import { FollowDAO } from '../database/DAOs/follow.dao';
 import mongoose from 'mongoose';
 import BaseRepository from './baseRepository';
 
-export default class FollowRepository
-  extends BaseRepository<Follow>
-  implements IFollowRepo
-{
+export default class FollowRepository extends BaseRepository<Follow> implements IFollowRepo {
   constructor() {
     super(FollowDAO);
   }

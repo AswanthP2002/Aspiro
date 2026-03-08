@@ -1,5 +1,5 @@
 import SocialLinks from '../../../domain/entities/SocialLinks';
-import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo';
+import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo.GARBAGE';
 import IGetSocialLinksUseCase from './interface/IGetSocialLinks.usecase';
 
 export default class GetSocialLinksUseCase implements IGetSocialLinksUseCase {

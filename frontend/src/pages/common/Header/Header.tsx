@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import {CgProfile} from 'react-icons/cg'
 import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCirclePlus} from 'react-icons/fa6'
-import { logout } from "../../../redux-toolkit/userAuthSlice"
+import { logout } from "../../../redux/userAuthSlice"
 import Swal from "sweetalert2"
 import { userLogout, getNotifications } from "../../../services/userServices"
 import { useContext, useEffect, useState } from "react"

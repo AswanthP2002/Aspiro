@@ -1,23 +1,30 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Comments, UserPosts } from "../types/entityTypes";
-import { useSelector } from "react-redux";
-import { addComment, deleteComment, likeUserPost, unlikeUserPost } from "../services/userServices";
+import { Comments, Notification, UserPosts } from "../types/entityTypes";
+import { useDispatch, useSelector } from "react-redux";
+import { addComment, deleteComment, deletePost, hidePost, likeComment, likeUserPost, unlikeComment, unlikeUserPost } from "../services/userServices";
 import { Notify } from "notiflix";
-import { SocketContext } from "./SocketContext";
 import Swal from "sweetalert2";
 import { BsFillArrowDownLeftSquareFill } from "react-icons/bs";
+import { getSocket } from "../socket";
+import { addLiveNotification } from "../redux/notificationSlice";
 
 //context for all operations related to post
+interface CommentAddingResponsePayload {
+    success: boolean;
+    message: string;
+    comment: Comments
+}
 
 export const PostContext = createContext<any>(null)
 
 export default function PostProvider({children}: {children: React.ReactNode}){
     //get socket from socket context
-    const {socket} = useContext(SocketContext)
+    const socket = null
     
     const logedUser = useSelector((state: any) => {
         return state.userAuth.user
     })
+    const dispatch = useDispatch()
     
     //user posts
     const [userPosts, setUserPosts] = useState<UserPosts[]>([])
@@ -52,44 +59,21 @@ export default function PostProvider({children}: {children: React.ReactNode}){
     const toggleCommentBoxOpen = () => setCommentBoxOpen(prv => !prv)
 
     //like post
-    const likePost = async (postId: string) => {
-        //update ui instantly
-        setPostLiked(true)
-        setShowHeartAnimation(true)
-        setTimeout(() => setShowHeartAnimation(false), 600)
-
-        setUserPosts((posts: UserPosts[]) => {
-            return posts.map((post: UserPosts) => {
-                if(post._id === postId){
-                    return {
-                        ...post,
-                        likes: [...post.likes, logedUser.id] // Correctly spread the likes array
-                    }
-                }else{
-                    return post
-                }
-            })
-        })
-        
-        //api call
+    const likePost = async (postId: string, ownerId: string) => {
         try {
-            await likeUserPost(postId)
+            await likeUserPost(postId, ownerId, logedUser.name, logedUser.profilePicture)
+            
         } catch (error: unknown) {
             Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
         }
     }
 
     const unlikePost = async (postId: string) => {
-        setPostLiked(false)
-        setShowHeartAnimation(true)
-        setTimeout(() => setShowHeartAnimation(false), 600)
-
-        //update ui instantly
         setUserPosts((posts: UserPosts[]) => {
             return posts.map((post: UserPosts) => {
                 if(post._id === postId){
                     return {
-                        ...post, likes:post.likes.filter((id: string) => id !== logedUser.id)
+                        ...post, likes:post.likes.filter((id: string) => id !== logedUser._id)
                     }
                 }else{
                     return post
@@ -105,21 +89,21 @@ export default function PostProvider({children}: {children: React.ReactNode}){
         }
     }
 
-    const addCommentOnPost = async (postId: string, commentText: string) => {
+    const addCommentOnPost = async (postId: string, commentText: string, parentId?: string | null = null) => {
         const text = commentText
         setComment('')
         try {
-            const result = await addComment(postId, text)
+            const result: CommentAddingResponsePayload = await addComment(postId, text, parentId)
 
             if(!result?.success){
                 Notify.failure(result?.message, {timeout:2000})
                 return
             }
 
-            Notify.success(result?.message, {timeout:2000})
+            Notify.success(result?.message)
 
 
-            const {_id} = result?.comment //geting comment id
+            const {_id} = result.comment //geting comment id
 
             //alert('filding commented post')
             setUserPosts((posts: UserPosts[]) => {
@@ -132,6 +116,10 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                                 userId:logedUser.id,
                                 postId,
                                 text,
+                                userDetails:{
+                                    name: logedUser.name,
+                                    headline: logedUser.headline
+                                },
                                 createdAt:`${new Date()}`
                             }]
                         }
@@ -148,6 +136,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
     }
 
     const deleteCommentOnPost = async (postId: string, commentId: string) => {
+        if(!postId || !commentId) return
         Swal.fire({
             icon:'warning',
             title:'Delete Comment?',
@@ -187,106 +176,135 @@ export default function PostProvider({children}: {children: React.ReactNode}){
         })
     }
 
-
-    //useeffect for real time update 
-    useEffect(() => {
-        console.log('socket out of if', socket)
-        if(socket){
-            //real time update for post liked
-            socket.on('postLiked', ({postId, userId}: {postId: string, userId: string}) => {
-            //     //to avoid duplicate ui updation check if the userId is same as loged user is if ? then avoid the
-            //     //updatio through socket for acted user
-                
-            //     Notify.info(`post liked by ${userId}`)
-                if(userId === logedUser?.id) return
-
-            //     //update ui through real time
-                setUserPosts((posts: UserPosts[]) => {
-                  return posts.map((post: UserPosts) => {
-                    if (post._id === postId) {
-                      return {
-                        ...post,
-                        likes: [...post.likes, userId],
-                      };
-                    } else {
-                      return post;
-                    }
-                  });
-                });
-            })
-
-            //real time update for post unliked
-            socket.on('postUnliked', ({postId, userId}: {postId: string, userId: string}) => {
-                Notify.info(`post unliked by ${userId}`)
-                if(userId === logedUser?.id) return
-                
-                setUserPosts((posts: UserPosts[]) => {
-                  return posts.map((post: UserPosts) => {
-                    if (post._id === postId) {
-                      return {
-                        ...post,
-                        likes: post.likes.filter((id: string) => id !== userId),
-                      };
-                    } else {
-                      return post;
-                    }
-                  });
-                });
-            })
-
-            socket.on('commentAdded', ({postId, userId, commentId, text}: {postId: string, userId: string, commentId: string, text: string}) => {
-
-                if(userId === logedUser.id){
-                    return
-                }
-
-                setUserPosts((posts: UserPosts[]) => {
-                return posts.map((post: UserPosts) => {
-                    if(post._id === postId){
-                        return {
-                            ...post,
-                            comments: [...post.comments, {
-                                _id: commentId,
-                                userId:logedUser.id,
-                                postId,
-                                text,
-                                createdAt:`${new Date()}`
-                            }]
-                        }
-                    }else{
-                        return post
-                    }
-                })
-            })
-            })
-
-            socket.on('commentDeleted', ({postId, commentId, userId}: {postId: string, commentId: string, userId: string}) => {
-                if(userId === logedUser.id){
-                    return
-                }
-
+    const likeACommentOnAPost = async (postId: string, commentId: string, postOwnerId: string) => {
+        try {
+            const result: CommentAddingResponsePayload = await likeComment(postId, commentId, postOwnerId)
+            if(result.success){
                 setUserPosts((posts: UserPosts[]) => {
                     return posts.map((post: UserPosts) => {
                         if(post._id === postId){
                             return {
                                 ...post,
-                                comments: post.comments.filter((comment: Comments) => comment._id !== commentId)
+                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment?.likes + 1} : comment)
                             }
                         }else{
                             return post
                         }
                     })
                 })
+            }
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        }
+    }
+
+    const unlikeACommentOnAPost = async (postId: string, commentId: string, postOwnerId: string) => {
+        try {
+            const result: CommentAddingResponsePayload = await unlikeComment(postId, commentId, postOwnerId)
+            if(result.success){
+                setUserPosts((posts: UserPosts[]) => {
+                    return posts.map((post: UserPosts) => {
+                        if(post._id === postId){
+                            return {
+                                ...post,
+                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment?.likes - 1} : comment)
+                            }
+                        }else{
+                            return post
+                        }
+                    })
+                })
+            }
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        }
+    }
+
+    const deleteMyPost = async (postId: string) => {
+        try {
+            const result = await deletePost(postId)
+            if(result.success){
+                setUserPosts((posts: UserPosts[]) => {
+                    return posts.filter((post: UserPosts) => post._id !== postId)
+                })
+                Notify.success(result.message)
+            }else{
+                Notify.failure(result.message)
+            }
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        }
+    }
+
+    const hideAPost = async (postId: string) => {
+        try {
+            const originalPosts = userPosts
+            setUserPosts((post: UserPosts[]) => {
+                return post.filter((post: UserPosts) => post._id !== postId)
+            })
+            
+            
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Post hidden successfully',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Undo',
+                    cancelButtonText: 'Close'
+                }).then(async (response) => {
+                    if(response.isConfirmed){
+                        setUserPosts(originalPosts)
+                        return
+                    }else{
+                        const result = await hidePost(postId)
+                        Notify.success(result.message)
+                        return
+                    }
+                })
+            
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        }
+    }
+
+
+    useEffect(() => {
+        const socket = getSocket()
+        if(socket){
+            //broadcasts
+            socket.on('FEED_POST_LIKED', ({postId, userId}) => {
+                setUserPosts((prv: UserPosts[]) => {
+                    return prv.map((post: UserPosts) => {
+                        if(post._id === postId){
+                            return {
+                                ...post,
+                                likes: [...post.likes, userId]
+                            }
+                        }else{
+                            return post
+                        
+                        }
+                    })
+                })
             })
 
+
+
+            //individual
+            socket.on('POST_LIKED', (notification: Notification) => {
+                dispatch(addLiveNotification({notification}))
+            })
+
+
+            
             return () => {
-                socket.off('postLiked')
-                socket.off('postUnliked')
-                socket.off('commentAdded')
-                socket.off('commentDeleted')
+                socket.off('FEED_POST_LIKED')
+                socket.off('POST_LIKED')
             }
+            
         }
-    }, [socket])
+    }, [getSocket])
+
 
     return <PostContext.Provider
             value={{
@@ -305,7 +323,11 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                 setUserPosts, 
                 showDescription, 
                 toggleDescriptionVisibility,
-                transoformCloudinaryUrl
+                transoformCloudinaryUrl,
+                likeACommentOnAPost,
+                unlikeACommentOnAPost,
+                deleteMyPost,
+                hideAPost
             }}
             >
         {children}

@@ -1,52 +1,66 @@
-import { NextFunction, Request, Response } from 'express';
-import express from 'express'
-import {
-  authorization,
-  centralizedAuthentication,
-} from '../../middlewares/auth';
+import express from 'express';
+import { authorization, centralizedAuthentication } from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
-import { StatusCodes } from '../statusCodes';
 import { container } from 'tsyringe';
 import PostController from '../controllers/postController';
 import Validator from '../../validation/validator.zod';
 import { createPostSchema } from '../schemas/user/createPost.schema';
+import { PostApiRoutes } from '../../constants/Apis/post.routes';
 
 function createPostRouter() {
   const postRouter = express.Router();
 
-  const postController = container.resolve(PostController)
-
+  const postController = container.resolve(PostController);
 
   postRouter.post(
-    '/post',
+    PostApiRoutes.UPLOAD_A_POST,
     centralizedAuthentication,
     authorization(['user']),
     upload.single('media'),
     Validator(createPostSchema),
     postController.createPost.bind(postController)
   );
-  // postRouter.delete(
-  //   '/post/:postId',
-  //   userAuth,
-  //   postController.deletePost.bind(postController)
-  // );
+  postRouter.delete(
+    PostApiRoutes.DELETE_A_POST_BY_ID,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.deletePost.bind(postController)
+  );
   postRouter.patch(
-    '/post/like/:postId/',
+    PostApiRoutes.LIKE_A_POST,
     centralizedAuthentication,
     authorization(['user']),
     postController.likePost.bind(postController)
   );
   postRouter.patch(
-    '/post/unlike/:postId',
+    PostApiRoutes.UNLIKE_A_POST,
     centralizedAuthentication,
     authorization(['user']),
     postController.unlikePost.bind(postController)
   );
   postRouter.get(
-    '/post',
+    PostApiRoutes.GET_POSTS,
     centralizedAuthentication,
     authorization(['user']),
     postController.getPosts.bind(postController)
+  );
+  postRouter.patch(
+    PostApiRoutes.HIDE_A_POST,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.hidePost.bind(postController)
+  );
+  postRouter.patch(
+    PostApiRoutes.UNHIDE_A_POST,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.unHidePost.bind(postController)
+  );
+  postRouter.patch(
+    PostApiRoutes.SAVE_UNSAVE_A_POST,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.toggleSavePost.bind(postController)
   );
   // postRouter.get(
   //   '/post/user',
@@ -55,27 +69,32 @@ function createPostRouter() {
   // );
 
   postRouter.post(
-    '/post/:postId/comment',
+    PostApiRoutes.COMMENT_ON_A_POST,
     centralizedAuthentication,
     authorization(['user']),
     postController.createComment.bind(postController)
-  )
+  );
 
   postRouter.delete(
-    '/post/:postId/comment/:commentId',
+    PostApiRoutes.DELETE_COMMENT_FROM_A_POST,
     centralizedAuthentication,
     authorization(['user']),
     postController.deleteComment.bind(postController)
-  )
+  );
+  postRouter.patch(
+    PostApiRoutes.LIKE_A_COMMENT,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.likeComment.bind(postController)
+  );
+  postRouter.patch(
+    PostApiRoutes.UNLIKE_A_COMMENT,
+    centralizedAuthentication,
+    authorization(['user']),
+    postController.unlikeComment.bind(postController)
+  );
 
   return postRouter;
 }
-
-const testMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  console.log('Checking the data from the frontend', req.body);
-  res
-    .status(StatusCodes.ACCEPTED)
-    .json({ success: false, message: 'Testing create post route' });
-};
 
 export default createPostRouter;

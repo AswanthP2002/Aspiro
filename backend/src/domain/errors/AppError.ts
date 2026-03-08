@@ -42,8 +42,8 @@ export class WrongCredentialsError extends AppError {
 }
 
 export class WrongPasswordError extends AppError {
-  constructor(){
-    super('WRONG_PASSWORD', 'Password not matching')
+  constructor() {
+    super('WRONG_PASSWORD', 'Password not matching');
   }
 }
 
@@ -55,12 +55,36 @@ export class BlockedEntityError extends AppError {
 
 export class InvalidGoogleTokenError extends AppError {
   constructor() {
-    super('INVALID_GOOGLE_TOKEN', 'Google Token is not valid')
+    super('INVALID_GOOGLE_TOKEN', 'Google Token is not valid');
   }
 }
 
 export class UserAlreadyVerifiedError extends AppError {
   constructor() {
-    super('USER_ALREADY_VERIFIED', 'User is already verified')
+    super('USER_ALREADY_VERIFIED', 'User is already verified');
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor() {
+    super('BAD_REQUEST', 'User request data does not pass the validation');
+  }
+}
+
+export class UserBlockedError extends AppError {
+  constructor() {
+    super(
+      'USER_SUSPENDED',
+      'Your Account has been temporarly blocked, check email for further information'
+    );
+  }
+}
+
+export class UserBannedError extends AppError {
+  constructor() {
+    super(
+      'USER_BANNED',
+      'Your account has ben banned due to violation of our community guidelines. Check email for further information'
+    );
   }
 }

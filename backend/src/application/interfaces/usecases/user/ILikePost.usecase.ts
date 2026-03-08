@@ -1,5 +1,6 @@
 import { PostDTO } from '../../../DTOs/post.dto';
+import LikePostDTO from '../../../DTOs/user/likePost.dto';
 
 export default interface ILikePostUsecase {
-  execute(postId: string, userId: string): Promise<PostDTO | null>;
+  execute(dto: LikePostDTO): Promise<PostDTO | null>;
 }

@@ -1,31 +1,53 @@
-import ICreateMessageUseCase from '../../application/usecases/interfaces/ICreateMessage.usecase';
 import { Auth } from '../../middlewares/auth';
-import { Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
+import { inject, injectable } from 'tsyringe';
+import IGetConversationsUsecase from '../../application/interfaces/usecases/user/IGetConversations.usecase';
+import IInitializeConversation from '../../application/interfaces/usecases/user/IInitializeConversation.usecase';
+import IGetchatsUsecase from '../../application/interfaces/usecases/user/IGetChats.usecase';
 
+@injectable()
 export default class ChatController {
-  constructor(private _sendMessageUC: ICreateMessageUseCase) {}
+  constructor(
+    @inject('IGetConversationsUsecase') private _getConversations: IGetConversationsUsecase,
+    @inject('IInitializeConversation') private _initializeConversation: IInitializeConversation,
+    @inject('IGetChatsUsecase') private _getChats: IGetchatsUsecase
+  ) {}
 
-  async sendMessage(req: Auth, res: Response): Promise<void> {
-    const { sender, receiver, message } = req.body;
+  async getConversations(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
     try {
-      const result = await this._sendMessageUC.execute({
-        sender,
-        receiver,
-        message,
-      });
+      const result = await this._getConversations.execute(userId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Conversations fetched', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async initializeConversation(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const sender = req.user.id;
+    const receiver = req.body.receiver;
+
+    try {
+      const result = await this._initializeConversation.execute(sender, receiver);
       res
         .status(StatusCodes.OK)
-        .json({ success: true, message: 'Message sent success', result });
-      return;
+        .json({ success: true, message: 'Conversation Initialized', result });
     } catch (error: unknown) {
-      console.log('Error occured while sending the message', error);
+      next(error);
+    }
+  }
+
+  async getchats(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const conversationId = req.params.conversationId;
+
+    try {
+      const result = await this._getChats.execute(conversationId);
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({
-          success: false,
-          message: 'Internal server error, please try again after some time',
-        });
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Chats fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
     }
   }
 }

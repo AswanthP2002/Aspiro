@@ -1,16 +1,26 @@
-import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { Autocomplete, Box, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import { Controller, useForm } from "react-hook-form";
-import { addUserSkill } from "../../../services/userServices";
+import { addUserSkill, getSkillsSuggesion } from "../../../services/userServices";
+import { Notify } from "notiflix";
+import { Skills } from "../../../types/entityTypes";
 
-export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal, onAddSkill, onRemoveSkill} : any){
+interface AddSkillResponsePayload {
+    success: boolean
+    message: string
+    result: Skills
+}
+
+export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddSkill} : any){
     const [type, setskillType] = useState("")
     const [skillTypeError, setskilltyperror] = useState("")
     const [skill, setskill] = useState("")
     const [skillError, setskillerror] = useState("")
     const [level, setlevel] = useState("")
     const [levelError, setlevelerror] = useState("")
+    const [skillsOptions, setSkillsOptions] = useState<string[]>([])
+    const [skillOptionsLoading, setSkillOptionsLoading] = useState<boolean>(false)
 
     type Inputs = {
         skillType:string,
@@ -18,7 +28,52 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
         skillLevel:string
     }
 
-    const {handleSubmit, watch, formState:{errors}, control, register} = useForm<Inputs>()
+    const {handleSubmit, reset, watch, formState:{errors}, control, register} = useForm<Inputs>({
+        defaultValues: {
+            skill: '',
+            skillType: '',
+            skillLevel: ''
+        }
+    })
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const fetchSkillSuggestions = useCallback(async (query: string) => {
+        if (!query) {
+            setSkillsOptions([]);
+            return;
+        }
+        setSkillOptionsLoading(true)
+        try {
+            const result = await getSkillsSuggesion(query)
+
+            if(result?.success){
+                const fetchedSkills = result?.result?.skills || [];
+                // Map correctly based on API response structure (handling objects or strings)
+                const mappedSkills = fetchedSkills.map((s: any) => {
+                    return typeof s === 'string' ? s : (s?.skill || s?.skills || s?.name);
+                }).filter((s: any) => s && typeof s === 'string');
+                setSkillsOptions(mappedSkills);
+            }
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        } finally {
+            setSkillOptionsLoading(false)
+        }
+    }, [])
+
+    const debounceFetchSkillsSuggestions = (fn: Function, delay: number) => {
+        let timer: any
+        return function(...args: any){
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                fn(...args)
+            }, delay);
+        }
+    }
+
+    const debounce = useMemo(() => {
+        return debounceFetchSkillsSuggestions(fetchSkillSuggestions, 400)
+    }, [fetchSkillSuggestions])
 
     const style = {
         position: 'absolute',
@@ -33,31 +88,16 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
         p: 4,
     }
 
-    function validateAddSkill(){
-        const skilltyperror = !type || false
-        const skillerror = !skill || !/^[A-Za-z][A-Za-z\s\-_]{1,49}$/.test(skill) || false
-        const levelerror = !level || false
-
-        skilltyperror ? setskilltyperror('Select Skill type') : setskilltyperror("")
-        skillerror ? setskillerror('Enter a valid skill') : setskillerror('')
-        levelerror ? setlevelerror('Select skill level') : setlevelerror('')
-
-        if(skilltyperror || skillerror || levelerror){
-            return
-        }
-
-        addSkill()
-    }
-
 
     async function addSkill(){
-        console.log(watch())
+        setLoading(true)
         const {skill, skillLevel, skillType} = watch()
                
         try {
-            const result = await addUserSkill(skillType, skill, skillLevel)
-            closeSkillsModal()
+            const result: AddSkillResponsePayload = await addUserSkill(skillType, skill, skillLevel)
+           // closeSkillsModal()
             if(result.success){
+                console.log('--checking skill return --', result.result)
                 Swal.fire({
                     icon:'success',
                     title:'Added',
@@ -66,25 +106,23 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
                     allowOutsideClick:false,
                     timer:2000,
                 }).then(() => {
-                    onAddSkill(skill, type, level)
-                    closeSkillsModal()
+                    onAddSkill(result.result)
+                    //onAddSkill(skill, type, level)
                 })
             }else{
-                Swal.fire({
-                    icon:'error',
-                    title:'Oops',
-                    text:result?.message
-                })
+                Notify.failure('Something went wrong', {timeout: 2000})
             }
         } catch (error : unknown) {
             console.log(error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    //text:error?.message
-                })
-            }
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+        } finally {
+            reset({
+                skill:'',
+                skillLevel:'',
+                skillType:''
+            })
+            setLoading(false)
+            closeSkillsModal()
         }
     }
 
@@ -121,16 +159,44 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
                 <FormHelperText>{errors.skillType?.message}</FormHelperText>
             </FormControl>            
 
-            {/* <label htmlFor="" className="block">Skill Type</label>
-            <select value={type} onChange={(event) => setskillType(event.target.value)} name="" id="" className="border border-gray-400 w-full rounded p-2 text-sm text-gray-500 outline-none">
-                <option value="">--Select Type--</option>
-                <option value="Technical-Skill">Technical Skill</option>
-                <option value="Soft-Skill">Soft Skill</option>
-            </select>
-            <label htmlFor="" className="error-label">{skillTypeError}</label> */}
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <TextField fullWidth {...register('skill', {
+            <FormControl fullWidth>
+                <Controller 
+                    control={control}
+                    name="skill"
+                    rules={{
+                        required:{value: true, message: 'Skill name can not be empty'},
+                        minLength:{value: 2, message: 'Minimum 2 charecters'},
+                        maxLength:{value: 30, message: 'Maximum 30 charecters'}
+                    }}
+                    render={({field: {onChange, value}}) => (
+                        <Autocomplete 
+                            freeSolo
+                            options={skillsOptions}
+                            filterOptions={(x) => x}
+                            loading={skillOptionsLoading}
+                            value={value}
+                            onInputChange={(_, newInputValue, reason) => {
+                                if (reason === 'input') debounce(newInputValue);
+                            }}
+                            onChange={(_, newValue) => onChange(newValue)}
+                            renderInput={(params) => (
+                                <TextField 
+                                    {...params}
+                                    fullWidth
+                                    label="Skill"
+                                    variant="outlined"
+                                    error={Boolean(errors.skill)}
+                                    helperText={errors.skill?.message}
+                        
+                                />
+                            )}
+                        />
+                    )}
+                />
+            </FormControl>
+            {/* <TextField fullWidth {...register('skill', {
                 required:{value:true, message:'Please enter skill'},
                 minLength:{value:2, message:'Minimum 2 charecters'},
                 maxLength:{value:30, message:'Maximum 30 charecters'}
@@ -139,10 +205,8 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
             label="Skill"
             error={Boolean(errors.skill)}
             helperText={errors.skill?.message}
-            />
-            {/* <label htmlFor="" className="block">Skill</label>
-            <input value={skill} onChange={(event) => setskill(event.target.value)} type="text" name="name" id="name" className="outline-none border !border-gray-400 outline-none w-full md:w-200 mt-2 block p-2 rounded" />
-            <label className='error-label'>{skillError}</label> */}
+            /> */}
+            
           </Box>
     
           <Box sx={{width:'100%', marginTop:'10px'}}>
@@ -170,18 +234,9 @@ export default function AddSkillsForm({token, skillsModalOpen, closeSkillsModal,
                 <FormHelperText>{errors.skillLevel?.message}</FormHelperText>
             </FormControl>
 
-            {/* <label htmlFor="" className="block">Location Type</label>
-            <select value={level} onChange={(event) => setlevel(event.target.value)} name="" id="" className="border border-gray-400 outline-none text-sm text-gray-500 w-full rounded p-2">
-                <option value="">--Select Level--</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="professional">Professional</option>
-                <option value="advanced">Advanced</option>
-            </select>
-            <label htmlFor="" className="error-label">{levelError}</label> */}
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
-            <button type="submit" className="bg-blue-400 rounded w-full p-1 text-white">Add</button>
+            <Button type="submit" variant="contained" loading={loading} fullWidth>Add Skill</Button>
           </Box>
           </form>
         </Box>

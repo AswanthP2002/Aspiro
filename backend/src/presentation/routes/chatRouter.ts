@@ -1,20 +1,31 @@
-const express = require('express');
+import express from 'express';
 import ChatController from '../controllers/chatController';
-import CreateMessageUseCase from '../../application/usecases/CreateMessage.usecase';
-import MessageRepository from '../../infrastructure/repositories/MessageRepository';
+import { container } from 'tsyringe';
+import { authorization, centralizedAuthentication } from '../../middlewares/auth';
+import { ChatApiRoutes } from '../../constants/Apis/chat.routes';
 
 function createChatRouter() {
   const chatRouter = express.Router();
 
-  const chatRepo = new MessageRepository();
+  const chatController = container.resolve(ChatController);
 
-  const sendMessageUC = new CreateMessageUseCase(chatRepo);
-
-  const chatController = new ChatController(sendMessageUC);
-
+  chatRouter.get(
+    ChatApiRoutes.GET_CONVERSATIONS,
+    centralizedAuthentication,
+    authorization(['user']),
+    chatController.getConversations.bind(chatController)
+  );
   chatRouter.post(
-    '/chat/send',
-    chatController.sendMessage.bind(chatController)
+    ChatApiRoutes.INITIALIZE_CONVERSATION,
+    centralizedAuthentication,
+    authorization(['user']),
+    chatController.initializeConversation.bind(chatController)
+  );
+  chatRouter.get(
+    ChatApiRoutes.GET_CHATS_BY_CONVERSATION_ID,
+    centralizedAuthentication,
+    authorization(['user']),
+    chatController.getchats.bind(chatController)
   );
 
   return chatRouter;

@@ -10,9 +10,9 @@ export default function mapToJobDTOFromJob(job: Job): JobDTO {
     requirements: job.requirements,
     responsibilities: job.responsibilities,
     duration: job.duration,
-    jobType: job.jobType,
-    workMode: job.workMode,
-    location: job.location,
+    jobType: job.jobType as string,
+    workMode: job.workMode as string,
+    location: job.location as string,
     minSalary: job.minSalary,
     maxSalary: job.maxSalary,
     salaryCurrency: job.salaryCurrency,
@@ -29,6 +29,6 @@ export default function mapToJobDTOFromJob(job: Job): JobDTO {
     applicationsCount: job.applicationsCount,
     createdAt: job.createdAt,
     updatedAt: job.updatedAt,
-    expiresAt: job.expiresAt
+    expiresAt: job.expiresAt,
   };
 }

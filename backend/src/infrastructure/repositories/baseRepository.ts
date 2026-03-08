@@ -5,7 +5,7 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
   private readonly _model: Model<T>;
   constructor(model: Model<T>) {
     this._model = model;
-  } //changed the collection name for testing error
+  }
 
   async create(entity: T): Promise<T | null> {
     const result = await this._model.insertOne(entity);
@@ -19,30 +19,36 @@ export default class BaseRepository<T> implements IBaseRepo<T> {
 
   async findById(id: string): Promise<T | null> {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return null; // Return null if the ID format is invalid
+      return null;
     }
-    const result = await this._model.findOne({
-      _id: new mongoose.Types.ObjectId(id),
-    }); // Use .lean() for better performance and a plain object
-    return result;
+    const result = await this._model
+      .findOne({
+        _id: new mongoose.Types.ObjectId(id),
+      })
+      .lean();
+    return result as T | null;
   }
 
   async update(id: string, updateEntity: Partial<T>): Promise<T | null> {
     if (!id || !updateEntity) {
       return null;
     }
-    const result = await this._model.findOneAndUpdate(
-      { _id: new mongoose.Types.ObjectId(id) },
-      { $set: updateEntity },
-      { returnDocument: 'after' }
-    );
-    return result;
+    const result = await this._model
+      .findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateEntity },
+        { returnDocument: 'after' }
+      )
+      .lean();
+    return result as T | null;
   }
 
   async delete(id: string): Promise<void> {
-    console.log('delete profposed id', id)
-    const result = await this._model.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
-    console.log('is dleted or not', result.deletedCount)
+    if (!mongoose.isValidObjectId(id)) return;
+    await this._model.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
+  }
 
+  async deleteAll(): Promise<void> {
+    await this._model.deleteMany({});
   }
 }

@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux"
 import useRefreshToken from "./refreshToken"
-import { tokenRefresh, logout } from "../redux-toolkit/candidateAuthSlice"
+import { tokenRefresh, logout } from "../redux/candidateAuthSlice"
 import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
 

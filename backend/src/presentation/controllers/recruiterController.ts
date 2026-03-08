@@ -1,54 +1,25 @@
 import { NextFunction, Request, Response } from 'express';
 import { Auth } from '../../middlewares/auth';
-import RegisterRecruiterUseCase from '../../application/usecases/recruiter/CreateRecruiter.usecase';
 import { StatusCodes } from '../statusCodes';
-import VerifyRecruiterUseCase from '../../application/usecases/recruiter/VerifyRecruiter.usecase';
-import { LoginRecruiterUseCase } from '../../application/usecases/recruiter/LoginRecruiter.usecase';
-import SaveBasicsUseCase from '../../application/usecases/recruiter/SaveBasicsRecruiter.usecase';
-import { LoadRecruiterProfileOverviewUsecase } from '../../application/usecases/recruiter/LoadRecruiterProfileOverview.usecase';
-import CreateJobUseCase from '../../application/usecases/recruiter/CreateJob.usecase';
-import IRegisterRecruiterUseCase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
 import ICreateJobUseCase from '../../application/interfaces/usecases/recruiter/ICreateJob.usecase';
-import IVerifyRecruiterUseCase from '../../application/usecases/recruiter/interface/IVerifyRecruiter.usecase';
-import ILoginRecruiterrUseCase from '../../application/usecases/recruiter/interface/ILoginRecruiter.usecase';
-import ISaveBasicsUseCase from '../../application/usecases/recruiter/interface/ISaveBasicsRecruiter.usecase';
 import ILoadRecruiterProfileOverviewUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
-import IRejectCandidate from '../../application/usecases/recruiter/interface/IRejectCandidate.usecase';
-import IRejectCandidateUseCase from '../../application/usecases/recruiter/interface/IRejectCandidate.usecase';
-import ICreateNotification from '../../application/interfaces/usecases/shared/ICreateNotification.usecase';
-import IFinalizeShortlist from '../../application/usecases/recruiter/interface/IFinalizeShortlist.usecase';
-import IGetFinalizedShortlistData from '../../application/usecases/recruiter/interface/IGetFinalizedData.usecase';
 import IGetJobApplicationsUseCase from '../../application/interfaces/usecases/recruiter/IGetJobApplications.usecase';
-import IGetJobApplicationDetailsUseCase from '../../application/usecases/recruiter/interface/IGetJobApplicationDetails.usecase';
-import mapToCreateRecruiterDTOFromRequest from '../mappers/recruiter/mapToCreateRecruiterDTOFromRequest';
-import mapToVerifyRecruiterDTOFromRequest from '../mappers/recruiter/mapToVerifyRecruiterDTOFromRequest';
-import mapToLoginRecruiterDTOFromRequest from '../mappers/recruiter/mapToLoginRecruiterDTOFromRequest';
-import mapToSaveIntroDetailsDTOFromRequest from '../mappers/recruiter/mapToSaveIntroDetailsDTOFromRequest';
-import mapToCreateJobDTOFromRequest from '../mappers/recruiter/mapToCreateJobDTOFromRequest';
-import mapToCreateNotificationFromRejectRequest from '../mappers/recruiter/mapToCreateNotificationFromRejectRequest';
 import { inject, injectable } from 'tsyringe';
-import mapCreateUserRequestToDTO from '../mappers/user/mapCreateUserRequestToDTO.refactored';
-import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase';
-import { RecruiterRegisterValidator } from '../../application/validators/recruiterRegister.validator';
-import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
-import { VerifyUserValidator } from '../../application/validators/verifyUser.validator';
-import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
-import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
-import { CreateJobSchema } from '../schemas/recruiter/createJob.schema';
+import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase.FIX';
 import ILoadRecruiterJobsUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterJobs.usecase';
-import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
-import mapToLoadRecruiterJobsDTO from '../mappers/recruiter/mapToLoadRecruiterJobsDTO.mapper';
 import IEditJobUsecase from '../../application/interfaces/usecases/recruiter/IEditJob.usecase';
-import { editJobSchema } from '../schemas/recruiter/editJob.schema';
-import mapToEditJobDTOFromRequest from '../mappers/recruiter/mapToEditJobDTOFromRequest';
 import IDeleteJobUsecase from '../../application/interfaces/usecases/recruiter/IDeleteJob.usecase';
-import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase';
 import IScheduleInterviewUsecase from '../../application/interfaces/usecases/recruiter/IScheduleInterview.usecase';
 import CreateInterviewDTO from '../../application/DTOs/user/interview.dto';
 import IUpdateCandidateNotes from '../../application/interfaces/usecases/recruiter/IUpdateCandidateNotes.usecase';
-import { JobApplicationDTO } from '../../application/DTOs/candidate -LEGACY/jobApplication.dto';
+import { JobApplicationDTO } from '../../application/DTOs/job/jobApplication.dto.FIX';
 import IUpdateJobApplicationStatusUsecase from '../../application/interfaces/usecases/recruiter/IUpdateJobApplicationStatus.usecase';
 import UpdateJobApplicationStatusDTO from '../../application/DTOs/recruiter/UpdateJobApplicationStatus.dto';
+import ILoadRecruiterRecentJobs from '../../application/interfaces/usecases/recruiter/ILoadRecruiterRecentJobs.usecase';
+import IGetJobTypeListUsecase from '../../application/interfaces/usecases/recruiter/IGetJobTypeLists.usecase';
+import IGetJobLevelListsUsecase from '../../application/interfaces/usecases/recruiter/IGetJobLevelLists.usecase';
+import IGetWorkModeListsUsecase from '../../application/interfaces/usecases/recruiter/IGetWorkModeLists.usecase';
+import IGetJobApplicationDetailsUseCase from '../../application/interfaces/usecases/recruiter/IGetJobApplicationDetails.usecase';
 
 @injectable()
 export default class RecruiterController {
@@ -63,31 +34,27 @@ export default class RecruiterController {
     @inject('IScheduleInterviewUsecase') private _scheduleInterview: IScheduleInterviewUsecase,
     @inject('IGetJobApplicationsUsecase') private _getJobApplications: IGetJobApplicationsUseCase,
     @inject('IUpdateCandidateNotesUsecase') private _updateCandidateNotes: IUpdateCandidateNotes,
-    @inject('IUpdateJobApplicationStatusUsecase') private _updateJobApplicationStatus: IUpdateJobApplicationStatusUsecase
-    // @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase
-  ) // @inject('IRegisterRecruiterUseCase')
-  // private _registerRecruiterUC: IRegisterRecruiterUseCase,
-  // @inject('IVerifyUserUseCase') private _verifyUserUC: IVerifyUserUseCase,
-  // @inject('ILoginRecruiterUseCase')
-  // private _loginRecruiterUC: ILoginRecruiterrUseCase,
-  // @inject('ILoadRecruiterProfileUseCase')
-  // private _loadRecruiterProfileUC: ILoadRecruiterProfileUseCase // private _createJobUseCase: ICreateJobUseCase, //usecase interface //usecase interface // private _verifyRecruiterUC: IVerifyRecruiterUseCase, //usecase interface // private _loginRecruiterUC: ILoginRecruiterrUseCase, //usecase interface // private _saveBasicsUC: ISaveBasicsUseCase, //usecase interface // private _loadCompanyProfileUseCase: ILoadRecruiterProfileUseCase, //usecase interface // private _getJobApplications: IGetJobApplicationsUseCase, //usecase interface // private _rejectCandidateJobApplicationUseCase: IRejectCandidateUseCase, // private _createNotificationUseCase: ICreateNotification, // // private _saveShortlistUseCase : IFinalizeShortlist, // // private _getFinalizedShortlistDataUC : IGetFinalizedShortlistData, // private _getJobApplicationDetailsUC: IGetJobApplicationDetailsUseCase
-  {}
+    @inject('IUpdateJobApplicationStatusUsecase')
+    private _updateJobApplicationStatus: IUpdateJobApplicationStatusUsecase,
+    @inject('ILoadRecruiterRecentJobs') private _loadRecruiterRecentJobs: ILoadRecruiterRecentJobs,
+    @inject('IGetJobTypeListsUsecase') private _getJobTypeLists: IGetJobTypeListUsecase,
+    @inject('IGetJobLevelListsUsecase') private _getJobLevelLists: IGetJobLevelListsUsecase,
+    @inject('IGetWorkModeListsUsecase') private _getWorkModeLists: IGetWorkModeListsUsecase,
+    @inject('IGetJobApplicationDetailsUsecase')
+    private _getJobApplicationDetails: IGetJobApplicationDetailsUseCase
+  ) {}
 
   async createRecruiter(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req?.user?.id;
     try {
-      // console.log('Data after validating from validator-----', req.body);
-      // res.status(StatusCodes.NOT_FOUND).json({success:false, message:'Not found'})
-      // return
-
-      const dto = mapToCreateRecruiterDTOFromRequest({userId, ...req.body})
-
-      const result = await this._createRecruiter.execute(dto);
-
-      if (!result) {
-        throw new Error('Something went wrong');
-      }
+      const file = req.file?.buffer;
+      const path = req.file?.originalname.split('.')[0];
+      const result = await this._createRecruiter.execute({
+        userId: userId,
+        verificationDocumentFile: file,
+        verificationDocumentFilePath: path,
+        ...req.body,
+      });
 
       res.status(StatusCodes.CREATED).json({
         succcess: true,
@@ -97,26 +64,25 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked
+  } //fixed
 
   async LoadRecruiterJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
-    const search = req.query.search as string || ""
-    const page = parseInt(req.query.page as string) || 1
-    const limit = parseInt(req.query.limit as string) || 3
-    const sortOption = req.query.sortOption as string || 'Newest'
-    const filter = JSON.parse(req.query.filter as string) || {}
-    
-    try {
-      const validateQuery = recruiterJobsSchema.parse({search, page, limit, sortOption, filter})
-      const dto = mapToLoadRecruiterJobsDTO({recruiterId:userId, ...validateQuery})
-      const result = await this._loadRecruiterJobs.execute(dto);
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 3;
+    const sortOption = (req.query.sortOption as string) || 'Newest';
+    const filter = JSON.parse(req.query.filter as string) || {};
 
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
-      }
+    try {
+      const result = await this._loadRecruiterJobs.execute({
+        recruiterId: userId,
+        search,
+        page,
+        limit,
+        sortOption,
+        filter,
+      });
 
       res
         .status(StatusCodes.OK)
@@ -124,91 +90,38 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  }
+  } //fixed
 
   async deleteJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const jobId = req.params.jobId
+    const jobId = req.params.jobId;
 
     try {
-      await this._deleteJob.execute(jobId)
-      res.status(StatusCodes.OK).json({success:true, message:'Job deleted successfully'})
+      await this._deleteJob.execute(jobId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'Job deleted successfully' });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
   async updateJobApplicationStatus(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
-      const applicationId = req.params.applicationId
-      const result = await this._updateJobApplicationStatus.execute({_id: applicationId, ...req.body} as UpdateJobApplicationStatusDTO)
+      const applicationId = req.params.applicationId;
+      const result = await this._updateJobApplicationStatus.execute({
+        _id: applicationId,
+        ...req.body,
+      } as UpdateJobApplicationStatusDTO);
 
-      res.status(StatusCodes.OK).json({success:true, message:'Updated', result})
+      res.status(StatusCodes.OK).json({ success: true, message: 'Updated', result });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
-  }
-
-
-  // async loginRecruiter(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     const dto = mapToLoginRecruiterDTOFromRequest(req.body);
-  //     const result: any = await this._loginRecruiterUC.execute(dto);
-  //     const { refreshToken } = result;
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .cookie('refreshToken', refreshToken, {
-  //         httpOnly: true,
-  //         secure: false,
-  //         sameSite: 'lax',
-  //         maxAge: 24 * 60 * 60 * 1000,
-  //       })
-  //       .json({
-  //         success: true,
-  //         message: 'Recruiter loged in successfully',
-  //         result,
-  //       });
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked
-
-  // // async recruiterLogout(req: Auth, res: Response): Promise<Response> {
-  // //   try {
-  // //     res.clearCookie('recruiterRefreshToken', {
-  // //       httpOnly: true,
-  // //       secure: false,
-  // //       sameSite: 'lax',
-  // //     });
-
-  // //     return res
-  // //       .status(StatusCodes.OK)
-  // //       .json({ success: true, message: 'Logouted successfully' });
-  // //   } catch (error: unknown) {
-  // //     console.log('Error occured while recruiter logout', error);
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({
-  // //         success: false,
-  // //         message: 'Something went wrong, please try again after some time',
-  // //       });
-  // //   }
-  // // } //reworked
-
+  } //fixed
 
   async loadRecruiterProfileData(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
     try {
-      const result = await this._loadRecruiterProfileOverview.execute(id)
+      const result = await this._loadRecruiterProfileOverview.execute(id);
 
-      // if(!result){
-      //   res.status(StatusCodes.NOT_FOUND).json({success:false, message:'something went wrong'})
-      //   return
-      // }
-      //console.log('---- result ----', result)
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Recruiter details fetched successfully',
@@ -222,15 +135,15 @@ export default class RecruiterController {
   async createJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
     try {
-      const dto = mapToCreateJobDTOFromRequest({recruiterId:id, ...req.body});
-
-      const createdJob = await this._createJob.execute(dto);
+      const createdJob = await this._createJob.execute({ recruiterId: id, ...req.body });
 
       if (!createdJob) {
-       throw new Error('Can not create job')
+        throw new Error('Can not create job');
       }
 
-      res.status(StatusCodes.CREATED).json({ success: true, message: 'job created', job: createdJob });
+      res
+        .status(StatusCodes.CREATED)
+        .json({ success: true, message: 'job created', job: createdJob });
     } catch (error: unknown) {
       next(error);
     }
@@ -238,175 +151,129 @@ export default class RecruiterController {
 
   async editJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
-      const validdateData = editJobSchema.parse(req.body)
-      const dto = mapToEditJobDTOFromRequest(validdateData)
-      const result = await this._editJob.execute(dto)
+      const result = await this._editJob.execute(req.body);
 
-      if(!result){
-        res.status(StatusCodes.BAD_REQUEST).json({success:false, message:'Something went wrong'})
+      if (!result) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ success: false, message: 'Something went wrong' });
       }
 
-      res.status(StatusCodes.OK).json({success:true, message:'Job edited successfully', result})
-
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Job edited successfully', result });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
   async scheduleInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const candidateId = req.params.candidateId
-      const jobId = req.params.jobId
+      const candidateId = req.params.candidateId;
+      const jobId = req.params.jobId;
       const result = await this._scheduleInterview.execute({
         candidateId,
         jobId,
-        ...req.body as CreateInterviewDTO
-      })
+        ...(req.body as CreateInterviewDTO),
+      });
 
-      res.status(StatusCodes.CREATED).json({success:true, message:'Interview Scheduled', result})
-
+      res
+        .status(StatusCodes.CREATED)
+        .json({ success: true, message: 'Interview Scheduled', result });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
   async getJobApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
     const jobId = req.params.jobId;
-
+    const search = (req.query.search as string) || '';
+    const limit = parseInt(req.query.limit as string) || 5;
+    const page = parseInt(req.query.page as string) || 1;
+    const filter = (req.query.status as string) || 'all';
     try {
-      const result = await this._getJobApplications.execute(jobId);
+      const result = await this._getJobApplications.execute({
+        jobId,
+        search,
+        page,
+        limit,
+        filter,
+      });
+      res.status(StatusCodes.OK).json({ success: true, message: 'success', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async getJobApplicationDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const applicationId = req.params.applicationId;
+    try {
+      const result = await this._getJobApplicationDetails.execute(applicationId);
       res
         .status(StatusCodes.OK)
-        .json({ success: true, message: 'success', result });
-    } catch (error: unknown) {
-     next(error)
+        .json({ success: true, message: 'Applicatio details fetched succesfully', result });
+    } catch (error) {
+      next(error);
     }
   }
 
   async updateCandidateNotes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const {applicationId} = req.params
-      const result = await this._updateCandidateNotes.execute({_id:applicationId, ...req.body} as JobApplicationDTO)
+      const { applicationId } = req.params;
+      const result = await this._updateCandidateNotes.execute({
+        _id: applicationId,
+        ...req.body,
+      } as JobApplicationDTO);
 
       res.status(StatusCodes.OK).json({
-        success:true, message:'Notes updated', result
-      })
+        success: true,
+        message: 'Notes updated',
+        result,
+      });
     } catch (error: unknown) {
-      next(error)
+      next(error);
     }
   }
 
-  // // async rejectCandidateJobApplication(
-  // //   req: Auth,
-  // //   res: Response
-  // // ): Promise<Response> {
-  // //   const { applicationId } = req.params;
-  // //   const message = req.body.message as string;
-  // //   const reason = req.body.reason as string;
-  // //   const id = req.user.id;
-  // //   //title : string, description : string, type, relatedid
+  async getRecentJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user.id;
+      const result = await this._loadRecruiterRecentJobs.execute(userId);
 
-  // //   try {
-  // //     const rejectResult =
-  // //       await this._rejectCandidateJobApplicationUseCase.execute(applicationId);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Recent jobs fetched successfully',
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // //     if (!rejectResult)
-  // //       return res
-  // //         .status(StatusCodes.BAD_REQUEST)
-  // //         .json({
-  // //           success: false,
-  // //           message:
-  // //             'Can not reject request right now, please try again after some time',
-  // //         });
-  // //     const dto = mapToCreateNotificationFromRejectRequest({
-  // //       rejector: id,
-  // //       rejectee: req.body.candidateId,
-  // //       message: req.body.description,
-  // //       ...req.body,
-  // //     });
+  async getJobTypes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._getJobTypeLists.execute();
+      res.status(StatusCodes.OK).json({ success: true, message: 'Fetched', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // //     const createNotificationResult =
-  // //       await this._createNotificationUseCase.execute(dto);
+  async getJobLevels(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._getJobLevelLists.execute();
+      res.status(StatusCodes.OK).json({ success: true, message: 'Fetched', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // //     if (createNotificationResult) {
-  // //       return res
-  // //         .status(StatusCodes.OK)
-  // //         .json({
-  // //           success: true,
-  // //           message: 'Application rejected successfully',
-  // //         });
-  // //     }
-  // //     return res
-  // //       .status(StatusCodes.BAD_REQUEST)
-  // //       .json({ success: false, message: 'Something went wrong' });
-  // //   } catch (error: unknown) {
-  // //     console.log(
-  // //       'error occured while rejecting the candidate application',
-  // //       error
-  // //     );
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({
-  // //         success: false,
-  // //         message: 'Internal server error, please try again after some time',
-  // //       });
-  // //   }
-  // // }
-
-  // // // async finalizeShortlist(req : Auth, res : Response) : Promise<Response> {
-  // // //     const {jobId} = req.params
-  // // //     const applications = req.body.applications
-  // // //     const recruiterId = req.user?.id
-
-  // // //     try {
-  // // //         const result = await this._saveShortlistUseCase.execute(jobId, recruiterId, applications)
-  // // //         return res.status(StatusCodes.OK).json({success:true, message:'Shortlist finalized'})
-  // // //     } catch (error : unknown) {
-  // // //         console.log('Error occured while saving shortlist', error)
-  // // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
-  // // //     }
-  // // // }
-
-  // // // async getFinalizedShortlistData(req : Auth, res : Response) : Promise<Response> {
-  // // //     const {jobId} = req.params
-  // // //     console.log('jobid before fetching', jobId)
-  // // //     try {
-  // // //         const result = await this._getFinalizedShortlistDataUC.execute(jobId)
-  // // //         return res.status(StatusCodes.OK).json({success:true, message:'Data fetched successfully', result})
-  // // //     } catch (error : unknown) {
-  // // //         console.log('error occured while fetching finalized list', error)
-  // // //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false, message:'Internal server error, please try again after some time'})
-  // // //     }
-  // // // }
-
-  // // async getJobApplicationDetails(req: Auth, res: Response): Promise<Response> {
-  // //   const applicationId = req.params?.applicationId as string;
-  // //   try {
-  // //     const result = await this._getJobApplicationDetailsUC.execute(
-  // //       applicationId
-  // //     );
-  // //     return result
-  // //       ? res
-  // //           .status(StatusCodes.OK)
-  // //           .json({
-  // //             success: true,
-  // //             message: 'Application details fetched successfully',
-  // //             result,
-  // //           })
-  // //       : res
-  // //           .status(StatusCodes.BAD_REQUEST)
-  // //           .json({
-  // //             success: false,
-  // //             message: 'Can not fetch application details right now',
-  // //           });
-  // //   } catch (error: unknown) {
-  // //     console.log('Error occured while fetching application details', error);
-  // //     return res
-  // //       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  // //       .json({
-  // //         success: false,
-  // //         message: 'Internal server error, please try again after some time',
-  // //       });
-  // //   }
-  // // }
+  async getWorkModes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._getWorkModeLists.execute();
+      res.status(StatusCodes.OK).json({ success: true, message: 'Fetched', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

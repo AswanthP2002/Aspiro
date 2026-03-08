@@ -1,3 +1,3 @@
 export default interface IAdminDeleteUserUsecase {
-    execute(userId: string): Promise<void>
+  execute(userId: string): Promise<void>;
 }

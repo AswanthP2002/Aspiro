@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Shortlist from '../../../domain/entities/recruiter/shortlist.entity';
+import Shortlist from '../../../domain/entities/recruiter/shortlist..GARBAGE.entity';
 import IShortlistRepo from '../../../domain/interfaces/recruiter/IShortlistRepo';
 import IFinalizeShortlist from './interface/IFinalizeShortlist.usecase';
 

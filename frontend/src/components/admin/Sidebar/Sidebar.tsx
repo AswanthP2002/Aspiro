@@ -4,13 +4,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { userLogout } from '../../../services/userServices';
 import { CiHome, CiLogout, CiCreditCard1 } from 'react-icons/ci';
-import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome } from 'react-icons/fa';
-import { LuUser, LuUsers, LuUserSearch } from 'react-icons/lu';
-import { AiOutlineClose } from 'react-icons/ai';
+import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome, FaTools } from 'react-icons/fa';
+import { LuUser, LuUserCheck, LuUserPlus, LuUsers, LuUserSearch } from 'react-icons/lu';
+import { AiFillMoneyCollect, AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
 import { logoutAdmin } from '../../../services/adminServices';
 import { Notify } from 'notiflix';
+import { BiBriefcase, BiGrid, BiGridAlt, BiWallet } from 'react-icons/bi';
+import { BsDatabaseGear, BsEye, BsSuitcase } from 'react-icons/bs';
+import { FaMoneyBill1Wave } from 'react-icons/fa6';
+import {GiReceiveMoney} from 'react-icons/gi'
+import { PiMoneyFill } from 'react-icons/pi';
 
 const checkPresentPath = (path: string) => {
   return window.location.pathname.includes(path)
@@ -33,10 +38,11 @@ export default function Sidebar(){
     showCancelButton:true
   }).then(async (result) => {
     if(result?.isConfirmed){
-      const logoutResult = await logoutAdmin(dispatcher, navigate)
-      if(!logoutResult){
-        Notify.failure('Can not logout right now', {timeout:1500})
-        return
+      try {
+        await logoutAdmin(dispatcher, navigate)
+
+      } catch (error: unknown) {
+        Notify.failure(error instanceof Error ? error.message : 'Can not logout right now, please try again after some time', {timeout: 3000})
       }
     }else{
       return
@@ -49,9 +55,9 @@ export default function Sidebar(){
   })
   return (
     <>
-      <div className='w-64 flex !opacity-100 flex-col !bg-white h-screen'>
+      <div className='w-64 flex !opacity-100 flex-col border-r border-gray-200 !bg-white h-screen'>
         <div className="border-b flex items-center justify-between border-gray-300 !p-5">
-          <p className='text-xl'>Aspiro</p>
+          <p className='text-xl'>Aspiro Admin</p>
           {
             windowSize.width < 768 && (
               <button onClick={() => setAdminSidebarOpen(false)} className='hover:bg-gray-100'>
@@ -62,31 +68,80 @@ export default function Sidebar(){
         </div>
         <div className='!p-5 flex-1'>
           <ul className='flex flex-col'>
-            <li className={`group ${checkPresentPath('dashboard') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
+            <li className={`group ${checkPresentPath('dashboard') ? 'bg-blue-100 font-medium text-blue-500' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
               <Link to="/admin/dashboard" className='flex items-center gap-2 text-orange-500'>
-                <CiHome size={23} color='gray' className='group-hover:!text-orange-500' />
-                <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Home</p>
+                <BiGridAlt size={23} color='blue' className='group-hover:!text-blue-500' />
+                <p className='text-blue-400 group-hover:text-blue-500 group-hover:font-medium'>Overview</p>
               </Link>
             </li>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
+            <li className={`group ${checkPresentPath('users') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/users" className='flex items-center gap-2'>
+              <LuUsers size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>Users</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('applications') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
+              <LuUserPlus size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>Recruiter Applications</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('recruiters') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/recruiters" className='flex items-center gap-2'>
+              <LuUserCheck size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400'>Recruiters & Companies</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('jobs') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/jobs" className='flex items-center gap-2'>
+              <BiBriefcase size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400'>Jobs</p>
+              </Link>
+            </li>
+            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
+              <Link to="admin/dashboard" className='flex items-center gap-2'>
+                <BsEye size={23} color='gray' className='cursor-not-allowed' />
+                <p className='text-gray-300 cursor-not-allowed'>Contents Moderation</p>
+              </Link>
+            </li>
+            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
+              <Link to="admin/dashboard" className='flex items-center gap-2'>
+                <BiWallet size={23} color='gray' className='cursor-not-allowed' />
+                <p className='text-gray-300 cursor-not-allowed'>Subscription & Plans</p>
+              </Link>
+            </li>
+            <li className={`group ${checkPresentPath('config') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/config" className='flex items-center gap-2'>
+              <BsDatabaseGear size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>App Config</p>
+              </Link>
+            </li>
+            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
+              <Link to="/admin/dashboard" className='flex items-center gap-2'>
+                <GiReceiveMoney size={23} color='gray' className='cursor-not-allowed' />
+                <p className='text-gray-300 cursor-not-allowed'>Analytics & Revenue</p>
+              </Link>
+            </li>
+            {/* <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md cursor-not-allowed`}>
+              <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
+              <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>
+              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiter Applications</p>
+              </Link>
+            </li> */}
+            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
               <Link to="/admin/jobs" className='flex items-center gap-2'>
                 <FaBriefcase size={21} color='gray' className='group-hover:!text-orange-500' />
                 <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Job Posts</p>
               </Link>
-            </li>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/companies" className='flex items-center gap-2'>
+            </li> */}
+            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
+              <Link to="/admin/recruiters" className='flex items-center gap-2'>
                 <FaUserTie size={21} color='gray' className='group-hover:!text-orange-500' />
                 <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiters</p>
               </Link>
-            </li>
-            <li className={`group ${checkPresentPath('users') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
-              <Link to="/admin/users" className='flex items-center gap-2'>
-              <LuUsers size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Users</p>
-              </Link>
-            </li>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
+            </li> */}
+            
+            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
               <Link to="/admin/users" className='flex items-center gap-2'>
               <FaRegChartBar size={21} color='gray' className='group-hover:!text-orange-400'/>
               <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Analyitcs</p>
@@ -98,17 +153,18 @@ export default function Sidebar(){
               <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Billings & Subscriptions</p>
               </Link>
             </li>
-            <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
-              <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
-              <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiter Applications</p>
+            
+            <li className={`group ${checkPresentPath('skills-manage') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
+              <Link to="/admin/skills-manage" className='flex items-center gap-2'>
+              <FaTools size={21} color='gray' className='group-hover:!text-orange-400'/>
+              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Skills</p>
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
         <div className='!p-5 border-t border-gray-300'>
-          <button onClick={adminLogout} className='text-orange-500 font-medium flex items-cneter gap-2'>
-            <CiLogout color='orange' />
+          <button onClick={adminLogout} className='text-blue-500 font-medium flex items-center gap-2'>
+            <CiLogout color='blue' />
             <p className='!m-0'>Logout</p>
           </button>
         </div>
@@ -134,5 +190,3 @@ export default function Sidebar(){
     // </div>
   );
 };
-
-

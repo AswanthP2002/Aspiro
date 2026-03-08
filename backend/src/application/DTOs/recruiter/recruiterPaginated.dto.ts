@@ -1,8 +1,8 @@
-import { RecruiterDTO } from './recruiter.dto';
+import { AdminRecruiterListDTO } from './recruiterProfileOverviewData.dto.FIX';
 
 export default interface RecruiterPaginatedDTO {
-  recruiters: RecruiterDTO[];
+  recruiters: AdminRecruiterListDTO[];
   page: number;
   totalPages: number;
-  currentSort: {[key: string]:number};
+  currentSort?: string;
 }

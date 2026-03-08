@@ -2,18 +2,18 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'
-import { finalizeShortList, getApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus } from "../../../services/recruiterServices"
+import { finalizeShortList, getApplicationDetails, getSingleApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus } from "../../../services/recruiterServices"
 import ApplicantCard from "../../../components/recruiter/ApplicantCard"
 import Swal from "sweetalert2"
 import Loader from "../../../components/candidate/Loader"
 import { Notify } from "notiflix"
-import { LuMessageCircle, LuPhone, LuUser, LuUsers } from "react-icons/lu"
-import { BiCalendar, BiEnvelope, BiSend, BiTrash } from "react-icons/bi"
+import { LuCalendar, LuCircleX, LuFileArchive, LuFileUser, LuGraduationCap, LuMapPin, LuMessageCircle, LuPhone, LuSearch, LuSend, LuSparkles, LuUser, LuUserCheck, LuUsers, LuUserX } from "react-icons/lu"
+import { BiBriefcase, BiCalendar, BiChevronDown, BiChevronUp, BiEnvelope, BiSend, BiStar, BiTrash } from "react-icons/bi"
 import { FaRegCircleXmark, FaXmark } from "react-icons/fa6"
 import { CiCircleCheck } from "react-icons/ci"
-import formatDate from "../../../services/util/formatDate"
+import formatDate, { formattedDateMoment } from "../../../services/util/formatDate"
 import { PiSuitcase } from "react-icons/pi"
-import { FaFile, FaGraduationCap } from "react-icons/fa"
+import { FaFile, FaGraduationCap, FaUsersSlash } from "react-icons/fa"
 import { Box, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, MenuItem, Modal, TextField } from "@mui/material"
 import { IoCall, IoCloseCircle, IoLocation } from "react-icons/io5"
 import dayjs, { Dayjs } from "dayjs"
@@ -22,9 +22,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
-import { ApplicationsAggregated, Education, Experience, Skills } from "../../../types/entityTypes"
+import { ApplicationsAggregated, Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData, Skills } from "../../../types/entityTypes"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { HiPaperClip } from "react-icons/hi2"
+import { BsArrowLeft, BsClock } from "react-icons/bs"
 
 interface Application {
     _id: string;
@@ -41,16 +42,33 @@ interface Application {
 export default function ApplicantManagePage(){
     const location = useLocation()
     const [selectedCards, setSelectedCards] = useState<any[]>([])
+    const [selectedApplication, setSelectedApplication] = useState<string | null>(null)
+    const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
+    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer'>('all')
+    const [search, setSearch] = useState('')
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const [totalDocs, setTotalDocs] = useState(0)
+    const [limit, setLimit] = useState(1)
     const [selectionMode, setSelectionMode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [jobDetails, setJobDetails] = useState<any>(null);
     const params : any = useParams()
     const jobId = params.jobId || location.state.jobId || {}
-    const [controlBarOpen, setControlBarOpen] = useState<Boolean>(false)
+    const [controlBarOpen, setControlBarOpen] = useState<boolean>(false)
     const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState<boolean>(false)
     const navigator = useNavigate()
     const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
 
+    const [isControlBarMenuOpen, setIsControlBarMenuOpen] = useState(false)
+
+    const openControlBarMenu = (applicationId: string) => {
+        setSelectedApplication(applicationId)
+        setIsControlBarMenuOpen(true)
+    }
+    const closeControlBarMenu = () => setIsControlBarMenuOpen(false)
+
+    const toggleFilterMenuOpen = () => setIsFilterMenuOpened(prv => !prv)
 
     type InterviewFormData = {
   date: Dayjs | null;
@@ -240,7 +258,7 @@ const interviewTypes = [
     }
 
     const [job, setJob] = useState<string>('')
-    const [applications, setApplications] = useState<ApplicationsAggregated[]>([])
+    const [applications, setApplications] = useState<JobApplicationsListForRecruiter[]>([])
     
     // const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
     const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
@@ -340,10 +358,6 @@ const interviewTypes = [
         //seting selected candidate
         setSelectedCandidateForManaging(candidate)
         setControlBarOpen(true)
-    }
-
-    const navigateToUserPublicProfile = (userId: string) => {
-        navigator(`/users/${userId}`, {state:{userId: userId}})
     }
 
     const updateStatus = async (e: any) => {
@@ -475,21 +489,22 @@ const interviewTypes = [
             setLoading(true);
             try {
                 const [appResult] = await Promise.all([
-                    getApplicationDetails(jobId),
+                    getApplicationDetails(jobId, search, page, limit, filter)
                     //getJobDetails(jobId)
                 ]);
 
                 if (appResult?.success) {
                     console.log('--checking inner value of data--', appResult.result)
-                    setJob(appResult?.result[0].job.jobTitle)
-                    setApplications(appResult.result);
-                    setApplied(filterApplications(appResult.result, "applied"))
-                    setScreening(filterApplications(appResult.result, "screening"))
-                    setInterview(filterApplications(appResult?.result, "interview"))
-                    setOffer(filterApplications(appResult?.result, "offer"))
-                    setHired(filterApplications(appResult?.result, "hired"))
-                    setRejected(filterApplications(appResult?.result, "rejected"))
-                    setAppCount(appResult?.result?.length)
+                    setApplications(appResult.result.applications)
+                    // setJob(appResult?.result[0].job.jobTitle)
+                    // setApplications(appResult.result);
+                    // setApplied(filterApplications(appResult.result, "applied"))
+                    // setScreening(filterApplications(appResult.result, "screening"))
+                    // setInterview(filterApplications(appResult?.result, "interview"))
+                    // setOffer(filterApplications(appResult?.result, "offer"))
+                    // setHired(filterApplications(appResult?.result, "hired"))
+                    // setRejected(filterApplications(appResult?.result, "rejected"))
+                    // setAppCount(appResult?.result?.length)
                 } else {
                     Notify.failure(appResult?.message || "Could not fetch applications.");
                 }
@@ -500,12 +515,13 @@ const interviewTypes = [
                //     Notify.failure(jobResult?.message || "Could not fetch job details.");
                 //}
             } catch (error) {
+                console.log('Checking error while fetching data --', error)
                 Notify.failure("An error occurred while fetching data.");
             } finally {
                 setLoading(false);
             }
         })()
-    }, [])
+    }, [search, page, filter])
     //checking problem here..............
     useEffect(() => {
         if(selectedCandidateForManaging?._id){
@@ -519,824 +535,379 @@ const interviewTypes = [
         })()
         }
     }, [notes])
+    
+    return (
+        <>
+        <div className="px-5 py-15 lg:px-20 py-10">
+            <div>
+                <button className="flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1 rounded-md hover:bg-gray-200">
+                    <BsArrowLeft />
+                    <p>Back</p>
+                </button>
+            </div>
+            <div>
+                <p className="font-semibold text-xl">Manage Candidates</p>
+                <p className="text-xs text-gray-500 mt-1"><span className="text-sm font-semibold text-black">Senior Accountant</span> 15 candidates applied for this role</p>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuFileArchive color="blue" />
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Applied</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuPhone  color="blue"/>
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Screening</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuCalendar color="blue" />
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Interview</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuSend color="blue" />
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Offer</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuUserCheck color="blue" />
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Hired</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
+                    <div className="flex items-center gap-2">
+                        <LuUserX color="blue" />
+                        <p className="text-xl">0</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Rejected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-5 bg-white border border-slate-200 rounded-md p-2 grid grid-cols-12 gap-2">
+                <div className="col-span-12 lg:col-span-6 bg-gray-100 p-2 rounded flex items-center gap-2">
+                    <LuSearch color="gray" />
+                    <input className="w-full !text-xs" type="text" placeholder="Search name, email" />
+                </div>
+                <div className="col-span-12 lg:col-span-3 relative">
+                    <div className="flex items-center justify-between w-full bg-gray-100 rounded-md p-2">
+                        <p className="text-xs font-medium">{filter}</p>
+                        {isFilterMenuOpened
+                            ? <button onClick={() => setIsFilterMenuOpened(false)}><BiChevronUp size={20} /></button>
+                            : <button onClick={() => setIsFilterMenuOpened(true)}><BiChevronDown size={20} /></button>
+                        }
+                    </div>
+                    {isFilterMenuOpened && (
+                        <div className="absolute border w-full border border-slate-200 rounded-md bg-white">
+                            {Array.from(['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected']).map((item, index) => (
+                                <button onClick={() => {setFilter(item); setIsFilterMenuOpened(false)}} className="w-full text-xs font-medium p-2 hover:bg-gray-100">{item}</button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="col-span-12 lg:col-span-3">
+                    <button disabled className="flex w-full justify-center p-2 border border-slate-300 rounded-md hover:bg-blue-100 items-center gap-2 text-xs font-medium">
+                        <LuSparkles color="blue" size={18} />
+                        <p className="text-indigo-500">Smart Filter</p>
+                    </button>
+                </div>
+            </div>
+
+            <div className="mt-5">
+                {applications && applications.length > 0 
+                    ? <>
+                        <div className="grid grid-cols-1 gap-3">
+                            {applications.map((application: JobApplicationsListForRecruiter) => (
+                                <div onClick={() => openControlBarMenu(application._id as string)} key={application._id} className="bg-white p-5 cursor-pointer hover:ring-1 hover:ring-blue-500 hover:shadow rounded-md border border-slate-200 flex gap-3">
+                                    <div>
+                                        <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-12 h-12 rounded-full flex items-center justify-center">
+                                            <LuFileUser color="white" size={22} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold">{application.candidateDetails?.name}</p>
+                                        <p className="text-sm text-gray-500">{application.candidateDetails?.headline}</p>
+                                        <div className="flex flex-col md:flex-row mt-3 gap-2">
+                                            <span className="flex items-center gap-1">
+                                                <BiEnvelope size={12} color="gray" />
+                                                <p className="text-xs text-gray-500">{application.candidateDetails?.email}</p>
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <LuMapPin size={12} color="gray" />
+                                                <p className="text-xs text-gray-500">{application.candidateDetails?.location}</p>
+                                            </span>
+                                        </div>
+                                        <span className="!mt-5 flex items-center gap-2 block">
+                                            <LuCalendar size={13} color="gray" />
+                                            <p className="text-xs text-gray-500">Applied on {formattedDateMoment(application.createdAt, "MMM DD YYYY")}</p>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <StatusPhills status={application.status as string} />
+                                        <p className="flex items-center gap-1 text-xs mt-2">
+                                            <BiStar size={16} />
+                                            {application.candidateDetails?.match} % Match
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                            <p className="text-xs text-gray-700">Showing page {page} of {totalPages} pages</p>
+                            <div className="space-x-2">
+                                <button className="bg-white border border-slate-300 px-3 py-2 text-xs rounded-md" disabled={page === 1}>Prev</button>
+                                <button className="bg-blue-500 px-3 py-2 text-xs text-white rounded-md" disabled={page >= totalPages}>Next</button>
+                            </div>
+                        </div>
+                      </>
+                    : <>
+                        <div className="flex flex-col items-center">
+                            <FaUsersSlash size={40} color="gray" />
+                            <p className="text-xs text-gray-500 mt-3">No Applications Received</p>
+                        </div>
+                      </>
+                }
+            </div>
+        </div>
+        {isControlBarMenuOpen && (
+            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} />
+        )}
+        
+        </>
+    )
+}
+
+export function StatusPhills({status}: {status: string}){
+    switch(status){
+        case 'applied':
+            return <span className="bg-blue-200 text-xs px-3 rounded-full text-blue-700">{status}</span>
+    }
+}
+
+export function ControlBarModal({open, applicationId, onClose}: {open: boolean, applicationId: string, onClose: () => void}){
+    const [isStatusMenuOpened, setIsStatusMenuOpened] = useState(false)
+    const [applicationDetails, setApplicationDetails] = useState<SingleJobApplicationDetailsData | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
+
+
+    const navigate = useNavigate()
+
+    const navigateToUserPublicProfile = (userId: string) => {
+        if(!userId) return
+        navigate(`/users/${userId}`, {state:{userId: userId}})
+    }
+
+    useEffect(() => {
+        async function fetchSingleApplicationDetails(){
+            setLoading(true)
+            try {
+                const result = await getSingleApplicationDetails(applicationId)
+                if(result.success){
+                    Notify.success('Application details loaded')
+                    setApplicationDetails(result.result)
+                }
+
+            } catch (error) {
+                Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        if(applicationId){
+            fetchSingleApplicationDetails()
+        }
+    }, [applicationId])
+    
+
+    const toggleStatusMenu = () => setIsStatusMenuOpened(prv => !prv)
 
     return(
         <>
-        {/* <div className="absolute border top-20 left-2 border-gray-200 rounded-md shadow-lg bg-white w-md h-400px">
-            <p>status: {selectedCandidateForManaging?.status || 'null'}</p>
-        </div> */}
-        {loading && <Loader />}
-        <div className="bg-gray-50 min-h-screen p-5 lg:px-10">
-            <p className="font-light">Manage Candidate</p>
-            <p className="text-xs text-gray-500 mt-1">{job} {applications.length} candiadates</p>
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <LuUser />
-                        <p className="mt-3">Applied</p>
+            <Modal className="flex flex-col items-end" open={open} onClose={onClose}>
+                <div className="bg-white min-h-screen overflow-y-auto w-100 p-5">
+                    <div className="header flex justify-between items-center">
+                        <p className="font-semibold text-md">Applicant Details</p>
+                        <button onClick={onClose} className="hover:bg-gray-100"><LuCircleX size={20} /></button>
                     </div>
-                    <div>
-                        <p>{applications.length}</p>
-                    </div>
-                </div>
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <LuPhone color="gray" />
-                        <p className="mt-3">Screening</p>
-                    </div>
-                    <div>
-                        <p>{screening.length}</p>
-                    </div>
-                </div>
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <LuMessageCircle />
-                        <p className="mt-3">Interview</p>
-                    </div>
-                    <div>
-                        <p>{interview.length}</p>
-                    </div>
-                </div>
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <BiSend />
-                        <p className="mt-3">Offer</p>
-                    </div>
-                    <div>
-                        <p>{offer.length}</p>
-                    </div>
-                </div>
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <CiCircleCheck />
-                        <p className="mt-3">Hired</p>
-                    </div>
-                    <div>
-                        <p>{hired.length}</p>
-                    </div>
-                </div>
-                <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
-                    <div className="flex-1">
-                        <FaRegCircleXmark />
-                        <p className="mt-3">Rejected</p>
-                    </div>
-                    <div>
-                        <p>{rejected.length}</p>
-                    </div>
-                </div>
-            </div>
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-3">
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Applied</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{applied.length}</div>
-                    </div>
-                    {
-                        applied.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromApplied(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+                    {applicationDetails && (
+                    <div className="body mt-5">
                         <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+                            <div className="w-13 h-13 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                                <LuUser color="white" size={25} />
                             </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                                <p>Status: {app.status}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-{/* che................ */}
-                {/* screening */}
-                
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Screening</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{screening.length}</div>
-                    </div>
-                    {
-                        screening.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromScreening(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
-                        <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
-                                <p>Status: {app.status}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-
-                {/* interview */}
-
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Interview</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{interview.length}</div>
-                    </div>
-                    {
-                        interview.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromInterview(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
-                        <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                                <p>Status: {app.status}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-
-                {/* offer */}
-
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Offer</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{offer.length}</div>
-                    </div>
-                    {
-                        offer.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromOffer(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
-                        <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                                <p>Status: {app.status}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-
-                {/* hired */}
-
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Hired</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{hired.length}</div>
-                    </div>
-                    {
-                        hired.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromHired(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
-                        <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                                <p>Status: {app.status}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-
-                {/* Rejected  */}
-                
-                <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
-                    <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <LuUsers />
-                            <p>Rejected</p>
-                        </div>
-                        <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{rejected.length}</div>
-                    </div>
-                    {
-                        rejected.map((app: ApplicationsAggregated) => (
-                            <div onClick={() => selectOneFromRejected(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
-                        <div className="flex gap-2">
-                            <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
-                            <div className="flex-1">
-                                <p className="text-sm font-light">{app.applicant.name}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.headline}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
-                                <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
-                            </div>
-                        <div className="border border-gray-200 my-2"></div>
-                        <div className="mt-3 flex justify-end">
-                            <p className="text-xs text-gray-500">
-                                {formatDate(app.createdAt)}
-                            </p>
-                        </div>
-                    </div>
-                        ))
-                    }
-                </div>
-                
-                
-                
-            </div>
-            {/* <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
-                {/* Header */}
-                {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800">{jobDetails?.jobTitle || 'Loading...'}</h1>
-                    <p className="text-gray-500">{jobDetails?.location}</p>
-                    <div className="flex items-center gap-6 mt-4 text-sm text-gray-600">
-                        <span className="font-medium">Total Applicants: <span className="text-blue-600">{applications.length + shortList.length}</span></span>
-                        <span className="font-medium">Shortlisted: <span className="text-green-600">{shortList.length}</span></span>
-                    </div>
-                </div> */}
-
-                {/* Main Content Grid */}
-                {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> */}
-                    {/* New Applications Column */}
-                    {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-semibold text-gray-700">New Applicants ({applications.length})</h2>
-                            <div className="flex items-center gap-2">
-                                <button onClick={selectAllCard} className="text-xs font-medium text-blue-600 hover:underline">Select All</button>
-                                {selectionMode && <button onClick={unselectAllCard} className="text-xs font-medium text-red-600 hover:underline">Cancel</button>}
+                            <div>
+                                <p className="font-medium text-sm">{applicationDetails.candidateDetails?.name}</p>
+                                <p className="text-xs text-gray-500">{applicationDetails.candidateDetails?.headline}</p>
                             </div>
                         </div>
-                        {selectionMode && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex items-center justify-between">
-                                <p className="text-sm font-medium text-blue-800">{selectedCards.length} selected</p>
-                                <button onClick={handleShortlistAll} className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-md hover:bg-blue-700">
-                                    Shortlist Selected
-                                </button>
-                            </div>
-                        )} */}
-                        {/* <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                            {applications.length > 0 ? applications.map((applicant, index) => (
-                                <ApplicantCard 
-                                    key={index} 
-                                    isSelected={selectedCards.includes(applicant?._id)} 
-                                    selectionMode={selectionMode} 
-                                    applicationData={applicant} 
-                                    defaultProfile={defaultProfile} 
-                                    selectFromOption={() => selectFromOption(applicant?._id)}
-                                    toggleCardSelection={() => toggleCardSelection(applicant?._id)}
-                                    shortList={() => handleShortlistSingle(applicant._id)}
-                                    buttonOptions={['Add to shortlist', 'Select tile', 'Reject application']}
-                                    flag={'applicationList'}
-                                    reject={() => rejectIndividualCandidate(applicant?.applicantDetails._id, applicant._id)} 
-                                />
-                            )) : (
-                                <div className="text-center py-10">
-                                    <i className="fa-solid fa-inbox text-3xl text-gray-400"></i>
-                                    <p className="mt-2 text-sm text-gray-500">No new applications.</p>
+                        <div className="div mt-5">
+                            <p className="text-xs text-gray-700">Application Status</p>
+                            <div className="relative">
+                                <div className="flex items-center justify-between bg-blue-200 px-2 py-2 rounded-md border border-blue-400 mt-1">
+                                    <p className="text-xs font-medium">{applicationDetails.status}</p>
+                                    {isStatusMenuOpened
+                                        ? <button onClick={() => setIsStatusMenuOpened(false)}><BiChevronUp size={20} /></button>
+                                        : <button onClick={() => setIsStatusMenuOpened(true)}><BiChevronDown size={20} /></button>
+                                    }
                                 </div>
-                            )}
+                                {isStatusMenuOpened && (
+                                    <div className="bg-white w-full rounded-md border border-slate-200 shadow">
+                                        {Array.from(["applied", "screening", "interview", "offer", "hired", "rejected"]).map((status, index) => (
+                                            <button className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">{status}</button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div> */}
-
-                    {/* Shortlisted Column */}
-                    {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-semibold text-gray-700">Shortlisted ({shortList.length})</h2>
-                            {shortList.length > 0 && (
-                                <button onClick={finalizeShortlistMethod} className="bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-md hover:bg-green-700">
-                                    Finalize Shortlist
-                                </button>
-                            )}
+                        <div className="mt-5 bg-orange-100 p-5 rounded-md ring-1 ring-orange-500">
+                            <div className="flex justify-between items-center text-xs font-medium w-full">
+                                <p>Profile Match</p>
+                                <p>86%</p>
+                            </div>
+                            <div className="border border-slate-200 rounded-md w-full h-3 mt-1 bg-white">
+                                <div className="h-full bg-orange-500 rounded-md w-[86%]"></div>
+                            </div>
                         </div>
-                        <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                            {shortList.length > 0 ? shortList.map((application, index) => (
-                                <ApplicantCard 
-                                    key={index} 
-                                    applicationData={application} 
-                                    defaultProfile={defaultProfile}
-                                    buttonOptions={['Remove','Interview email', 'Reject']} 
-                                    flag={'shortList'}
-                                    removeFromShortlist={() => handleRemoveFromShortList(application._id)} 
-                                />
-                            )) : (
-                                <div className="text-center py-10">
-                                    <i className="fa-solid fa-star text-3xl text-gray-400"></i>
-                                    <p className="mt-2 text-sm text-gray-500">No candidates shortlisted yet.</p>
+                        <div className="mt-5">
+                            <p className="text-sm font-semibold">Contact Information</p>
+                            <div className="mt-1 space-y-2">
+                                <div className="border border-slate-200 rounded-md flex gap-2 p-3">
+                                    <div><BiEnvelope size={20} color="gray" /></div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Email</p>
+                                        <p className="text-xs">{applicationDetails.candidateDetails?.email}</p>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div> */}
-        </div>
-
-       {/* Controlbar */}
-       {controlBarOpen && (
-        <>
-          {/* Overlay */}
-          <div
-            onClick={() => setControlBarOpen(false)}
-            className="fixed inset-0 bg-black opacity-50 z-40 transition-opacity"
-            aria-hidden="true"
-          ></div>
-
-          {/* Panel */}
-          <div className="bg-white fixed right-0 top-0 shadow-xl w-90 h-screen overflow-y-auto z-50 flex flex-col">
-            {/* Panel Header */}
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
-                <h2 className="text-lg font-semibold text-gray-800">Applicant Details</h2>
-                <button 
-                    onClick={() => setControlBarOpen(false)} 
-                    className="text-gray-500 hover:text-gray-800 transition-colors"
-                >
-                    <FaRegCircleXmark size={22} />
-                </button>
-            </div>
-            {/* Panel Body (Your content goes here) */}
-            <div className="p-4">
-                <div className="flex gap-2">
-                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-sm">
-                        <p className="text-white">U</p>
-                    </div>
-                    <div>
-                        <p className="text-sm text-gray-700 font-light">{selectedCandidateForManaging?.applicant.name}</p>
-                        <p className="text-xs text-gray-500">{selectedCandidateForManaging?.applicant.headline}</p>
-                    </div>
-                </div>
-
-                <div className="mt-5">
-                    <select onChange={(e) => updateStatus(e)} className="border border-blue-500 rounded-md p-2 w-full text-sm bg-blue-100">
-                        {
-                            <option value={selectedCandidateForManaging?.status}>{`${selectedCandidateForManaging?.status[0].toUpperCase()}${selectedCandidateForManaging?.status.slice(1)}`}</option>
-                        }
-                        {
-                            selectedCandidateForManaging?.status === 'applied' && (<option value="applied">Applied</option>)
-                        }
-                        {
-                            (selectedCandidateForManaging?.status === 'applied' ||
-                            selectedCandidateForManaging?.status === 'screening') && (
-                                <option value="screening">Screening</option>
-                            )
-                        }
-                        {
-                            (selectedCandidateForManaging?.status === 'applied' ||
-                            selectedCandidateForManaging?.status === 'screening' ||
-                            selectedCandidateForManaging?.status === 'interview'
-                            ) && (
-                                <option value="interview">Interview</option>
-                            )
-                        }
-                        {
-                            (selectedCandidateForManaging?.status === 'applied' ||
-                            selectedCandidateForManaging?.status === 'screening' ||
-                            selectedCandidateForManaging?.status === 'interview' ||
-                            selectedCandidateForManaging?.status === 'offer'
-                            ) && (
-                                <option value="offer">Offer</option>
-                            )
-                        }
-                        {
-                            (selectedCandidateForManaging?.status === 'applied' ||
-                            selectedCandidateForManaging?.status === 'screening' ||
-                            selectedCandidateForManaging?.status === 'interview' ||
-                            selectedCandidateForManaging?.status === 'offer' ||
-                            selectedCandidateForManaging?.status === 'rejected'
-                            ) && (
-                                <option value="rejected">Rejected</option>
-                            )
-                        }
-                        {
-                            (selectedCandidateForManaging?.status === 'applied' ||
-                            selectedCandidateForManaging?.status === 'screening' ||
-                            selectedCandidateForManaging?.status === 'interview' ||
-                            selectedCandidateForManaging?.status === 'offer' ||
-                            selectedCandidateForManaging?.status === 'hired'
-                            ) && (
-                                <option value="hired">Hired</option>
-                            )
-                        }
-                        
-                    </select>
-                </div>
-
-                <div className="mt-5">
-                    <p className="font-light">Contact Information</p>
-                    <div className="mt-2 space-y-2">
-                        <div className="flex gap-2">
-                            <BiEnvelope color="gray" />
-                            <div>
-                                <p className="text-sm font-light">Email</p>
-                                <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.email}</p>
+                                <div className="border border-slate-200 rounded-md flex gap-2 p-3">
+                                    <div><LuPhone size={20} color="gray" /></div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Phone</p>
+                                        <p className="text-xs">{applicationDetails.candidateDetails?.phone}</p>
+                                    </div>
+                                </div>
+                                <div className="border border-slate-200 rounded-md flex gap-2 p-3">
+                                    <div><LuMapPin size={20} color="gray" /></div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Location</p>
+                                        <p className="text-xs">{applicationDetails.candidateDetails?.location}</p>
+                                    </div>
+                                </div>
                             </div>
-                            
                         </div>
-                        <div className="flex gap-2">
-                            <IoCall color="gray" />
-                            <div>
-                                <p className="text-sm font-light">Phone</p>
-                                <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.phone}</p>
-                            </div>
-                            
-                        </div>
-                        <div className="flex gap-2">
-                            <IoLocation color="gray" />
-                            <div>
-                                <p className="text-sm font-light">Location</p>
-                                <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.location?.district}, {selectedCandidateForManaging?.applicant.location?.state}</p>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
 
-                <div className="mt-5">
-                    <p className="font-light">Professional Details</p>
-                    <div className="mt-2 space-y-2">
-                        <div>
-                            <p className="font-medium text-sm">Expreiences</p>
+                        <div className="mt-5">
+                            <p className="text-sm font-semibold">Professional Informations</p>
+                            <p className="text-xs uppercase text-gray-600">experience</p>
                             <div className="mt-1 space-y-2">
-                                {
-                                    selectedCandidateForManaging?.experiences &&
-                                    selectedCandidateForManaging?.experiences?.length > 0 && (
-                                        selectedCandidateForManaging?.experiences?.map((exp: Experience) => (
-                                            <>
-                                                <div key={exp._id} className="flex gap-2">
-                                                    <PiSuitcase />
-                                                    <div>
-                                                        <p className="text-sm font-light">{exp.jobRole}</p>
-                                                        <p className="text-xs text-gray-500">{exp.organization}</p>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ))
-                                    )
-                                }{
-                                    selectedCandidateForManaging?.experiences &&
-                                    selectedCandidateForManaging?.experiences?.length === 0 && (
-                                        <p>No experiences</p>
-                                    )
-                                }
+                                {applicationDetails.experiences && applicationDetails.experiences.length > 0 && (
+                                    applicationDetails.experiences.map((experience: Experience) => (
+                                        <div key={experience._id} className="border border-slate-200 rounded-md flex gap-2 p-3">
+                                    <div><BiBriefcase size={20} color="gray" /></div>
+                                    <div>
+                                        <p className="text-xs">{experience.jobRole}</p>
+                                        <p className="text-xs text-gray-500">{experience.organization}</p>
+                                        <p className="text-xs font-semibold mt-1">2 Years</p>
+                                    </div>
+                                </div>
+                                    ))
+                                )}
+                                {applicationDetails.experiences?.length === 0 && (
+                                    <p className="text-xs text-gray-500 text-center">No Experience Added</p>
+                                )}
                             </div>
                         </div>
-                        <div>
-                            <p className="font-medium text-sm">Educations</p>
+
+                         <div className="mt-5">
+                            <p className="text-xs uppercase text-gray-600">education</p>
                             <div className="mt-1 space-y-2">
-                                {
-                                    selectedCandidateForManaging?.educations &&
-                                    selectedCandidateForManaging?.educations?.length > 0 && (
-                                        selectedCandidateForManaging?.educations?.map((edu: Education) => (
-                                            <>
-                                                <div key={edu._id} className="flex gap-2">
-                                                    <FaGraduationCap />
-                                                    <div>
-                                                        <p className="text-sm font-light">{edu.educationStream}</p>
-                                                        <p className="text-xs text-gray-500">{edu.institution}</p>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ))
-                                    )
-                                }
+                                {applicationDetails.educations && applicationDetails.educations.length > 0 && (
+                                    applicationDetails.educations.map((education: Education) => (
+                                        <div key={education._id} className="border border-slate-200 rounded-md flex gap-2 p-3">
+                                    <div><LuGraduationCap size={20} color="gray" /></div>
+                                    <div>
+                                        <p className="text-xs">{education.educationStream}</p>
+                                        <p className="text-xs text-gray-500">{education.institution}</p>
+                                    </div>
+                                </div>
+                                    ))
+                                )}
+                                {applicationDetails.educations?.length === 0 && (
+                                    <p className="text-xs text-gray-500 text-center">No Education Added</p>
+                                )}
                             </div>
                         </div>
-                        <div className="mt-3">
-                            <p className="font-medium text-sm">Skills</p>
-                            <div className="flex flex-wrap mt-2 gap-2">
-                                {
-                                    selectedCandidateForManaging?.skills &&
-                                    selectedCandidateForManaging?.skills?.length > 0 && (
-                                        selectedCandidateForManaging.skills.map((s: Skills) => (
-                                            <>
-                                                <span className="text-xs text-blue-500 bg-blue-100 rounded-md px-3 py-1" key={s._id}>
-                                                    {s.skill}
-                                                </span>
-                                            </>
-                                        ))
-                                    )
-                                }
-                            </div>
+
+                        <div className="mt-5">
+                            <p className="text-xs uppercase text-gray-600">skills</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                                {applicationDetails.skills && applicationDetails.skills.length > 0 && (
+                                    applicationDetails.skills.map((skill) => (
+                                    <span key={skill._id} className="text-xs px-3 bg-blue-200 text-blue-700 rounded-md">{skill.skill}</span>
+                                ))
+                                )}
+                                
+                            </div> 
+                            {applicationDetails.skills?.length === 0 && (
+                                    <p className="text-xs text-center text-gray-500">No Skills added</p>
+                                )}
                         </div>
+
+                        <div className="mt-5">
+                     <p className="font-light">Notes</p>
+                     <textarea onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+                 </div>
+                 <div className="mt-5 space-y-2">
+                     <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
+                     <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button>
+                     <div onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</div>
+                     <div onClick={() => navigateToUserPublicProfile(applicationDetails.candidateDetails?._id as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</div>
+                 </div>
                     </div>
-                </div>
-
-                <div className="mt-5">
-                    <p className="font-light">Notes</p>
-                    <textarea onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
-                </div>
-                <div className="mt-5 space-y-2">
-                    <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
-                    <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button>
-                    <div onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</div>
-                    <div onClick={() => navigateToUserPublicProfile(selectedCandidateForManaging?.candidateId as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</div>
-                </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {
-        scheduleInterviewModalOpen && (
-            <Modal className="flex flex-col items-center justify-center" open={scheduleInterviewModalOpen} onClose={() => setScheduleInterviewModalOpen(false)}>
-                <div className="p-5 bg-white shadow-xl rounded-md w-md lg:w-lg">
-                    <div className="header w-full items-center flex justify-between">
-                        <p>Schedule Interview</p>
-                        <button onClick={() => setScheduleInterviewModalOpen(false)}>
-                            <FaRegCircleXmark />
-                        </button>
-                    </div>
-                    <div className="mt-2 bg-blue-100 flex gap-3 w-full p-3">
-                        <div className="bg-blue-500 w-10 h-10 flex items-center justify-center text-sm text-white rounded-full">
-                            <p>U</p>
-                        </div>
-                        <div>
-                            <p className="text-sm">Name of the can</p>
-                            <p className="text-xs">Headline if</p>
-                        </div>
-                    </div>
-
-                    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{ maxWidth: 500, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}
-    >
-      {/* Date */}
-      <FormControl error={Boolean(errors.date)}>
-        <Controller
-        name="date"
-        control={control}
-        rules={{ required: "Date is required" }}
-        render={({ field }) => (
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['DateField']}>
-                <DateField
-            label="Interview Date"
-            {...field}
-            error={Boolean(errors.date)}
-            onChange={(fieldVAlue) => field.onChange(fieldVAlue)} value={field.value}
-            slotProps={{
-              textField: { fullWidth: true }
-            }}
-          />
-            </DemoContainer>
-          </LocalizationProvider>
-        )}
-      />
-      <FormHelperText>{errors.date?.message}</FormHelperText>
-      </FormControl>
-
-      {/* Time */}
-      <FormControl>
-        <Controller
-        name="time"
-        control={control}
-        rules={{ required: "Time is required" }}
-        render={({ field }) => (
-          <TextField
-                label="Interview Time"
-                type="time"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                {...field}
-                error={Boolean(errors.time)}
-                helperText={errors.time?.message}
-              />
-        )}
-      />
-      </FormControl>
-
-      {/* Interview Type */}
-      <FormControl error={Boolean(errors.interviewType)}>
-        <Controller
-        name="interviewType"
-        control={control}
-        rules={{ required: "Interview type is required" }}
-        render={({ field }) => (
-          <TextField select label="Interview Type" fullWidth {...field} error={Boolean(errors.interviewType)} helperText={errors.interviewType?.message}>
-            {interviewTypes.map(type => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-      />
-      </FormControl>
-
-      {/* Google Meet URL */}
-      <FormControl error={Boolean(errors.gmeetUrl)}>
-        <Controller
-        name="gmeetUrl"
-        control={control}
-        rules={{ required: "Google Meet URL is required" }}
-        render={({ field }) => (
-          <TextField
-            label="Google Meet URL"
-            fullWidth
-            {...field}
-            error={Boolean(errors.gmeetUrl)}
-            helperText={errors.gmeetUrl?.message}
-          />
-        )}
-      />
-      </FormControl>
-
-      {/* Interviewer Name */}
-      <FormControl error={Boolean(errors.interviewerName)}>
-        <Controller
-        name="interviewerName"
-        control={control}
-        rules={{ required: "Interviewer name is required" }}
-        render={({ field }) => (
-          <TextField
-            label="Interviewer Name"
-            fullWidth
-            {...field}
-            error={Boolean(errors.interviewerName)}
-            helperText={errors.interviewerName?.message}
-          />
-        )}
-      />
-      </FormControl>
-
-      {/* Note */}
-      <Controller
-        name="note"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Note"
-            multiline
-            rows={4}
-            fullWidth
-            {...field}
-          />
-        )}
-      />
-
-      {/* Checkbox */}
-      <Controller
-        name="sendEmail"
-        control={control}
-        render={({ field }) => (
-          <FormControlLabel
-            control={<Checkbox {...field} checked={field.value} />}
-            label="Send email invitation to the email also"
-          />
-        )}
-      />
-
-      {/* Submit Button */}
-      <Button variant="contained" type="submit" fullWidth>
-        Submit
-      </Button>
-    </Box>
+                    )}
+                    {!applicationDetails && (
+                        <p className="text-center text-xs text-gray">No Application details found</p>
+                    )}
+                 {/**This is body ending */}
                 </div>
             </Modal>
-        )
-      }
 
-
-      {/* Modal for viewing resume */}
-
-      {
+            {
         pdfViewerOpened && (
             <Modal className="flex flex-col items-center justify-center" open={pdfViewerOpened} onClose={() => SetPdfViewerOpen(false)}>
                 <div className="bg-white p-5 overflow-y-scroll max-h-lg w-2xl rounded-md shadow-lg">
                     <div className="header flex justify-end">
                         <button onClick={() => SetPdfViewerOpen(false)}><FaRegCircleXmark /></button>
                     </div>
-                    <ViewPDFDocument fileUrl={selectedCandidateForManaging?.resume?.resumeUrlCoudinary} />
-                </div>
-            </Modal>
-        )
-      }
-
-
-      {/* Modal for email  */}
-      {
-        emailModalOpen && (
-            <Modal className="flex flex-col items-center justify-center" open={true} onClose={() => setEmailModalOpen(false)}>
-                <div className="bg-white shadow-xl rounded-md w-md md:w-lg">
-                    <div className="header p-3 bg-blue-50 rounded-md flex justify-between">
-                        <p className="font-medium text-sm text-gray-700">Send Email</p>
-                        <button onClick={() => setEmailModalOpen(false)}><FaXmark color="black" /></button>
-                    </div>
-                    <div className="body bg-white p-3 rounded-b-md">
-                        <form onSubmit={handleEmailContentsSubmit(() => console.log(''))}>
-                            <FormControl fullWidth>
-                               <Controller
-                                    name="to"
-                                    control={EmailContentsControl} 
-                                    render={({field}) => (
-                                        <div className="border-b w-full border-gray-300">
-                                            <input {...field} className="!text-xs text-gray-700 w-full" placeholder="To: example@gmail.com" type="text" />
-                                        </div>
-                                    )}
-                               />
-                            </FormControl>
-
-                            <FormControl fullWidth className="!mt-3">
-                                <Controller 
-                                    name="subject"
-                                    control={EmailContentsControl}
-                                    render={({field}) => (
-                                        <div className="border-b w-full border-gray-300">
-                                            <input {...field} type="text" placeholder="Subject" className="!text-xs text-gray-700 w-full" />
-                                        </div>
-                                    )}
-                                />
-                            </FormControl>
-
-                            <FormControl className="!mt-5" fullWidth>
-                                <Controller 
-                                    name="body"
-                                    control={EmailContentsControl}
-                                    render={({field}) => (
-                                        <div>
-                                            <textarea placeholder="Dear name,.." {...field} className="w-full outline-none text-xs text-gray-700" rows={20} />
-                                        </div>
-                                    )}
-                                />
-                            </FormControl>
-                            <div className="file-attachments"></div>
-                            <div className="flex items-center gap-3">
-                                <button type="submit" className="flex items-center gap-2 bg-blue-700 text-white text-sm font-light px-3 py-1 rounded-full">
-                                    <p>Send</p>
-                                    <BiSend />
-                                </button>
-                                <button className="text-gray-700">
-                                    <HiPaperClip />
-                                </button>
-                                <button className="text-gray-700">
-                                    <BiTrash />
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <ViewPDFDocument fileUrl={applicationDetails?.resumeDetails?.url as string} />
                 </div>
             </Modal>
         )
@@ -1344,3 +915,826 @@ const interviewTypes = [
         </>
     )
 }
+//     return(
+//         <>
+//         {/* <div className="absolute border top-20 left-2 border-gray-200 rounded-md shadow-lg bg-white w-md h-400px">
+//             <p>status: {selectedCandidateForManaging?.status || 'null'}</p>
+//         </div> */}
+//         {loading && <Loader />}
+//         <div className="bg-gray-50 min-h-screen p-5 lg:px-10">
+//             <p className="font-light">Manage Candidate</p>
+//             <p className="text-xs text-gray-500 mt-1">{job} {applications.length} candiadates</p>
+//             <div className="mt-10 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <LuUser />
+//                         <p className="mt-3">Applied</p>
+//                     </div>
+//                     <div>
+//                         <p>{applications.length}</p>
+//                     </div>
+//                 </div>
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <LuPhone color="gray" />
+//                         <p className="mt-3">Screening</p>
+//                     </div>
+//                     <div>
+//                         <p>{screening.length}</p>
+//                     </div>
+//                 </div>
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <LuMessageCircle />
+//                         <p className="mt-3">Interview</p>
+//                     </div>
+//                     <div>
+//                         <p>{interview.length}</p>
+//                     </div>
+//                 </div>
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <BiSend />
+//                         <p className="mt-3">Offer</p>
+//                     </div>
+//                     <div>
+//                         <p>{offer.length}</p>
+//                     </div>
+//                 </div>
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <CiCircleCheck />
+//                         <p className="mt-3">Hired</p>
+//                     </div>
+//                     <div>
+//                         <p>{hired.length}</p>
+//                     </div>
+//                 </div>
+//                 <div className="border border-gray-200 bg-white rounded-md shadow-sm p-3 flex">
+//                     <div className="flex-1">
+//                         <FaRegCircleXmark />
+//                         <p className="mt-3">Rejected</p>
+//                     </div>
+//                     <div>
+//                         <p>{rejected.length}</p>
+//                     </div>
+//                 </div>
+//             </div>
+//             <div className="mt-10 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-3">
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Applied</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{applied.length}</div>
+//                     </div>
+//                     {
+//                         applied.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromApplied(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                                 <p>Status: {app.status}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+// {/* che................ */}
+//                 {/* screening */}
+                
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Screening</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{screening.length}</div>
+//                     </div>
+//                     {
+//                         screening.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromScreening(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                                 <p>Status: {app.status}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+
+//                 {/* interview */}
+
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Interview</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{interview.length}</div>
+//                     </div>
+//                     {
+//                         interview.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromInterview(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                                 <p>Status: {app.status}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+
+//                 {/* offer */}
+
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Offer</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{offer.length}</div>
+//                     </div>
+//                     {
+//                         offer.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromOffer(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                                 <p>Status: {app.status}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+
+//                 {/* hired */}
+
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Hired</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{hired.length}</div>
+//                     </div>
+//                     {
+//                         hired.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromHired(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                                 <p>Status: {app.status}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+
+//                 {/* Rejected  */}
+                
+//                 <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+//                     <div className="flex justify-between">
+//                         <div className="flex gap-2 items-center">
+//                             <LuUsers />
+//                             <p>Rejected</p>
+//                         </div>
+//                         <div className="border border-gray-200 bg-white w-6 h-6 rounded-full flex items-center justify-center">{rejected.length}</div>
+//                     </div>
+//                     {
+//                         rejected.map((app: ApplicationsAggregated) => (
+//                             <div onClick={() => selectOneFromRejected(app._id as string)} className="mt-3 bg-white border border-gray-200 rounded-md p-3">
+//                         <div className="flex gap-2">
+//                             <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center text-sx rounded-full">U</div>
+//                             <div className="flex-1">
+//                                 <p className="text-sm font-light">{app.applicant.name}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.headline}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="mt-3">
+//                                 <p className="text-xs font-medium text-gray-700">{app.applicant.email}</p>
+//                                 <p className="text-xs text-gray-500">{app.applicant.location?.city}, {app.applicant.location.state}</p>
+//                             </div>
+//                         <div className="border border-gray-200 my-2"></div>
+//                         <div className="mt-3 flex justify-end">
+//                             <p className="text-xs text-gray-500">
+//                                 {formatDate(app.createdAt)}
+//                             </p>
+//                         </div>
+//                     </div>
+//                         ))
+//                     }
+//                 </div>
+                
+                
+                
+//             </div>
+//             {/* <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
+//                 {/* Header */}
+//                 {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
+//                     <h1 className="text-2xl font-bold text-gray-800">{jobDetails?.jobTitle || 'Loading...'}</h1>
+//                     <p className="text-gray-500">{jobDetails?.location}</p>
+//                     <div className="flex items-center gap-6 mt-4 text-sm text-gray-600">
+//                         <span className="font-medium">Total Applicants: <span className="text-blue-600">{applications.length + shortList.length}</span></span>
+//                         <span className="font-medium">Shortlisted: <span className="text-green-600">{shortList.length}</span></span>
+//                     </div>
+//                 </div> */}
+
+//                 {/* Main Content Grid */}
+//                 {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> */}
+//                     {/* New Applications Column */}
+//                     {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+//                         <div className="flex justify-between items-center mb-4">
+//                             <h2 className="text-xl font-semibold text-gray-700">New Applicants ({applications.length})</h2>
+//                             <div className="flex items-center gap-2">
+//                                 <button onClick={selectAllCard} className="text-xs font-medium text-blue-600 hover:underline">Select All</button>
+//                                 {selectionMode && <button onClick={unselectAllCard} className="text-xs font-medium text-red-600 hover:underline">Cancel</button>}
+//                             </div>
+//                         </div>
+//                         {selectionMode && (
+//                             <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex items-center justify-between">
+//                                 <p className="text-sm font-medium text-blue-800">{selectedCards.length} selected</p>
+//                                 <button onClick={handleShortlistAll} className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-md hover:bg-blue-700">
+//                                     Shortlist Selected
+//                                 </button>
+//                             </div>
+//                         )} */}
+//                         {/* <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+//                             {applications.length > 0 ? applications.map((applicant, index) => (
+//                                 <ApplicantCard 
+//                                     key={index} 
+//                                     isSelected={selectedCards.includes(applicant?._id)} 
+//                                     selectionMode={selectionMode} 
+//                                     applicationData={applicant} 
+//                                     defaultProfile={defaultProfile} 
+//                                     selectFromOption={() => selectFromOption(applicant?._id)}
+//                                     toggleCardSelection={() => toggleCardSelection(applicant?._id)}
+//                                     shortList={() => handleShortlistSingle(applicant._id)}
+//                                     buttonOptions={['Add to shortlist', 'Select tile', 'Reject application']}
+//                                     flag={'applicationList'}
+//                                     reject={() => rejectIndividualCandidate(applicant?.applicantDetails._id, applicant._id)} 
+//                                 />
+//                             )) : (
+//                                 <div className="text-center py-10">
+//                                     <i className="fa-solid fa-inbox text-3xl text-gray-400"></i>
+//                                     <p className="mt-2 text-sm text-gray-500">No new applications.</p>
+//                                 </div>
+//                             )}
+//                         </div>
+//                     </div> */}
+
+//                     {/* Shortlisted Column */}
+//                     {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+//                         <div className="flex justify-between items-center mb-4">
+//                             <h2 className="text-xl font-semibold text-gray-700">Shortlisted ({shortList.length})</h2>
+//                             {shortList.length > 0 && (
+//                                 <button onClick={finalizeShortlistMethod} className="bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-md hover:bg-green-700">
+//                                     Finalize Shortlist
+//                                 </button>
+//                             )}
+//                         </div>
+//                         <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+//                             {shortList.length > 0 ? shortList.map((application, index) => (
+//                                 <ApplicantCard 
+//                                     key={index} 
+//                                     applicationData={application} 
+//                                     defaultProfile={defaultProfile}
+//                                     buttonOptions={['Remove','Interview email', 'Reject']} 
+//                                     flag={'shortList'}
+//                                     removeFromShortlist={() => handleRemoveFromShortList(application._id)} 
+//                                 />
+//                             )) : (
+//                                 <div className="text-center py-10">
+//                                     <i className="fa-solid fa-star text-3xl text-gray-400"></i>
+//                                     <p className="mt-2 text-sm text-gray-500">No candidates shortlisted yet.</p>
+//                                 </div>
+//                             )}
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div> */}
+//         </div>
+
+//        {/* Controlbar */}
+//        {controlBarOpen && (
+//         <>
+//           {/* Overlay */}
+//           <div
+//             onClick={() => setControlBarOpen(false)}
+//             className="fixed inset-0 bg-black opacity-50 z-40 transition-opacity"
+//             aria-hidden="true"
+//           ></div>
+
+//           {/* Panel */}
+//           <div className="bg-white fixed right-0 top-0 shadow-xl w-90 h-screen overflow-y-auto z-50 flex flex-col">
+//             {/* Panel Header */}
+//             <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+//                 <h2 className="text-lg font-semibold text-gray-800">Applicant Details</h2>
+//                 <button 
+//                     onClick={() => setControlBarOpen(false)} 
+//                     className="text-gray-500 hover:text-gray-800 transition-colors"
+//                 >
+//                     <FaRegCircleXmark size={22} />
+//                 </button>
+//             </div>
+//             {/* Panel Body (Your content goes here) */}
+//             <div className="p-4">
+//                 <div className="flex gap-2">
+//                     <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-sm">
+//                         <p className="text-white">U</p>
+//                     </div>
+//                     <div>
+//                         <p className="text-sm text-gray-700 font-light">{selectedCandidateForManaging?.applicant.name}</p>
+//                         <p className="text-xs text-gray-500">{selectedCandidateForManaging?.applicant.headline}</p>
+//                     </div>
+//                 </div>
+
+//                 <div className="mt-5">
+//                     <select onChange={(e) => updateStatus(e)} className="border border-blue-500 rounded-md p-2 w-full text-sm bg-blue-100">
+//                         {
+//                             <option value={selectedCandidateForManaging?.status}>{`${selectedCandidateForManaging?.status[0].toUpperCase()}${selectedCandidateForManaging?.status.slice(1)}`}</option>
+//                         }
+//                         {
+//                             selectedCandidateForManaging?.status === 'applied' && (<option value="applied">Applied</option>)
+//                         }
+//                         {
+//                             (selectedCandidateForManaging?.status === 'applied' ||
+//                             selectedCandidateForManaging?.status === 'screening') && (
+//                                 <option value="screening">Screening</option>
+//                             )
+//                         }
+//                         {
+//                             (selectedCandidateForManaging?.status === 'applied' ||
+//                             selectedCandidateForManaging?.status === 'screening' ||
+//                             selectedCandidateForManaging?.status === 'interview'
+//                             ) && (
+//                                 <option value="interview">Interview</option>
+//                             )
+//                         }
+//                         {
+//                             (selectedCandidateForManaging?.status === 'applied' ||
+//                             selectedCandidateForManaging?.status === 'screening' ||
+//                             selectedCandidateForManaging?.status === 'interview' ||
+//                             selectedCandidateForManaging?.status === 'offer'
+//                             ) && (
+//                                 <option value="offer">Offer</option>
+//                             )
+//                         }
+//                         {
+//                             (selectedCandidateForManaging?.status === 'applied' ||
+//                             selectedCandidateForManaging?.status === 'screening' ||
+//                             selectedCandidateForManaging?.status === 'interview' ||
+//                             selectedCandidateForManaging?.status === 'offer' ||
+//                             selectedCandidateForManaging?.status === 'rejected'
+//                             ) && (
+//                                 <option value="rejected">Rejected</option>
+//                             )
+//                         }
+//                         {
+//                             (selectedCandidateForManaging?.status === 'applied' ||
+//                             selectedCandidateForManaging?.status === 'screening' ||
+//                             selectedCandidateForManaging?.status === 'interview' ||
+//                             selectedCandidateForManaging?.status === 'offer' ||
+//                             selectedCandidateForManaging?.status === 'hired'
+//                             ) && (
+//                                 <option value="hired">Hired</option>
+//                             )
+//                         }
+                        
+//                     </select>
+//                 </div>
+
+//                 <div className="mt-5">
+//                     <p className="font-light">Contact Information</p>
+//                     <div className="mt-2 space-y-2">
+//                         <div className="flex gap-2">
+//                             <BiEnvelope color="gray" />
+//                             <div>
+//                                 <p className="text-sm font-light">Email</p>
+//                                 <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.email}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="flex gap-2">
+//                             <IoCall color="gray" />
+//                             <div>
+//                                 <p className="text-sm font-light">Phone</p>
+//                                 <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.phone}</p>
+//                             </div>
+                            
+//                         </div>
+//                         <div className="flex gap-2">
+//                             <IoLocation color="gray" />
+//                             <div>
+//                                 <p className="text-sm font-light">Location</p>
+//                                 <p className="text-xs text-gray-700">{selectedCandidateForManaging?.applicant.location?.district}, {selectedCandidateForManaging?.applicant.location?.state}</p>
+//                             </div>
+                            
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 <div className="mt-5">
+//                     <p className="font-light">Professional Details</p>
+//                     <div className="mt-2 space-y-2">
+//                         <div>
+//                             <p className="font-medium text-sm">Expreiences</p>
+//                             <div className="mt-1 space-y-2">
+//                                 {
+//                                     selectedCandidateForManaging?.experiences &&
+//                                     selectedCandidateForManaging?.experiences?.length > 0 && (
+//                                         selectedCandidateForManaging?.experiences?.map((exp: Experience) => (
+//                                             <>
+//                                                 <div key={exp._id} className="flex gap-2">
+//                                                     <PiSuitcase />
+//                                                     <div>
+//                                                         <p className="text-sm font-light">{exp.jobRole}</p>
+//                                                         <p className="text-xs text-gray-500">{exp.organization}</p>
+//                                                     </div>
+//                                                 </div>
+//                                             </>
+//                                         ))
+//                                     )
+//                                 }{
+//                                     selectedCandidateForManaging?.experiences &&
+//                                     selectedCandidateForManaging?.experiences?.length === 0 && (
+//                                         <p>No experiences</p>
+//                                     )
+//                                 }
+//                             </div>
+//                         </div>
+//                         <div>
+//                             <p className="font-medium text-sm">Educations</p>
+//                             <div className="mt-1 space-y-2">
+//                                 {
+//                                     selectedCandidateForManaging?.educations &&
+//                                     selectedCandidateForManaging?.educations?.length > 0 && (
+//                                         selectedCandidateForManaging?.educations?.map((edu: Education) => (
+//                                             <>
+//                                                 <div key={edu._id} className="flex gap-2">
+//                                                     <FaGraduationCap />
+//                                                     <div>
+//                                                         <p className="text-sm font-light">{edu.educationStream}</p>
+//                                                         <p className="text-xs text-gray-500">{edu.institution}</p>
+//                                                     </div>
+//                                                 </div>
+//                                             </>
+//                                         ))
+//                                     )
+//                                 }
+//                             </div>
+//                         </div>
+//                         <div className="mt-3">
+//                             <p className="font-medium text-sm">Skills</p>
+//                             <div className="flex flex-wrap mt-2 gap-2">
+//                                 {
+//                                     selectedCandidateForManaging?.skills &&
+//                                     selectedCandidateForManaging?.skills?.length > 0 && (
+//                                         selectedCandidateForManaging.skills.map((s: Skills) => (
+//                                             <>
+//                                                 <span className="text-xs text-blue-500 bg-blue-100 rounded-md px-3 py-1" key={s._id}>
+//                                                     {s.skill}
+//                                                 </span>
+//                                             </>
+//                                         ))
+//                                     )
+//                                 }
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 <div className="mt-5">
+//                     <p className="font-light">Notes</p>
+//                     <textarea onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+//                 </div>
+//                 <div className="mt-5 space-y-2">
+//                     <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
+//                     <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button>
+//                     <div onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</div>
+//                     <div onClick={() => navigateToUserPublicProfile(selectedCandidateForManaging?.candidateId as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</div>
+//                 </div>
+//             </div>
+//           </div>
+//         </>
+//       )}
+
+//       {
+//         scheduleInterviewModalOpen && (
+//             <Modal className="flex flex-col items-center justify-center" open={scheduleInterviewModalOpen} onClose={() => setScheduleInterviewModalOpen(false)}>
+//                 <div className="p-5 bg-white shadow-xl rounded-md w-md lg:w-lg">
+//                     <div className="header w-full items-center flex justify-between">
+//                         <p>Schedule Interview</p>
+//                         <button onClick={() => setScheduleInterviewModalOpen(false)}>
+//                             <FaRegCircleXmark />
+//                         </button>
+//                     </div>
+//                     <div className="mt-2 bg-blue-100 flex gap-3 w-full p-3">
+//                         <div className="bg-blue-500 w-10 h-10 flex items-center justify-center text-sm text-white rounded-full">
+//                             <p>U</p>
+//                         </div>
+//                         <div>
+//                             <p className="text-sm">Name of the can</p>
+//                             <p className="text-xs">Headline if</p>
+//                         </div>
+//                     </div>
+
+//                     <Box
+//       component="form"
+//       onSubmit={handleSubmit(onSubmit)}
+//       sx={{ maxWidth: 500, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}
+//     >
+//       {/* Date */}
+//       <FormControl error={Boolean(errors.date)}>
+//         <Controller
+//         name="date"
+//         control={control}
+//         rules={{ required: "Date is required" }}
+//         render={({ field }) => (
+//           <LocalizationProvider dateAdapter={AdapterDayjs}>
+//             <DemoContainer components={['DateField']}>
+//                 <DateField
+//             label="Interview Date"
+//             {...field}
+//             error={Boolean(errors.date)}
+//             onChange={(fieldVAlue) => field.onChange(fieldVAlue)} value={field.value}
+//             slotProps={{
+//               textField: { fullWidth: true }
+//             }}
+//           />
+//             </DemoContainer>
+//           </LocalizationProvider>
+//         )}
+//       />
+//       <FormHelperText>{errors.date?.message}</FormHelperText>
+//       </FormControl>
+
+//       {/* Time */}
+//       <FormControl>
+//         <Controller
+//         name="time"
+//         control={control}
+//         rules={{ required: "Time is required" }}
+//         render={({ field }) => (
+//           <TextField
+//                 label="Interview Time"
+//                 type="time"
+//                 InputLabelProps={{ shrink: true }}
+//                 fullWidth
+//                 {...field}
+//                 error={Boolean(errors.time)}
+//                 helperText={errors.time?.message}
+//               />
+//         )}
+//       />
+//       </FormControl>
+
+//       {/* Interview Type */}
+//       <FormControl error={Boolean(errors.interviewType)}>
+//         <Controller
+//         name="interviewType"
+//         control={control}
+//         rules={{ required: "Interview type is required" }}
+//         render={({ field }) => (
+//           <TextField select label="Interview Type" fullWidth {...field} error={Boolean(errors.interviewType)} helperText={errors.interviewType?.message}>
+//             {interviewTypes.map(type => (
+//               <MenuItem key={type} value={type}>
+//                 {type}
+//               </MenuItem>
+//             ))}
+//           </TextField>
+//         )}
+//       />
+//       </FormControl>
+
+//       {/* Google Meet URL */}
+//       <FormControl error={Boolean(errors.gmeetUrl)}>
+//         <Controller
+//         name="gmeetUrl"
+//         control={control}
+//         rules={{ required: "Google Meet URL is required" }}
+//         render={({ field }) => (
+//           <TextField
+//             label="Google Meet URL"
+//             fullWidth
+//             {...field}
+//             error={Boolean(errors.gmeetUrl)}
+//             helperText={errors.gmeetUrl?.message}
+//           />
+//         )}
+//       />
+//       </FormControl>
+
+//       {/* Interviewer Name */}
+//       <FormControl error={Boolean(errors.interviewerName)}>
+//         <Controller
+//         name="interviewerName"
+//         control={control}
+//         rules={{ required: "Interviewer name is required" }}
+//         render={({ field }) => (
+//           <TextField
+//             label="Interviewer Name"
+//             fullWidth
+//             {...field}
+//             error={Boolean(errors.interviewerName)}
+//             helperText={errors.interviewerName?.message}
+//           />
+//         )}
+//       />
+//       </FormControl>
+
+//       {/* Note */}
+//       <Controller
+//         name="note"
+//         control={control}
+//         render={({ field }) => (
+//           <TextField
+//             label="Note"
+//             multiline
+//             rows={4}
+//             fullWidth
+//             {...field}
+//           />
+//         )}
+//       />
+
+//       {/* Checkbox */}
+//       <Controller
+//         name="sendEmail"
+//         control={control}
+//         render={({ field }) => (
+//           <FormControlLabel
+//             control={<Checkbox {...field} checked={field.value} />}
+//             label="Send email invitation to the email also"
+//           />
+//         )}
+//       />
+
+//       {/* Submit Button */}
+//       <Button variant="contained" type="submit" fullWidth>
+//         Submit
+//       </Button>
+//     </Box>
+//                 </div>
+//             </Modal>
+//         )
+//       }
+
+
+//       {/* Modal for viewing resume */}
+
+//       {
+//         pdfViewerOpened && (
+//             <Modal className="flex flex-col items-center justify-center" open={pdfViewerOpened} onClose={() => SetPdfViewerOpen(false)}>
+//                 <div className="bg-white p-5 overflow-y-scroll max-h-lg w-2xl rounded-md shadow-lg">
+//                     <div className="header flex justify-end">
+//                         <button onClick={() => SetPdfViewerOpen(false)}><FaRegCircleXmark /></button>
+//                     </div>
+//                     <ViewPDFDocument fileUrl={selectedCandidateForManaging?.resume?.resumeUrlCoudinary} />
+//                 </div>
+//             </Modal>
+//         )
+//       }
+
+
+//       {/* Modal for email  */}
+//       {
+//         emailModalOpen && (
+//             <Modal className="flex flex-col items-center justify-center" open={true} onClose={() => setEmailModalOpen(false)}>
+//                 <div className="bg-white shadow-xl rounded-md w-md md:w-lg">
+//                     <div className="header p-3 bg-blue-50 rounded-md flex justify-between">
+//                         <p className="font-medium text-sm text-gray-700">Send Email</p>
+//                         <button onClick={() => setEmailModalOpen(false)}><FaXmark color="black" /></button>
+//                     </div>
+//                     <div className="body bg-white p-3 rounded-b-md">
+//                         <form onSubmit={handleEmailContentsSubmit(() => console.log(''))}>
+//                             <FormControl fullWidth>
+//                                <Controller
+//                                     name="to"
+//                                     control={EmailContentsControl} 
+//                                     render={({field}) => (
+//                                         <div className="border-b w-full border-gray-300">
+//                                             <input {...field} className="!text-xs text-gray-700 w-full" placeholder="To: example@gmail.com" type="text" />
+//                                         </div>
+//                                     )}
+//                                />
+//                             </FormControl>
+
+//                             <FormControl fullWidth className="!mt-3">
+//                                 <Controller 
+//                                     name="subject"
+//                                     control={EmailContentsControl}
+//                                     render={({field}) => (
+//                                         <div className="border-b w-full border-gray-300">
+//                                             <input {...field} type="text" placeholder="Subject" className="!text-xs text-gray-700 w-full" />
+//                                         </div>
+//                                     )}
+//                                 />
+//                             </FormControl>
+
+//                             <FormControl className="!mt-5" fullWidth>
+//                                 <Controller 
+//                                     name="body"
+//                                     control={EmailContentsControl}
+//                                     render={({field}) => (
+//                                         <div>
+//                                             <textarea placeholder="Dear name,.." {...field} className="w-full outline-none text-xs text-gray-700" rows={20} />
+//                                         </div>
+//                                     )}
+//                                 />
+//                             </FormControl>
+//                             <div className="file-attachments"></div>
+//                             <div className="flex items-center gap-3">
+//                                 <button type="submit" className="flex items-center gap-2 bg-blue-700 text-white text-sm font-light px-3 py-1 rounded-full">
+//                                     <p>Send</p>
+//                                     <BiSend />
+//                                 </button>
+//                                 <button className="text-gray-700">
+//                                     <HiPaperClip />
+//                                 </button>
+//                                 <button className="text-gray-700">
+//                                     <BiTrash />
+//                                 </button>
+//                             </div>
+//                         </form>
+//                     </div>
+//                 </div>
+//             </Modal>
+//         )
+//       }
+//         </>
+//     )

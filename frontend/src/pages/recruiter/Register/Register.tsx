@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import './Register.css'
-import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 import { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
@@ -20,18 +19,10 @@ export default function RecruiterRegister(){
 
     const {control, watch, handleSubmit, formState:{errors}} = useForm<Inputs>()
 
-    const [username, setusername] = useState("")
-    const [email, setemail] = useState("")
-    const [password, setpassword] = useState("")
-    const [confirmpassword, setconfirmpassword] = useState("")
     const [validationerror, setvalidationerror] = useState(false)
     const [validationerrortext, setvalidationerrortext] = useState("")
     const [loading, setloading] = useState(false)
     const [showpassword, setshowpassword] = useState(false)
-    const [emailerror, setemailerror] = useState("")
-    const [passworderror, setpassworderror] = useState("")
-    const [usernameerror, setusernameerror] = useState("")
-    const [passwordconfirmationerror, setpasswordconfirmationerror] = useState("")
 
     const navigateTo = useNavigate()
 
@@ -57,47 +48,6 @@ export default function RecruiterRegister(){
     }
 
     const typedPassword = watch('password')
-
-    // // async function validateRegister(event : any) {
-    // //     setloading(true)
-    // //     event.preventDefault()
-    // //     const typedUsernameError = !/^[a-zA-Z0-9_]{3,16}$/.test(username) || !username || false
-    // //     const typedEmailError = !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email) || !email || false
-    // //     const typedPasswordError = !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password) || !password || false
-    // //     const confirmationError = password !== confirmpassword || false
-        
-    // //     //check for passsword confirmation
-
-
-    // //     typedEmailError ? setemailerror("Enter a valid Email") : setemailerror("")
-    // //     typedPasswordError ? setpassworderror("Enter a strong password") : setpassworderror("")
-    // //     typedUsernameError ? setusernameerror("Username can not be empty") : setusernameerror("")
-    // //     confirmationError ? setpasswordconfirmationerror("Password doesn't match") : setpasswordconfirmationerror("")
-        
-    // //     if(typedEmailError || typedUsernameError || typedPasswordError || confirmationError){
-    // //         setvalidationerror(true)
-    // //         setloading(false)
-    // //         setvalidationerrortext("Fill the details correctly!")
-    // //         return
-    // //     }else{
-    // //         setvalidationerror(false)
-    // //         setvalidationerrortext("")
-    // //         //send data to the backend
-
-           
-    // //             const result = await recruiterRegister(email, username, password)
-    // //             if(result.success){
-    // //                 setloading(false)
-    // //                 navigator(`/verify/recruiter/${result.recruiter}`)
-                    
-    // //             }else{
-    // //                 setloading(false)
-    // //                 setvalidationerror(true)
-    // //                 setvalidationerrortext(result.message)
-    // //             }
-            
-    // //     }
-    // }
 
     //google authentication
     async function googleAuth(){

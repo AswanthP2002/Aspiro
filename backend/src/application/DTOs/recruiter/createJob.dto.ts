@@ -6,7 +6,6 @@ import {
   SalaryPeriod,
 } from '../../../domain/entities/recruiter/job.entity';
 
-
 export default interface CreateJobDTO {
   _id?: string;
   recruiterId?: string; // Renamed from companyId for clarity
@@ -15,8 +14,8 @@ export default interface CreateJobDTO {
   requirements: string;
   responsibilities: string;
   duration?: string; // Good for contract/temporary roles
-  jobType?: JobType;
-  workMode?: WorkMode;
+  jobType?: string;
+  workMode?: string;
   location: string;
   minSalary: number;
   maxSalary: number;
@@ -25,7 +24,7 @@ export default interface CreateJobDTO {
   vacancies: number;
   qualification: string;
   experienceInYears: number; // More queryable than a string
-  jobLevel: JobLevel;
+  jobLevel: string;
   requiredSkills: string[];
   optionalSkills: string[];
   status?: JobStatus; // Replaces isBlocked and isRejected for better state management
@@ -34,7 +33,7 @@ export default interface CreateJobDTO {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
 }
 
 export interface JobDTO {
@@ -45,8 +44,8 @@ export interface JobDTO {
   requirements: string;
   responsibilities: string;
   duration?: string; // Good for contract/temporary roles
-  jobType?: JobType;
-  workMode?: WorkMode;
+  jobType?: string;
+  workMode?: string;
   location: string;
   minSalary: number;
   maxSalary: number;
@@ -55,7 +54,7 @@ export interface JobDTO {
   vacancies: number;
   qualification: string;
   experienceInYears: number; // More queryable than a string
-  jobLevel?: JobLevel;
+  jobLevel?: string;
   requiredSkills: string[];
   optionalSkills: string[];
   status?: JobStatus; // Replaces isBlocked and isRejected for better state management
@@ -64,7 +63,7 @@ export interface JobDTO {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
 }
 
 export interface EditJobDTO {
@@ -94,10 +93,8 @@ export interface EditJobDTO {
   applicationsCount?: number; // For analytics
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: String;
+  expiresAt?: string;
 }
-
-
 
 /**
  * search: string,

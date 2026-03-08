@@ -16,6 +16,10 @@ export default interface User {
     state: string;
     country: string;
     pincode: string;
+    coords?: {
+      type: 'Point';
+      coordinates: [number, number]; //long lat order
+    };
   };
   role?: Role[];
   phone?: string;
@@ -23,7 +27,7 @@ export default interface User {
   googleId?: string;
   facebookId?: string;
   linkedinId?: string;
-  connections?: string[]
+  connections?: string[];
   profilePicture?: {
     cloudinaryPublicId: string;
     cloudinarySecureUrl: string;
@@ -33,33 +37,16 @@ export default interface User {
     cloudinarySecureUrl: string;
   };
   isBlocked?: boolean;
+  isBanned?: boolean;
+  isDeleted?: boolean;
   isVerified?: boolean;
   isAdmin?: boolean;
   isRecruiter?: boolean;
+  gender?: 'Male' | 'Female';
   createdAt?: string;
   updatedAt?: string;
   verificationToken?: string;
   otpExpiresAt?: Date;
-  // _id?: string;
-  // password?: string;
-  // role?: Role;
-  // phone?: string;
-  // email?: string | undefined;
-  // googleid?: string;
-  // facebookid?: string;
-  // profilePicture?: {
-  //   cloudinaryPublicId: string;
-  //   cloudinarySecureUrl: string;
-  // };
-  // coverPhoto?: {
-  //   cloudinaryPublicId: string;
-  //   cloudinarySecureUrl: string;
-  // };
-  // isBlocked?: boolean;
-  // isVerified?: boolean;
-  // isAdmin?: boolean;
-  // createdAt?: string;
-  // updatedAt?: string;
-  // verificationToken?: string;
-  // otpExpiresAt?: Date;
+  hiddenPosts?: string[];
+  lastLogin?: Date;
 }

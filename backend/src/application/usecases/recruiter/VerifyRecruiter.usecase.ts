@@ -1,5 +1,5 @@
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
 import VerifyRecruiterDTO from '../../DTOs/recruiter/verifyRecruiter.dto';
 import mapToRecruiterDtoFromRecruiter from '../../mappers/recruiter/mapToRecruiterDtoFromRecruiter.mapper';
 import IVerifyRecruiterUseCase from './interface/IVerifyRecruiter.usecase';

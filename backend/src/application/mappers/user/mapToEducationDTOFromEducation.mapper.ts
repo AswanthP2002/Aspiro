@@ -1,5 +1,5 @@
 import Education from '../../../domain/entities/user/educations.entity';
-import { EducationDTO } from '../../DTOs/user/education.dto';
+import { EducationDTO } from '../../DTOs/user/education.dto.FIX';
 
 export default function mapToEducationDTOFromEducation(
   education: Education

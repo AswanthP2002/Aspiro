@@ -4,6 +4,12 @@ import Swal from "sweetalert2";
 import { resendOtp, verify } from "../../../services/userServices";
 import { Notify } from "notiflix";
 import { HiOutlineEnvelope } from "react-icons/hi2";
+import { Button } from "@mui/material";
+
+type ResultPayload = {
+    success: boolean,
+    message: string
+}
 
 export default function VerificationPage(){
 
@@ -14,16 +20,17 @@ export default function VerificationPage(){
     const digit5Ref = useRef<HTMLInputElement | null>(null)
     const digit6Ref = useRef<HTMLInputElement | null>(null)
 
-    const [digit1, setDigit1] = useState('')
-    const [digit2, setDigit2] = useState('')
-    const [digit3, setDigit3] = useState('')
-    const [digit4, setDigit4] = useState('')
-    const [digit5, setDigit5] = useState('')
-    const [digit6, setDigit6] = useState('')
+    const [digit1, setDigit1] = useState<string>('')
+    const [digit2, setDigit2] = useState<string>('')
+    const [digit3, setDigit3] = useState<string>('')
+    const [digit4, setDigit4] = useState<string>('')
+    const [digit5, setDigit5] = useState<string>('')
+    const [digit6, setDigit6] = useState<string>('')
 
 
-    const [valuesFilled, setValuesFilled] = useState(false)
-    const [otpError, setOtpError] = useState('')
+    const [valuesFilled, setValuesFilled] = useState<boolean>(false)
+    const [otpError, setOtpError] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if(digit1){
@@ -112,9 +119,8 @@ export default function VerificationPage(){
         return Math.round(time % 60)
     }
 
-    async function verifyOnSubmit() {
-        alert('testing')
-
+    async function verifyOnSubmit(): Promise<void> {
+        setLoading(true)
         if(
             isNaN(parseInt(digit1)) ||
             isNaN(parseInt(digit2)) ||
@@ -141,42 +147,59 @@ export default function VerificationPage(){
             return
         }
 
-        const result = await verify(id, otp)
-
-        if(result.success){
-            Swal.fire({
-                title:"Success",
-                icon:"success",
-                text:'Email verified successfully',
-                showConfirmButton:true,
-                showCancelButton:false,
-                allowOutsideClick:false,
-                allowEscapeKey:false,
-                confirmButtonText:"Login"
-            }).then((result) => {
-                if(result.isConfirmed){
-                    navigate(`/login`)
-                }
-                return
-            })
-        }else{
-            setOtpError(result.message)
+        try {
+            setLoading(true)
+            const result: ResultPayload = await verify(id, otp)
+    
+            if(result.success){
+                Swal.fire({
+                    title:"Success",
+                    icon:"success",
+                    text:'Email verified successfully',
+                    showConfirmButton:true,
+                    showCancelButton:false,
+                    allowOutsideClick:false,
+                    allowEscapeKey:false,
+                    confirmButtonText:"Login"
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        navigate(`/login`)
+                    }
+                    return
+                })
+            }else{
+                setOtpError(result.message)
+            }
+        } catch (error: unknown) {
+            console.log(error instanceof Error ? error.message : error)
+        } finally {
+            setLoading(false)
         }
     }
 
     async function handleResendOtp() {
+        alert('Handle resend clicked')
+        Notify.info(`Emai ${email}`)
+        Notify.info(`Id ${id}`)
         if (!email) {
+            alert('No Email present')
             Notify.failure('Email not found. Cannot resend OTP.', {timeout: 2000});
             return;
         }
-        
-        const result = await resendOtp(email, id)
-
-        if (result.success) {
-            Notify.success('A new OTP has been sent to your email.', {timeout: 2000});
-            startTimer();
-        } else {
-            Notify.failure('Failed to resend OTP. Please try again later.', {timeout: 2000});
+        alert('Email is available')
+        try {
+            alert('going to call api')
+            const result = await resendOtp(email, id)
+    
+            if (result.success) {
+                alert('a')
+                Notify.success('A new OTP has been sent to your email.', {timeout: 2000});
+                startTimer();
+            } else {
+                Notify.failure('Failed to resend OTP. Please try again later.', {timeout: 2000});
+            }
+        } catch (error: unknown) {
+            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
         }
     }
 
@@ -227,10 +250,10 @@ export default function VerificationPage(){
                             <p className="text-center text-sm mt-3 text-gray-500">OTP will expire in <span className="text-blue-500">{getMinute(remainingtime)}:{getSecond(remainingtime)}</span></p>
                         </div>
                         <div className="mt-3 w-full">
-                            <button type="button" onClick={verifyOnSubmit} disabled={!valuesFilled} className={`w-full bg-${valuesFilled ? 'black' : 'gray-400'} text-sm text-white rounded-sm py-2`}>Verify & continue</button>
+                            <Button type="button" variant="contained" loading={loading} onClick={verifyOnSubmit} disabled={!valuesFilled} className={`w-full bg-${valuesFilled ? 'black' : 'gray-400'} text-sm text-white rounded-sm py-2`}>Verify & continue</Button>
                         </div>
                         <div className="resend-otp">
-                          <p className="text-center text-sm mt-3">Didn't receive any code? <button onClick={handleResendOtp} disabled={!resendenabled} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
+                          <p className="text-center text-sm mt-3">Didn't receive any code? <button type="button" onClick={handleResendOtp} disabled={!resendenabled} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
                         </div>
                     </form>
                 </div>

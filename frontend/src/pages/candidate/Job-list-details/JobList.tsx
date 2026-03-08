@@ -1,200 +1,109 @@
-import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
+import { useEffect, useRef, useState } from 'react';
 import JobListTile from '../../../components/common/JobListTile';
-import { useNavigate } from 'react-router-dom';
-import JobFilterCandidateSide from '../../../components/candidate/JobFiltersCandidateSide';
 import { getJobs } from '../../../services/userServices';
-import { MdProductionQuantityLimits } from 'react-icons/md';
 import { Notify } from 'notiflix';
-import { JobAggregatedData } from '../../../types/entityTypes';
+import { JobLevelData, JobTypesData, LoadJobsForPublicData, WorkModeData } from '../../../types/entityTypes';
 import { BsSearch } from 'react-icons/bs';
-import { IoLocation } from 'react-icons/io5';
-interface filterState {
-  industry: string[];
-  jobType: string[];
-  locationType: string[];
-  minSalary: string;
-  maxSalary: string;
-}
+import { BiChevronDown, BiMapPin } from 'react-icons/bi';
+import { TbBriefcaseOff } from 'react-icons/tb';
+import { Button } from '@mui/material';
+import { recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from '../../../services/recruiterServices';
 
 export default function JobListing() {
-  const [jobs, setjobs] = useState<JobAggregatedData[]>([]);
+  const [jobs, setjobs] = useState<LoadJobsForPublicData[]>([]);
   const [search, setsearch] = useState('');
   const [locationSearch, setLoctionSearch] = useState('')
   const [page, setpage] = useState(1);
   const [totalPages, settotalpages] = useState(0);
-  const [pagination, setpagination] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false)
 
-  const [statusFilter, setStatusFilter] = useState('active')
-  const [workModeFilter, setWorkModeFilter] = useState('all')
-  const [jobLevelFilter, setJobLevelFilter] = useState('all')
-  const [jobTypeFilter, setJobTypeFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('Newest')
+  const [workModeFilter, setWorkModeFilter] = useState('All')
+  const [jobLevelFilter, setJobLevelFilter] = useState('All')
+  const [jobTypeFilter, setJobTypeFilter] = useState('All')
 
-  const [industryFilterOpen, setIndustryFilterOpen] = useState(false);
-  const [jobTyeFilterOpen, setJobTypeFilterOpen] = useState(false);
-  const [locationTypeFilterOpen, setLocationTypeFilterOpen] = useState(false);
+  const [isJobTypeFilterOpen, setIsJobTypeFilterOpen] = useState(false)
+  const [isJobLevelFilterOpen, setIsJobLevelFilterOpen] = useState(false)
+  const [isWorkModeFilterOpen, setIsWorkModeFilterOpen] = useState(false)
 
-  // Filter view hide function
-  const toggleIndustryFilter = () => {
-    setIndustryFilterOpen((prv) => {
-      if (!prv) {
-        setJobTypeFilterOpen(false);
-        setLocationTypeFilterOpen(false);
-        return true;
-      } else {
-        return false;
+  const [jobTypeOptions, setJobTypeOptions] = useState<JobTypesData[]>([])
+  const [jobLevelOptions, setJobLevelOptions] = useState<JobLevelData[]>([])
+  const [workModeOptions, setWorkModeOptions] = useState<WorkModeData[]>([])
+  
+  const locationSearchInputField = useRef<HTMLInputElement | null>(null)
+
+  const toggleJobTypeFilterOpen = () => {
+    setIsJobTypeFilterOpen((prv) => {
+      if(!prv){
+        setIsJobLevelFilterOpen(false)
+        setIsWorkModeFilterOpen(false)
+        return true
+      }else{
+        return false
       }
-    });
-  };
-
-  const toggleJobTypeFilter = () => {
-    setJobTypeFilterOpen((prv) => {
-      if (!prv) {
-        setIndustryFilterOpen(false);
-        setLocationTypeFilterOpen(false);
-        return true;
-      } else {
-        return false;
-      }
-    });
-  };
-
-  const toggleLocationFilter = () => {
-    setLocationTypeFilterOpen((prv) => {
-      if (!prv) {
-        setIndustryFilterOpen(false);
-        setJobTypeFilterOpen(false);
-        return true;
-      } else {
-        return false;
-      }
-    });
-  };
-
-  const [sortvalue, setsortvalue] = useState('');
-  const [visibleSort, setVisibleSort] = useState(false);
-  const [currentSort, setCurrentSort] = useState('job-latest');
-  const [filter, setFilter] = useState<filterState>({
-    industry: [],
-    jobType: [],
-    locationType: [],
-    minSalary: '',
-    maxSalary: '',
-  });
-  const [minSalary, setMinSalary] = useState('');
-  const [minSalaryError, setMinSalaryError] = useState('');
-  const [maxSalaryError, setMaxSalaryError] = useState('');
-  const [maxSalary, setMaxSalary] = useState('');
-
-  const navigator = useNavigate();
-
-  function filterSalary() {
-    const minSalary: any = document.getElementById('minSalary');
-    const maxSalary: any = document.getElementById('maxSalary');
-
-    //validation
-    const minsalaryerror =
-      !minSalary?.value || minSalary?.value.includes('.') || false;
-    const maxsalaryerror =
-      !maxSalary?.value || maxSalary?.value.includes('.') || false;
-
-    minsalaryerror
-      ? setMinSalaryError('Give minimum salary')
-      : setMinSalaryError('');
-    maxsalaryerror
-      ? setMaxSalaryError('Give maximum salary')
-      : setMaxSalaryError('');
-
-    if (minsalaryerror || maxsalaryerror) return;
-
-    setMinSalary(minSalary?.value);
-    setMaxSalary(maxSalary?.value);
+    })
   }
 
-  function handleIndustryChange(industry: string, isChecked: boolean) {
-    setFilter((state: any) => {
-      if (isChecked) {
-        return { ...state, industry: [...state.industry, industry] };
-      } else {
-        return {
-          ...state,
-          industry: state.industry.filter((ind: string) => ind !== industry),
-        };
-      }
-    });
+  const setSearchingLocation = () => {
+    const value = locationSearchInputField.current?.value
+    setLoctionSearch(value as string)
   }
 
-  function handleJobTypeChange(jobType: string, isChecked: boolean) {
-    setFilter((state: any) => {
-      if (isChecked) {
-        return { ...state, jobType: [...state.jobType, jobType] };
-      } else {
-        return {
-          ...state,
-          jobType: state.jobType.filter((jt: string) => jt !== jobType),
-        };
+  const toggleJobLevelFilterOpen = () => {
+    setIsJobLevelFilterOpen((prv) => {
+      if(!prv){
+        setIsJobTypeFilterOpen(false)
+        setIsWorkModeFilterOpen(false)
+        return true
+      }else {
+        return false
       }
-    });
+    })
   }
 
-  function handleLocationType(locationType: string, isChecked: boolean) {
-    setFilter((state: any) => {
-      if (isChecked) {
-        return {
-          ...state,
-          locationType: [...state.locationType, locationType],
-        };
-      } else {
-        return {
-          ...state,
-          locationType: state.locationType.filter(
-            (lt: string) => lt !== locationType
-          ),
-        };
+  const toggleWorkModeFilter = () => {
+    setIsWorkModeFilterOpen((prv) => {
+      if(!prv){
+        setIsJobTypeFilterOpen(false)
+        setIsJobLevelFilterOpen(false)
+        return true
+      }else{
+        return false
       }
-    });
-  }
-
-  function toggleSortVisibility() {
-    setVisibleSort((prev) => !prev);
+    })
   }
 
   useEffect(() => {
     async function fetchJobs() {
+      setLoading(true)
       try {
-        const result = await getJobs(search, locationSearch, page, sortBy, statusFilter, workModeFilter, jobLevelFilter, jobTypeFilter)
+        const [jobLevelResult, jobTypeResult, workModeResult] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchJobTypeLists(), recruiterFetchWorkModeLists()])
+        const result = await getJobs(search, locationSearch, page, workModeFilter, jobLevelFilter, jobTypeFilter)
 
         if (result.success) {
           console.log('Result from the backend :: jobs', result.result);
           setjobs(result?.result?.jobs);
-          setpage(result?.result?.page);
           settotalpages(result?.result?.totalPages);
-          setCurrentSort(result?.result?.currentSort);
-          setpagination(new Array(result?.result?.totalPages).fill(0));
         }else{
           Notify.failure(result?.message, {timeout:2000})
         }
+
+        setJobLevelOptions(jobLevelResult.result)
+        setJobTypeOptions(jobTypeResult.result)
+        setWorkModeOptions(workModeResult.result)
+
       } catch (error: unknown) {
         Notify.failure('Something went wrong', {timeout:2000})
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchJobs();
-  }, [search, page, sortBy, statusFilter, workModeFilter, jobLevelFilter, jobTypeFilter, locationSearch]);
+  }, [search, page, workModeFilter, jobLevelFilter, jobTypeFilter, locationSearch]);
 
-  const nextPage = () => setpage((prev) => prev + 1);
-  const previousPage = () => setpage((prev) => prev - 1);
-  const changePage = (pagenumber: number) => {
-    setpage(pagenumber);
-  };
   function searchJobs(event: any) {
     setsearch(event.target.value);
   }
-  function locationSearchJobs(event: any) {
-    setLoctionSearch(event.target.value);
-  }
-
 
   function debouncedSearch(fn: Function, dealy: number) {
     let timer: any;
@@ -207,175 +116,98 @@ export default function JobListing() {
   }
 
   const dSearch = debouncedSearch(searchJobs, 500);
-  const dLocationSearch = debouncedSearch(locationSearchJobs, 700);
 
-
-  useEffect(() => {
-    console.log('this happened ot filter', filter);
-  }, [filter]);
-
-  return (
+  return(
     <>
-      <div className="job-listing-container border border-gray-200 rounded-md w-full bg-white">
-        <section className="jobs mt-5">
-          <div className="p-5 lg:p-10">
-            {/* Simplified filter implementation */}
-            <div className="relative filter-wrapper mb-3 flex gap-3">
-              <div>
-                <p className='text-xs text-gray-500 block'>Work Mode</p>
-              <select value={workModeFilter} onChange={(event) => setWorkModeFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="workMode-filter">
-                <option value="all">All</option>
-                <option value="On-site">On-site</option>
-                <option value="Remote">Remote</option>
-                <option value="Hybrid">Hybrid</option>
-              </select>
-              </div>
-              <div>
-                <p className='text-xs text-gray-500 block'>Job Level</p>
-                <select value={jobLevelFilter} onChange={(event) => setJobLevelFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="jobLevel-filter">
-                  <option value="all">All</option>
-                  <option value="Entry-level">Entry Level</option>
-                  <option value="Mid-level">Mid Level</option>
-                  <option value="Senior-level">Senior Level</option>
-                  <option value="Lead">Lead</option>
-                  <option value="Manager">Manager</option>
-                </select>
-              </div>
-              <div>
-                <p className='text-xs text-gray-500 block'>Job Type</p>
-                <select value={jobTypeFilter} onChange={(event) => setJobTypeFilter(event.target.value)} className='border bg-white border-gray-300 !px-3 !py-1 rounded text-sm text-gray-700 outline-none' name="" id="jobType-filter">
-                  <option value="all">All</option>
-                  <option value="Full-time">Full Time</option>
-                  <option value="Part-time">Part Time</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Temporary">Temporary</option>
-                </select>
-              </div>
-              {/* <button className="text-xs border border-gray-400 text-gray-500 rounded-full px-3 py-2">Salary</button> */}
-              <div className="flex items-center gap-3">
-                <div>
+      <section className='job-listing-container pb-10'>
+          <div className="header px-5 py-3 bg-white rounded-md border border-slate-200">
+              <p >Find your opportunities</p>
+              <p className='text-xs text-gray-500'>Discover opportunities that matches your skills</p>
+              <div className="mt-3 grid grid-cols-12 gap-2">
+                <div className="col-span-12 border border-slate-200 rounded-md flex items-center gap-3 p-2">
+                  <BsSearch size={12} color='gray' />
+                  <input onKeyUp={(event) => dSearch(event)} type="text" className='w-full !text-xs' placeholder='Search job tile, skills' />
                 </div>
-                <div>
+                <div className='col-span-12 flex gap-2'>
+                  <div className="border flex-1 border-slate-200 rounded-md flex items-center gap-3 p-2">
+                  <BiMapPin size={12} color='gray' />
+                  <input ref={locationSearchInputField} type="text" className='w-full !text-xs' placeholder='Search location' />
                 </div>
-              </div>
-            </div>
-            <div className="w-full bg-white rounded-md p-2 border border-gray-200 grid grid-cols-1 gap-2 lg:grid-cols-12">
-              <div className="flex lg:col-span-5 border px-3 py-2 border-gray-300 rounded-md items-center gap-2">
-                <BsSearch size={12} color='gray'/>
-                <input onKeyUp={(event) => dSearch(event)} type="text" placeholder='Job title keywords or company' className='w-full !text-xs' />
-              </div>
-
-              <div className="flex lg:col-span-5 border px-3 py-2 border-gray-300 rounded-md items-center gap-2">
-                <IoLocation size={12} color='gray'/>
-                <input onKeyUp={(event) => dSearch(event)} type="text" placeholder='City state or remote' className='w-full !text-xs' />
-              </div>
-
-              <div className="action lg:col-span-2 !text-xs">
-                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className='w-full !text-xs border border-gray-300 outline-none !px-3 !py-1 rounded'>
-                      <option value="Newest">Newly Posted</option>
-                      <option value="Oldest">Oldest</option>
-                      <option value="Salry-low">Salary low</option>
-                      <option value="Salary-high">Salary high</option>
-                  </select>
+                <Button type='button' loading={loading} onClick={setSearchingLocation} className='!text-xs' variant='contained' >Search</Button>
+                </div>
+                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
+                  <div className="flex justify-between items-center">
+                    <p className='text-xs font-medium text-center'>{jobTypeFilter}</p>
+                    <button onClick={toggleJobTypeFilterOpen}><BiChevronDown /></button>
                   </div>
-          {/* stoped herer */}
-            </div>
-            {/* <div className="search-header w-full">
-              <div className="search-wrapper-w-full flex justify-between bg-white p-1 rounded-sm items-center border border-gray-300">
-                <div className="rounded-md grid grid-cols-1">
-                  <div className="job-title-search relative">
-                    <i className="fa-solid fa-magnifying-glass absolute top-3 !text-blue-300"></i>
-                    <input
-                      onKeyUp={(event) => dSearch(event)}
-                      type="text"
-                      name=""
-                      id=""
-                      className="px-7 py-2"
-                      placeholder="Search by job title"
-                    />
+                  {isJobTypeFilterOpen && (
+                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
+                     <button onClick={() => {setJobTypeFilter('All'); setIsJobTypeFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
+                    {jobTypeOptions.map((option: JobTypesData, index: number) => (
+                      <button onClick={() => {setJobTypeFilter(option.name as string); setIsJobTypeFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
+                    ))}
                   </div>
-                  <div className="job-location-search relative">
-                    <i className="fa-solid fa-location-dot absolute top-3 !text-blue-300"></i>
-                    <input
-                      type="text"
-                      name=""
-                      onKeyUp={(event) => dSearch(event)}
-                      className="px-7 py-2"
-                      id=""
-                      placeholder="Search by locations"
-                    />
-                  </div>
+                  )}
                 </div>
-                <div className="actions relative">
-                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className='border border-gray-500 text-sm !px-3 !py-1 rounded'>
-                      <option value="Newest">Newly Posted</option>
-                      <option value="Oldest">Oldest</option>
-                      <option value="Salry-low">Salary low</option>
-                      <option value="Salary-high">Salary high</option>
-                  </select>
+                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
+                  <div className="flex justify-between items-center">
+                    <p className='text-xs font-medium text-center'>{jobLevelFilter}</p>
+                    <button onClick={toggleJobLevelFilterOpen}><BiChevronDown /></button>
+                  </div>
+                  {isJobLevelFilterOpen && (
+                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
+                    <button onClick={() => {setJobLevelFilter('All'); setIsJobLevelFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
+                    {jobLevelOptions.map((option: JobLevelData, index: number) => (
+                      <button onClick={() => {setJobLevelFilter(option.name as string); setIsJobLevelFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
+                    ))}
+                  </div>
+                  )}
+                </div>
+                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
+                  <div className="flex justify-between items-center">
+                    <p className='text-xs font-medium text-center'>{workModeFilter}</p>
+                    <button onClick={toggleWorkModeFilter}><BiChevronDown /></button>
+                  </div>
+                  {isWorkModeFilterOpen && (
+                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
+                    <button onClick={() => {setWorkModeFilter('All'); setIsWorkModeFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
+                    {workModeOptions.map((option: WorkModeData, index: number) => (
+                      <button onClick={() => {setWorkModeFilter(option.name as string); setIsWorkModeFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
+                    ))}
+                  </div>
+                  )}
                 </div>
               </div>
-            </div> */}
-            <div className="job-list mt-10">
-              <div className="grid grid-cols-1">
-                {jobs.length > 0 ? (
-                  <>
-                    {jobs.map((job: JobAggregatedData, index: number) => {
-                      return (
-                        <>
-                          <JobListTile key={index} data={job} />
-                        </>
-                      );
-                    })}
-                  </>
-                ) : (
-                  <p className='text-xs text-gray-500 text-center'>No jobs available</p>
-                )}
-              </div>
-            </div>
           </div>
-        </section>
-        <div className="w-full mt-10 mb-10 flex justify-center">
-          <div className="flex gap-5">
-            {page > 1 ? (
-              <button
-                onClick={previousPage}
-                type="button"
-                className="bg-blue-100 w-[30px] h-[30px] btn-prev rounded-full"
-              >
-                <i className="fa-solid fa-arrow-left"></i>
-              </button>
-            ) : null}
-            {pagination.map((_, index: number) => {
-              return (
-                <>
-                  <button
-                    onClick={() => changePage(index + 1)}
-                    type="button"
-                    className={
-                      page === index + 1
-                        ? 'bg-blue-500 text-white w-[30px] h-[30px] btn rounded-full'
-                        : 'bg-blue-100 w-[30px] h-[30px] btn rounded-full'
-                    }
-                  >
-                    {index + 1}
-                  </button>
-                </>
-              );
-            })}
-            {page < totalPages ? (
-              <button
-                onClick={nextPage}
-                type="button"
-                className="bg-blue-100 w-[30px] h-[30px] btn-next rounded-full"
-              >
-                <i className="fa-solid fa-arrow-right"></i>
-              </button>
-            ) : null}
+          <div className="mt-5 grid grid-cols-1 gap-3">
+            {jobs.length > 0 && (
+              jobs.map((job: LoadJobsForPublicData) => (
+                <JobListTile key={job._id} data={job} />
+              ))
+            )}
           </div>
-        </div>
-      </div>
+          {jobs.length > 0 && (
+            <div className='flex mt-5 items-center justify-center gap-3'>
+            <button onClick={() => setpage(prv => prv - 1)} disabled={page === 1} className={`border border-slate-300 rounded-md text-xs font-medium px-3 py-2 ${page === 1 ? "bg-gray-300 text-gray-400": "bg-white"}`}>Prev</button>
+            {
+              Array.from(new Array(totalPages)).map((_, index) => (
+                <button onClick={() => setpage(index + 1)} className={`${page === index + 1 ? "bg-blue-500 text-white" : "bg-white border border-slate-300"} px-4 py-1 rounded-md`}>{index + 1}</button>
+              ))
+            }
+            <button onClick={() => setpage(prv => prv + 1)} disabled={page >= totalPages} className={`border border-slate-300 rounded-md text-xs font-medium px-3 py-2 ${page >= totalPages ? "bg-gray-300 text-gray-400": "bg-white"}`}>Next</button>
+          </div>
+          )}
+          {
+            jobs.length === 0 && (
+              <div className='text-xs text-center flex justify-center flex-col items-center gap-2'>
+                <TbBriefcaseOff size={50} color='gray' />
+                <p>No jobs found</p>
+              </div>
+            )
+          }
+          
+      </section>
     </>
-  );
+  )
+
 }

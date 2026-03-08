@@ -5,10 +5,7 @@ import { PostDAO } from '../database/DAOs/post.dao';
 import mongoose from 'mongoose';
 import PostsAggregated from '../../domain/entities/PostsAggregated.entity';
 
-export default class PostRespository
-  extends BaseRepository<Post>
-  implements IPostRepo
-{
+export default class PostRespository extends BaseRepository<Post> implements IPostRepo {
   constructor() {
     super(PostDAO);
   }
@@ -32,76 +29,39 @@ export default class PostRespository
     return result;
   }
 
-  async getPosts(): Promise<PostsAggregated[] | null> {
-    // const result = await PostDAO.aggregate([
-    //   {
-    //     $lookup: {
-    //       from: 'users',
-    //       localField: 'creatorId',
-    //       foreignField: '_id',
-    //       as: 'createdUserDetails',
-    //     },
-    //   },
-    //   { $unwind: '$createdUserDetails' },
-    //   {
-    //     $lookup: {
-    //       from: 'recruiters',
-    //       localField: 'creatorId',
-    //       foreignField: 'userId',
-    //       as: 'recruiterProfile',
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'candidates',
-    //       localField: 'creatorId',
-    //       foreignField: 'userId',
-    //       as: 'candidateProfile',
-    //     },
-    //   },
-    //   {
-    //     $addFields: {
-    //       profileDetails: {
-    //         $cond: [
-    //           { $gt: [{ $size: '$candidateProfile' }, 0] },
-    //           { $arrayElemAt: ['$candidateProfile', 0] },
-    //           { $arrayElemAt: ['$recruiterProfile', 0] },
-    //         ],
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       recruiterProfile: 0,
-    //       candidateProfile: 0,
-    //     },
-    //   },
-    // ]);
-
+  async getPosts(hiddenList: string[]): Promise<PostsAggregated[] | null> {
     const result = await PostDAO.aggregate([
-      {$lookup:{
-        from:'users',
-        localField:'userId',
-        foreignField:'_id',
-        as:'userDetails'
-      }},
-      {$unwind:'$userDetails'},
-      {$lookup:{
-        from:'comments',
-        localField:'_id',
-        foreignField:'postId',
-        as:'comments',
-        pipeline:[
-          {$lookup:{
-            from:'users',
-            localField:'userId',
-            foreignField:'_id',
-            as:'userDetails'
-          }},
-          {$unwind:'$userDetails'}
-        ]
-      }}
-    ])
+      { $match: { _id: { $nin: hiddenList } } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      { $unwind: '$userDetails' },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'comments',
+          pipeline: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            { $unwind: '$userDetails' },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ]);
 
     return result;
   }
@@ -113,7 +73,7 @@ export default class PostRespository
     return result;
   }
 
-  async getPostByUserId(userId: string): Promise<any | null> {
+  async getPostByUserId(userId: string): Promise<Post | null> {
     const result = await PostDAO.aggregate([
       { $match: { creatorId: new mongoose.Types.ObjectId(userId) } },
       {
@@ -126,6 +86,6 @@ export default class PostRespository
       },
     ]);
 
-    return result;
+    return result as Post;
   }
 }

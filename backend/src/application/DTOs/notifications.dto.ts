@@ -1,42 +1,62 @@
-
 export default interface CreateNotificationDTO {
-    recepientId: string
-    type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
-    category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
-    actorId?: string
-    targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
-    targetId?: string
-    message?: string
-    isRead?: boolean
-    createdAt?: string
-    metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
+  recepientId?: string;
+  category:
+    | 'LIKE'
+    | 'COMMENT'
+    | 'FOLLOW'
+    | 'CONNECTION_REQUEST'
+    | 'CONNECTION_ACCEPTED'
+    | 'COMMENT_REPLY'
+    | 'SHARE';
+  actorId?: string;
+  targetType?: 'USER' | 'POST' | 'COMMENT';
+  targetId?: string;
+  targetUrl?: string;
+  message?: string;
+  isRead?: boolean;
+  metadata?: { [key: string]: any };
 }
 
+export interface UpdateNotificationDTO {
+  _id: string;
+  recepientId?: string;
+  category?:
+    | 'LIKE'
+    | 'COMMENT'
+    | 'FOLLOW'
+    | 'CONNECTION_REQUEST'
+    | 'CONNECTION_ACCEPTED'
+    | 'COMMENT_REPLY'
+    | 'SHARE';
+  actorId?: string;
+  targetType?: 'USER' | 'POST' | 'COMMENT';
+  targetId?: string;
+  targetUrl?: string;
+  message?: string;
+  isRead?: boolean;
+  isDeleted?: boolean;
+  metadata?: { [key: string]: any };
+  createdAt?: string;
+}
 
 export interface NotificationDTO {
-    _id?: string
-    recepientId?: string
-    type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
-    category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
-    actorId?: string
-    targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
-    targetId?: string
-    message?: string
-    isRead?: boolean
-    createdAt?: string
-    metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
+  _id?: string;
+  recepientId?: string;
+  category:
+    | 'LIKE'
+    | 'COMMENT'
+    | 'FOLLOW'
+    | 'CONNECTION_REQUEST'
+    | 'CONNECTION_ACCEPTED'
+    | 'COMMENT_REPLY'
+    | 'SHARE';
+  actorId?: string;
+  targetType?: 'USER' | 'POST' | 'COMMENT';
+  targetId?: string;
+  targetUrl?: string;
+  message?: string;
+  isRead?: boolean;
+  isDeleted?: boolean;
+  metadata?: { [key: string]: any };
+  createdAt?: string;
 }
-
-/**
- * _id: string
-    recepientId: string
-    type: 'USER_ACTION' | 'JOB_ALERT' | 'SYSTEM_NOTICE'
-    category: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'CONNECTION_REQUEST' | 'CONNECTION_ACCEPTED' | 'EXPIRY' | 'APPLICATION_STATUS_CHANGE' | 'JOB'
-    actorId?: string
-    targetType?: 'USER' | 'JOB' | 'POST' | 'RECRUITER' | 'APPLICATION'
-    targetId?: string
-    message?: string
-    isRead: boolean
-    createdAt: string
-    metaData?: {[key: string]: string | number | boolean | object | undefined | null | Date | any}
- */
