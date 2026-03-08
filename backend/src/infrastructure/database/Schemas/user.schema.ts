@@ -1,6 +1,5 @@
 import { Schema } from 'mongoose';
 import User from '../../../domain/entities/user/User.FIX';
-import { Role } from '../../../domain/entities/user/User.FIX';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 export const SocialLinksSchema = new Schema<SocialLinks>({
   domain: { type: String },
@@ -22,6 +21,7 @@ export const UserSchema = new Schema<User>(
     isRecruiter: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    gender: { type: String, enum: ['Male', 'Female'] },
     name: { type: String, required: true },
     password: { type: String },
     location: {
@@ -30,6 +30,10 @@ export const UserSchema = new Schema<User>(
       state: { type: String },
       country: { type: String },
       pincode: { type: String },
+      coords: {
+        type: { type: String, enum: ['Point'], required: false },
+        coordinates: { type: [Number], required: false },
+      },
     },
     connections: { type: [Schema.Types.ObjectId], ref: 'users' },
     phone: { type: String },
@@ -42,6 +46,12 @@ export const UserSchema = new Schema<User>(
     summary: { type: String },
     verificationToken: { type: String },
     otpExpiresAt: { type: Date },
+    isBanned: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
+    lastLogin: { type: Date },
+    hiddenPosts: { type: [Schema.Types.ObjectId], ref: 'posts' },
   },
   { timestamps: true }
 );
+
+UserSchema.index({ 'location.coords': '2dsphere' });

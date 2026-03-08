@@ -1,4 +1,4 @@
-import Candidate from '../../../domain/entities/user/candidate.entity';
+import Candidate from '../../../domain/entities/user/candidate.entity.GARBAGE';
 import CreateCandidateDTO from '../../DTOs/candidate -LEGACY/createCandidate.dto';
 
 export default function mapToCandidate(

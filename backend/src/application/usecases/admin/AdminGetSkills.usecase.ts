@@ -3,12 +3,15 @@ import IAdminGetSkillsUsecase from '../../interfaces/usecases/admin/IAdminGetSki
 import ISkillSetsRepo from '../../../domain/interfaces/ISkillSetsRepo';
 import SkillsDTO, { GetSkillsDTO, LoadPaginatedSkillsDTO } from '../../DTOs/admin/skills.dto';
 import SkillSet from '../../../domain/entities/skills.entity';
-import { plainToInstance } from 'class-transformer';
 import SkillsLoadQuery from '../../queries/skills.query';
+import AdminSkillSetMapper from '../../mappers/admin/skillset.mapperClass';
 
 @injectable()
 export default class AdminGetSkillsUsecase implements IAdminGetSkillsUsecase {
-  constructor(@inject('ISkillSetsRepository') private _repo: ISkillSetsRepo) {}
+  private _mapper: AdminSkillSetMapper;
+  constructor(@inject('ISkillSetsRepository') private _repo: ISkillSetsRepo) {
+    this._mapper = new AdminSkillSetMapper();
+  }
 
   async execute(dto: GetSkillsDTO): Promise<LoadPaginatedSkillsDTO | null> {
     const { limit, page, search } = dto;
@@ -22,7 +25,7 @@ export default class AdminGetSkillsUsecase implements IAdminGetSkillsUsecase {
     if (skills) {
       const dto: SkillsDTO[] = [];
       skills.skills.forEach((skill: SkillSet) => {
-        dto.push(plainToInstance(SkillsDTO, skill));
+        dto.push(this._mapper.skillsetToSkillSetDTO(skill));
       });
 
       return {

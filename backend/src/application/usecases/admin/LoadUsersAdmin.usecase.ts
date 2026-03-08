@@ -7,14 +7,17 @@ import {
 } from '../../queries/users.query';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import LoadUsersQueryDTO from '../../DTOs/admin/loadUsersAdminside.dto.FIX';
-import UserDTO, { UserDto } from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto.FIX';
 import User from '../../../domain/entities/user/User.FIX';
 import ILoadUsersAdminUseCase from '../../interfaces/usecases/admin/ILoadUsersAdmin.usecase.FIX';
-import { plainToInstance } from 'class-transformer';
+import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()
 export class LoadUsersAdminUsecase implements ILoadUsersAdminUseCase {
-  constructor(@inject('IUserRepository') private _userRepository: IUserRepository) {}
+  private _mapper: UserMapper;
+  constructor(@inject('IUserRepository') private _userRepository: IUserRepository) {
+    this._mapper = new UserMapper();
+  }
 
   async execute(loadUsersQueryDto: LoadUsersQueryDTO): Promise<PaginatedUsersDTO | null> {
     const { search, page, limit, sort, filter } = loadUsersQueryDto;
@@ -55,7 +58,7 @@ export class LoadUsersAdminUsecase implements ILoadUsersAdminUseCase {
     if (result && result.users) {
       const userDto: UserDTO[] = [];
       result.users.forEach((user: User) => {
-        userDto.push(plainToInstance(UserDto, user));
+        userDto.push(this._mapper.userToUserDto(user));
       });
 
       return {

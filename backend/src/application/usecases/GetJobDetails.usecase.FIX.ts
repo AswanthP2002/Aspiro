@@ -1,17 +1,21 @@
 import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../domain/interfaces/IJobRepo';
-import JobAggregatedDTO from '../DTOs/job/jobDetails.dto.FIX';
 import IGetJobDetailsUseCase from './interfaces/IGetJobDetails.usecase.FIX';
-import { plainToInstance } from 'class-transformer';
+import JobMapper from '../mappers/recruiter/Job.mapperClass';
+import { LoadJobDetailsDTOForPublic } from '../DTOs/job/loadJob.dto.FIX';
 
 @injectable()
-export default class GetJobDetailsUseCase implements IGetJobDetailsUseCase {
-  constructor(@inject('IJobRepository') private _repo: IJobRepo) {}
+export default class  GetJobDetailsUseCase implements IGetJobDetailsUseCase {
+  constructor(
+    @inject('IJobRepository') private _repo: IJobRepo,
+    @inject('JobMapper') private _mapper: JobMapper
+  ) {}
 
-  async execute(jobId: string): Promise<JobAggregatedDTO | null> {
+  async execute(jobId: string): Promise<LoadJobDetailsDTOForPublic | null> {
     const result = await this._repo.getJobDetails(jobId);
+    console.log('-- Checking company profile details from job details --', result)
     if (result) {
-      const dto = plainToInstance(JobAggregatedDTO, result);
+      const dto = this._mapper.jobAggregatedToJobDetailsForPublicDTO(result);
       return dto;
     }
 

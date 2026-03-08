@@ -4,13 +4,16 @@ import streamifier from 'streamifier';
 import { v4 } from 'uuid';
 import IAddResumeUseCase from '../../interfaces/usecases/user/IAddResume.usecase.FIX';
 import { UploadApiResponse } from 'cloudinary';
-import ResumeDTO, { CreateResumeDTO } from '../../DTOs/candidate -LEGACY/resume.dto';
+import ResumeDTO, { CreateResumeDTO } from '../../DTOs/user/resume.dto';
 import { inject, injectable } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
+import ResumeMapper from '../../mappers/user/Resume.mapperClass';
 
 @injectable()
 export default class AddResumeUseCase implements IAddResumeUseCase {
-  constructor(@inject('IResumeRepository') private _iResumeRepo: IResumeRepo) {}
+  constructor(
+    @inject('IResumeRepository') private _iResumeRepo: IResumeRepo,
+    @inject('ResumeMapper') private _mapper: ResumeMapper
+  ) {}
 
   async execute(addResumeDto: CreateResumeDTO): Promise<ResumeDTO | null> {
     const result: UploadApiResponse | undefined = await new Promise((resolve, reject) => {
@@ -32,14 +35,15 @@ export default class AddResumeUseCase implements IAddResumeUseCase {
     if (result) {
       //save the resume
       const addResumeResult = await this._iResumeRepo.create({
-        candidateId: addResumeDto.candidateId,
+        userId: addResumeDto.userId,
         resumeUrlCoudinary: result.secure_url,
         resumePublicIdCloudinary: result?.public_id,
-        resumeFileName: addResumeDto.path,
+        name: addResumeDto.name,
+        isPrimary: addResumeDto.isPrimary,
       });
 
       if (addResumeResult) {
-        const dto = plainToInstance(ResumeDTO, addResumeResult);
+        const dto = this._mapper.resumeToResumeDTO(addResumeResult);
         return dto;
       }
     }

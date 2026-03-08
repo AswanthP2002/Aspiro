@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import defaultUser from '/default-user-aspiro-removebg-preview.png'
-import { recruiterLogout } from "../../../redux-toolkit/recruiterAuthSlice"
+import { recruiterLogout } from "../../../redux/recruiterAuthSlice"
 import { logoutRecruiter } from "../../../services/recruiterServices"
 import Swal from "sweetalert2"
 

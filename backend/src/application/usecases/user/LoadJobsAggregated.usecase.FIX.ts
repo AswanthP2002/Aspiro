@@ -1,187 +1,88 @@
 import { inject, injectable } from 'tsyringe';
 import ILoadJobsAggregatedUsecase from '../../interfaces/usecases/user/IloadJobsAggregated.usecase.FIX';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
-import { LoadJobsResDto } from '../../DTOs/job/loadJob.dto.FIX';
-import { LoadJobsAggregatedQueryDto } from '../../DTOs/job/loadJobsAggregatedQuery.dto.FIX';
-import { JobsQuery } from '../../queries/jobs.query';
-import { JobAggregatedDTO } from '../../DTOs/user/jobAggregated.dto';
-import mapJobAggregatedDataToDTO from '../../mappers/user/mapJobAggregatedDataToDTO.mapper';
-import JobAggregatedData from '../../../domain/entities/user/jobAggregated.entity';
-import { plainToInstance } from 'class-transformer';
+import { JobListForPublicDTO, LoadJobListForPublicDTO } from '../../DTOs/job/loadJob.dto.FIX';
+import JobMapper from '../../mappers/recruiter/Job.mapperClass';
+import IJobLevelRepository from '../../../domain/interfaces/admin/IJobLevel.repository';
+import IWorkModeRepository from '../../../domain/interfaces/admin/IWorkMode.repo';
+import IJobTypeRepository from '../../../domain/interfaces/admin/IJobType.repository';
 
 @injectable()
 export default class LoadJobsAggregatedUsecase implements ILoadJobsAggregatedUsecase {
-  constructor(@inject('IJobRepository') private _jobRepo: IJobRepo) {}
+  constructor(
+    @inject('IJobRepository') private _jobRepo: IJobRepo,
+    @inject('IJobLevelRepository') private _jobLevelRepo: IJobLevelRepository,
+    @inject('IWorkModeRepository') private _workModeRepo: IWorkModeRepository,
+    @inject('IJobTypeRepository') private _jobTypeRepo: IJobTypeRepository,
+    @inject('JobMapper') private _mapper: JobMapper
+  ) {}
 
-  async execute(loadJobQueryDto: LoadJobsAggregatedQueryDto): Promise<LoadJobsResDto | null> {
-    const { search, page, limit, sortOption, filter, locationSearch } = loadJobQueryDto;
-    const sort: { [key: string]: number } = {};
+  async execute(
+    loadJobQueryDto: LoadJobListForPublicDTO
+  ): Promise<{ jobs: JobListForPublicDTO[]; totalPages: number } | null> {
+    const { search, page, limit, workModeFilter, jobLevelFilter, jobTypeFilter, locationSearch } =
+      loadJobQueryDto;
 
-    switch (sortOption) {
-      case 'Newest':
-        sort['createdAt'] = -1;
-        break;
-      case 'Oldest':
-        sort['createdAt'] = 1;
-        break;
-      case 'Expiry':
-        sort['expiryDate'] = -1;
-        break;
-      case 'Application-most':
-        sort['applicationsCount'] = -1;
-        break;
-      case 'Application-least':
-        sort['applicationsCount'] = 1;
-        break;
-      case 'Salary-low':
-        sort['minSalary'] = 1;
-        break;
-      case 'Salary-high':
-        sort['minSalary'] = -1;
-        break;
-      default:
-        sort['createdAt'] = -1;
-        break;
+    console.log('-- This is from  use case checking dto from controller', loadJobQueryDto);
+    const [jobLevelResult, jobTypeResult, workModeResult] = await Promise.all([
+      this._jobLevelRepo.find(),
+      this._jobTypeRepo.find(),
+      this._workModeRepo.find(),
+    ]);
+    console.log('--fetched workmode datas--', workModeResult)
+
+    let jobLevel: string[] = jobLevelResult
+      ? jobLevelResult.map((item) => item.name as string)
+      : [];
+    let jobType: string[] = jobTypeResult ? jobTypeResult.map((item) => item.name as string) : [];
+    let workMode: string[] = workModeResult
+      ? workModeResult.map((item) => item.name as string)
+      : [];
+
+    if (jobLevelResult) {
+      jobLevelResult.forEach((item) => {
+        if (jobLevelFilter === item.name) {
+          jobLevel = [item.name as string];
+        }
+      });
     }
 
-    const filterOption: {
-      status: string[];
-      workMode: string[];
-      jobType: string[];
-      jobLevel: string[];
-    } = {
-      status: ['draft', 'active', 'expired', 'closed', 'rejected', 'blocked'],
-      workMode: ['On-site', 'Remote', 'Hybrid'],
-      jobType: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'],
-      jobLevel: ['Entry-level', 'Mid-level', 'Senior-level', 'Lead', 'Manager'],
-    };
-
-    if (filter.status && filter.status !== 'all') {
-      switch (filter.status) {
-        case 'active':
-          filterOption['status'] = ['active'];
-          break;
-        case 'draft':
-          filterOption['status'] = ['draft'];
-          break;
-        case 'expired':
-          filterOption['status'] = ['expired'];
-          break;
-        case 'closed':
-          filterOption['status'] = ['closed'];
-          break;
-        case 'rejected':
-          filterOption['status'] = ['rejected'];
-          break;
-        case 'blocked':
-          filterOption['status'] = ['blocked'];
-          break;
-        default:
-          filterOption['status'] = ['active', 'draft', 'expired', 'closed', 'rejected', 'blocked'];
-          break;
-      }
+    if (jobTypeResult) {
+      jobTypeResult.forEach((item) => {
+        if (jobTypeFilter === item.name) {
+          jobType = [item.name as string];
+        }
+      });
     }
 
-    if (filter.workMode && filter.workMode !== 'all') {
-      switch (filter.workMode) {
-        case 'On-site':
-          filterOption['workMode'] = ['On-site'];
-          break;
-        case 'Remote':
-          filterOption['workMode'] = ['Remote'];
-          break;
-        case 'Hybrid':
-          filterOption['workMode'] = ['Hybrid'];
-          break;
-        default:
-          filterOption['workMode'] = ['On-site', 'Remote', 'Hybrid'];
-          break;
-      }
+    if (workModeResult) {
+      workModeResult.forEach((item) => {
+        if (workModeFilter === item.name) {
+          workMode = [item.name as string];
+        }
+      });
     }
 
-    if (filter.jobType && filter.jobType !== 'all') {
-      switch (filter.jobType) {
-        case 'Full-time':
-          filterOption['jobType'] = ['Full-time'];
-          break;
-        case 'Part-time':
-          filterOption['jobType'] = ['Part-time'];
-          break;
-        case 'Contract':
-          filterOption['jobType'] = ['Contract'];
-          break;
-        case 'Internship':
-          filterOption['jobType'] = ['Internship'];
-          break;
-        case 'Temporary':
-          filterOption['jobType'] = ['Temporary'];
-          break;
-        default:
-          filterOption['jobType'] = [
-            'Full-time',
-            'Part-time',
-            'Contract',
-            'Internship',
-            'Temporary',
-          ];
-          break;
-      }
-    }
-
-    if (filter.jobLevel && filter.jobLevel !== 'all') {
-      switch (filter.jobLevel) {
-        case 'Entry-level':
-          filterOption['jobLevel'] = ['Entry-level'];
-          break;
-        case 'Mid-level':
-          filterOption['jobLevel'] = ['Mid-level'];
-          break;
-        case 'Senior-level':
-          filterOption['jobLevel'] = ['Senior-level'];
-          break;
-        case 'Lead':
-          filterOption['jobLevel'] = ['Lead'];
-          break;
-        case 'Manager':
-          filterOption['jobLevel'] = ['Manager'];
-          break;
-        default:
-          filterOption['jobLevel'] = [
-            'Entry-level',
-            'Mid-level',
-            'Senior-level',
-            'Lead',
-            'Manager',
-          ];
-          break;
-      }
-    }
-
-    const dbQuery: JobsQuery = {
-      search: search,
-      page: page,
-      limit: limit,
-      skip: (page - 1) * limit,
-      sortOption: sort,
-      filter: filterOption,
-      locationSearch: locationSearch,
-    };
-
-    const result = await this._jobRepo.getJobs(dbQuery);
+    const result = await this._jobRepo.getJobListForPublic({
+      search,
+      page,
+      limit,
+      locationSearch,
+      jobLevelFilter: jobLevel,
+      jobTypeFilter: jobType,
+      workModeFilter: workMode,
+    });
 
     if (result) {
-      const { jobs, totalPages, page } = result;
-      const dto: JobAggregatedDTO[] = [];
-
-      jobs.forEach((job: JobAggregatedData) => {
-        dto.push(plainToInstance(JobAggregatedDTO, job));
+      const { jobs, totalPages } = result;
+      const dto: JobListForPublicDTO[] = [];
+      jobs.forEach((job) => {
+        dto.push(this._mapper.jobListAggregatedForPublicToJobListForPublicDTO(job));
       });
 
       return {
         jobs: dto,
-        totalPages: totalPages,
-        page: page,
-        currentSort: sortOption,
+        totalPages,
       };
     }
 

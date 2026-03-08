@@ -1,5 +1,7 @@
-import FavoriteJobsAggregatedDTO from '../../../DTOs/candidate -LEGACY/favoriteJobAggregated.dto.FIX';
+import { LoadSavedJobsRequestDTO, MySavedJobsDTO } from '../../../DTOs/job/loadSavedJobs.dto';
 
 export default interface IGetSavedJobsUsecase {
-  execute(candidateId: string): Promise<FavoriteJobsAggregatedDTO[] | null>;
+  execute(
+    dto: LoadSavedJobsRequestDTO
+  ): Promise<{ jobs: MySavedJobsDTO[]; totalPages: number } | null>;
 }

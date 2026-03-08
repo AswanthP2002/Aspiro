@@ -20,10 +20,8 @@ export default async function allowResendOtp(
   try {
     const key = `otp-limit-${email}-${id}`;
 
-    //get the key
     const limit = await redisClient.get(key);
 
-    //check if it first time
     if (!limit) {
       const multi = redisClient.multi();
 
@@ -35,7 +33,6 @@ export default async function allowResendOtp(
       next();
     }
 
-    //check limit excede
     if (limit && parseInt(limit) < 3) {
       await redisClient.incr(key);
       next();

@@ -1,4 +1,3 @@
-import { Exclude, Expose } from 'class-transformer';
 import {
   JobType,
   WorkMode,
@@ -9,92 +8,34 @@ import {
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 import User from '../../../domain/entities/user/User.FIX';
 
-@Exclude()
-export class JobAggregatedDTO {
-  @Expose()
-  _id!: string;
-
-  @Expose()
-  recruiterId!: string;
-
-  @Expose()
-  jobTitle!: string;
-
-  @Expose()
-  description!: string;
-
-  @Expose()
-  requirements!: string;
-
-  @Expose()
-  responsibilities!: string;
-
-  @Expose()
-  duration!: string;
-
-  @Expose()
-  jobType!: JobType;
-
-  @Expose()
-  workMode!: WorkMode;
-
-  @Expose()
-  location!: string;
-
-  @Expose()
-  minSalary!: number;
-
-  @Expose()
-  maxSalary!: number;
-
-  @Expose()
-  salaryCurrency!: string;
-
-  @Expose()
-  salaryPeriod!: SalaryPeriod;
-
-  @Expose()
-  vacancies!: number;
-
-  @Expose()
-  qualification!: string;
-
-  @Expose()
-  experienceInYears!: number;
-
-  @Expose()
-  jobLevel!: JobLevel;
-
-  @Expose()
-  requiredSkills!: string[];
-
-  @Expose()
-  optionalSkills!: string[];
-
-  @Expose()
-  status!: JobStatus;
-
-  @Expose()
-  rejectionReason!: string;
-
-  @Expose()
-  views!: number;
-
-  @Expose()
-  applicationsCount!: number;
-
-  @Expose()
-  createdAt!: Date;
-
-  @Expose()
-  updatedAt!: Date;
-
-  @Expose()
-  expiresAt!: string;
-
-  @Expose()
-  userProfile!: User;
-
-  @Expose()
-  userRecruiterProfile!: Recruiter;
+export interface JobAggregatedDTO {
+  _id?: string;
+  recruiterId?: string; // Renamed from companyId for clarity
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string; // Good for contract/temporary roles
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string; // e.g., 'USD', 'INR'
+  salaryPeriod?: SalaryPeriod;
+  vacancies: number;
+  qualification: string;
+  experienceInYears: number; // More queryable than a string
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; // Replaces isBlocked and isRejected for better state management
+  rejectionReason?: string; // To provide feedback if status is 'rejected'
+  views?: number; // For analytics
+  applicationsCount?: number; // For analytics
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+  userProfile: User;
+  userRecruiterProfile: Recruiter;
 }

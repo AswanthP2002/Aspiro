@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import Recruiter from '../../../../domain/entities/recruiter/recruiter.entity';
+import mongoose, { Schema } from 'mongoose';
+import { NewRecruiter } from '../../../../domain/entities/recruiter/recruiter.entity';
 import SocialLinks from '../../../../domain/entities/SocialLinks';
 
 const SocialLinkSchema = new Schema<SocialLinks>({
@@ -7,31 +7,49 @@ const SocialLinkSchema = new Schema<SocialLinks>({
   url: { type: String },
 });
 
-export const RecruiterSchema = new Schema<Recruiter>(
+const VerificationTimeLineSchema = new Schema<{
+  action: string;
+  actor: string;
+  createdAt: string;
+  updatedAt: string;
+}>(
   {
-    employerType: { type: String },
-    userId: { type: Schema.Types.ObjectId, ref: 'user', required: true },
-    organizationDetails: {
-      organizationName: { type: String },
-      organizationType: { type: String },
-      organizationContactNumber: { type: String },
-      summary: { type: String },
-      linkedinUrl: { type: String },
-      website: { type: String },
-      teamStrength: { type: String },
-      organizationEmail: { type: String },
-      industry: { type: String },
-    },
-    focusingIndustries: { type: [String] },
+    action: { type: String },
+    actor: { type: String },
+  },
+  { timestamps: true }
+);
+
+export const RecruiterSchema = new Schema<NewRecruiter>(
+  {
+    fullName: { type: String },
+    professionalTitle: { type: String },
+    email: { type: String },
+    phone: { type: String },
+    applicationResendBufferDate: { type: Date },
+    companyId: { type: mongoose.Types.ObjectId },
+    isJobsHidden: { type: Boolean },
+    isPermissionRevoked: { type: Boolean },
+    isRejected: { type: Boolean },
+    isVerified: { type: Boolean },
     profileStatus: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'suspended', 'closed'],
+      enum: ['pending', 'under-review', 'approved', 'rejected', 'closed'],
       default: 'pending',
     },
-    isDeleted: { type: Boolean, default: false },
-    isSuspended: { type: Boolean, default: false },
-    recruitingExperience: { type: String },
-    summary: { type: String },
+    rejection: {
+      reason: { type: String },
+      feedback: { type: String },
+    },
+    verificationTimeline: { type: [VerificationTimeLineSchema] },
+    linkedinUrl: { type: String },
+    recruiterType: { type: String, enum: ['freelance', 'corporate'] },
+    userId: { type: mongoose.Types.ObjectId },
+    verificationDocument: {
+      publicId: { type: String },
+      url: { type: String },
+    },
+    yearOfExperience: { type: Number },
   },
   { timestamps: true }
 );

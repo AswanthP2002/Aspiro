@@ -1,6 +1,6 @@
-import UpdateUserDTO from '../../../DTOs/user/updateUser.dto.FIX';
-import { UserDto } from '../../../DTOs/user/user.dto.FIX';
+import { UpdataeUserDto } from '../../../DTOs/user/updateUser.dto.FIX';
+import UserDTO from '../../../DTOs/user/user.dto.FIX';
 
 export default interface IEditProfileUseCase {
-  execute(editUserDto: UpdateUserDTO): Promise<UserDto | null>;
+  execute(editUserDto: UpdataeUserDto): Promise<UserDTO | null>;
 }

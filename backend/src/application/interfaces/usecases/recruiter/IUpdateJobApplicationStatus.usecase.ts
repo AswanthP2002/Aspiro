@@ -1,6 +1,8 @@
-import { JobApplicationDTO } from "../../../DTOs/candidate -LEGACY/jobApplication.dto.FIX";
-import UpdateJobApplicationStatusDTO from "../../../DTOs/recruiter/UpdateJobApplicationStatus.dto";
+import { JobApplicationDTO } from '../../../DTOs/job/jobApplication.dto.FIX';
+import UpdateJobApplicationStatusDTO from '../../../DTOs/recruiter/UpdateJobApplicationStatus.dto';
 
 export default interface IUpdateJobApplicationStatusUsecase {
-    execute(updateJobApplicationDto: UpdateJobApplicationStatusDTO): Promise<JobApplicationDTO | null>
+  execute(
+    updateJobApplicationDto: UpdateJobApplicationStatusDTO
+  ): Promise<JobApplicationDTO | null>;
 }

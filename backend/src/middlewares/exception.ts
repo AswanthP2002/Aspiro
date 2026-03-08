@@ -10,7 +10,7 @@ export default function exceptionhandle(
 ) {
   let responseMessage: string;
   let code: number;
-  let errors: any; //es lint warning for using any need to fix later NEED_FIX
+  let errors: { code: string; message: string } = { code: '', message: '' }; //from any changed to proper structure
 
   console.error(err.stack);
 
@@ -40,6 +40,16 @@ export default function exceptionhandle(
       responseMessage = 'Your account has been blocked by the admin';
       code = StatusCodes.NOT_ACCEPTABLE;
       break;
+    case 'USER_SUSPENDED':
+      responseMessage =
+        'Your Account has been temporarly blocked, check email for further information';
+      code = StatusCodes.NOT_ACCEPTABLE;
+      break;
+    case 'USER_BANNED':
+      responseMessage =
+        'Your account has been permanently banned due to violation of our community guidelines';
+      code = StatusCodes.NOT_ACCEPTABLE;
+      break;
     case 'WRONG_PASSWORD':
       responseMessage = 'Incorrect password';
       code = StatusCodes.UNAUTHORIZED;
@@ -55,6 +65,7 @@ export default function exceptionhandle(
 
     //jwt based errors
     case 'TokenExpiredError':
+      console.log('--Un Authorized Error Occured in Authentication :: TOKEN EXPIRED--');
       responseMessage = 'Your session has expired, please re login';
       code = StatusCodes.UNAUTHORIZED;
       errors = {
@@ -64,7 +75,7 @@ export default function exceptionhandle(
       break;
 
     case 'JsonWebTokenError':
-      console.log('json web token error executed'); //debugging
+      console.log('--Un Authorized Error Occured in Authentication :: JSON WEB TOKEN ERROR--');
       responseMessage = 'Invalid token';
       code = StatusCodes.UNAUTHORIZED;
       errors = {
@@ -73,12 +84,12 @@ export default function exceptionhandle(
       };
       break;
     default:
-      console.log('Internal server error executed', err); // debugging
+      console.log('Internal server error executed', err); 
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;
   }
 
-  res.status(code).json({ success: false, message: responseMessage, errors }); //leave this error now, debug later NEED-FIX
+  res.status(code).json({ success: false, message: responseMessage, errors: errors });
   return;
 }

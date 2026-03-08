@@ -10,29 +10,12 @@ import ICheckIsJobSavedUseCase from '../../application/interfaces/usecases/user/
 import IUnsaveJobUseCase from '../../application/interfaces/usecases/user/IUnsaveJob.usecase.FIX';
 import IAddSocialLinkUsecase from '../../application/interfaces/usecases/user/IAddSocialLink.usecase.FIX';
 import IDeleteSocialLinkUseCase from '../../application/interfaces/usecases/user/IDeleteSocialLink.usecase.FIX';
-import mapToVerifyUserDTO from '../mappers/user/mapToVerifyUserRequestDTO';
-import MapToAddExperienceDTO from '../mappers/user/mapToCreateExperienceDto';
-import mapToCreateSkillDTOFromRequest from '../mappers/candidate/mapToCreateSkillDTOFromRequest';
-import mapToCreateEducationDTOFromRequest from '../mappers/candidate/mapToCreateEducationDTOFromRequest';
-import mapToUpdateEducationDTOFromRequest from '../mappers/candidate/mapToUpdateEducationDTOFromRequest';
-import mapToUploadProfilePictureDTOFromRequest from '../mappers/user/mapToUploadProfilePictureDTOFromRequest';
-import mapToUploadCoverPhotoDTOFromRequest from '../mappers/user/mapToUploadcoverphotoDTOFromRequest';
 import IRemoveCoverphotoUseCase from '../../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase.FIX';
-import mapToAddsocialLinkDTOFromRequest from '../mappers/user/mapToAddSocialLinkDTOFromRequest';
-import mapToEditExperienceDTO from '../mappers/user/mapToEditExperienceDTO';
-import mapEditProfileRequestToUpdateDTO from '../mappers/user/mapEditProfileRequestToUpdateDTO';
 import ICreateUserUseCase from '../../application/interfaces/usecases/user/ICreateUser.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
-import { verifyUserInputsSchema } from '../schemas/user/verifyUserInputs.schema';
 import IResendOTPUseCase from '../../application/interfaces/usecases/user/IResendOTP.usecase.FIX';
-import { resendOtpSchema } from '../schemas/user/resendOtp.schema';
 import IUserLoginUseCase from '../../application/interfaces/usecases/user/IUserLogin.usecase.FIX';
-import mapToUserLoginDTO from '../mappers/user/mapToUserLoginDTO';
-import ILoadUserProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserProfile.usecase.FIX';
-import { userIdSchema } from '../schemas/user/userId.schema';
 import ISaveUserBasicsUsecase from '../../application/interfaces/usecases/user/ISaveUsersBasics.usecase.FIX';
-import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasics.schema';
-import mapToUpdateUserDTO from '../mappers/user/mapToUpdateUserDTO';
 import IUploadUserCoverPhotoUsecase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase.FIX';
 import IUploadUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase.FIX';
 import IRemoveUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase.FIX';
@@ -41,20 +24,15 @@ import IGetUserExperiencesUsecase from '../../application/interfaces/usecases/us
 import IAddUserEducationUsecase from '../../application/interfaces/usecases/user/IAddUserEducation.usecase.FIX';
 import IGetUserEducationsUsecase from '../../application/interfaces/usecases/user/IGetUserEducations.usecase.FIX';
 import IAddUsersSkillUsecase from '../../application/interfaces/usecases/user/IAddUsersSkill.usecase.FIX';
-import { createUserSkillSchema } from '../schemas/user/createUserSkill.schema';
 import IGetUserSkillsUsecase from '../../application/interfaces/usecases/user/IGetUserSkills.usecase.FIX';
 import IEditUserEducationUsecase from '../../application/interfaces/usecases/user/IEditUserEducation.usecase.FIX';
 import IEditUserExperienceUsecase from '../../application/interfaces/usecases/user/IEditUserExperience.usecase.FIX';
 import IDeleteUserExperienceUsecase from '../../application/interfaces/usecases/user/IDeleteUserExperience.usecase.FIX';
 import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/user/IDeleteUserEducation.usecase.FIX';
 import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase.FIX';
-import { experienceIdSchema } from '../schemas/user/experienceId.schema';
 import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase.FIX';
-import { recruiterJobsSchema } from '../schemas/shared/recruiterJobsQuery.schema';
-import mapToLoadJobsQueryDTOFromRequest from '../mappers/user/mapLoadJobsQueryFromRequest.mapper';
 import SendResetPassworLinkUsecase from '../../application/usecases/user/SendPasswordResetLink.usecase.FIX';
 import ResetPasswordUsecase from '../../application/usecases/user/ResetPassword.usecase.FIX';
-import mapResetPasswordDtoMapper from '../../application/mappers/user/mapResetPasswordDto.mapper';
 import ILoadUserAggregatedProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
 import ILoadUserMetaDataUsecase from '../../application/interfaces/usecases/user/ILoadUserMetaData.usecase.FIX';
 import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase.FIX';
@@ -63,43 +41,74 @@ import IGetSavedJobsUsecase from '../../application/interfaces/usecases/user/IGe
 import IApplyJobUsecase from '../../application/interfaces/usecases/user/IApplyJob.usecase.FIX';
 import IGetMyApplicationsUsecase from '../../application/interfaces/usecases/user/IGetMyApplications.usecase.FIX';
 import { plainToInstance } from 'class-transformer';
-import { CreateUserDto } from '../../application/DTOs/user/createUser.dto.FIX';
 import { validate } from 'class-validator';
 import { ValidationError } from '../../domain/errors/AppError';
-import { VerifyUserDto } from '../../application/DTOs/user/verifyUser.dto.FIX';
 import { ResendOtpDto } from '../../application/DTOs/user/resendOtp.dto.FIX';
-import { UserLoginRequestDto } from '../../application/DTOs/user/userLogin.dto';
-import UpdateUserDTO, { UpdataeUserDto } from '../../application/DTOs/user/updateUser.dto.FIX';
-import {
-  CreateExperienceDto,
-  UpdateExperienceDto,
-} from '../../application/DTOs/user/experience.dto.FIX';
-import { LoadJobsAggregatedQueryDto } from '../../application/DTOs/job/loadJobsAggregatedQuery.dto.FIX';
-import { CreateSkillDTO } from '../../application/DTOs/user/skill.dto.FIX';
-import {
-  CreateEducationDTO,
-  UpdateEducationDTO,
-} from '../../application/DTOs/user/education.dto.FIX';
-import { ResetPasswordDto } from '../../application/DTOs/user/resetPassword.dto.FIX';
-import {
-  CreateResumeDTO,
-  DeleteResumeDTO,
-} from '../../application/DTOs/candidate -LEGACY/resume.dto';
 import ILoadResumeUseCase from '../../application/interfaces/usecases/user/ILoadResumes.usecase.FIX';
 import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase.FIX';
-import { CreateCertificateDTO } from '../../application/DTOs/candidate -LEGACY/certificate.dto.FIX';
-import IAddCertificateUseCase from '../../application/usecases/candidate/interface/IAddCertificate.usecase.FIX';
-import ILoadCertificateUseCase from '../../application/usecases/candidate/interface/IGetCeritificates.usecase.FIX';
-import CreateJobApplicationDTO from '../../application/DTOs/candidate -LEGACY/jobApplication.dto.FIX';
+import IAddCertificateUseCase from '../../application/interfaces/usecases/user/IAddCertificate.usecase.FIX';
+import ILoadCertificateUseCase from '../../application/interfaces/usecases/user/IGetCeritificates.usecase.FIX';
 import AddJobFavoriteDTO from '../../application/DTOs/user/addJobFavorite.dto.FIX';
-import AddSocialLinkDTO, {
-  RemoveSocialLinkDTO,
-} from '../../application/DTOs/user/socialLink.dto.FIX';
-import { UploadProfilePictureDTO } from '../../application/DTOs/user/uploadProfilePicture.dto.FIX';
-import RemoveProfilePhotoDTO, {
-  RemoveCoverPhotoDTO,
-} from '../../application/DTOs/candidate -LEGACY/removeProfilePhoto.dto.FIX';
-import { UploadCoverPhotoDTO } from '../../application/DTOs/candidate -LEGACY/uploadCoverPhoto.dto.FIX';
+import IDeleteCertificateUsecase from '../../application/interfaces/usecases/user/IDeleteCertificate.usecase';
+import ISetResumePrimaryUsecase from '../../application/interfaces/usecases/user/ISetResumePrimary.usecase';
+import IGetUsersForPublicUsecase from '../../application/interfaces/usecases/user/IGetUsersforPublic.usecase';
+import ILoadMyProfileUsecase from '../../application/interfaces/usecases/user/ILoadMyProfile.usecase.FIX';
+import IGetUserAlertsUsecase from '../../application/interfaces/usecases/user/IGetUserAlerts.usecase';
+import ISendConnectionRequestUsecase from '../../application/interfaces/usecases/user/ISendConnectionRequest.usecase';
+import IRejectConnectionRequestUsecase from '../../application/interfaces/usecases/user/IRejectConnectionRequest.usecase';
+import ICancelConnectionRequestUsecase from '../../application/interfaces/usecases/user/ICancelConnectionRequest.usecase';
+import IAcceptConnectionRequestUsecase from '../../application/interfaces/usecases/user/IAcceptConnectionRequest.usecase';
+import { generateToken, verifyToken } from '../../services/jwt';
+import ICheckIsJobApplied from '../../application/interfaces/usecases/user/ICheckJobApplied.usecase';
+import ISendResetPassworLinkUsecase from '../../application/interfaces/usecases/user/ISendPasswordResetLink.usecase.FIX';
+import IResetPasswordUsecase from '../../application/interfaces/usecases/user/IResetPassword.usecase.FIX';
+
+const MockData = [
+  { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
+  { name: 'Priya Sharma', headline: 'Turning ideas into scalable products' },
+  { name: 'Daniel Lee', headline: 'Passionate about clean code and design' },
+  { name: 'Maria Gomez', headline: 'Crafting user-first interfaces' },
+  { name: 'Rohit Verma', headline: 'Solving real-world problems with tech' },
+  { name: 'Emily Watson', headline: 'Creating impact through creativity' },
+  { name: 'Kunal Mehta', headline: 'Driven by curiosity and innovation' },
+  { name: 'Sarah Johnson', headline: 'Designing with purpose and empathy' },
+  { name: 'Arjun Patel', headline: 'Building reliable and scalable systems' },
+  { name: 'Liam Brown', headline: 'Focused on performance and simplicity' },
+
+  { name: 'Neha Kapoor', headline: 'Blending aesthetics with usability' },
+  { name: 'Michael Chen', headline: 'Engineering thoughtful solutions' },
+  { name: 'Aisha Khan', headline: 'Turning complex ideas into clarity' },
+  { name: 'Tom Williams', headline: 'Obsessed with product quality' },
+  { name: 'Sneha Iyer', headline: 'Design-led problem solver' },
+  { name: 'Chris Miller', headline: 'Making technology more human' },
+  { name: 'Vikram Singh', headline: 'Building future-ready applications' },
+  { name: 'Olivia Martinez', headline: 'Creating delightful user journeys' },
+  { name: 'Aditya Rao', headline: 'Focused on growth and learning' },
+  { name: 'Emma Davis', headline: 'Transforming concepts into reality' },
+
+  { name: 'Nikhil Joshi', headline: 'Always learning, always building' },
+  { name: 'Sophia Taylor', headline: 'Designing products people love' },
+  { name: 'Rahul Malhotra', headline: 'Problem solver with a product mindset' },
+  { name: 'James Anderson', headline: 'Turning challenges into opportunities' },
+  { name: 'Pooja Desai', headline: 'Creating simple solutions for complex needs' },
+];
+
+const fetchData = (page: number, limit: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      resolve(MockData.slice(start, end));
+    }, 1000);
+  });
+};
+
+type JWTTokenVerifyResult = {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+};
 
 @injectable()
 export class UserController {
@@ -108,7 +117,7 @@ export class UserController {
     @inject('IVerifyUserUsecase') private _verifyUserUC: IVerifyUserUseCase,
     @inject('IResendOTPUsecase') private _resendOTPUC: IResendOTPUseCase,
     @inject('IUserLoginUsecase') private _userLoginUC: IUserLoginUseCase,
-    @inject('ILoadUserProfileUsecase') private _loadUserProfileUC: ILoadUserProfileUsecase,
+    @inject('ILoadMyProfileUsecase') private _loadMyProfile: ILoadMyProfileUsecase,
     @inject('ISaveUserBasicsUsecase') private _saveUserBasicsUC: ISaveUserBasicsUsecase,
     @inject('IUploadUserCoverPhotoUsecase')
     private _uploadUserCoverPhotoUC: IUploadUserCoverPhotoUsecase,
@@ -133,13 +142,13 @@ export class UserController {
     @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase,
     @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase,
     @inject('ISendResetPasswordLinkUsecase')
-    private _sendResetPasswordLink: SendResetPassworLinkUsecase,
-    @inject('IResetPasswordUsecase') private _resetPassword: ResetPasswordUsecase,
+    private _sendResetPasswordLink: ISendResetPassworLinkUsecase,
+    @inject('IResetPasswordUsecase') private _resetPassword: IResetPasswordUsecase,
     @inject('IAddSocialLinkUsecase') private _addSocialLink: IAddSocialLinkUsecase,
     @inject('IDeleteSocialLinkUsecase') private _deleteSocialLink: IDeleteSocialLinkUseCase,
     @inject('IEditProfileUsecase') private _editProfile: IEditProfileUseCase,
-    @inject('ILoadUserAggregatedProfileUsecase')
-    private _loadUserAggregatedProfile: ILoadUserAggregatedProfileUsecase,
+    @inject('ILoadUserPublicProfileUsecase')
+    private _loadUserPublicProfile: ILoadUserAggregatedProfileUsecase,
     @inject('ILoadUserMetaDataUsecase') private _loadUserMetaData: ILoadUserMetaDataUsecase,
     @inject('IGetJobDetailsUsecase') private _getJobDetails: IGetJobDetailsUseCase,
     @inject('ISaveJobUsecase') private _saveJob: ISaveJobUsecase,
@@ -152,48 +161,52 @@ export class UserController {
     @inject('ILoadResumeUsecase') private _loadResumes: ILoadResumeUseCase,
     @inject('IDeleteResumeUsecase') private _deleteResume: IDeleteResumeUseCase,
     @inject('IAddCertificate') private _addCertificate: IAddCertificateUseCase,
-    @inject('ILoadCertificates') private _loadCertificates: ILoadCertificateUseCase
+    @inject('ILoadCertificates') private _loadCertificates: ILoadCertificateUseCase,
+    @inject('IDeleteCertificateUsecase') private _deleteCertificate: IDeleteCertificateUsecase,
+    @inject('ISetResumePrimary') private _setResumePrimary: ISetResumePrimaryUsecase,
+    @inject('IGetUsersForPublicUsecase') private _getUsersForPublic: IGetUsersForPublicUsecase,
+    @inject('IGetUserAlertsUsecase') private _getUserAlerts: IGetUserAlertsUsecase,
+    @inject('ISendConnectionRequestUsecase')
+    private _sendConnectionRequest: ISendConnectionRequestUsecase,
+    @inject('IRejectConnectionRequestUsecase')
+    private _rejectConnectionRequest: IRejectConnectionRequestUsecase,
+    @inject('ICancelConnectionRequestUsecase')
+    private _cancelConnectionRequest: ICancelConnectionRequestUsecase,
+    @inject('IAcceptConnectionRequestUsecase')
+    private _acceptConnectionRequest: IAcceptConnectionRequestUsecase,
+    @inject('ICheckIsJobAppliedUsecase') private _checkIsJobApplied: ICheckIsJobApplied
   ) {}
 
-  /**
-   * 1. Controller gets validated data from the router
-   * 2. map to dto
-   * 3. call particular usecase
-   */
+  async testInfinityScroll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = req.query.search || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 4;
+    try {
+      const result = await fetchData(page, limit);
+      res.status(StatusCodes.OK).json({ success: true, message: 'fetched', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
   async registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // const validateInput = CreateUserSchema.parse(req.body);
-      // const createUserDto = mapRequestToCreateUserDTO(validateInput);
-      const dto = plainToInstance(CreateUserDto, req.body);
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        throw new ValidationError();
-      }
-
-      const createUser = await this._createUserUsecase.execute(dto);
+      const createUser = await this._createUserUsecase.execute(req.body);
 
       res.status(StatusCodes.CREATED).json({
         success: true,
-        message: 'Candidate created need to verify before continue',
+        message: 'User created need to verify before continue',
         userId: createUser?._id,
         userEmail: createUser?.email,
       });
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async verifyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // const validatedInputs = verifyUserInputsSchema.parse(req.body);
-      const dto = plainToInstance(VerifyUserDto, req.body);
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        throw new ValidationError();
-      }
-
-      const verifiedUser = await this._verifyUserUC.execute(dto);
+      const verifiedUser = await this._verifyUserUC.execute(req.body);
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -224,13 +237,8 @@ export class UserController {
   } //fixed
 
   async userLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //candidate  login
     try {
-      const dto = plainToInstance(UserLoginRequestDto, req.body);
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._userLoginUC.execute(dto);
+      const result = await this._userLoginUC.execute(req.body);
       const { refreshToken } = result;
 
       res
@@ -239,28 +247,76 @@ export class UserController {
           httpOnly: true,
           secure: false,
           sameSite: 'lax',
-          maxAge: 24 * 60 * 60 * 1000,
+          maxAge: parseInt(process.env.COOKIE_MAX_AGE as string),
         })
         .json({
           success: true,
           message: 'User login successfull',
-          result: { user: result.user, accessToken: result.token, role: result.role },
+          result: { user: result.user, accessToken: result.accessToken, role: result.role },
         });
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
-  async loadUserMetaData(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
+  async reAuthenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await this._loadUserMetaData.execute(userId);
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'Metadata fetched successfully', result });
+      const refreshToken = req.cookies.refreshToken;
+      if (!refreshToken) {
+        console.log('--Refreshtoken not provided--');
+        res
+          .status(StatusCodes.NOT_ACCEPTABLE)
+          .json({ success: false, message: 'No refresh token provided' });
+        return;
+      }
+      const decoded = (await verifyToken(refreshToken)) as JWTTokenVerifyResult; //chance for error
+
+      const result = await this._loadUserMetaData.execute(decoded.id);
+      const accessToken = await generateToken({
+        id: decoded?.id as string,
+        email: decoded?.email as string,
+        role: decoded?.role as string,
+      });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Metadata fetched successfully',
+        userData: result,
+        accessToken,
+      });
     } catch (error: unknown) {
-      next(error);
+      if (error instanceof Error) {
+        console.log('Error occured while refreshing accessToken', error);
+        switch (error.name) {
+          case 'TokenExpiredError':
+            res.status(StatusCodes.UNAUTHORIZED).json({
+              success: false,
+              message: 'Your session has expired, please login again',
+              errors: {
+                code: 'REFRESH_TOKEN_EXPIRED',
+                message: 'Refresh token expired, please login again',
+              },
+            });
+            break;
+
+          case 'JsonWebTokenError':
+            res.status(StatusCodes.UNAUTHORIZED).json({
+              success: false,
+              message: 'Invalid Token, please login again',
+              errors: {
+                code: 'INVALID_TOKEN',
+                message: 'Invalid token, please login again',
+              },
+            });
+            break;
+
+          default:
+            console.log('Refresh token verification failed');
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+              success: false,
+              message: 'Something went wrong, please try again after some time',
+            });
+        }
+      }
     }
   } //fixed
 
@@ -268,30 +324,22 @@ export class UserController {
     const id = req.user.id as string;
 
     try {
-      // const validatedId = userIdSchema.parse({ id });
-      // const validatedData = SaveUserBasicsSchema.parse(req.body);
-      //console.log('--data came from the body--', req.body);
-      const adapterBody = {
+      const result = await this._saveUserBasicsUC.execute({
         _id: id,
         headline: req.body.headline,
         summary: req.body.summary,
         location: {
-          state: req.body.state,
           city: req.body.city,
           district: req.body.district,
-          country: req.body.country,
+          state: req.body.state,
           pincode: req.body.pincode,
+          country: req.body.country,
+          coords: {
+            type: 'Point',
+            coordinates: [parseFloat(req.body.long), parseFloat(req.body.lat)],
+          },
         },
-      };
-      //console.log('--adapter body--', adapterBody);
-      const dto = plainToInstance(UpdataeUserDto, adapterBody);
-      //console.log('--data after transformed', dto);
-      //console.log('--data expecting in this form--', UpdateUserDTO);
-
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._saveUserBasicsUC.execute(dto);
+      });
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -305,8 +353,9 @@ export class UserController {
 
   async loadUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
+    console.log('-- Inspecting user id from the controller --', id);
     try {
-      const userDetails = await this._loadUserProfileUC.execute(id);
+      const userDetails = await this._loadMyProfile.execute(id);
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -336,12 +385,7 @@ export class UserController {
   async addExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
     try {
-      //const dto = MapToAddExperienceDTO({ userId: userId, ...req.body });
-      const dto = plainToInstance(CreateExperienceDto, { userId, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._addUserExperience.execute(dto);
+      const result = await this._addUserExperience.execute({ userId, ...req.body });
 
       res.status(StatusCodes.CREATED).json({
         success: true,
@@ -382,14 +426,8 @@ export class UserController {
 
   async editExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const { experienceId } = req.params;
-
     try {
-      const dto = plainToInstance(UpdateExperienceDto, { _id: experienceId, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._editUserExperienceUC.execute(dto);
-
+      const result = await this._editUserExperienceUC.execute({ experienceId, ...req.body });
       res.status(StatusCodes.OK).json({ success: true, message: 'Edited', result });
     } catch (error: unknown) {
       next(error);
@@ -398,30 +436,22 @@ export class UserController {
 
   async loadJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
+    const locationSearch = (req.query.locationSearch as string) || '';
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 3;
-    const sortOption = (req.query.sort as string) || 'Newest';
-    const filter = JSON.parse(req.query.filter as string) || {};
-    //location search is pending
-
+    const limit = parseInt(req.query.limit as string) || 5;
+    const workModeFilter = (req.query.workMode as string) || 'All';
+    const jobTypeFilter = (req.query.jobType as string) || 'All';
+    const jobLevelFilter = (req.query.jobLevel as string) || 'All';
     try {
-      // const valdiateQueryData = recruiterJobsSchema.parse({
-      //   search,
-      //   page,
-      //   limit,
-      //   sortOption,
-      //   filter,
-      // });
-      const dto = plainToInstance(LoadJobsAggregatedQueryDto, {
+      const result = await this._loadJobs.execute({
         search,
-        page,
         limit,
-        sortOption,
-        filter,
+        page,
+        jobLevelFilter,
+        workModeFilter,
+        jobTypeFilter,
+        locationSearch,
       });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-      const result = await this._loadJobs.execute(dto);
 
       res
         .status(StatusCodes.OK)
@@ -431,10 +461,10 @@ export class UserController {
     }
   } //fixed
 
-  async loadUserAggregatedProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async loadUsersPublicProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { userId } = req.params;
     try {
-      const result = await this._loadUserAggregatedProfile.execute(userId);
+      const result = await this._loadUserPublicProfile.execute(userId);
 
       res
         .status(StatusCodes.OK)
@@ -449,7 +479,6 @@ export class UserController {
 
     try {
       const jobDetails = await this._getJobDetails.execute(jobId);
-      //console.log('--checking job details from the backend--', jobDetails);
       res
         .status(StatusCodes.OK)
         .json({ success: true, message: 'Job details fetched', jobDetails });
@@ -461,14 +490,8 @@ export class UserController {
   async addSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user.id;
     try {
-      // const validatedId = userIdSchema.parse({ id: userId });
-      // const validateData = createUserSkillSchema.parse(req.body);
-      const dto = plainToInstance(CreateSkillDTO, { userId, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._addUserSkillUC.execute(dto);
-      res.status(StatusCodes.OK).json({ success: true, message: 'added', skill: result });
+      const result = await this._addUserSkillUC.execute({ userId, ...req.body });
+      res.status(StatusCodes.OK).json({ success: true, message: 'added', result });
     } catch (error: unknown) {
       next(error);
     }
@@ -477,8 +500,7 @@ export class UserController {
   async getSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user.id;
     try {
-      const validatedId = userIdSchema.parse({ id: userId });
-      const skills = await this._getUserSkillsUC.execute(validatedId.id);
+      const skills = await this._getUserSkillsUC.execute(userId);
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -494,7 +516,6 @@ export class UserController {
     const { skillId } = req.params;
 
     try {
-      console.log('--checking skill id', skillId);
       await this._deleteUserSkillUC.execute(skillId);
 
       res.status(StatusCodes.OK).json({ success: true, message: 'Skill removed' });
@@ -507,11 +528,7 @@ export class UserController {
     const userId = req.user.id;
 
     try {
-      const dto = plainToInstance(CreateEducationDTO, { userId, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._addUserEducationUC.execute(dto);
+      const result = await this._addUserEducationUC.execute({ userId, ...req.body });
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -527,8 +544,7 @@ export class UserController {
     const userId = req.user.id;
 
     try {
-      const validateId = userIdSchema.parse({ id: userId });
-      const result = await this._getUserEducationsUC.execute(validateId.id);
+      const result = await this._getUserEducationsUC.execute(userId);
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -555,14 +571,7 @@ export class UserController {
     const { educationId } = req.params;
 
     try {
-      console.log('--data from the req body--', req.body);
-      const dto = plainToInstance(UpdateEducationDTO, { _id: educationId, ...req.body });
-      console.log('--data after transformation--', dto);
-      const errors = await validate(dto);
-      console.log('--checking errors--', errors);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._editUserEducationUC.execute(dto);
+      const result = await this._editUserEducationUC.execute({ _id: educationId, ...req.body });
 
       res.status(StatusCodes.OK).json({ success: true, message: 'Education edited', result });
     } catch (error: unknown) {
@@ -584,11 +593,7 @@ export class UserController {
 
   async resetPassword(req: Auth, res: Response, next: NextFunction): Promise<void> {
     try {
-      const dto = plainToInstance(ResetPasswordDto, req.body);
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      await this._resetPassword.execute(dto);
+      await this._resetPassword.execute(req.body);
 
       res.status(StatusCodes.OK).json({ success: true, message: 'Password reset successfully' });
     } catch (error: unknown) {
@@ -597,30 +602,34 @@ export class UserController {
   } //fixed
 
   async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
-    //testing file
-    //console.log('Request for uploading resume reached here, controller candididateController.ts');
+    const userId = req.user.id;
+
     try {
       if (req.file) {
         const resume = req.file.buffer;
-        const dto = plainToInstance(CreateResumeDTO, {
+
+        const result = await this._addResume.execute({
+          userId,
           file: resume,
           path: req.file.originalname,
-          candidateId,
+          ...req.body,
         });
-        const errors = await validate(dto);
-        if (errors.length > 0) throw new ValidationError();
 
-        const result = await this._addResume.execute(dto);
+        if (!result) {
+          res
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ success: false, message: 'Failed to process resume' });
+          return;
+        }
 
         res.status(StatusCodes.OK).json({
           success: true,
           message: 'Resume added successfully',
-          resumeId: result?._id,
+          result,
         });
         return;
       }
-      //console.log('A problem occured while saving resume candidateController.ts');
+      console.log('No file found in request for addResume');
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Can not add resume' });
     } catch (error: unknown) {
       next(error);
@@ -642,16 +651,25 @@ export class UserController {
     }
   } //fixed
 
+  async setResumePrimary(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user.id;
+      const resumeId = req.params.resumeId;
+
+      const result = await this._setResumePrimary.execute({ resumeId, userId });
+
+      res.status(StatusCodes.OK).json({ success: true, message: 'Resume set to primary', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
   async deleteResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const { resumeId } = req.params;
     const cloudinaryPublicId = req.query?.cloudinaryPublicId as string;
 
     try {
-      const dto = plainToInstance(DeleteResumeDTO, { resumeId, cloudinaryPublicId });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      await this._deleteResume.execute(dto);
+      await this._deleteResume.execute({ cloudinaryPublicId, resumeId });
 
       res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
     } catch (error: unknown) {
@@ -666,19 +684,17 @@ export class UserController {
       if (req.file) {
         const arrayBuffer = req.file.buffer;
         const filePathName = req.file.originalname.split('.')[0];
-        const dto = plainToInstance(CreateCertificateDTO, {
-          candidateId: userId,
+
+        const result = await this._addCertificate.execute({
           file: arrayBuffer,
           path: filePathName,
+          userId,
+          ...req.body,
         });
-        const errors = await validate(dto);
-        if (errors.length > 0) throw new ValidationError();
-
-        const result = await this._addCertificate.execute(dto);
 
         res
           .status(StatusCodes.OK)
-          .json({ success: true, message: 'Certificate added successfully' });
+          .json({ success: true, message: 'Certificate added successfully', result });
         return;
       }
     } catch (error: unknown) {
@@ -701,23 +717,31 @@ export class UserController {
     }
   } //fixed
 
-  async saveJobApplication(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    //coverLetterContent, savedResumeId
+  async deleteCertificate(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const cloudinaryPublicId = req.query.cloudinaryPublicId as string;
+    const certificateId = req.params.certificateId;
+
+    try {
+      await this._deleteCertificate.execute({ certificateId, cloudinaryPublicId });
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'Certificate deleted successfully' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async applyJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user.id;
     const { jobId } = req.params;
     const { coverLetterContent, resumeId } = req.body;
-
     try {
-      const dto = plainToInstance(CreateJobApplicationDTO, {
+      const result = await this._applyJob.execute({
         candidateId,
-        jobId,
         coverLetterContent,
+        jobId,
         resumeId,
       });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
-
-      const result = await this._applyJob.execute(dto);
 
       res.status(StatusCodes.OK).json({ success: true, message: 'success', result });
     } catch (error: unknown) {
@@ -725,33 +749,25 @@ export class UserController {
     }
   } //fixed
 
-  // // async searchJobFromHomePage(req: Request, res: Response): Promise<Response> {
-  // //   const search = (req.query.search as string) || '';
-  // //   //console.log('search query from the controller', search)
-
-  // //   try {
-  // //     const jobs = await this._searchJobFromHomeUC.execute(search);
-
-  // //     return res
-  // //       .status(StatusCodes.OK)
-  // //       .json({ success: true, message: 'success', jobs });
-  // //   } catch (error: unknown) {
-  // //     console.log('Error occured while searching the jobs', error);
-  // //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  // //       success: false,
-  // //       message: 'Internal server error, please try again after some time',
-  // //     });
-  // //   }
-  // // }
-
-  async editUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async editMyProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const id = req.user.id;
-    try {
-      const dto = plainToInstance(UpdateUserDTO, { _id: id, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
 
-      const result = await this._editProfile.execute(dto);
+    const data = {
+      name: req.body.name,
+      headline: req.body.headline,
+      summary: req.body.summary,
+      phone: req.body.phone,
+      location: {
+        city: req.body.city,
+        district: req.body.district,
+        state: req.body.state,
+        country: req.body.country,
+        pincode: req.body.pincode,
+      },
+    };
+    try {
+      console.log('--edit profile details in controller--', req.body);
+      const result = await this._editProfile.execute({ _id: id, ...data });
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -763,46 +779,6 @@ export class UserController {
     }
   } //fixed
 
-  // async getNotifications(req: Auth, res: Response): Promise<Response> {
-  //   const userId = req.user.id;
-  //   try {
-  //     const notifications = await this._getNotificationsUC.execute(userId);
-  //     return res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Notifications fetched successfully',
-  //       notifications,
-  //     });
-  //   } catch (error: unknown) {
-  //     console.log(
-  //       'Error occured while fetching candidate notifications',
-  //       error
-  //     );
-  //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  //       susccess: false,
-  //       message: 'Internal server error, please try again after some time',
-  //     });
-  //   }
-  // }
-
-  // async updateNotificationReadStatus(
-  //   req: Auth,
-  //   res: Response
-  // ): Promise<Response> {
-  //   const { id } = req.params;
-  //   try {
-  //     const result = await this._updateNotificationReadStatus.execute(id);
-  //     return res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Status updated to read' });
-  //   } catch (error: unknown) {
-  //     console.log('Errro occured while updating notification status', error);
-  //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  //       success: false,
-  //       message: 'Internal seerver error, pleaes try again after som etime',
-  //     });
-  //   }
-  // }
-
   async saveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user.id;
     const { jobId } = req.params;
@@ -813,7 +789,6 @@ export class UserController {
 
       const result = await this._saveJob.execute({ candidateId, jobId });
 
-      //console.log('--job saved--');
       res.status(StatusCodes.CREATED).json({ success: true, message: 'Job saved' });
     } catch (error: unknown) {
       next(error);
@@ -822,7 +797,7 @@ export class UserController {
 
   async checkIsJobSaved(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user.id;
-    const jobId = req.query.jobId as string;
+    const jobId = req.params.jobId as string;
     try {
       const result = await this._checkIsJobSaved.execute(jobId, candidateId);
 
@@ -832,27 +807,47 @@ export class UserController {
     }
   } //fixed
 
+  async checkIsJobApplied(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user.id;
+    const jobId = req.params.jobId;
+    try {
+      const result = await this._checkIsJobApplied.execute(jobId, candidateId);
+      res.status(StatusCodes.OK).json({ success: true, message: 'result', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getFavoriteJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user.id;
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const sort = (req.query.sort as string) || 'recently-saved';
     try {
-      const result = await this._getSavedJobs.execute(candidateId);
+      const result = await this._getSavedJobs.execute({
+        candidateId,
+        search,
+        page,
+        limit,
+        sort,
+      });
 
       res.status(StatusCodes.OK).json({
         success: true,
         message: 'Favorite jobs fetched sucessfully',
-        jobs: result,
+        result: result,
       });
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async unsaveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
-    const { jobId } = req.params;
+    const savedId = req.params.id;
 
     try {
-      await this._unsaveJob.execute(jobId, candidateId);
+      await this._unsaveJob.execute(savedId);
       res.status(StatusCodes.OK).json({ success: true, message: 'Unsaved' });
     } catch (error: unknown) {
       next(error);
@@ -865,13 +860,9 @@ export class UserController {
     const domain = urlObj?.hostname as string;
 
     try {
-      const dto = plainToInstance(AddSocialLinkDTO, { userId, domain, ...req.body });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._addSocialLink.execute({ userId, domain, ...req.body });
 
-      const result = await this._addSocialLink.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Social link added' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Social link added', result });
     } catch (error: unknown) {
       next(error);
     }
@@ -882,13 +873,9 @@ export class UserController {
     const domain = req.body?.domain as string;
 
     try {
-      const dto = plainToInstance(RemoveSocialLinkDTO, { userId, domain });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._deleteSocialLink.execute({ userId, domain });
 
-      await this._deleteSocialLink.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Removed' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Removed', result });
     } catch (error: unknown) {
       next(error);
     }
@@ -900,35 +887,31 @@ export class UserController {
     const publicId = req.query?.publicId as string;
 
     try {
-      const dto = plainToInstance(UploadProfilePictureDTO, { userId, imageFile: img, publicId });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._uploadUserProfilePictureUC.execute({
+        userId,
+        imageFile: img,
+        publicId,
+      });
 
-      await this._uploadUserProfilePictureUC.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Profile photo updated' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Profile photo updated', result });
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async removeProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
     const cloudinaryPublicId = req.body.cloudinaryPublicId as string;
 
     try {
-      const dto = plainToInstance(RemoveProfilePhotoDTO, { userId, cloudinaryPublicId });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._removeUserProfPictureUC.execute({ cloudinaryPublicId, userId });
 
-      await this._removeUserProfPictureUC.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Photo removed' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Photo removed', result });
       return;
     } catch (error: unknown) {
       next(error);
     }
-  } //rfixed
+  }
 
   async uploadCoverphoto(req: Auth, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
@@ -936,13 +919,13 @@ export class UserController {
     const imgFile = req.file?.buffer;
 
     try {
-      const dto = plainToInstance(UploadCoverPhotoDTO, { userId, imageFile: imgFile, publicId });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._uploadUserCoverPhotoUC.execute({
+        userId,
+        publicId,
+        imageFile: imgFile,
+      });
 
-      await this._uploadUserCoverPhotoUC.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo updated' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo updated', result });
     } catch (error: unknown) {
       next(error);
     }
@@ -953,143 +936,140 @@ export class UserController {
     const cloudinaryPublicId = req.query?.publicId as string;
 
     try {
-      const dto = plainToInstance(RemoveCoverPhotoDTO, { userId, cloudinaryPublicId });
-      const errors = await validate(dto);
-      if (errors.length > 0) throw new ValidationError();
+      const result = await this._removeUserCoverPhotoUC.execute({ cloudinaryPublicId, userId });
 
-      await this._removeUserCoverPhotoUC.execute(dto);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo removed' });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo removed', result });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  // async getCandidates(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   console.log('Trying to inspect the request query params', req.query);
-  //   const search = (req.query?.search as string) || '';
-  //   const page = parseInt(req.query?.page as string) || 1;
-  //   const limit = parseInt(req.query?.limit as string) || 4;
-  //   const sort = (req.query?.sort as string) || '';
-  //   const filter = JSON.parse(req.query?.filter as string) || {};
+  async getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query?.search as string) || '';
+    const page = parseInt(req.query?.page as string) || 1;
+    const limit = parseInt(req.query?.limit as string) || 4;
+    const roleTypeFilter = (req.query.roleTypeFilter as string) || 'All';
+    const experienceFilter = (req.query.experienceFilter as string) || 'All';
+    const location = (req.query.location as string) || '';
+    // const sort = (req.query?.sort as string) || '';
+    // const filter = JSON.parse(req.query?.filter as string) || {};
 
-  //   try {
-  //     const dto = mapToFindCandidatesDTOFromRequest({
-  //       search,
-  //       page,
-  //       limit,
-  //       sort,
-  //       filter,
-  //     });
-  //     const result = await this._getCandidatesUC.execute(dto);
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Candidate list fetched successfully',
-  //       result,
-  //     });
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
-
-  // async getCandidateDetails(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   const candidateId = req.params?.candidateId as string;
-  //   try {
-  //     const result = await this._getCandidateDetailsUC.execute(candidateId);
-
-  //     res.status(StatusCodes.OK).json({
-  //       success: true,
-  //       message: 'Candidate details fetched successfully',
-  //       candidateDetails: result,
-  //     });
-
-  //     return;
-  //   } catch (error: unknown) {
-  //     next(error);
-  //   }
-  // } //reworked : void
-
-  async getCandidateApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user?.id;
     try {
-      const applications = await this._getMyApplications.execute(candidateId);
-      //console.log('-------applications in the contorller', applications);
+      const result = await this._getUsersForPublic.execute({
+        search,
+        page,
+        limit,
+        roleTypeFilter,
+        experienceFilter,
+        location,
+      });
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Applications fetched successfully',
-        applications,
+        message: 'users list fetched successfully',
+        result,
       });
     } catch (error: unknown) {
       next(error);
     }
   } //reworked : void
 
-  // }
+  async getMyAlerts(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._getUserAlerts.execute(userId);
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: 'User Alerts fetched successfully', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // export const getAuthUserData = async (req : Request, res : Response) : Promise<Response> => {
-  //     try {
-  //         const db = await connectDb()
-  //         const {id} = req.params
-  //         const cRepo = new CandidateRepository(db)
-  //         const getAuthUseCase = new GetAuthUserUseCase(cRepo)
-  //         const data = await getAuthUseCase.execute(id)
-  //         return res.status(200).json({success:true, message:'user details fetched successfully', user:data})
-  //     } catch (error) {
-  //         console.log('error occured while geting google auth user data', error)
-  //         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
-  //     }
+  async getCandidateApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id;
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const sort = (req.query.sort as string) || 'recently-applied';
+    const status = (req.query.status as string) || 'all';
+    try {
+      const result = await this._getMyApplications.execute({
+        candidateId,
+        search,
+        page,
+        limit,
+        sort,
+        status,
+      });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Applications fetched successfully',
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  } //reworked : void
+
+  async sendConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const sender = req.user.id;
+    const receiver = req.params.receiverId;
+    const { acted_by, acted_user_avatar } = req.body;
+
+    try {
+      const result = await this._sendConnectionRequest.execute({
+        sender,
+        receiver,
+        acted_by,
+        acted_user_avatar,
+      });
+
+      res
+        .status(StatusCodes.CREATED)
+        .json({ success: true, message: 'Connection Request send', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async cancelConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const sender = req.user.id;
+    const receiver = req.params.receiverId;
+    try {
+      const result = await this._cancelConnectionRequest.execute({ sender, receiver });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Canceled', result });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async rejectConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const sender = req.body.sender;
+    const receiver = req.user.id;
+
+    try {
+      const result = await this._rejectConnectionRequest.execute({ receiver, sender });
+      res.status(StatusCodes.OK).json({ success: true, message: 'Request rejected' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async acceptConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
+    const receiver = req.user.id;
+    const { sender, acted_by, acted_user_avatar } = req.body;
+
+    try {
+      const result = await this._acceptConnectionRequest.execute({
+        senderId: sender,
+        myId: receiver,
+        myName: acted_by,
+        myAvatar: acted_user_avatar,
+      });
+
+      res.status(StatusCodes.OK).json({ success: true, message: 'Accepted', result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
-
-// export const editCandidateProfile = async (req : Auth, res : Response) : Promise<Response> => {
-//     console.log('Candidate edit request reached here', req.body)
-//     try {
-//         const db = await connectDb()
-//         const id = req.user?.id
-//         const {name, role, city, district, state, country} = req.body
-//         const cRepo = new CandidateRepository(db)
-//         const editProfileUseCase = new EditProfileUseCase(cRepo)
-//         const result = await editProfileUseCase.execute(id, name, role, city, district, state, country)
-//         return res.status(200).json({success:true, message:'Profile details updated successfully', data:result}) // ?? why data.result ???
-//     } catch (error) {
-//         console.log('Error occured while updating the candidate profile', error)
-//         return res.status(500).json({success:false, message:"Internal server error, please try again after some time"})
-//     }
-// }
-
-/**
- * Llama 3.1 8B
- * Llama 3.1 Chat
- * Llama 3.2 Chat
- * CodeLlama Instruct
- * Llama 3.1 Nemotron 70B
- * Llama3 Chat
- * Phind CodeLlama (34b)
- * Llama 4 Maverick Instruct
- * Llama 3.3 70B Instruct
- * Llama 3.3 Swallow 70B Instruct
- * Llama 3.1 8B
- */
-
-/**
- * Qwen 2.5 coder 7b
- * Qwen 2.5 coder 32b
- * Qwen QwQ 32b Preview
- * Qwen 2.5 Coder 32b
- * Qwen 3 32B
- */
-
-/**
- * Mistral Chat
- * Mistral
- * Codestral Mamba
- * Mistral Nemo
- */

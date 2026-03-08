@@ -6,7 +6,7 @@ import {
   JobLevel,
   JobStatus,
 } from '../../../domain/entities/recruiter/job.entity';
-import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
+import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import User from '../../../domain/entities/user/User.FIX';
 
 @Exclude()
@@ -87,7 +87,7 @@ export default class JobAggregatedDTO {
   userProfile?: User;
 
   @Expose()
-  userRecruiterProfile?: Recruiter;
+  userRecruiterProfile?: NewRecruiter;
 
   @Expose()
   candidateIds?: string[];
@@ -100,4 +100,34 @@ export default class JobAggregatedDTO {
 
   @Expose()
   expiresAt!: string;
+}
+
+
+export interface AdminJobDetailsDTO {
+  _id?: string;
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  jobType?: string;
+  workMode?: string;
+  location?: string;
+  minSalary: number;
+  maxSalary: number;
+  qualification: string;
+  jobLevel?: string;
+  reportsCount?: number;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus; 
+  views?: number; 
+  applicationsCount?: number; 
+  isDeleted?: boolean;
+  isArchived?: boolean;
+  isFlagged?: boolean
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
+  companyName?: string;
+  recruiterName?: string
 }

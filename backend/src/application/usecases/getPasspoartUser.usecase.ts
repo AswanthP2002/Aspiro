@@ -1,5 +1,5 @@
-import Candidate from '../../domain/entities/user/candidates.LEGACY';
-import CandidateRepo from '../../domain/interfaces/user/ICandidateRepo';
+import Candidate from '../../domain/entities/user/candidates..GARBAGE';
+import CandidateRepo from '../../domain/interfaces/user/ICandidateRepo.GARBAGE';
 
 export default class GetAuthUserUseCase {
   constructor(private candidateRepo: CandidateRepo) {}

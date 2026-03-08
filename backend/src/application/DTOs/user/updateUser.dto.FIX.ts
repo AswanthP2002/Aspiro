@@ -1,98 +1,48 @@
 import { Role } from '../../../domain/entities/user/User.FIX';
 import SocialLinks from '../../../domain/entities/SocialLinks';
 import { IsDefined, IsOptional, IsString } from 'class-validator';
-import { Exclude } from 'class-transformer';
 
-export class UpdataeUserDto {
-  @IsDefined({ message: 'Id can not be empty' })
-  @IsString({ message: '_id must be string' })
-  _id!: string;
-
-  @IsOptional()
-  @IsString({ message: 'Name must be a string' })
-  name!: string;
-
-  @IsOptional()
-  @IsString({ message: 'Headline must be a string' })
+export interface UpdataeUserDto {
+  _id: string;
+  name?: string;
   headline?: string;
-
-  @IsOptional()
-  @IsString({ message: 'Summary must be a string' })
   summary?: string;
-
-  @Exclude()
   password?: string;
-
-  @IsOptional()
-  dateOfBirth!: string;
-
-  @IsOptional()
-  socialLinks!: SocialLinks[];
-
-  @IsOptional()
-  location!: {
+  dateOfBirth?: string;
+  socialLinks?: SocialLinks[];
+  location?: {
     city: string;
     district: string;
     state: string;
     country: string;
     pincode: string;
+    coords?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
   };
-
-  @IsOptional()
-  role!: Role[];
-
-  @IsOptional()
-  phone!: string;
-
-  @IsOptional()
-  email!: string;
-
-  @Exclude()
+  role?: Role[];
+  phone?: string;
+  email?: string;
   googleId?: string;
-
-  @Exclude()
   facebookId?: string;
-
-  @Exclude()
   linkedinId?: string;
-
-  @IsOptional()
-  connections!: string[];
-
-  @IsOptional()
-  profilePicture!: {
+  connections?: string[];
+  profilePicture?: {
     cloudinaryPublicId: string;
     cloudinarySecureUrl: string;
   };
-
-  @IsOptional()
-  coverPhoto!: {
+  coverPhoto?: {
     cloudinaryPublicId: string;
     cloudinarySecureUrl: string;
   };
-
-  @IsOptional()
-  isBlocked!: boolean;
-
-  @IsOptional()
+  isBlocked?: boolean;
   isVerified?: boolean;
-
-  @IsOptional()
   isAdmin?: boolean;
-
-  @IsOptional()
   isRecruiter?: boolean;
-
-  @Exclude()
   createdAt?: string;
-
-  @Exclude()
   updatedAt?: string;
-
-  @IsOptional()
   verificationToken?: string;
-
-  @IsOptional()
   otpExpiresAt?: Date;
 }
 

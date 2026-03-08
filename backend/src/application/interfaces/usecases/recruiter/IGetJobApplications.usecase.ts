@@ -1,5 +1,11 @@
-import ApplicationsAggregatedDTO from '../../../DTOs/recruiter/applicationAgg.dto';
+import JobApplicationsListForRecruiterDTO, {
+  JobApplicationListRecruiterRequestDTO,
+} from '../../../DTOs/job/JobApplicationsListForRecruiter.dto';
 
 export default interface IGetJobApplicationsUseCase {
-  execute(jobId: string): Promise<ApplicationsAggregatedDTO[] | null>;
+  execute(dto: JobApplicationListRecruiterRequestDTO): Promise<{
+    applications: JobApplicationsListForRecruiterDTO[];
+    totalPages: number;
+    totalDocs: number;
+  } | null>;
 }

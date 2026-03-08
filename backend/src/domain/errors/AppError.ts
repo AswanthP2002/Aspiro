@@ -70,3 +70,21 @@ export class ValidationError extends AppError {
     super('BAD_REQUEST', 'User request data does not pass the validation');
   }
 }
+
+export class UserBlockedError extends AppError {
+  constructor() {
+    super(
+      'USER_SUSPENDED',
+      'Your Account has been temporarly blocked, check email for further information'
+    );
+  }
+}
+
+export class UserBannedError extends AppError {
+  constructor() {
+    super(
+      'USER_BANNED',
+      'Your account has ben banned due to violation of our community guidelines. Check email for further information'
+    );
+  }
+}

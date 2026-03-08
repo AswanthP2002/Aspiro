@@ -6,6 +6,7 @@ export type JobApplicationStatus =
   | 'offer'
   | 'hired'
   | 'rejected';
+
 export default interface JobApplication {
   _id?: string;
   candidateId?: string;

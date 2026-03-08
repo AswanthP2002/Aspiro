@@ -1,33 +1,4 @@
 import express, { NextFunction, Request, Response } from 'express';
-// import { Request, Response, NextFunction } from 'express';
-// import { AdminLoginUseCase } from '../../../application/usecases/admin/AdminLogin.usecase';
-// import { BlockCandidateUseCase } from '../../../application/usecases/admin/BlockCandidate.usecase';
-// import BlockCompanyUseCase from '../../../application/usecases/admin/BlockComapny.usecase';
-// import { BlockJobUseCase } from '../../../application/usecases/admin/BlockJob.usecase';
-// import CloseCompanyUseCase from '../../../application/usecases/admin/CloseCompany.usecase';
-// import { LoadCandidateDetailsUseCase } from '../../../application/usecases/admin/LoadCandidateDetails.usecase';
-// import { LoadCandidatesUseCase } from '../../../application/usecases/admin/LoadCandidates.usecase';
-// import LoadCompanyDetailsUseCase from '../../../application/usecases/admin/LoadCompanyDetails.usecase';
-// import { LoadCompaniesUseCase } from '../../../application/usecases/admin/LoadCompanies.usecase';
-// import { LoadJobDetailsUseCase } from '../../../application/usecases/admin/LoadJobDetails.usecase';
-// import LoadJobsUseCase from '../../../application/usecases/admin/LoadJobs.usecase';
-// import { RejectJobUseCase } from '../../../application/usecases/admin/RejectJob.usecase';
-// import { UnblockCandidateUseCase } from '../../../application/usecases/admin/UnblockCandidate.usecase';
-// import UnblockCompanyUseCase from '../../../application/usecases/admin/UnblockComapny.usecase';
-// import { UnblockJobUseCase } from '../../../application/usecases/admin/UnblockJob.usecase';
-// import { UnRejectJobUseCase } from '../../../application/usecases/admin/UnrejectJob.usecase';
-// import CandidateRepository from '../../../infrastructure/repositories/candidate/candidateRepository';
-// import JobRepository from '../../../infrastructure/repositories/jobRepository';
-// import RecruiterRespository from '../../../infrastructure/repositories/recruiter/recruiterRepository';
-// import {
-//   adminAuth,
-//   authorization,
-//   centralizedAuthentication,
-//   refreshAccessToken,
-// } from '../../../middlewares/auth';
-// import { AdminController } from '../../controllers/adminController';
-// import { Db } from 'mongodb';
-// import UserRepository from '../../../infrastructure/repositories/userRepository';
 import { container } from 'tsyringe';
 import { AdminController } from '../controllers/adminController';
 import {
@@ -36,8 +7,9 @@ import {
   refreshAccessToken,
 } from '../../middlewares/auth';
 import Validator from '../../validation/validator.zod';
-import { loginSchema } from '../schemas/user/userLogin.schema';
+import { loginSchema } from '../schemas/user/userLoginRequest.zod.schema';
 import { LoadRecruiterApplicationSchem } from '../schemas/admin/loadRecruiterApplications';
+import { AdminApiRouts } from '../../constants/Apis/admin.routes';
 
 function createAdminRouter() {
   const adminRouter = express.Router();
@@ -45,69 +17,202 @@ function createAdminRouter() {
   const adminController = container.resolve(AdminController);
 
   adminRouter.post(
-    '/login',
+    AdminApiRouts.ADMIN_AUTH.LOGIN,
     Validator(loginSchema),
-    testMiddleware,
     adminController.adminLogin.bind(adminController)
   );
   adminRouter.get(
-    '/users',
+    '/v1/users',
     centralizedAuthentication,
     authorization(['admin']),
-    testMiddleware,
     adminController.loadUsers.bind(adminController)
   );
   adminRouter.get(
-    '/recruiters/data',
+    AdminApiRouts.ADMIN_RECRUITER_MANAGE.LOAD_ALL_RECRUITERS,
     centralizedAuthentication,
     authorization(['admin']),
     testMiddleware,
-    adminController.loadCompanies.bind(adminController)
+    adminController.loadRecruiters.bind(adminController)
   );
   adminRouter.get(
-    '/users/details/:userId',
+    AdminApiRouts.ADMIN_RECRUITER_MANAGE.LOAD_RECRUITER_DETAILS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.recruiterDetails.bind(adminController)
+  );
+  adminRouter.get(
+    '/v1/users/details/:userId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.loadUserDetails.bind(adminController)
   );
   adminRouter.patch(
-    '/user/block/:userId',
+    '/v1/user/block/:userId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.blockUser.bind(adminController)
   );
   adminRouter.patch(
-    '/user/unblock/:userId',
+    '/v1/user/unblock/:userId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.unblockCandidate.bind(adminController)
   );
+  adminRouter.patch(
+    '/v1/user/ban/:userId',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.userBan.bind(adminController)
+  );
   adminRouter.delete(
-    '/user/:userId',
+    '/v1/user/:userId',
     centralizedAuthentication,
     authorization(['admin']),
     adminController.deleteUser.bind(adminController)
   );
-  adminRouter.get(
-    '/recruiter/applications',
+  adminRouter.post(
+    '/v1/password/reset-request',
     centralizedAuthentication,
     authorization(['admin']),
-    // Validator(LoadRecruiterApplicationSchem),
+    adminController.requestReset.bind(adminController)
+  );
+  adminRouter.patch(
+    '/v1/user/password-reset',
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.resetUserPassword.bind(adminController)
+  );
+  adminRouter.get(
+    AdminApiRouts.ADMIN_RECRUITER_APPLICATION.LOAD_ALL_APPLICATIONS,
+    centralizedAuthentication,
+    authorization(['admin']),
     adminController.loadRecruiterApplications.bind(adminController)
   );
   adminRouter.patch(
-    '/recruiter/application/:recruiterId',
+    AdminApiRouts.ADMIN_RECRUITER_APPLICATION.REJECT_APPLICATION_BY_ID,
     centralizedAuthentication,
     authorization(['admin']),
     adminController.rejectRecruiterApplication.bind(adminController)
   );
   adminRouter.patch(
-    '/recruiter/application/approve/:recruiterId',
+    AdminApiRouts.ADMIN_RECRUITER_MANAGE.HANDLE_RECRUITER_VERIFICATION,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.handleRecruiterVerification.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_RECRUITER_MANAGE.HANDLE_RECRUITER_PERMISSIONS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.handleRecruiterPermission.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_RECRUITER_APPLICATION.APPROVE_APPLICATION_BY_ID,
     centralizedAuthentication,
     authorization(['admin']),
     adminController.approveRecruiterApplication.bind(adminController)
   );
-
+  adminRouter.patch(
+    '/recruiter/application/approve/bulck',
+    centralizedAuthentication,
+    authorization(['user'])
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_RECRUITER_APPLICATION.CHANGE_STATUS_UNDER_REVIEW,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.changeStatusToUnderReview.bind(adminController)
+  );
+  adminRouter.post(
+    AdminApiRouts.ADMIN_CONFIG_WORKMODE.ADD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.addWorkMode.bind(adminController)
+  );
+  adminRouter.get(
+    AdminApiRouts.ADMIN_CONFIG_WORKMODE.LOAD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.getWorkModes.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_WORKMODE.CHANGE_STATUS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.changeWorkModeStatus.bind(adminController)
+  );
+  adminRouter.delete(
+    AdminApiRouts.ADMIN_CONFIG_WORKMODE.DELETE_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteWorkMode.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_WORKMODE.EDIT_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.editWorkMode.bind(adminController)
+  );
+  adminRouter.post(
+    AdminApiRouts.ADMIN_CONFIG_JOBLEVEL.ADD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.addJobLevel.bind(adminController)
+  );
+  adminRouter.get(
+    AdminApiRouts.ADMIN_CONFIG_JOBLEVEL.LOAD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.getJobLevels.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_JOBLEVEL.EDIT_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.editJobLevel.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_JOBLEVEL.CHANGE_STATU_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.changeJobLevelStatus.bind(adminController)
+  );
+  adminRouter.delete(
+    AdminApiRouts.ADMIN_CONFIG_JOBLEVEL.DELETE_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteJobLevel.bind(adminController)
+  );
+  adminRouter.post(
+    AdminApiRouts.ADMIN_CONFIG_JOBTYPE.ADD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.addJobType.bind(adminController)
+  );
+  adminRouter.get(
+    AdminApiRouts.ADMIN_CONFIG_JOBTYPE.LOAD,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.getJobTypes.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_JOBTYPE.CHANGE_STATUS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.changeJobTypeStatus.bind(adminController)
+  );
+  adminRouter.patch(
+    AdminApiRouts.ADMIN_CONFIG_JOBTYPE.EDIT_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.updateJobType.bind(adminController)
+  );
+  adminRouter.delete(
+    AdminApiRouts.ADMIN_CONFIG_JOBTYPE.DELETE_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteJobTypes.bind(adminController)
+  );
   // // adminRouter.get(
   // //   '/admin/company/details/:companyId',
   // //   adminAuth,
@@ -133,14 +238,14 @@ function createAdminRouter() {
     adminController.closeCompany.bind(adminController)
   );
   adminRouter.get(
-    '/jobs/data',
+    AdminApiRouts.ADMIN_JOBS_MANAGE.LOAD_ALL_JOBS,
     centralizedAuthentication,
     authorization(['admin']),
     adminController.loadJobs.bind(adminController)
   );
 
   adminRouter.get(
-    '/skills',
+    AdminApiRouts.ADMIN_CONFIG_SKILLS.LOAD,
     centralizedAuthentication,
     authorization(['admin', 'user', 'recruiter']),
     testMiddleware,
@@ -148,7 +253,7 @@ function createAdminRouter() {
   );
 
   adminRouter.post(
-    '/skills',
+    AdminApiRouts.ADMIN_CONFIG_SKILLS.ADD,
     centralizedAuthentication,
     authorization(['admin']),
     testMiddleware,
@@ -156,17 +261,29 @@ function createAdminRouter() {
   );
 
   adminRouter.patch(
-    '/skills/:skillId',
+    AdminApiRouts.ADMIN_CONFIG_SKILLS.EDIT_BY_ID,
     centralizedAuthentication,
     authorization(['admin']),
     adminController.updateSkills.bind(adminController)
   );
 
   adminRouter.delete(
-    '/skills/:skillId',
+    AdminApiRouts.ADMIN_CONFIG_SKILLS.DELETE_BY_ID,
     centralizedAuthentication,
     authorization(['admin']),
     adminController.deleteSkills.bind(adminController)
+  );
+  adminRouter.get(
+    AdminApiRouts.ADMIN_JOBS_MANAGE.LOAD_JOB_DETAILS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.loadJobDetails.bind(adminController)
+  );
+  adminRouter.delete(
+    AdminApiRouts.ADMIN_JOBS_MANAGE.DELETE_JOB_BY_JOBID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    adminController.deleteJob.bind(adminController)
   );
   // // adminRouter.get(
   // //   '/admin/job/details/:jobId',

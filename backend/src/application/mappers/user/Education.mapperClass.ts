@@ -1,5 +1,9 @@
 import Education from '../../../domain/entities/user/educations.entity';
-import { CreateEducationDTO, UpdateEducationDTO } from '../../DTOs/user/education.dto.FIX';
+import {
+  CreateEducationDTO,
+  EducationDTO,
+  UpdateEducationDTO,
+} from '../../DTOs/user/education.dto.FIX';
 
 export default class EducationMapper {
   public createEducationDtoToEducation(dto: CreateEducationDTO): Education {
@@ -18,13 +22,29 @@ export default class EducationMapper {
   public updateEducationDtoToEducation(dto: UpdateEducationDTO): Education {
     return {
       _id: dto._id,
-      educationLevel: dto.educationLevel,
-      educationStream: dto.educationStream,
+      educationLevel: dto.educationLevel as string,
+      educationStream: dto.educationStream as string,
       startYear: dto.startYear,
-      isPresent: dto.isPresent,
+      isPresent: dto.isPresent as boolean,
       endYear: dto.endYear,
-      institution: dto.institution,
-      location: dto.location,
+      institution: dto.institution as string,
+      location: dto.location as string,
+    };
+  }
+
+  public educationToEducationDTO(education: Education): EducationDTO {
+    return {
+      _id: education._id,
+      educationLevel: education.educationLevel,
+      educationStream: education.educationStream,
+      institution: education.institution,
+      isPresent: education.isPresent,
+      startYear: education.startYear,
+      endYear: education.endYear,
+      createdAt: education.createdAt,
+      updatedAt: education.updatedAt,
+      location: education.location,
+      userId: education.userId,
     };
   }
 }

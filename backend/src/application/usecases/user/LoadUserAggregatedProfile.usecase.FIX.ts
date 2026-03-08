@@ -1,28 +1,21 @@
 import { inject, injectable } from 'tsyringe';
-import ILoadUserAggregatedProfileUsecase from '../../interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserProfileAggregatedDTO from '../../DTOs/user/userProfileAggregated.dto.FIX';
-import mapToUserProfileAggregatedDTO from '../../mappers/admin/mapToUserProfileAggregatedAdminDTO';
-import Follow from '../../../domain/entities/follow.entity';
-import { plainToInstance } from 'class-transformer';
+import { UserPublicProfileDTO } from '../../DTOs/user/userProfileAggregated.dto.FIX';
+import ILoadUserPublicProfileUsecase from '../../interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
+import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()
-export default class LoadUserAggregatedProfileUsecase implements ILoadUserAggregatedProfileUsecase {
-  constructor(@inject('IUserRepository') private _userRepo: IUserRepository) {}
+export default class LoadUserpublicProfileUsecase implements ILoadUserPublicProfileUsecase {
+  private _mapper: UserMapper;
+  constructor(@inject('IUserRepository') private _userRepo: IUserRepository) {
+    this._mapper = new UserMapper();
+  }
 
-  async execute(userId: string): Promise<UserProfileAggregatedDTO | null> {
+  async execute(userId: string): Promise<UserPublicProfileDTO | null> {
     const userProfileDetails = await this._userRepo.getUserAggregatedProfile(userId);
 
     if (userProfileDetails) {
-      const dto = plainToInstance(UserProfileAggregatedDTO, userProfileDetails);
-
-      //format followers (instead of follow object, make them as string of object id array)
-      //   const followers: string[] = [];
-      //   dto.followers.forEach((follower: Follow) => {
-      //     followers.push(follower);
-      //   });
-
-      //   dto.followers = followers;
+      const dto = this._mapper.userAggregatedToPublicProfileDTO(userProfileDetails);
       return dto;
     }
 

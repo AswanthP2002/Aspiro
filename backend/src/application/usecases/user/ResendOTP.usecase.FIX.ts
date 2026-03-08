@@ -53,7 +53,7 @@ export default class ResendOTPUseCase implements IResendOTPUseCase {
     `;
 
     await this._emailService.sendEmail(email, subject, content);
-
+    console.log('--Resended OTP--', otp);
     if (result) {
       return plainToInstance(UserDto, result);
     }

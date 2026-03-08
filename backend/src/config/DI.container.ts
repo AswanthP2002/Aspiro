@@ -4,26 +4,20 @@ import UserRepository from '../infrastructure/repositories/userRepository';
 import IAdminLoginUseCase from '../application/interfaces/usecases/admin/IAdminLogin.usecase..FIX';
 import { AdminLoginUseCase } from '../application/usecases/admin/AdminLogin.usecase.FIX';
 import { AdminController } from '../presentation/controllers/adminController';
-import ICandidateRepo from '../domain/interfaces/user/ICandidateRepo';
-import CandidateRepository from '../infrastructure/repositories/user/candidateRepository';
-import ILoadCandidateUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase.FIX';
-import ILoadCandidateDetailsUseCase from '../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
+// import ICandidateRepo from '../domain/interfaces/user/ICandidateRepo';
+// import CandidateRepository from '../infrastructure/repositories/user/candidateRepository.GARBAGE';
 import { AdminLoadUsersDetailsUsecase } from '../application/usecases/admin/AdminLoadUsersDetails.usecase';
-import IBlockCandidateUseCase from '../application/interfaces/usecases/admin/IAdminBlockUser.usecase.FIX';
 import { AdminBlockUserUsecase } from '../application/usecases/admin/AdminBlockUser.usecase.FIX';
-import IFindCandidateByUserIdUseCase from '../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
-import FindCandidateByUserIdUseCase from '../application/usecases/candidate/FindCandidateByUserId.usecase';
-import IUnblockCandidateUseCase from '../application/interfaces/usecases/admin/IAdminUnblockUser.usecase.FIX';
+// import IFindCandidateByUserIdUseCase from '../application/usecases/candidate/interface/IFindCandidateByUserId.usecase';
+// import FindCandidateByUserIdUseCase from '../application/usecases/candidate/FindCandidateByUserId.usecase';
 import { AdminUnblockUserUsecase } from '../application/usecases/admin/AdminUnblockUser.usecase';
-import IFindCandidateByCandidateIdUseCase from '../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
-import FindCandidateByCandidateIDUseCase from '../application/usecases/FindCandidateByCandidateID.usecase';
+// import IFindCandidateByCandidateIdUseCase from '../application/usecases/interfaces/IFindCandidateByCandidateID.usecase';
+// import FindCandidateByCandidateIDUseCase from '../application/usecases/FindCandidateByCandidateID.usecase';
 import ICreateUserUseCase from '../application/interfaces/usecases/user/ICreateUser.usecase.FIX';
 import CreateUserUseCase from '../application/usecases/user/CreateUser.usecase';
 import RecruiterController from '../presentation/controllers/recruiterController';
 import IRecruiterRepo from '../domain/interfaces/recruiter/IRecruiterRepo';
 import RecruiterRespository from '../infrastructure/repositories/recruiter/recruiterRepository';
-import IRegisterRecruiterUseCase from '../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase.FIX';
-import RegisterRecruiterUseCase from '../application/usecases/recruiter/CreateRecruiter.usecase.FIX';
 import IVerifyUserUseCase from '../application/interfaces/usecases/user/IVerifyUser.usecase.FIX';
 import VerifyUserUseCase from '../application/usecases/user/VerifyUser.usecase.FIX';
 import ILoginRecruiterrUseCase from '../application/usecases/recruiter/interface/ILoginRecruiter.usecase';
@@ -41,8 +35,7 @@ import IUserLoginUseCase from '../application/interfaces/usecases/user/IUserLogi
 import { UserLoginUseCase } from '../application/usecases/user/UserLogin.usecase.FIX';
 import { LoadUsersAdminUsecase } from '../application/usecases/admin/LoadUsersAdmin.usecase';
 import ILoadUsersAdminUseCase from '../application/interfaces/usecases/admin/ILoadUsersAdmin.usecase.FIX';
-import ILoadUserProfileUsecase from '../application/interfaces/usecases/user/ILoadUserProfile.usecase.FIX';
-import { LoadUserProfileUsecase } from '../application/usecases/user/LoadUserProfile.usecase.FIX';
+import { LoadMyProfileUsecase } from '../application/usecases/user/LoadMyProfileUsecase.usecase.FIX';
 import ISaveUserBasicsUsecase from '../application/interfaces/usecases/user/ISaveUsersBasics.usecase.FIX';
 import SaveUserBasicsUsecase from '../application/usecases/candidate/SaveUserBasics.usecase.FIX';
 import IUploadUserProfilePictureUsecase from '../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase.FIX';
@@ -124,8 +117,6 @@ import FollowUseruseCse from '../application/usecases/FollowUser.usecase';
 import IAdminLoadUserDetailsUsecase from '../application/interfaces/usecases/admin/IAdminLoadUsersDetails.usecase';
 import IAdminBlockUserUsecase from '../application/interfaces/usecases/admin/IAdminBlockUser.usecase.FIX';
 import IAdminUnblockUserUsecase from '../application/interfaces/usecases/admin/IAdminUnblockUser.usecase.FIX';
-import IGetFavoriteJobUseCase from '../application/interfaces/usecases/user/IGetSavedJobs.usecase.FIX';
-import GetFavoriteJobUseCase from '../application/usecases/user/GetSavedJobs.usecase.FIX';
 import IFavoriteJobsRepo from '../domain/interfaces/user/IFavoriteJobRepo';
 import FavoriteJobsRepsitory from '../infrastructure/repositories/user/favoriteJobsRepository';
 import ISendResetPassworLinkUsecase from '../application/interfaces/usecases/user/ISendPasswordResetLink.usecase.FIX';
@@ -154,8 +145,6 @@ import GetUserSpecificNotificationsUsecase from '../application/usecases/shared/
 import NotificationController from '../presentation/controllers/notificationController';
 import INotificationRepo from '../domain/interfaces/INotificationRepo';
 import NotificationRepository from '../infrastructure/repositories/notificationRepository';
-import ILoadUserAggregatedProfileUsecase from '../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
-import LoadUserAggregatedProfileUsecase from '../application/usecases/user/LoadUserAggregatedProfile.usecase.FIX';
 import ILoadUserMetaDataUsecase from '../application/interfaces/usecases/user/ILoadUserMetaData.usecase.FIX';
 import LoadUserMetaData from '../application/usecases/user/LoadUserMetaData.usecase.FIX';
 import IUnFollowUserUsercase from '../application/usecases/interfaces/IUnFollowUser.usecase';
@@ -200,10 +189,10 @@ import ILoadResumeUseCase from '../application/interfaces/usecases/user/ILoadRes
 import LoadResumesUseCase from '../application/usecases/candidate/LoadResume.usecase.FIX';
 import IDeleteResumeUseCase from '../application/usecases/candidate/interface/IDeleteResume.usecase.FIX';
 import DeleteResumeUseCase from '../application/usecases/candidate/DeleteResume.usecase.FIX';
-import IAddCertificateUseCase from '../application/usecases/candidate/interface/IAddCertificate.usecase.FIX';
-import AddCertificateUseCase from '../application/usecases/candidate/AddCertificate.usecase.FIX';
-import ILoadCertificateUseCase from '../application/usecases/candidate/interface/IGetCeritificates.usecase.FIX';
-import GetCertificatesUseCase from '../application/usecases/candidate/GetCertificates.usecase.FIX';
+import IAddCertificateUseCase from '../application/interfaces/usecases/user/IAddCertificate.usecase.FIX';
+import AddCertificateUseCase from '../application/usecases/user/AddCertificate.usecase.FIX';
+import ILoadCertificateUseCase from '../application/interfaces/usecases/user/IGetCeritificates.usecase.FIX';
+import GetCertificatesUseCase from '../application/usecases/user/GetCertificates.usecase.FIX';
 import ICertificateRepo from '../domain/interfaces/user/ICertificateRepo';
 import CertificateRepository from '../infrastructure/repositories/user/certificateRepository';
 import IAdminLoadRecruitersUsecase from '../application/interfaces/usecases/admin/IAdminLoadRecruiters.usecase';
@@ -225,10 +214,166 @@ import IAdminGetSkillsUsecase from '../application/interfaces/usecases/admin/IAd
 import AdminGetSkillsUsecase from '../application/usecases/admin/AdminGetSkills.usecase';
 import ILoadRecruiterRecentJobs from '../application/interfaces/usecases/recruiter/ILoadRecruiterRecentJobs.usecase';
 import LoadRecruiterRecentJobsUsecase from '../application/usecases/recruiter/LoadRecruiterRecentJobs.usecase';
+import IDeleteCertificateUsecase from '../application/interfaces/usecases/user/IDeleteCertificate.usecase';
+import DeleteCertificateUsecase from '../application/usecases/user/DeleteCertificate.usecase';
+import ISetResumePrimaryUsecase from '../application/interfaces/usecases/user/ISetResumePrimary.usecase';
+import SetResumePrimaryUsecase from '../application/usecases/user/SetResumePrimary.usecase';
+import IBulckApproveRecruiterApplicationUsecase from '../application/interfaces/usecases/admin/IBulckApproveRecruiterApplication.usecase';
+import BulckApproveRecruiterApplicationsUSecase from '../application/usecases/admin/BulckApproveRecruiterApplications.usecase';
+import IGetUsersForPublicUsecase from '../application/interfaces/usecases/user/IGetUsersforPublic.usecase';
+import GetUsersForPublicUsecase from '../application/usecases/GetUsersForPublic.usecase';
+import ILoadMyProfileUsecase from '../application/interfaces/usecases/user/ILoadMyProfile.usecase.FIX';
+import IAlertRepo from '../domain/interfaces/user/IAlertRepo';
+import AlertRepository from '../infrastructure/repositories/user/alertRepository';
+import IGetUserAlertsUsecase from '../application/interfaces/usecases/user/IGetUserAlerts.usecase';
+import GetUserAlertsUsecase from '../application/usecases/user/GetUserAlerts.usecase';
+import ILoadUserPublicProfileUsecase from '../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
+import LoadUserpublicProfileUsecase from '../application/usecases/user/LoadUserAggregatedProfile.usecase.FIX';
+import IChangeNotificationStatusUsecase from '../application/interfaces/usecases/shared/IChangeNotificationStatus.usecase';
+import ChangeNotificationStatusUsecase from '../application/usecases/shared/ChangeNotificationStatus.usecase';
+import ISoftDeleteNotificationUsecase from '../application/interfaces/usecases/shared/ISoftDeleteNotification.usecase';
+import SoftDeleteNotificationUsecase from '../application/usecases/shared/SoftDeleteNotification.usecase';
+import IConnectionRequestRepository from '../domain/interfaces/IConnectionRequest.repo';
+import ConnectionRequestRepository from '../infrastructure/repositories/user/connectionRequest.repository';
+import ISendConnectionRequestUsecase from '../application/interfaces/usecases/user/ISendConnectionRequest.usecase';
+import { SendConnectionRequestUsecase } from '../application/usecases/user/SendConnectionRequest.usecase';
+import IRejectConnectionRequestUsecase from '../application/interfaces/usecases/user/IRejectConnectionRequest.usecase';
+import RejectConnectionRequestUsecase from '../application/usecases/user/RejectConnectionRequest.usecase';
+import ICancelConnectionRequestUsecase from '../application/interfaces/usecases/user/ICancelConnectionRequest.usecase';
+import CancelConnectionRequestUsecase from '../application/usecases/user/CancelConnectionRequest.usecase';
+import IAcceptConnectionRequestUsecase from '../application/interfaces/usecases/user/IAcceptConnectionRequest.usecase';
+import AcceptConnectionRequestUsecase from '../application/usecases/user/AcceptConnectionRequest.usecase';
+import IConversationRepo from '../domain/interfaces/user/IConversationRepo';
+import ConversationRepository from '../infrastructure/repositories/user/conversationRepository';
+import ChatController from '../presentation/controllers/chatController';
+import IGetConversationsUsecase from '../application/interfaces/usecases/user/IGetConversations.usecase';
+import GetconversationsUsecase from '../application/usecases/user/GetConversations.usecase';
+import IInitializeConversation from '../application/interfaces/usecases/user/IInitializeConversation.usecase';
+import InitializeConversationUsecase from '../application/usecases/user/InitializeConversation.usecase';
+import IChatRepository from '../domain/interfaces/user/IChatRepo';
+import ChatRepository from '../infrastructure/repositories/user/chatRepository';
+import IGetchatsUsecase from '../application/interfaces/usecases/user/IGetChats.usecase';
+import GetChatsUsecase from '../application/usecases/user/GetChats.usecase';
+import UserMapper from '../application/mappers/user/User.mapperClass';
+import LoadUserMetaDataUsecase from '../application/usecases/user/LoadUserMetaData.usecase.FIX';
+import CertificateMapper from '../application/mappers/user/Certificate.mapperClass';
+import ResumeMapper from '../application/mappers/user/Resume.mapperClass';
+import { ExperienceMapper } from '../application/mappers/user/Experience.mapperClass';
+import EducationMapper from '../application/mappers/user/Education.mapperClass';
+import { SkillsMapper } from '../application/mappers/user/Skill.mapperClass';
+import IAdminPermanentBanUserUsecase from '../application/interfaces/usecases/admin/IAdminPermanentBanUser.usecase';
+import AdminPermanentBanUserUsecase from '../application/usecases/admin/AdminPermanentBanUser.usecase';
+import IAdminResetUserPasswordUsecase from '../application/interfaces/usecases/admin/IAdminResetUserPassword.usecase';
+import AdminResetUserPasswordUsecase from '../application/usecases/admin/AdminResetUserPassword.usecase';
+import IAdminRequestResetUserPasswordUsecase from '../application/interfaces/usecases/admin/IAdminRequestRestPassword.usecase';
+import AdminRequestResetUserPasswordUsecase from '../application/usecases/admin/AdminRequestResetUserPassword.usecase';
+import ILikePostCommentUsecase from '../application/interfaces/usecases/user/ILikePostComment.usecase';
+import LikeCommentUsecase from '../application/usecases/user/LikeComment.usecase';
+import IUnlikeCommentUsecase from '../application/interfaces/usecases/user/IUnlikeComment.usecase';
+import UnlikeCommentUsecase from '../application/usecases/user/UnlikeComment.usecase';
+import IDeletePostUsecase from '../application/interfaces/usecases/user/IDeletePost.usecase';
+import DeletePostUsecase from '../application/usecases/user/DeletePost.usecase';
+import { IHidePostUsecase } from '../application/interfaces/usecases/user/IHidePost.usecase';
+import HidePostUsecase from '../application/usecases/user/HidePost.usecase';
+import { IUnHidePostUsecase } from '../application/interfaces/usecases/user/IUnHidePost.usecase';
+import UnHidePostUsecase from '../application/usecases/user/UnHidePost.usecase';
+import ISavePostRepo from '../domain/interfaces/user/ISavePostRepo';
+import SavePostRepository from '../infrastructure/repositories/user/savePostRepository';
+import IToggleSavePostUsecase from '../application/interfaces/usecases/user/IToggleSavePost.usecase';
+import ToggleSavePostUsecase from '../application/usecases/user/ToggleSavePost.usecase';
+import ICompanyRepo from '../domain/interfaces/ICompanyRepo';
+import CompanyRepository from '../infrastructure/repositories/companyRepository';
+import IGetCompanyListUsecase from '../application/interfaces/usecases/IGetCompanyList.usecase';
+import GetCompanyListUsecase from '../application/usecases/company/GetCompanyList.usecase';
+import CompanyController from '../presentation/controllers/companyController';
+import FollowMapper from '../application/mappers/user/Follow.mapperClass';
+import IGetUnReadNotificationsCountUsecase from '../application/interfaces/usecases/shared/IGetUnreadNotificationsCount.usecase';
+import GetUnReadNotificationsCountUsecase from '../application/usecases/shared/GetUnReadNotificationCount.usecase';
+import IMarkReadAllNotificationsUsecase from '../application/interfaces/usecases/user/IMarkReadAllNotifications.usecase';
+import MarkReadAllNotifications from '../application/usecases/user/MarkReadAllNotification.usecase';
+import { IDeleteNotificationsUsecase } from '../application/interfaces/usecases/user/IDeleteAllNotifications.usecase';
+import DeleteNotificationsUsecase from '../application/usecases/user/DeleteNotificationsUsecase';
+import NotificationMapper from '../application/mappers/user/Notification.mapperClass';
+import CompanyMapper from '../application/mappers/recruiter/Company.mapperClass';
+import IAddCompanyUsecase from '../application/interfaces/usecases/recruiter/IAddCompnay.usecase';
+import AddCompanyUsecase from '../application/usecases/recruiter/AddCompany.usecase';
+import IGetcompaniesBySuggesionUsecase from '../application/interfaces/usecases/company/IGetCompaniesBySuggession.usecase';
+import GetCompanySuggesionUsecase from '../application/usecases/recruiter/GetCompaniesSuggesion.usecase';
+import RecruiterMapper from '../application/mappers/recruiter/Recruiter.mapperClass';
+import IAdminLoadRecruiterDetailsUsecase from '../application/interfaces/usecases/admin/IAdminLoadRecruiterDetails.usecase';
+import AdminLoadRecruiterDetailsUsecase from '../application/usecases/admin/AdminLoadRecruiterDetails.usecase';
+import IAdminReoveRecruiterPermission from '../application/interfaces/usecases/admin/IAdminRevokeRecruiterVerification.usecase';
+import IAdminRevokeRecruiterVerification from '../application/interfaces/usecases/admin/IAdminRevokeRecruiterVerification.usecase';
+import AdminRevokeRecruiteerVerificationUsecase from '../application/usecases/admin/AdminRevokeRecruiterVerification.usecase';
+import IAdminHandlePermissionRevokingUsecase from '../application/interfaces/usecases/admin/IAdminHandlePermissionRevoking.usecase';
+import AdminHandlePermissionRevoking from '../application/usecases/admin/AdminHandlePermissionRevoking.usecase';
+import IWorkModeRepository from '../domain/interfaces/admin/IWorkMode.repo';
+import WorkModeRepository from '../infrastructure/repositories/admin/workMode.repository';
+import WorkModeMapper from '../application/mappers/admin/WorkMode.mapperClass';
+import IAdminAddWorkModeUsecase from '../application/interfaces/usecases/admin/IAdminAddWorkMode.usecase';
+import AdminAddWorkModeUsecase from '../application/usecases/admin/AdminAddWorkMode.usecase';
+import { IAdminGetWorkModesUsecase } from '../application/interfaces/usecases/admin/IAdminGetWorkModes.usecase';
+import AdminGetWorkModesUsecase from '../application/usecases/admin/AdminGetWorkModes.usecase';
+import { IAdminChangeWorkModeStatusUsecase } from '../application/interfaces/usecases/admin/IAdminChangeWorkmodeStatus.usecase';
+import AdminChangeWorkmodeUsecase from '../application/usecases/admin/AdminChangeWorkmode.usecase';
+import IAdminDeleteWorkModeUsecase from '../application/interfaces/usecases/admin/IAdminDeleteWorkMode.usecase';
+import AdminDeleteWorkModeUsecase from '../application/usecases/admin/AdminDeleteWorkMode.usecase';
+import IAdminEditWorkModeUsecase from '../application/interfaces/usecases/admin/IAdminEditWorkMode.usecase';
+import AdminEditWorkModeUsecase from '../application/usecases/admin/AdminEditWorkMode.usecase';
+import IJobLevelRepository from '../domain/interfaces/admin/IJobLevel.repository';
+import JobLevelRepository from '../infrastructure/repositories/admin/jobLevel.repository';
+import JobLevelMapper from '../application/mappers/admin/JobLevel.mapperClass';
+import IAdminAddJobLevelUsecase from '../application/interfaces/usecases/admin/IAdminAddJobLevel.usecase';
+import AdminAddJobLevelUsecase from '../application/usecases/admin/AdminAddJobLevel.usecase';
+import IAdminGetJobLevelsUsecase from '../application/interfaces/usecases/admin/IAdminGetJobLevel.usecase';
+import AdminGetJobLevelsUsecase from '../application/usecases/admin/AdminGetJobLevels.usecase';
+import IAdminEditJobLevelUsecase from '../application/interfaces/usecases/admin/IAdminEditJobLevel.usecase';
+import AdminEditJobLevelUsecase from '../application/usecases/admin/AdminEditJobLevel.usecase';
+import IAdminChangeJobLevelStatusUsecase from '../application/interfaces/usecases/admin/IAdminChangeJobLevelStatus.usecase';
+import AdminChangeJobLevelStatus from '../application/usecases/admin/AdminChangeJobLevelStatus.usecase';
+import IAdminDeleteJobLevelUsecase from '../application/interfaces/usecases/admin/IAdminDeleteJobLevel.usecase';
+import AdminDeleteJobLevelUsecase from '../application/usecases/admin/AdminDeleteJobLevel.usecase';
+import IJobTypeRepository from '../domain/interfaces/admin/IJobType.repository';
+import JobTypeRepository from '../infrastructure/repositories/admin/jobType.repository';
+import JobTypeMapper from '../application/mappers/admin/JobType.mapperClass';
+import IAdminAddJobTypeUsecase from '../application/interfaces/usecases/admin/IAdminAddJobType.usecase';
+import AdminAddJobTypeUsecase from '../application/usecases/admin/AdminAddJobType.usecase';
+import IAdminUpdateJobTypeUse from '../application/interfaces/usecases/admin/IAdminUpdateJobType.usecase';
+import AdminUpdateJobTypeUsecase from '../application/usecases/admin/AdminUpdateJobType.usecase';
+import IAdminChangeJobTypeStatusUsecase from '../application/interfaces/usecases/admin/IAdminChangeJobTypeStatus.usecase';
+import AdminChangeJobTypeStatusUsecase from '../application/usecases/admin/AdminChangeJobTypeStatus.usecase';
+import IAdminGetJobTypesUsecase from '../application/interfaces/usecases/admin/IAdminGetJobType.usecase';
+import AdminGetJobTypesUsecase from '../application/usecases/admin/AdminGetJobTypes.usecase';
+import IAdminDeleteJobTypeUsecase from '../application/interfaces/usecases/admin/IAdminDeleteJobType.usecase';
+import AdminDeleteJobTypeUsecase from '../application/usecases/admin/AdminDeleteJobType.usecase';
+import IAdminChangeRecruiterApplicationStatusToUnderReview from '../application/interfaces/usecases/admin/IAdminChangeRecruiterApplicationStatusToUnderReview.usecase';
+import AdminChangeRecruiterApplicationStatusToUnderReview from '../application/usecases/admin/IAdminChangeRecruiterApplicationStatusToUnderReview.usecase';
+import IGetJobTypeListUsecase from '../application/interfaces/usecases/recruiter/IGetJobTypeLists.usecase';
+import GetJobTypeListsUsecase from '../application/usecases/recruiter/GetJobTypeLists.usecase';
+import IGetJobLevelListsUsecase from '../application/interfaces/usecases/recruiter/IGetJobLevelLists.usecase';
+import GetJobLevelListsUsecase from '../application/usecases/recruiter/GetJobLevelList.usecase';
+import IGetWorkModeListsUsecase from '../application/interfaces/usecases/recruiter/IGetWorkModeLists.usecase';
+import GetWorkModesListUsecase from '../application/usecases/recruiter/GetWorkModeLists.usecase';
+import JobMapper from '../application/mappers/recruiter/Job.mapperClass';
+import ILoadJobsUseCase from '../application/interfaces/usecases/admin/IAdminLoadJobs.usecase';
+import LoadJobsUseCase from '../application/usecases/admin/AdminLoadJobs.usecase';
+import IAdminLoadJobDetailsUseCase from '../application/usecases/admin/interfaces/ILoadJobDetails.usecase';
+import { AdminLoadJobDetailsUseCase } from '../application/usecases/admin/LoadJobDetails.usecase';
+import IAdminDeleteJobUsecase from '../application/interfaces/usecases/admin/IAdminDeleteJob.usecase';
+import AdminDeleteJobUsecase from '../application/usecases/admin/AdminDeleteJob.usecase';
+import JobController from '../presentation/controllers/jobController';
+import ISearchJobsFromHomeUseCase from '../application/usecases/interfaces/ISearchJobsFromHome.usecase';
+import SearchJobsFromHomeUseCase from '../application/usecases/SearchJobsFromHome.usecase';
+import JobApplicationMapper from '../application/mappers/job/JobApplication.mapperClass';
+import ICheckIsJobApplied from '../application/interfaces/usecases/user/ICheckJobApplied.usecase';
+import CheckIsJobAppliedUsecase from '../application/usecases/user/CheckIsJobApplied.usecase';
+import SavedJobsMapper from '../application/mappers/job/SavedJob.mapperClass';
+import IGetJobApplicationDetailsUseCase from '../application/interfaces/usecases/recruiter/IGetJobApplicationDetails.usecase';
+import GetJobApplicationDetailsUseCase from '../application/usecases/recruiter/GetJobApplicationDetails.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
-container.registerSingleton<ICandidateRepo>('ICandidateRepository', CandidateRepository);
+// container.registerSingleton<ICandidateRepo>('ICandidateRepository', CandidateRepository);
 container.registerSingleton<IRecruiterRepo>('IRecruiterRepository', RecruiterRespository);
 container.registerSingleton<IExperienceRepo>('IExperienceRepository', ExperienceRepository);
 container.registerSingleton<IEducationRepo>('IEducationRepository', EducationRepository);
@@ -240,6 +385,13 @@ container.registerSingleton<IJobRepo>('IJobRepository', JobRepository);
 container.registerSingleton<IFollowRepo>('IFollowRepository', FollowRepository);
 container.registerSingleton<IFavoriteJobsRepo>('IFavoriteJobRepository', FavoriteJobsRepsitory);
 container.registerSingleton<INotificationRepo>('INotificationRepository', NotificationRepository);
+container.registerSingleton<IAlertRepo>('IAlertsRepository', AlertRepository);
+container.registerSingleton<IConnectionRequestRepository>(
+  'IConnectionRequestRepository',
+  ConnectionRequestRepository
+);
+container.registerSingleton<IChatRepository>('IChatRepository', ChatRepository);
+container.registerSingleton<IConversationRepo>('IConversationRepository', ConversationRepository);
 container.registerSingleton<IJobApplicationRepo>(
   'IJobApplicationRepository',
   JObApplicationRepository
@@ -247,7 +399,13 @@ container.registerSingleton<IJobApplicationRepo>(
 container.registerSingleton<ICertificateRepo>('ICertificateRepository', CertificateRepository);
 container.registerSingleton<IResumeRepo>('IResumeRepository', ResumeRepository);
 container.registerSingleton<IInterviewRepo>('IInterviewRepository', InterviewRepository);
+container.registerSingleton<ISavePostRepo>('ISavePostRepository', SavePostRepository);
+container.registerSingleton<ICompanyRepo>('ICompanyRepository', CompanyRepository);
+container.registerSingleton<IWorkModeRepository>('IWorkModeRepository', WorkModeRepository);
+container.registerSingleton<IJobLevelRepository>('IJobLevelRepository', JobLevelRepository);
+container.registerSingleton<IJobTypeRepository>('IJobTypeRepository', JobTypeRepository);
 
+container.registerSingleton<IGetchatsUsecase>('IGetChatsUsecase', GetChatsUsecase);
 //register usecase
 container.registerSingleton<IAdminLoginUseCase>('IAdminLoginUseCase', AdminLoginUseCase);
 container.registerSingleton<ILoadUsersAdminUseCase>(
@@ -263,27 +421,36 @@ container.registerSingleton<IAdminUnblockUserUsecase>(
   'IAdminUnblockUserUsecase',
   AdminUnblockUserUsecase
 );
+container.registerSingleton<IAdminPermanentBanUserUsecase>(
+  'IAdminPermanentBanUserUsecase',
+  AdminPermanentBanUserUsecase
+);
+container.registerSingleton<IAdminRequestResetUserPasswordUsecase>(
+  'IAdminRequestUserPasswordResetUsecase',
+  AdminRequestResetUserPasswordUsecase
+);
+container.registerSingleton<IAdminResetUserPasswordUsecase>(
+  'IAdminResetUserPasswordUsecase',
+  AdminResetUserPasswordUsecase
+);
 
 container.registerSingleton<ILoadRecruiterRecentJobs>(
   'ILoadRecruiterRecentJobs',
   LoadRecruiterRecentJobsUsecase
 );
-container.registerSingleton<IFindCandidateByUserIdUseCase>(
-  'IFindCandidateByUserIdUseCase',
-  FindCandidateByUserIdUseCase
-);
-container.registerSingleton<IFindCandidateByCandidateIdUseCase>(
-  'IFindCandidateByCandidateIDUseCase',
-  FindCandidateByCandidateIDUseCase
-);
+// container.registerSingleton<IFindCandidateByUserIdUseCase>(
+//   'IFindCandidateByUserIdUseCase',
+//   FindCandidateByUserIdUseCase
+// );
+// container.registerSingleton<IFindCandidateByCandidateIdUseCase>(
+//   'IFindCandidateByCandidateIDUseCase',
+//   FindCandidateByCandidateIDUseCase
+// );
 container.registerSingleton<ICreateUserUseCase>('ICreateUserUsecase', CreateUserUseCase);
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUseCase', VerifyUserUseCase);
 container.registerSingleton<IResendOTPUseCase>('IResendOTPUsecase', ResendOTPUseCase);
 container.registerSingleton<IUserLoginUseCase>('IUserLoginUsecase', UserLoginUseCase);
-container.registerSingleton<ILoadUserProfileUsecase>(
-  'ILoadUserProfileUsecase',
-  LoadUserProfileUsecase
-);
+container.registerSingleton<ILoadMyProfileUsecase>('ILoadMyProfileUsecase', LoadMyProfileUsecase);
 container.registerSingleton<ISaveUserBasicsUsecase>(
   'ISaveUserBasicsUsecase',
   SaveUserBasicsUsecase
@@ -343,15 +510,45 @@ container.registerSingleton<IDeleteUserSkillUsecase>(
   DeleteUserSkillUsecase
 );
 container.registerSingleton<ICreatePostUsecase>('ICreatePostUsecase', CreatePostUseCase);
+container.registerSingleton<IDeletePostUsecase>('IDeletePostUsecase', DeletePostUsecase);
+container.registerSingleton<IHidePostUsecase>('IHidePostUsecase', HidePostUsecase);
+container.registerSingleton<IUnHidePostUsecase>('IUnHidePostUsecase', UnHidePostUsecase);
+container.registerSingleton<IToggleSavePostUsecase>(
+  'IToggleSavePostUsecase',
+  ToggleSavePostUsecase
+);
+container.registerSingleton<IGetCompanyListUsecase>(
+  'IGetCompanyListUsecase',
+  GetCompanyListUsecase
+);
+container.registerSingleton<IGetcompaniesBySuggesionUsecase>(
+  'IGetcompaniesBySuggesion',
+  GetCompanySuggesionUsecase
+);
+container.registerSingleton<IAddCompanyUsecase>('IAddCompanyUsecase', AddCompanyUsecase);
 container.registerSingleton<IGetPostsUsecase>('IGetPostsUsecase', GetPostsUsecase);
 container.registerSingleton<ILikePostUsecase>('ILikePostUsecase', LikePostUsecase);
 container.registerSingleton<IUnlikePostUsecase>('IUnlikePostUsecase', UnlikePostUsecase);
 container.registerSingleton<ICreateCommentUsecase>('ICreateCommentUsecase', CreateCommentUsecase);
 container.registerSingleton<IDeleteCommentUsecase>('IDeleteCommentUsecase', DeleteCommentUsecase);
+container.registerSingleton<ILikePostCommentUsecase>('ILikeCommentUsecase', LikeCommentUsecase);
+container.registerSingleton<IUnlikeCommentUsecase>('IUnlikeCommentUsecase', UnlikeCommentUsecase);
 container.registerSingleton<ICreateJobUseCase>('ICreateJobUsecase', CreateJobUseCase);
 container.registerSingleton<ILoadRecruiterJobsUsecase>(
   'ILoadRecruiterJobsUsecase',
   LoadRecruiterJobsUsecase
+);
+container.registerSingleton<IGetJobTypeListUsecase>(
+  'IGetJobTypeListsUsecase',
+  GetJobTypeListsUsecase
+);
+container.registerSingleton<IGetJobLevelListsUsecase>(
+  'IGetJobLevelListsUsecase',
+  GetJobLevelListsUsecase
+);
+container.registerSingleton<IGetWorkModeListsUsecase>(
+  'IGetWorkModeListsUsecase',
+  GetWorkModesListUsecase
 );
 container.registerSingleton<IEditJobUsecase>('IEditJobUsecase', EditJobUsecase);
 container.registerSingleton<IDeleteJobUsecase>('IDeleteJobUsecase', DeleteJobUsecase);
@@ -364,6 +561,22 @@ container.registerSingleton<ICreateNotificationUsecase>(
   CreateNotificationUsecase
 );
 container.registerSingleton<IFollowUserUseCase>('IFollowUserUsecase', FollowUseruseCse);
+container.registerSingleton<ISendConnectionRequestUsecase>(
+  'ISendConnectionRequestUsecase',
+  SendConnectionRequestUsecase
+);
+container.registerSingleton<IRejectConnectionRequestUsecase>(
+  'IRejectConnectionRequestUsecase',
+  RejectConnectionRequestUsecase
+);
+container.registerSingleton<ICancelConnectionRequestUsecase>(
+  'ICancelConnectionRequestUsecase',
+  CancelConnectionRequestUsecase
+);
+container.registerSingleton<IAcceptConnectionRequestUsecase>(
+  'IAcceptConnectionRequestUsecase',
+  AcceptConnectionRequestUsecase
+);
 container.registerSingleton<IUnFollowUserUsercase>('IUnfollowUserUsecase', UnfollowUserUseCase);
 container.registerSingleton<IAdminLoadUserDetailsUsecase>(
   'IAdminLoadUserDetailsUsecase',
@@ -390,11 +603,34 @@ container.registerSingleton<IGetUserSpecificNotificationUsecase>(
   'IGetUserSpecificNotificationsUsecase',
   GetUserSpecificNotificationsUsecase
 );
-container.registerSingleton<ILoadUserAggregatedProfileUsecase>(
-  'ILoadUserAggregatedProfileUsecase',
-  LoadUserAggregatedProfileUsecase
+container.registerSingleton<IMarkReadAllNotificationsUsecase>(
+  'IMarkReadAllNotificationsUsecase',
+  MarkReadAllNotifications
 );
-container.registerSingleton<ILoadUserMetaDataUsecase>('ILoadUserMetaDataUsecase', LoadUserMetaData);
+container.registerSingleton<IDeleteNotificationsUsecase>(
+  'IDeleteNotificationsUsecase',
+  DeleteNotificationsUsecase
+);
+container.registerSingleton<IGetUnReadNotificationsCountUsecase>(
+  'IGetUnReadNotificationsCount',
+  GetUnReadNotificationsCountUsecase
+);
+container.registerSingleton<IChangeNotificationStatusUsecase>(
+  'IChangeNotificationStatusUsecae',
+  ChangeNotificationStatusUsecase
+);
+container.registerSingleton<ISoftDeleteNotificationUsecase>(
+  'ISoftDeleteNotificationUsecase',
+  SoftDeleteNotificationUsecase
+);
+container.registerSingleton<ILoadUserPublicProfileUsecase>(
+  'ILoadUserPublicProfileUsecase',
+  LoadUserpublicProfileUsecase
+);
+container.registerSingleton<ILoadUserMetaDataUsecase>(
+  'ILoadUserMetaDataUsecase',
+  LoadUserMetaDataUsecase
+);
 container.registerSingleton<IGetRecruiterApplicationsUsecase>(
   'IGetRecruiterApplicationsUsecase',
   GetRecruiterApplicationsUsecase
@@ -415,14 +651,43 @@ container.registerSingleton<ICheckIsJobSavedUseCase>(
 );
 container.registerSingleton<IUnsaveJobUseCase>('IUnsaveJobUsecase', UnsaveJobUseCase);
 container.registerSingleton<IApplyJobUsecase>('IApplyJobUsecase', ApplyJobUsecase);
+container.registerSingleton<ICheckIsJobApplied>(
+  'ICheckIsJobAppliedUsecase',
+  CheckIsJobAppliedUsecase
+);
 container.registerSingleton<IAddResumeUseCase>('IAddResumeUsecase', AddResumeUseCase);
 container.registerSingleton<ILoadResumeUseCase>('ILoadResumeUsecase', LoadResumesUseCase);
 container.registerSingleton<IDeleteResumeUseCase>('IDeleteResumeUsecase', DeleteResumeUseCase);
 container.registerSingleton<IAddCertificateUseCase>('IAddCertificate', AddCertificateUseCase);
 container.registerSingleton<ILoadCertificateUseCase>('ILoadCertificates', GetCertificatesUseCase);
+container.registerSingleton<IDeleteCertificateUsecase>(
+  'IDeleteCertificateUsecase',
+  DeleteCertificateUsecase
+);
+container.registerSingleton<IBulckApproveRecruiterApplicationUsecase>(
+  'IBulckApproveRecruiterApplicationsUsecase',
+  BulckApproveRecruiterApplicationsUSecase
+);
+container.registerSingleton<IAdminChangeRecruiterApplicationStatusToUnderReview>(
+  'IAdminChangeRecruiterApplicationStatusToUnderReview',
+  AdminChangeRecruiterApplicationStatusToUnderReview
+);
+container.registerSingleton<IGetUsersForPublicUsecase>(
+  'IGetUsersForPublicUsecase',
+  GetUsersForPublicUsecase
+);
+container.registerSingleton<ISetResumePrimaryUsecase>('ISetResumePrimary', SetResumePrimaryUsecase);
 container.registerSingleton<IGetMyApplicationsUsecase>(
   'IGetMyApplicationsUsecase',
   GetMyApplicationsUsecase
+);
+container.registerSingleton<IGetConversationsUsecase>(
+  'IGetConversationsUsecase',
+  GetconversationsUsecase
+);
+container.registerSingleton<IInitializeConversation>(
+  'IInitializeConversation',
+  InitializeConversationUsecase
 );
 container.registerSingleton<IScheduleInterviewUsecase>(
   'IScheduleInterviewUsecase',
@@ -431,6 +696,14 @@ container.registerSingleton<IScheduleInterviewUsecase>(
 container.registerSingleton<IGetJobApplicationsUseCase>(
   'IGetJobApplicationsUsecase',
   GetJobApplicationsUseCase
+);
+container.registerSingleton<IGetJobApplicationDetailsUseCase>(
+  'IGetJobApplicationDetailsUsecase',
+  GetJobApplicationDetailsUseCase
+);
+container.registerSingleton<ISearchJobsFromHomeUseCase>(
+  'SearchJobsFromHomeUsecase',
+  SearchJobsFromHomeUseCase
 );
 container.registerSingleton<IUpdateCandidateNotes>(
   'IUpdateCandidateNotesUsecase',
@@ -457,6 +730,14 @@ container.registerSingleton<ILoadCompaniesUseCase>(
   'ILoadCompaniesUseCase',
   AdminLoadRecruitersUsecase
 );
+container.registerSingleton<IAdminRevokeRecruiterVerification>(
+  'IAdminRevokeRecruiterVerificationUsecase',
+  AdminRevokeRecruiteerVerificationUsecase
+);
+container.registerSingleton<IAdminHandlePermissionRevokingUsecase>(
+  'IAdminHandlePermissionRevokingUsecase',
+  AdminHandlePermissionRevoking
+);
 container.registerSingleton<IAdminLoadRecruitersUsecase>(
   'IAdminLoadRecruitersUsecase',
   AdminLoadRecruitersUsecase
@@ -468,6 +749,10 @@ container.registerSingleton<IBlockRecruiterUsecase>(
 container.registerSingleton<IUnblockRecruiterUsecase>(
   'IUnblockRecruiterUsecase',
   UnblockRecruiterUsecase
+);
+container.registerSingleton<IAdminLoadRecruiterDetailsUsecase>(
+  'IAdminLoadRecruiterDetailsUsecase',
+  AdminLoadRecruiterDetailsUsecase
 );
 container.registerSingleton<IDeleteRecruiterUsecase>(
   'IDeleteRecruiterUsecase',
@@ -486,7 +771,78 @@ container.registerSingleton<IAdminGetSkillsUsecase>(
   'IAdminGetSkillsUsecase',
   AdminGetSkillsUsecase
 );
+container.registerSingleton<IAdminAddWorkModeUsecase>(
+  'IAdminAddWorkModeUsecase',
+  AdminAddWorkModeUsecase
+);
+container.registerSingleton<IAdminGetWorkModesUsecase>(
+  'IAdminGetWorkModeUsecase',
+  AdminGetWorkModesUsecase
+);
+container.registerSingleton<IAdminChangeWorkModeStatusUsecase>(
+  'IAdminChangeWorkModeStatusUsecase',
+  AdminChangeWorkmodeUsecase
+);
+container.registerSingleton<IAdminDeleteWorkModeUsecase>(
+  'IAdminDeleteWorkModeUsecase',
+  AdminDeleteWorkModeUsecase
+);
+container.registerSingleton<IAdminEditWorkModeUsecase>(
+  'IAdminEditWorkModeUsecase',
+  AdminEditWorkModeUsecase
+);
+container.registerSingleton<IAdminAddJobLevelUsecase>(
+  'IAdminAddJobLevelUsecase',
+  AdminAddJobLevelUsecase
+);
+container.registerSingleton<IAdminGetJobLevelsUsecase>(
+  'IAdminGetJobLevelUsecase',
+  AdminGetJobLevelsUsecase
+);
+container.registerSingleton<IAdminEditJobLevelUsecase>(
+  'IAdminEditJobLevelUsecase',
+  AdminEditJobLevelUsecase
+);
+container.registerSingleton<ILoadJobsUseCase>('IAdminLoadJobsUsecase', LoadJobsUseCase);
+container.registerSingleton<IAdminChangeJobLevelStatusUsecase>(
+  'IAdminChangeJobLevelStatusUsecase',
+  AdminChangeJobLevelStatus
+);
+container.registerSingleton<IAdminDeleteJobUsecase>(
+  'IAdminDeleteJobUsecase',
+  AdminDeleteJobUsecase
+);
+container.registerSingleton<IAdminLoadJobDetailsUseCase>(
+  'IAdminLoadJobDetailsUsecase',
+  AdminLoadJobDetailsUseCase
+);
+container.registerSingleton<IAdminDeleteJobLevelUsecase>(
+  'IAdminDeleteJobLevelUsecase',
+  AdminDeleteJobLevelUsecase
+);
+container.registerSingleton<IAdminAddJobTypeUsecase>(
+  'IAdminAddJobTypeUsecase',
+  AdminAddJobTypeUsecase
+);
+container.registerSingleton<IAdminUpdateJobTypeUse>(
+  'IAdminUpdateJobTypeUsecase',
+  AdminUpdateJobTypeUsecase
+);
+container.registerSingleton<IAdminChangeJobTypeStatusUsecase>(
+  'IAdminChangeJobTypeStatusUsecase',
+  AdminChangeJobTypeStatusUsecase
+);
+container.registerSingleton<IAdminGetJobTypesUsecase>(
+  'IAdminGetJobTypesUsecase',
+  AdminGetJobTypesUsecase
+);
+container.registerSingleton<IAdminDeleteJobTypeUsecase>(
+  'IAdminDeleteJobTypeUsecase',
+  AdminDeleteJobTypeUsecase
+);
+
 container.registerSingleton<IVerifyUserUseCase>('IVerifyUserUsecase', VerifyUserUseCase);
+container.registerSingleton<IGetUserAlertsUsecase>('IGetUserAlertsUsecase', GetUserAlertsUsecase);
 
 //register controller
 container.registerSingleton(UserController);
@@ -496,6 +852,9 @@ container.registerSingleton(RecruiterController);
 container.registerSingleton(FollowController);
 container.registerSingleton(OAuthController);
 container.registerSingleton(NotificationController);
+container.registerSingleton(ChatController);
+container.registerSingleton(CompanyController);
+container.registerSingleton(JobController);
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service
@@ -506,5 +865,23 @@ container.registerSingleton<IRealTimeEventEmitter>(
   'IRealTimeEventEmitter',
   RealTimeEventEmitterService
 );
+
+//register mappers
+container.registerSingleton('UserMapper', UserMapper);
+container.registerSingleton('CertificateMapper', CertificateMapper);
+container.registerSingleton('ResumeMapper', ResumeMapper);
+container.registerSingleton('ExperienceMapper', ExperienceMapper);
+container.registerSingleton('EducationMapper', EducationMapper);
+container.registerSingleton('SkillMapper', SkillsMapper);
+container.registerSingleton('FollowMapper', FollowMapper);
+container.registerSingleton('NotificationMapper', NotificationMapper);
+container.registerSingleton('CompanyMapper', CompanyMapper);
+container.registerSingleton('RecruiterMapper', RecruiterMapper);
+container.registerSingleton('WorkModeMapper', WorkModeMapper);
+container.registerSingleton('JobLevelMapper', JobLevelMapper);
+container.registerSingleton('JobTypeMapper', JobTypeMapper);
+container.registerSingleton('JobMapper', JobMapper);
+container.registerSingleton('JobApplicationMapper', JobApplicationMapper);
+container.registerSingleton('SavedJobsMapper', SavedJobsMapper);
 
 //register socket

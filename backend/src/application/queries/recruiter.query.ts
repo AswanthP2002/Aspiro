@@ -11,11 +11,11 @@ export default interface FindRecruitersDBQuery {
   page: number;
   limit: number;
   employer_type_filter: string[];
-  employer_status_filter?: any;
+  employer_status_filter?: boolean[];
   sortOption: { [key: string]: number };
 }
 
 export interface AppliedRecruitersQuery {
-  search: string;
-  profileStatus: string[];
+  page: number,
+  limit: number
 }

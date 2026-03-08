@@ -22,12 +22,11 @@ export class UserMetadataDto {
 }
 
 //legacy
-export default interface UserMetaData {
+export default interface UserMetaDataDTO {
   _id?: string;
   name?: string;
   headline?: string;
-  profilePicture?: {
-    cloudinaryPublicId: string;
-    cloudinarySecureUrl: string;
-  };
+  email?: string;
+  role?: string;
+  profilePicture?: string;
 }

@@ -3,13 +3,14 @@ import IApproveRecruiterApplicationUsecase from '../../interfaces/usecases/admin
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import IEmailService from '../../interfaces/services/IEmailService';
 import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
-import { plainToInstance } from 'class-transformer';
+import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 
 @injectable()
 export default class ApproveRecruiterApplicationUsecase implements IApproveRecruiterApplicationUsecase {
   constructor(
     @inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo,
-    @inject('IEmailService') private _emailService: IEmailService
+    @inject('IEmailService') private _emailService: IEmailService,
+    @inject('RecruiterMapper') private _mapper: RecruiterMapper
   ) {}
 
   async execute(id: string): Promise<RecruiterDTO | null> {
@@ -44,7 +45,10 @@ export default class ApproveRecruiterApplicationUsecase implements IApproveRecru
 </body>
 </html>`;
     try {
-      const updatedRecruiter = await this._recruiterRepo.update(id, { profileStatus: 'approved' });
+      const updatedRecruiter = await this._recruiterRepo.update(id, {
+        profileStatus: 'approved',
+        isVerified: true,
+      });
       if (updatedRecruiter) {
         const recruiterDetails = await this._recruiterRepo.getRecruiterProfileOverview(id);
         const email = recruiterDetails?.userProfile.email;
@@ -55,7 +59,7 @@ export default class ApproveRecruiterApplicationUsecase implements IApproveRecru
         if (email) {
           await this._emailService.sendEmail(email, subject, personalizedBody);
         }
-        return plainToInstance(RecruiterDTO, updatedRecruiter);
+        return this._mapper.recruiterToRecruiterDTO(updatedRecruiter);
       }
       return null;
     } catch (error: unknown) {

@@ -1,5 +1,5 @@
-import { ExperienceDto } from '../../../DTOs/user/experience.dto.FIX';
+import { ExperienceDTO } from '../../../DTOs/user/experience.dto.FIX';
 
 export default interface IGetUserExperiencesUsecase {
-  execute(userId?: string): Promise<ExperienceDto[] | null>;
+  execute(userId?: string): Promise<ExperienceDTO[] | null>;
 }

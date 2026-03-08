@@ -28,7 +28,7 @@ export class AdminLoginUseCase implements IAdminLoginUseCase {
     }
 
     // Role in the first position of 'role' field is considered as primary role
-    const primaryRole = admin.role?.[1] || 'admin'; //every user base role is 'user' which is in the first position
+    const primaryRole = 'admin'; //every user base role is 'user' which is in the first position
 
     const token = await generateToken({
       id: admin._id as string,
@@ -44,7 +44,7 @@ export class AdminLoginUseCase implements IAdminLoginUseCase {
     return {
       token,
       refreshToken,
-      user: { id: admin._id as string, email: admin.email },
+      user: { id: admin._id as string, email: admin.email as string },
       role: primaryRole,
     };
   }

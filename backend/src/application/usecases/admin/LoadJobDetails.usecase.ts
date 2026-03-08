@@ -1,12 +1,22 @@
+import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
-import JobAggregatedDTO from '../../DTOs/job/jobDetails.dto.FIX';
-import ILoadJobDetailsUseCase from './interfaces/ILoadJobDetails.usecase';
+import { AdminJobDetailsDTO } from '../../DTOs/job/jobDetails.dto.FIX';
+import JobMapper from '../../mappers/recruiter/Job.mapperClass';
+import IAdminLoadJobDetailsUseCase from './interfaces/ILoadJobDetails.usecase';
 
-export class LoadJobDetailsUseCase implements ILoadJobDetailsUseCase {
-  constructor(private _jobRepo: IJobRepo) {}
+@injectable()
+export class AdminLoadJobDetailsUseCase implements IAdminLoadJobDetailsUseCase {
+  constructor(
+    @inject('IJobRepository') private _repo: IJobRepo,
+    @inject('JobMapper') private _mapper: JobMapper
+  ) {}
 
-  async execute(id: string): Promise<JobAggregatedDTO | null> {
-    const result = await this._jobRepo.getJobDetails(id);
-    return result;
+  async execute(id: string): Promise<AdminJobDetailsDTO | null> {
+    const reuslt = await this._repo.getJobDetailsForAdmin(id);
+    if (reuslt) {
+      return this._mapper.jobAggragatedToAdminJobDetailsDTO(reuslt);
+    }
+
+    return null;
   }
 }

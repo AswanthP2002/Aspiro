@@ -4,13 +4,18 @@ import PostsAggregatedDTO from '../DTOs/postsAggregated.dto';
 import mapPostsAggregatedToDTO from '../mappers/user/mapPostsAggregatedToDTO.mapper';
 import { inject, injectable } from 'tsyringe';
 import IGetPostsUsecase from '../interfaces/usecases/user/IGetPosts.usecase';
+import IUserRepository from '../../domain/interfaces/IUserRepo';
 
 @injectable()
 export default class GetPostsUsecase implements IGetPostsUsecase {
-  constructor(@inject('IPostRepository') private _postRepository: IPostRepo) {}
+  constructor(
+    @inject('IPostRepository') private _postRepository: IPostRepo,
+    @inject('IUserRepository') private _userRepository: IUserRepository
+  ) {}
 
-  async execute(): Promise<PostsAggregatedDTO[] | null> {
-    const result = await this._postRepository.getPosts();
+  async execute(userId: string): Promise<PostsAggregatedDTO[] | null> {
+    const userDetails = await this._userRepository.findById(userId)
+    const result = await this._postRepository.getPosts(userDetails?.hiddenPosts || []);
     
     if (result) {
       const dto: PostsAggregatedDTO[] = [];

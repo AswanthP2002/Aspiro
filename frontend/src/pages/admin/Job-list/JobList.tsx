@@ -4,6 +4,13 @@ import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
 import { industryTypes } from '../../../assets/data/companyDetailsArrayData';
 import { getJobs } from '../../../services/adminServices';
+import { IoSearchOutline } from 'react-icons/io5';
+import { AdminJobListsData } from '../../../types/entityTypes';
+import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
+import { formatRelativeTime } from '../../../services/util/formatDate';
+import { FaUserSlash, FaUsersSlash } from 'react-icons/fa';
+import { TbBriefcaseOff } from 'react-icons/tb';
+import { CiWarning } from 'react-icons/ci';
 
 interface filterType {
   industry:string[]
@@ -15,13 +22,13 @@ interface filterType {
 
 export default function Jobs() {
   
-  const [jobs, setjobs] = useState<any[]>([])
-  const [selectedjob, setselectedjob] = useState<any>({})
+  const [jobs, setjobs] = useState<AdminJobListsData[]>([])
   const [search, setsearch] = useState("")
-  const [limit, setlimit] = useState(3)
+  const [limit, setlimit] = useState(5)
   const [page, setpage] = useState(1)
-  const [totalPages, settotalpages] = useState(0)
-  const [pagination, setpagination] = useState<any[]>([])
+  const [totalPages, settotalpages] = useState(1)
+  const [reportsCount, setReportsCount] = useState(0)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'expired' | 'active'>('all')
   
   const [sort, setsort] = useState('job-latest')
   const [sortVisibility, setSortVisibility] = useState(false)
@@ -34,6 +41,76 @@ export default function Jobs() {
     minSalary:'',
     maxSalary:''
   })
+
+  const jobsTableColumn: TableColumn<AdminJobListsData>[] = [
+    {
+      header: 'JOB TITLE',
+      key: 'jobTitle',
+      render: (row: AdminJobListsData) => (
+        <p className='font-semibold text-xs'>{row.jobTitle}</p>
+      )
+    },
+    {
+      header: 'RECRUITER',
+      key: 'recruiterName',
+      render: (row: AdminJobListsData) => (
+        <div className='flex items-center gap-2'>
+          <div className='w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-semibold'>{row.recruiterName[0]}</div>
+          <p className='font-medium text-xs'>{row.recruiterName}</p>
+        </div>
+      )
+    },
+    {
+      header: 'COMPANY',
+      key: 'companyName',
+      render: (row: AdminJobListsData) => (
+        <div><p className='font-semibold text-xs'>{row.companyName ? row.companyName : 'N/A'}</p></div>
+      )
+    },
+    {
+      header: 'DATE POSTED',
+      key: 'createdAt',
+      render: (row: AdminJobListsData) => (
+        <div><p className='text-xs'>{formatRelativeTime(row.createdAt)}</p></div>
+      )
+    },
+    {
+      header:'JOB TYPE',
+      key: 'jobType',
+      render: (row: AdminJobListsData) => (
+        <span className='text-xs bg-blue-200 text-blue-700 font-medium px-2 rounded-md'>{row.jobType}</span>
+      )
+    },
+    {
+      header: 'REPORTS COUNT',
+      key: 'reportsCount',
+      render: (row: AdminJobListsData) => (
+        <div>
+          {row.reportsCount && row?.reportsCount > 0 ? <span>{row.reportsCount}</span> : "-"}
+        </div>
+      )
+    },
+    {
+      header: 'STATUS',
+      key: 'status',
+      render: (row: AdminJobListsData) => {
+        if(row.status === 'active'){
+          return <span className='bg-green-200 text-green-700 text-xs font-medium rounded-md px-2'>{row.status}</span>
+        }else if(row.status === 'expired'){
+          return <span className='bg-gray-200 text-gray-700 text-xs font-medium rounded-md px-2'>{row.status}</span>
+        }else if(row.status === 'blocked'){
+          return <span className='bg-red-200 text-red-700 text-xs font-medium rounded-md px-2'>{row.status}</span>
+        }
+      }
+    },
+    {
+      header: 'ACTIONS',
+      key: 'actions',
+      render: (row: AdminJobListsData) => (
+        <button onClick={() => viewJobDetails(row._id)} className='text-blue-500 font-medium'>View Details</button>
+      )
+    }
+  ]
 
   const [filterVisibility, setFilterVisibility] = useState(false)
 
@@ -94,19 +171,15 @@ export default function Jobs() {
 
     async function fetchJobDetails(){
       
-        const result = await getJobs(search, page, sort, filter)
-
-        setjobs(result.jobList.jobs)
-        setselectedjob(result.jobList.jobs[0])
-        setpage(result.jobList.page)
-        settotalpages(result.jobList.totalPages)
-        setCurrentSort(result?.jobList.currentSort)
-        setpagination(new Array(result.jobList.totalPages).fill(0))
+        const result = await getJobs(search, page, limit, statusFilter, '', reportsCount)
+        console.log('--checking job list from the backend--', result)
+        setjobs(result?.result?.jobs)
+        settotalpages(result?.result.totalPages)
           
     }
 
     fetchJobDetails()
-  }, [search, page, sort, filter])
+  }, [search, page, reportsCount, limit, statusFilter])
 
   function formatDate(createdAt : Date | string) : string {
     const joined = new Date(createdAt)
@@ -138,6 +211,16 @@ export default function Jobs() {
 
   const dSearch = debouncedSearchJobs(searchJobs, 600)
 
+  const toggleReportsCount = () => {
+    setReportsCount((prv) => {
+      if(prv === 0){
+        return 3
+      }else{
+        return 0
+      }
+    })
+  }
+
   const changePage = (pagenumber : number) => {
     setpage(pagenumber)
   }
@@ -145,203 +228,262 @@ export default function Jobs() {
   const nextPage = () => setpage(prev => prev + 1)
   const previousPage = () => setpage(prev => prev - 1)
 
+
   return (
     <>
-    {
-      filterVisibility && (
-          <div className="filter absolute bg-white shadow h-screen top-0 left-0 w-[270px]">
-            <div className="flex justify-between p-3 items-center">
-              <p className="text-blue-500">Filter</p>
-              <i onClick={closeFilter} className="fa-solid fa-circle-xmark cursor-pointer"></i>
-            </div>
-            <div className="industries p-3 max-h-[300px] overflow-y-scroll">
-              <p className="text-sm font-normal-text-gray-500">Industry</p>
-              <ul>
-                {
-                  industryTypes.map((industry : string, index : number) => {
-                    return(
-                      <li key={index}><input checked={filter?.industry.includes(industry) ? true : false} onChange={(event) => handleIndustrySelect(industry, event.target.checked)} type="checkbox" /><label htmlFor="" className="ms-2 text-xs">{industry}</label></li>
-                    )
-                  })
-                }
-              </ul>
-            </div>
-
-            <div className="job-type p-3">
-              <p className="text-sm font-normal text-gray-500">Job Type</p>
-              <div>
-                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Full-Time')} onChange={(event) => handleJobTypeSelect('Full-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Full-Time</label></li>
-                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Part-Time')} onChange={(event) => handleJobTypeSelect('Part-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Part-Time</label></li>
-                <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Internship')} onChange={(event) => handleJobTypeSelect('Internship', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Internship</label></li>
+      <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-100">
+        <p className='text-lg font-medium'>Jobs Management</p>
+        <p className='text-xs mt-1 mb-5 text-gray-500'>Monitor & Manage all job postings</p>
+        
+        <div className="p-3 border border-gray-200 bg-white rounded-md mb-3">
+          {/* Main Grid Container */}
+          <div className="grid grid-cols-12 gap-4 items-center">
+            
+            {/* Search Input - Occupies 8 columns on large screens */}
+            <div className="col-span-12 lg:col-span-4">
+              <div className="border border-gray-200 rounded-md px-3 py-1.5 flex items-center gap-2 bg-white">
+                <IoSearchOutline className="text-gray-400" />
+                <input 
+                  onKeyUp={(event) => dSearch(event)} 
+                  type="text" 
+                  className="text-xs w-full outline-none bg-transparent" 
+                  placeholder="Search jobs" 
+                />
               </div>
             </div>
-
-            <div className="lcoation-type p-3">
-              <p className="text-sm font-normal text-gray-500">Location Type</p>
-              <div>
-                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('In-Office')} onChange={(event) => handleLocationTypeSelect('In-Office', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">In-Office</label></li>
-                <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('Remote')} onChange={(event) => handleLocationTypeSelect('Remote', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Remote</label></li>
+            <div className="col-span-12 lg:col-span-4">
+              <div className="bg-gray-100 p-1 border border-gray-200 rounded-md grid grid-cols-3 font-medium" style={{fontSize:'0.65rem'}}>
+                <button onClick={() => setStatusFilter('all')}  className={`py-1 rounded-md ${statusFilter === 'all' ? "bg-white border border-gray-200 shadow-sm text-black" : "text-gray-400"}`}>All</button>
+                <button onClick={() => setStatusFilter('expired')}  className={`py-1 rounded-md ${statusFilter === 'expired' ? "bg-white border border-gray-200 shadow-sm text-black" : "text-gray-400"}`}>Expired</button>
+                <button onClick={() => setStatusFilter('active')}  className={`py-1 rounded-md ${statusFilter === 'active' ? "bg-white border border-gray-200 shadow-sm text-black" : "text-gray-400"}`}>Active</button>
               </div>
             </div>
-
-            <div className="salary p-3">
-              <p className="text-sm font-normal text-gray-500">Salary (Monthly)</p>
-              <div className="flex gap-2">
-                <div className="w-1/2">
-                  <label htmlFor="" className="!text-xs">Min Salary</label>
-                  <input value={filter.minSalary} onChange={(event) => handleMinSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
-                </div>
-
-                <div className="w-1/2">
-                  <label htmlFor="" className="!text-xs">Max Salary</label>
-                  <input value={filter.maxSalary} onChange={(event) => handleMaxSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
-                </div>
-              </div>
+            {/* Filter Toggle - Occupies 4 columns on large screens */}
+            <div className="col-span-12 lg:col-span-4">
+              <button onClick={toggleReportsCount} className={`flex items-center gap-2 text-xs ${reportsCount >= 3 ? "text-white borde hover:bg-red-800 border-slate-300 bg-red-500" : "text-gray-700 bg-white border border-slate-300 hover:bg-slate-100"} p-2 w-full justify-center rounded-md`}>
+                <CiWarning size={20} />
+                <p>High risk (3+ Reports)</p>
+              </button>
             </div>
+      
           </div>
-      )
-    }
-    <div className="px-6 flex gap-20">
-      <h2 className='font-bold'>Listed Jobs</h2>
-      <div className="bg-white search-wrapper rounded-full w-[400px] relative">
-        <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
-        <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
+        </div>
+
+        {jobs.length > 0 && (
+          <ReusableTable 
+          columns={jobsTableColumn}
+          data={jobs}
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(page) => setpage(page)}
+        />
+        )}
+        {jobs.length === 0 && (
+          <div className='flex flex-col items-center gap-2'>
+            <TbBriefcaseOff size={40} color='gray' />
+            <p className='text-xs text-gray-500'>No Jobs found</p>
+          </div>
+        )}
       </div>
-    </div>
-    {
-      jobs.length > 0
-          ? <div className="flex gap-6 p-6 bg-[#fff7f1] min-h-screen">
-      {/* Company List Section */}
-      <div className="flex-1 bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-end items-center mb-4">
-          <div className="flex gap-3 relative">
-            <button onClick={openFilter} className="text-sm text-gray-500">Filter</button>
-            <button onClick={toggleSortVisibility} className="text-sm text-gray-500">Sort</button>
+    </>
+  )
+  // return (
+  //   <>
+  //   {
+  //     filterVisibility && (
+  //         <div className="filter absolute bg-white shadow h-screen top-0 left-0 w-[270px]">
+  //           <div className="flex justify-between p-3 items-center">
+  //             <p className="text-blue-500">Filter</p>
+  //             <i onClick={closeFilter} className="fa-solid fa-circle-xmark cursor-pointer"></i>
+  //           </div>
+  //           <div className="industries p-3 max-h-[300px] overflow-y-scroll">
+  //             <p className="text-sm font-normal-text-gray-500">Industry</p>
+  //             <ul>
+  //               {
+  //                 industryTypes.map((industry : string, index : number) => {
+  //                   return(
+  //                     <li key={index}><input checked={filter?.industry.includes(industry) ? true : false} onChange={(event) => handleIndustrySelect(industry, event.target.checked)} type="checkbox" /><label htmlFor="" className="ms-2 text-xs">{industry}</label></li>
+  //                   )
+  //                 })
+  //               }
+  //             </ul>
+  //           </div>
 
-            {
-              sortVisibility
-                      ? <div className="sort shadow absolute w-[200px] bg-white p-3">
-                        <div className="flex justify-end p-2">
-                          <i onClick={toggleSortVisibility} className="cursor-pointer fa-solid fa-circle-xmark"></i>
-                        </div>
-                        <ul>
-                          <li><input checked={currentSort === 'job-latest' ? true : false} onChange={() => setsort('job-latest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job latest</label></li>
-                          <li><input checked={currentSort === 'job-oldest' ? true : false} onChange={() => setsort('job-oldest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job oldest</label></li>
-                          <li><input checked={currentSort === 'salary-high' ? true : false} onChange={() => setsort('salary-high')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Highest Paying</label></li>
-                          <li><input checked={currentSort === 'salary-low' ? true : false} onChange={() => setsort('salary-low')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Lowest Paying</label></li>
-                        </ul>
-                      </div>
-                      : null
-            }
-          </div>
-        </div>
+  //           <div className="job-type p-3">
+  //             <p className="text-sm font-normal text-gray-500">Job Type</p>
+  //             <div>
+  //               <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Full-Time')} onChange={(event) => handleJobTypeSelect('Full-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Full-Time</label></li>
+  //               <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Part-Time')} onChange={(event) => handleJobTypeSelect('Part-Time', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Part-Time</label></li>
+  //               <li className="list-none"><input type="checkbox" checked={filter.jobType.includes('Internship')} onChange={(event) => handleJobTypeSelect('Internship', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Internship</label></li>
+  //             </div>
+  //           </div>
 
-        <div className="overflow-auto max-h-[400px]">
-          <table className="w-full text-sm text-left">
-            <thead className="text-gray-500 font-medium border-t">
-              <tr>
-                <th className="p-3">Title</th>
-                <th>Company</th>
-                <th>Industry</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job : any, idx : number) => (
-                <tr
-                  key={idx}
-                  onClick={() => selectjob(job)}
-                  className={`${selectedjob?._id === job?._id ? "bg-orange-300" : "bg-white"} rounded rounded-sm`}
-                >
-                  <td className="p-3 flex items-center gap-2">
-                    <img src={job?.companyDetails?.logo ? job?.companyDetails?.logo : defautImage} alt="logo" className="w-8 h-8 rounded-full" />
-                    {job?.jobTitle}
-                  </td>
-                  <td>{job?.companyDetails?.companyName}</td>
-                  <td>{job?.companyDetails?.industry}</td>
-                  <td>{formatDate(job?.createdAt)}</td>
-                  <td>
-                    <span className="text-green-500 font-medium">{job.isBlocked ? <label className='text-red-500'>Blocked</label> : <label className='text-green-500'>Active</label>}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+  //           <div className="lcoation-type p-3">
+  //             <p className="text-sm font-normal text-gray-500">Location Type</p>
+  //             <div>
+  //               <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('In-Office')} onChange={(event) => handleLocationTypeSelect('In-Office', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">In-Office</label></li>
+  //               <li className="list-none"><input type="checkbox" checked={filter.locationType.includes('Remote')} onChange={(event) => handleLocationTypeSelect('Remote', event.target.checked)} name="" id="" /><label htmlFor="" className="ms-2 !text-xs">Remote</label></li>
+  //             </div>
+  //           </div>
+
+  //           <div className="salary p-3">
+  //             <p className="text-sm font-normal text-gray-500">Salary (Monthly)</p>
+  //             <div className="flex gap-2">
+  //               <div className="w-1/2">
+  //                 <label htmlFor="" className="!text-xs">Min Salary</label>
+  //                 <input value={filter.minSalary} onChange={(event) => handleMinSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
+  //               </div>
+
+  //               <div className="w-1/2">
+  //                 <label htmlFor="" className="!text-xs">Max Salary</label>
+  //                 <input value={filter.maxSalary} onChange={(event) => handleMaxSalary(event.target.value)} type="number" className="border border-gray-300 w-full" name="" id="" />
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //     )
+  //   }
+  //   <div className="px-6 flex gap-20">
+  //     <h2 className='font-bold'>Listed Jobs</h2>
+  //     <div className="bg-white search-wrapper rounded-full w-[400px] relative">
+  //       <input onKeyUp={(event) => dSearch(event)} type="text" name="" id="" className="outline-none border-none px-3 py-2" placeholder='Search company' />
+  //       <i className="fa-solid fa-search absolute right-5 bottom-2 !text-sm"></i>
+  //     </div>
+  //   </div>
+  //   {
+  //     jobs.length > 0
+  //         ? <div className="flex gap-6 p-6 bg-[#fff7f1] min-h-screen">
+  //     {/* Company List Section */}
+  //     <div className="flex-1 bg-white p-6 rounded-xl shadow">
+  //       <div className="flex justify-end items-center mb-4">
+  //         <div className="flex gap-3 relative">
+  //           <button onClick={openFilter} className="text-sm text-gray-500">Filter</button>
+  //           <button onClick={toggleSortVisibility} className="text-sm text-gray-500">Sort</button>
+
+  //           {
+  //             sortVisibility
+  //                     ? <div className="sort shadow absolute w-[200px] bg-white p-3">
+  //                       <div className="flex justify-end p-2">
+  //                         <i onClick={toggleSortVisibility} className="cursor-pointer fa-solid fa-circle-xmark"></i>
+  //                       </div>
+  //                       <ul>
+  //                         <li><input checked={currentSort === 'job-latest' ? true : false} onChange={() => setsort('job-latest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job latest</label></li>
+  //                         <li><input checked={currentSort === 'job-oldest' ? true : false} onChange={() => setsort('job-oldest')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Job oldest</label></li>
+  //                         <li><input checked={currentSort === 'salary-high' ? true : false} onChange={() => setsort('salary-high')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Highest Paying</label></li>
+  //                         <li><input checked={currentSort === 'salary-low' ? true : false} onChange={() => setsort('salary-low')} type="radio" name="job-sort" id="" /> <label htmlFor="" className="text-xs">Lowest Paying</label></li>
+  //                       </ul>
+  //                     </div>
+  //                     : null
+  //           }
+  //         </div>
+  //       </div>
+
+  //       <div className="overflow-auto max-h-[400px]">
+  //         <table className="w-full text-sm text-left">
+  //           <thead className="text-gray-500 font-medium border-t">
+  //             <tr>
+  //               <th className="p-3">Title</th>
+  //               <th>Company</th>
+  //               <th>Industry</th>
+  //               <th>Date</th>
+  //               <th>Status</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             {jobs.map((job : any, idx : number) => (
+  //               <tr
+  //                 key={idx}
+  //                 onClick={() => selectjob(job)}
+  //                 className={`${selectedjob?._id === job?._id ? "bg-orange-300" : "bg-white"} rounded rounded-sm`}
+  //               >
+  //                 <td className="p-3 flex items-center gap-2">
+  //                   <img src={job?.companyDetails?.logo ? job?.companyDetails?.logo : defautImage} alt="logo" className="w-8 h-8 rounded-full" />
+  //                   {job?.jobTitle}
+  //                 </td>
+  //                 <td>{job?.companyDetails?.companyName}</td>
+  //                 <td>{job?.companyDetails?.industry}</td>
+  //                 <td>{formatDate(job?.createdAt)}</td>
+  //                 <td>
+  //                   <span className="text-green-500 font-medium">{job.isBlocked ? <label className='text-red-500'>Blocked</label> : <label className='text-green-500'>Active</label>}</span>
+  //                 </td>
+  //               </tr>
+  //             ))}
+  //           </tbody>
+  //         </table>
+  //       </div>
 
         
-        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-          <span>Showing {page} of {totalPages} pages</span>
-          <div className="flex gap-2">
-            {
-              page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
-            }
-            {
-              pagination.map((_, index) => {
-                return(
-                    <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
-                )
-              })
-            }
-            {
-              page < totalPages ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
-            }
-          </div>
-        </div>
-      </div>
+  //       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+  //         <span>Showing {page} of {totalPages} pages</span>
+  //         <div className="flex gap-2">
+  //           {
+  //             page > 1 ? <button onClick={previousPage} className="px-2 py-1 bg-gray-100 rounded">Prev</button> : null
+  //           }
+  //           {
+  //             pagination.map((_, index) => {
+  //               return(
+  //                   <button onClick={() => changePage(index + 1)} key={index} className={index + 1 === page ? 'px-3 py-1 bg-orange-500 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'}>{index + 1}</button>
+  //               )
+  //             })
+  //           }
+  //           {
+  //             page < totalPages ? <button onClick={nextPage} className="px-2 py-1 bg-gray-100 rounded">Next</button> : null
+  //           }
+  //         </div>
+  //       </div>
+  //     </div>
 
     
-      <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
-        <div className="text-sm text-gray-400 text-center">{selectedjob?.companyDetails?.industry ? selectedjob?.companyDetails?.industry : "Not specified"}</div>
-        <img src={selectedjob?.companyDetails?.logo ? selectedjob?.companyDetails?.logo : defautImage} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
-        <div className="text-center">
-          <h3 className="font-semibold">{selectedjob?.companyDetails?.companyName}</h3>
-          <p className="text-sm text-gray-500">{selectedjob?.location}</p>
-        </div>
+  //     <div className="w-[300px] bg-white p-5 rounded-xl shadow flex flex-col gap-3">
+  //       <div className="text-sm text-gray-400 text-center">{selectedjob?.companyDetails?.industry ? selectedjob?.companyDetails?.industry : "Not specified"}</div>
+  //       <img src={selectedjob?.companyDetails?.logo ? selectedjob?.companyDetails?.logo : defautImage} alt="logo" className="w-16 h-16 rounded-full mx-auto" />
+  //       <div className="text-center">
+  //         <h3 className="font-semibold">{selectedjob?.companyDetails?.companyName}</h3>
+  //         <p className="text-sm text-gray-500">{selectedjob?.location}</p>
+  //       </div>
 
-        <div className="mt-4">
-          <h4 className="font-medium text-sm text-gray-600 mb-1">Job Description</h4>
-          <p className="text-xs text-gray-500">
-            {selectedjob?.description}
-          </p>
-        </div>
+  //       <div className="mt-4">
+  //         <h4 className="font-medium text-sm text-gray-600 mb-1">Job Description</h4>
+  //         <p className="text-xs text-gray-500">
+  //           {selectedjob?.description}
+  //         </p>
+  //       </div>
 
-        <div className="grid grid-cols-2 text-xs gap-2 mt-2 text-gray-600">
-          <div>
-            <span className="font-medium">Experience</span>
-            <p>{selectedjob?.experience}</p>
-          </div>
-          <div>
-            <span className="font-medium">Level</span>
-            <p>{selectedjob?.jobLevel ? selectedjob?.jobLevel : "not specified"}</p>
-          </div>
-          <div>
-            <span className="font-medium">Salary</span>
-            <p>{selectedjob.minSalary} - {selectedjob?.maxSalary}</p>
-          </div>
-          <div>
-            <span className="font-medium">Location</span>
-            <p>{selectedjob?.location}</p>
-          </div>
-        </div>
+  //       <div className="grid grid-cols-2 text-xs gap-2 mt-2 text-gray-600">
+  //         <div>
+  //           <span className="font-medium">Experience</span>
+  //           <p>{selectedjob?.experience}</p>
+  //         </div>
+  //         <div>
+  //           <span className="font-medium">Level</span>
+  //           <p>{selectedjob?.jobLevel ? selectedjob?.jobLevel : "not specified"}</p>
+  //         </div>
+  //         <div>
+  //           <span className="font-medium">Salary</span>
+  //           <p>{selectedjob.minSalary} - {selectedjob?.maxSalary}</p>
+  //         </div>
+  //         <div>
+  //           <span className="font-medium">Location</span>
+  //           <p>{selectedjob?.location}</p>
+  //         </div>
+  //       </div>
 
-        <div className="mt-4">
-          <iframe
-          width="100%"
-          height="200"
-          style={{ borderRadius: "10px" }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedjob.location}`)}&output=embed`}
-          ></iframe>
-          </div>
+  //       <div className="mt-4">
+  //         <iframe
+  //         width="100%"
+  //         height="200"
+  //         style={{ borderRadius: "10px" }}
+  //         loading="lazy"
+  //         allowFullScreen
+  //         src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedjob.location}`)}&output=embed`}
+  //         ></iframe>
+  //         </div>
 
-        <button onClick={() => viewJobDetails(selectedjob?._id)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
-      </div>
-    </div>
-      : <p className='text-center mt-10 font-normal text-sm'>No Jobs found</p>
-    }
-    </>
-  );
+  //       <button onClick={() => viewJobDetails(selectedjob?._id)} className="mt-auto bg-orange-500 text-white rounded py-2">View</button>
+  //     </div>
+  //   </div>
+  //     : <p className='text-center mt-10 font-normal text-sm'>No Jobs found</p>
+  //   }
+  //   </>
+  // );
 }

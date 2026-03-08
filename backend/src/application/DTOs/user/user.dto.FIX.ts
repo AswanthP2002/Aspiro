@@ -40,6 +40,9 @@ export class UserDto {
   phone?: string;
 
   @Expose()
+  gender?: string;
+
+  @Expose()
   email?: string;
 
   googleId?: string;
@@ -118,10 +121,56 @@ export default interface UserDTO {
   };
   isBlocked?: boolean;
   isVerified?: boolean;
+  isBanned?: boolean;
+  isDeleted?: boolean;
   isAdmin?: boolean;
   isRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
   verificationToken?: string;
   otpExpiresAt?: Date;
+}
+
+
+/** Some properties are commented which is not needed in the frontend */
+export interface MyProfileDTO {
+  _id?: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  // password?: string;
+  dateOfBirth?: string;
+  socialLinks?: SocialLinks[];
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+  };
+
+  // role?: Role[];
+  phone?: string;
+  email?: string;
+  // googleId?: string;
+  // facebookId?: string;
+  connections?: number;
+  followers?: number
+  // linkedinId?: string;
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  coverPhoto?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  // isBlocked?: boolean;
+  isVerified?: boolean;
+  // isAdmin?: boolean;
+  // isRecruiter?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  // verificationToken?: string;
+  // otpExpiresAt?: Date;
 }

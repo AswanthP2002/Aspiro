@@ -22,6 +22,13 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { Notify } from 'notiflix';
+import { Experience } from '../../../types/entityTypes';
+
+interface EditExperienceResponsePayload {
+  success: boolean
+  message: string
+  result: Experience
+}
 
 export default function EditExperienceForm({
   experience,
@@ -81,12 +88,7 @@ export default function EditExperienceForm({
     p: 4,
   };
 
-  function toggleIsPresent() {
-    setEditableIsPresent((prevState) => !prevState);
-  }
-
   const currentWorkingStatus = watch('isPresent');
-
 
   async function editExperienceOnSubmit(data : Inputs) {
     setLoading(true)
@@ -96,7 +98,7 @@ export default function EditExperienceForm({
     const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
     
     try {
-      const result = await editUserExperience(
+      const result: EditExperienceResponsePayload = await editUserExperience(
       experience?._id as string,
       role,
       jobType,
@@ -107,7 +109,6 @@ export default function EditExperienceForm({
       location,
       workMode
     );
-    //closeExpEditModal();
     if(!result?.success){
       Notify.failure(result?.message, {timeout:2000})
       return
@@ -120,17 +121,7 @@ export default function EditExperienceForm({
       showCancelButton: false,
       timer: 2000,
     }).then(() => {
-      onEditExperience({
-        _id: experience?._id,
-        jobRole: role,
-        organization: organization,
-        jobType: jobType,
-        location: location,
-        workMode: workMode,
-        startDate: formatedStartDate,
-        endDate: formatedEndDate,
-        ispresent: editableIsPresent,
-      });
+      onEditExperience(result.result)
     });
     } catch (error : unknown) {
       Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})

@@ -14,3 +14,11 @@ export function transformDate(date : string) {
 export function formatRelativeTime(date : any){
     return formatDistanceToNow(date, {addSuffix:true})
 }
+
+export function formattedDateMoment(
+    date: string,
+    format: "MMM DD YYYY"
+){
+    const formatted = moment(date).format(format)
+    return formatted
+}

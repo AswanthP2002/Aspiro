@@ -13,7 +13,7 @@ import logger from './logger';
 //import recruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
 //import adminRouter from './src/presentation/routes/admin/adminRouter'
 import passport from 'passport';
-import './src/config/passport';
+// import './src/config/passport.LEGACY';
 //import createCandidateRouter from './src/presentation/routes/userRouter';
 import connectToDb from './src/infrastructure/database/connection';
 //import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
@@ -24,11 +24,13 @@ import createChatRouter from './src/presentation/routes/chatRouter';
 import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
-import createUserRouter from './src/presentation/routes/UserRouter';
+import createUserRouter from './src/presentation/routes/user.router';
 //import connectRedis from './src/infrastructure/redis/redisClient';
-import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
+import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
+import { connectRedis } from './src/infrastructure/redis/redisClient';
+import createCompanyRouter from './src/presentation/routes/companyRouter';
 // import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
@@ -63,9 +65,10 @@ async function main() {
   await connectToDb();
   //connect redis
   //await connectRedis(); closed right now for testing :
+  //await connectRedis();
 
   const expressServer = http.createServer(app);
-  initSocket(expressServer); 
+  initSocket(expressServer);
 
   const userRouter = createUserRouter();
   const recruiterRouter = createRecruiterRouter();
@@ -76,6 +79,7 @@ async function main() {
   const oAuthRouter = CreateOAuthRouter();
   const jobRouter = CreateJobRouter();
   const notificationRouter = createNotificationRouter();
+  const companyRouter = createCompanyRouter();
 
   const port = process.env.PORT || 5000;
   app.use('/', (req: Request, res: Response, next: NextFunction) => {
@@ -97,6 +101,7 @@ async function main() {
   app.use('/api', oAuthRouter); // OAuth for google signup
   app.use('/api', jobRouter);
   app.use('/api', notificationRouter);
+  app.use('/api', companyRouter);
 
   app.use(exceptionhandle); //centralized exception handling
 

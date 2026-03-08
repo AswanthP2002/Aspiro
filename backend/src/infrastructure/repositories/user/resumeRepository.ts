@@ -2,43 +2,38 @@ import mongoose from 'mongoose';
 import Resume from '../../../domain/entities/user/resume.entity';
 import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
 import BaseRepository from '../baseRepository';
-import { Db } from 'mongodb';
 import { ResumeDAO } from '../../database/DAOs/user/resume.dao';
 
-export default class ResumeRepository
-  extends BaseRepository<Resume>
-  implements IResumeRepo
-{
+export default class ResumeRepository extends BaseRepository<Resume> implements IResumeRepo {
   constructor() {
     super(ResumeDAO);
   }
   async findWithCandidateId(id?: string): Promise<Resume[] | null> {
     const result = await ResumeDAO.find({
-      candidateId: new mongoose.Types.ObjectId(id),
+      userId: new mongoose.Types.ObjectId(id),
     });
     return result;
   }
-  // private _collection
-  // constructor(db : Db){
-  //     super(db, 'resume')
-  //     this._collection = 'resume'
-  // }
 
-  // async addResume(resume: Resume): Promise<boolean> {
-  //     const db = await connectDb()
-  //     const result = await db.collection<Resume>(this._collection).insertOne(resume)
-  //     return result.acknowledged
-  // }
+  async setResumePrimary(userId: string, resumeId: string): Promise<Resume | null> {
+    //remove primary from the current primary resume
+    await ResumeDAO.findOneAndUpdate(
+      {
+        userId: new mongoose.Types.ObjectId(userId),
+        isPrimary: true,
+      },
+      {
+        $set: { isPrimary: false },
+      }
+    );
 
-  // async loadResumes(candidateId: string): Promise<Resume[] | null> {
-  //     const db = await connectDb()
-  //     const result = await db.collection<Resume>(this._collection).find({candidateId:new mongoose.Types.ObjectId(candidateId)}).toArray()
-  //     return result
-  // }
+    //set new resume primary
+    const result = await ResumeDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(resumeId) },
+      { $set: { isPrimary: true } },
+      { returnDocument: 'after' }
+    ).lean();
 
-  // async deleteResume(resumeId: string): Promise<boolean> {
-  //     const db = await connectDb()
-  //     const result = await db.collection<Resume>(this._collection).deleteOne({_id:new mongoose.Types.ObjectId(resumeId)})
-  //     return result.acknowledged
-  // }
+    return result as Resume | null;
+  }
 }

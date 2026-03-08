@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
 import cloudinary from '../../../utilities/cloudinary';
-import { DeleteResumeDTO } from '../../DTOs/candidate -LEGACY/resume.dto';
+import { DeleteResumeDTO } from '../../DTOs/user/resume.dto';
 import IDeleteResumeUseCase from './interface/IDeleteResume.usecase.FIX';
 
 @injectable()

@@ -5,14 +5,22 @@ import {CgProfile} from 'react-icons/cg'
 import {CiLogout} from 'react-icons/ci'
 import SuggessionBar from "../../components/user/SuggestionBar";
 import Swal from "sweetalert2";
-import { logout } from "../../redux-toolkit/candidateAuthSlice";
+import { logout } from "../../redux/candidateAuthSlice";
 import { userLogout } from "../../services/userServices";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
 import { appContext } from "../../context/AppContext";
 import { IoMdMenu } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 
+interface RootState {
+    userAuth: {
+        user:{
+            name: string,
+            profilePicture: string
+        }
+    }
+}
 
 export default function CommonLayout(){
     const {windowSize, setWindowSize, userSidebarOpen, setUserSidebarOpen} = useContext(appContext)
@@ -32,6 +40,9 @@ export default function CommonLayout(){
         }
     }, [])
 
+    const logedUser = useSelector((state: RootState) => {
+        return state.userAuth.user
+    })
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -90,7 +101,7 @@ export default function CommonLayout(){
                     <Link to={'/profile/personal'}>
                         <div className="flex items-center gap-2 cursor-pointer">
                             <CgProfile color="white" size={20} />
-                            <p className="text-white text-sm">Profile</p>
+                            <p className="text-white text-sm font-light">{logedUser.name}</p>
                         </div>
                     </Link>
                     <div onClick={logoutUser} className="flex flex gap-2 mt-3 cursor-pointer">
@@ -124,7 +135,7 @@ export default function CommonLayout(){
                         <Outlet />
                     </div>
                 
-                    <div className="hidden lg:block w-90 p-3">
+                    <div className="hidden lg:block w-90 px-3">
                         <SuggessionBar />
                     </div>
                 </div>

@@ -1,58 +1,93 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
 import Job from '../../../domain/entities/recruiter/job.entity';
 import User from '../../../domain/entities/user/User.FIX';
+import CompanyDTO from './company.dto';
 
-@Exclude()
-export default class RecruiterProfilelOverviewDataDTO {
-  @Expose()
+export default interface RecruiterProfilelOverviewDataDTO {
   _id?: string;
-
-  @Expose()
   userId?: string;
-
-  @Expose()
-  employerType?: string;
-
-  @Expose()
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    teamStrength?: string;
-    website?: string;
+  recruiterType?: 'self' | 'corporate';
+  companyId?: string;
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
   };
+  isVerified?: boolean;
+  isJobsHidden?: boolean;
+  isPermissionRevoked?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  rejection?: {
+    reason?: string;
+    feedback?: string;
+  };
+  isRejected?: boolean;
+  applicationResendBufferDate?: Date;
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
+  verificationHistory?: any;
+  createdAt?: string;
+  updatedAt?: string;
+  userProfile: User;
+  companyDetails?: CompanyDTO;
+  jobs: Job[];
+}
 
-  @Expose()
-  recruitingExperience?: string;
+export interface AdminRecruiterApplicationsDTO {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  professionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
+  };
+  isVerified?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  createdAt?: string;
+  updatedAt?: string;
+  userProfile?: User;
+  companyDetails?: CompanyDTO;
+}
 
-  @Expose()
-  focusingIndustries?: string[];
+export interface AdminRecruiterListDTO {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  email?: string;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  companyName?: string;
+}
 
-  @Expose()
-  profileStatus?: 'pending' | 'approved' | 'rejected';
-
-  @Expose()
-  @Transform(({ value }) => value || false)
-  isSuspended?: boolean;
-
-  @Expose()
-  @Transform(({ value }) => value || false)
-  isDeleted?: boolean;
-
-  @Expose()
-  summary?: string;
-
-  @Expose()
-  createdAt?: Date;
-
-  @Expose()
-  updatedAt?: Date;
-
-  @Expose()
-  userProfile!: User;
-
-  @Expose()
-  jobs!: Job[];
+export interface AdminRecruiterDetailsDTO {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
+  };
+  isVerified?: boolean;
+  isPermissionRevoked?: boolean
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
+  createdAt?: string;
+  updatedAt?: string;
+  companyDetails?: CompanyDTO;
+  totalJobs?: number;
+  activeJobs?: number;
+  totalApplications: number;
 }

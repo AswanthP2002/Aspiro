@@ -1,3 +1,3 @@
 export default interface IUnsaveJobUseCase {
-  execute(jobId: string, candidateId: string): Promise<void>;
+  execute(id: string): Promise<void>;
 }

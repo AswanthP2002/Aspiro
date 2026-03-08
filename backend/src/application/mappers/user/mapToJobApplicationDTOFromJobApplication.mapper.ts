@@ -1,5 +1,5 @@
 import JobApplication from '../../../domain/entities/user/jobApplication.entity';
-import { JobApplicationDTO } from '../../DTOs/candidate -LEGACY/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../DTOs/job/jobApplication.dto.FIX';
 
 export default function mapToJobApplicationDTOFromJobApplication(
   jobApplication: JobApplication

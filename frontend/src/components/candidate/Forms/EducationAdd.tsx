@@ -22,6 +22,13 @@ import {
 import { addUserEducation } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { Notify } from 'notiflix';
+import { Education } from '../../../types/entityTypes';
+
+interface AddEducationResponsePayload {
+  success: boolean
+  message: string
+  result: Education
+}
 
 export default function AddEducationForm({
   educationModalOpen,
@@ -62,7 +69,7 @@ export default function AddEducationForm({
     const { educationInstitution, educationLevel, isPresent, educationStream, startYear, endYear, location } =
       data;
     try {
-      const result = await addUserEducation(
+      const result: AddEducationResponsePayload = await addUserEducation(
         educationLevel,
         educationStream,
         educationInstitution,
@@ -74,21 +81,22 @@ export default function AddEducationForm({
       
         if (result?.success) {
           Notify.success('Education added', { timeout: 2000 });
+          onAddEducation(result.result)
+          return
         } else {
           Notify.failure(result?.message, { timeout: 2000 });
           return
         }
-       // closeEducationModal();
        
-        onAddEducation({
-          educationLevel: educationLevel,
-          educationStream: educationStream,
-          institution: educationInstitution,
-          isPresent: isPresent,
-          location: location,
-          startYear: startYear,
-          endYear: endYear,
-        });
+        // onAddEducation({
+        //   educationLevel: educationLevel,
+        //   educationStream: educationStream,
+        //   institution: educationInstitution,
+        //   isPresent: isPresent,
+        //   location: location,
+        //   startYear: startYear,
+        //   endYear: endYear,
+        // });
     
     } catch (error: unknown) {
         Notify.failure(error instanceof Error ? error.message : 'Something went wrong')

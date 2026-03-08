@@ -2,52 +2,31 @@ import { inject, injectable } from 'tsyringe';
 import IGetRecruiterApplicationsUsecase from '../../interfaces/usecases/admin/IGetRecruiterApplications.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import LoadRecruiterApplicationDTO from '../../DTOs/admin/loadRecruiterApplication.dto.FIX';
-import RecruiterProfilelOverviewDataDTO from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
+import { AdminRecruiterApplicationsDTO } from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
-import { plainToInstance } from 'class-transformer';
+import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 
 @injectable()
 export default class GetRecruiterApplicationsUsecase implements IGetRecruiterApplicationsUsecase {
-  constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {}
+  constructor(
+    @inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo,
+    @inject('RecruiterMapper') private _mapper: RecruiterMapper
+  ) {}
 
   async execute(
     loadRecruiterApplicationsDto: LoadRecruiterApplicationDTO
-  ): Promise<RecruiterProfilelOverviewDataDTO[] | null> {
-    const { search, profileStatus } = loadRecruiterApplicationsDto;
+  ): Promise<{ applications: AdminRecruiterApplicationsDTO[]; totalPages: number } | null> {
+    const { page, limit } = loadRecruiterApplicationsDto;
 
-    console.log('--checking query from the usecase--', profileStatus);
-    let updatedProfileStatus: string[] = [];
-
-    switch (profileStatus) {
-      case 'All':
-        updatedProfileStatus = ['pending', 'approved', 'rejected'];
-        break;
-      case 'Pending':
-        updatedProfileStatus = ['pending'];
-        break;
-      case 'Approved':
-        updatedProfileStatus = ['approved'];
-        break;
-      case 'Rejected':
-        updatedProfileStatus = ['rejected'];
-        break;
-      default:
-        updatedProfileStatus = ['pending', 'approved', 'rejected'];
-        break;
-    }
-
-    const recruiterData = await this._recruiterRepo.getAppliedRecruitersData({
-      search,
-      profileStatus: updatedProfileStatus,
-    });
-
+    const recruiterData = await this._recruiterRepo.getAppliedRecruitersData({ page, limit });
+    console.log('-- recruiter data from the database ---', recruiterData)
     if (recruiterData) {
-      const dto: RecruiterProfilelOverviewDataDTO[] = [];
-      recruiterData.forEach((recruiter: RecruiterProfileOverviewData) => {
-        dto.push(plainToInstance(RecruiterProfilelOverviewDataDTO, recruiter));
+      const dto: AdminRecruiterApplicationsDTO[] = [];
+      recruiterData.applications.forEach((recruiter: RecruiterProfileOverviewData) => {
+        dto.push(this._mapper.recruiterProfileOverviewToAdminRecruiterApplicationsDTO(recruiter));
       });
 
-      return dto;
+      return { applications: dto, totalPages: recruiterData.totalPages };
     }
 
     return null;

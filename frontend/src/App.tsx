@@ -1,14 +1,14 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import {ToastContainer, Bounce} from 'react-toastify'
 import './App.css';
 // import LoginPage from './pages/admin/Login/Login';
-import CandidateRegister from './pages/user/Register/Register';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
 import VerificationPage from './pages/user/Verification/Verification';
-import CandidateLogin from './pages/user/Login-FIX/Login';
 import ProfileLayout from './pages/candidate/Profile-Layout';
-import ProfilePersonal from './pages/candidate/Profile-Personal/Personal';
-import StoreDetails from './pages/candidate/Basic Details Storing Page/StoreDetails';
+import ProfilePersonal from './pages/user/Profile-Overview/Personal.overview';
+import StoreDetails from './pages/user/User-Intro Details/StoreDetails';
 // import AuthSuccess from './components/common/AuthSuccessGoogle';
 // import RecruiterLogin from './pages/recruiter/Login/Login';
 // import RecruiterRegister from './pages/recruiter/Register/Register';
@@ -29,10 +29,10 @@ import CandidateDetails from './pages/admin/CandidateDetails/UserDetails';
 // import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
 import Jobs from './pages/admin/Job-list/JobList';
 // import JobDetails from './pages/admin/JobDetails/JobDetails';
-import ExperiencePage from './pages/candidate/Skills & Experience/SkillsExperience';
+import ExperiencePage from './pages/user/Skills & Experience/SkillsExperience';
 import JobListing from './pages/candidate/Job-list-details/JobList';
 // import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
-import DocumentsPage from './pages/candidate/Documents Page/Documents';
+import DocumentsPage from './pages/user/Documents Page/Documents';
 // import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsManage';
 import AdminProtectedRoutes from './components/admin/AdminProtectedRoutes';
@@ -62,7 +62,7 @@ import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
 import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
 import EditJobForm from './pages/recruiter/EditJob/EditJob';
 
-import SocketProvider from './context/SocketContext';
+// import SocketProvider from './context/SocketContext';
 import ForgotPasswordPage from './pages/user/Forgot-Password/ForgotPassword';
 import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
 import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
@@ -75,46 +75,191 @@ import { useEffect } from 'react';
 import { Notify } from 'notiflix';
 import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
 import JobApplyPage from './pages/candidate/Job-apply/Apply';
-import MyApplications from './pages/candidate/My-applications/Applications';
+import MyApplications from './pages/user/My-applications/Applications';
 import ChatPage from './pages/common/Chat/Chat';
 import Companies from './pages/admin/Company-list/Companies';
 import AdminSkillManagementPage from './pages/admin/Company-list/SkillsManagement';
+import NoAuthRoutes from './components/route-components/NoAuthRoute';
+import UserRegister from './pages/user/Register/Register';
+import UserLogin from './pages/user/Login-FIX/Login';
+import UsersFindingPage from './pages/user/Users/Users';
+import { AnimatePresence } from 'motion/react';
+import AlertsPage from './pages/user/Alerts/Alerts';
+import { useDispatch, useSelector } from 'react-redux';
+import { Alerts, Notification } from './types/entityTypes';
+import { setAlerts } from './redux/alertSlice';
+import { fetchUserAlerts, getNotifications } from './services/userServices';
+import { disconnectSocket, getSocket, initializeSocket } from './socket';
+import { addLiveNotification, deleteNotificationFromStore, notificationThunk, setNotifications } from './redux/notificationSlice';
+import { UserRoutes } from './constants/routs/user.routes';
+import { reAuthenticateThunk } from './redux/reAuthenticateSlice';
+import store from './redux/store';
+import { Modal } from '@mui/material';
+import Loader from './components/admin/Loader';
+import { AdminRoutes } from './constants/routs/admin.routes';
+import TerminationPage from './pages/user/Action-Termination/Termination';
+import { SocketEvents } from './socket/socket.events';
+import Recruiters from './pages/admin/Company-list/Companies';
+import RecruiterDetails from './pages/admin/company-details/ComapnyDetails';
+import AppConfigPage from './pages/admin/Company-list/SkillsManagement';
+import JobDetails from './pages/admin/JobDetails/JobDetails';
+import ApplySuccessPage from './pages/candidate/Job-apply/Apply-Success';
+import ApplicationTrack from './pages/user/Application-track/Application.track';
+
+interface FetchAlertsPayloadResponse {
+  success: boolean
+  message: string
+  result: Alerts[]
+}
+
+interface FetchNotificationsResponsePayload {
+  success: boolean
+  message: string
+  notifications: Notification[]
+  unRead: number
+}
+
+interface RootState {
+  userAuth: {
+    user: {_id: string} | null,
+    userToken: any,
+    userRole: any,
+    initialLoading: boolean,
+  }
+}
 
 function App() {
+  const logedUser = useSelector((state: RootState) => {
+    return state.userAuth.user
+  })
+  const initialLoading = useSelector((state: RootState) => {
+    return state.userAuth.initialLoading
+  })
+
+  console.log('Inital loading', initialLoading)
+  const dispatch = useDispatch()
+  /**
+   * App mounting phase
+   * 1) Alerts fetching
+   */
+
+  useEffect(() => {
+    store.dispatch(reAuthenticateThunk())
+  }, [])
+  
+  useEffect(() => {
+    //Notify.info('Notification useEffect running')
+    if(logedUser){
+      //Notify.success('Loged user exist so thunk will run')
+      store.dispatch(notificationThunk())
+    }else{
+      //Notify.warning('Loged user does not exist so thunk won run')
+    }
+  }, [logedUser, initialLoading, dispatch])
+
+  useEffect(() => {
+    console.log('--This is from app.tsx useeffect for socket')
+    if(!logedUser){
+      console.log('--Currently no loged user so socket wornt work--')
+      disconnectSocket()
+      return
+    }
+    console.log('--Now loged user is there so going to initialize socket--')
+    const socket = initializeSocket(logedUser?._id as string)
+    socket.on('message', (data) => console.log(`data from te server ${data}`))
+    console.log('--what found after socket initialization--', socket)
+    console.log('--listening for CONNECTION_REQUEST in socket', socket.id)
+
+    if(socket){
+      socket.on(SocketEvents.FOLLOWED, (notification: Notification) => {
+        console.log('Follow event received in the frontend')
+        dispatch(addLiveNotification({notification}))
+        //Notify.success(`${notification?.metadata?.acted_by} started following you`)
+      })
+
+      socket.on(SocketEvents.CONNECTION_REQUEST, (notification: Notification) => {
+        dispatch(addLiveNotification({notification}))
+        //Notify.success(`${notification?.metadata?.acted_by} send you a connection request`)
+      })
+      
+      socket.on(SocketEvents.CONNECTION_REQUEST_CANCELLED, (notificationId: string) => {
+        dispatch(deleteNotificationFromStore({notificationId}))
+      })
+
+      socket.on(SocketEvents.CONNECTION_REQUEST_ACCEPTED, (notification: Notification) => {
+        dispatch(addLiveNotification({notification}))
+      })
+
+      //Cleanups
+      return () => {
+        socket.off(SocketEvents.FOLLOWED)
+        socket.off(SocketEvents.CONNECTION_REQUEST)
+        socket.off(SocketEvents.CONNECTION_REQUEST_CANCELLED)
+        socket.off(SocketEvents.CONNECTION_REQUEST_ACCEPTED)
+      }
+    }
+  }, [logedUser, dispatch])
 
   // useEffect(() => {
-  //   const handleNetworkConnectionLoss = () => {
-  //     window.location.href = '/network-error'
+  //   Notify.info('Useeffect for Notification is running')
+  //   if(logedUser){
+  //     async function getUserNotifications(){
+  //       try {
+  //         const result: FetchNotificationsResponsePayload = await getNotifications()
+  //         if(result.success){
+  //           console.log('User notifications', result.notifications)
+  //           dispatch(setNotifications({notifications: result.notifications, unReadNotificationsCount: result.unRead}))
+  //           Notify.info(result.message)
+  //         }
+  //       } catch (error: unknown) {
+  //         Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+  //       }
+  //     }
+
+  //     getUserNotifications()
   //   }
+  // }, [logedUser, initialLoading, dispatch])
 
-  //   window.addEventListener('offline', handleNetworkConnectionLoss)
+  // 1) fetch alerts
+  useEffect(() => { 
+    if(logedUser){
+      async function getUserAlerts(){
+        try {
+          const result: FetchAlertsPayloadResponse = await fetchUserAlerts()
+          if(result.success){
+            dispatch(setAlerts({alerts: result.result, unReadAlertsCount: result.result.length}))
+            //Notify.info(result.message)
+          }
+        } catch (error: unknown) {
+          //Notify.failure(error instanceof Error ? error.message : 'something went wrong')
+        }
+      }
 
-  //   return () => {
-  //     window.removeEventListener('offline', handleNetworkConnectionLoss)
-  //   }
-  // }, [])
+      getUserAlerts()
+    }
+  }, [logedUser, initialLoading, dispatch]) 
+  
 
-
-  // useEffect(() => {
-  //   const handleOnline = () => Notify.success('Back online!', {timeout:2000})
-  //   window.addEventListener('online', handleOnline)
-
-  //   const timer = setTimeout(() => {
-  //     window.location.reload()
-  //   }, 2000)
-
-  //   return () => {
-  //     window.removeEventListener('online', handleOnline)
-  //     clearTimeout(timer)
-  //   }
-  // }, [])
-
-
+  const location = useLocation()
   return (
-    <BrowserRouter>
-      <SocketProvider>
+        <>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
+
         <PostProvider>
-      <Routes>
+      <AnimatePresence mode='wait'>
+      <Routes location={location} key={location.pathname}>
         <Route path='/' element={<Layouts />}>
           <Route index element={
             <PublicRoute>
@@ -123,22 +268,26 @@ function App() {
           } />
 
           <Route element={<UserProtectedRoute />}>
+            
             <Route element={<CommonLayout />}>
-              <Route path='/feed' element={<Feed />} />
-              <Route path='/jobs' element={<JobListing />} />
-              <Route path='/jobs/:id' element={<JObDetailsCandidateSide />} />
-              <Route path='/jobs/:id/apply' element={<JobApplyPage />} />
-              <Route path='/notifications' element={<NotificationPage />} />
-              <Route path='/users/:userId' element={<UserPublicProfile />} />
-              <Route path='/chats' element={<ChatPage />} />
+              <Route path={UserRoutes.SOCIAL_FEED} element={<Feed />} />
+              <Route path={UserRoutes.JOBS} element={<JobListing />} />
+              <Route path={UserRoutes.USERS} element={<UsersFindingPage />} />
+              <Route path={UserRoutes.JOB_DETAILS} element={<JObDetailsCandidateSide />} />
+              <Route path={UserRoutes.JOB_APPLY} element={<JobApplyPage />} />
+              <Route path={UserRoutes.NOTIFICATIONS} element={<NotificationPage />} />
+              <Route path={UserRoutes.USER_DETAILS} element={<UserPublicProfile />} />
+              <Route path={UserRoutes.CHATS} element={<ChatPage />} />
             </Route>
           </Route>
 
-          <Route path='/profile' element={<UserProtectedRoute />}>
+          <Route path='/notificatons' element={<NotificationPage />} />
+
+          <Route path={UserRoutes.USER_PROTECTED_ROUTE} element={<UserProtectedRoute />}>
             <Route element={<ProfileLayout />}>
-              <Route path='personal' index element={<ProfilePersonal />} />
-              <Route path='documents' element={<DocumentsPage />} />
-              <Route path='skills-experience' element={<ExperiencePage />} />
+              <Route path={UserRoutes.MY_PROFILE_PERSONAL} index element={<ProfilePersonal />} />
+              <Route path={UserRoutes.MY_PROFILE_DOCUMENTS} element={<DocumentsPage />} />
+              <Route path={UserRoutes.MY_EXPERIENCES_EDUCATIONS_SKILLS} element={<ExperiencePage />} />
               <Route path='recruiter/register' element={<RecruiterRegisterPage />} />
               <Route path='recruiter/post-job' element={<PostAJobForm />} />
               <Route path='recruiter/post-a-job' element={<PostAJobForm />} />
@@ -146,45 +295,46 @@ function App() {
               <Route path='recruiter/my-jobs' element={<MyJobs />} />
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
               <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
-              <Route path='favorites' element={<SavedJobs />} />
+              <Route path={UserRoutes.FAVORITE_JOBS} element={<SavedJobs />} />
               <Route path='my-applications' element={<MyApplications />} />
+              <Route path='my-applications/:id' element={<ApplicationTrack />} />
+              <Route path='alerts' element={<AlertsPage />} />
             </Route>
           </Route>
         </Route>
 
-        <Route path='/verify' element={<VerificationPage />} />
-        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
-        <Route path='/password-reset-link/send' element={<ResetLinkSendPage />} />
-        <Route path='/password-reset' element={<PasswordResetPage />} />
-        <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
+        <Route path={UserRoutes.VERIFY} element={<NoAuthRoutes><VerificationPage /></NoAuthRoutes>} />
+        <Route path='/forgot-password' element={<NoAuthRoutes><ForgotPasswordPage /></NoAuthRoutes>} />
+        <Route path='/password-reset-link/send' element={<NoAuthRoutes><ResetLinkSendPage /></NoAuthRoutes>} />
+        <Route path='/password-reset' element={<NoAuthRoutes><PasswordResetPage /></NoAuthRoutes>} />
+        <Route path='/password-reset/success' element={<NoAuthRoutes><PasswordResetSuccessPage /></NoAuthRoutes>} />
 
         {/* Candidate specific routes not applicable header & sidebar & footer */}
-        <Route path='/login' element={<CandidateLogin />} />
-        <Route path='/register' element={<CandidateRegister />} />
-        <Route path='/store/details' element={<StoreDetails />} />
-
+        <Route path={UserRoutes.LOGIN} element={<NoAuthRoutes><UserLogin /></NoAuthRoutes>} />
+        <Route path={UserRoutes.REGISTER} element={<NoAuthRoutes><UserRegister /></NoAuthRoutes>} />
+        <Route path={UserRoutes.STORE_BASIC_DETAILS} element={<StoreDetails />} />
+        <Route path={UserRoutes.APPLICATION_SUCCESS_PAGE} element={<ApplySuccessPage />} />
         {/* Recruiter specific routes not applicable header & sidebar & footer */}
 
         
         {/* Admin specific routes */}
-        <Route path='/admin/login' element={<AdminLoginPage />} />
+        <Route path={AdminRoutes.ADMIN_LOGIN} element={<AdminLoginPage />} />
         <Route path='/admin' element={<AdminLayout />}>
+        <Route path={AdminRoutes.ADMIN_USER_DETAILS} element={<CandidateDetails />} />
           <Route element={<AdminProtectedRoutes />}>
-          <Route path='dashboard' element={<Dashboard />} />
-          <Route path='recruiter/applications' element={<RecruiterApplications />} />
+          <Route path={AdminRoutes.ADMIN_DASHBOARD} element={<Dashboard />} />
+          <Route path={AdminRoutes.ADMIN_USERS} element={<Users />} />
+          <Route path={AdminRoutes.ADMIN_RECRUITER_APPLICATIONS} element={<RecruiterApplications />} />
+          <Route path={AdminRoutes.ADMIN_RECRUITER_DETAILS} element={<RecruiterDetails />} />
           <Route path='recruiter/applications/details' element={<RecruiterApplicationDetailsPage />} />
-          <Route path='users' element={<Users />} />
-          <Route path='users/details/:id' element={<CandidateDetails />} />
-          <Route path='jobs' element={<Jobs />} />
-          <Route path='recruiters/' element={<Companies />} />
-          <Route path='skills-manage' element={<AdminSkillManagementPage />} />
+          
+          
+          <Route path={AdminRoutes.ADMIN_JOBS} element={<Jobs />} />
+          <Route path={AdminRoutes.ADMIN_JOB_DETAILS_BY_ID} element={<JobDetails />} />
+          <Route path={AdminRoutes.ADMIN_RECRUITERS_LIST} element={<Recruiters />} />
+          <Route path={AdminRoutes.ADMIN_APP_CONFIG} element={<AppConfigPage />} />
           </Route>
         </Route>
-
-
-        {/* Recruiter login */}
-        {/* <Route path='/recruiter/login' element={<RecruiterLogin />} />
-        <Route path='/recruiter/register' element={<RecruiterRegister />} /> */}
 
         <Route path="/recruiter" element={<RecruiterLayouts />}>
            <Route index element={<RecruiterHome />} />
@@ -216,16 +366,23 @@ function App() {
 
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
         <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
+        <Route path='/action/termination' element={<TerminationPage />} />
 
-        <Route path='/test' element={<RecruiterRegisterPage />} />
+        <Route path='/test' element={<ApplicationTrack />} />
 
         <Route path='*' element={<NotFoundPage />} />
 
       </Routes>
+      </AnimatePresence>
       </PostProvider>
-      </SocketProvider>
-    </BrowserRouter>
-    // <BrowserRouter>
+    </>
+  );
+}
+
+export default App;
+
+
+// <BrowserRouter>
     //   <Routes>
     //     <Route path="/" element={<Layouts />}>
     //       <Route index element={<Home />} />
@@ -347,7 +504,3 @@ function App() {
     //     <Route path="/chat" element={<Chat />} />
     //   </Routes>
     // </BrowserRouter>
-  );
-}
-
-export default App;

@@ -2,15 +2,18 @@ import { inject, injectable } from 'tsyringe';
 import Job from '../../../domain/entities/recruiter/job.entity';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import ILoadRecruiterJobsUsecase from '../../interfaces/usecases/recruiter/ILoadRecruiterJobs.usecase';
-import { JobDTO } from '../../DTOs/recruiter/createJob.dto';
-import { JobsQueryDTO } from '../../DTOs/shared/jobsQuery.dto';
 import { JobsQuery } from '../../queries/jobs.query';
 import PaginatedJobsDTO from '../../DTOs/recruiter/paginattedJobsDTO.dto';
 import LoadRecruiterJobsDTO from '../../DTOs/recruiter/loadRecruiterJobs.dto';
+import JobMapper from '../../mappers/recruiter/Job.mapperClass';
+import { MyJobDTO } from '../../DTOs/job/loadJob.dto.FIX';
 
 @injectable()
 export class LoadRecruiterJobsUsecase implements ILoadRecruiterJobsUsecase {
-  constructor(@inject('IJobRepository') private _jobRepo: IJobRepo) {}
+  constructor(
+    @inject('IJobRepository') private _jobRepo: IJobRepo,
+    @inject('JobMapper') private _mapper: JobMapper
+  ) {}
 
   async execute(loadRecruiterJobsDto: LoadRecruiterJobsDTO): Promise<PaginatedJobsDTO | null> {
     const { recruiterId, search, limit, page, sortOption, filter } = loadRecruiterJobsDto;
@@ -42,47 +45,47 @@ export class LoadRecruiterJobsUsecase implements ILoadRecruiterJobsUsecase {
       status: ['draft', 'active', 'expired', 'closed', 'rejected', 'blocked'],
       workMode: ['On-site', 'Remote', 'Hybrid'],
     };
+    let jobStatusFilter = ['active', 'draft', 'expired', 'closed', 'rejected', 'blocked']
+    let jobWorkModeFilter = ['On-site', 'Remote', 'Hybrid']
 
     if (filter.status && filter.status !== 'all') {
       switch (filter.status) {
         case 'active':
-          filterData['status'] = ['active'];
+          jobStatusFilter = ['active'];
           break;
         case 'draft':
-          filterData['status'] = ['draft'];
+          jobStatusFilter = ['draft'];
           break;
         case 'expired':
-          filterData['status'] = ['expired'];
+          jobStatusFilter = ['expired'];
           break;
         case 'closed':
-          filterData['status'] = ['closed'];
+          jobStatusFilter = ['closed'];
           break;
         case 'rejected':
-          filterData['status'] = ['rejected'];
+          jobStatusFilter = ['rejected'];
           break;
         case 'blocked':
-          filterData['status'] = ['blocked'];
+          jobStatusFilter = ['blocked'];
           break;
         default:
-          filterData['status'] = ['draft', 'active', 'expired', 'closed', 'rejected', 'blocked'];
-          break;
+          jobStatusFilter = ['draft', 'active', 'expired', 'closed', 'rejected', 'blocked'];
       }
     }
 
     if (filter.workMode && filter.workMode !== 'all') {
       switch (filter.workMode) {
         case 'On-site':
-          filterData['workMode'] = ['On-site'];
+          jobWorkModeFilter = ['On-site'];
           break;
         case 'Remote':
-          filterData['workMode'] = ['Remote'];
+          jobWorkModeFilter = ['Remote'];
           break;
         case 'Hybrid':
-          filterData['workMode'] = ['Hybrid'];
+          jobWorkModeFilter = ['Hybrid'];
           break;
         default:
-          filterData['workMode'] = ['On-site', 'Remote', 'Hybrid'];
-          break;
+          jobWorkModeFilter = ['On-site', 'Remote', 'Hybrid'];
       }
     }
 
@@ -95,16 +98,18 @@ export class LoadRecruiterJobsUsecase implements ILoadRecruiterJobsUsecase {
       skip: (page - 1) * limit,
       sortOption: sort,
       filter: filterData,
+      jobWorkModeFilter: jobWorkModeFilter,
+      jobStatusFilter: jobStatusFilter
     };
     const result = await this._jobRepo.getRecruiterJobsByRecruiterId(recruiterId, dbQuery);
     // onst {jobs, totalPages, totalDocs} : {jobs: Job[], totalPages: number, totalDocs: number, page: number} = result
 
     if (result) {
       const { jobs, totalPages, page, totalDocs } = result;
-      const jobsDto: JobDTO[] = [];
+      const jobsDto: MyJobDTO[] = [];
 
       jobs.forEach((job: Job) => {
-        jobsDto.push(job);
+        jobsDto.push(this._mapper.JobToMyJobDTO(job));
       });
 
       return { jobs: jobsDto, page: page, limit: limit, totalPages: totalPages };

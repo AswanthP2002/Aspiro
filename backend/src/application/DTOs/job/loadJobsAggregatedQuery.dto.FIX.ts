@@ -1,33 +1,15 @@
-import { IsDefined, IsNumber, IsOptional, IsString } from 'class-validator';
-
-export class LoadJobsAggregatedQueryDto {
-  @IsDefined()
-  @IsString()
-  search!: string;
-
-  @IsDefined()
-  @IsNumber()
-  page!: number;
-
-  @IsDefined()
-  @IsNumber()
-  limit!: number;
-
-  @IsDefined()
-  @IsString()
-  sortOption!: string;
-
-  @IsOptional()
-  filter!: {
+export interface LoadJobsAggregatedQueryDto {
+  search: string;
+  page: number;
+  limit: number;
+  sortOption: string;
+  filter?: {
     status: string;
     workMode: string;
     jobType: string;
     jobLevel: string;
   };
-
-  @IsOptional()
-  @IsString()
-  locationSearch!: string;
+  locationSearch?: string;
 }
 
 //legacy

@@ -3,14 +3,15 @@ import Resume from '../../../../domain/entities/user/resume.entity';
 
 export const ResumeSchema = new Schema<Resume>(
   {
-    resumeFileName: { type: String },
+    name: { type: String },
     resumePublicIdCloudinary: { type: String },
     resumeUrlCoudinary: { type: String },
-    candidateId: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'candidates',
       required: true,
     },
+    isPrimary: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -1,25 +1,26 @@
-import { RedisClientType, createClient } from 'redis';
-import logger from '../../../logger';
+import dotenv from 'dotenv';
+import { createClient, RedisClientType } from 'redis';
+
+dotenv.config();
 
 export const redisClient: RedisClientType = createClient({
-  // Providing a default URL is good practice for local development.
-  // Ensure your .env file has REDIS_URL="redis://127.0.0.1:6379"
-  url: process.env.REDIS_URL,
+  password: process.env.REDIS_PASSWORD,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  },
 });
 
-export default async function connectRedis() {
-  try {
-    redisClient.on('error', (err) => {
-      logger.error(err, 'Redis Client Error');
-    });
+redisClient.on('error', (error: unknown) =>
+  console.log('Redis client error', error instanceof Error ? error.message : error)
+);
 
+export const connectRedis = async () => {
+  try {
     await redisClient.connect();
-    logger.info('Redis connected');
+    console.log('Connection established succesfully');
   } catch (error: unknown) {
-    logger.error(error, 'Error occured while connecting to redis');
-    // If Redis is critical, it's better to fail fast and exit the application.
-    // This prevents the server from running in a state where essential services (like OTP limiting) will fail.
-    logger.fatal('Could not connect to Redis. Shutting down.');
-    process.exit(1);
+    console.log('Error occured while connecting redis', error);
   }
-}
+};
+

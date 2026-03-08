@@ -7,8 +7,7 @@ export default class GetJobsUseCase implements IGetJobsUseCase {
   constructor(private _repo: IJobRepo) {}
 
   async execute(loadJobsDto: LoadJobDTO): Promise<LoadJobResDTO | null> {
-    const { search, sort, filters, limit, maxSalary, minSalary, page } =
-      loadJobsDto;
+    const { search, sort, filters, limit, maxSalary, minSalary, page } = loadJobsDto;
 
     /**
      * legacy need to remove

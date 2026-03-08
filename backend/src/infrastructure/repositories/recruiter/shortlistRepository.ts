@@ -1,5 +1,5 @@
 import { Db } from 'mongodb';
-import Shortlist from '../../../domain/entities/recruiter/shortlist.entity';
+import Shortlist from '../../../domain/entities/recruiter/shortlist..GARBAGE.entity';
 import IShortlistRepo from '../../../domain/interfaces/recruiter/IShortlistRepo';
 import BaseRepository from '../baseRepository';
 import mongoose from 'mongoose';
@@ -16,7 +16,7 @@ export default class ShortlistRepository
     this.collection = 'shortlist';
   }
 
-  async getShortlistDataAggregated(jobId: string): Promise<any[]> {
+  async getShortlistDataAggregated(jobId: string): Promise<Shortlist[]> {
     const result = await this.db
       .collection<Shortlist>(this.collection)
       .aggregate([

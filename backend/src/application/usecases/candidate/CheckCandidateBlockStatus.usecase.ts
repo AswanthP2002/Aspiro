@@ -1,4 +1,4 @@
-import CandidateRepo from "../../../domain/interfaces/user/ICandidateRepo";
+import CandidateRepo from "../../../domain/interfaces/user/ICandidateRepo.GARBAGE";
 import IUserRepository from "../../../domain/interfaces/IUserRepo";
 
 export default class CheckCandidateBlockStatusUseCase {

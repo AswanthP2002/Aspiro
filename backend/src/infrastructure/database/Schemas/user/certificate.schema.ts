@@ -3,14 +3,14 @@ import Certificates from '../../../../domain/entities/user/certificates.entity';
 
 export const CertificateSchema = new Schema<Certificates>(
   {
-    certificateId: { type: String },
+    name: { type: String, required: true },
     issuedOrganization: { type: String },
     issuedDate: { type: Date },
     certificateUrl: { type: String },
     certificatePublicId: { type: String },
-    candidateId: {
+    userId: {
       type: Schema.Types.ObjectId,
-      ref: 'candidates',
+      ref: 'users',
       required: true,
     },
   },

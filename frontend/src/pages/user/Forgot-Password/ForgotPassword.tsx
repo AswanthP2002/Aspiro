@@ -1,15 +1,16 @@
-import { FormControl, FormHelperText } from '@mui/material'
+import { Button, FormControl, FormHelperText } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import {HiOutlineEnvelope} from 'react-icons/hi2'
 import {FaArrowLeft} from 'react-icons/fa'
 import { passwordResetLinkSend } from '../../../services/userServices'
 import { Notify } from 'notiflix'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
-export default function ForgotPasswordPage(){
+export default function ForgotPasswordPage(): React.ReactNode{
     const navigate = useNavigate()
-    const [serverResponseError, setServerResponseError] = useState('')
+    const [serverResponseError, setServerResponseError] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
 
     type FormInput = {
         email: string
@@ -18,7 +19,7 @@ export default function ForgotPasswordPage(){
     const {control, handleSubmit, formState:{errors}} = useForm<FormInput>()
 
     const sendPasswordResetLink = async (data: FormInput) => {
-        // alert('testing')
+        setLoading(true)
         const {email} = data
 
         try {
@@ -32,6 +33,8 @@ export default function ForgotPasswordPage(){
             }
         } catch (error: unknown) {
             Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:1500})
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -83,7 +86,17 @@ export default function ForgotPasswordPage(){
                         <FormHelperText>{errors.email?.message}</FormHelperText>
                     </FormControl>
                     <div>
-                        <button className='bg-black text-white font-medium text-sm w-full !mt-4 !mb-3 rounded-sm !py-2 hover:bg-gray-600'>Send reset link</button>
+                        <Button
+                            type='submit'
+                            variant='contained'
+                            loading={loading}
+                            fullWidth
+                            sx={{
+                                bgcolor:'black',
+                                marginTop:'20px'
+                            }}
+                        >Set reset link</Button>
+                        {/* <button className='bg-black text-white font-medium text-sm w-full !mt-4 !mb-3 rounded-sm !py-2 hover:bg-gray-600'>Send reset link</button> */}
                     </div>
                 </form>
                 <div>

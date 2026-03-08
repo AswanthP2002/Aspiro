@@ -16,7 +16,7 @@ export default class LoadRecruiterRecentJobsUsecase implements ILoadRecruiterRec
       const { jobs, totalPages, totalDocs, page } = result;
       const jobDto: JobDTO[] = [];
       jobs.forEach((job: Job) => {
-        jobDto.push(job);
+        jobDto.push(job as JobDTO);
       });
 
       return {

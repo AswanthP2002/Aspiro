@@ -13,6 +13,4 @@ export default interface SaveIntroDetailsDTO {
   state: string;
   city: string;
   mobile: string;
-  // logo : string,
-  // coverphoto : string
 }

@@ -1,72 +1,36 @@
 import Job from './job.entity';
-import Recruiter from './recruiter.entity';
-import SocialLinks from '../SocialLinks';
-import User, { Role } from '../user/User.FIX';
-
-/**
- * _id?: string;
-  userId?: string;
-  employerType?: string;
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string
-    teamStrength?: string;
-    website?: string;
-  };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
-  summary?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
- */
+import User from '../user/User.FIX';
+import Company from '../company.entity';
 
 export default interface RecruiterProfileOverviewData {
   _id?: string;
   userId?: string;
-  employerType?: string;
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string
-    teamStrength?: string;
-    website?: string;
+  recruiterType?: 'self' | 'corporate';
+  companyId?: string;
+  fullName?: string;
+  professionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
   };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
-  summary?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  isVerified?: boolean;
+  isJobsHidden?: boolean;
+  isPermissionRevoked?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  rejection?: {
+    reason?: string;
+    feedback?: string;
+  };
+  isRejected?: boolean
+  applicationResendBufferDate?: Date;
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
+  createdAt?: string;
+  updatedAt?: string;
   userProfile: User;
+  companyDetails?: Company
   jobs: Job[];
 }
-
-/**
- * _id?: string;
-  userId?: string;
-  employerType?: string;
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string
-    teamStrength?: string;
-    website?: string;
-  };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
-  summary?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
- */

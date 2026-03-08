@@ -1,20 +1,25 @@
 import IVerifyUserUseCase from '../../interfaces/usecases/user/IVerifyUser.usecase.FIX';
-import { VerifyUserDto } from '../../DTOs/user/verifyUser.dto.FIX';
+import VerifyUserDTO from '../../DTOs/user/verifyUser.dto.FIX';
 import {
   InvalidUserError,
   OtpExpiredError,
   WrongCredentialsError,
 } from '../../../domain/errors/AppError';
-import { UserDto } from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { inject, injectable } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
+import UserMapper from '../../mappers/user/User.mapperClass';
+import IAlertRepo from '../../../domain/interfaces/user/IAlertRepo';
 
 @injectable()
 export default class VerifyUserUseCase implements IVerifyUserUseCase {
-  constructor(@inject('IUserRepository') private _userRepo: IUserRepository) {}
+  constructor(
+    @inject('IUserRepository') private _userRepo: IUserRepository,
+    @inject('IAlertsRepository') private _alertRepo: IAlertRepo,
+    @inject('UserMapper') private _mapper: UserMapper
+  ) {}
 
-  async execute(verifyUser: VerifyUserDto): Promise<UserDto | null> {
+  async execute(verifyUser: VerifyUserDTO): Promise<UserDTO | null> {
     //find user
     const user = await this._userRepo.findById(verifyUser.id);
     if (!user || !user.otpExpiresAt || !user.verificationToken) {
@@ -36,8 +41,18 @@ export default class VerifyUserUseCase implements IVerifyUserUseCase {
       otpExpiresAt: undefined,
     });
 
+    //create an alert for welcoming the user
+    await this._alertRepo.create({
+      recipientId: result?._id,
+      title: 'Welcome to Aspiro',
+      body: 'Your account has been successfully created, start exploring now',
+      priority: 'LOW',
+      status: 'ACTIVE',
+      type: 'SYSTEM_SECURITY',
+    });
+
     if (result) {
-      const userDto = plainToInstance(UserDto, result);
+      const userDto = this._mapper.userToUserDto(result);
       return userDto;
     }
     return null;

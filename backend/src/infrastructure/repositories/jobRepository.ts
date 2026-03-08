@@ -1,70 +1,52 @@
 import Job from '../../domain/entities/recruiter/job.entity';
 import IJobRepo from '../../domain/interfaces/IJobRepo';
-import { SaveJob } from '../../domain/interfaces/IJobRepo';
-import { Db, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import BaseRepository from './baseRepository';
 import { JobDAO } from '../database/DAOs/recruiter/job.dao';
-import { LoadJobRes } from '../../application/DTOs/job/loadJob.dto.FIX';
 import JobAggregated from '../../domain/entities/jobAggregated.entity';
-import { JobsQuery } from '../../application/queries/jobs.query';
+import {
+  AdminLoadJobsQuery,
+  JobsQuery,
+  LoadJobsAggregatedListForPublicQuery,
+} from '../../application/queries/jobs.query';
 import JobAggregatedData from '../../domain/entities/user/jobAggregated.entity';
 import mongoose from 'mongoose';
+import AdminJobAggregatedEntity from '../../domain/entities/admin/jobAggregated.entity';
+import JobListAggregatedForPublic from '../../domain/entities/job/jobListAggregatedForPublic.entity';
 
 export default class JobRepository extends BaseRepository<Job> implements IJobRepo {
   constructor() {
     super(JobDAO);
   }
 
-  // async create(job: Job): Promise<SaveJob> {
-  //     const db = await connectDb()
-  //     const result = await db.collection<Job>(this._collection).insertOne(job)
-  //     return result
-  // }
-
   async getRecruiterJobsByRecruiterId(
     recruiterId: string,
     dbQuery: JobsQuery
   ): Promise<{ jobs: Job[]; totalPages: number; totalDocs: number; page: number } | null> {
     if (!ObjectId.isValid(recruiterId)) return null;
-    // console.log('checking data from the db side', recruiterId, dbQuery)
-    const { sortOption, skip, search, filter, limit, page } = dbQuery;
-
-    const matchFilter: any = { recruiterId: new ObjectId(recruiterId) };
-
-    if (search) {
-      matchFilter['jobTitle'] = { $regex: new RegExp(search, 'i') };
-    }
-
-    if (filter.status) {
-      matchFilter['status'] = { $in: filter.status };
-    }
-
-    if (filter.workMode) {
-      matchFilter['workMode'] = { $in: filter.workMode };
-    }
-
-    const jobsFetchingPipeline: any[] = [
-      { $match: matchFilter },
-      { $sort: sortOption },
-      { $skip: skip },
-      { $limit: limit },
-    ];
-
-    // console.log('jobs fetching pipeline', jobsFetchingPipeline)
-
-    const totalJobsPipeline = [{ $match: matchFilter }, { $count: 'count' }];
-
-    const [jobs, totalJobs] = await Promise.all([
-      JobDAO.aggregate(jobsFetchingPipeline),
-      JobDAO.aggregate(totalJobsPipeline),
+    const { search, limit, page, jobStatusFilter, jobWorkModeFilter } = dbQuery;
+    const skip = (page - 1) * limit;
+    const result = await JobDAO.aggregate([
+      {
+        $match: {
+          jobTitle: { $regex: new RegExp(search, 'i') },
+          status: { $in: jobStatusFilter },
+          workMode: { $in: jobWorkModeFilter },
+        },
+      },
+      {
+        $facet: {
+          jobs: [{ $sort: { createdAt: -1 } }, { $skip: skip }, { $limit: limit }],
+          metaData: [{ $count: 'totalDocs' }],
+        },
+      },
     ]);
 
-    const totalDocs = totalJobs[0]?.count || 0;
-    const totalPages = Math.ceil(totalDocs / limit);
+    const jobs = result[0]?.jobs || [];
+    const totalDocs = result[0]?.metaData[0]?.totalDocs;
 
-    //console.log('Jobs before sending to the frontend', jobs)
-
-    return { jobs, totalPages, totalDocs, page };
+    const totalPages = Math.ceil(totalDocs / limit) || 0;
+    return { jobs, page, totalDocs, totalPages };
   }
 
   async getJobs(dbQuery: JobsQuery): Promise<{
@@ -75,11 +57,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   } | null> {
     //change strict to later
     const { sortOption, skip, search, filter, limit, page, locationSearch } = dbQuery;
-
-    const matchFilter: any = {};
-
-    const prelookupMatch: any = { expiresAt: { $gte: new Date() } };
-    const postlookupMatch: any = {};
+    const matchFilter: { [key: string]: object } = {};
 
     if (search) {
       matchFilter['jobTitle'] = { $regex: new RegExp(search, 'i') };
@@ -89,77 +67,91 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
       matchFilter['location'] = { $regex: new RegExp(locationSearch, 'i') };
     }
 
-    // if (filter.status && filter.status.length > 0) {
-    //   matchFilter['status'] = { $in: filter.status };
-    // }
-
-    if (filter.workMode && filter.workMode.length > 0) {
+    if (filter?.workMode && filter.workMode.length > 0) {
       matchFilter['workMode'] = { $in: filter.workMode };
     }
 
-    if (filter.jobType && filter.jobType.length > 0) {
+    if (filter?.jobType && filter.jobType.length > 0) {
       matchFilter['jobType'] = { $in: filter.jobType };
     }
 
-    if (filter.jobLevel && filter.jobLevel.length > 0) {
+    if (filter?.jobLevel && filter.jobLevel.length > 0) {
       matchFilter['jobLevel'] = { $in: filter.jobLevel };
     }
-    // console.log('testing match filter values', JSON.stringify(matchFilter))
 
-    //const match = search ? {$match:{jobTitle:{$regex: new RegExp(search, 'i')}}} : {$match:{}}
-    const jobsFetchingPipeline: any[] = [
-      { $match: matchFilter },
+    // const jobsFetchingPipeline: any[] = [
+    //   { $match: matchFilter },
+    //   {
+    //     $lookup: {
+    //       from: 'users',
+    //       localField: 'recruiterId',
+    //       foreignField: '_id',
+    //       as: 'userDetails',
+    //     },
+    //   },
+    //   { $unwind: '$userDetails' },
+    //   {
+    //     $lookup: {
+    //       from: 'recruiters',
+    //       localField: 'userDetails._id',
+    //       foreignField: 'userId',
+    //       as: 'recruiterProfile',
+    //     },
+    //   },
+    //   { $unwind: '$recruiterProfile' },
+    //   { $sort: sortOption },
+    //   { $skip: skip },
+    //   { $limit: limit },
+    // ];
+
+    // const totalJobsPipeline = [{ $match: matchFilter }, { $count: 'count' }];
+    // const [jobs, totalJobs] = await Promise.all([
+    //   JobDAO.aggregate(jobsFetchingPipeline),
+    //   JobDAO.aggregate(totalJobsPipeline),
+    // ]);
+
+    const result = await JobDAO.aggregate([
       {
-        $lookup: {
-          from: 'users',
-          localField: 'recruiterId',
-          foreignField: '_id',
-          as: 'userDetails',
+        $match: {
+          jobTitle: { $regex: new RegExp(search, 'i') },
         },
       },
-      { $unwind: '$userDetails' },
       {
-        $lookup: {
-          from: 'recruiters',
-          localField: 'userDetails._id',
-          foreignField: 'userId',
-          as: 'recruiterProfile',
+        $facet: {
+          jobs: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'recruiterId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            { $unwind: '$userDetails' },
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: 'userDetails._id',
+                foreignField: 'userId',
+                as: 'recruiterProfile',
+              },
+            },
+            { $unwind: '$recruiterProfile' },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          metaData: [{ $count: 'totalDocs' }],
         },
       },
-      { $unwind: '$recruiterProfile' },
-      { $sort: sortOption },
-      { $skip: skip },
-      { $limit: limit },
-    ];
-
-    const totalJobsPipeline = [{ $match: matchFilter }, { $count: 'count' }];
-
-    //console.log('Pipeline before applying', jobsFetchingPipeline)
-
-    const [jobs, totalJobs] = await Promise.all([
-      JobDAO.aggregate(jobsFetchingPipeline),
-      JobDAO.aggregate(totalJobsPipeline),
     ]);
-
-    const totalPages = Math.ceil(totalJobs[0]?.count || 0 / limit);
-    const totalDocs = totalJobs[0]?.count || 0;
-
-    //console.log('Testing job before retruing', jobs)
-
-    return { jobs, totalPages, totalDocs, page };
+    const jobResult = result[0]?.jobs || [];
+    const totalPages = result[0]?.metaData[0]?.totalDocs;
+    return { jobs: jobResult, totalPages, page, totalDocs: 12 };
   }
 
   async getJobDetails(id: string): Promise<JobAggregated | null> {
     const result = await JobDAO.aggregate([
-      // {
-      //   $lookup: {
-      //     from: 'recruiters',
-      //     localField: 'companyId',
-      //     foreignField: '_id',
-      //     as: 'companyDetails',
-      //   },
-      // },
-      // { $unwind: '$companyDetails' },
       {
         $lookup: {
           from: 'users',
@@ -186,6 +178,15 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
           as: 'applications',
         },
       },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'userRecruiterProfile.companyId',
+          foreignField: '_id',
+          as: 'companyProfileDetails',
+        },
+      },
+      { $unwind: { path: '$companyProfileDetails', preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           candidateIds: {
@@ -302,5 +303,195 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
       totalDocs: result.length,
       page: 1,
     };
+  }
+
+  async getJobsListForAdmin(
+    query: AdminLoadJobsQuery
+  ): Promise<{ jobs: AdminJobAggregatedEntity[]; totalPages: number } | null> {
+    const { search, limit, page, statusFilter, jobTypeFilter, reportsCount } = query;
+    const skip = (page - 1) * limit;
+    const result = await JobDAO.aggregate([
+      {
+        $match: {
+          jobTitle: { $regex: new RegExp(search, 'i') },
+          status: { $in: statusFilter },
+          jobType: { $in: jobTypeFilter },
+          reportsCount: { $gte: reportsCount },
+        },
+      },
+      {
+        $facet: {
+          jobs: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'recruiterId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            {
+              $unwind: {
+                path: '$userDetails',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: 'userDetails._id',
+                foreignField: 'userId',
+                as: 'recruiterDetails',
+              },
+            },
+            {
+              $unwind: {
+                path: '$recruiterDetails',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'companies',
+                localField: 'recruiterDetails.companyId',
+                foreignField: '_id',
+                as: 'companyDetails',
+              },
+            },
+            {
+              $unwind: {
+                path: '$companyDetails',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          metaData: [{ $count: 'totalDocs' }],
+        },
+      },
+    ]);
+
+    const jobs = result[0]?.jobs || [];
+    const totalDocs = result[0]?.metaData[0]?.totalDocs;
+    const totalPages = Math.ceil(totalDocs / limit) || 0;
+
+    return { jobs, totalPages };
+  }
+
+  async getJobDetailsForAdmin(jobId: string): Promise<AdminJobAggregatedEntity | null> {
+    if (!mongoose.isValidObjectId(jobId)) return null;
+
+    const result = await JobDAO.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(jobId) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'recruiterId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'recruiters',
+          localField: 'userDetails._id',
+          foreignField: 'userId',
+          as: 'recruiterDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$recruiterDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'recruiterDetails.companyId',
+          foreignField: '_id',
+          as: 'companyDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$companyDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
+    return result[0];
+  }
+
+  async getJobListForPublic(
+    query: LoadJobsAggregatedListForPublicQuery
+  ): Promise<{ jobs: JobListAggregatedForPublic[]; totalPages: number } | null> {
+    const { search, locationSearch, page, limit, jobLevelFilter, jobTypeFilter, workModeFilter } =
+      query;
+
+    const skip = (page - 1) * limit;
+    const result = await JobDAO.aggregate([
+      {
+        $match: {
+          jobTitle: { $regex: new RegExp(search, 'i') },
+          workMode: { $in: workModeFilter },
+          jobLevel: { $in: jobLevelFilter },
+          jobType: { $in: jobTypeFilter },
+          location: { $regex: new RegExp(locationSearch, 'i') },
+        },
+      },
+      {
+        $facet: {
+          jobs: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'recruiterId',
+                foreignField: '_id',
+                as: 'userProfileDetails',
+              },
+            },
+            { $unwind: { path: '$userProfileDetails', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: 'recruiterId',
+                foreignField: 'userId',
+                as: 'recruiterProfileDetails',
+              },
+            },
+            { $unwind: { path: '$recruiterProfileDetails', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: 'companies',
+                localField: 'recruiterProfileDetails.companyId',
+                foreignField: '_id',
+                as: 'companyProfileDetails',
+              },
+            },
+            { $unwind: { path: '$companyProfileDetails', preserveNullAndEmptyArrays: true } },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          metaData: [{ $count: 'totalDocs' }],
+        },
+      },
+    ]);
+
+    const jobs = result[0]?.jobs;
+    const totalDocs = result[0]?.metaData[0]?.totalDocs;
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    return { jobs, totalPages };
   }
 }

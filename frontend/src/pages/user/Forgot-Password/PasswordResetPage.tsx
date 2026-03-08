@@ -1,15 +1,17 @@
-import { FormControl, FormHelperText } from '@mui/material'
+import { Button, FormControl, FormHelperText } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import {FaArrowLeft} from 'react-icons/fa'
 import {GoLock} from 'react-icons/go'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../../../services/userServices'
 import Swal from 'sweetalert2'
+import { useState } from 'react'
 
 export default function PasswordResetPage(){
 
     //access token from the url
     const [searchParams, setSearchParams] = useSearchParams()
+    const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
     const token = searchParams.get('token')
 
@@ -23,6 +25,7 @@ export default function PasswordResetPage(){
     const typedPassword = watch('password')
 
     async function resetPasswordOnSubmit(data: FormInput){
+        setLoading(true)
         const {password} = data
         
         try {
@@ -54,6 +57,8 @@ export default function PasswordResetPage(){
                 allowOutsideClick:false,
                 showCancelButton:false
             }).then(() => navigate('/login'))
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -122,7 +127,15 @@ export default function PasswordResetPage(){
                         <FormHelperText>{errors.confirmPassword?.message}</FormHelperText>
                     </FormControl>
                     <div className="action !mt-5">
-                        <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button>
+                        <Button
+                            variant='contained'
+                            loading={loading}
+                            fullWidth
+                            sx={{
+                                bgcolor:'black'
+                            }}
+                        >Reset Password</Button>
+                        {/* <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button> */}
                     </div>
                 </form>
                 

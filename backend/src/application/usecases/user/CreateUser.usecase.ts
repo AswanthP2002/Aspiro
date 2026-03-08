@@ -3,24 +3,21 @@ import { DuplicateEmailError, DuplicateMobileError } from '../../../domain/error
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateCode } from '../../../utilities/generateCode';
 import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
-import { UserDto } from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto.FIX';
 import hashPassword from '../../Services/hashPassword';
 import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase.FIX';
 import IEmailService from '../../interfaces/services/IEmailService';
-import { plainToInstance } from 'class-transformer';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()
 export default class CreateUserUseCase implements ICreateUserUseCase {
-  private _mapper: UserMapper;
   constructor(
     @inject('IUserRepository') private readonly _repo: IUserRepository,
-    @inject('IEmailService') private _emailService: IEmailService
-  ) {
-    this._mapper = new UserMapper();
-  }
+    @inject('IEmailService') private _emailService: IEmailService,
+    @inject('UserMapper') private _mapper: UserMapper
+  ) {}
 
-  async execute(createUserDto: CreateUserDto): Promise<UserDto | null> {
+  async execute(createUserDto: CreateUserDto): Promise<UserDTO | null> {
     const newUser = this._mapper.dtoToUser(createUserDto);
 
     //check if the email is already linked with another user
@@ -66,16 +63,13 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
     const result = await this._repo.create(newUser);
 
     // 2. Then, send the verification email.
-    await this._emailService.sendEmail(newUser.email as string, subject, content);
+    //await this._emailService.sendEmail(newUser.email as string, subject, content);
 
     if (result) {
-      const dto = plainToInstance(UserDto, result);
+      const dto = this._mapper.userToUserDto(result);
       return dto;
     }
 
     return null;
   }
 }
-
-//tested from this :: need to complete all existing code transoformation tomorrow itself!
-//important

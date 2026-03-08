@@ -1,9 +1,8 @@
 import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
-import { ExperienceDto, UpdateExperienceDto } from '../../DTOs/user/experience.dto.FIX';
+import { EditExperienceDTO, ExperienceDTO } from '../../DTOs/user/experience.dto.FIX';
 import IEditUserExperienceUsecase from '../../interfaces/usecases/user/IEditUserExperience.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import { ExperienceMapper } from '../../mappers/user/Experience.mapperClass';
-import { plainToInstance } from 'class-transformer';
 
 @injectable()
 export default class EditUserExperienceUsecase implements IEditUserExperienceUsecase {
@@ -12,12 +11,12 @@ export default class EditUserExperienceUsecase implements IEditUserExperienceUse
     this._mapper = new ExperienceMapper();
   }
 
-  async execute(editExperienceDto: UpdateExperienceDto): Promise<ExperienceDto | null> {
-    const { _id } = editExperienceDto;
+  async execute(editExperienceDto: EditExperienceDTO): Promise<ExperienceDTO | null> {
+    const { experienceId } = editExperienceDto;
     const editData = this._mapper.updateExperienceDtoToExperience(editExperienceDto);
-    const result = await this._experienceRepo.update(_id, editData);
+    const result = await this._experienceRepo.update(experienceId, editData);
     if (result) {
-      const dto = plainToInstance(ExperienceDto, result);
+      const dto = this._mapper.experienceToExperienceDTO(result);
 
       return dto;
     }

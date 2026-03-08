@@ -5,6 +5,13 @@ import Swal from "sweetalert2";
 import { editUserEducation } from "../../../services/userServices";
 import { Controller, useForm } from "react-hook-form";
 import { Notify } from "notiflix";
+import { Education } from "../../../types/entityTypes";
+
+interface EditEducationResponsePayload {
+    success: boolean
+    message: string
+    result: Education
+}
 
 export default function EditEducationForm({selectedEducation, onEditEducation, editEducationModalOpen, closeEditEducationModal} : any) {
     
@@ -71,7 +78,7 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
         //closeEditEducationModal()
 
             try {
-                const result = await editUserEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
+                const result: EditEducationResponsePayload = await editUserEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
 
             if(result?.success){
                 Swal.fire({
@@ -81,15 +88,17 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
                     showConfirmButton:false,
                     timer:1500
                 }).then(() => {
-                    onEditEducation(selectedEducation._id, {
-                        level:educationLevel,
-                        stream:stream,
-                        organization:institution,
-                        isPresent:isPresent,
-                        location:location,
-                        startYear:startDate,
-                        endYear:endDate
-                    })
+                    console.log('--user education updated result from server--', result.result)
+                    onEditEducation(result.result._id, result.result)
+                    // onEditEducation(selectedEducation._id, {
+                    //     level:educationLevel,
+                    //     stream:stream,
+                    //     organization:institution,
+                    //     isPresent:isPresent,
+                    //     location:location,
+                    //     startYear:startDate,
+                    //     endYear:endDate
+                    // })
                 })
             }else{
                 Notify.failure(result?.message, {timeout:2000})

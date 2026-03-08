@@ -4,20 +4,24 @@ import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo'
 import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
 import IEmailService from '../../interfaces/services/IEmailService';
 import RejectRecruiterApplicationDTO from '../../DTOs/admin/rejectRecruiter.dto.FIX';
-import { plainToInstance } from 'class-transformer';
+import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 
 @injectable()
 export default class RejectRecruiterApplicationUsecase implements IRejectRecruiterApplication {
   constructor(
     @inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo,
-    @inject('IEmailService') private _emailService: IEmailService
+    @inject('IEmailService') private _emailService: IEmailService,
+    @inject('RecruiterMapper') private _mapper: RecruiterMapper
   ) {}
 
   async execute(
     rejectRecruiterApplicationDto: RejectRecruiterApplicationDTO
   ): Promise<RecruiterDTO | null> {
-    const { id, reason } = rejectRecruiterApplicationDto;
-
+    const { applicationId, reason, feedback } = rejectRecruiterApplicationDto;
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + 14);
+    const bufferDate = futureDate.toISOString();
     const subject = 'Application Not Approved';
     const body = `<!DOCTYPE html>
 <html lang="en">
@@ -42,28 +46,29 @@ export default class RejectRecruiterApplicationUsecase implements IRejectRecruit
 </body>
 </html>`;
     try {
-      const updatedRecruiter = await this._recruiterRepo.update(id, {
+      const updatedRecruiter = await this._recruiterRepo.update(applicationId, {
+        isRejected: true,
+        rejection: { reason, feedback },
         profileStatus: 'rejected',
+        applicationResendBufferDate: new Date(bufferDate),
       });
 
       if (updatedRecruiter) {
-        // Assuming you have a way to get the recruiter's email and name from the updatedRecruiter object
-        // For example: const recruiterEmail = updatedRecruiter.userProfile.email;
-        // await this._emailService.sendEmail(recruiterEmail, subject, body);
-        const recruiterDetails = await this._recruiterRepo.getRecruiterProfileOverview(id);
-        const email = recruiterDetails?.userProfile.email;
+        const recruiterDetails =
+          await this._recruiterRepo.getRecruiterProfileOverview(applicationId);
+        const email = recruiterDetails?.email;
 
         if (email) {
           await this._emailService.sendEmail(email, subject, body);
         }
 
-        return plainToInstance(RecruiterDTO, updatedRecruiter);
+        return this._mapper.recruiterToRecruiterDTO(updatedRecruiter);
       }
 
       return null;
     } catch (error: unknown) {
       console.error('Error in RejectRecruiterApplicationUsecase:', error);
-      throw error
+      throw error;
     }
   }
 }

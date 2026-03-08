@@ -4,10 +4,7 @@ import mongoose from 'mongoose';
 import BaseRepository from '../baseRepository';
 import { SkillDAO } from '../../database/DAOs/user/skill.dao';
 
-export default class SkillRepsitory
-  extends BaseRepository<Skills>
-  implements ISkillRepo
-{
+export default class SkillRepsitory extends BaseRepository<Skills> implements ISkillRepo {
   constructor() {
     super(SkillDAO);
   }
@@ -17,5 +14,4 @@ export default class SkillRepsitory
     });
     return result;
   }
-
 }

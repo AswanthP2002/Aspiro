@@ -1,6 +1,6 @@
-import { VerifyUserDto } from '../../../DTOs/user/verifyUser.dto.FIX';
-import { UserDto } from '../../../DTOs/user/user.dto.FIX';
+import VerifyUserDTO from '../../../DTOs/user/verifyUser.dto.FIX';
+import UserDTO from '../../../DTOs/user/user.dto.FIX';
 
 export default interface IVerifyUserUseCase {
-  execute(verifyUser: VerifyUserDto): Promise<UserDto | null>;
+  execute(verifyUser: VerifyUserDTO): Promise<UserDTO | null>;
 }

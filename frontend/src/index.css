@@ -90,3 +90,9 @@ input:read-only{
 .footer-bg-dark{
   background: rgb(3, 3, 36)
 }
+.text-underline{
+  text-decoration:underline;
+}
+.text-striked{
+  text-decoration: line-through;
+}

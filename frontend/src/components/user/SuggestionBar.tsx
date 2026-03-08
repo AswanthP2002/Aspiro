@@ -38,7 +38,7 @@ export default function SuggessionBar(){
     }, [])
 
     return(
-        <div className="suggestions p-3 grid grid-cols-1 gap-4 fixed w-90 ">
+        <div className="suggestions px-3 grid grid-cols-1 gap-4 fixed w-90 ">
             <div className="border border-gray-300 rounded-md p-5 bg-white">
                 <p className='font-light text-sm'>People you might know</p>
                 <div className="mt-5 grid grid-cols-1 gap-3">

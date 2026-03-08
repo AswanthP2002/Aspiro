@@ -4,7 +4,6 @@ export default function GeneralModal({openModal, closeModal, children, size = 'm
     const modalStyle = {
         background:'white', 
         padding:'10px', 
-        width:'fit-content', 
         borderRadius:'12px',
         outline:'none'
     }

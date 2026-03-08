@@ -1,8 +1,9 @@
-import { AxiosError, AxiosInterceptorManager } from "axios";
+import { AxiosError} from "axios";
 import axios from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
 import { Recruiter } from "../types/entityTypes";
+import { RecruiterEndPoints } from "../constants/endPoints/recruiter.endpoints";
 
 //legacy
 export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
@@ -25,22 +26,13 @@ export const recruiterRegister = async (fullName : string, email : string, phone
 }
 
 export const createRecruiterService = async (
-    employerType: string, industry: string, organizationName: string, organizationType: string,
-    teamStrength: string, summary: string, website: string, organizationContactNumber: string, 
-    organizationEmail: string, focusingIndustries: any[], recruitingExperience: string, 
-    linkedinUrl: string
+   formData: any
 ) => {
     try {
-        const response = await axiosInstance.post('/recruiter/create', {
-            employerType, industry, organizationName,
-            focusingIndustries, summary, recruitingExperience, linkedinUrl,
-            organizationType, teamStrength, website, 
-            organizationContactNumber, organizationEmail
-        },
-        {
-            headers:{'Content-Type':'application/json'},
-            sendAuthToken:true
-        } as AxiosRequest
+        const response = await axiosInstance.post(RecruiterEndPoints.REGISTER_RECRUITER, formData,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
         )
 
         return response.data
@@ -160,7 +152,7 @@ export const logoutRecruiter = async () => {
 
 export const getProfileOverview = async () => {
     try {
-        const response = await axiosInstance.get('/recruiter/profile/overview', {
+        const response = await axiosInstance.get(RecruiterEndPoints.RECRUITER_DASHBOARD, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -207,21 +199,6 @@ export const scheduleInterview = async (
     }
 }
 
-/**
- * _id?: string
-    candidateId?: string
-    jobId?: string
-    interviewersName?: string
-    interviewType?: 'Technical' | 'HR' | 'Mnaegirial' | 'General'
-    interviewDate?: string | Date
-    interviewTime?: string
-    gmeetUrl?: string
-    note?: string
-    status?: "Scheduled" | "Completed" | "Cancelled"
-    createdAt?: string | Date
-    upddatedAt?: string | Date
- */
-
 export const postJob = async (
     {
         jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency, 
@@ -229,7 +206,7 @@ export const postJob = async (
     }: any,
 ) => {
     try {
-        const response = await axiosInstance.post('/recruiter/job/create', {
+        const response = await axiosInstance.post(RecruiterEndPoints.POST_A_JOB, {
             jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency,
             salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
         },
@@ -297,7 +274,7 @@ export const deleteJob = async (jobId: string) => {
 
 export const getJobs = async (search: string, page: number, limit: number = 3, sortOption: string, filterStatus: string, filterWorkMode: string) => {
     try {
-        const response = await axiosInstance.get('/recruiter/jobs',
+        const response = await axiosInstance.get(RecruiterEndPoints.GET_MY_JOBS,
             {
                 sendAuthToken:true,
                 params:{
@@ -338,9 +315,10 @@ export const getRecentJobs = async () => {
     }
 }
 
-export const getApplicationDetails = async (jobId : string) => {
+export const getApplicationDetails = async (jobId : string, search: string, page: number, limit: number, status: string) => {
     try {
-        const response = await axiosInstance.get(`/recruiter/job/${jobId}/application/details`, {
+        const response = await axiosInstance.get(RecruiterEndPoints.GET_JOB_APPLICATIONS_BY_ID(jobId), {
+            params:{search, page, limit, status},
             sendAuthToken:true
         } as AxiosRequest)
     
@@ -353,7 +331,23 @@ export const getApplicationDetails = async (jobId : string) => {
             throw err
         }
     }
-} 
+}
+
+export const getSingleApplicationDetails = async (applicationId: string) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.GET_JOB_APPLICATION_DETAILS_BY_APPLICATION_ID(applicationId), 
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        console.log(err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
 
 export const refreshRecruiterToken = async () => {
     try {
@@ -460,7 +454,7 @@ export const rejectCandidateJobApplication = async (title : string, description 
 
 export const updateCandidateNotes = async (applicationId: string, notes: string) => {
     try {
-        const response = await axiosInstance.patch(`/recruiter/application/${applicationId}`, {
+        const response = await axiosInstance.patch(RecruiterEndPoints.UPDATE_CANDIDATE_NOTE(applicationId), {
             notes
         },
         {
@@ -476,6 +470,41 @@ export const updateCandidateNotes = async (applicationId: string, notes: string)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error
         }
+    }
+}
+
+export const addCompany = async (name: string, linkedin: string, website: string, industry: string, slogan: string, description: string, location: string) => {
+    try {
+        const response = await axiosInstance.post(RecruiterEndPoints.ADD_COMPANY, {
+            name, linkedin, website,industry, slogan, description, location 
+        },
+        {
+            headers: {'Content-Type': 'application/json'},
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log(err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const getCompaniesList = async (search: string) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
+            {
+                params:{search},
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
@@ -501,4 +530,48 @@ export const updateJobApplicationStatus = async (
         }
     }
 }
-///// stopped here, need to connect this api with page
+
+export const recruiterFetchJobLevelLists = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_JOBLEVEL_LIST,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        console.log('--Error occured--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const recruiterFetchJobTypeLists = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_JOBTYPE_LIST,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        console.log('--Error occured--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const recruiterFetchWorkModeLists = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_WORKMODE_LIST,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        console.log('--Error occured--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}

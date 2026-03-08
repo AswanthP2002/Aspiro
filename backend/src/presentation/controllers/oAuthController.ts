@@ -9,9 +9,8 @@ export default class OAuthController {
 
   async googleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result: any = await this._googleLoginUsecase.execute(req.body?.googleToken);
+      const result = await this._googleLoginUsecase.execute(req.body?.googleToken);
 
-      console.log('Checking result before sending response', result)
       const { refreshToken } = result;
       res
         .status(StatusCodes.ACCEPTED)
@@ -19,7 +18,7 @@ export default class OAuthController {
           httpOnly: true,
           secure: false,
           sameSite: 'lax',
-          maxAge: 24 * 60 * 60 * 1000,
+          maxAge: parseInt(process.env.COOKIE_MAX_AGE as string),
         })
         .json({ success: true, message: 'Login successful', result });
     } catch (error: unknown) {

@@ -9,6 +9,13 @@ import { DateField } from "@mui/x-date-pickers/DateField";
 import { Dayjs } from "dayjs";
 import { useState } from "react";
 import { Notify } from "notiflix";
+import { Experience } from "../../../types/entityTypes";
+
+interface AddExperienceResponsePayload {
+  success: boolean
+  message: string
+  result: Experience
+}
 
 export default function AddExperienceForm({experiencemodalopen, closeModal, onAddExperience} : any){
   
@@ -43,8 +50,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
           const formatedStartDate = startDate.format("YYYY-MM-DD")
           const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
                 try {
-                  const result = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
-                  //closeModal()//closing form
+                  const result: AddExperienceResponsePayload = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
                       Swal.fire({
                           icon:'success',
                           title:'Added',
@@ -53,7 +59,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
                           showCancelButton:false,
                           timer:3000
                       }).then(() => {
-                        onAddExperience({role, jobType, location, workMode, organization, isPresent, startDate:formatedStartDate, endDate:formatedEndDate})
+                        onAddExperience(result.result)
                         reset({
                           jobType:'',
                           role:'',

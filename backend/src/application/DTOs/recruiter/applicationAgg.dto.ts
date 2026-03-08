@@ -7,18 +7,18 @@ import User from '../../../domain/entities/user/User.FIX';
 
 export default interface ApplicationsAggregatedDTO {
   _id: string;
-    candidateId: string;
-    jobId: string;
-    coverLetterContent: string;
-    resumeId: string;
-    status: string;
-    notes?: string
-    createdAt: Date;
-    updatedAt: Date;
-    job: Job
-    applicant: User;
-    resume: Resume;
-    experiences: Experience[]
-    educations: Education[]
-    skills: Skills
+  candidateId: string;
+  jobId: string;
+  coverLetterContent: string;
+  resumeId: string;
+  status: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  job: Job;
+  applicant: User;
+  resume: Resume;
+  experiences: Experience[];
+  educations: Education[];
+  skills: Skills;
 }

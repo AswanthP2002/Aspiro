@@ -16,7 +16,7 @@ export const JobApplicationSchema = new Schema<JobApplication>(
       enum: ['applied', 'opened', 'screening', 'interview', 'offer', 'rejected', 'hired'],
       default: 'applied',
     },
-    notes:{type: String}
+    notes: { type: String },
   },
   { timestamps: true }
 );

@@ -6,7 +6,7 @@ import IUnsaveJobUseCase from '../../interfaces/usecases/user/IUnsaveJob.usecase
 export default class UnsaveJobUseCase implements IUnsaveJobUseCase {
   constructor(@inject('IFavoriteJobRepository') private _iFavoriteJobRepo: IFavoriteJobsRepo) {}
 
-  async execute(jobId: string, candidateId: string): Promise<void> {
-    await this._iFavoriteJobRepo.deleteFavoriteJob(jobId, candidateId);
+  async execute(id: string): Promise<void> {
+    await this._iFavoriteJobRepo.delete(id)
   }
 }

@@ -3,7 +3,7 @@ import Experience from '../../../../domain/entities/user/experience.entity';
 
 export const ExperienceSchema = new Schema<Experience>(
   {
-    userId:{type:Schema.Types.ObjectId, ref:'users', required:true},
+    userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
     jobRole: { type: String },
     organization: { type: String },
     location: { type: String },

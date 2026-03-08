@@ -1,5 +1,5 @@
-import { ExperienceDto, UpdateExperienceDto } from '../../../DTOs/user/experience.dto.FIX';
+import { EditExperienceDTO, ExperienceDTO } from '../../../DTOs/user/experience.dto.FIX';
 
 export default interface IEditUserExperienceUsecase {
-  execute(editExperienceDto: UpdateExperienceDto): Promise<ExperienceDto | null>;
+  execute(editExperienceDto: EditExperienceDTO): Promise<ExperienceDTO | null>;
 }

@@ -1,16 +1,19 @@
-import { LoadJobRes } from '../../application/DTOs/job/loadJob.dto.FIX';
 import Job from '../entities/recruiter/job.entity';
 import JobAggregated from '../entities/jobAggregated.entity';
 import IBaseRepo from './IBaseRepo';
-import { JobsQuery } from '../../application/queries/jobs.query';
+import {
+  AdminLoadJobsQuery,
+  JobsQuery,
+  LoadJobsAggregatedListForPublicQuery,
+} from '../../application/queries/jobs.query';
 import JobAggregatedData from '../entities/user/jobAggregated.entity';
+import AdminJobAggregatedEntity from '../entities/admin/jobAggregated.entity';
+import JobListAggregatedForPublic from '../entities/job/jobListAggregatedForPublic.entity';
 export interface SaveJob {
   acknowledged: boolean;
   insertedId: object;
 }
 export default interface IJobRepo extends IBaseRepo<Job> {
-  //create(job : Job) : Promise<SaveJob>
-
   getRecruiterJobsByRecruiterId(
     recruiterId: string,
     dbQuery: JobsQuery
@@ -20,7 +23,7 @@ export default interface IJobRepo extends IBaseRepo<Job> {
     totalPages: number;
     totalDocs: number;
     page: number;
-  } | null>; //change strict later
+  } | null>; 
   searchJobsFromHome(search: string): Promise<JobAggregated[] | null>;
   getJobDetails(id: string): Promise<JobAggregated | null>;
   blockJob(id: string): Promise<boolean>;
@@ -31,4 +34,11 @@ export default interface IJobRepo extends IBaseRepo<Job> {
   getRecruiterRecentJobs(
     recruiterId: string
   ): Promise<{ jobs: Job[]; totalPages: number; totalDocs: number; page: number } | null>;
+  getJobsListForAdmin(
+    query: AdminLoadJobsQuery
+  ): Promise<{ jobs: AdminJobAggregatedEntity[]; totalPages: number } | null>;
+  getJobDetailsForAdmin(jobId: string): Promise<AdminJobAggregatedEntity | null>;
+  getJobListForPublic(
+    query: LoadJobsAggregatedListForPublicQuery
+  ): Promise<{ jobs: JobListAggregatedForPublic[]; totalPages: number } | null>;
 }

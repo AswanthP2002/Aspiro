@@ -1,108 +1,48 @@
-import { IsDefined, IsOptional, IsString } from 'class-validator';
 import SocialLinks from '../../../domain/entities/SocialLinks';
-import { Exclude, Expose } from 'class-transformer';
 
-export default class CreateRecruiterDTO {
-  @IsDefined()
-  @IsString()
-  userId!: string;
-
-  @IsDefined()
-  @IsString()
-  employerType!: string;
-
-  @IsOptional()
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string;
-    teamStrength?: string;
-    website?: string;
-  };
-
-  @IsDefined()
-  @IsString()
-  summary?: string;
-
-  @IsDefined()
-  focusingIndustries?: string[];
-
-  @IsDefined()
-  @IsString()
-  recruitingExperience!: string;
+export default interface CreateRecruiterDTO {
+  userId?: string;
+  recruiterType?: 'self' | 'corporate';
+  companyId?: string;
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocumentFile?: any;
+  verificationDocumentFilePath?: string;
 }
 
-/**
-_id?: string;
+export interface RecruiterDTO {
+  _id?: string;
   userId?: string;
-  employerType?: string;
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string
-    teamStrength?: string;
-    website?: string;
+  recruiterType?: 'self' | 'corporate';
+  companyId?: string;
+  fullName?: string;
+  profiessionalTitle?: string;
+  email?: string;
+  phone?: string;
+  yearOfExperience?: string;
+  linkedinUrl?: string;
+  verificationDocument?: {
+    publicId?: string;
+    url?: string;
   };
-  recruitingExperience?: string
-  focusingIndustries?:string[]
-  profileStatus?: 'pending' | 'approved' | 'rejected'
-  summary?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
- */
-
-@Exclude()
-export class RecruiterDTO {
-  @Expose()
-  _id!: string;
-
-  @Expose()
-  userId?: string;
-
-  @Expose()
-  employerType?: string;
-
-  @Expose()
-  organizationDetails?: {
-    organizationName?: string;
-    organizationType?: string;
-    industry?: string;
-    organizationContactNumber?: string;
-    organizationEmail?: string;
-    linkedinUrl?: string;
-    teamStrength?: string;
-    website?: string;
+  isVerified?: boolean;
+  isJobsHidden?: boolean;
+  isPermissionRevoked?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  isRejected?: boolean;
+  rejection?: {
+    reason?: string;
+    feedback?: string;
   };
-
-  @Expose()
-  recruiterExperience?: string;
-
-  @Expose()
-  focusingIndustries?: string[];
-
-  @Expose()
-  profileStatus?: 'pending' | 'approved' | 'rejected';
-
-  @Expose()
-  summary?: string;
-
-  @Expose()
-  createdAt?: Date;
-
-  @Expose()
-  isDeleted?: boolean;
-
-  @Expose()
-  isSuspended?: boolean;
-
-  @Expose()
-  updatedAt?: Date;
+  verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
+  applicationResendBufferDate?: Date;
+  verificationHistory?: any;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UpdateRecriterDTO {
@@ -129,5 +69,3 @@ export interface UpdateRecriterDTO {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-// Stoped at account suspension

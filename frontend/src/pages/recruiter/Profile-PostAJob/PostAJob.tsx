@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { postJob } from "../../../services/recruiterServices"
+import { postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from "../../../services/recruiterServices"
 import { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
 import { Autocomplete, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
@@ -12,6 +12,8 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import { Notify } from "notiflix"
 import axiosInstance, { AxiosRequest } from "../../../services/util/AxiosInstance"
+import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityTypes"
+import { adminGetSkills } from "../../../services/adminServices"
 
 interface JobDetails {
     jobTitle: string,
@@ -41,6 +43,9 @@ export default function PostAJobForm(){
     const [loading, setloading] = useState(false)
     const [skillOptions, setSkillOptions] = useState<string[]>([])
     const [skillsLoading, setSkillsLoading] = useState(false)
+    const [jobTypeOptions, setJobTypeOptions] = useState<JobTypesData[]>([])
+    const [jobLevelOptions, setJobLevelOptions] = useState<JobLevelData[]>([])
+    const [workModeOptions, setWorkModeOptions] = useState<WorkModeData[]>([])
 
     const {control, watch, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
         defaultValues: {
@@ -75,14 +80,13 @@ export default function PostAJobForm(){
         try {
             // Assuming you have a route for recruiters to search skills. 
             // If not, you might need to create one or use a common route.
-            const response = await axiosInstance.get('/admin/skills', {
-                params: { search: query },
-                sendAuthToken: true
-            } as AxiosRequest);
+            const result = await adminGetSkills(query)
             
-            if (response.data?.success) {
+            if (result?.success) {
+                console.log('--checking fetching skills --', result)
                 // Adjust based on your actual API response structure
-                const skills = response.data.result.skills.map((s: any) => s.skills);
+                const skills = result.result.skills.map((s: any) => s.skills);
+                console.log('--checking mapped skils', skills)
                 setSkillOptions(skills);
             }
         } catch (error) {
@@ -143,6 +147,30 @@ export default function PostAJobForm(){
     
     }
 
+    useEffect(() => {
+        async function fetchJobConfigOptionsList(){
+            try {
+                const [
+                    jobLevels,
+                    jobTypes,
+                    workModes
+                ] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchJobTypeLists(), recruiterFetchWorkModeLists()])
+                
+                console.log('Individually checking promise all data')
+                console.log('job level', jobLevels)
+                console.log('job type', jobTypes)
+                console.log('work mode', workModes)
+                setJobTypeOptions(jobTypes?.result)
+                setJobLevelOptions(jobLevels?.result)
+                setWorkModeOptions(workModes?.result)
+
+            } catch (error) {
+                Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+            }
+        }
+        fetchJobConfigOptionsList()
+    }, [])
+
     return(
         <>
         <div className="bg-white">
@@ -188,11 +216,11 @@ export default function PostAJobForm(){
                                     variant="outlined"
                                     error={Boolean(errors.jobType)}
                                 >
-                                    <MenuItem value="Full-time">Full-time</MenuItem>
-                                    <MenuItem value="Part-time">Part-time</MenuItem>
-                                    <MenuItem value="Contract">Contract</MenuItem>
-                                    <MenuItem value="Internship">Internship</MenuItem>
-                                    <MenuItem value="Temporary">Temporary</MenuItem>
+                                    {jobTypeOptions.length > 0 && (
+                                        jobTypeOptions.map((data: JobTypesData) => (
+                                            <MenuItem value={data.name}>{data.name}</MenuItem>
+                                        ))
+                                    )}
                                 </Select>
                             )}
                         />
@@ -260,9 +288,11 @@ export default function PostAJobForm(){
                                     variant="outlined"
                                     error={Boolean(errors.workMode)}
                                 >
-                                    <MenuItem value="On-site">On-site</MenuItem>
-                                    <MenuItem value="Remote">Remote</MenuItem>
-                                    <MenuItem value="Hybrid">Hybrid</MenuItem>
+                                    {workModeOptions.length > 0 && (
+                                        workModeOptions.map((workmode: WorkModeData) => (
+                                            <MenuItem value={workmode.name}>{workmode.name}</MenuItem>
+                                        ))
+                                    )}
                                 </Select>
                             )}
                         />
@@ -402,11 +432,11 @@ export default function PostAJobForm(){
                                         variant="outlined"
                                         error={Boolean(errors.jobLevel)}
                                     >
-                                        <MenuItem value="Entry-level">Entry-level</MenuItem>
-                                        <MenuItem value="Mid-level">Mid-level</MenuItem>
-                                        <MenuItem value="Senior-level">Senior-level</MenuItem>
-                                        <MenuItem value="Lead">Lead</MenuItem>
-                                        <MenuItem value="Manager">Manager</MenuItem>
+                                        {jobLevelOptions.length > 0 && (
+                                            jobLevelOptions.map((jobLevel: JobLevelData) => (
+                                                <MenuItem value={jobLevel.name}>{jobLevel.name}</MenuItem>
+                                            ))
+                                        )}
                                     </Select>
                                 )}
                             />

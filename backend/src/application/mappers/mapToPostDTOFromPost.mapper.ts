@@ -4,7 +4,7 @@ import { PostDTO } from '../DTOs/post.dto';
 export default function mapToPostDTOFromPost(post: Post): PostDTO {
   return {
     _id: post._id,
-    description: post.description,
+    description: post.description as string,
     media: post.media,
     likes: post.likes,
     createdAt: post.createdAt,

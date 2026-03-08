@@ -6,6 +6,10 @@ import BaseRepository from './baseRepository';
 import { injectable } from 'tsyringe';
 import { FindUsersQuery } from '../../application/queries/users.query';
 import UserProfileAggregatedAdmin from '../../domain/entities/userProfileAggregated';
+import LoadUsersForPublicDBQuery from '../../application/queries/loadUsersForPublicDB.query';
+import { redisClient } from '../redis/redisClient';
+import UserCachedData from '../../domain/entities/user/user.cachedData.entity';
+import MyProfileAggregated from '../../domain/entities/user/myProfileAggregated.entity';
 
 @injectable()
 export default class UserRepository extends BaseRepository<User> implements IUserRepository {
@@ -71,6 +75,14 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           as: 'followers',
         },
       },
+      {
+        $lookup: {
+          from: 'connectionrequests',
+          localField: '_id',
+          foreignField: 'receiver',
+          as: 'connectionRequests',
+        },
+      },
       // {
       //   $lookup:{
       //     from:'recruiters',
@@ -114,12 +126,10 @@ export default class UserRepository extends BaseRepository<User> implements IUse
   }
 
   async blockUser(userId: string): Promise<boolean> {
-    console.log('id of user being blocked', userId);
     const result = await UserDAO.updateOne(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { isBlocked: true } }
     );
-    console.log('update result', result);
     return result.modifiedCount > 0;
   }
 
@@ -138,7 +148,9 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     const { search, page, limit, filterOptions, sortOption } = query;
     const skip = (page - 1) * limit;
 
-    const matchFilter: any = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+    const matchFilter: { [key: string]: object } = search
+      ? { name: { $regex: new RegExp(search, 'i') } }
+      : {};
 
     if (filterOptions.status.length > 0) {
       matchFilter['isBlocked'] = { $in: filterOptions.status };
@@ -196,5 +208,197 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     ).lean();
 
     return result as User | null;
+  }
+
+  async loadUsersForPublic(
+    query: LoadUsersForPublicDBQuery
+  ): Promise<{ users: UserProfileAggregatedAdmin[]; totalPages: number; page: number } | null> {
+    const { search, page, limit, location, experienceFilter, roleTypeFilter, sort } = query;
+    const skip = (page - 1) * limit;
+
+    let matchQuery: object = {
+      isVerified: true,
+      isAdmin: false,
+      isBlocked: false,
+      role: { $in: roleTypeFilter },
+      headline: { $exists: true },
+    };
+
+    if (location) {
+      const places = location.split(' ');
+      const regexes = places.map((place: string) => new RegExp(`^${place}$`, 'i'));
+      matchQuery = {
+        isVerified: true,
+        isAdmin: false,
+        isBlocked: false,
+        role: { $in: roleTypeFilter },
+        $or: [
+          { 'location.city': { $in: regexes } },
+          { 'location.district': { $in: regexes } },
+          { 'location.state': { $in: regexes } },
+          { 'location.country': { $in: regexes } },
+        ],
+      };
+    }
+
+    const aggPipeline: any[] = [
+      {
+        $match: matchQuery,
+      },
+      {
+        $lookup: {
+          from: 'experiences',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'experiences',
+        },
+      },
+      {
+        $lookup: {
+          from: 'skills',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'skills',
+        },
+      },
+      {
+        $lookup: {
+          from: 'follows',
+          localField: '_id',
+          foreignField: 'following',
+          as: 'followers',
+        },
+      },
+      {
+        $lookup: {
+          from: 'connectionrequests',
+          localField: '_id',
+          foreignField: 'receiver',
+          as: 'connectionRequests',
+        },
+      },
+    ];
+
+    const searchQuery = {
+      $match: {
+        $or: [
+          { name: { $regex: new RegExp(search, 'i') } },
+          { headline: { $regex: new RegExp(search, 'i') } },
+        ],
+      },
+    };
+
+    aggPipeline.push(searchQuery, { $skip: skip }, { $limit: limit });
+
+    const users = await UserDAO.aggregate(aggPipeline);
+    const totalDocs = await UserDAO.aggregate([
+      ...aggPipeline,
+      searchQuery,
+      { $count: 'totalDocs' },
+    ]);
+
+    const totalPages = (totalDocs[0]?.totalDocs || 0) / limit || 0;
+
+    return { users, page, totalPages };
+  }
+
+  async addToConnection(userId: string, newConnection: string): Promise<User | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $addToSet: { connections: newConnection } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async removeFromConnection(userId: string, removingConnection: string): Promise<User | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $pull: { connections: removingConnection } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async getUserMetaData(userId: string): Promise<UserCachedData | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+    //get cached data
+    //const cachedData: UserCachedData | undefined = await redisClient.hGetAll(`${userId}`);
+    //cached data if abailable?
+    // if (cachedData && cachedData._id) {
+    //   return {
+    //     _id: cachedData._id,
+    //     name: cachedData.name,
+    //     email: cachedData.email,
+    //     headline: cachedData.headline,
+    //     profilePicture: cachedData.profilePicture,
+    //     role: cachedData.role,
+    //   };
+    // }
+    //if cached data is not available, then fetch data from mongodatabase -> store into redis for next use -> return data
+    const userData = await UserDAO.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    if (!userData) return null;
+    //set user data into redis for future request
+    const newCacheData = {
+      _id: `${userData._id}` || '',
+      name: `${userData.name}` || '',
+      email: `${userData.email}` || '',
+      headline: `${userData.headline ? userData.headline : ''}` || '',
+      profilePicture:
+        `${userData.profilePicture?.cloudinarySecureUrl ? userData.profilePicture.cloudinarySecureUrl : ''}` ||
+        '',
+      role: `${userData.role ? userData.role[0] : 'user'}`,
+    };
+
+
+    //await redisClient.multi().hSet(`${userId}`, newCacheData).expire(`${userId}`, 1800);
+
+    return newCacheData;
+  }
+
+  async addToHiddenPost(userId: string, postId: string): Promise<User | null> {
+    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(postId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $addToSet: { hiddenPosts: postId } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async removeFromHiddenPost(userId: string, postId: string): Promise<User | null> {
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $pull: { hiddenPosts: postId } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async findByUserId(userId: string): Promise<MyProfileAggregated | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await UserDAO.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      {
+        $lookup: {
+          from: 'follows',
+          foreignField: 'following',
+          localField: '_id',
+          as: 'followers',
+        },
+      },
+    ]);
+
+    return result[0];
   }
 }

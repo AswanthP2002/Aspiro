@@ -1,5 +1,5 @@
-import ResumeDTO from '../../../DTOs/candidate -LEGACY/resume.dto';
+import ResumeDTO from '../../../DTOs/user/resume.dto';
 
 export default interface ILoadResumeUseCase {
-  execute(candidateId?: string): Promise<ResumeDTO[] | null>;
+  execute(userId?: string): Promise<ResumeDTO[] | null>;
 }

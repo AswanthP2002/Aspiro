@@ -1,6 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsBoolean, IsDefined, IsOptional, IsString } from 'class-validator';
 
+
+//legacy
 export class CreateExperienceDto {
   @IsDefined({ message: 'User id can not be empty' })
   @IsString({ message: 'User id must be string' })
@@ -39,7 +41,7 @@ export class CreateExperienceDto {
   workMode!: string;
 }
 
-//legacy
+
 export default interface CreateExperienceDTO {
   userId?: string;
   jobRole: string;
@@ -52,6 +54,8 @@ export default interface CreateExperienceDTO {
   workMode: string;
 }
 
+
+//legacy
 @Exclude()
 export class ExperienceDto {
   @Expose()
@@ -91,7 +95,6 @@ export class ExperienceDto {
   updatedAt!: string;
 }
 
-//legacy
 export interface ExperienceDTO {
   _id?: string;
   userId?: string;
@@ -107,6 +110,7 @@ export interface ExperienceDTO {
   updatedAt?: string;
 }
 
+//legacy
 export class UpdateExperienceDto {
   @IsDefined({ message: 'Id can not be empty' })
   @IsString({ message: 'Id must be string' })

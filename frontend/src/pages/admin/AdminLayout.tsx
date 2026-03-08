@@ -34,7 +34,8 @@ export default function AdminLayout(){
         <div onClick={() => setAdminSidebarOpen(false)} className="fixed inset-0 bg-black opacity-50 z-40"></div>
       )}
       <div className="md:ml-64">
-        <TopBar />
+      {/* <TopBar />  */}
+      {/* Admin top bar hidden - temporary */}
         <Outlet />
       </div>
       {/* <Sidebar />

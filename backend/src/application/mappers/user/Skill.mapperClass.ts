@@ -1,13 +1,22 @@
 import Skills from '../../../domain/entities/user/skills.entity';
-import { CreateSkillDTO } from '../../DTOs/user/skill.dto.FIX';
+import { CreateSkillDTO, SkillDTO } from '../../DTOs/user/skill.dto.FIX';
 
 export class SkillsMapper {
   public createSkillsDtoToSkill(dto: CreateSkillDTO): Skills {
     return {
-      skill: dto.skill,
-      skillLevel: dto.skillLevel,
-      skillType: dto.skillType,
+      skill: dto.skill as string,
+      skillLevel: dto.skillLevel as string,
+      skillType: dto.skillType as string,
       userId: dto.userId,
+    };
+  }
+
+  public skillToSkillDTO(skill: Skills): SkillDTO {
+    return {
+      _id: skill._id,
+      skill: skill.skill,
+      skillLevel: skill.skillLevel,
+      skillType: skill.skillType,
     };
   }
 }

@@ -1,11 +1,5 @@
-import { IsDefined, IsString } from 'class-validator';
-
-export default class RejectRecruiterApplicationDTO {
-  @IsDefined()
-  @IsString()
-  id!: string;
-
-  @IsDefined()
-  @IsString()
-  reason!: string;
+export default interface RejectRecruiterApplicationDTO {
+  applicationId: string;
+  reason: string;
+  feedback?: string;
 }

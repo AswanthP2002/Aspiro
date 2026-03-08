@@ -16,6 +16,10 @@ export default interface User {
     state: string;
     country: string;
     pincode: string;
+    coords?: {
+      type: 'Point';
+      coordinates: [number, number]; //long lat order
+    };
   };
   role?: Role[];
   phone?: string;
@@ -33,11 +37,16 @@ export default interface User {
     cloudinarySecureUrl: string;
   };
   isBlocked?: boolean;
+  isBanned?: boolean;
+  isDeleted?: boolean;
   isVerified?: boolean;
   isAdmin?: boolean;
   isRecruiter?: boolean;
+  gender?: 'Male' | 'Female';
   createdAt?: string;
   updatedAt?: string;
   verificationToken?: string;
   otpExpiresAt?: Date;
+  hiddenPosts?: string[];
+  lastLogin?: Date;
 }

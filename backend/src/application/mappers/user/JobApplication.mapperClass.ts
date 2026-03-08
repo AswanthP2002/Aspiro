@@ -1,5 +1,5 @@
 import JobApplication from '../../../domain/entities/user/jobApplication.entity';
-import CreateJobApplicationDTO from '../../DTOs/candidate -LEGACY/jobApplication.dto.FIX';
+import CreateJobApplicationDTO from '../../DTOs/job/jobApplication.dto.FIX';
 
 export default class JobApplicationMapper {
   public createJobApplicationDtoToJobApplication(dto: CreateJobApplicationDTO): JobApplication {

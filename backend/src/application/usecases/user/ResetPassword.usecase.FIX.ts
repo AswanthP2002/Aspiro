@@ -2,21 +2,23 @@ import { inject, injectable } from 'tsyringe';
 import IResetPasswordUsecase from '../../interfaces/usecases/user/IResetPassword.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { ResetPasswordDto } from '../../DTOs/user/resetPassword.dto.FIX';
-import UserDTO, { UserDto } from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto.FIX';
 import IDataHashService from '../../interfaces/services/IDataHashService';
 import { InvalidUserError } from '../../../domain/errors/AppError';
-import mapUserToUserDTO from '../../mappers/user/mapUserToUserDTO.mapper';
 import { verifyToken } from '../../../services/jwt';
-import { plainToInstance } from 'class-transformer';
+import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()
 export default class ResetPasswordUsecase implements IResetPasswordUsecase {
+  private _mapper: UserMapper;
   constructor(
     @inject('IUserRepository') private _userRepository: IUserRepository,
     @inject('IDataHashService') private _dataHashService: IDataHashService
-  ) {}
+  ) {
+    this._mapper = new UserMapper();
+  }
 
-  async execute(resetPasswordDto: ResetPasswordDto): Promise<UserDto | null> {
+  async execute(resetPasswordDto: ResetPasswordDto): Promise<UserDTO | null> {
     const { token, password } = resetPasswordDto;
 
     //decode token & find email
@@ -34,7 +36,7 @@ export default class ResetPasswordUsecase implements IResetPasswordUsecase {
     //update user
     const updatedUser = await this._userRepository.update(user._id as string, { password: hashed });
     if (updatedUser) {
-      const userDto = plainToInstance(UserDto, updatedUser);
+      const userDto = this._mapper.userToUserDto(updatedUser);
       return userDto;
     }
     return null;
