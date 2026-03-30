@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Messsage from '../../../domain/entities/message.entity';
+import Messsage from '../../../domain/entities/message/message.entity';
 
 export const MessageSchema = new Schema<Messsage>(
   {

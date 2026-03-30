@@ -1,13 +1,14 @@
 import { inject, injectable } from 'tsyringe';
-import IGetUserSpecificNotificationUsecase from '../../application/interfaces/usecases/shared/IGetUserSpecificNotifications.usecase';
-import { Auth } from '../../middlewares/auth';
-import { NextFunction, Response } from 'express';
+import IGetUserSpecificNotificationUsecase from '../../application/interfaces/usecases/notification/IGetUserSpecificNotifications.usecase';
+// import { Auth } from '../../middlewares/auth';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
-import IChangeNotificationStatusUsecase from '../../application/interfaces/usecases/shared/IChangeNotificationStatus.usecase';
-import ISoftDeleteNotificationUsecase from '../../application/interfaces/usecases/shared/ISoftDeleteNotification.usecase';
-import IGetUnReadNotificationsCountUsecase from '../../application/interfaces/usecases/shared/IGetUnreadNotificationsCount.usecase';
-import IMarkReadAllNotificationsUsecase from '../../application/interfaces/usecases/user/IMarkReadAllNotifications.usecase';
-import { IDeleteNotificationsUsecase } from '../../application/interfaces/usecases/user/IDeleteAllNotifications.usecase';
+import IChangeNotificationStatusUsecase from '../../application/interfaces/usecases/notification/IChangeNotificationStatus.usecase';
+import ISoftDeleteNotificationUsecase from '../../application/interfaces/usecases/notification/ISoftDeleteNotification.usecase';
+import IGetUnReadNotificationsCountUsecase from '../../application/interfaces/usecases/notification/IGetUnreadNotificationsCount.usecase';
+import IMarkReadAllNotificationsUsecase from '../../application/interfaces/usecases/notification/IMarkReadAllNotifications.usecase';
+import { IDeleteNotificationsUsecase } from '../../application/interfaces/usecases/notification/IDeleteAllNotifications.usecase';
+import { StatusMessage } from '../../constants/Messages/statusMessages';
 
 @injectable()
 export default class NotificationController {
@@ -25,12 +26,16 @@ export default class NotificationController {
     @inject('IDeleteNotificationsUsecase') private _deleteNotifications: IDeleteNotificationsUsecase
   ) {}
 
-  async getUserSpecificNotifications(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
+  async getUserSpecificNotifications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user?.id as string;
     const status = (req.query.status as string) || 'ALL';
     const page = parseInt(req.query.page as string) || 1;
     const type = (req.query.type as string) || 'ALL';
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 7;
     const offSet = parseInt(req.query.offSet as string) || 0;
 
     try {
@@ -43,47 +48,55 @@ export default class NotificationController {
         offSet,
       });
       if (result) {
-        const { notifications, unRead, hasMore } = result;
+        const { notifications } = result;
         res.status(StatusCodes.OK).json({
           success: true,
           message: 'Fetched notifications',
           notifications,
-          unRead,
-          hasMore,
         });
         return;
       }
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'OK', notifications: [], unRead: 0, hasMore: false });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Notifications'),
+        notifications: [],
+        unRead: 0,
+        hasMore: false,
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async changeNotificationStatus(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async changeNotificationStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     const notificationId = req.params.notificationId;
     try {
       const result = await this._changeNotificationStatus.execute({ _id: notificationId });
 
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'Notification status changed', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Notification read status'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async markReadAllNotification(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async markReadAllNotification(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const result = await this._markReadAllNotifications.execute();
-      res.status(StatusCodes.OK).json({ success: true, message: 'Updated', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Notification read status'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async softDeleteNotification(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async softDeleteNotification(req: Request, res: Response, next: NextFunction): Promise<void> {
     const notificationId = req.params.notificationId;
     try {
       await this._softDeleteNotification.execute({ _id: notificationId });
@@ -94,8 +107,12 @@ export default class NotificationController {
     }
   }
 
-  async getUnreadNotificationsCount(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
+  async getUnreadNotificationsCount(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user?.id as string;
 
     try {
       const result = await this._getUnReadNotificationsCount.execute(userId);
@@ -107,7 +124,7 @@ export default class NotificationController {
     }
   }
 
-  async deleteNotifications(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async deleteNotifications(req: Request, res: Response, next: NextFunction): Promise<void> {
     const notificationId = req.params.notificationId as string;
     const action = req.query.action as 'BULCK' | 'SINGLE';
 

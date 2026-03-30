@@ -10,5 +10,5 @@ export const PostApiRoutes = {
   COMMENT_ON_A_POST: '/v1/post/:postId/comment',
   DELETE_COMMENT_FROM_A_POST: '/v1/post/:postId/comment/:commentId',
   LIKE_A_COMMENT: '/v1/post/comment/:commentId',
-  UNLIKE_A_COMMENT: '/v1/post/comment/:commentId/unlike'
+  UNLIKE_A_COMMENT: '/v1/post/comment/:commentId/unlike',
 } as const;

@@ -1,5 +1,5 @@
-import { Role } from '../../../domain/entities/user/User.FIX';
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import { AccountAction, Role } from '../../../domain/entities/user/User.FIX';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import { Expose, Exclude } from 'class-transformer';
 
 @Exclude()
@@ -124,13 +124,13 @@ export default interface UserDTO {
   isBanned?: boolean;
   isDeleted?: boolean;
   isAdmin?: boolean;
+  accountActions?: AccountAction[];
   isRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
   verificationToken?: string;
   otpExpiresAt?: Date;
 }
-
 
 /** Some properties are commented which is not needed in the frontend */
 export interface MyProfileDTO {
@@ -155,7 +155,7 @@ export interface MyProfileDTO {
   // googleId?: string;
   // facebookId?: string;
   connections?: number;
-  followers?: number
+  followers?: number;
   // linkedinId?: string;
   profilePicture?: {
     cloudinaryPublicId: string;
@@ -173,4 +173,11 @@ export interface MyProfileDTO {
   updatedAt?: string;
   // verificationToken?: string;
   // otpExpiresAt?: Date;
+}
+
+export interface SimilarSkillUserDTO {
+  _id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
 }

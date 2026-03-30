@@ -4,10 +4,11 @@ import { Controller, useForm } from 'react-hook-form';
 import { BiStar, BiUpload } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { IoCloseCircle } from 'react-icons/io5';
-import { addUserResume } from '../../../services/userServices';
-import { Notify } from 'notiflix';
-import Swal from 'sweetalert2';
+// import { addUserResume } from '../../../services/userServices';
+import { addUserResume } from '../../../services/resumeServices'; 
 import { Resumes } from '../../../types/entityTypes';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 interface AddResumeResponsePayload {
   success: true
@@ -15,8 +16,14 @@ interface AddResumeResponsePayload {
   result: Resumes
 }
 
-export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResumeAdd}: any) {
-  const [resume, setResume] = useState<any>(null);
+interface ResumeCardProps {
+  resumeModalOpen: boolean
+  closeResumeModal: () => void
+  onResumeAdd: (data: Resumes) => void
+}
+
+export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResumeAdd}: ResumeCardProps) {
+  const [resume, setResume] = useState<File | null>(null);
   const [resumeFileName, setResumeFileName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false)
   const [isPrimary, setIsPrimary] = useState<boolean>(false)
@@ -30,7 +37,7 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
   }
 
   const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files[0]
+    const file = e.target.files ? e.target.files[0] : null
     if(file){
         setResume(file)
         setResumeFileName(file.name)
@@ -40,7 +47,9 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
   const removeSelectedFile = () => {
     setResume(null)
     setResumeFileName('')
-    fileRef.current.value = ''
+    if(fileRef.current){
+      fileRef.current.value = ''
+    }
   }
 
   type Inputs = {
@@ -67,22 +76,26 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
     }
 
     try {
-        const result: AddResumeResponsePayload = await addUserResume(formData)
+        const result: AddResumeResponsePayload = await toast.promise(
+          addUserResume(formData),
+          {
+            pending: 'Adding Resume...',
+            success: 'Resume added',
+            error:{
+              render(props) {
+                const data = props.data as AxiosError<{message: string}>
+                return data.message
+              },
+            }
+          }
+        )
+
         if(result?.success){
-            Notify.success(result.message, {timeout: 3000})
             console.log('-- Checking resume add response--', result)
             onResumeAdd(result.result)
-        }else{
-            Swal.fire({
-                icon: 'warning',
-                title: 'Oops',
-                text: result?.message,
-                showCancelButton: false,
-                showConfirmButton: true
-            })
         }
     } catch (error: unknown) {
-        Notify.failure(error instanceof Error ? error.message : 'Something went werong', {timeout: 3000})
+        console.log('error occured', error)
     } finally {
         setLoading(false)
         closeResumeModal()

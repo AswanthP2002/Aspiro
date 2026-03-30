@@ -9,12 +9,15 @@ export const AdminEndPoints = {
     REQUEST_PASSWORD_RESET: '/admin/v1/password/reset-request',
     RESET_USER_PASSWORD: `/admin/v1/user/password-reset`,
     LOAD_RECRUITER_APPLICATIONS: `/admin/v1/recruiter/applications`,
+    LOAD_RECRUITER_APPLICATION_DETAILS: (applicationId: string) => `/admin/v1/recruiter/application/${applicationId}/details`,
     REJECT_RECRUITER_APPLICATION: (recruiterId: string) => `/admin/v1/recruiter/application/${recruiterId}`,
     APPROVE_RECRUITER_APPLICATION: (recruiterId: string) => `/admin/v1/recruiter/application/approve/${recruiterId}`,
+    
     ADMIN_LOAD_RECRUITERS: `/admin/v1/recruiters/data`,
     ADMIN_RECRUITER_DETAILS: (recruiterId: string) => `/admin/v1/recruiters/${recruiterId}`,
     ADMIN_REVOKE_RECRUITER_VERIFICATION: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}/verification/action`,
     ADMIN_REVOKE_RECRUITER_PERMISSIONS: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}/permissions/update`,
+    ADMIN_DELETE_RECRUITER: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}`,
 
     //Configs - Work Mode
     ADMIN_ADD_WORKMODE: `/admin/v1/workmode`,
@@ -42,5 +45,8 @@ export const AdminEndPoints = {
     //Jobs - manage
     ADMIN_JOBS_LOAD_ALL_JOBS: '/admin/v1/jobs/data',
     ADMIN_JOB_DETAILS_BY_ID: (jobId: string) => `/admin/v1/job/details/${jobId}`,
-    ADMIN_DELETE_JOB_BY_ID: (jobId: string) => `/admin/v1/job/${jobId}`
+    ADMIN_DELETE_JOB_BY_ID: (jobId: string) => `/admin/v1/job/${jobId}`,
+    ADMIN_FLAG_JOB: (jobId: string) => `/admin/v1/job/${jobId}/flag`,
+    ADMIN_BLOCK_JOB: (jobId: string) => `/admin/v1/job/${jobId}/block`,
+    ADMIN_UNBLOCK_JOB: (jobId: string) => `/admin/v1/job/${jobId}/unblock`
 } as const

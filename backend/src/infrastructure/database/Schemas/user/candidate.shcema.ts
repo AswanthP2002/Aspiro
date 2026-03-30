@@ -1,4 +1,4 @@
-import SocialLinks from '../../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../../domain/entities/user/SocialLinks';
 
 import { Schema } from 'mongoose';
 import Candidate from '../../../../domain/entities/user/candidate.entity.GARBAGE';

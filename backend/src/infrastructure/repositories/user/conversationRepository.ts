@@ -1,9 +1,8 @@
 import { injectable } from 'tsyringe';
-import Conversation from '../../../domain/entities/user/conversation.entity';
+import Conversation from '../../../domain/entities/conversation/conversation.entity';
 import IConversationRepo from '../../../domain/interfaces/user/IConversationRepo';
 import { ConversationDAO } from '../../database/DAOs/user/conversation.dao';
 import BaseRepository from '../baseRepository';
-import mongoose from 'mongoose';
 
 @injectable()
 export default class ConversationRepository
@@ -14,15 +13,68 @@ export default class ConversationRepository
     super(ConversationDAO);
   }
 
-  async getConversations(logedUserId: string): Promise<Conversation[] | null> {
-    const result = await ConversationDAO.find({
-      'participants.userId': new mongoose.Types.ObjectId(logedUserId),
-    })
-      .populate('participants.userId', 'name email profilePicture')
-      .sort({ createdAt: -1 });
+  async getConversations(
+    logedUserId: string,
+    search: string,
+    page: number,
+    limit: number
+  ): Promise<Conversation[] | null> {
+    const skip = (page - 1) * limit;
+
+    const result = await ConversationDAO.aggregate([
+      { $unwind: { path: '$participants', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'participants.userId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: '$_id',
+          participants: { $push: '$userDetails' },
+          type: { $first: '$type' },
+          lastMessage: { $first: '$lastMessage' },
+          createdAt: { $first: '$createdAt' },
+          updatedAt: { $first: '$updatedAt' },
+        },
+      },
+      {
+        $match: {
+          $expr: { $gte: [{ $size: '$participants' }, 2] },
+          'participants.name': { $regex: new RegExp(search, 'i') },
+        },
+      },
+      { $sort: { updatedAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
 
     return result;
+    // const result = await ConversationDAO.find({
+    //   'participants.userId': new mongoose.Types.ObjectId(logedUserId),
+    // })
+    //   .populate('participants.userId', 'name email profilePicture')
+    //   .sort({ createdAt: -1 });
+
+    // return result;
   }
+
+  // export default interface Conversation {
+  //   _id?: string;
+  //   type: 'private' | 'group';
+  //   participants: ConversationParticipants[];
+  //   lastMessage: {
+  //     text: string;
+  //     senderId: string;
+  //     sendAt: string | Date;
+  //   };
+  //   createdAt?: string;
+  //   updatedAt?: string;
+  // }
 
   async initializeConversation(
     senderId: string,

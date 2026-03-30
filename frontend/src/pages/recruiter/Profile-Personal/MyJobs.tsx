@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteJob, getJobs } from "../../../services/recruiterServices";
+import { deleteJob, getJobs, getPostedJobDetails } from "../../../services/recruiterServices";
 import defaultProfile from '/default-img-instagram.png';
 import { Notify } from "notiflix";
 import Loader from "../../../components/candidate/Loader";
@@ -9,9 +9,14 @@ import { FaPlus } from "react-icons/fa";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import { BiBriefcase, BiMapPin, BiTrash } from "react-icons/bi";
 import { BsClock, BsEye, BsPencilSquare } from "react-icons/bs";
-import { MyJobData } from "../../../types/entityTypes";
+import { MyJobData, RecruiterJobDetailsData } from "../../../types/entityTypes";
 import moment from "moment";
 import getReminingDays from "../../../helpers/DateTime.helper";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
+import { Box, IconButton, Modal, Skeleton } from "@mui/material";
+import { FiAward, FiCalendar, FiClock, FiEye, FiLayers, FiMapPin, FiUserCheck, FiX } from "react-icons/fi";
+import { FaIndianRupeeSign } from "react-icons/fa6";
 
 ///Experimental
 interface Job {
@@ -34,6 +39,25 @@ function debouncedSearch(fn: Function, delay: number) {
     }
 }
 
+const dummyMyJob = {
+  "jobTitle": "Senior MERN Stack Developer",
+  "jobLevel": "Senior",
+  "jobType": "Full-Time",
+  "workMode": "Remote",
+  "location": "Malappuram, Kerala",
+  "duration": "Indefinite",
+  "description": "We are looking for a developer to architect scalable social platforms...",
+  "requirements": ["5+ years experience", "Strong TS knowledge"],
+  "responsibilities": ["Lead code reviews", "Architect API endpoints"],
+  "salary": "₹12L - ₹18L per annum",
+  "expiresAt": "2026-04-15",
+  "postedOn": "2026-03-11",
+  "qualification": "B.Tech in Computer Science or Equivalent",
+  "experience": "5",
+  "requiredSkills": ["React", "Node.js", "MongoDB", "TypeScript"],
+  "optionalSkills": ["AWS S3", "Docker", "Redux Thunk"]
+}
+
 export default function MyJobs() {
 
     const [myJobs, setMyJobs] = useState<MyJobData[]>([])
@@ -44,6 +68,17 @@ export default function MyJobs() {
     const [totalPages, setTotalPages] = useState(1)
     const [statusFilter, setStatusFilter] = useState<'all' | 'expired' | 'active'>('all')
     const [workModeFilter, setWorkModeFilter] = useState<'all' | 'On-site' | 'Remote' | 'Hybrid'>('all')
+    const [isJobViewModalOpened, setIsJobViewModalOpened] = useState(false)
+    const [selectedJobId, setSelectedJobId] = useState('')
+
+    const openJobViewModal = (jobId: string) => {
+      setSelectedJobId(jobId)
+      setIsJobViewModalOpened(true)
+    }
+    const closeJobViewModal = () => {
+      setIsJobViewModalOpened(false)
+      setSelectedJobId('')
+    }
 
     const searchByJobTitle = (e: any) => {
         console.log('the value being entered', e.target.value)
@@ -53,6 +88,48 @@ export default function MyJobs() {
     const navigate = useNavigate()
 
     const searchWhileTyping = useCallback(debouncedSearch(searchByJobTitle, 500), []);
+
+    async function deleteJobByRecruiter(jobId: string){
+        Swal.fire({
+            title: 'Delete this job?',
+            text: "Are you sure to delete this job. This action can not be redo",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText:'Delete Job',
+            allowOutsideClick:false,
+            allowEscapeKey:false
+        }).then(async (response) => {
+            if(response.isConfirmed){
+                try {
+                    const result = await toast.promise(
+                      deleteJob(jobId),
+                      {
+                        pending: 'Deleting job...',
+                        success: 'Job Deleted',
+                        error:{
+                          render(props){
+                            const data = props.data as AxiosError<{message: string}>
+                            return data.message
+                          }
+                        }
+                      }
+                    )
+                    if(result?.success){
+                        setMyJobs((prv: MyJobData[]) => prv.filter((job: MyJobData) => job._id !== jobId))
+                    }
+                } catch (error: unknown) {
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
+                }
+            }else{
+                return
+            }
+        })
+    }
+
+    function navigateToJobEditPage(jobId: string){
+        const editableJob = myJobs.find(job => job._id === jobId)
+        navigate('/profile/recruiter/edit-job', {state:{jobData:editableJob}})
+    }
 
       
   useEffect(() => {
@@ -82,6 +159,7 @@ export default function MyJobs() {
   
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -127,7 +205,7 @@ export default function MyJobs() {
         {/* Job List */}
         <div className="space-y-4">
           {myJobs.map(job => (
-            <JobCard key={job._id} job={job} />
+            <JobCard key={job._id} job={job} deleteJob={deleteJobByRecruiter} viewJob={() => openJobViewModal(job._id as string)} editJob={() => navigateToJobEditPage(job._id as string)} />
           ))}
         </div>
 
@@ -141,6 +219,9 @@ export default function MyJobs() {
         </div>
       </div>
     </div>
+
+    {isJobViewModalOpened && (<TestJobModal open={isJobViewModalOpened} onClose={closeJobViewModal} jobId={selectedJobId} />)}
+    </>
   );
 
   
@@ -398,8 +479,14 @@ export default function MyJobs() {
 }
 
 
-const JobCard = ({ job }: {job: MyJobData}) => {
+const JobCard = ({ job, deleteJob, viewJob, editJob }: {job: MyJobData, deleteJob: (jobId: string) => void, viewJob: () => void, editJob: () => void}) => {
   const isExpired = job.status === 'expired';
+  const navigate = useNavigate()
+
+
+  const navigateToApplicantsManagePage = (jobId: string) => {
+      navigate(`/profile/recruiter/applications/${jobId}`, {state: {jobId}})
+    }
 
   return (
     <div className="bg-white rounded-xl p-6 mb-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between transition-all hover:shadow-md">
@@ -418,19 +505,234 @@ const JobCard = ({ job }: {job: MyJobData}) => {
             <span className="text-sm text-gray-500 font-medium">{job.applicationsCount} Applicants</span>
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-400">
-            <span className="flex items-center gap-1"><BiMapPin size={14} /> {job.location}</span>
+            <span className="flex items-center gap-1"><BiMapPin size={14} /> {job.location ? job.location : job.workMode}</span>
             <span className="flex items-center gap-1"><BsClock size={14} /> {getReminingDays(job.expiresAt)} days left</span>
           </div>
           <div className="mt-4 flex items-center gap-2">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <button onClick={() => navigateToApplicantsManagePage(job._id as string)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
               View Applications
             </button>
-            <button className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsPencilSquare size={16} /></button>
-            <button className="p-2 border border-gray-200 rounded-md text-red-400 hover:bg-red-50"><BiTrash size={16} /></button>
-            <button className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsEye size={16} /></button>
+            <button onClick={editJob} className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsPencilSquare size={16} /></button>
+            <button onClick={() => deleteJob(job._id as string)} className="p-2 border border-gray-200 rounded-md text-red-400 hover:bg-red-50"><BiTrash size={16} /></button>
+            <button onClick={viewJob} className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsEye size={16} /></button>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+
+function TestJobModal({open, onClose, jobId}: {open: boolean, onClose: () => void, jobId: string}){
+  const [loading, setLoading] = useState(false)
+  const [jobDetails, setJobDetails] = useState<RecruiterJobDetailsData | null >(null)
+
+  useEffect(() => {
+    setLoading(true)
+    async function fetchJobDetails(){
+      try {
+        const result = await getPostedJobDetails(jobId)
+        if(result.success){
+          console.log('resul')
+          setTimeout(() => {
+            setJobDetails(result?.result)
+            setLoading(false)
+          }, 2000)
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      } 
+    }
+
+    fetchJobDetails()
+  }, [])
+  return(
+    <Modal open={open} onClose={onClose} className="flex items-center justify-center p-4">
+      <Box className="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl outline-none overflow-hidden flex flex-col">
+        
+        {/* Header Section */}
+        <div className="relative p-6 border-b border-gray-100 bg-slate-50/50">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                {loading
+                  ? <Skeleton width={100} />
+                  : <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider">
+                      {jobDetails?.jobLevel}
+                    </span>
+                }
+                {loading
+                  ? null
+                  : <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider">
+                      {jobDetails?.jobType}
+                    </span>
+                }
+              </div>
+              {loading ? <Skeleton width={300} /> : <h2 className="text-2xl font-black text-gray-900 leading-tight mt-2 italic">{jobDetails?.jobTitle}</h2>}
+              {loading
+                ? <Skeleton height={12} />
+                : <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500 font-medium">
+                    <span className="flex items-center gap-1.5"><FiMapPin className="text-blue-500" /> {jobDetails?.workMode} {jobDetails?.location && `• ${jobDetails.location}`}</span>
+                    <span className="flex items-center gap-1.5"><FaIndianRupeeSign className="text-emerald-500" /> {jobDetails?.minSalary}/{jobDetails?.salaryPeriod}</span>
+                    <span className="flex items-center gap-1.5"><FiClock className="text-amber-500" /> {jobDetails?.duration || 'N/A'}</span>
+                  </div>
+              }
+            </div>
+            <IconButton onClick={onClose} className="hover:bg-gray-200 transition-colors">
+              <FiX size={20} />
+            </IconButton>
+          </div>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
+          
+          {/* Main Body (Left 2/3) */}
+          <div className="lg:col-span-2 space-y-8">
+            <section>
+              {loading
+                ? <Skeleton width={150} />
+                : <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-blue-600 rounded-full" /> Job Description
+                  </h4>
+              }
+              {loading
+                ? <Skeleton />
+                : <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{jobDetails?.description}</p>
+              }
+            </section>
+
+            <section>
+              {loading
+                ? <Skeleton width={150} />
+                : <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-blue-600 rounded-full" /> Key Responsibilities
+                  </h4>
+              }
+              {loading
+                ? <Skeleton />
+                : <ul className="grid grid-cols-1 gap-2">
+                {jobDetails?.responsibilities.split(".").map((item, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-gray-600">
+                    <span className="text-blue-500 font-bold">•</span> {item}
+                  </li>
+                ))}
+              </ul>
+              }
+            </section>
+
+            <section>
+              {loading
+                ? <Skeleton width={150} />
+                : <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-blue-600 rounded-full" /> Required Skills
+                  </h4>
+              }
+              {loading
+                ? <Skeleton />
+                : <div className="flex flex-wrap gap-2">
+                {jobDetails?.requiredSkills.map((skill, i) => (
+                  <span key={i} className="px-3 py-1 bg-gray-900 text-white text-[11px] font-bold rounded-md">
+                    {skill}
+                  </span>
+                ))}
+                {jobDetails?.optionalSkills.map((skill, i) => (
+                  <span key={i} className="px-3 py-1 border border-gray-200 text-gray-500 text-[11px] font-medium rounded-md">
+                    {skill} (Optional)
+                  </span>
+                ))}
+              </div>
+              }
+            </section>
+          </div>
+
+          {/* Sidebar (Right 1/3) */}
+          <div className="space-y-6">
+            <div className="p-5 bg-gray-50 rounded-xl border border-gray-100 space-y-4">
+              {loading
+                ? <Skeleton width={150} />
+                : <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-2">Candidate Profile</h4>
+              }
+              
+              {loading
+                ? <Skeleton />
+                : <div className="flex items-center gap-3">
+                <FiAward className="text-blue-500" />
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold">Qualification</p>
+                  <p className="text-xs font-bold text-gray-700">{jobDetails?.qualification}</p>
+                </div>
+              </div>
+              }
+
+              {loading
+                ? <Skeleton />
+                : <div className="flex items-center gap-3">
+                <FiLayers className="text-blue-500" />
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold">Experience</p>
+                  <p className="text-xs font-bold text-gray-700">{jobDetails?.experienceInYears} Years</p>
+                </div>
+              </div>
+              }
+
+              {loading
+                ? <Skeleton />
+                : <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                <FiCalendar className="text-gray-400" />
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold">Posted On</p>
+                  <p className="text-xs font-medium text-gray-600">{moment(jobDetails?.createdAt).format('MMM DD, YYYY')}</p>
+                </div>
+              </div>
+              }
+
+              {loading
+                ? <Skeleton />
+                : <div className="flex items-center gap-3">
+                <FiCalendar className="text-red-400" />
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold text-red-400">Expires At</p>
+                  <p className="text-xs font-bold text-red-600">{moment(jobDetails?.expiresAt).format('MMM DD, YYYY')}</p>
+                </div>
+              </div>
+              }
+            </div>
+            {loading
+              ? <Skeleton />
+              : <>
+                  <div className="flex items-center gap-4 py-3 px-4 bg-slate-50/80 rounded-xl border border-slate-100 w-fit">
+  {/* Views Count */}
+  <div className="flex items-center gap-2 pr-4 border-r border-slate-200">
+    <div className="p-1.5 bg-blue-100 rounded-lg text-blue-600">
+      <FiEye size={16} />
+    </div>
+    <div className="flex flex-col">
+      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider leading-none">
+        Views
+      </span>
+      <span className="text-sm font-bold text-slate-700">{jobDetails?.views || 0}</span>
+    </div>
+  </div>
+
+  {/* Applications Count */}
+  <div className="flex items-center gap-2">
+    <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
+      <FiUserCheck size={16} />
+    </div>
+    <div className="flex flex-col">
+      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider leading-none">
+        Applications
+      </span>
+      <span className="text-sm font-bold text-slate-700">{jobDetails?.applicationsCount || 0}</span>
+    </div>
+  </div>
+</div>
+                </>
+            }
+          </div>
+        </div>
+      </Box>
+    </Modal>
+  )
+}

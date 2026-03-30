@@ -53,14 +53,26 @@ export const EndPoints = {
     ACCEPT_CONNECTION_REQUEST: `/v1/user/connection-request-accept/`,
 
     APPLY_JOB_BY_JOB_ID: (jobId: string) => `/v1/job/${jobId}/apply`,
+    GET_MY_INTERVIEWS: '/v1/interviews',
     CHECK_IS_JOB_APPLIED: (jobId: string) => `/v1/job/${jobId}/applied`,
     CHECK_IS_JOB_SAVED: (jobId: string) => `/v1/job/${jobId}/saved/check`,
     SAVE_JOB: (jobId: string) => `/v1/job/${jobId}/save`,
     UNSAVE_JOB: (savedId: string) => `/v1/job/${savedId}/unsave`,
     LOAD_SAVED_JOBS: '/v1/job/saved',
     LOAD_MY_APPLICATIONS: '/v1/applications',
+    TRACK_MY_APPLICATION: (applicationId: string) => `/v1/application/${applicationId}/track`,
     UPLOAD_PROFILE_PICTURE: '/v1/user/me/profile-picture',
     REMOVE_PROFILE_PICTURE: `/v1/user/me/profile-picture/remove`,
     UPLOAD_COVER_PHOTO: '/v1/user/me/cover-photo',
-    REMOVE_COVER_PHOTO: '/v1/user/me/cover-photo/remove'
+    REMOVE_COVER_PHOTO: '/v1/user/me/cover-photo/remove',
+    WITHDRAW_APPLICATION: (applicationId: string) => `/v1/application/${applicationId}`,
+
+    LOAD_ALL_USERS: '/v2/users',
+    LOAD_USER_DETAIL_BY_ID: (userId: string) => `/v2/users/details/${userId}`,
+    BLOCK_USER_BY_ID: (userId: string) => `/v2/user/block/${userId}`,
+    UNBLOCK_USER_BY_ID: (userId: string) => `/v2/user/unblock/${userId}`,
+    DELETE_USER_BY_ID: (userId: string) => `/v2/user/${userId}`,
+    BAN_USER_BY_ID: (userId: string) => `/v2/user/ban/${userId}`,
+
+    LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
 } as const

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { BsCheckCircle, BsClock, BsEye, BsFilter, BsGlobe, BsLinkedin, BsSearch } from "react-icons/bs"
 import { CiCircleCheck } from "react-icons/ci"
-import { FaFileAlt, FaSearch, FaUsersSlash } from "react-icons/fa"
-import { FaCircleXmark, FaRegCircleXmark } from "react-icons/fa6"
-import { approveRecruiterApplication, changeStatusToUnderReview, loadRecruiterApplications, rejectRecruiterApplication } from "../../../services/adminServices"
-import { AdminRecruiterApplicationsData, RecruiterProfileData } from "../../../types/entityTypes"
+import { FaEye, FaFileAlt, FaSearch, FaUsersSlash } from "react-icons/fa"
+import { FaCircleXmark, FaRegCircleXmark, FaUserTie } from "react-icons/fa6"
+import { loadRecruiterApplications, changeStatusToUnderReview, rejectRecruiterApplication, approveRecruiterApplication } from "../../../services/recruiterServices"
+import { loadRecruiterAppicationDetails } from "../../../services/adminServices"
+import { AdminRecruiterApplicationDetailsData, AdminRecruiterApplicationsData, RecruiterProfileData } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
-import { Box, Button, IconButton, Modal, Table, TableHead, TextareaAutosize, Typography } from "@mui/material"
+import { Box, Button, IconButton, Modal, Skeleton, Table, TableHead, TextareaAutosize, Typography } from "@mui/material"
 import formatDate, { formatRelativeTime } from "../../../services/util/formatDate"
 import { useNavigate } from "react-router-dom"
 import { BiGlobe } from "react-icons/bi"
@@ -15,6 +16,7 @@ import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { Controller, useForm } from "react-hook-form"
 import { CgClose } from "react-icons/cg"
 import Swal from "sweetalert2"
+import { toast } from "react-toastify"
 
 interface DeclineFormInputs {
   reason: string;
@@ -39,6 +41,7 @@ const reasons = [
   "Does not meet requirements",
   "Other"
 ];
+
 
 function ProfileStatusTileCard({data}: {data: {title: string, icon: any, count: number, customClass: string, customTitleClass: string}}){
     return (
@@ -105,6 +108,9 @@ export default function RecruiterApplications(){
     const [totalPages, setTotalPages] = useState(0)
     const [isVerificationDocumentOpened, setIsVerificationDocuemtnOpened] = useState(false)
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [applicationSelect, setApplicationSelect] = useState(false)
+    const navigate = useNavigate()
 
     const openRejectModal = () => setIsRejectModalOpen(true)
     const closeRejectModal = () => setIsRejectModalOpen(false)
@@ -118,6 +124,7 @@ export default function RecruiterApplications(){
         return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== selectedApp?._id)
       })
       setSelectedApp(null)
+      setApplicationSelect(false)
     }
 
     const onApproveApplication = async (applicationId: string) => {
@@ -196,34 +203,51 @@ export default function RecruiterApplications(){
   ];
 
   // 2. State to track which application is selected
-  const [selectedApp, setSelectedApp] = useState(recruiterApplications && recruiterApplications?.length > 0 ? recruiterApplications[1] : null); // Default to Hana
+  const [selectedApp, setSelectedApp] = useState<AdminRecruiterApplicationDetailsData | null>(null)
 
   const selectAnApplication = async (application: AdminRecruiterApplicationsData) => {
-    setSelectedApp(application)
+    //setSelectedApp(application)
+    setApplicationSelect(true)
+    setLoading(true)
     if(application.profileStatus === 'pending') {
       try {
         const result: RecruiterApplicationUpdateResponsePayload = await changeStatusToUnderReview(application._id as string)
-        if(result.success){
-          Notify.success('Application is currently under Review')
-          setSelectedApp((app: AdminRecruiterApplicationsData | null) => {
-            if(!app) return null
-            return {...app, profileStatus: 'under-review'}
-          })
+        // if(result.success){
+        //   toast.info('Application is currently under review')
+        //   setSelectedApp((app: AdminRecruiterApplicationsData | null) => {
+        //     if(!app) return null
+        //     return {...app, profileStatus: 'under-review'}
+        //   })
 
-          setRecruiterApplications((applications: AdminRecruiterApplicationsData[] | null) => {
-            if(!applications) return null
-            return applications?.map((app: AdminRecruiterApplicationsData) => {
-              if(app._id === application._id){
-                return {...app, profileStatus: 'under-review'}
-              }else{
-                return app
-              }
-            })
-          })
-        }
+        //   setRecruiterApplications((applications: AdminRecruiterApplicationsData[] | null) => {
+        //     if(!applications) return null
+        //     return applications?.map((app: AdminRecruiterApplicationsData) => {
+        //       if(app._id === application._id){
+        //         return {...app, profileStatus: 'under-review'}
+        //       }else{
+        //         return app
+        //       }
+        //     })
+        //   })
+        // }
       } catch (error) {
         Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
       }
+    }
+
+    try {
+      const selectedApplicationDetails = await loadRecruiterAppicationDetails(application._id as string)
+      if(selectedApplicationDetails.success){
+        setSelectedApp(selectedApplicationDetails.result)
+      }else{
+        setSelectedApp(null)
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to fetch recruiter application details')
+    } finally {
+      setTimeout(() => {
+        setLoading(false)
+      }, 2000);
     }
   }
 
@@ -308,45 +332,51 @@ export default function RecruiterApplications(){
 
       {/* Main Content - Dynamic Details */}
       <div className="flex-1 p-10 overflow-y-auto">
-        {selectedApp && (
+        {applicationSelect && (
           <>
             <div className="max-w-4xl mx-auto">
           
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div>
-              <h1 className="text-2xl font-medium">{selectedApp?.fullName}</h1>
-              <p className="text-gray-500 text-sm">{selectedApp?.email}</p>
-              <p className="text-sm text-gray-400 mt-2">Submitted {formatRelativeTime(selectedApp?.createdAt || new Date())}</p>
+              {loading ? <Skeleton width={250} /> : <h1 className="text-2xl font-medium">{selectedApp?.fullName}</h1>}
+              {loading ? <Skeleton height={15} /> : <p className="text-gray-500 text-sm">{selectedApp?.email}</p>}
+              {loading ? <Skeleton sx={{marginTop: '10px'}} width={150} height={10} /> : <p className="text-sm text-gray-400 mt-2">Submitted {formatRelativeTime(selectedApp?.createdAt || new Date())}</p>}
             </div>
-            <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">
+            {!loading && <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">
                 {selectedApp?.profileStatus}
-            </span>
+            </span>}
           </div>
 
           {/* Profile Links */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          {loading
+            ? <Skeleton height={250} />
+            : <>
+                <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
             <p className="font-semibold mb-4">Profile Links</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="flex items-center gap-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="bg-blue-600 p-2 rounded text-white"><BsLinkedin size={20} /></div>
                 <div className="overflow-hidden">
                   <a href={selectedApp?.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold">LinkedIn Profile</a>
-                  <a href="#" target="_blank" rel="noopener noreferrer" className="text-[10px] text-gray-400 truncate">https://linkedin.com/in/{selectedApp?.fullName?.toLowerCase().replace(/\s/g, '')}</a>
                 </div>
               </div>
               <div className="flex items-center gap-4 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                <div className={`p-2 rounded text-white ${'blue'}`}><BsGlobe size={20} color="blue" /></div>
+                <div className={`p-2 rounded text-white ${'blue'}`}><FaUserTie size={20} color="blue" /></div>
                 <div className="overflow-hidden">
-                  <p className="text-xs font-bold">Portfolio Website</p>
-                  <p className="text-[10px] text-gray-400 truncate">https://www.{selectedApp?.fullName?.toLowerCase().replace(/\s/g, '')}.com</p>
+                  <button onClick={() => navigate(`/admin/users/details/${selectedApp.userProfile?._id}`)} className="text-xs font-bold">Inspect full profile</button>
                 </div>
               </div>
             </div>
           </div>
+              </>
+          }
 
           {/* Info Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-10">
+          {loading
+            ? <Skeleton />
+            : <>
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-10">
             <p className="font-semibold mb-6">{selectedApp?.recruiterType} Information</p>
             
             {
@@ -407,25 +437,43 @@ export default function RecruiterApplications(){
                   </>
             }
           </div>
+              </>
+          }
 
-          <div className="mt-5 bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+          {loading
+            ? <Skeleton />
+            : <>
+                <div className="mt-5 bg-white border border-gray-200 rounded-xl shadow-sm p-5">
             <p className="font-semibold">Verification Document</p>
             <div className="grid grid-cols-2 gap-2 mt-3 cursor-pointer">
-              <div className="border flex items-center gap-2 border-gray-200 rounded-md p-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-md bg-red-300"><FaFileAlt color="white" /></div>
-                  <p onClick={openVerificationDocuemtn} className="text-sm font-medium">{selectedApp?.verificationDocument?.publicId?.split("/")[2].split(" ")[0]}</p>
+              <div className="border flex justify-between items-center gap-2 border-gray-200 rounded-md p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-md bg-red-300"><FaFileAlt color="white" /></div>
+                    <p onClick={openVerificationDocuemtn} className="text-sm font-medium">{selectedApp?.verificationDocument?.publicId?.split("/")[2].split(" ")[0]}</p>
+                  </div>
+                  <div>
+                    <button onClick={openVerificationDocuemtn}><FaEye color="blue" /></button>
+                  </div>
               </div>
             </div>
           </div>
+              </>
+          }
 
           {/* Buttons */}
           <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-gray-100">
-            <button onClick={openRejectModal} className="px-6 py-2.5 border border-red-500 text-red-500 font-medium rounded-lg hover:bg-red-50 transition-colors">
-              Reject with reason
-            </button>
-            <button onClick={() => onApproveApplication(selectedApp?._id as string)} className="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-lg shadow-green-200">
-              Verify & Approve Recruiter
-            </button>
+            {loading
+              ? <Skeleton width={100} height={50} />
+              : <button onClick={openRejectModal} className="px-6 py-2.5 border border-red-500 text-red-500 font-medium rounded-lg hover:bg-red-50 transition-colors">
+                  Reject with reason
+                </button>
+            }
+            {loading
+              ? <Skeleton width={100} height={50} />
+              : <button onClick={() => onApproveApplication(selectedApp?._id as string)} className="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-lg shadow-green-200">
+                  Verify & Approve Recruiter
+                </button>
+            }
           </div>
         </div>
           </>
@@ -442,13 +490,27 @@ export default function RecruiterApplications(){
         )}
       </div>
     </div>
-    {/* {isVerificationDocumentOpened && (
-      <div className="!absolute w-full min-h-screen left-0 top-"><ViewPDFDocument fileUrl={selectedApp?.verificationDocument?.url as string} docWidth={300} /></div>
-    )} */}
+    {isVerificationDocumentOpened && (
+      <Modal className="flex items-center justify-center" open={isVerificationDocumentOpened}>
+                                  <div className="bg-white rounded-lg max-h-[90vh] overflow-auto outline-none p-4 w-full max-w-4xl">
+                                      <div className="flex justify-end sticky top-0 z-50 mb-2">
+                                          <button onClick={() => setIsVerificationDocuemtnOpened(false)} className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100"><CgClose /></button>
+                                      </div>
+                                      <div className="flex justify-center">
+                                          <ViewPDFDocument
+                                              fileUrl={selectedApp?.verificationDocument?.url as string}
+                                              docWidth={700}
+                                          />
+                                      </div>
+                                  </div>
+                              </Modal>
+    )}
 
     {isRejectModalOpen && (
       <DeclineApplicationModal isOpen={isRejectModalOpen} onClose={closeRejectModal} applicantData={selectedApp as RecruiterProfileData} onConfirmDecline={onRejectApplication} />
     )}
+
+
     </>
   );
 
@@ -497,7 +559,7 @@ function DeclineApplicationModal({ isOpen, onClose, applicantData, onConfirmDecl
       }
     } catch (error: unknown) {
       console.log(error)
-      Notify.failure(error instanceof Error ? error.message : 'Can not reject application')
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       onClose()
     }

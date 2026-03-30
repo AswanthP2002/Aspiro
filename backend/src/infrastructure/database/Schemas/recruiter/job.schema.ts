@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Job from '../../../../domain/entities/recruiter/job.entity';
+import Job from '../../../../domain/entities/job/job.entity';
 
 export const JobSchema = new Schema<Job>(
   {
@@ -40,6 +40,7 @@ export const JobSchema = new Schema<Job>(
       enum: ['draft', 'active', 'expired', 'closed', 'rejected', 'blocked'],
       default: 'active',
     },
+    isFlagged: { type: Boolean, default: false },
     rejectionReason: { type: String },
     views: { type: Number, default: 0 },
     applicationsCount: { type: Number, default: 0 },

@@ -1,3 +1,3 @@
-export default interface IGetFinalizedShortlistData {
-    execute(jobId : string) : Promise<any[]>
-}
+// export default interface IGetFinalizedShortlistData {
+//   execute(jobId: string): Promise<any[]>;
+// }

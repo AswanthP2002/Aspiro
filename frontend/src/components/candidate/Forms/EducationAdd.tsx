@@ -19,10 +19,12 @@ import {
   mastersDegree,
   diploma,
 } from '../../../assets/data/educationalStreamsData';
-import { addUserEducation } from '../../../services/userServices';
+import { addUserEducation } from '../../../services/educationServices';
+// import { addUserEducation } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
-import { Notify } from 'notiflix';
 import { Education } from '../../../types/entityTypes';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 interface AddEducationResponsePayload {
   success: boolean
@@ -30,11 +32,17 @@ interface AddEducationResponsePayload {
   result: Education
 }
 
+interface AddEducationFormProps {
+  educationModalOpen: boolean
+  closeEducationModal: () => void
+  onAddEducation: (data: Education) => void
+}
+
 export default function AddEducationForm({
   educationModalOpen,
   closeEducationModal,
   onAddEducation,
-}: any) {
+}: AddEducationFormProps) {
   type Inputs = {
     educationLevel: string;
     educationStream: string;
@@ -69,37 +77,38 @@ export default function AddEducationForm({
     const { educationInstitution, educationLevel, isPresent, educationStream, startYear, endYear, location } =
       data;
     try {
-      const result: AddEducationResponsePayload = await addUserEducation(
-        educationLevel,
-        educationStream,
-        educationInstitution,
-        isPresent,
-        startYear,
-        endYear,
-        location
-      );
+      const result: AddEducationResponsePayload = await toast.promise(
+        addUserEducation(
+          educationLevel,
+          educationStream,
+          educationInstitution,
+          isPresent,
+          startYear,
+          endYear,
+          location
+        ),
+        {
+          pending: 'Adding education...',
+          success: 'Education added',
+          error:{
+            render(props) {
+              const data = props.data as AxiosError<{message: string}>
+              return data.message
+            },
+          }
+        }
+      )
       
         if (result?.success) {
-          Notify.success('Education added', { timeout: 2000 });
           onAddEducation(result.result)
           return
         } else {
-          Notify.failure(result?.message, { timeout: 2000 });
+          toast.error(result.message)
           return
         }
-       
-        // onAddEducation({
-        //   educationLevel: educationLevel,
-        //   educationStream: educationStream,
-        //   institution: educationInstitution,
-        //   isPresent: isPresent,
-        //   location: location,
-        //   startYear: startYear,
-        //   endYear: endYear,
-        // });
     
     } catch (error: unknown) {
-        Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
        reset({
           educationLevel: '',
@@ -119,13 +128,13 @@ export default function AddEducationForm({
   const currentEducationStatus = watch('isPresent')
 
   const [loading, setLoading] = useState(false);
-  const [isPresent, setIspresent] = useState(false);
+  // const [isPresent, setIspresent] = useState(false);
 
   //seting vales from watch
 
-  const toggleIsPresent = () => {
-    setIspresent((prev) => !prev);
-  };
+  // const toggleIsPresent = () => {
+  //   setIspresent((prev) => !prev);
+  // };
 
   const style = {
     position: 'absolute',

@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import ConnectionRequest from '../../../../domain/entities/user/connectionRequest.entity';
+import ConnectionRequest from '../../../../domain/entities/connection/connectionRequest.entity';
 
 export const ConnectionRequestSchema = new Schema<ConnectionRequest>(
   {

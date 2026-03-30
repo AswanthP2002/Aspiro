@@ -1,9 +1,10 @@
-import { AxiosError} from "axios";
+import { AxiosError, HttpStatusCode} from "axios";
 import axios from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import Swal from "sweetalert2";
 import { Recruiter } from "../types/entityTypes";
 import { RecruiterEndPoints } from "../constants/endPoints/recruiter.endpoints";
+import { toast } from "react-toastify";
 
 //legacy
 export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
@@ -26,7 +27,7 @@ export const recruiterRegister = async (fullName : string, email : string, phone
 }
 
 export const createRecruiterService = async (
-   formData: any
+   formData: FormData
 ) => {
     try {
         const response = await axiosInstance.post(RecruiterEndPoints.REGISTER_RECRUITER, formData,
@@ -177,7 +178,7 @@ export const scheduleInterview = async (
     note?: string
 ) => {
     try {
-        const response = await axiosInstance.post(`/recruiter/schedule-interview/${candidateId}/job/${jobId}/`,
+        const response = await axiosInstance.post(RecruiterEndPoints.SCHEDULE_INTERVIEW(candidateId, jobId),
             {
                 interviewType, interviewersName, interviewDate, interviewTime, gmeetUrl, note
             },
@@ -258,7 +259,7 @@ export const editJob = async (
 
 export const deleteJob = async (jobId: string) => {
     try {
-        const response = await axiosInstance.delete(`/recruiter/job/delete/${jobId}`,
+        const response = await axiosInstance.delete(RecruiterEndPoints.DELETE_MY_JOB(jobId),
             {sendAuthToken:true} as AxiosRequest
         )
 
@@ -292,6 +293,24 @@ export const getJobs = async (search: string, page: number, limit: number = 3, s
         }
 
         
+    }
+}
+
+export const getPostedJobDetails = async (jobId: string) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.GET_POSTED_JOB_DETAILS(jobId),
+            {
+                sendAuthToken:true,
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        }  
     }
 }
 
@@ -440,7 +459,7 @@ export const rejectCandidateJobApplication = async (title : string, description 
             {title, description, type, candidateId, relatedId},
             {   
                 headers:{'Content-Type':'application/json'},
-                sendAuthTokenRecruiter:true
+                sendAuthToken:true
             } as AxiosRequest
         )
 
@@ -453,6 +472,7 @@ export const rejectCandidateJobApplication = async (title : string, description 
 }
 
 export const updateCandidateNotes = async (applicationId: string, notes: string) => {
+    // toast.info(`inside the service application id ${applicationId}`)
     try {
         const response = await axiosInstance.patch(RecruiterEndPoints.UPDATE_CANDIDATE_NOTE(applicationId), {
             notes
@@ -513,8 +533,8 @@ export const updateJobApplicationStatus = async (
     applicationId: string, status: string, candidateName: string, candidateEmail: string, jobTitle: string
 ) => {
     try {
-        const response = await axiosInstance.patch(`/recruiter/application/${applicationId}/status`,
-            {status},
+        const response = await axiosInstance.patch(RecruiterEndPoints.UPDATE_JOB_APPLICATION_STATUS(applicationId),
+            {status, candidateName, candidateEmail, jobTitle},
             {
                 sendAuthToken:true,
                 headers:{"Content-Type":'application/json'}
@@ -573,5 +593,143 @@ export const recruiterFetchWorkModeLists = async () => {
         const err = error as AxiosError
         console.log('--Error occured--', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const loadRecruiterApplications = async (page: number, limit: number) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.LOAD_ALL_RECRUITER_APPLICATIONS, {
+            params:{page, limit},
+            sendAuthToken:true
+        } as AxiosRequest
+
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+    }
+}
+
+export const rejectRecruiterApplication = async (recruiterId: string, reason: string, feedback? : string) => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_RECRUITER_APPLICATION(recruiterId), 
+            {reason, feedback},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+    }
+}
+
+export const approveRecruiterApplication = async (recruiterId: string) => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_RECRUITER_APPLICATION(recruiterId), {},
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('--error occured--', error)
+
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+    }
+}
+
+
+export const getRecruiters = async (search: string, page: number, sort : string, recruiterType: string, recruiterStatus: string) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.LOAD_ALL_RECRUITERS, {
+            params:{search, page, sort, recruiterType, recruiterStatus},
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting company details', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw err
+        }
+    }
+}
+
+export const getRecruiterDetails = async (recruiterId: string) => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.LOAD_RECRUITER_DETAILS_BY_ID(recruiterId), {
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while geting company details', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw err
+        }
+    }
+}
+
+export const handleRecruiterVerification = async (recrutierId: string, action: "Verified" | "Revoked") => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_VERIFICATION(recrutierId), null, {
+            params:{action},
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while blocking the candidate', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError  && err.response.status !== HttpStatusCode.Forbidden) throw error
+
+        
+    }
+}
+
+export const handleRecruiterPermissions = async (recrutierId: string, action: "Revoke" | "Un-Revoke") => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_PERMISSIONS(recrutierId), null, {
+            params:{action},
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while blocking the candidate', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError  && err.response.status !== HttpStatusCode.Forbidden) throw error
+    }
+}
+
+export const changeStatusToUnderReview = async (applicationId: string) => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.CHANGE_STATUS_UNDER_REVIEW(applicationId), null,
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+    return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        console.log('--Error occured--', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }

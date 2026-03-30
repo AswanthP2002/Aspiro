@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { CgClose } from 'react-icons/cg';
 import { Company } from '../../types/entityTypes';
+import { toast } from 'react-toastify';
 
 interface RootState {
     userAuth: {
@@ -97,6 +98,7 @@ export default function RecruiterRegisterPage() {
 
         setLoading(true);
         try {
+            console.log('-->>> checking professional title before submiting -- ', data.professionalTitle)
             const formData = new FormData()
             formData.append("recruiterType", data.employerType)
             formData.append("fullName", data.fullName)
@@ -109,6 +111,10 @@ export default function RecruiterRegisterPage() {
                 formData.append("companyId", data.companyId)
             }
             formData.append("document", verificationDoc)
+            console.log('-- checking fordata converted -->>')
+            for(const [key, value] of formData.entries()){
+                console.log(`${key}: ${value}`)
+            }
             const result = await createRecruiterService(formData)
 
                Swal.fire({
@@ -122,7 +128,7 @@ export default function RecruiterRegisterPage() {
                     timer:2000
                 }).then(() => navigate('/profile/recruiter/overview'))
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 2000})
+           toast.error(error instanceof Error ? error.message : 'Something went wrong')
             
         } finally {
             setLoading(false)

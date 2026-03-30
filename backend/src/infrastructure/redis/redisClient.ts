@@ -23,4 +23,3 @@ export const connectRedis = async () => {
     console.log('Error occured while connecting redis', error);
   }
 };
-

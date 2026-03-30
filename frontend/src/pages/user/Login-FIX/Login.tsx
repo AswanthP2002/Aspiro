@@ -62,7 +62,7 @@ export default function UserLogin(): React.ReactNode{
         const {email, password} = data
         try {
             const result: LoginResultPayload = await userLogin(email, password)
-            console.log('Result from the backend', result?.result)
+            console.log('Login result from the backend--', result?.result)
 
             if(result?.success && result?.result){
                 dispatcher(loginSuccess({
@@ -128,7 +128,7 @@ export default function UserLogin(): React.ReactNode{
                     
                 </div>
                 <div className="right col-span-12 md:col-span-5 flex flex-col items-center justify-center">
-                    <div>
+                    <div className="px-10">
                         <p className="font-semibold text-2xl">Aspiro</p>
                         <div className="mt-15">
                             <p className="font-semibold text-xl">Welcome back!</p>

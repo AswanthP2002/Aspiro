@@ -3,7 +3,5 @@ import RecruiterLoginDTO, {
 } from '../../../DTOs/recruiter/recruiterLogin.dto';
 
 export default interface ILoginRecruiterrUseCase {
-  execute(
-    loginRecruiterDto: RecruiterLoginDTO
-  ): Promise<RecruiterLoginResDTO | null>;
+  execute(loginRecruiterDto: RecruiterLoginDTO): Promise<RecruiterLoginResDTO | null>;
 }

@@ -16,6 +16,8 @@ export enum UserRoutes {
     REGISTER = '/register',
     STORE_BASIC_DETAILS = '/store/details',
     APPLICATION_SUCCESS_PAGE = '/job/application/success-state',
-    FAVORITE_JOBS = 'favorites'
+    FAVORITE_JOBS = 'favorites',
+    MY_APPLICATIONS = 'my-applications',
+    MY_APPLICATION_TRACK = 'my-application/:id'
 
 }

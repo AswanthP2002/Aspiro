@@ -1,15 +1,15 @@
 import { Exclude, Expose } from 'class-transformer';
-import Follow from '../../../domain/entities/follow.entity';
-import Job from '../../../domain/entities/recruiter/job.entity';
-import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
-import SocialLinks from '../../../domain/entities/SocialLinks';
-import Certificates from '../../../domain/entities/user/certificates.entity';
-import Education from '../../../domain/entities/user/educations.entity';
-import Experience from '../../../domain/entities/user/experience.entity';
-import Post from '../../../domain/entities/user/Post';
-import Skills from '../../../domain/entities/user/skills.entity';
-import { Role } from '../../../domain/entities/user/User.FIX';
-import ConnectionRequest from '../../../domain/entities/user/connectionRequest.entity';
+import Follow from '../../../domain/entities/follow/follow.entity';
+import Job from '../../../domain/entities/job/job.entity';
+import Recruiter, { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
+import Certificates from '../../../domain/entities/certificate/certificates.entity';
+import Education from '../../../domain/entities/education/educations.entity';
+import Experience from '../../../domain/entities/experience/experience.entity';
+import Post from '../../../domain/entities/post/Post';
+import Skills from '../../../domain/entities/skill.user/skills.entity';
+import { AccountAction, Role } from '../../../domain/entities/user/User.FIX';
+import ConnectionRequest from '../../../domain/entities/connection/connectionRequest.entity';
 
 @Exclude()
 export default class UserProfileAggregatedDTO {
@@ -157,7 +157,7 @@ export interface UserPublicProfileDTO {
 
   posts: Post[];
 
-  recruiterProfile: Recruiter;
+  recruiterProfile: NewRecruiter;
 
   jobs: Job[];
 
@@ -195,6 +195,8 @@ export interface AdminUserDetailsDTO {
   isBanned?: boolean;
   isVerified?: boolean;
   isBlocked?: boolean;
+  accountActions?: AccountAction[];
+  googleId?: string;
   createdAt?: string;
   updatedAt?: string;
   experiences: Experience[];

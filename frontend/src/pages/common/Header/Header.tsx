@@ -5,7 +5,7 @@ import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCirclePlus} from 'react-icons/fa6'
 import { logout } from "../../../redux/userAuthSlice"
 import Swal from "sweetalert2"
-import { userLogout, getNotifications } from "../../../services/userServices"
+import { userLogout } from "../../../services/userServices"
 import { useContext, useEffect, useState } from "react"
 import { appContext } from "../../../context/AppContext"
 import { Notify } from "notiflix"
@@ -68,16 +68,16 @@ export default function Header(){
 
     }
 
-    useEffect(() => {
-        if(user){
-            (async function(){
-                const result = await getNotifications()
-                console.log('notficiations', result.notifications)
-                // notificationstest = result?.notifications
-                setNotifications(result.notifications)
-            })
-        }
-    }, [user])
+    // useEffect(() => {
+    //     if(user){
+    //         (async function(){
+    //             const result = await getNotifications()
+    //             console.log('notficiations', result.notifications)
+    //             // notificationstest = result?.notifications
+    //             setNotifications(result.notifications)
+    //         })
+    //     }
+    // }, [user])
     
     return(
         <div className="w-full sticky top-0 left-0 bg-white border-b border-gray-200 z-59">

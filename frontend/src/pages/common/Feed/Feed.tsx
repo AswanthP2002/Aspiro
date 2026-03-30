@@ -1,14 +1,16 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { createPost, getPosts } from "../../../services/userServices";
 import { useSelector } from "react-redux";
 import { UserPosts } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
 import { CiImageOn, CiVideoOn } from "react-icons/ci"
 import { Controller, useForm } from "react-hook-form";
-import { FormControl, FormHelperText } from "@mui/material";
+import { FormControl, FormHelperText, Skeleton } from "@mui/material";
 import { FaCircleXmark } from "react-icons/fa6";
 import { PostContext } from "../../../context/PostContext";
 import Post from "../../../components/common/Post";
+import { toast } from "react-toastify";
+import { GoFileMedia } from "react-icons/go";
 
 interface CreatePostResponsePayload {
     success: boolean
@@ -19,6 +21,7 @@ interface CreatePostResponsePayload {
 interface RootState {
     userAuth: {
         user: {
+            _id: string
             profilePicture: string,
             name: string
         }
@@ -36,11 +39,21 @@ export default function Feed() {
         description: string
     }
 
+    const currentlyLogedUserDetails = useSelector((state: RootState) => {
+        return state.userAuth.user
+    })
+
     const [mediaFile, setMediaFile] = useState<File | null>(null)
     const [mediaPreview, setMediaPreview] = useState<string>('')
     const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null)
     const [progress, setProgress] = useState(0)
     const [isUploading, setIsUploading] = useState<boolean>(false)
+    const [loading, setLoading] = useState(false)
+    const [hasMore, setHasMore] = useState(true)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(4)
+
+    const observer = useRef<any>(null)
     
     const mediaFileRef = useRef<HTMLInputElement | null>(null)
 
@@ -109,7 +122,20 @@ export default function Feed() {
 
             if(result.success){
                 Notify.success(result?.message, {timeout:2000})
-                setUserPosts((prev: UserPosts[]) => [result.result, ...(prev || [])])
+                setUserPosts((prev: UserPosts[]) => {
+                    return [
+                        {
+                            ...result.result,
+                            userDetails:{
+                                name: currentlyLogedUserDetails.name,
+                                profilePicture:{
+                                    cloudinarySecureUrl: currentlyLogedUserDetails.profilePicture
+                                }
+                            }
+                        }, 
+                        ...(prev || [])
+                    ]
+                })
             }else{
                 Notify.failure(result?.message, {timeout:2000})
             }
@@ -125,28 +151,50 @@ export default function Feed() {
        // Notify.success('done', {timeout:2000})
     }
 
+    const lastPostObservComponentRef = useCallback((node) => {
+        if(loading) return
+        if(observer.current) observer.current.disconnect()
+
+        observer.current = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting){
+                setPage(prv => prv + 1)
+            }
+        })
+
+        if(node){
+            observer.current.observe(node)
+        }
+    }, [loading])
+
     useEffect(() => {
-        (async function(){
+        if(hasMore){
+            (async function(){
+            setLoading(true)
             try {
-                const result = await getPosts()
+                const result = await getPosts(page, limit)
                 console.log('pposts from backend', result)
                 if(result.success){
                     setPostsLoading(false)
                     //setPosts(result.result)
-                    setUserPosts(result?.result)
+                    setUserPosts((prv) => [...prv, ...result.result])
+                    setHasMore(result?.result.length > 0)
+                    //setLoading(false)
                 }else{
-                    Notify.failure('Something went wrong', {timeout:3000})
+                    toast.error(result?.message)
                 }
             } catch (error : unknown) {
-                Notify.failure('Something went wrong', {timeout:3000})
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            } finally {
+                setTimeout(() => {
+                    setLoading(false)
+                }, 2000);
             }
         })()
-
-        setPostsLoading(false)
+        }
 
         //update post like real time using socket
     
-    }, [])
+    }, [page])
     
 
     return (
@@ -226,10 +274,38 @@ export default function Feed() {
                 {
                     userPosts && userPosts?.length > 0 && (
                     userPosts.map((post: UserPosts, index: number) => (
-                        <Post key={index} postData={post} loading={false} />
+                        <div ref={userPosts.length === index + 1 ? lastPostObservComponentRef : null} key={post._id}>
+                            <Post postData={post} />
+                        </div>
                     )) 
                     )
                 }
+                {loading && (
+                    <div className="bg-gray-200 rounded-md">
+                        <div className="flex gap-3 p-5">
+                            <div>
+                                <Skeleton variant="circular" height={40} width={40} />
+                            </div>
+                            <div className="flex-1">
+                                <Skeleton height={18} width={200} />
+                                <Skeleton height={18} width={130} style={{marginTop: 6}} />
+                            </div>
+                        </div>
+                        <div className="">
+                            <Skeleton variant="rectangular" animation="wave" height={250} style={{transform: 'scal(1, 1)'}} />
+                        </div>
+                        <div className="p-5">
+                            <Skeleton height={18} />
+                            <Skeleton height={18} width="70%" style={{marginTop: 6}} />
+                        </div>
+                    </div>
+                )}
+                {userPosts.length === 0 && (
+                    <div className="flex flex-col items-center mt-10">
+                        <GoFileMedia size={35} color="gray" />
+                        <p className="text-xs text-gray-500 mt-2">No post available</p>
+                    </div>
+                )}
                 
             </div>
             

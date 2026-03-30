@@ -1,6 +1,6 @@
 import { Modal, Box, Typography, FormControl, TextField, InputLabel, Select, MenuItem, FormHelperText, Checkbox, FormControlLabel, Button } from "@mui/material";
-import Swal from "sweetalert2";
-import { addUserExperience } from "../../../services/userServices";
+// import { addUserExperience } from "../../../services/userServices";
+import { addUserExperience } from "../../../services/experienceServices";
 import { Controller, useForm } from "react-hook-form";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -8,8 +8,10 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { Dayjs } from "dayjs";
 import { useState } from "react";
-import { Notify } from "notiflix";
 import { Experience } from "../../../types/entityTypes";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
+import { Textarea } from "@mui/joy";
 
 interface AddExperienceResponsePayload {
   success: boolean
@@ -17,17 +19,24 @@ interface AddExperienceResponsePayload {
   result: Experience
 }
 
-export default function AddExperienceForm({experiencemodalopen, closeModal, onAddExperience} : any){
+interface AddExperienceFormProps {
+  experiencemodalopen: boolean
+  closeModal: () => void
+  onAddExperience: (data: Experience) => void
+}
+
+export default function AddExperienceForm({experiencemodalopen, closeModal, onAddExperience} : AddExperienceFormProps){
   
   type Inputs = {
     role:string
     jobType:string
     organization:string
-    startDate:Dayjs
-    endDate : any
+    startDate:Dayjs | null
+    endDate? : Dayjs | null
     location:string
     workMode : string
     isPresent: boolean 
+    description: string
   }
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -39,40 +48,47 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
       organization:'',
       location:'',
       workMode:'',
-      isPresent:false
+      startDate: null,
+      endDate: null,
+      isPresent:false,
+      description: ''
     }
   })
       
         async function addExperience(data : Inputs){
           setLoading(true)
-          const {role, jobType, organization, startDate, endDate, location, workMode, isPresent } = data
+          const {role, jobType, organization, startDate, endDate, location, workMode, isPresent, description } = data
           console.log(data)
-          const formatedStartDate = startDate.format("YYYY-MM-DD")
+          const formatedStartDate = startDate ? startDate.format("YYYY-MM-DD") : ""
           const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
                 try {
-                  const result: AddExperienceResponsePayload = await addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate)
-                      Swal.fire({
-                          icon:'success',
-                          title:'Added',
-                          text:result?.message,
-                          showConfirmButton:false,
-                          showCancelButton:false,
-                          timer:3000
-                      }).then(() => {
+                  const result: AddExperienceResponsePayload = await toast.promise(
+                    addUserExperience(role, jobType, location, workMode, organization, isPresent, formatedStartDate, formatedEndDate, description),
+                    {
+                      pending: 'Adding experience...',
+                      success: 'Experience added',
+                      error:{
+                        render(props) {
+                          const data = props.data as AxiosError<{message: string}>
+                          return data.message
+                        },
+                      }
+                    }
+                  )
                         onAddExperience(result.result)
                         reset({
                           jobType:'',
                           role:'',
                           organization:'',
-                          startDate:'',
-                          endDate:'',
+                          startDate:null,
+                          endDate:null,
                           location:'',
                           workMode:'',
-                          isPresent:false
+                          isPresent:false,
+                          description: ''
                         })
-                      })
                 } catch (error: unknown) {
-                  Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                  toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 } finally {
                   setLoading(false)
                   closeModal()
@@ -91,12 +107,13 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
         bgcolor: 'background.paper',
         borderRadius: 2,
         boxShadow: 24,
+        overflowY: 'auto',
         p: 4,
     };
 
     return(
-        <Modal open={experiencemodalopen} onClose={closeModal}>
-        <Box sx={style}>
+        <Modal open={experiencemodalopen} className="flex items-center justify-center" onClose={closeModal}>
+        <div className="bg-white w-lg lg:w-md p-3 rounded-md max-h-[600px] !overflow-y-scroll">
             <div className='w-full flex justify-end'>
                 <button onClick={closeModal} type="button" className=""><i className="fa-solid fa-close"></i></button>
             </div>
@@ -262,10 +279,27 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
             
           </Box>
           <Box sx={{width:'100%', marginTop:'10px'}}>
+            <FormControl fullWidth error={Boolean(errors.description)}>
+              {/* <InputLabel id="work-mode-label">Description</InputLabel> */}
+              <Controller
+                name="description"
+                control={control}
+                rules={{
+                  required:{value:true, message:'Description can not be emtpy'}
+                }}
+                render={({field}) => {
+                  return <Textarea {...field} sx={{height: '150px'}} placeholder="Write about your work experience..." />
+                }}
+              />
+              <FormHelperText>{errors.description?.message as string}</FormHelperText>
+            </FormControl>
+            
+          </Box>
+          <Box sx={{width:'100%', marginTop:'10px'}}>
             <Button type="submit" fullWidth variant="contained" color="info" loading={loading}>Add Experience</Button>
           </Box>
           </form>
-        </Box>
+        </div>
       </Modal>
     )
 }

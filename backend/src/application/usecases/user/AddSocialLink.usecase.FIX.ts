@@ -1,4 +1,4 @@
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import AddSocialLinkDTO from '../../DTOs/user/socialLink.dto.FIX';
 import IAddSocialLinkUsecase from '../../interfaces/usecases/user/IAddSocialLink.usecase.FIX';
 import { inject, injectable } from 'tsyringe';

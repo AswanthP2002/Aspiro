@@ -1,24 +1,30 @@
 import { Button, FormControl, FormHelperText, Modal } from "@mui/material";
 import React, { useRef, useState } from "react";
-import { addUserCertificate } from "../../../services/userServices";
+import { addUserCertificate } from "../../../services/certificateServices";
 import { Controller, useForm } from "react-hook-form";
 import { CgClose } from "react-icons/cg";
 import { BiUpload } from "react-icons/bi";
-import { Notify } from "notiflix";
 import { IoCloseCircle } from "react-icons/io5";
-import { Certificates, Resumes } from "../../../types/entityTypes";
+import { Certificates } from "../../../types/entityTypes";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
-interface AddCertificateResponsePayload {
-    success: boolean
-    message: string
-    result: Certificates
+// interface AddCertificateResponsePayload {
+//     success: boolean
+//     message: string
+//     result: Certificates
+// }
+
+interface AddCertificateModalProps {
+    certificateModalOpen: boolean
+    closeCertificateModal: () => void
+    onCertificateAdd: (data: Certificates) => void
 }
 
-export default function AddCertificateForm({certificateModalOpen, closeCertificateModal, onCertificateAdd} : any) {
+export default function AddCertificateForm({certificateModalOpen, closeCertificateModal, onCertificateAdd} : AddCertificateModalProps) {
 
-    const [certificate, setCertificate] = useState<any>(null)
+    const [certificate, setCertificate] = useState<File | null>(null)
     const [fileName, setFileName] = useState<string>('')
-    const [certificateError, setCertificateError]  = useState('')
     const [loading, setLoading] = useState<boolean>(false)
 
     const fileRef = useRef<HTMLInputElement | null>(null)
@@ -30,17 +36,19 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
     }
 
     const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target?.files[0]
+        const file = e.target.files ? e.target.files[0] : null
         if(file){
             setCertificate(file)
-            setFileName(file.name)
+            setFileName(file.name || '')
         }
     }
 
     const removeFileSelect = () => {
         setCertificate(null)
         setFileName('')
-        fileRef.current.value = ''
+        if(fileRef.current){
+            fileRef.current.value = ''
+        }
     }
 
     type Inputs = {
@@ -49,41 +57,14 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
        issuedDate: string
     }
 
-    const {watch, control, handleSubmit, register, formState:{errors}} = useForm<Inputs>()
-
-    // const style = {
-    //     position: 'absolute',
-    //     top: '50%',
-    //     left: '50%',
-    //     transform: 'translate(-50%, -50%)',
-    //     width: 'auto',
-    //     minWidth: 250,
-    //     bgcolor: 'background.paper',
-    //     borderRadius: 2,
-    //     boxShadow: 24,
-    //     p: 4,
-    // };
-
-    function selectFile(event : any) {
-        const file = event.target.files[0]
-        if(file){
-            setCertificate(file)
-        }
-    }
-
-    async function dummySubmit(data: Inputs): Promise<void> {
-        Notify.success('Success')
-    }
+    const {control, handleSubmit, formState:{errors}} = useForm<Inputs>()
 
     async function addCertificate(data : Inputs) : Promise<void> {
         
         if(!certificate){
             return
         }
-        // closeCertificateModal()
-        // console.log('This is from data property', data)
-        // console.log('this is watch property', watch().date.format('DD-MM-YYYY'))
-        // console.log('this is certificate', certificate)
+
         const {issuedOrganization, issuedDate, name} = data
 
         const formData = new FormData()
@@ -92,30 +73,35 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
         formData.append('issuedOrganization', issuedOrganization)
         formData.append('issuedDate', issuedDate)
         formData.append('name', name)
-
-        //return
+        
         try {
-            setLoading(true)
-            // const formData = new FormData()
-            // formData.append('certificate', certificate)
-            // formData.append('issuedOrganization', issuingOrganization)
-            // formData.append('issuedDate', issuedDate)
-            // formData.append('id', certificateId)
+            const response = await toast.promise(
+                addUserCertificate(formData),
+                {
+                    pending:'Adding certificate...',
+                    success: 'Certificate added succesfully',
+                    error:{
+                        render(props) {
+                            const data = props.data as AxiosError<{message: string}>
+                            return data.message || 'Something went wrong'
+                        },
+                    }
+                }
+            )
 
-            const result: AddCertificateResponsePayload = await addUserCertificate(formData)
-
-            if(result?.success){
-                Notify.success(result?.message, {timeout: 3000})
-                onCertificateAdd(result.result)
-            }else{
-                Notify.failure('Something went wrong', {timeout: 3000})
+            console.log('- checking certificate add result -', response)
+            if(response.success){
+                
+                onCertificateAdd(response.result)
             }
-        } catch (error : unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+        } catch (error: unknown) {
+            console.log('Error occured', error)
         } finally {
             setLoading(false)
             closeCertificateModal()
         }
+        
+        return
     }
 
     return (

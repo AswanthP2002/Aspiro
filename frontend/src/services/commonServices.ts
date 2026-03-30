@@ -1,4 +1,5 @@
 //candidate services :: recruiter services :: adminservices ::
+import { JobsEndpoints } from "../constants/endPoints/jobs.endpoints"
 import { EndPoints } from "../constants/endPoints/user.endpoints"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { AxiosError } from "axios"
@@ -505,7 +506,7 @@ export const recruiterService = {
 
 export const loadJobDetails = async (jobId : string) => {
     try {
-        const response = await axiosInstance.get(`/jobs/details/${jobId}`)
+        const response = await axiosInstance.get(JobsEndpoints.FETCH_JOB_DETAILS_BY_ID(jobId))
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError

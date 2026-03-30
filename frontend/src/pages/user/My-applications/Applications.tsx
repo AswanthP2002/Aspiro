@@ -12,6 +12,7 @@ import { formattedDateMoment } from '../../../services/util/formatDate';
 import { LuFileUser, LuSearch } from 'react-icons/lu';
 import { currencyFormatter } from '../../../helpers/Currency.helper';
 import { FaClock } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const dummyJobs = [
   {
@@ -52,6 +53,29 @@ export default function MyApplications() {
 
     navigate(`/jobs/${jobId}`)
   }
+
+  const searchJobApplication = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+  }
+
+  const dbouncedSearch = (fn: Function, delay: number) => {
+    let timer: any
+    return function(...args: any){
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+          fn(...args)
+      }, delay);
+    }
+  }
+
+  const dSearch = dbouncedSearch(searchJobApplication, 500)
+
+  const navigateToApplicationDetailsPage = (applicationId: string) => {
+    toast.info('redirecting to application tracking page')
+    if(!applicationId) return
+    navigate(`/profile/my-application/${applicationId}`, {state:{applicationId: applicationId}})
+  }
   // function formatLocalDateTime(date?: string) {
   //   return moment(date).format('DD MMM YYYY, h:mm a');
   // }
@@ -85,7 +109,7 @@ export default function MyApplications() {
         setLoading(false);
       }
     })()
-  }, [search, page, status, sort]);
+  }, [search, page, status, sort, limit]);
 
   const getStatusPhills = (status: string): React.ReactNode => {
     switch(status){
@@ -115,14 +139,14 @@ export default function MyApplications() {
             <p>Back</p>
           </button>
           <div>
-            <p className='font-semibold text-xl'>My Applications ({totalDocs})</p>
+            <p className='font-semibold text-xl'>My Applications</p>
             <p className='text-xs text-gray-500'>Track and manage your applications</p>
             <p></p>
           </div>
           <div className="mt-5 bg-white w-full grid gap-2 grid-cols-12 rounded-md p-2 border border-slate-200">
             <div className="col-span-12 rounded-md flex items-center gap-2 p-2 bg-gray-100">
               <LuSearch />
-              <input type="text" className='!text-xs w-full' placeholder='Search job title' />
+              <input onChange={(e) => dSearch(e)} type="text" className='!text-xs w-full' placeholder='Search job title' />
             </div>
             <div className="col-span-6 bg-gray-100 p-2 relative rounded-md">
                 <div className="flex items-center justify-between">
@@ -178,7 +202,7 @@ export default function MyApplications() {
                         </div>
                         <div className='space-x-2'>
                           <button onClick={() => navigatetoJobDetailsPage(application.jobDetails?._id as string)} className='px-3 py-2 text-xs font-medium rounded-md border border-slate-300'>View Job</button>
-                          <button className='px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-md'>View Application</button>
+                          <button onClick={() => navigateToApplicationDetailsPage(application._id as string)} className='px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-md'>View Application</button>
                         </div>
                       </div>
                     </div>

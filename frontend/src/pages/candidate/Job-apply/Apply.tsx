@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
-import { addUserResume, candidateApplyJob, getSavedJobs, loadUserResumes } from "../../../services/userServices"
+import { candidateApplyJob, getSavedJobs } from "../../../services/userServices"
+import { addUserResume, loadUserResumes } from "../../../services/resumeServices"
 import { JobDetails, JobDetailsForPublicData, Resumes } from "../../../types/entityTypes"
 import { BsArrowLeft, BsEye, BsUpload } from "react-icons/bs"
 import { BiClipboard, BiRupee } from "react-icons/bi"
@@ -11,6 +12,7 @@ import { FaUserTie } from "react-icons/fa"
 import { CiCircleCheck } from "react-icons/ci"
 import { Notify } from "notiflix"
 import { LuFileText } from "react-icons/lu"
+import { toast } from "react-toastify"
 
 export default function JobApplyPage() {
     
@@ -122,13 +124,15 @@ export default function JobApplyPage() {
                 formData.append('resume', resume);
 
                 resumeResult = await addUserResume(formData);
-                setSavedResumeId(resumeResult?.resumeId)
+                console.log('-- recently uploadred recume id response--', resumeResult, resumeResult?.result?._id)
+                setSavedResumeId(resumeResult?.result?._id)
                 if (!resumeResult?.success) {
                     throw new Error(resumeResult?.message || 'Failed to upload resume.');
                 }
             }
+            // toast.info('Testing done')
 
-            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, savedResumeId);
+            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, savedResumeId || resumeResult?.result?._id);
 
             if (!applicationResult?.success) {
                 throw new Error(applicationResult?.message || 'Failed to submit application.');
@@ -148,7 +152,8 @@ export default function JobApplyPage() {
                         companyName: jobDetails?.companyProfileDetails?.name,
                         workMode: jobDetails?.workMode, 
                         minSalary: jobDetails?.minSalary, 
-                        maxSalary: jobDetails?.maxSalary
+                        maxSalary: jobDetails?.maxSalary,
+                        applicationId: applicationResult?.result?._id || ''
                     }
                 });
             });

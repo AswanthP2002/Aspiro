@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import JobLevel from '../../../../domain/entities/admin/jobLevel.entity';
+import JobLevel from '../../../../domain/entities/jobLevel/jobLevel.entity';
 
 export const JobLevelSchema = new Schema<JobLevel>(
   {
@@ -10,5 +10,4 @@ export const JobLevelSchema = new Schema<JobLevel>(
   { timestamps: true }
 );
 
-
-export const JobLevelDAO = model<JobLevel>('joblevel', JobLevelSchema)
+export const JobLevelDAO = model<JobLevel>('joblevel', JobLevelSchema);

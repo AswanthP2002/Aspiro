@@ -1,5 +1,5 @@
-import Post from '../entities/user/Post';
-import PostsAggregated from '../entities/PostsAggregated.entity';
+import Post from '../entities/post/Post';
+import PostsAggregated from '../entities/post/PostsAggregated.entity';
 import IBaseRepo from './IBaseRepo';
 
 export default interface IPostRepo extends IBaseRepo<Post> {
@@ -7,5 +7,5 @@ export default interface IPostRepo extends IBaseRepo<Post> {
   unlikePost(postId: string, userId: string): Promise<Post | null>;
   getPostById(postId: string): Promise<Post | null>;
   getPostByUserId(userId: string): Promise<Post | null>;
-  getPosts(hiddenList: string[]): Promise<PostsAggregated[] | null>;
+  getPosts(hiddenList: string[], page: number, limit: number): Promise<PostsAggregated[] | null>;
 }

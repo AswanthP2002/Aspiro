@@ -1,5 +1,5 @@
-import FavoriteJobs from '../../entities/user/favoriteJobs.entity';
-import FavoriteJobsAggregated from '../../entities/user/favoriteJobsAggregated.entity';
+import FavoriteJobs from '../../entities/savedJob/favoriteJobs.entity';
+import FavoriteJobsAggregated from '../../entities/savedJob/favoriteJobsAggregated.entity';
 
 import IBaseRepo from '../IBaseRepo';
 

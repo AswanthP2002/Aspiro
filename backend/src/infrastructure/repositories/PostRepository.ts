@@ -1,9 +1,9 @@
-import Post from '../../domain/entities/user/Post';
+import Post from '../../domain/entities/post/Post';
 import IPostRepo from '../../domain/interfaces/IPostRepo';
 import BaseRepository from './baseRepository';
 import { PostDAO } from '../database/DAOs/post.dao';
 import mongoose from 'mongoose';
-import PostsAggregated from '../../domain/entities/PostsAggregated.entity';
+import PostsAggregated from '../../domain/entities/post/PostsAggregated.entity';
 
 export default class PostRespository extends BaseRepository<Post> implements IPostRepo {
   constructor() {
@@ -29,9 +29,14 @@ export default class PostRespository extends BaseRepository<Post> implements IPo
     return result;
   }
 
-  async getPosts(hiddenList: string[]): Promise<PostsAggregated[] | null> {
+  async getPosts(
+    hiddenList: string[],
+    page: number,
+    limit: number
+  ): Promise<PostsAggregated[] | null> {
+    const skip = (page - 1) * limit;
     const result = await PostDAO.aggregate([
-      { $match: { _id: { $nin: hiddenList } } },
+      //{ $match: { _id: { $nin: hiddenList } } }, commented this for testing other posts availability
       {
         $lookup: {
           from: 'users',
@@ -40,7 +45,7 @@ export default class PostRespository extends BaseRepository<Post> implements IPo
           as: 'userDetails',
         },
       },
-      { $unwind: '$userDetails' },
+      { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: 'comments',
@@ -56,11 +61,13 @@ export default class PostRespository extends BaseRepository<Post> implements IPo
                 as: 'userDetails',
               },
             },
-            { $unwind: '$userDetails' },
+            { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
           ],
         },
       },
       { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
     ]);
 
     return result;

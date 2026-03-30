@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 import FollowController from '../controllers/followController';
 import { container } from 'tsyringe';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
@@ -20,6 +20,24 @@ function createFollowRouter() {
     centralizedAuthentication,
     authorization(['user']),
     followController.unfollowUser.bind(followController)
+  );
+  followRouter.get(
+    FollowApiRoutes.GET_FOLLOWERS,
+    centralizedAuthentication,
+    authorization(['user']),
+    followController.getFollowers.bind(followController)
+  );
+  followRouter.get(
+    FollowApiRoutes.GET_FOLLOWINGS,
+    centralizedAuthentication,
+    authorization(['user']),
+    followController.getFollowings.bind(followController)
+  );
+  followRouter.delete(
+    '/v2/follower/:followerId/remove',
+    centralizedAuthentication,
+    authorization(['user']),
+    followController.removeAFollower.bind(followController)
   );
   //   followRouter.get(
   //     '/followers',

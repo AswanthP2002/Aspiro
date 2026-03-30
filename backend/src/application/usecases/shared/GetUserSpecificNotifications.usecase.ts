@@ -1,17 +1,19 @@
 import { inject, injectable } from 'tsyringe';
-import IGetUserSpecificNotificationUsecase from '../../interfaces/usecases/shared/IGetUserSpecificNotifications.usecase';
+import IGetUserSpecificNotificationUsecase from '../../interfaces/usecases/notification/IGetUserSpecificNotifications.usecase';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
-import { NotificationDTO } from '../../DTOs/notifications.dto';
-import mapToNotificationDTO from '../../mappers/mapToCreateNotificationDTO.mapper';
-import Notification from '../../../domain/entities/notification.entity';
-import GetNotificationsDTO from '../../DTOs/user/getNotifications.dto';
+import { NotificationDTO } from '../../DTOs/notification/notifications.dto';
+// import mapToNotificationDTO from '../../mappers/notification/mapToCreateNotificationDTO.mapper';
+import Notification from '../../../domain/entities/notification/notification.entity';
+import GetNotificationsDTO from '../../DTOs/notification/getNotifications.dto';
+import NotificationMapper from '../../mappers/notification/Notification.mapperClass';
 
 @injectable()
 export default class GetUserSpecificNotificationsUsecase implements IGetUserSpecificNotificationUsecase {
-  constructor(@inject('INotificationRepository') private _notificationRep: INotificationRepo) {}
-  async execute(
-    dto: GetNotificationsDTO
-  ): Promise<{ notifications: NotificationDTO[]; unRead: number; hasMore: boolean } | null> {
+  constructor(
+    @inject('INotificationRepository') private _notificationRep: INotificationRepo,
+    @inject('NotificationMapper') private _mapper: NotificationMapper
+  ) {}
+  async execute(dto: GetNotificationsDTO): Promise<{ notifications: NotificationDTO[] } | null> {
     const { type, status, limit, page, logedUserId, offSet } = dto;
     let notificationTypes = [
       'LIKE',
@@ -60,10 +62,10 @@ export default class GetUserSpecificNotificationsUsecase implements IGetUserSpec
     }
 
     switch (status) {
-      case 'read':
+      case 'READ':
         notificationStatus = [true];
         break;
-      case 'unread':
+      case 'UNREAD':
         notificationStatus = [false];
         break;
       default:
@@ -83,17 +85,13 @@ export default class GetUserSpecificNotificationsUsecase implements IGetUserSpec
       const notificationDto: NotificationDTO[] = [];
 
       notifications.notifications.forEach((notification: Notification) => {
-        notificationDto.push(mapToNotificationDTO(notification));
+        notificationDto.push(
+          this._mapper.notificationWithActorDetailsToNotificationDTO(notification)
+        );
       });
-
-      const unReadNotificationsCount = notificationDto.filter(
-        (notification: NotificationDTO) => !notification.isRead
-      ).length;
 
       return {
         notifications: notificationDto,
-        unRead: unReadNotificationsCount,
-        hasMore: notifications.hasMore,
       };
     }
     return null;

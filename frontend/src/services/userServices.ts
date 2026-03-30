@@ -1,9 +1,10 @@
-import axios, { AxiosError, AxiosProgressEvent } from "axios";
+import axios, { AxiosError, AxiosProgressEvent, HttpStatusCode } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import { Notify } from "notiflix";
 import { logout } from "../redux/userAuthSlice";
 import { EndPoints } from "../constants/endPoints/user.endpoints";
 import { toast } from "react-toastify";
+import { JobsEndpoints } from "../constants/endPoints/jobs.endpoints";
 
 const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
 console.log('Access token for geocode api', import.meta.env)
@@ -124,10 +125,8 @@ export const userLogout = async (dispatch : Function, navigate : Function) => {
                 sendAuthToken:true
             } as AxiosRequest
         )
-
-        toast.info('Logout successfull')
         dispatch(logout())
-        navigate('/login')
+        //navigate('/login')
 
         return response.data
     } catch (error : unknown) {
@@ -209,337 +208,337 @@ export const editUserProfile = async (name?: string, headline?: string, city?: s
     }
 }
 
-export const getUserExperiences = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_EXPERIENCES,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const getUserExperiences = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_EXPERIENCES,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while geting candidate experiences', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while geting candidate experiences', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// } //moved to seperate service for modularity
 
-export const getUserSkills = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_SKILLS,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+// export const getUserSkills = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_SKILLS,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log('Error occured while geting candidate skills', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         console.log('Error occured while geting candidate skills', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } // moved for modularity
 
-export const addUserSkill = async (skillType : string, skill : string, skillLevel : string) => {
-    try {
-        const response = await axiosInstance.post(EndPoints.ADD_SKILL, 
-            {skillType, skill, skillLevel},
-            {
-                headers:{"Content-Type":'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const addUserSkill = async (skillType : string, skill : string, skillLevel : string) => {
+//     try {
+//         const response = await axiosInstance.post(EndPoints.ADD_SKILL, 
+//             {skillType, skill, skillLevel},
+//             {
+//                 headers:{"Content-Type":'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('--error occured while adding skill--', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 401){
-            throw error
-        }
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('--error occured while adding skill--', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 401){
+//             throw error
+//         }
+//     }
+// } // moved for modularty
 
-export const getUserEducations = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_EDUCATIONS,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const getUserEducations = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_EDUCATIONS,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log('Error occured while geting candidate education', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         console.log('Error occured while geting candidate education', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } mmoved for modularity
 
-export const addUserExperience = async (jobRole: string, jobType: string, location: string, workMode: string, organization: string, isPresent: boolean, startDate: string, endDate: string) => {
-    try {
-        const response = await axiosInstance.post(EndPoints.ADD_EXPERIENCE,
-            {jobRole, jobType, location, workMode, organization, isPresent, startDate, endDate},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const addUserExperience = async (jobRole: string, jobType: string, location: string, workMode: string, organization: string, isPresent: boolean, startDate: string, endDate: string) => {
+//     try {
+//         const response = await axiosInstance.post(EndPoints.ADD_EXPERIENCE,
+//             {jobRole, jobType, location, workMode, organization, isPresent, startDate, endDate},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while adding candidat experience', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while adding candidat experience', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// } //moved to seperate service for modularity
 
-export const editUserExperience = async (experienceId: string, jobRole: string, jobType: string, organization: string, isPresent: boolean, startDate: string, endDate: string, location: string, workMode: string) => {
-    try {
-        const response = await axiosInstance.put(EndPoints.EDIT_EXPERIENCE(experienceId),
-            {jobRole, jobType, organization, isPresent, startDate, endDate, location, workMode},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while editing candidate experience', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+// export const editUserExperience = async (experienceId: string, jobRole: string, jobType: string, organization: string, isPresent: boolean, startDate: string, endDate: string, location: string, workMode: string) => {
+//     try {
+//         const response = await axiosInstance.put(EndPoints.EDIT_EXPERIENCE(experienceId),
+//             {jobRole, jobType, organization, isPresent, startDate, endDate, location, workMode},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while editing candidate experience', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// } // moved for modularity
 
-export const deleteUserExperience = async (expId? : string) => {
-    try {
-        const response = await axiosInstance.delete(EndPoints.DELETE_EXPERIENCE(expId as string),
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const deleteUserExperience = async (expId? : string) => {
+//     try {
+//         const response = await axiosInstance.delete(EndPoints.DELETE_EXPERIENCE(expId as string),
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while deleting experience', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while deleting experience', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } moved for modularity
 
-export const deleteUserSkill = async (skillId : string) => {
-    try {
-        const response = await axiosInstance.delete(`/v1/user/me/skills/${skillId}`,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const deleteUserSkill = async (skillId : string) => {
+//     try {
+//         const response = await axiosInstance.delete(`/v1/user/me/skills/${skillId}`,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
         
-        console.log('Error occured while deleting skills', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         console.log('Error occured while deleting skills', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } moved for modularity
 
-export const fetchUserAlerts = async () => {
-    try {
-        const response = await axiosInstance.get('/v1/user/me/alerts',
-            {
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const fetchUserAlerts = async () => {
+//     try {
+//         const response = await axiosInstance.get('/v1/user/me/alerts',
+//             {
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('-- Error occured while fetching user alerts --', err.message)
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('-- Error occured while fetching user alerts --', err.message)
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// }
 
-export const addUserEducation = async (educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
-    try {
-        const response = await axiosInstance.post(EndPoints.ADD_EDUCATION,
-            {educationLevel, educationStream, institution, isPresent, startYear, endYear, location},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const addUserEducation = async (educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
+//     try {
+//         const response = await axiosInstance.post(EndPoints.ADD_EDUCATION,
+//             {educationLevel, educationStream, institution, isPresent, startYear, endYear, location},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while adding candidate education', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while adding candidate education', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } moved for modularity
 
-export const editUserEducation = async (educationId : string, educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
-    try {
-        const response = await axiosInstance.put(EndPoints.EDIT_EDUCATION(educationId),
-            {educationLevel, educationStream, institution, isPresent, startYear:startYear, endYear, location},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+// export const editUserEducation = async (educationId : string, educationLevel : string, educationStream : string, institution : string, isPresent : boolean, startYear : string, endYear : string, location : string) => {
+//     try {
+//         const response = await axiosInstance.put(EndPoints.EDIT_EDUCATION(educationId),
+//             {educationLevel, educationStream, institution, isPresent, startYear:startYear, endYear, location},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log('Error occured while editing candidate education', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         console.log('Error occured while editing candidate education', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } moved for modularity
 
-export const deleteUserEducation = async (educationId? : string) => {
-    try {
-        const response = await axiosInstance.delete(EndPoints.DELETE_EDUCATION(educationId as string),
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+// export const deleteUserEducation = async (educationId? : string) => {
+//     try {
+//         const response = await axiosInstance.delete(EndPoints.DELETE_EDUCATION(educationId as string),
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log('Error occured while deleting education data', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         console.log('Error occured while deleting education data', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// } moved for modularity
 
-export const addUserResume = async (formData : any) => {
-    try {
-        const response = await axiosInstance.post(EndPoints.ADD_RESUME,formData,
-            {
-                headers: { 'Content-Type': undefined }, 
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const addUserResume = async (formData : FormData) => {
+//     try {
+//         const response = await axiosInstance.post(EndPoints.ADD_RESUME,formData,
+//             {
+//                 headers: { 'Content-Type': undefined }, 
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('--Error occured while adding resume--', err)
-        // Return response data if available so frontend can handle the error message
-        if (err.response) return err.response.data;
-        throw error;
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occured while adding resume--', err)
+//         // Return response data if available so frontend can handle the error message
+//         if (err.response) return err.response.data;
+//         throw error;
+//     }
+// } moved for modularity
 
-export const loadUserResumes = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_MY_RESUMES,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const loadUserResumes = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_MY_RESUMES,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log('Error occured while loading candidate resumes', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
-    }
-}
+//         console.log('Error occured while loading candidate resumes', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw error
+//     }
+// } moved for modularity
 
-export const setUserResumePrimary = async (resumeId: string) => {
-    try {
-        const response = await axiosInstance.patch(EndPoints.SET_RESUME_PRIMARY(resumeId), null,
-            {
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const setUserResumePrimary = async (resumeId: string) => {
+//     try {
+//         const response = await axiosInstance.patch(EndPoints.SET_RESUME_PRIMARY(resumeId), null,
+//             {
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('--Error occured while seting resume primary--', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-            throw error
-        }
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occured while seting resume primary--', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403){
+//             throw error
+//         }
+//     }
+// } moved for modualrity
 
-export const deleteUserResume = async (resumeId : string, cloudinaryPublicId : string) => {
-    try {
-        const response = await axiosInstance.delete(EndPoints.DELETE_RESUME(resumeId),
-            {
-                params:{cloudinaryPublicId},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while deleting resume', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-            throw error
-        }
-    }
-}
+// export const deleteUserResume = async (resumeId : string, cloudinaryPublicId : string) => {
+//     try {
+//         const response = await axiosInstance.delete(EndPoints.DELETE_RESUME(resumeId),
+//             {
+//                 params:{cloudinaryPublicId},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while deleting resume', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403){
+//             throw error
+//         }
+//     }
+// }
 
-export const addUserCertificate = async (formData : any) => {
-    try {
-        const response = await axiosInstance.post(EndPoints.ADD_CERTIFICATE, formData,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const addUserCertificate = async (formData : FormData) => {
+//     try {
+//         const response = await axiosInstance.post(EndPoints.ADD_CERTIFICATE, formData,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('--Error occured while adding certificate--', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-            throw error
-        }
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occured while adding certificate--', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403){
+//             throw err
+//         }
 
-    }
-}
+//     }
+// } moved for modularity
 
-export const loadUserCertificates = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_MY_CERTIFICATES, 
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const loadUserCertificates = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_MY_CERTIFICATES, 
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while geting candidate certificates', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while geting candidate certificates', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// } moved for modularity
 
-export const deleteUserCertificate = async (certificateId: string, cloudinaryPublicId: string) => {
-    try {
-        const response = await axiosInstance.delete(EndPoints.DELETE_CERTIFICATE(certificateId), 
-            {
-                params:{cloudinaryPublicId},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('--Error occured while deleting certificate--', err )
+// export const deleteUserCertificate = async (certificateId: string, cloudinaryPublicId: string) => {
+//     try {
+//         const response = await axiosInstance.delete(EndPoints.DELETE_CERTIFICATE(certificateId), 
+//             {
+//                 params:{cloudinaryPublicId},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occured while deleting certificate--', err )
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-            throw error
-        }
-    }
-}
+//         if(err.response && err.response.status < 500 && err.response.status !== 403){
+//             throw error
+//         }
+//     }
+// } moved for modularity
 
 export const refreshCandidateToken = async () => {
     try {
@@ -572,90 +571,90 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
     }
 }
 
-export const getNotifications = async (page: number, limit: number, type: string, status: string, offSet: number) => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_NOTIFICATIONS,
-            {
-                params:{page, limit, type, status, offSet},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const getNotifications = async (page: number, limit: number, type: string, status: string, offSet: number) => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_NOTIFICATIONS,
+//             {
+//                 params:{page, limit, type, status, offSet},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while geting notifications', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) {
-            throw error
-        }  
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while geting notifications', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) {
+//             throw error
+//         }  
+//     }
+// }
 
-export const getUnReadNotificationsCount = async () => {
-    try {
-        const response = await axiosInstance.get(EndPoints.GET_UNREAD_NOTIFICATIONS_COUNT,
-            {
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const getUnReadNotificationsCount = async () => {
+//     try {
+//         const response = await axiosInstance.get(EndPoints.GET_UNREAD_NOTIFICATIONS_COUNT,
+//             {
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while geting notifications', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) {
-            throw error
-        }  
-    }
-}
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while geting notifications', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) {
+//             throw error
+//         }  
+//     }
+// }
 
-export const changeNotificationStatus = async (notificationId: string) => {
-    try {
-        const response = await axiosInstance.patch(`/v1/notifications/${notificationId}`, null,
-            {
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const changeNotificationStatus = async (notificationId: string) => {
+//     try {
+//         const response = await axiosInstance.patch(`/v1/notifications/${notificationId}`, null,
+//             {
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('--Error occure dwhile changing notification status', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occure dwhile changing notification status', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const markAllNotificationRead = async () => {
-    try {
-        const response = await axiosInstance.put(EndPoints.MARK_ALL_NOTIFICATIONS_READ, null,
-            {
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const markAllNotificationRead = async () => {
+//     try {
+//         const response = await axiosInstance.put(EndPoints.MARK_ALL_NOTIFICATIONS_READ, null,
+//             {
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('--Error occure dwhile changing notification status', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('--Error occure dwhile changing notification status', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const deleteNotification = async (action: string, notificationId?: string) => {
-    try {
-        const response = await axiosInstance.delete(EndPoints.DELETE_NOTIFICATION, 
-            {   
-                params:{action, notificationId},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('error occured while deleeting notifigication', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+// export const deleteNotification = async (action: string, notificationId?: string) => {
+//     try {
+//         const response = await axiosInstance.delete(EndPoints.DELETE_NOTIFICATION, 
+//             {   
+//                 params:{action, notificationId},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('error occured while deleeting notifigication', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
 export const getCandidateFavoriteJobs = async () => {
     try {
@@ -904,7 +903,7 @@ export const getLocationDetails = async (query: string) => {
 
 export const getJobs = async (search: string, locationSearch: string, page: number, workMode: string, jobLevel: string, jobType: string) => {
     try {
-        const response = await axiosInstance.get('/jobs', {
+        const response = await axiosInstance.get(JobsEndpoints.FETCH_JOBS, {
             params:{
                 search,
                 locationSearch,
@@ -937,6 +936,60 @@ export const getMyApplications = async (search: string, sort: string, page: numb
     } catch (error : unknown) {
         const err = error as AxiosError
         console.log('--error occured while geting my applications--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        
+        }
+    }
+}
+
+export const getMyInterviews = async () => {
+    try {
+        const response = await axiosInstance.get(EndPoints.GET_MY_INTERVIEWS,
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('--error occured while geting my interviews--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        
+        }
+    }
+}
+
+export const deleteMyApplication = async (applicationId: string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.WITHDRAW_APPLICATION(applicationId),
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('--error occured while geting my interviews--', err)
+        if(err.response && err.response.status < 500 && err.response.status !== 403){
+            throw error
+        
+        }
+    }
+}
+
+export const trackMyApplication = async (applicationId: string) => {
+    try {
+        const response = await axiosInstance.get(EndPoints.TRACK_MY_APPLICATION(applicationId),
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('--error occured while tracking my application--', err)
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error
         
@@ -1035,9 +1088,10 @@ export const togglePostSave = async (postId: string) => {
     }
 }
 
-export const getPosts = async () => {
+export const getPosts = async (page: number, limit: number) => {
     try {
         const response = await axiosInstance.get(EndPoints.GET_FEED_POSTS, {
+            params:{page, limit},
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -1177,88 +1231,88 @@ export const followUser = async (userId : string, acted_by: string, acted_user_a
     }
 }
 
-export const sendConnectionRequest = async (receiverId: string, acted_by: string, acted_user_avatar: string) => {
-    try {
-        const response = await axiosInstance.post(`/v1/user/connect-request/${receiverId}`,
-            {acted_by, acted_user_avatar},
-            {
-                headers:{'Content-Type': 'application/json'},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const sendConnectionRequest = async (receiverId: string, acted_by: string, acted_user_avatar: string) => {
+//     try {
+//         const response = await axiosInstance.post(`/v1/user/connect-request/${receiverId}`,
+//             {acted_by, acted_user_avatar},
+//             {
+//                 headers:{'Content-Type': 'application/json'},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('error occured while sednign connection request', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('error occured while sednign connection request', err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const cancelConnectionRequest = async (receiverId: string) => {
-    try {
-        const response = await axiosInstance.patch(EndPoints.CANCEL_CONNECTION_REQUEST(receiverId),
-            null,
-            {
-                sendAuthToken: true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log(err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+// export const cancelConnectionRequest = async (receiverId: string) => {
+//     try {
+//         const response = await axiosInstance.patch(EndPoints.CANCEL_CONNECTION_REQUEST(receiverId),
+//             null,
+//             {
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log(err)
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const rejectConnectionRequest = async (sender: string) => {
-    try {
-        const response = await axiosInstance.patch(EndPoints.REJECT_CONNECTION_REQUEST,
-            {sender},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const rejectConnectionRequest = async (sender: string) => {
+//     try {
+//         const response = await axiosInstance.patch(EndPoints.REJECT_CONNECTION_REQUEST,
+//             {sender},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const acceptConnectionRequest = async (sender: string, acted_by: string, acted_user_avatar: string) => {
-    try {
-        const response = await axiosInstance.patch(EndPoints.ACCEPT_CONNECTION_REQUEST,
-            {sender, acted_by, acted_user_avatar},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const acceptConnectionRequest = async (sender: string, acted_by: string, acted_user_avatar: string) => {
+//     try {
+//         const response = await axiosInstance.patch(EndPoints.ACCEPT_CONNECTION_REQUEST,
+//             {sender, acted_by, acted_user_avatar},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
-export const getConversations = async () => {
-    try {
-        const response = await axiosInstance.get('/v1/conversations',
-            {sendAuthToken: true} as AxiosRequest
-        )
+// export const getConversations = async () => {
+//     try {
+//         const response = await axiosInstance.get('/v2/conversations',
+//             {sendAuthToken: true} as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 export const initializeConversation = async (receiver: string) => {
     try {
         const response = await axiosInstance.post('/v1/conversation/initialize',
@@ -1275,21 +1329,21 @@ export const initializeConversation = async (receiver: string) => {
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
-export const getChats = async (conversationId: string) => {
-    try {
-        const response = await axiosInstance.get(`/v1/chats/${conversationId}`,
+// export const getChats = async (conversationId: string) => {
+//     try {
+//         const response = await axiosInstance.get(`/v1/chats/${conversationId}`,
             
-            {   
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+//             {   
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
 export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
     try {
@@ -1357,27 +1411,27 @@ export const loadUserMetaData = async () => {
     }
 }
 
-export const getSkillsSuggesion = async (search: string) => {
-    try {
-        const response = await axiosInstance.get('/admin/skills', 
-            {
-                params:{search},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while fetching skills suggestions', err)
-        throw err
-    }
-}
+// export const getSkillsSuggesion = async (search: string) => {
+//     try {
+//         const response = await axiosInstance.get('/admin/v1/skills', 
+//             {
+//                 params:{search},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while fetching skills suggestions', err)
+//         throw err
+//     }
+// }
 
-export const getUsersForPublic = async (search: string, roleTypeFilter: string, experienceFilter: string, location: string) => {
+export const getUsersForPublic = async (search: string, roleTypeFilter: string, experienceFilter: string, location: string, page: number, limit: number) => {
     try {
         const response = await axiosInstance.get(EndPoints.GET_USERS, 
             {
-                params:{search, roleTypeFilter, experienceFilter, location},
+                params:{search, roleTypeFilter, experienceFilter, location, page, limit},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -1390,5 +1444,134 @@ export const getUsersForPublic = async (search: string, roleTypeFilter: string, 
         if(err.response && err.response.status < 500 && err.response.status !== 403){
             throw error
         }
+    }
+}
+
+export const getUsers = async (search: string, page: number, sort : string, filter : any) => {
+    try {
+        const response = await axiosInstance.get(EndPoints.LOAD_ALL_USERS, {
+            params:{search, page, sort, filter:JSON.stringify(filter)},
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        console.log('Error occurred while getting user list', error);
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+        
+    }
+}
+
+export const getUserDetails = async (userId : string) => {
+    try {
+        const response = await axiosInstance.get(EndPoints.LOAD_USER_DETAIL_BY_ID(userId), {
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+       const err = error as AxiosError
+
+       if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+        throw error
+       }
+    }
+}
+
+export const userBlock = async (userId : string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.BLOCK_USER_BY_ID(userId), null, {
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError  && err.response.status !== HttpStatusCode.Forbidden) throw error
+
+        console.log('Error occured while blocking the candidate', err)
+    }
+}
+
+export const userUnblock = async (userId : string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.UNBLOCK_USER_BY_ID(userId), null, {
+            sendAuthToken:true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error : unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while unblocking the candidate', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+
+        
+    }
+}
+
+export const deleteUser = async (userId: string) => {
+    try {
+        const response = await axiosInstance.delete(EndPoints.DELETE_USER_BY_ID(userId), 
+            {
+                sendAuthToken:true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+    }
+}
+
+export const banUser = async (userId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.BAN_USER_BY_ID(userId), null,
+    {
+        sendAuthToken: true
+    } as AxiosRequest)
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('-Error occured while blocking user-', err)
+
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw error
+        }
+    }
+}
+
+export const similarUseers = async () => {
+    try {
+        const response = await axiosInstance.get('/v1/similar-people', {
+            sendAuthToken: true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const loadUserFullProfileDetails = async () => {
+    try {
+        const response = await axiosInstance.get(EndPoints.LOAD_USER_FULL_PROFILE_DETAILS, {
+            sendAuthToken: true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }

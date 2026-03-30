@@ -1,4 +1,4 @@
-import { UnFollowUserDTO } from '../../DTOs/follow.dto';
+import { UnFollowUserDTO } from '../../DTOs/follow/follow.dto';
 
 export default interface IUnFollowUserUsercase {
   execute(unfollowuserDto: UnFollowUserDTO): Promise<void>;

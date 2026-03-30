@@ -1,6 +1,6 @@
-import Job from './job.entity';
+import Job from '../job/job.entity';
 import User from '../user/User.FIX';
-import Company from '../company.entity';
+import Company from '../company/company.entity';
 
 export default interface RecruiterProfileOverviewData {
   _id?: string;
@@ -25,12 +25,12 @@ export default interface RecruiterProfileOverviewData {
     reason?: string;
     feedback?: string;
   };
-  isRejected?: boolean
+  isRejected?: boolean;
   applicationResendBufferDate?: Date;
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   createdAt?: string;
   updatedAt?: string;
   userProfile: User;
-  companyDetails?: Company
+  companyDetails?: Company;
   jobs: Job[];
 }

@@ -1,6 +1,5 @@
-import Post from '../../../../domain/entities/user/Post';
-import { CreatePostResDTO } from '../../../DTOs/post.dto';
+import { PostDTO } from '../../../DTOs/post/post.dto';
 
 export default interface IGetUserSpecificPosts {
-  execute(userId: string): Promise<any[] | null>;
+  execute(userId: string): Promise<PostDTO[] | null>;
 }

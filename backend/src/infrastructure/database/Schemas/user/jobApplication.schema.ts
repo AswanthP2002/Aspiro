@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import JobApplication from '../../../../domain/entities/user/jobApplication.entity';
+import JobApplication from '../../../../domain/entities/jobApplication/jobApplication.entity';
 
 export const JobApplicationSchema = new Schema<JobApplication>(
   {

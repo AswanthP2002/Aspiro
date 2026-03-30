@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from 'tsyringe';
-import IGetCompanyListUsecase from '../../application/interfaces/usecases/IGetCompanyList.usecase';
+import IGetCompanyListUsecase from '../../application/interfaces/usecases/company/IGetCompanyList.usecase';
 import { StatusCodes } from '../statusCodes';
-import IAddCompanyUsecase from '../../application/interfaces/usecases/recruiter/IAddCompnay.usecase';
+import IAddCompanyUsecase from '../../application/interfaces/usecases/company/IAddCompnay.usecase';
 import IGetcompaniesBySuggesionUsecase from '../../application/interfaces/usecases/company/IGetCompaniesBySuggession.usecase';
 
 @injectable()
@@ -52,7 +52,7 @@ export default class CompanyController {
         .status(StatusCodes.OK)
         .json({ success: true, message: 'Companies fetched succesfully', result });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

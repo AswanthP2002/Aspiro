@@ -1,4 +1,4 @@
-import JobLevel from '../../entities/admin/jobLevel.entity';
+import JobLevel from '../../entities/jobLevel/jobLevel.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IJobLevelRepository extends IBaseRepo<JobLevel> {
@@ -7,4 +7,5 @@ export default interface IJobLevelRepository extends IBaseRepo<JobLevel> {
     limit: number,
     page: number
   ): Promise<{ jobLevels: JobLevel[]; totalPages: number } | null>;
+  findJobLevelWithSlugName(slug: string): Promise<JobLevel | null>;
 }

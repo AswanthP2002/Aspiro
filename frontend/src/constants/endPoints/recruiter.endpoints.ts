@@ -8,7 +8,21 @@ export const RecruiterEndPoints = {
     FETCH_WORKMODE_LIST: '/v1/recruiter/workmodes',
     POST_A_JOB: '/recruiter/job/create',
     GET_MY_JOBS: '/recruiter/jobs',
+    GET_POSTED_JOB_DETAILS: (jobId: string) => `/v1/recruiter/jobs/${jobId}/details`,
+    DELETE_MY_JOB: (jobId: string) => `/v1/recruiter/job/delete/${jobId}`,
     GET_JOB_APPLICATIONS_BY_ID: (jobId: string) => `/v1/recruiter/job/${jobId}/application/details`,
     GET_JOB_APPLICATION_DETAILS_BY_APPLICATION_ID: (applicationId: string) => `/v1/recruiter/job/application/${applicationId}/details`,
-    UPDATE_CANDIDATE_NOTE: (applicationId: string) => `/v1/recruiter/application/${applicationId}`
+    UPDATE_CANDIDATE_NOTE: (applicationId: string) => `/v1/recruiter/application/${applicationId}`,
+    UPDATE_JOB_APPLICATION_STATUS: (applicationId: string) => `/v1/recruiter/application/${applicationId}/status`,
+    SCHEDULE_INTERVIEW: (candidateId: string, jobId: string) => `/recruiter/schedule-interview/${candidateId}/job/${jobId}/`,
+
+    LOAD_ALL_RECRUITER_APPLICATIONS: '/v2/recruiter/applications',
+    CHANGE_STATUS_UNDER_REVIEW: (id: string) => `/v2/recruiter/application/${id}/status-under-review`,
+    REJECT_RECRUITER_APPLICATION: (recruiterId: string) => `/v2/recruiter/application/${recruiterId}`,
+    APPROVE_APPLICATION_BY_ID: (recrutierId: string) => `/v2/recruiter/application/approve/${recrutierId}`,
+    LOAD_ALL_RECRUITERS: '/v2/recruiters/data',
+    LOAD_RECRUITER_DETAILS_BY_ID: (recruiterId: string) =>  `/v2/recruiters/${recruiterId}`,
+    BLOCK_RECRUITER_BY_ID: (recruiterId: string) => `/recruiter/block/${recruiterId}`,
+    HANDLE_RECRUITER_VERIFICATION: (recruiterId: string) => `/v2/recruiter/${recruiterId}/verification/action`,
+    HANDLE_RECRUITER_PERMISSIONS: (recruiterId: string) => `/v2/recruiter/${recruiterId}/permissions/update`
 } as const

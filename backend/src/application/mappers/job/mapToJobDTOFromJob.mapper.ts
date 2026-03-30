@@ -1,0 +1,34 @@
+import Job from '../../../domain/entities/job/job.entity';
+import { JobDTO } from '../../DTOs/job/createJob.dto';
+
+export default function mapToJobDTOFromJob(job: Job): JobDTO {
+  return {
+    _id: job._id,
+    recruiterId: job.recruiterId,
+    jobTitle: job.jobTitle,
+    description: job.description,
+    requirements: job.requirements,
+    responsibilities: job.responsibilities,
+    duration: job.duration,
+    jobType: job.jobType as string,
+    workMode: job.workMode as string,
+    location: job.location as string,
+    minSalary: job.minSalary,
+    maxSalary: job.maxSalary,
+    salaryCurrency: job.salaryCurrency,
+    salaryPeriod: job.salaryPeriod,
+    vacancies: job.vacancies,
+    qualification: job.qualification,
+    experienceInYears: job.experienceInYears,
+    jobLevel: job.jobLevel,
+    requiredSkills: job.requiredSkills,
+    optionalSkills: job.optionalSkills,
+    status: job.status,
+    rejectionReason: job.rejectionReason,
+    views: job.views,
+    applicationsCount: job.applicationsCount,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    expiresAt: job.expiresAt,
+  };
+}

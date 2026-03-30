@@ -1,4 +1,4 @@
-import Experience from '../../entities/user/experience.entity';
+import Experience from '../../entities/experience/experience.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IExperienceRepo extends IBaseRepo<Experience> {

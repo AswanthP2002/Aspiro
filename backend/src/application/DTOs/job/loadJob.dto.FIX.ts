@@ -1,18 +1,7 @@
-import { JobStatus, SalaryPeriod } from '../../../domain/entities/recruiter/job.entity';
-import Recruiter, { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
+import { JobStatus, SalaryPeriod } from '../../../domain/entities/job/job.entity';
+import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 import User from '../../../domain/entities/user/User.FIX';
-import CompanyDTO from '../recruiter/company.dto';
-import { JobAggregatedDTO } from '../user/jobAggregated.dto';
-
-export default interface LoadJobDTO {
-  search: string;
-  page: number;
-  limit: number;
-  sort: string;
-  filters: any;
-  minSalary: string;
-  maxSalary: string;
-}
+import { JobAggregatedDTO } from './jobAggregated.dto';
 
 export interface LoadJobListForPublicDTO {
   search: string;
@@ -42,13 +31,6 @@ export interface LoadJobsResDto {
 //legacy
 export interface LoadJobResDTO {
   jobs: { userDetails: User; recruiterProfile: Recruiter }[];
-  page: number;
-  totalPages: number;
-  currentSort: string;
-}
-
-export interface LoadJobRes {
-  jobs: any;
   page: number;
   totalPages: number;
   currentSort: string;
@@ -124,7 +106,7 @@ export interface JobListForPublicDTO {
 export interface LoadJobDetailsDTOForPublic {
   _id?: string;
   recruiterId?: string;
-  companyId?: string; 
+  companyId?: string;
   jobTitle: string;
   description: string;
   requirements: string;
@@ -135,15 +117,15 @@ export interface LoadJobDetailsDTOForPublic {
   location?: string;
   minSalary: number;
   maxSalary: number;
-  salaryCurrency: string; 
+  salaryCurrency: string;
   salaryPeriod?: SalaryPeriod;
   vacancies: number;
   qualification: string;
-  experienceInYears: number; 
+  experienceInYears: number;
   jobLevel?: string;
   requiredSkills: string[];
   optionalSkills: string[];
-  applicationsCount?: number; 
+  applicationsCount?: number;
   isFlagged?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -152,7 +134,8 @@ export interface LoadJobDetailsDTOForPublic {
     _id: string;
     name: string;
     recruiterType: string;
-    professionalTitle: string
+    professionalTitle: string;
+    isVerifiedRecruiter?: boolean;
   };
   companyProfileDetails?: {
     _id: string;

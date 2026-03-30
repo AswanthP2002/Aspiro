@@ -1,4 +1,4 @@
-import Skills from '../../entities/user/skills.entity';
+import Skills from '../../entities/skill.user/skills.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface ISkillRepo extends IBaseRepo<Skills> {

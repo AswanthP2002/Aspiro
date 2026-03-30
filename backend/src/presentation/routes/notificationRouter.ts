@@ -49,7 +49,7 @@ function createNotificationRouter() {
     centralizedAuthentication,
     authorization(['user']),
     notificationController.deleteNotifications.bind(notificationController)
-  )
+  );
 
   return notificationRouter;
 }

@@ -29,4 +29,9 @@ export default interface UserMetaDataDTO {
   email?: string;
   role?: string;
   profilePicture?: string;
+  subscription?: {
+    subscriptionId: string;
+    planId: string;
+    name: string;
+  };
 }

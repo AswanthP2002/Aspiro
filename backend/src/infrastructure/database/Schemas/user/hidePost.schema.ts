@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import HidePost from '../../../../domain/entities/user/hidePost.entity';
+import HidePost from '../../../../domain/entities/post/hidePost.entity';
 
 export const HidePostSchema = new Schema<HidePost>(
   {

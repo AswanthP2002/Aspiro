@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Follow from '../../../domain/entities/follow.entity';
+import Follow from '../../../domain/entities/follow/follow.entity';
 
 export const FollowSchema = new Schema<Follow>(
   {

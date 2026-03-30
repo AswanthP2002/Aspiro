@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { userBlock, userUnblock, getUserDetails, deleteUser, banUser, resetUserPassword, requestReset,  } from "../../../services/adminServices"
+import { getUserDetails } from "../../../services/userServices"
+import { userBlock, userUnblock, deleteUser, banUser } from "../../../services/userServices"
+import { resetUserPassword, requestReset,  } from "../../../services/adminServices"
 import { AdminUserDetailsData, Education, Experience, Skills } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
 import { FaArrowLeft, FaLinkedin, FaInstagram, FaTwitter, FaGithub} from "react-icons/fa"
@@ -12,6 +14,8 @@ import { Button, Modal, ModalProps } from "@mui/material"
 import { BiEnvelope } from "react-icons/bi"
 import { useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
+import { toast } from "react-toastify"
+import { AxiosError } from "axios"
 
 
 export default function CandidateDetails(){
@@ -58,11 +62,9 @@ export default function CandidateDetails(){
                         console.log('user details', result.candidateDetails)
                 } catch (error: unknown) {
                     console.log('Erorr occured while geting user details', error)
-                    Notify.failure(error instanceof Error ? error?.message : 'An Error occured', {timeout:1500})
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
-                
         }
-        
        fetchCandidateDetails()
     }, [])
 
@@ -79,12 +81,23 @@ export default function CandidateDetails(){
             allowEnterKey:false
         }).then(async (result) => {
             if(result?.isConfirmed){
-                const deleteResult = await deleteUser(userId)
+                const deleteResult = await toast.promise(
+                    deleteUser(userId),
+                    {
+                        pending: 'Deleting User...',
+                        success: 'User Deleted',
+                        error:{
+                            render(props) {
+                                const data = props.data as AxiosError<{message: string}>
+                                return data.message
+                            },
+                        }
+                    }
+                )
 
                 if(!deleteResult?.success){
-                    Notify.failure('Can not delete user now', {timeout:1600})
+                    toast.error('Can not delete user now')
                 }else{
-                    Notify.success('User deleted', {timeout:1600})
                     setTimeout(() => {
                         navigate('/admin/users')
                     }, 1600)
@@ -110,7 +123,7 @@ export default function CandidateDetails(){
           if(response.isConfirmed){
             try {
           await userBlock(userId)
-          Notify.success('User blocked Successfully')
+          toast.success('User blocked Successfully')
           setUserDetails((userData: AdminUserDetailsData | null) => {
             if(!userData) return null
             return {
@@ -119,7 +132,7 @@ export default function CandidateDetails(){
             }
           })
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
           }else{
             return
@@ -143,8 +156,9 @@ export default function CandidateDetails(){
         }).then(async (response) => {
           if(response.isConfirmed){
             try {
-          await userUnblock(id)
-          Notify.success('User Unblocked', {timeout: 3000})
+          const result = await userUnblock(id)
+          console.log('-- checking result from backend after unsuspending--', result.result)
+          toast.success('User unblocked succesfully')
           setUserDetails((data: AdminUserDetailsData | null) => {
             if(!data) return null
             return {
@@ -153,7 +167,7 @@ export default function CandidateDetails(){
             }
           })
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
           }else {
             return
@@ -178,7 +192,7 @@ export default function CandidateDetails(){
           if(response.isConfirmed){
             try {
           const result = await banUser(userId)
-          Notify.success(result.message)
+          toast.success(result.message)
           setUserDetails((data: AdminUserDetailsData | null) => {
             if(!data) return null
             return {
@@ -187,7 +201,7 @@ export default function CandidateDetails(){
             }
           })
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
           }else{
             return
@@ -199,7 +213,7 @@ export default function CandidateDetails(){
         <>
         <div className="w-full min-h-screen p-5 lg:p-10">
             <div className="w-full">
-                <button className="flex items-center gap-2 text-sm font-light text-gray-700 hover:bg-gray-200 rounded-md !p-2">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-light text-gray-700 hover:bg-gray-200 rounded-md !p-2">
                     <FaArrowLeft />
                     Back to users
                 </button>
@@ -214,9 +228,14 @@ export default function CandidateDetails(){
                             <div className="border border-gray-200 rounded-md bg-white p-5">
                                 <div className="flex justify-between">
                                     <div className="flex gap-2">
-                                        <div className="w-15 h-15 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                                            <p className="text-white text-xl">S</p>
-                                        </div>
+                                        {userDetails?.profilePicture?.cloudinarySecureUrl
+                                            ? <div className="w-18 h-18 rounded-full border border-slate-300 p-1">
+                                                <img className="h-full w-full rounded-full object-cover" src={userDetails.profilePicture.cloudinarySecureUrl} alt="" />
+                                              </div>
+                                            : <div className="w-15 h-15 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                                                <p className="text-white text-xl">S</p>
+                                              </div>
+                                        }
                                         <div>
                                             <p className="font-semibold">{userDetails?.name}</p>
                                             <p className="text-xs">{userDetails?.email}</p>
@@ -273,16 +292,12 @@ export default function CandidateDetails(){
                                 <p className="font-semibold">Technical Skills</p>
                                 <div className="mt-5 flex flex-wrap gap-2">
                                     {userDetails?.skills.map((skill: Skills) => {
-                                        if(skill.skillType === 'soft'){
                                             return <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">{skill.skill}</span>
-                                        }else{
-                                            return <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">{skill.skill}</span>
-                                        }
                                     })}
                                 </div>
-                                <p className="font-semibold mt-5">Technical Skills</p>
+                                <p className="font-semibold mt-5">Soft Skills</p>
                                 <div className="mt-5">
-                                    <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">MongoDB</span>
+                                    {/* <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">MongoDB</span> */}
                                 </div>
                             </div>
                             {userDetails?.posts && userDetails.posts.length > 0 && (
@@ -305,16 +320,16 @@ export default function CandidateDetails(){
                             </div>
                             )}
                         </div>
-                        <div className="col-span-12 lg:col-span-4">
+                        <div className="col-span-12 lg:col-span-4 space-y-5">
                             <div className="bg-white p-5 rounded-md border border-gray-200">
                                 <p className="font-semibold">Account Actions</p>
                                 <div className="mt-3 space-y-2">
-                                    <button onClick={openPasswordResetModal} className="bg-blue-500 block w-full rounded-md py-2 text-sm text-white">Reset Password</button>
+                                    <button disabled={userDetails?.googleId ? true : false} onClick={openPasswordResetModal} className={`${userDetails?.googleId ? "bg-gray-300" : "bg-blue-500"} block w-full rounded-md py-2 text-sm ${userDetails?.googleId ? "text-gray-400" : "text-white"}`}>Reset Password</button>
                                     {userDetails?.isBlocked
                                         ? <button onClick={() => unblockUser(userDetails._id as string)} className="bg-orange-500 block w-full rounded-md py-2 text-sm text-white">Unsuspend Account</button>
                                         : <button onClick={() => bloackUser(userDetails?._id as string)} className="bg-orange-500 block w-full rounded-md py-2 text-sm text-white">Suspend Account</button>
                                     }
-                                    <button onClick={() => banUserPermanently(userDetails?._id as string)} className="bg-red-500 block w-full rounded-md py-2 text-sm text-white">Permanent Ban</button>
+                                    {!userDetails?.isBanned && (<button onClick={() => banUserPermanently(userDetails?._id as string)} className="bg-red-500 block w-full rounded-md py-2 text-sm text-white">Permanent Ban</button>)}
                                 </div>
                                 <div className="border border-gray-200 w-full mt-3 mb-2"></div>
                                 <button onClick={() => deleteSingleUser(userDetails?._id as string)} className="bg-white border border-red-500 w-full py-2 text-sm text-red-500 rounded-md">Delete User</button>
@@ -332,6 +347,31 @@ export default function CandidateDetails(){
                                         </li>
                                     </ul>
                                 </div>
+                            </div>
+                            <div className="bg-white p-5 rounded-md border border-slate-200">
+                                <p className="font-semibold">Account action History</p>
+                                {userDetails?.accountActions && userDetails?.accountActions?.length > 0 
+                                    ? <>
+                                        <div className="grid grid-cols-1 gap-2 mt-5">
+                                            {userDetails.accountActions.map((history: {action: string, actor: string, date: string}, index: number) => (
+                                                <div className={`${history.action === 'Blocked' ? "bg-red-500" : (history.action === 'Un blocked' ? "bg-green-500" : "bg-blue-500")} ps-1 rounded-md`}>
+                                                    <div className={`flex gap-2 p-2 rounded-md ${history.action === 'Blocked' ? "bg-red-100" : (history.action === 'Un blocked' ? "bg-green-100" : "bg-blue-100")}`}>
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-semibold">{history.action}</p>
+                                                        <p className="text-sm mt-2">Acted by : <span className="font-semibold">{history.actor}</span></p>
+                                                    </div>
+                                                    <div className="flex items-end text-xs text-gray-700">
+                                                        <p>{formattedDateMoment(history.date, "MMM DD YYYY")}</p>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                      </>
+                                    : <>
+                                        <p className="text-xs text-center italic text-gray-500 mt-5">No history available</p>
+                                      </>
+                                }
                             </div>
                         </div>
                     </div>

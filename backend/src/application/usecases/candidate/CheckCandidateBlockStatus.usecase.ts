@@ -1,11 +1,14 @@
-import CandidateRepo from "../../../domain/interfaces/user/ICandidateRepo.GARBAGE";
-import IUserRepository from "../../../domain/interfaces/IUserRepo";
+import CandidateRepo from '../../../domain/interfaces/user/ICandidateRepo.GARBAGE';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
 
 export default class CheckCandidateBlockStatusUseCase {
-    constructor(private _candidateRepo : CandidateRepo, private _userRepo : IUserRepository){}
+  constructor(
+    private _candidateRepo: CandidateRepo,
+    private _userRepo: IUserRepository
+  ) {}
 
-    async execute(id : string) : Promise<boolean | null> {
-        const isBlocked = await this._userRepo.isUserBlocked(id)
-        return isBlocked
-    }
+  async execute(id: string): Promise<boolean | null> {
+    const isBlocked = await this._userRepo.isUserBlocked(id);
+    return isBlocked;
+  }
 }

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import IGetUnReadNotificationsCountUsecase from '../../interfaces/usecases/shared/IGetUnreadNotificationsCount.usecase';
+import IGetUnReadNotificationsCountUsecase from '../../interfaces/usecases/notification/IGetUnreadNotificationsCount.usecase';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
 
 @injectable()

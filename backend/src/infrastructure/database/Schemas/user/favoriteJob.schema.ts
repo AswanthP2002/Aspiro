@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import FavoriteJobs from '../../../../domain/entities/user/favoriteJobs.entity';
+import FavoriteJobs from '../../../../domain/entities/savedJob/favoriteJobs.entity';
 
 export const FavoriteJobSchema = new Schema<FavoriteJobs>(
   {

@@ -6,17 +6,9 @@ import cors from 'cors';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import { Server } from 'socket.io';
-import { pinoHttp } from 'pino-http';
 import logger from './logger';
-//import candidateRouter from './src/presentation/routes/candidate/candidateRouter'
-//import recruiterRouter from './src/presentation/routes/recruiter/recruiterRouter'
-//import adminRouter from './src/presentation/routes/admin/adminRouter'
 import passport from 'passport';
-// import './src/config/passport.LEGACY';
-//import createCandidateRouter from './src/presentation/routes/userRouter';
 import connectToDb from './src/infrastructure/database/connection';
-//import createRecruiterRouter from './src/presentation/routes/recruiter/recruiterRouter';
 import createAdminRouter from './src/presentation/routes/adminRouter';
 import createFollowRouter from './src/presentation/routes/followRouter';
 import createPostRouter from './src/presentation/routes/postRouter';
@@ -29,13 +21,26 @@ import createUserRouter from './src/presentation/routes/user.router';
 import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
-import { connectRedis } from './src/infrastructure/redis/redisClient';
+// import { connectRedis } from './src/infrastructure/redis/redisClient';
 import createCompanyRouter from './src/presentation/routes/companyRouter';
+import CreateExperienceRouter from './src/presentation/routes/experienceRouter';
+import CreateEducationRouter from './src/presentation/routes/educationRouter';
+import CreateSkillRouter from './src/presentation/routes/skillRouter';
+import CreateCertificateRouter from './src/presentation/routes/certificateRouter';
+import CreateResumeRouter from './src/presentation/routes/resumeRouter';
+import CreateWorkModeRouter from './src/presentation/routes/workModeRouter';
+import CreateJobLevelRouter from './src/presentation/routes/jobLevelRouter';
+import CreateJobTypeRouter from './src/presentation/routes/jobTypeRouter';
+import CreateAlertsRouter from './src/presentation/routes/alertsRouter';
+import CreateConnectionRouter from './src/presentation/routes/connectionRouter';
+import CreatePlanRouter from './src/presentation/routes/planRouter';
+import PlanController from './src/presentation/controllers/planController';
+import { container } from 'tsyringe';
 // import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
   const app = express();
-
+  const planController = container.resolve(PlanController);
   dotenv.config();
   app.use(
     cors({
@@ -44,6 +49,12 @@ async function main() {
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'],
     })
+  );
+
+  app.post(
+    '/api/v1/subscriptions/webhook',
+    express.raw({ type: 'application/json' }),
+    planController.handleWebhook.bind(planController)
   );
 
   app.use(express.json());
@@ -80,6 +91,17 @@ async function main() {
   const jobRouter = CreateJobRouter();
   const notificationRouter = createNotificationRouter();
   const companyRouter = createCompanyRouter();
+  const experienceRouter = CreateExperienceRouter();
+  const educationRouter = CreateEducationRouter();
+  const skillRouter = CreateSkillRouter();
+  const certificateRouter = CreateCertificateRouter();
+  const resumeRouter = CreateResumeRouter();
+  const workModeRouter = CreateWorkModeRouter();
+  const jobLevelRouter = CreateJobLevelRouter();
+  const jobtypeRouter = CreateJobTypeRouter();
+  const alertsRouter = CreateAlertsRouter();
+  const connectionRouter = CreateConnectionRouter();
+  const planRouter = CreatePlanRouter();
 
   const port = process.env.PORT || 5000;
   app.use('/', (req: Request, res: Response, next: NextFunction) => {
@@ -102,6 +124,17 @@ async function main() {
   app.use('/api', jobRouter);
   app.use('/api', notificationRouter);
   app.use('/api', companyRouter);
+  app.use('/api', experienceRouter);
+  app.use('/api', educationRouter);
+  app.use('/api', skillRouter);
+  app.use('/api', certificateRouter);
+  app.use('/api', resumeRouter);
+  app.use('/api', workModeRouter);
+  app.use('/api', jobLevelRouter);
+  app.use('/api', jobtypeRouter);
+  app.use('/api', alertsRouter);
+  app.use('/api', connectionRouter);
+  app.use('/api', planRouter);
 
   app.use(exceptionhandle); //centralized exception handling
 

@@ -3,9 +3,9 @@ import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo'
 import { ObjectId } from 'mongodb';
 import BaseRepository from '../baseRepository';
 import { RecruiterDAO } from '../../database/DAOs/recruiter/recruiter.dao';
-import { AppliedRecruitersQuery } from '../../../application/queries/recruiter.query';
+import { AppliedRecruitersQuery } from '../../../application/queries/recruiter/recruiter.query';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
-import FindRecruitersDBQuery from '../../../application/queries/recruiter.query';
+import FindRecruitersDBQuery from '../../../application/queries/recruiter/recruiter.query';
 import mongoose from 'mongoose';
 
 export default class RecruiterRespository
@@ -20,6 +20,7 @@ export default class RecruiterRespository
     query: FindRecruitersDBQuery
   ): Promise<{ recruiters: RecruiterProfileOverviewData[]; totalPages: number } | null> {
     const { search, page, limit, employer_type_filter, employer_status_filter, sortOption } = query;
+    console.log(sortOption);
     const skip = (page - 1) * limit;
     const result = await RecruiterDAO.aggregate([
       {
@@ -468,7 +469,7 @@ export default class RecruiterRespository
           as: 'userProfile',
         },
       },
-      { $unwind: '$userProfile' },
+      { $unwind: { path: '$userProfile', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: 'jobs',

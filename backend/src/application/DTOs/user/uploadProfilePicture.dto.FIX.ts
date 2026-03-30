@@ -1,6 +1,5 @@
-
 export interface UploadProfilePictureDTO {
   publicId: string;
-  imageFile: any;
+  imageFile: Buffer<ArrayBufferLike>;
   userId: string;
 }

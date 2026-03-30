@@ -26,6 +26,6 @@ function createCompanyRouter() {
   );
 
   return companyRouter;
-} 
+}
 
 export default createCompanyRouter;

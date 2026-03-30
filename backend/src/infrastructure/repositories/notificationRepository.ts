@@ -2,8 +2,8 @@ import INotificationRepo from '../../domain/interfaces/INotificationRepo';
 import BaseRepository from './baseRepository';
 import mongoose from 'mongoose';
 import { NotificationDAO } from '../database/DAOs/notification.dao';
-import Notification from '../../domain/entities/notification.entity';
-import NotificationsQuery from '../../application/DTOs/shared/notifications.query';
+import Notification from '../../domain/entities/notification/notification.entity';
+import NotificationsQuery from '../../application/DTOs/notification/notifications.query';
 
 export default class NotificationRepository
   extends BaseRepository<Notification>
@@ -15,28 +15,63 @@ export default class NotificationRepository
 
   async getNotificationsByUserId(
     query: NotificationsQuery
-  ): Promise<{ notifications: Notification[]; hasMore: boolean } | null> {
+  ): Promise<{ notifications: Notification[] } | null> {
     const { logedUserId, limit, page, offSet, status, type } = query;
-
+    console.log(offSet);
     if (!mongoose.isValidObjectId(logedUserId)) return null;
 
     const skip = (page - 1) * limit;
 
-
-    const filterQuery = {
-      recepientId: new mongoose.Types.ObjectId(logedUserId),
-      isRead: { $in: status },
-      category: { $in: type },
-    };
-
-    const testResutl = await NotificationDAO.aggregate([
-      { $match: filterQuery },
-      { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
+    const result = await NotificationDAO.aggregate([
+      {
+        $match: {
+          recepientId: new mongoose.Types.ObjectId(logedUserId),
+          actorId: { $ne: new mongoose.Types.ObjectId(logedUserId) },
+          isRead: { $in: status },
+          category: { $in: type },
+        },
+      },
+      {
+        $facet: {
+          notifications: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'actorId',
+                foreignField: '_id',
+                as: 'actorDetails',
+              },
+            },
+            {
+              $unwind: {
+                path: '$actorDetails',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+        },
+      },
     ]);
 
-    return { notifications: testResutl, hasMore: testResutl.length > 0 };
+    const notifications = result[0]?.notifications;
+
+    // const filterQuery = {
+    //   recepientId: new mongoose.Types.ObjectId(logedUserId),
+    //   isRead: { $in: status },
+    //   category: { $in: type },
+    // };
+
+    // const testResutl = await NotificationDAO.aggregate([
+    //   { $match: filterQuery },
+    //   { $sort: { createdAt: -1 } },
+    //   { $skip: skip },
+    //   { $limit: limit },
+    // ]);
+
+    return { notifications };
   }
 
   async softDeleteNotificationById(notificationId: string): Promise<void> {
@@ -74,7 +109,6 @@ export default class NotificationRepository
       },
       { $set: { isDeleted: true } }
     );
-
   }
 
   async getUnReadNotificationsCount(userId: string): Promise<number | null> {
@@ -99,16 +133,14 @@ export default class NotificationRepository
       actorId: new mongoose.Types.ObjectId(follower),
       category: 'FOLLOW',
     });
-
   }
 
   async deleteConnectionRequestNotification(receipient: string, sender: string): Promise<void> {
-     await NotificationDAO.deleteOne({
+    await NotificationDAO.deleteOne({
       recepientId: new mongoose.Types.ObjectId(receipient),
       actorId: new mongoose.Types.ObjectId(sender),
       category: 'CONNECTION_REQUEST',
     });
-
   }
 
   async getANotificationBySendReceiverCategory(
@@ -122,5 +154,17 @@ export default class NotificationRepository
       category: category,
     });
     return result;
+  }
+
+  async deleteLikeNotificationByActorCategoryPostId(
+    postId: string,
+    actorId: string,
+    category: 'LIKE'
+  ): Promise<void> {
+    await NotificationDAO.deleteOne({
+      actorId: new mongoose.Types.ObjectId(actorId),
+      targetId: new mongoose.Types.ObjectId(postId),
+      category: category,
+    });
   }
 }

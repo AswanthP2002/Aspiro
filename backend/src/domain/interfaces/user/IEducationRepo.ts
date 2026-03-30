@@ -1,4 +1,4 @@
-import Education from '../../entities/user/educations.entity';
+import Education from '../../entities/education/educations.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IEducationRepo extends IBaseRepo<Education> {

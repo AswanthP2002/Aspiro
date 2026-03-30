@@ -1,21 +1,17 @@
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { userLogout } from '../../../services/userServices';
-import { CiHome, CiLogout, CiCreditCard1 } from 'react-icons/ci';
-import { FaBriefcase, FaUserTie, FaRegChartBar, FaHome, FaTools } from 'react-icons/fa';
-import { LuUser, LuUserCheck, LuUserPlus, LuUsers, LuUserSearch } from 'react-icons/lu';
-import { AiFillMoneyCollect, AiOutlineClose } from 'react-icons/ai';
+import { CiLogout } from 'react-icons/ci';
+import { LuUserCheck, LuUserPlus, LuUsers } from 'react-icons/lu';
+import { AiOutlineClose } from 'react-icons/ai';
 import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
 import { logoutAdmin } from '../../../services/adminServices';
 import { Notify } from 'notiflix';
-import { BiBriefcase, BiGrid, BiGridAlt, BiWallet } from 'react-icons/bi';
-import { BsDatabaseGear, BsEye, BsSuitcase } from 'react-icons/bs';
-import { FaMoneyBill1Wave } from 'react-icons/fa6';
+import { BiBriefcase, BiGridAlt, BiWallet } from 'react-icons/bi';
+import { BsDatabaseGear, BsEye } from 'react-icons/bs';
 import {GiReceiveMoney} from 'react-icons/gi'
-import { PiMoneyFill } from 'react-icons/pi';
 
 const checkPresentPath = (path: string) => {
   return window.location.pathname.includes(path)
@@ -50,9 +46,9 @@ export default function Sidebar(){
   })
  }
 
-  const token = useSelector((state : any) => {
-    return state.userAuth.userToken
-  })
+  // const token = useSelector((state : any) => {
+  //   return state.userAuth.userToken
+  // })
   return (
     <>
       <div className='w-64 flex !opacity-100 flex-col border-r border-gray-200 !bg-white h-screen'>
@@ -104,10 +100,10 @@ export default function Sidebar(){
                 <p className='text-gray-300 cursor-not-allowed'>Contents Moderation</p>
               </Link>
             </li>
-            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
-              <Link to="admin/dashboard" className='flex items-center gap-2'>
-                <BiWallet size={23} color='gray' className='cursor-not-allowed' />
-                <p className='text-gray-300 cursor-not-allowed'>Subscription & Plans</p>
+            <li className={`group ${checkPresentPath('subscriptions') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/subscription/plans" className='flex items-center gap-2'>
+              <BiWallet size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>Subscriptions & Plans</p>
               </Link>
             </li>
             <li className={`group ${checkPresentPath('config') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
@@ -116,10 +112,10 @@ export default function Sidebar(){
               <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>App Config</p>
               </Link>
             </li>
-            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
-              <Link to="/admin/dashboard" className='flex items-center gap-2'>
-                <GiReceiveMoney size={23} color='gray' className='cursor-not-allowed' />
-                <p className='text-gray-300 cursor-not-allowed'>Analytics & Revenue</p>
+            <li className={`group ${checkPresentPath('analytics') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/analytics" className='flex items-center gap-2'>
+              <GiReceiveMoney size={21} color='blue' className='group-hover:!text-blue-400'/>
+              <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>Analytics & Revenue</p>
               </Link>
             </li>
             {/* <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md cursor-not-allowed`}>

@@ -1,16 +1,15 @@
 import { inject, injectable } from 'tsyringe';
-import IChangeNotificationStatusUsecase from '../../interfaces/usecases/shared/IChangeNotificationStatus.usecase';
-import NotificationMapper from '../../mappers/user/Notification.mapperClass';
+import IChangeNotificationStatusUsecase from '../../interfaces/usecases/notification/IChangeNotificationStatus.usecase';
+import NotificationMapper from '../../mappers/notification/Notification.mapperClass';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
-import { UpdateNotificationDTO, NotificationDTO } from '../../DTOs/notifications.dto';
+import { UpdateNotificationDTO, NotificationDTO } from '../../DTOs/notification/notifications.dto';
 
 @injectable()
 export default class ChangeNotificationStatusUsecase implements IChangeNotificationStatusUsecase {
-  private _mapper: NotificationMapper;
-
-  constructor(@inject('INotificationRepository') private _repo: INotificationRepo) {
-    this._mapper = new NotificationMapper();
-  }
+  constructor(
+    @inject('INotificationRepository') private _repo: INotificationRepo,
+    @inject('NotificationMapper') private _mapper: NotificationMapper
+  ) {}
 
   async execute(updateNotificaton: UpdateNotificationDTO): Promise<NotificationDTO | null> {
     const updatedNotification = await this._repo.update(updateNotificaton._id, { isRead: true });
@@ -19,7 +18,6 @@ export default class ChangeNotificationStatusUsecase implements IChangeNotificat
       return this._mapper.notificationToNotificatonDTO(updatedNotification);
     }
 
-    return null
+    return null;
   }
-
 }

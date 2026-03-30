@@ -2,6 +2,7 @@ import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entit
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
 import CreateRecruiterDTO, { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
 import RecruiterProfilelOverviewDataDTO, {
+  AdminRecruiterApplicationDetailsDTO,
   AdminRecruiterApplicationsDTO,
   AdminRecruiterDetailsDTO,
   AdminRecruiterListDTO,
@@ -16,7 +17,7 @@ export default class RecruiterMapper {
       phone: dto.phone,
       recruiterType: dto.recruiterType,
       linkedinUrl: dto.linkedinUrl,
-      professionalTitle: dto.profiessionalTitle,
+      professionalTitle: dto.professionalTitle,
       yearOfExperience: dto.yearOfExperience,
       userId: dto.userId,
     };
@@ -86,14 +87,8 @@ export default class RecruiterMapper {
       fullName: data.fullName,
       email: data.email,
       profileStatus: data.profileStatus,
-      phone: data.phone,
-      professionalTitle: data.professionalTitle,
-      companyDetails: data.companyDetails,
       createdAt: data.createdAt,
-      linkedinUrl: data.linkedinUrl,
-      verificationDocument: data.verificationDocument,
       recruiterType: data.recruiterType,
-      yearOfExperience: data.yearOfExperience,
     };
   }
 
@@ -134,6 +129,28 @@ export default class RecruiterMapper {
       yearOfExperience: data.yearOfExperience,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      isOrphan: data.userProfile ? false : true,
+    };
+  }
+
+  public recruiterProfileOverviewDataToAdminRecruiterApplDetailsDTO(
+    data: RecruiterProfileOverviewData
+  ): AdminRecruiterApplicationDetailsDTO {
+    return {
+      _id: data._id,
+      companyDetails: data.companyDetails,
+      createdAt: data.createdAt,
+      email: data.email,
+      fullName: data.fullName,
+      isVerified: data.isVerified,
+      linkedinUrl: data.linkedinUrl,
+      phone: data.phone,
+      professionalTitle: data.professionalTitle,
+      profileStatus: data.profileStatus,
+      recruiterType: data.recruiterType,
+      userProfile: data.userProfile,
+      verificationDocument: data.verificationDocument,
+      yearOfExperience: data.yearOfExperience,
     };
   }
 }

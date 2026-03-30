@@ -1,17 +1,17 @@
-import Job from '../../domain/entities/recruiter/job.entity';
+import Job from '../../domain/entities/job/job.entity';
 import IJobRepo from '../../domain/interfaces/IJobRepo';
 import { ObjectId } from 'mongodb';
 import BaseRepository from './baseRepository';
 import { JobDAO } from '../database/DAOs/recruiter/job.dao';
-import JobAggregated from '../../domain/entities/jobAggregated.entity';
+import JobAggregated from '../../domain/entities/job/jobAggregated.entity';
 import {
   AdminLoadJobsQuery,
   JobsQuery,
   LoadJobsAggregatedListForPublicQuery,
-} from '../../application/queries/jobs.query';
-import JobAggregatedData from '../../domain/entities/user/jobAggregated.entity';
+} from '../../application/queries/job/jobs.query';
+import JobAggregatedData from '../../domain/entities/job/jobAggregatedData.entity';
 import mongoose from 'mongoose';
-import AdminJobAggregatedEntity from '../../domain/entities/admin/jobAggregated.entity';
+import AdminJobAggregatedEntity from '../../domain/entities/job/adminJobAggregated.entity';
 import JobListAggregatedForPublic from '../../domain/entities/job/jobListAggregatedForPublic.entity';
 
 export default class JobRepository extends BaseRepository<Job> implements IJobRepo {
@@ -32,6 +32,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
           jobTitle: { $regex: new RegExp(search, 'i') },
           status: { $in: jobStatusFilter },
           workMode: { $in: jobWorkModeFilter },
+          recruiterId: new mongoose.Types.ObjectId(recruiterId),
         },
       },
       {
@@ -58,7 +59,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     //change strict to later
     const { sortOption, skip, search, filter, limit, page, locationSearch } = dbQuery;
     const matchFilter: { [key: string]: object } = {};
-
+    console.log(sortOption);
     if (search) {
       matchFilter['jobTitle'] = { $regex: new RegExp(search, 'i') };
     }
@@ -310,6 +311,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   ): Promise<{ jobs: AdminJobAggregatedEntity[]; totalPages: number } | null> {
     const { search, limit, page, statusFilter, jobTypeFilter, reportsCount } = query;
     const skip = (page - 1) * limit;
+    console.log('-- inspecting job type filter before queriying --', jobTypeFilter);
     const result = await JobDAO.aggregate([
       {
         $match: {
@@ -366,7 +368,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
             },
             { $sort: { createdAt: -1 } },
             { $skip: skip },
-            { $limit: limit },
+            { $limit: 20 },
           ],
           metaData: [{ $count: 'totalDocs' }],
         },
@@ -437,11 +439,12 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   ): Promise<{ jobs: JobListAggregatedForPublic[]; totalPages: number } | null> {
     const { search, locationSearch, page, limit, jobLevelFilter, jobTypeFilter, workModeFilter } =
       query;
-
+    console.log('- checking job level filter before queriying -', jobLevelFilter);
     const skip = (page - 1) * limit;
     const result = await JobDAO.aggregate([
       {
         $match: {
+          status: 'active',
           jobTitle: { $regex: new RegExp(search, 'i') },
           workMode: { $in: workModeFilter },
           jobLevel: { $in: jobLevelFilter },
@@ -490,8 +493,75 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
 
     const jobs = result[0]?.jobs;
     const totalDocs = result[0]?.metaData[0]?.totalDocs;
+    console.log('--- inspecitng total number of jobs and fetched count ', totalDocs, 'out of ', 8);
     const totalPages = Math.ceil(totalDocs / limit);
 
     return { jobs, totalPages };
+  }
+
+  async getRecommendedJobs(query: string): Promise<JobAggregated[] | null> {
+    console.log('- checking constructed query --', query);
+    const result = await JobDAO.aggregate([
+      {
+        $match: {
+          status: 'active',
+          // isFlagged: false,
+          $text: {
+            $search: query,
+          },
+        },
+      },
+      {
+        $addFields: {
+          score: { $meta: 'textScore' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'recruiterId',
+          foreignField: '_id',
+          as: 'userProfile',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userProfile',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'recruiters',
+          localField: 'userProfile._id',
+          foreignField: 'userId',
+          as: 'userRecruiterProfile',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userRecruiterProfile',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'userRecruiterProfile.companyId',
+          foreignField: '_id',
+          as: 'companyDetails',
+        },
+      },
+      { $unwind: { path: '$companyDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          userProfile: { $exists: true },
+        },
+      },
+      { $sort: { score: -1 } },
+      { $limit: 4 },
+    ]);
+
+    return result;
   }
 }

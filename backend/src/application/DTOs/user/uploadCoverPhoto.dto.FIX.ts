@@ -1,5 +1,5 @@
 export interface UploadCoverPhotoDTO {
   publicId: string;
-  imageFile: any;
+  imageFile: Buffer<ArrayBufferLike>;
   userId: string;
 }

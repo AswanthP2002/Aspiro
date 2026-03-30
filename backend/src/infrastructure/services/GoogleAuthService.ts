@@ -1,4 +1,4 @@
-import GoogleTokenVerificationDTO from '../../application/DTOs/googleTokenVerification.dto';
+import GoogleTokenVerificationDTO from '../../application/DTOs/user/googleTokenVerification.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { InvalidGoogleTokenError } from '../../domain/errors/AppError';
 import IGoogleAuthService from '../../application/interfaces/services/IGoogleAuthService';

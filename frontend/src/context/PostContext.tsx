@@ -60,6 +60,18 @@ export default function PostProvider({children}: {children: React.ReactNode}){
 
     //like post
     const likePost = async (postId: string, ownerId: string) => {
+        setUserPosts((post: UserPosts[]) => {
+            return post.map((post: UserPosts) => {
+                if(post._id === postId){
+                    return {
+                        ...post,
+                        likes: [...post.likes, logedUser._id]
+                    }
+                }else{
+                    return post
+                }
+            })
+        })
         try {
             await likeUserPost(postId, ownerId, logedUser.name, logedUser.profilePicture)
             

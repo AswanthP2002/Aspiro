@@ -5,6 +5,6 @@ export default function mapProfileOverviewDataToDTO(
   overviewData: RecruiterProfileOverviewData
 ): RecruiterProfilelOverviewDataDTO {
   return {
-    ...overviewData
+    ...overviewData,
   };
 }

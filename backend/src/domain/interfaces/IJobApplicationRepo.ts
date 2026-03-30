@@ -1,7 +1,9 @@
-import JobApplication from '../entities/user/jobApplication.entity';
-import JobApplicationAggregated from '../entities/user/jobApplicationAggregated.entity';
-import { SingleJobApplicationDetailsAggregated } from '../entities/recruiter/jobApplicationDetailsAggregated.entity';
-import ApplicationsAggregated from '../entities/recruiter/jobApplicationsAggregated.entity';
+import JobApplication, {
+  JobApplicationCompanyRecruiterAggregated,
+} from '../entities/jobApplication/jobApplication.entity';
+import JobApplicationAggregated from '../entities/jobApplication/jobApplicationAggregated.entity';
+import { SingleJobApplicationDetailsAggregated } from '../entities/jobApplication/jobApplicationDetailsAggregated.entity';
+import ApplicationsAggregated from '../entities/jobApplication/jobApplicationsAggregated.entity';
 import IBaseRepo from './IBaseRepo';
 
 export default interface IJobApplicationRepo extends IBaseRepo<JobApplication> {
@@ -15,6 +17,12 @@ export default interface IJobApplicationRepo extends IBaseRepo<JobApplication> {
     applications: ApplicationsAggregated[];
     totalPages: number;
     totalDocs: number;
+    applied?: number;
+    screening?: number;
+    interview?: number;
+    offer?: number;
+    hired?: number;
+    rejected?: number;
   } | null>;
   rejectJobApplication(applicationId: string): Promise<JobApplication | null>;
   getCandidateSpecificApplications(
@@ -36,4 +44,7 @@ export default interface IJobApplicationRepo extends IBaseRepo<JobApplication> {
     jobId: string,
     candidateId: string
   ): Promise<JobApplication | null>;
+  getJobApplicationDetailsCompanyRecruiterCombined(
+    applicationId: string
+  ): Promise<JobApplicationCompanyRecruiterAggregated | null>;
 }

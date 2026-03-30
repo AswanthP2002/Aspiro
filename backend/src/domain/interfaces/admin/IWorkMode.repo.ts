@@ -1,4 +1,4 @@
-import WorkMode from '../../entities/admin/workMode.entity';
+import WorkMode from '../../entities/workMode/workMode.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IWorkModeRepository extends IBaseRepo<WorkMode> {
@@ -7,4 +7,5 @@ export default interface IWorkModeRepository extends IBaseRepo<WorkMode> {
     limit: number,
     page: number
   ): Promise<{ workModes: WorkMode[]; totalPages: number } | null>;
+  findWorkModeWithSlugName(slug: string): Promise<WorkMode | null>;
 }

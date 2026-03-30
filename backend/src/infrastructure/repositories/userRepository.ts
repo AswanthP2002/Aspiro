@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
-import User from '../../domain/entities/user/User.FIX';
+import User, { AccountAction } from '../../domain/entities/user/User.FIX';
 import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { UserDAO } from '../database/DAOs/user.dao.refactored';
 import BaseRepository from './baseRepository';
 import { injectable } from 'tsyringe';
-import { FindUsersQuery } from '../../application/queries/users.query';
-import UserProfileAggregatedAdmin from '../../domain/entities/userProfileAggregated';
-import LoadUsersForPublicDBQuery from '../../application/queries/loadUsersForPublicDB.query';
-import { redisClient } from '../redis/redisClient';
+import { FindUsersQuery } from '../../application/queries/user/users.query';
+import UserProfileAggregatedAdmin from '../../domain/entities/user/userProfileAggregated';
+import LoadUsersForPublicDBQuery from '../../application/queries/user/loadUsersForPublicDB.query';
+// import { redisClient } from '../redis/redisClient';
 import UserCachedData from '../../domain/entities/user/user.cachedData.entity';
 import MyProfileAggregated from '../../domain/entities/user/myProfileAggregated.entity';
+import UserFullProfileData from '../../domain/entities/user/userFullProfile.entity';
 
 @injectable()
 export default class UserRepository extends BaseRepository<User> implements IUserRepository {
@@ -73,6 +74,14 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           localField: '_id',
           foreignField: 'following',
           as: 'followers',
+        },
+      },
+      {
+        $lookup: {
+          from: 'follows',
+          localField: '_id',
+          foreignField: 'follower',
+          as: 'following',
         },
       },
       {
@@ -148,9 +157,9 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     const { search, page, limit, filterOptions, sortOption } = query;
     const skip = (page - 1) * limit;
 
-    const matchFilter: { [key: string]: object } = search
+    const matchFilter: { [key: string]: object | boolean } = search
       ? { name: { $regex: new RegExp(search, 'i') } }
-      : {};
+      : { isAdmin: false };
 
     if (filterOptions.status.length > 0) {
       matchFilter['isBlocked'] = { $in: filterOptions.status };
@@ -215,7 +224,7 @@ export default class UserRepository extends BaseRepository<User> implements IUse
   ): Promise<{ users: UserProfileAggregatedAdmin[]; totalPages: number; page: number } | null> {
     const { search, page, limit, location, experienceFilter, roleTypeFilter, sort } = query;
     const skip = (page - 1) * limit;
-
+    console.log(experienceFilter, sort);
     let matchQuery: object = {
       isVerified: true,
       isAdmin: false,
@@ -241,63 +250,140 @@ export default class UserRepository extends BaseRepository<User> implements IUse
       };
     }
 
-    const aggPipeline: any[] = [
-      {
-        $match: matchQuery,
-      },
-      {
-        $lookup: {
-          from: 'experiences',
-          localField: '_id',
-          foreignField: 'userId',
-          as: 'experiences',
-        },
-      },
-      {
-        $lookup: {
-          from: 'skills',
-          localField: '_id',
-          foreignField: 'userId',
-          as: 'skills',
-        },
-      },
-      {
-        $lookup: {
-          from: 'follows',
-          localField: '_id',
-          foreignField: 'following',
-          as: 'followers',
-        },
-      },
-      {
-        $lookup: {
-          from: 'connectionrequests',
-          localField: '_id',
-          foreignField: 'receiver',
-          as: 'connectionRequests',
-        },
-      },
-    ];
+    // const aggPipeline: any[] = [
+    //   {
+    //     $match: matchQuery,
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'experiences',
+    //       localField: '_id',
+    //       foreignField: 'userId',
+    //       as: 'experiences',
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'skills',
+    //       localField: '_id',
+    //       foreignField: 'userId',
+    //       as: 'skills',
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'follows',
+    //       localField: '_id',
+    //       foreignField: 'following',
+    //       as: 'followers',
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'connectionrequests',
+    //       localField: '_id',
+    //       foreignField: 'receiver',
+    //       as: 'connectionRequests',
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'recruiters',
+    //       localField: '_id',
+    //       foreignField: 'userId',
+    //       as: 'recruiterProfile',
+    //     },
+    //   },
+    //   { $unwind: { path: '$recruiterProfile', preserveNullAndEmptyArrays: true } },
+    // ];
 
-    const searchQuery = {
-      $match: {
-        $or: [
-          { name: { $regex: new RegExp(search, 'i') } },
-          { headline: { $regex: new RegExp(search, 'i') } },
-        ],
+    // const searchQuery = {
+    //   $match: {
+    //     $or: [
+    //       { name: { $regex: new RegExp(search, 'i') } },
+    //       { headline: { $regex: new RegExp(search, 'i') } },
+    //     ],
+    //   },
+    // };
+
+    //rebuidling proper aggregation pipeline with facet
+    const result = await UserDAO.aggregate([
+      {
+        $match: {
+          ...matchQuery,
+          $or: [
+            { name: { $regex: new RegExp(search, 'i') } },
+            { headline: { $regex: new RegExp(search, 'i') } },
+          ],
+        },
       },
-    };
-
-    aggPipeline.push(searchQuery, { $skip: skip }, { $limit: limit });
-
-    const users = await UserDAO.aggregate(aggPipeline);
-    const totalDocs = await UserDAO.aggregate([
-      ...aggPipeline,
-      searchQuery,
-      { $count: 'totalDocs' },
+      {
+        $facet: {
+          users: [
+            {
+              $lookup: {
+                from: 'experiences',
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'experiences',
+              },
+            },
+            {
+              $lookup: {
+                from: 'skills',
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'skills',
+              },
+            },
+            {
+              $lookup: {
+                from: 'follows',
+                localField: '_id',
+                foreignField: 'following',
+                as: 'followers',
+              },
+            },
+            {
+              $lookup: {
+                from: 'connectionrequests',
+                localField: '_id',
+                foreignField: 'receiver',
+                as: 'connectionRequests',
+              },
+            },
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'recruiterProfile',
+              },
+            },
+            { $unwind: { path: '$recruiterProfile', preserveNullAndEmptyArrays: true } },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          metaData: [{ $count: 'totalDocs' }],
+        },
+      },
     ]);
 
-    const totalPages = (totalDocs[0]?.totalDocs || 0) / limit || 0;
+    const users = result[0]?.users;
+    const totalDocs = result[0]?.metaData[0]?.totalDocs;
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    // aggPipeline.push(searchQuery, { $skip: skip }, { $limit: limit });
+
+    // const users = await UserDAO.aggregate(aggPipeline);
+    // const totalDocs = await UserDAO.aggregate([
+    //   ...aggPipeline,
+    //   searchQuery,
+    //   { $count: 'totalDocs' },
+    // ]);
+
+    // const totalPages = (totalDocs[0]?.totalDocs || 0) / limit || 0;
 
     return { users, page, totalPages };
   }
@@ -342,20 +428,46 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     //   };
     // }
     //if cached data is not available, then fetch data from mongodatabase -> store into redis for next use -> return data
-    const userData = await UserDAO.findOne({ _id: new mongoose.Types.ObjectId(userId) });
-    if (!userData) return null;
+    // const userData = await UserDAO.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    const userData = await UserDAO.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      {
+        $lookup: {
+          from: 'subscriptions',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'subscriptionDetails',
+        },
+      },
+      { $unwind: { path: '$subscriptionDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'plans',
+          localField: 'subscriptionDetails.planId',
+          foreignField: '_id',
+          as: 'planDetails',
+        },
+      },
+      { $unwind: { path: '$planDetails', preserveNullAndEmptyArrays: true } },
+    ]);
+    const user = userData[0];
+    if (!user) return null;
     //set user data into redis for future request
-    const newCacheData = {
-      _id: `${userData._id}` || '',
-      name: `${userData.name}` || '',
-      email: `${userData.email}` || '',
-      headline: `${userData.headline ? userData.headline : ''}` || '',
+    const newCacheData: UserCachedData = {
+      _id: `${user._id}` || '',
+      name: `${user.name}` || '',
+      email: `${user.email}` || '',
+      headline: `${user.headline ? user.headline : ''}` || '',
       profilePicture:
-        `${userData.profilePicture?.cloudinarySecureUrl ? userData.profilePicture.cloudinarySecureUrl : ''}` ||
+        `${user.profilePicture?.cloudinarySecureUrl ? user.profilePicture.cloudinarySecureUrl : ''}` ||
         '',
-      role: `${userData.role ? userData.role[0] : 'user'}`,
+      role: `${user.role ? user.role[0] : 'user'}`,
+      subscription: {
+        planId: user?.planDetails?._id || '',
+        subscriptionId: user?.subscriptionDetails?._id || '',
+        name: user?.planDetails?.name,
+      },
     };
-
 
     //await redisClient.multi().hSet(`${userId}`, newCacheData).expire(`${userId}`, 1800);
 
@@ -395,6 +507,135 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           foreignField: 'following',
           localField: '_id',
           as: 'followers',
+        },
+      },
+    ]);
+
+    return result[0];
+  }
+
+  async updateAccountAction(userId: string, action: AccountAction): Promise<User | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $push: { accountActions: action } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async getSimilarUsersWithSkills(
+    skills: string[],
+    userId: string,
+    similarEducations: string[],
+    similarStudiedInstitutions: string[],
+    similarJobRoleWorked: string[],
+    similarCompanyWorked: string[],
+    similarHeadline: string[],
+    similarCity: string[],
+    similarDistrict: string[],
+    similarState: string[],
+    similarCountry: string[],
+    similarPincode: string[]
+  ): Promise<User[] | null> {
+    const users = await UserDAO.aggregate([
+      {
+        $lookup: {
+          from: 'skills',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'skills',
+        },
+      },
+      {
+        $lookup: {
+          from: 'experiences',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'experiences',
+        },
+      },
+      {
+        $lookup: {
+          from: 'educations',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'educations',
+        },
+      },
+      {
+        $match: {
+          // 'skills.skill': { $in: skills },
+          isAdmin: false,
+          _id: { $ne: new mongoose.Types.ObjectId(userId) },
+          $or: [
+            { headline: { $in: similarHeadline } },
+            { 'location.city': { $in: similarCity } },
+            { 'location.district': { $in: similarDistrict } },
+            { 'location.state': { $in: similarState } },
+            { 'location.country': { $in: similarCountry } },
+            { 'location.pincode': { $in: similarPincode } },
+            { 'experiences.jobRole': { $in: similarJobRoleWorked } },
+            { 'experiences.organization': { $in: similarCompanyWorked } },
+            { 'skills.skill': { $in: skills } },
+            {
+              'educations.educationStream': {
+                $in: similarEducations,
+              },
+            },
+            {
+              'educations.institution': {
+                $in: similarStudiedInstitutions,
+              },
+            },
+          ],
+        },
+      },
+      { $limit: 4 },
+    ]);
+
+    return users;
+  }
+
+  async getUserFullProfileDataAggregated(userId: string): Promise<UserFullProfileData | null> {
+    const result = await UserDAO.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'experiences',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'experiences',
+        },
+      },
+      {
+        $lookup: {
+          from: 'educations',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'educations',
+        },
+      },
+      {
+        $lookup: {
+          from: 'skills',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'skills',
+        },
+      },
+      {
+        $lookup: {
+          from: 'certificates',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'certificates',
         },
       },
     ]);

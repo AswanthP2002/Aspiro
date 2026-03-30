@@ -8,7 +8,8 @@ import { LuUser } from "react-icons/lu"
 import { CiFileOn } from "react-icons/ci"
 import { FaRegCircleXmark } from "react-icons/fa6"
 import Swal from "sweetalert2";
-import { approveRecruiterApplication, rejectRecruiterApplication } from "../../../services/adminServices"
+import { approveRecruiterApplication, rejectRecruiterApplication } from "../../../services/recruiterServices"
+// import { } from "../../../services/adminServices"
 import { Notify } from "notiflix"
 
 export default function RecruiterApplicationDetailsPage(){

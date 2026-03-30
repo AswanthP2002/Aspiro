@@ -1,5 +1,5 @@
-const baseEmailWrapper = (content: string) : string => {
-    return `
+const baseEmailWrapper = (content: string): string => {
+  return `
         <!DOCTYPE html>
 <html>
   <head>
@@ -46,23 +46,22 @@ const baseEmailWrapper = (content: string) : string => {
     </div>
   </body>
 </html>
-    ` 
-}
+    `;
+};
 
 export default function generatedAutomatedEmailContent(
-    job: string,
-    candidateName: string,
-    status: 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'
-): {subject: string, body: string} {
-    
-    let subject: string = '';
-    let body: string = ''
-    let content = ''
+  job: string,
+  candidateName: string,
+  status: 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | 'opened'
+): { subject: string; body: string } {
+  let subject: string = '';
+  let body: string = '';
+  let content = '';
 
-    switch (status) {
-      case 'applied':
-        subject = `Thank you for applying the job - ${job}`;
-        content = `
+  switch (status) {
+    case 'applied':
+      subject = `Thank you for applying the job - ${job}`;
+      content = `
                 <p>Hello ${candidateName},</p>
 
                 <p>
@@ -80,12 +79,12 @@ export default function generatedAutomatedEmailContent(
                 Aspiro Team
                 </p>
             `;
-        body = baseEmailWrapper(content)
-        break
-    
-      case 'screening':
-        subject = `Application Status Update - ${status}`
-        content = `
+      body = baseEmailWrapper(content);
+      break;
+
+    case 'screening':
+      subject = `Application Status Update - ${status}`;
+      content = `
             <p>Hello ${candidateName},</p>
 
             <p>
@@ -102,13 +101,13 @@ export default function generatedAutomatedEmailContent(
             Regards,<br />
             Aspiro Team
             </p>
-        `
-        body = baseEmailWrapper(content)
-        break
+        `;
+      body = baseEmailWrapper(content);
+      break;
 
-      case 'interview':
-        subject = `Application Status Update - ${status}`
-        content = `
+    case 'interview':
+      subject = `Application Status Update - ${status}`;
+      content = `
             <p>Hello ${candidateName},</p>
 
             <p>
@@ -124,12 +123,12 @@ export default function generatedAutomatedEmailContent(
             Regards,<br />
             Aspiro Team
             </p>
-        `
-        body = baseEmailWrapper(content)
-    
-      case 'offer':
-        subject = `Application Status Update - ${status}`
-        content = `
+        `;
+      body = baseEmailWrapper(content);
+      break;
+    case 'offer':
+      subject = `Application Status Update - ${status}`;
+      content = `
             <p>Hello ${candidateName},</p>
 
             <p>
@@ -145,12 +144,12 @@ export default function generatedAutomatedEmailContent(
             Regards,<br />
             Aspiro Team
             </p>
-        `
-        body = baseEmailWrapper(content)
-
-      case 'hired':
-        subject = `Application Status Update - ${status}`
-        content = `
+        `;
+      body = baseEmailWrapper(content);
+      break;
+    case 'hired':
+      subject = `Application Status Update - ${status}`;
+      content = `
             <p>Hello ${candidateName},</p>
 
             <p>
@@ -166,12 +165,12 @@ export default function generatedAutomatedEmailContent(
             Regards,<br />
             Aspiro Team
             </p>
-        `
-        body = baseEmailWrapper(content)
-
-      case 'rejected':
-        subject = `Appplication Status Update - ${status}`
-        content = `
+        `;
+      body = baseEmailWrapper(content);
+      break;
+    case 'rejected':
+      subject = `Appplication Status Update - ${status}`;
+      content = `
             <p>Hello ${candidateName},</p>
 
             <p>
@@ -187,11 +186,11 @@ export default function generatedAutomatedEmailContent(
             Regards,<br />
             Aspiro Team
             </p>
-        `
-    }
+        `;
+  }
 
-    return {
-        subject, body
-    }
-    
+  return {
+    subject,
+    body,
+  };
 }

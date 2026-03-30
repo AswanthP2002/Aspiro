@@ -1,11 +1,12 @@
 import { Box, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
-import Swal from "sweetalert2";
-import { editUserEducation } from "../../../services/userServices";
+// import { editUserEducation } from "../../../services/userServices";
+import { editUserEducation } from "../../../services/educationServices";
 import { Controller, useForm } from "react-hook-form";
-import { Notify } from "notiflix";
 import { Education } from "../../../types/entityTypes";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 interface EditEducationResponsePayload {
     success: boolean
@@ -13,7 +14,14 @@ interface EditEducationResponsePayload {
     result: Education
 }
 
-export default function EditEducationForm({selectedEducation, onEditEducation, editEducationModalOpen, closeEditEducationModal} : any) {
+interface EditEducationFormProps {
+    selectedEducation: Education
+    onEditEducation: (dataId: string, data: Education) => void
+    editEducationModalOpen: boolean
+    closeEditEducationModal: () => void
+}
+
+export default function EditEducationForm({selectedEducation, onEditEducation, editEducationModalOpen, closeEditEducationModal} : EditEducationFormProps) {
     
     type Inputs = {
         educationLevel : string
@@ -66,9 +74,9 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
 
     const currentEducationStatus = watch("isPresent")
 
-    const toggleIsPresent = () => {
-        setIspresent(prev => !prev)
-    }
+    // const toggleIsPresent = () => {
+    //     setIspresent(prev => !prev)
+    // }
 
 
     async function editEducation(data : Inputs) {
@@ -78,33 +86,27 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
         //closeEditEducationModal()
 
             try {
-                const result: EditEducationResponsePayload = await editUserEducation(selectedEducation._id, educationLevel, stream, institution, isPresent, startDate, endDate, location)
+                const result: EditEducationResponsePayload = await toast.promise(
+                    editUserEducation(selectedEducation._id as string, educationLevel, stream, institution, isPresent, startDate, endDate, location),
+                    {
+                        pending: 'Updating education...',
+                        success: 'Education updated',
+                        error:{
+                            render(props) {
+                                const data = props.data as AxiosError<{message: string}>
+                                return data.message
+                            },
+                        }
+                    }
+                )
 
             if(result?.success){
-                Swal.fire({
-                    icon:'success',
-                    title:'Edited',
-                    showCancelButton:false,
-                    showConfirmButton:false,
-                    timer:1500
-                }).then(() => {
-                    console.log('--user education updated result from server--', result.result)
-                    onEditEducation(result.result._id, result.result)
-                    // onEditEducation(selectedEducation._id, {
-                    //     level:educationLevel,
-                    //     stream:stream,
-                    //     organization:institution,
-                    //     isPresent:isPresent,
-                    //     location:location,
-                    //     startYear:startDate,
-                    //     endYear:endDate
-                    // })
-                })
+                onEditEducation(result.result._id as string, result.result)
             }else{
-                Notify.failure(result?.message, {timeout:2000})
+                toast.error(result.message)
             }
             } catch (error : unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
             } finally {
                 closeEditEducationModal()
                 setLoading(true)

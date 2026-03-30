@@ -4,12 +4,18 @@ import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
 import { Button, FormControl, FormHelperText, Modal, Switch } from '@mui/material';
 import { CgClose, CgTrash } from 'react-icons/cg';
-import { adminAddJobLevel, adminAddJobType, adminAddSkill, adminAddWorkMode, adminChangeJobLevelStatus, adminChangeJobTypeStatus, adminChangeWorkmodeStatus, adminDeleteJobLevel, adminDeleteJobType, adminDeleteSkills, adminDeleteWorkMode, adminEditJobLevel, adminEditWorkMode, adminGetJobLevels, adminGetJobTypes, adminGetSkills, adminGetWorkModes, adminUpdateJobType, adminUpdateSkill } from '../../../services/adminServices';
+import { adminAddSkill, adminUpdateSkill, adminDeleteSkills, adminGetSkills } from '../../../services/skillService';
+import { adminAddWorkMode, adminChangeWorkmodeStatus, adminDeleteWorkMode,adminEditWorkMode, adminGetWorkModes } from '../../../services/workModeServices';
+import { adminAddJobLevel, adminChangeJobLevelStatus, adminDeleteJobLevel, adminEditJobLevel, adminGetJobLevels } from '../../../services/jobLevelServices';
+// import {  } from '../../../services/adminServices';
+import { adminAddJobType, adminChangeJobTypeStatus, adminDeleteJobType, adminGetJobTypes, adminUpdateJobType } from '../../../services/jobTypeServices';
 import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
 import { BsPencilSquare, BsSearch } from 'react-icons/bs';
 import { JobLevelData, JobTypesData, WorkModeData } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 interface SkillData {
     _id: string;
@@ -171,21 +177,36 @@ const SkillsLibrary = () => {
 
     const handleSubmit = async () => {
         if (!skillName.trim()) {
-            Notify.failure('Please enter a skill name');
+            toast.error('Please enter a skill name');
             return;
         }
 
         try {
             if (isEditing && currentSkill) {
                 await adminUpdateSkill(currentSkill._id, skillName, currentSkill.isVerified);
-                Notify.success('Skill updated successfully');
+                toast.success('Skill updated successfully');
             } else {
-                await adminAddSkill(skillName);
-                Notify.success('Skill added successfully');
+                const result = await toast.promise(
+                    adminAddSkill(skillName),
+                    {
+                        pending: 'Adding skill...',
+                        success: 'Skill added',
+                        error:{
+                            render(props){
+                                const error = props.data as AxiosError<{message: string}>
+                                return error.response?.data.message || error.message || 'something went wrong'
+                            }
+                        }
+                    }
+                )
+
+                if(result?.success){
+                    setSkills((prv: SkillData[]) => [result?.result, ...prv])
+                }
             }
             setModalOpen(false);
-        } catch (error: any) {
-            Notify.failure(error.response?.data?.message || 'Operation failed');
+        } catch (error: unknown) {
+            console.log(error)
         }
     };
 
@@ -202,10 +223,10 @@ const SkillsLibrary = () => {
             if (result.isConfirmed) {
                 try {
                     await adminDeleteSkills(id);
-                    Notify.success('Skill deleted successfully');
+                    toast.success('Skill deleted successfully');
                     setSkills((skills: SkillData[]) => skills.filter((skill: SkillData) => skill._id !== id))
-                } catch (error: any) {
-                    Notify.failure(error.response?.data?.message || 'Delete failed');
+                } catch (error: unknown) {
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
             }
         });
@@ -254,7 +275,7 @@ const SkillsLibrary = () => {
                 }
             } catch (error: unknown) {
                 console.log('--Error occured while fetching skills--', error)
-                Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
             }
         }
 
@@ -401,7 +422,7 @@ const WorkModes = () => {
     const [currentWorkMode, setCurrentWorkMode] = useState<WorkModeData | null>(null)
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(7)
+    const [limit, setLimit] = useState(5)
     const [totalPages, setTotalPages] = useState(1)
     const [isAddWorkModeModalOpen, setIsAddWorkModeModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -415,7 +436,7 @@ const WorkModes = () => {
         setWorkModes((prv: WorkModeData[]) => {
             return prv.map((workMode: WorkModeData) => {
                 if(workMode._id === id) {
-                    Notify.info(`status updated current status = ${workMode.isActive}`)
+                    // Notify.info(`status updated current status = ${workMode.isActive}`)
                     return {...workMode, isActive: !workMode.isActive}
                 }else{
                     return workMode
@@ -452,10 +473,10 @@ const WorkModes = () => {
                 try {
                     const result = await adminChangeWorkmodeStatus(id, 'active')
                     if(result?.success){
-                        Notify.success('Workmode is now active')
+                        toast.success('Workmode is now active')
                     }
                 } catch (error) {
-                    Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
             }else{
                 setWorkModes((prv: WorkModeData[]) => {
@@ -487,10 +508,10 @@ const WorkModes = () => {
                 try {
                     const result = await adminChangeWorkmodeStatus(id, 'inactive')
                     if(result?.success){
-                        Notify.success('Workmode is now inactive')
+                        toast.success('Workmode is now inactive')
                     }
-                } catch (error) {
-                    Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                } catch (error: unknown) {
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
             }else{
                 setWorkModes((prv: WorkModeData[]) => {
@@ -522,13 +543,13 @@ const WorkModes = () => {
                 try {
                     const result = await adminDeleteWorkMode(id)
                     if(result.success){
-                        Notify.success('Work mode deleted')
+                        toast.success('Work mode deleted')
                         setWorkModes((worModes: WorkModeData[]) => {
                             return worModes.filter((workMode: WorkModeData) => workMode._id !== id)
                         })
                     }
                 } catch (error) {
-                    Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
             }else{
                 return
@@ -560,7 +581,7 @@ const WorkModes = () => {
             if(isEditing && currentWorkMode){
                 const result: EditWorkModeResultPayload = await adminEditWorkMode(currentWorkMode._id as string, data.name)
                 if(result.success){
-                    Notify.success(result.message)
+                    toast.success(result.message)
                     setWorkModes((workModes: WorkModeData[]) => {
                         return workModes.map((workMode: WorkModeData) => {
                             if(workMode._id === currentWorkMode._id){
@@ -572,14 +593,26 @@ const WorkModes = () => {
                     })
                 }
             }else {
-                const result: AddWorkModeResultPayload = await adminAddWorkMode(data.name, isActive)
+                const result: AddWorkModeResultPayload = await toast.promise(
+                    adminAddWorkMode(data.name, isActive),
+                    {
+                        pending: 'Adding work mode...',
+                        success: 'Work mode added',
+                        error:{
+                            render(props) {
+                                const error = props.data as AxiosError<{message: string}>
+                                return error.response?.data?.message || error.message || 'Something went wrong'
+                            },
+                        }
+                    }
+                )
                 if(result.success){
-                    Notify.success(result.message)
                     setWorkModes((workmodes: WorkModeData[]) => [...workmodes, result.result])
                 }
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went worng')
+            console.log(error instanceof Error ? error.message : 'Something went wrong')
+            // toast.error(error instanceof Error ? error.message : 'Something went wrong')
         } finally {
             setLoading(false)
             reset({name: ''})
@@ -682,7 +715,7 @@ const JobLevel = () => {
     const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(1)
+    const [limit, setLimit] = useState(5)
     const [search, setSearch] = useState('')
    
     const JobLevelTableColumn: TableColumn<JobLevelData>[] = [
@@ -920,14 +953,25 @@ const JobLevel = () => {
                     })
                 }
             }else {
-                const result: AddJobLevelResultPayload = await adminAddJobLevel(data.name, isActive)
+                const result: AddJobLevelResultPayload = await toast.promise(
+                    adminAddJobLevel(data.name, isActive),
+                    {
+                        pending: 'Adding job level...',
+                        success: 'Job level added',
+                        error:{
+                            render(props) {
+                                const error = props.data as AxiosError<{message: string}>
+                                return error.response?.data.message || error.message || 'Something went wrong'
+                            },
+                        }
+                    }
+                )
                 if(result.success){
-                    Notify.success(result.message)
                     setJobLevelData((jobLevels: JobLevelData[]) => [...jobLevels, result.result])
                 }
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went worng')
+            console.log(error)
         } finally {
             setLoading(false)
             reset({name: ''})
@@ -939,7 +983,7 @@ const JobLevel = () => {
     useEffect(() => {
         async function fetchJobLevels() {
             try {
-                const result: FetchJobLevelResultPayload = await adminGetJobLevels(search, page)
+                const result: FetchJobLevelResultPayload = await adminGetJobLevels(search, page, limit)
                 if(result.success){
                     console.log('data from backend j-level', result)
                     setJobLevelData(result.result.jobLevels)
@@ -1038,7 +1082,7 @@ const JobTypes = () => {
     const [jobTypesData, setJobTypesData] = useState<JobTypesData[]>([])
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(1)
+    const [limit, setLimit] = useState(5)
     const [search, setSearch] = useState('')
    
     const jobTypesTableColumn: TableColumn<JobTypesData>[] = [
@@ -1276,14 +1320,25 @@ const JobTypes = () => {
                     })
                 }
             }else {
-                const result: AddJobTypeResultPayload = await adminAddJobType(data.name, isActive)
+                const result: AddJobTypeResultPayload = await toast.promise(
+                    adminAddJobType(data.name, isActive),
+                    {
+                        pending: 'Adding job type...',
+                        success: 'Job type added',
+                        error:{
+                            render(props) {
+                                const error = props.data as AxiosError<{message: string}>
+                                return error.response?.data.message || error.message || 'Something went wrong'
+                            },
+                        }
+                    }
+                )
                 if(result.success){
-                    Notify.success(result.message)
                     setJobTypesData((jobTypes: JobTypesData[]) => [...jobTypes, result.result])
                 }
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went worng')
+            console.log(error)
         } finally {
             setLoading(false)
             reset({name: ''})
@@ -1295,7 +1350,7 @@ const JobTypes = () => {
     useEffect(() => {
         async function fetchJobTypes() {
             try {
-                const result: FetchJobTypesResultPayload = await adminGetJobTypes(search)
+                const result: FetchJobTypesResultPayload = await adminGetJobTypes(search, page, limit)
                 if(result.success){
                     console.log('data from backend j-type', result)
                     setJobTypesData(result.result.jobTypes)

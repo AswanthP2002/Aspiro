@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import { getRecruiterDetails, handleRecruiterPermissions, handleRecruiterVerification } from '../../../services/adminServices'
-import { BiArrowBack, BiBriefcase, BiBuildings, BiCheckCircle, BiMessageSquare } from 'react-icons/bi'
-import { LuUser } from 'react-icons/lu'
+import { getRecruiterDetails, handleRecruiterVerification, handleRecruiterPermissions } from '../../../services/recruiterServices'
+import { deleteRecruiterData } from '../../../services/adminServices'
+import { BiArrowBack, BiBriefcase, BiBuildings, BiCheckCircle, BiMessageSquare, BiUserPlus } from 'react-icons/bi'
+import { LuShieldAlert, LuUser } from 'react-icons/lu'
 import { AdminRecruiterDetailsData } from '../../../types/entityTypes'
 import {TbBrandDaysCounter} from 'react-icons/tb'
 import { Notify } from 'notiflix'
 import moment from 'moment'
-import { BsLinkedin } from 'react-icons/bs'
+import { BsLinkedin, BsTrash2 } from 'react-icons/bs'
+import { Modal, Box, Typography, Divider, Button } from '@mui/material'
+import { FiAlertTriangle, FiX } from 'react-icons/fi'
+import { FaFlag } from 'react-icons/fa'
+import { GiSuspicious } from 'react-icons/gi'
+import { toast } from 'react-toastify'
+import { AxiosError } from 'axios'
 
 
 export default function RecruiterDetails(){
@@ -16,6 +23,11 @@ export default function RecruiterDetails(){
   const {recruiterId} = location.state || {}
   const navigate = useNavigate()
   const [recruiterDetails, setRecruiterDetails] = useState<AdminRecruiterDetailsData | null>(null)
+  const [isWarningModalOpened, setIsWarningModalOpened] = useState(false)
+
+  const openWarningModal = () => setIsWarningModalOpened(true)
+  const closeWarningModal = () => setIsWarningModalOpened(false)
+
 
   const handleRevokeVerification = (recruiterId: string, action: "Verified" | "Revoked") => {
     if(!recruiterId) return
@@ -33,7 +45,7 @@ export default function RecruiterDetails(){
             try {
                 const result = await handleRecruiterVerification(recruiterId, action)
                 if(result?.success){
-                    Notify.success('Verification Revoked')
+                    toast.success('Recruiter verification Revoked')
                     setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
                         if(!prv) return null
                         return {
@@ -44,7 +56,7 @@ export default function RecruiterDetails(){
                     })
                 }
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'somethng went wrong')
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
             }
         }
     })
@@ -66,7 +78,7 @@ export default function RecruiterDetails(){
             try {
                 const result = await handleRecruiterVerification(recruiterId, action)
                 if(result?.success){
-                    Notify.success('Verification Unrevoked')
+                    toast.success('Verification Unrevoked')
                     setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
                         if(!prv) return null
                         return {
@@ -77,7 +89,7 @@ export default function RecruiterDetails(){
                     })
                 }
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'somethng went wrong')
+               toast.success(error instanceof Error ? error.message : 'Something went wrong')
             }
         }
     })
@@ -103,7 +115,7 @@ export default function RecruiterDetails(){
             try {
                 const result = await handleRecruiterPermissions(recruiterId, action)
                 if(result?.success){
-                    Notify.success('Permissions Revoked')
+                    toast.success('Permissions Revoked')
                     setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
                         if(!prv) return null
                         return {
@@ -113,7 +125,7 @@ export default function RecruiterDetails(){
                     })
                 }
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'somethng went wrong')
+                toast.error(error instanceof Error ? error.message : 'somethng went wrong')
             }
         }
     })
@@ -135,7 +147,7 @@ export default function RecruiterDetails(){
             try {
                 const result = await handleRecruiterPermissions(recruiterId, action)
                 if(result?.success){
-                    Notify.success('Permissions Un Revoked')
+                    toast.success('Permissions Un Revoked')
                     setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
                         if(!prv) return null
                         return {
@@ -145,11 +157,59 @@ export default function RecruiterDetails(){
                     })
                 }
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'somethng went wrong')
+                toast.error(error instanceof Error ? error.message : 'somethng went wrong')
             }
         }
     })
   };
+
+
+  const deleteThisRecruiterData = async (recruiterId: string) => {
+    if(!recruiterId) return
+    const confirmDelete = await Swal.fire({
+      icon: 'question',
+      title: 'Delete this recruiter?',
+      text: 'Are you sure to delete this recruiter data?. This action can not be redo and it will clear all data related to the recruiter',
+      showConfirmButton: true,
+      confirmButtonText: 'Delete',
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen:() => {
+        const container = Swal.getContainer()
+        if(container){
+          container.style.zIndex = '99999'
+        }
+      }
+    })
+
+    if(!confirmDelete.isConfirmed || confirmDelete.isDismissed) return
+
+    try {
+      const deleteResult = await toast.promise(
+        deleteRecruiterData(recruiterId),
+        {
+          pending: 'Deleting recruiter...',
+          success: 'Deleted',
+          error:{
+            render(props) {
+              const data = props.data as AxiosError<{message: string}>
+              return data.message
+            },
+          }
+        }
+      )
+      if(deleteResult?.success){
+        setTimeout(() => {
+        navigate(-1)
+      }, 2000)
+      }else{
+        toast.error('Can not delete recruiter now')
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
 
 
       useEffect(() => {
@@ -160,8 +220,13 @@ export default function RecruiterDetails(){
                 console.log('-- result from the server --', result)
                 if(result?.success){
                     setRecruiterDetails(result?.result)
+                    if(result.result.isOrphan){
+                      openWarningModal()
+                    }else{
+                      closeWarningModal()
+                    }
                     console.log('recruiter details from the server', result?.result)
-                    Notify.success(result?.message)
+                    // Notify.success(result?.message)
                 }
             } catch (error: unknown) {
                 Notify.failure(error instanceof Error ? error.message : 'something went wrong')
@@ -172,6 +237,7 @@ export default function RecruiterDetails(){
     }, [])
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 p-6 lg:p-10 font-sans text-slate-900">
       {/* Back Navigation */}
       <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-slate-500 hover:text-slate-800 transition-colors mb-6 text-sm font-medium">
@@ -237,13 +303,15 @@ export default function RecruiterDetails(){
                   <a href={recruiterDetails?.linkedinUrl} target='_blank' rel='noopener noreferrer' className='text-sm mt-1 text-underline text-blue-500'>LikedIn.com</a>
                 </div>
               </div>
-              <div className='flex gap-3 items-center border border-slate-200 rounded-lg p-3'>
+              {recruiterDetails?.recruiterType === 'corporate' && (
+                <div className='flex gap-3 items-center border border-slate-200 rounded-lg p-3'>
                 <BiBuildings color='blue' size={25} />
                 <div>
                   <p className='text-sm font-semibold turncate'>Company</p>
                   <p className='text-sm mt-1 text-gray-500'>{recruiterDetails?.companyDetails?.name}</p>
                 </div>
               </div>
+              )}
             </div>
            </div>
 
@@ -291,14 +359,16 @@ export default function RecruiterDetails(){
                     </>
               }
               
-              <button 
+              {!recruiterDetails?.isOrphan && (
+                <button 
                 onClick={handleMoveCompany} 
                 className="bg-gray-200 text-gray-400 p-2 rounded-md !cursor-not-allowed shadow-md shadow-indigo-100">
                     Move to different Company
              </button>
+              )}
               
               {
-                recruiterDetails?.isPermissionRevoked
+                !recruiterDetails?.isOrphan && recruiterDetails?.isPermissionRevoked
                     ? <>
                         <ActionButton 
                 onClick={() => handleUnRevokePermisson(recruiterDetails?._id as string, "Un-Revoke")}
@@ -307,15 +377,25 @@ export default function RecruiterDetails(){
                 Un Revoke Recruiter Permissions
               </ActionButton>
                       </>
-                    : <>
-                        <ActionButton 
+                    : (!recruiterDetails?.isOrphan
+                        ? <ActionButton 
                 onClick={() => handleRevokePermissions(recruiterDetails?._id as string, "Revoke")}
                 className="bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-100"
               >
                 Revoke Recruiter Permissions
               </ActionButton>
-                      </>
+                    : null
+                    )
               }
+
+              {recruiterDetails?.isOrphan && (
+                <ActionButton
+                onClick={() => deleteThisRecruiterData(recruiterDetails._id as string)}
+                  className="bg-white border border-red-500 ring-1 ring-red-500 text-red-500"
+                >
+                  Delete Record
+                </ActionButton>
+              )}
             </div>
 
             <hr className="border-slate-100 mb-6" />
@@ -335,6 +415,10 @@ export default function RecruiterDetails(){
 
       </div>
     </div>
+    {(recruiterDetails && isWarningModalOpened ) && (
+      <TestModal open={isWarningModalOpened} recruiter={recruiterDetails} onClose={closeWarningModal} onDelete={() => deleteThisRecruiterData(recruiterDetails._id as string)} />
+    )}
+    </>
   );
 };
 
@@ -578,3 +662,106 @@ const InfoRow = ({ label, value, color = "text-slate-900" }: any) => (
 //         </>
 //     )
 // }
+
+function TestModal({open, onClose, recruiter, onDelete}: {open: boolean, onClose: () => void, recruiter: AdminRecruiterDetailsData, onDelete: () => void}){
+  return(
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby="orphaned-profile-title"
+      className="flex items-center justify-center p-4"
+    >
+      <Box className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl outline-none overflow-hidden">
+        
+        {/* Close Button - top right */}
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+        >
+          <FiX size={20} />
+        </button>
+
+        {/* Header Section */}
+        <div className="p-6 pb-0 flex flex-col items-center text-center">
+          <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mb-4 border border-amber-100">
+            <FiAlertTriangle className="text-amber-500 w-8 h-8" />
+          </div>
+          <Typography id="orphaned-profile-title" variant="h6" className="font-bold text-slate-900">
+            Orphaned Recruiter Profile
+          </Typography>
+          <Typography className="text-slate-500 text-sm mt-1">
+            The linked user account no longer exists in the system.
+          </Typography>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-6 space-y-5">
+          {/* Target Profile Info */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Recruiter Identity</p>
+              <p className="font-semibold text-slate-800">{recruiter.fullName || 'Unidentified Profile'}</p>
+            </div>
+            <div className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded uppercase">
+              No User Link
+            </div>
+          </div>
+
+          {/* Action Options */}
+          <div className="grid grid-cols-1 gap-3">
+            <p className="text-xs font-bold text-slate-400 uppercase ml-1"> preferred Administrative Actions</p>
+            
+            {/* Suspend Option */}
+            <button 
+              //onClick={() => onAction('suspend')}
+              className="group flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-left"
+            >
+              <div className="p-2 bg-indigo-50 rounded-lg group-hover:bg-indigo-100">
+                <LuShieldAlert className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-slate-800">Revoke Verification</p>
+                <p className="text-xs text-slate-500">Keep data but hide all job listings.</p>
+              </div>
+            </button>
+
+            {/* Reassign Option */}
+            {/* <button 
+              //onClick={() => onAction('relink')}
+              className="group flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/30 transition-all text-left"
+            >
+              <div className="p-2 bg-emerald-50 rounded-lg group-hover:bg-emerald-100">
+                <GiSuspicious className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-slate-800">Flag Account</p>
+                <p className="text-xs text-slate-500">Mark this recruiter as flagged. Keeps the jobs for users marked as flagged</p>
+              </div>
+            </button> */}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <Divider />
+        <div className="bg-slate-50/80 p-4 px-6 flex items-center justify-between gap-3">
+          <Button 
+            onClick={onDelete}
+            startIcon={<BsTrash2 size={16} />}
+            className="text-red-600 hover:bg-red-50 capitalize font-bold text-sm"
+          >
+            Delete Record
+          </Button>
+          
+          <Button 
+            onClick={onClose}
+            variant="contained"
+            disableElevation
+            className="bg-slate-800 hover:bg-slate-900 capitalize px-6 rounded-lg text-sm"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Box>
+    </Modal>
+  )
+}

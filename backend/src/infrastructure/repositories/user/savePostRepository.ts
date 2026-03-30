@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import ISavePostRepo from '../../../domain/interfaces/user/ISavePostRepo';
-import SavePost from '../../../domain/entities/user/savePost.entity';
+import SavePost from '../../../domain/entities/post/savePost.entity';
 import { SavePostModel } from '../../database/Schemas/user/savePost.schema';
 import BaseRepository from '../baseRepository';
 
@@ -14,6 +14,8 @@ export default class SavePostRepository extends BaseRepository<SavePost> impleme
       const result = await SavePostModel.create({ userId, postId });
       return result;
     } catch (error) {
+      console.log(error);
+      console.log(error);
       return null;
     }
   }

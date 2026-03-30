@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import WorkMode from '../../../../domain/entities/admin/workMode.entity';
+import WorkMode from '../../../../domain/entities/workMode/workMode.entity';
 
 export const WorkModeSchema = new Schema<WorkMode>({
   name: { type: String, require: true },
@@ -7,5 +7,4 @@ export const WorkModeSchema = new Schema<WorkMode>({
   isActive: { type: Boolean, default: true },
 });
 
-
-export const workModeDAO = model<WorkMode>('workmode', WorkModeSchema)
+export const workModeDAO = model<WorkMode>('workmode', WorkModeSchema);

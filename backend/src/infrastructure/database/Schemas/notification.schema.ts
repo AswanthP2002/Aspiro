@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Notification from '../../../domain/entities/notification.entity';
+import Notification from '../../../domain/entities/notification/notification.entity';
 
 export const NotificationSchema = new Schema<Notification>(
   {

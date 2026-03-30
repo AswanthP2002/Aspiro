@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { editJob, postJob } from "../../../services/recruiterServices"
+import { editJob, getPostedJobDetails, postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from "../../../services/recruiterServices"
 import dayjs, { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
 import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
@@ -11,6 +11,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import { Notify } from "notiflix"
+import { toast } from "react-toastify"
+import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityTypes"
 
 interface JobDetails {
     jobTitle: string,
@@ -41,6 +43,9 @@ export default function EditJobForm(){
 
     const [requiredSkills, setRequiredSkills] = useState<string[]>([])
     const requiredSkillRef = useRef<HTMLInputElement | null>(null)
+    const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
+    const [jobTypeData, setJobTypeData] = useState<JobTypesData[]>([])
+    const [workModeData, setWorkModeData] = useState<WorkModeData[]>([])
     const [optionalSkills, setOptionalSkills] = useState<string[]>([])
     const optionalSkillRef = useRef<HTMLInputElement | null>(null)
     const navigator = useNavigate()
@@ -65,30 +70,79 @@ export default function EditJobForm(){
     })
 
     useEffect(() => {
-        if(jobData){
-            console.log('this is job data', jobData)
-            reset({
-                jobTitle: jobData.jobTitle,
-                description: jobData.description,
-                requirements: jobData.requirements,
-                responsibilities: jobData.responsibilities,
-                duration: jobData.duration,
-                jobType: jobData.jobType,
-                workMode: jobData.workMode,
-                location: jobData.location,
-                minSalary: jobData.minSalary,
-                maxSalary: jobData.maxSalary,
-                salaryCurrency: jobData.salaryCurrency,
-                salaryPeriod: jobData.salaryPeriod,
-                vacancies: jobData.vacancies,
-                qualification: jobData.qualification,
-                experienceInYears: jobData.experienceInYears,
-                jobLevel: jobData.jobLevel,
-                requiredSkills: jobData.requiredSkills,
-                optionalSkills: jobData.optionalSkills,
-                expiresAt: dayjs(jobData.expiresAt)
+        async function fetchEditableJobData(){
+            try {
+                const jobDetailsFetchResult = await getPostedJobDetails(jobData._id)
+                console.log('-- checking editable data from backend --', jobDetailsFetchResult)
+                const [
+                    jobLevelDataResult,
+                    workModeDataResult,
+                    jobTypeDataResult
+                ] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchWorkModeLists(), recruiterFetchJobTypeLists()])
+                
+                if(jobDetailsFetchResult.success){
+                    reset({
+                jobTitle: jobDetailsFetchResult.result.jobTitle,
+                description: jobDetailsFetchResult.result.description,
+                requirements: jobDetailsFetchResult.result.requirements,
+                responsibilities: jobDetailsFetchResult.result.responsibilities,
+                duration: jobDetailsFetchResult.result.duration,
+                jobType: jobDetailsFetchResult.result.jobType,
+                workMode: jobDetailsFetchResult.result.workMode,
+                location: jobDetailsFetchResult.result.location,
+                minSalary: jobDetailsFetchResult.result.minSalary,
+                maxSalary: jobDetailsFetchResult.result.maxSalary,
+                salaryCurrency: jobDetailsFetchResult.result.salaryCurrency,
+                salaryPeriod: jobDetailsFetchResult.result.salaryPeriod,
+                vacancies: jobDetailsFetchResult.result.vacancies,
+                qualification: jobDetailsFetchResult.result.qualification,
+                experienceInYears: jobDetailsFetchResult.result.experienceInYears,
+                jobLevel: jobDetailsFetchResult.result.jobLevel,
+                requiredSkills: jobDetailsFetchResult.result.requiredSkills,
+                optionalSkills: jobDetailsFetchResult.result.optionalSkills,
+                expiresAt: dayjs(jobDetailsFetchResult.result.expiresAt)
             })
+
+            setJobTypeData(jobTypeDataResult.result)
+            setJobLevelData(jobLevelDataResult.result)
+            setWorkModeData(workModeDataResult.result)
+                }
+            } catch (error) {
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            }
         }
+
+        if(jobData){
+            fetchEditableJobData()
+        }else{
+            toast.warn('Can not edit job now')
+            navigator(-1)
+        }
+        // if(jobData){
+        //     const jobDetailsResult = await
+        //     console.log('this is job data for editing', jobData)
+        //     reset({
+        //         jobTitle: jobData.jobTitle,
+        //         description: jobData.description,
+        //         requirements: jobData.requirements,
+        //         responsibilities: jobData.responsibilities,
+        //         duration: jobData.duration,
+        //         jobType: jobData.jobType,
+        //         workMode: jobData.workMode,
+        //         location: jobData.location,
+        //         minSalary: jobData.minSalary,
+        //         maxSalary: jobData.maxSalary,
+        //         salaryCurrency: jobData.salaryCurrency,
+        //         salaryPeriod: jobData.salaryPeriod,
+        //         vacancies: jobData.vacancies,
+        //         qualification: jobData.qualification,
+        //         experienceInYears: jobData.experienceInYears,
+        //         jobLevel: jobData.jobLevel,
+        //         requiredSkills: jobData.requiredSkills,
+        //         optionalSkills: jobData.optionalSkills,
+        //         expiresAt: dayjs(jobData.expiresAt)
+        //     })
+        // }
     }, [jobData, reset])
 
     const enteredJobType = watch('jobType')
@@ -124,6 +178,19 @@ export default function EditJobForm(){
     }
 
     async function editJobOnSubmit(data: JobDetails){
+        const editConfirmResult = await Swal.fire({
+            icon: 'question',
+            title: 'Do you want to update the changes?',
+            showConfirmButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Continute',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        })
+
+        if(editConfirmResult.isDismissed || !editConfirmResult.isConfirmed){
+            return
+        }
         setloading(true)
         console.log("Form Data on Submit:", data);
         const payload = {
@@ -143,21 +210,21 @@ export default function EditJobForm(){
                 setloading(false)
                 Swal.fire({
                     icon:'success',
-                    title:'Job Created',
+                    title:'Job Edited succesfully',
                     text:result?.message,
                     showConfirmButton:false,
                     showCancelButton:false,
                     allowOutsideClick:false,
                     allowEscapeKey:false,
-                    timer:2500
+                    timer:3500
                 }).then(() => navigator('/profile/recruiter/my-jobs'))
             }else{
                 setloading(false)
-                Notify.failure(result?.message, {timeout:2000})
+                toast.error(result?.message)
             }
 
         } catch (error: unknown) {
-            Notify.failure('Something went wrong', {timeout:2000})
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
             setloading(false)
         }
     
@@ -165,13 +232,13 @@ export default function EditJobForm(){
 
     return(
         <>
-        <div className="">
-            <form onSubmit={handleSubmit(editJobOnSubmit)} className="border border-gray-200 shadow-md max-w-4xl !mx-auto !my-10 rounded-md !py-5 !px-5">
-                <p className="text-center font-bold text-2xl">Edit the job post for {jobData?.jobTitle}</p>
-                <p className="text-sm mt-3 text-gray-700 text-center">Fill out the details below to find your next great hirie.</p>
+        <div className="bg-gray-50 py-20 px-5">
+            <form onSubmit={handleSubmit(editJobOnSubmit)} className="border border-slate-200 bg-white shadow-xl max-w-4xl !mx-auto rounded-md !py-5 !px-5">
+                <p className="text-start font-semibold text-2xl">Edit job post</p>
+                <p className="text-sm mt-1 text-gray-600 text-start">Currently editing <span className="text-blue-500 font-semibold">{jobData.jobTitle}</span>.</p>
 
                 <div className="form-group border border-gray-200 rounded-md mt-5 !p-5">
-                    <p className="font-medium text-lg">Core Job Details</p>
+                    <p className="font-bold text-blue-900 text-sm uppercase">Core Job Details</p>
                     <FormControl fullWidth sx={{marginTop:'15px'}}>
                         <Controller
                             name="jobTitle"
@@ -193,7 +260,7 @@ export default function EditJobForm(){
                         />
                     </FormControl>
 
-                    <div className="w-full flex gap-10 justify-between">
+                    <div className="w-full grid grid-cols-1 gap-1 lg:grid-cols-2 lg:gap-10 justify-between">
                         <FormControl error={Boolean(errors.jobType)} fullWidth sx={{marginTop:'15px'}}>
                         <InputLabel id="job-type-label">Job Type</InputLabel>
                         <Controller
@@ -207,12 +274,14 @@ export default function EditJobForm(){
                                     labelId="job-type-label"
                                     variant="outlined"
                                     error={Boolean(errors.jobType)}
-                                >
-                                    <MenuItem value="Full-time">Full-time</MenuItem>
+                                >   {jobTypeData.map((jobType: JobTypesData) => (
+                                    <MenuItem key={jobType._id} value={jobType.name}>{jobType.name}</MenuItem>
+                                ))}
+                                    {/* <MenuItem value="Full-time">Full-time</MenuItem>
                                     <MenuItem value="Part-time">Part-time</MenuItem>
                                     <MenuItem value="Contract">Contract</MenuItem>
                                     <MenuItem value="Internship">Internship</MenuItem>
-                                    <MenuItem value="Temporary">Temporary</MenuItem>
+                                    <MenuItem value="Temporary">Temporary</MenuItem> */}
                                 </Select>
                             )}
                         />
@@ -243,8 +312,9 @@ export default function EditJobForm(){
                 </div>
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Location & Logistics</p>
-                    <div className="flex gap-10 justify-between mt-5 w-full">
+                <p className="font-bold text-blue-900 text-sm uppercase">Location & Logistics</p>                    
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
+                        
                         <FormControl fullWidth>
                             <Controller
                                 name="vacancies"
@@ -256,6 +326,7 @@ export default function EditJobForm(){
                                 render={({field}) => (
                                     <TextField
                                         {...field}
+                                        InputLabelProps={{shrink: !!field.value}}
                                         variant="outlined"
                                         label="Vacancies"
                                         type="number"
@@ -279,10 +350,13 @@ export default function EditJobForm(){
                                     labelId="word-mode-label"
                                     variant="outlined"
                                     error={Boolean(errors.workMode)}
-                                >
-                                    <MenuItem value="On-site">On-site</MenuItem>
+                                >   
+                                    {workModeData.map((workMode: WorkModeData) => (
+                                        <MenuItem key={workMode._id} value={workMode.name}>{workMode.name}</MenuItem>
+                                    ))}
+                                    {/* <MenuItem value="On-site">On-site</MenuItem>
                                     <MenuItem value="Remote">Remote</MenuItem>
-                                    <MenuItem value="Hybrid">Hybrid</MenuItem>
+                                    <MenuItem value="Hybrid">Hybrid</MenuItem> */}
                                 </Select>
                             )}
                         />
@@ -313,8 +387,8 @@ export default function EditJobForm(){
                 </div>
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Compensation</p>
-                    <div className="flex gap-10 justify-between mt-5 w-full">
+                <p className="font-bold text-blue-900 text-sm uppercase">Compensation</p>                    
+                <div className="grid gird-cols-1 gap-5 lg:grid-cols-2 lg:gap-10 mt-5 w-full">
                         <FormControl fullWidth>
                             <Controller
                                 name="minSalary"
@@ -326,6 +400,7 @@ export default function EditJobForm(){
                                 render={({field}) => (
                                     <TextField
                                         {...field}
+                                        InputLabelProps={{shrink: !!field.value}}
                                         variant="outlined"
                                         label="Minimum Salary"
                                         type="number"
@@ -347,6 +422,7 @@ export default function EditJobForm(){
                                 render={({field}) => (
                                     <TextField
                                         {...field}
+                                        InputLabelProps={{shrink: !!field.value}}
                                         variant="outlined"
                                         label="Maximum Salary"
                                         type="number"
@@ -406,8 +482,8 @@ export default function EditJobForm(){
                 </div>
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Candidate Requirements</p>
-                    <div className="flex gap-10 justify-between mt-5 w-full">
+                    <p className="font-bold text-blue-900 text-sm uppercase">Candidate Requirements</p>
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth error={Boolean(errors.jobLevel)}>
                             <InputLabel id="job-level-id">Job Level</InputLabel>
                             <Controller 
@@ -422,11 +498,14 @@ export default function EditJobForm(){
                                         variant="outlined"
                                         error={Boolean(errors.jobLevel)}
                                     >
-                                        <MenuItem value="Entry-level">Entry-level</MenuItem>
+                                        {jobLevelData.map((jobLevel: JobLevelData) => (
+                                            <MenuItem key={jobLevel._id} value={jobLevel.name}>{jobLevel.name}</MenuItem>
+                                        ))}
+                                        {/* <MenuItem value="Entry-level">Entry-level</MenuItem>
                                         <MenuItem value="Mid-level">Mid-level</MenuItem>
                                         <MenuItem value="Senior-level">Senior-level</MenuItem>
                                         <MenuItem value="Lead">Lead</MenuItem>
-                                        <MenuItem value="Manager">Manager</MenuItem>
+                                        <MenuItem value="Manager">Manager</MenuItem> */}
                                     </Select>
                                 )}
                             />
@@ -464,6 +543,7 @@ export default function EditJobForm(){
                                 render={({field}) => (
                                     <TextField 
                                         {...field}
+                                        InputLabelProps={{shrink: !!field.value}}
                                         variant="outlined"
                                         label="Experience (in years)"
                                         type="number"
@@ -477,8 +557,9 @@ export default function EditJobForm(){
                 </div>
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Job Descriptions</p>
+                    <p className="font-bold text-blue-900 text-sm uppercase">Job Descriptions & Details</p>
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.description)}>
+                        <label htmlFor="" className="text-xs uppercase mb-2">description</label>
                         <Controller 
                             name="description"
                             control={control}
@@ -500,6 +581,7 @@ export default function EditJobForm(){
                     </FormControl>
 
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.requirements)}>
+                        <label htmlFor="" className="text-xs uppercase mb-2">Requirements</label>
                         <Controller 
                             name="requirements"
                             control={control}
@@ -521,6 +603,7 @@ export default function EditJobForm(){
                     </FormControl>
 
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.responsibilities)}>
+                        <label htmlFor="" className="text-xs uppercase mb-2">description</label>
                         <Controller 
                             name="responsibilities"
                             control={control}
@@ -543,7 +626,7 @@ export default function EditJobForm(){
                 </div>
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <div className="flex gap-10 w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full">
                         <div className="w-full">
                             <label htmlFor="">Required Skills</label>
                             <div className="flex mt-1 gap-2">
@@ -577,7 +660,7 @@ export default function EditJobForm(){
                     </div>                    
                 </div>
                 
-                <div className="form-group border border-gray-200 rounded-md mt-10 flex items-center justify-between !p-5">
+                <div className="form-group border border-gray-200 rounded-md mt-10 flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between !p-5">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DemoContainer components={['DateField']}>
                             <FormControl error={Boolean(errors.expiresAt)}>

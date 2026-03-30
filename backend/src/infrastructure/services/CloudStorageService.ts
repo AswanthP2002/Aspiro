@@ -5,7 +5,11 @@ import streamifier from 'streamifier';
 
 @injectable()
 export default class CloudStorageService implements ICloudStroageService {
-  async upload(file: Buffer<ArrayBufferLike>, folderName: string, publicId?: string): Promise<any> {
+  async upload(
+    file: Buffer<ArrayBufferLike>,
+    folderName: string,
+    publicId?: string
+  ): Promise<unknown> {
     return new Promise((resolve, reject) => {
       let stream;
       if (publicId) {

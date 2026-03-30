@@ -1,4 +1,4 @@
-import Skills from '../../../domain/entities/user/skills.entity';
+import Skills from '../../../domain/entities/skill.user/skills.entity';
 import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
 import mongoose from 'mongoose';
 import BaseRepository from '../baseRepository';

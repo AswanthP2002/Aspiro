@@ -1,12 +1,15 @@
+import AdminUserListDTO from '../../../domain/entities/user/AdminUserList.entity';
 import MyProfileAggregated from '../../../domain/entities/user/myProfileAggregated.entity';
 import UserCachedData from '../../../domain/entities/user/user.cachedData.entity';
 import User from '../../../domain/entities/user/User.FIX';
-import UserProfileAggregated from '../../../domain/entities/userProfileAggregated';
+import UserFullProfileData from '../../../domain/entities/user/userFullProfile.entity';
+import UserProfileAggregated from '../../../domain/entities/user/userProfileAggregated';
 import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
 import ProfilePictureUPloadResponseDTO from '../../DTOs/user/profileUploadResponse.dto';
 import UpdateUserDTO from '../../DTOs/user/updateUser.dto.FIX';
 import UploadCoverPhotoResponseDTO from '../../DTOs/user/uploadCoverPhotoResponse.dto';
-import UserDTO, { MyProfileDTO } from '../../DTOs/user/user.dto.FIX';
+import UserDTO, { MyProfileDTO, SimilarSkillUserDTO } from '../../DTOs/user/user.dto.FIX';
+import UserFullProfileDataDTO from '../../DTOs/user/user.fullProfileData.dto';
 import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto.FIX';
 import UserOverviewForPublicDTO from '../../DTOs/user/userOverviewForPublic.dto';
 import {
@@ -56,6 +59,7 @@ export default class UserMapper {
       updatedAt: user.updatedAt,
       isDeleted: user.isDeleted,
       isBanned: user.isBanned,
+      accountActions: user.accountActions,
     };
   }
 
@@ -73,7 +77,9 @@ export default class UserMapper {
       followers: data.followers,
       skills: data.skills,
       experience: data.experiences,
+      isRecruiter: data.isRecruiter,
       connectionRequests: data.connectionRequests,
+      isVerifiedRecruiter: data.recruiterProfile?.isVerified ? true : false,
     };
   }
 
@@ -125,6 +131,7 @@ export default class UserMapper {
       educations: data.educations,
       experiences: data.experiences,
       followers: data.followers,
+      following: data.following,
       headline: data.headline as string,
       jobs: data.jobs,
       posts: data.posts,
@@ -152,6 +159,11 @@ export default class UserMapper {
       headline: data.headline,
       role: data.role,
       profilePicture: data.profilePicture,
+      subscription: {
+        name: data.subscription.name,
+        planId: data.subscription.planId,
+        subscriptionId: data.subscription.planId,
+      },
     };
   }
 
@@ -190,6 +202,54 @@ export default class UserMapper {
       location: data.location,
       lastLogin: data.lastLogin,
       createdAt: data.createdAt,
+      accountActions: data.accountActions,
+      googleId: data.googleId,
+    };
+  }
+
+  public userEntityToAdminUserListDTO(data: User): AdminUserListDTO {
+    return {
+      _id: data._id,
+      name: data.name,
+      email: data.email,
+      isBanned: data.isBanned,
+      isVerified: data.isVerified,
+      isBlocked: data.isBlocked,
+      isDeleted: data.isDeleted,
+      profilePicture: data.profilePicture,
+      role: data.role,
+      createdAt: data.createdAt,
+    };
+  }
+
+  public UserToSimilarUserDTO(data: User): SimilarSkillUserDTO {
+    return {
+      _id: data._id as string,
+      name: data.name as string,
+      headline: data.headline as string,
+      profilePicture: data.profilePicture?.cloudinarySecureUrl as string,
+    };
+  }
+
+  public userFullProfileEntityToDTO(data: UserFullProfileData): UserFullProfileDataDTO {
+    return {
+      _id: data._id,
+      name: data.name,
+      summary: data.summary,
+      headline: data.headline,
+      email: data.email,
+      phone: data.phone,
+      location: {
+        city: data.location?.city as string,
+        district: data.location?.district as string,
+        state: data.location?.state as string,
+        country: data.location?.country as string,
+        pincode: data.location?.pincode as string
+      },
+      educations: data.educations,
+      experiences: data.experiences,
+      skills: data.skills,
+      certificates: data.certificates,
     };
   }
 }

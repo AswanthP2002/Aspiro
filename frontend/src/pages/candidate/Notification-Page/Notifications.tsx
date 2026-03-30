@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { acceptConnectionRequest, changeNotificationStatus, deleteNotification, getNotifications, markAllNotificationRead, rejectConnectionRequest, updateNOtificationReadStatus } from '../../../services/userServices';
+import { getNotifications, changeNotificationStatus, deleteNotification, markAllNotificationRead } from '../../../services/notificationServices';
+import { acceptConnectionRequest, rejectConnectionRequest } from '../../../services/connectionServices';
+import { updateNOtificationReadStatus } from '../../../services/userServices';
 import { formatRelativeTime } from '../../../services/util/formatDate';
 import claraImage from '/klara.jpg';
 import leschulerImage from '/schuller.jpg';
 import { PiSuitcase } from 'react-icons/pi';
-import { BiCheckDouble, BiHeart, BiMedal, BiTrash, BiUserCheck, BiUserPlus } from 'react-icons/bi';
+import { BiCheckDouble, BiFilter, BiHeart, BiMedal, BiTrash, BiUserCheck, BiUserPlus } from 'react-icons/bi';
 import { BiBell } from 'react-icons/bi';
 import { BsBell, BsClock, BsThreeDotsVertical } from 'react-icons/bs';
 import { Notification } from '../../../types/entityTypes';
-import { Notify } from 'notiflix';
 import { FaTrash } from 'react-icons/fa';
 import { MdChatBubble, MdOutlineNotifications } from 'react-icons/md';
 import { FaShareNodes } from 'react-icons/fa6';
@@ -19,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Loader from '../../../components/admin/Loader';
 import InfinitySpinner from '../../../components/common/InfinitySpinner';
+import { toast } from 'react-toastify';
 
 const notifications = [
   {
@@ -141,7 +143,7 @@ export default function NotificationPage() {
   const [isNotificationsActionMenuOpen, setIsNotificationActionMenuOpen] = useState(false);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(7)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [notificationType, setNotificationType] = 
     useState<
@@ -153,7 +155,7 @@ export default function NotificationPage() {
     'COMMENT_REPLY' | 
     'SHARE' | 
     'ALL'>('ALL')
-  const [notificationStatus, setNotificationStatus] = useState<'ALL' | 'READ' | 'UNREAD'>('ALL')
+  const [notificationStatus, setNotificationStatus] = useState<'ALL' | 'READ' | 'UNREAD'>('UNREAD')
   const [offSet, setOffSet] = useState(0)
 
   const toggleNotificationsActionMenu = () => {
@@ -197,10 +199,10 @@ export default function NotificationPage() {
           const result = await markAllNotificationRead()
           if(result.success){
             dispatcher(markAllNotificationAsRead())
-            Notify.success(result.message)
+            toast.success(result.message)
           }
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
       }else{
         return
@@ -232,12 +234,12 @@ export default function NotificationPage() {
           const result = await deleteNotification(action)
           if(result.succes){
             dispatcher(deleteAllNotificationsFromStore())
-            Notify.success('Notifications deleted')
+            toast.success('Notifications deleted')
           }else {
             return
           }
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
       }
     })
@@ -251,11 +253,11 @@ export default function NotificationPage() {
           console.log('notification fetch result', result)
           setNotificationsData(result.notifications)
           dispatcher(setNotifications({notifications: result.notifications, unRead: result.unRead}))
-          dispatcher(setNotificationsCount({count: result.unRead}))
+          // dispatcher(setNotificationsCount({count: result.unRead}))
           setHasMore(result.hasMore)
         }
       } catch (error: unknown) {
-        Notify.failure(error instanceof Error ? error.message : 'Something went wrong while fetching notifications')
+        toast.error(error instanceof Error ? error.message : 'Something went wrong while fetching notifications')
       }
     }
     fetchNotifications()
@@ -274,79 +276,95 @@ export default function NotificationPage() {
         </div>
         <div></div>
       </div>
-      <div className="my-5 bg-white flex p-3 w-full rounded-md border border-gray-300">
-        <div className="space-x-2 flex-1">
-          <button onClick={() => setNotificationStatus('ALL')} className="text-xs font-semibold bg-blue-500 text-white px-5 py-2 rounded-md">
-            All
-          </button>
-          <button onClick={() => setNotificationStatus('UNREAD')} className="text-xs font-semibold bg-white px-5 py-2 border border-gray-200 rounded-md">
-            Unread ({unReadNotificationsCount})
-          </button>
-        </div>
-        <div className="relative flex gap-2">
-          <button
-            onClick={toggleFilterMenu}
-            className="text-xs bg-white px-3 py-2 border border-gray-200 rounded-md flex items-center gap-2"
-          >
-            Filter
-          </button>
-          <button
-            onClick={toggleNotificationsActionMenu}
-            className="text-xs font-semibold bg-white px-5 py-2 border border-gray-200 rounded-md flex items-center"
-          >
-            <BsThreeDotsVertical color="gray" /> Action
-          </button>
-          {isNotificationsActionMenuOpen && (
-            <>
-              <div className="absolute space-y-3 border border-gray-300 shadow-sm p-3 rounded-md bg-white w-40 -bottom-18 right-0">
-                <button onClick={() => {updateAllNotificationStatus(); setIsNotificationActionMenuOpen(false)}} className="text-xs flex items-center gap-2">
-                  <BiCheckDouble /> Mark all as read
-                </button>
-                <button onClick={() => deleteAllNotification('BULCK')} className="text-xs flex items-center gap-2 text-red-500">
-                  <BiTrash /> Delete All
-                </button>
-              </div>
-            </>
-          )}
+      <div className="my-6 bg-white flex items-center justify-between p-2 w-full rounded-xl border border-gray-100 shadow-sm sticky top-0 z-10">
+  {/* Tab Section - Modern look with a background pill */}
+  <div className="flex bg-gray-50 p-1 rounded-lg gap-1">
+    <button 
+      onClick={() => setNotificationStatus('UNREAD')} 
+      className={`px-6 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 flex items-center gap-2 ${notificationStatus === 'UNREAD' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+    >
+      Unread
+      {unReadNotificationsCount > 0 && (
+        <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full text-[10px]">
+          {unReadNotificationsCount}
+        </span>
+      )}
+    </button>
+    <button 
+      onClick={() => setNotificationStatus('ALL')} 
+      className={`px-6 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${notificationStatus === 'ALL' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+    >
+      All
+    </button>
+    
+  </div>
 
-          {isFilterMenuOpen && (
-            <>
-              <div className="absolute left-0 top-10 bg-white rounded-md border border-gray-200 shadow-sm p-3">
-                <ul className="space-y-2">
-                  <li onClick={() => {setNotificationType('ALL'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <BiBell />
-                    <p>All</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('LIKE'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <BiHeart />
-                    <p>Likes</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('COMMENT'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <MdChatBubble />
-                    <p>Comments</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('SHARE'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <FaShareNodes />
-                    <p>Shares</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('CONNECTION_REQUEST'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <BiUserPlus />
-                    <p>Connections</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('FOLLOW'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <BiUserCheck />
-                    <p>Follows</p>
-                  </li>
-                  <li onClick={() => {setNotificationType('COMMENT_REPLY'); setIsFilterMenuOpen(false)}} className="flex cursor-pointer items-center gap-2 text-xs">
-                    <IoChatboxOutline />
-                    <p>Mentions</p>
-                  </li>
-                </ul>
-              </div>
-            </>
-          )}
+  {/* Action Section - Using Ghost buttons and better spacing */}
+  <div className="flex items-center gap-2 pr-1">
+    {/* Filter Dropdown */}
+    <div className="relative">
+      <button
+        onClick={toggleFilterMenu}
+        className="text-xs font-medium text-gray-600 hover:bg-gray-50 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors"
+      >
+        <BiFilter size={16} />
+        Filter
+      </button>
+
+      {isFilterMenuOpen && (
+        <div className="absolute right-0 top-11 w-48 bg-white rounded-xl border border-gray-100 shadow-xl z-50 py-2 animate-in fade-in slide-in-from-top-2">
+          <p className="px-4 py-1 text-[10px] uppercase tracking-wider text-gray-400 font-bold">Filter by type</p>
+          <ul className="mt-1">
+            {[
+              { type: 'ALL', label: 'All', icon: <BiBell /> },
+              { type: 'LIKE', label: 'Likes', icon: <BiHeart /> },
+              { type: 'COMMENT', label: 'Comments', icon: <MdChatBubble /> },
+              { type: 'CONNECTION_REQUEST', label: 'Connections', icon: <BiUserPlus /> },
+              { type: 'COMMENT_REPLY', label: 'Mentions', icon: <IoChatboxOutline /> },
+            ].map((item) => (
+              <li 
+                key={item.type}
+                onClick={() => {setNotificationType(item.type); setIsFilterMenuOpen(false)}} 
+                className="flex cursor-pointer items-center gap-3 px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              >
+                <span className="text-sm">{item.icon}</span>
+                {item.label}
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      )}
+    </div>
+
+    {/* More Actions Dropdown */}
+    <div className="relative">
+      <button
+        onClick={toggleNotificationsActionMenu}
+        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+      >
+        <BsThreeDotsVertical size={16} />
+      </button>
+
+      {isNotificationsActionMenuOpen && (
+        <div className="absolute right-0 top-11 w-48 bg-white rounded-xl border border-gray-100 shadow-xl z-50 py-2 animate-in fade-in slide-in-from-top-2">
+          <button 
+            onClick={() => {updateAllNotificationStatus(); setIsNotificationActionMenuOpen(false)}} 
+            className="w-full px-4 py-2 text-xs flex items-center gap-3 text-gray-600 hover:bg-gray-50"
+          >
+            <BiCheckDouble size={18} className="text-blue-500" /> Mark all as read
+          </button>
+          <div className="my-1 border-t border-gray-50" />
+          <button 
+            onClick={() => deleteAllNotification('BULCK')} 
+            className="w-full px-4 py-2 text-xs flex items-center gap-3 text-red-500 hover:bg-red-50"
+          >
+            <BiTrash size={18} /> Delete all history
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
       <div className="mt-5 grid grid-cols-1 gap-3">
         {notificationLoading
           ? <>
@@ -364,10 +382,28 @@ export default function NotificationPage() {
         }
         
       </div>
-      {notificationsFromRedux.length === 0 && (<div className='flex flex-col items-center justify-center min-h-100'>
-          <IoNotificationsOffOutline size={30} color='gray' />
-          <p className='text-xs text-gray-500'>No notifications</p>
-        </div>)}
+      {notificationsFromRedux.length === 0 && (<div className="flex flex-col items-center justify-center py-20 px-6 text-center animate-in fade-in zoom-in duration-300">
+  {/* The Icon Container */}
+  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100 shadow-sm">
+    <IoNotificationsOffOutline size={36} className="text-gray-300" />
+  </div>
+
+  {/* The Text Content */}
+  <h3 className="text-gray-900 font-semibold text-base mb-1">
+    All caught up!
+  </h3>
+  <p className="text-sm text-gray-500 max-w-[200px] leading-relaxed">
+    No new notifications right now. We'll let you know when something happens.
+  </p>
+
+  {/* Optional: A subtle "Action" button to keep them in the app */}
+  <button 
+    onClick={() => window.location.reload()} 
+    className="mt-6 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+  >
+    Refresh feed
+  </button>
+</div>)}
     </div>
   );
 }
@@ -396,12 +432,12 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
             if(result.success){
                 onSingleNotificationRead(notificationId)
                 dispatch(markAsRead({notificationId}))
-                Notify.success('Notification readed')
+                toast.success('Notification readed')
                 // dispatch(markAsRead({notificationId: notificationId}))
                 return
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')   
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')   
         }
     }
 
@@ -426,11 +462,11 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
         if(result?.success){
           //dispatch(deleteNotificationFromStore({notificationId}))
           onNotificationDelete(notificationId)
-          Notify.success('Deleted')
+          toast.error('Deleted')
           return
         }
       } catch (error: unknown) {
-        Notify.failure(error instanceof Error ? error.message : 'Somethng went wrong')
+        toast.error(error instanceof Error ? error.message : 'Somethng went wrong')
       }
         }else{
           return
@@ -443,7 +479,6 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
             return
         }else{
            const path = url.replace('http://localhost:5173', '')
-           Notify.info(path)
            navigate(path, {state: {userId: path.split('/')[1]}})
         }
     }
@@ -463,11 +498,11 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
           try {
             const result = await rejectConnectionRequest(sender)
             if(result.success){
-              Notify.success('Rejected')
+              toast.success('Rejected')
               dispatch(deleteNotificationFromStore({notificationId: notification._id as string}))
             }
           } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Somthing went wrong')
+            toast.error(error instanceof Error ? error.message : 'Somthing went wrong')
           }
         }else {
           return
@@ -491,11 +526,11 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
           const result = await acceptConnectionRequest(notification.actorId as string, logedUser.name, logedUser.profilePicture)
           console.log('-- checking result of connection request acceptance --', result)
           if(result.success){
-            Notify.success('Accepted')
+            toast.success('Accepted')
             dispatch(markAsRead({notificationId}))
           }
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong while accepting connection request')
+          toast.error(error instanceof Error ? error.message : 'Something went wrong while accepting connection request')
       }
         }else {
           return
@@ -505,90 +540,116 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
   
     return (
     <>
-      <div className={`w-full ${notification.isRead ? 'ps-0' : 'ps-1'} bg-blue-500 rounded-md`}>
-        <div
-          className={`w-full ${notification.isRead ? 'bg-white' : 'bg-blue-100'} rounded-md p-3 flex gap-3 `}
-        >
-          <div>
-            <div className="w-13 h-13 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center">
-              {notification?.metadata?.acted_user_avatar && (
-                <img
-                  src={notification.metadata.acted_user_avatar}
-                  className="w-full h-full rounded-full"
-                  style={{ objectFit: 'cover' }}
-                  alt=""
-                />
-              )}
-              {!notification.metadata?.acted_user_avatar && (
-                <p className="text-white">{notification?.metadata?.acted_by[0]}</p>
-              )}
-            </div>
-          </div>
-          <div className="flex-1 flex">
-            <div  className={`${notification.targetUrl ?  'cursor-pointer' : ''} flex-1`}>
-              <p onClick={() => redirectToTargetUrl(notification.targetUrl as string)} className={`text-sm ${notification.isRead ? 'text-gray-500' : 'text-black'}`}>{(notification.category === 'CONNECTION_REQUEST' && notification.isRead) ? `${notification.metadata?.acted_by} is your new connection` : notification.message}</p>
-              <p className="text-xs text-gray-500">Full stack Developer</p>
-              {notification.category === 'COMMENT' && (
-                <i>
-                  <p className="mt-2 text-xs text-gray-500">
-                    {getClippedText(notification?.metadata?.target_content?.preview, 40)}
-                  </p>
-                </i>
-              )}
-              {notification.category === 'LIKE' && (
-                <i>
-                  <p className="mt-2 text-xs text-gray-500">
-                    {getClippedText(notification?.metadata?.target_content?.preview, 40)}
-                  </p>
-                </i>
-              )}
-              {notification.category === 'COMMENT_REPLY' && (
-                <i>
-                  <p className="mt-2 text-xs text-gray-500">
-                    {getClippedText(notification?.metadata?.target_content?.preview, 40)}
-                  </p>
-                </i>
-              )}
-              {
-              (notification.category === 'CONNECTION_REQUEST' && !notification.isRead) && (
-                <div className='space-x-2 mt-2'>
-                  <button onClick={() => acceptAUserRequest(notification._id as string)} className='text-xs bg-gradient-to-br from-blue-500 hover:bg-gray-400 to-indigo-600 px-2 py-1 rounded-md text-white'>Accept</button>
-                  <button onClick={() => rejectAConnectionRequest(notification.actorId as string)} className='text-xs bg-white px-2 py-1 rounded-md hover:bg-gray-400 border border-gray-200 text-gray-700'>Reject</button>
-                </div>
-              )
-             }
-             
+      <div className={`group bg-white rounded-md relative w-full border-b border-gray-100 last:border-0 transition-colors duration-200 ${notification.isRead ? 'bg-white' : 'bg-blue-50/40 hover:bg-blue-50'}`}>
+  {/* Unread Indicator - A subtle vertical bar is cleaner than a full-width background shift */}
+  {!notification.isRead && (
+    <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-r-full" />
+  )}
 
-             {/* stopped here, notification testing is left */}
-              <span className="mt-3 text-xs flex items-center gap-2">
-                <BsClock color="gray" size={10} />
-                <p className="text-gray-500">{formatRelativeTime(notification.createdAt || new Date())}</p>
-              </span>
-             
-            </div>
-            <div className='relative'>
-              <button onClick={toggleNotificationMenu}>
-                <BsThreeDotsVertical size={13} />
+  <div className="w-full p-4 flex gap-4">
+    {/* Avatar Section */}
+    <div className="flex-shrink-0">
+      <div className="w-12 h-12 relative">
+        {notification?.actorDetails?.profilePicture ? (
+          <img
+            src={notification.actorDetails.profilePicture}
+            className="w-full h-full rounded-full object-cover ring-2 ring-white shadow-sm"
+            alt={notification.actorDetails.name}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center border border-gray-200 shadow-sm">
+            <p className="text-gray-600 font-medium text-lg uppercase">{notification?.actorDetails?.name[0]}</p>
+          </div>
+        )}
+        {/* Category Icon Badge (Optional: helps visual parsing) */}
+        {!notification.isRead && (
+          <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-600 border-2 border-white rounded-full" />
+        )}
+      </div>
+    </div>
+
+    {/* Content Section */}
+    <div className="flex-1 min-w-0">
+      <div className="flex justify-between items-start gap-2">
+        <div className={`flex-1 ${notification.targetUrl ? 'cursor-pointer group/text' : ''}`} onClick={() => redirectToTargetUrl(notification.targetUrl as string)}>
+          {/* Main Message */}
+          <p className={`text-[14px] leading-snug ${notification.isRead ? 'text-gray-600 font-normal' : 'text-gray-900 font-semibold'}`}>
+            { (notification.category === 'CONNECTION_REQUEST' && notification.isRead) 
+              ? <span className="text-blue-600 font-bold">{notification.metadata?.acted_by}</span> 
+              : notification.message 
+            }
+            {notification.category === 'CONNECTION_REQUEST' && notification.isRead && " is your new connection"}
+          </p>
+          
+          {/* Actor Headline */}
+          <p className="text-[12px] text-gray-500 mt-0.5 line-clamp-1 truncate">{notification.actorDetails?.headline}</p>
+        </div>
+
+        {/* Menu Button - Only visible on hover or mobile */}
+        <div className="relative">
+          <button 
+            onClick={toggleNotificationMenu} 
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+          >
+            <BsThreeDotsVertical size={16} />
+          </button>
+          
+          {isNotificationMenuOpened && (
+            <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-xl border border-gray-100 z-50 py-1 overflow-hidden">
+              {!notification.isRead && (
+                <button 
+                  onClick={() => {MarkNotificationAsRead(notification._id as string); setIsNotficationMenuOpened(false)}} 
+                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-gray-50 flex items-center gap-3 text-gray-700"
+                >
+                  <BiCheckDouble size={18} className="text-blue-600" /> Mark as read
+                </button>
+              )}
+              <button 
+                onClick={() => {deleteIndividualNotification(notification._id as string, 'SINGLE'); setIsNotficationMenuOpened(false)}} 
+                className="w-full text-left px-4 py-2.5 text-xs hover:bg-gray-50 flex items-center gap-3 text-red-600"
+              >
+                <BiTrash size={18} /> Delete notification
               </button>
-              {
-                isNotificationMenuOpened && (
-                    <div className="absolute right-0 w-40 bg-white rounded-md border border-gray-200 p-3">
-                        <ul className='space-y-3'>
-                            {
-                                !notification.isRead && (
-                                    <li onClick={() => {MarkNotificationAsRead(notification._id as string); setIsNotficationMenuOpened(false)}} className='text-xs cursor-pointer flex items-center gap-2'><BiCheckDouble /> Mark as read</li>
-                                )
-                            }
-                            <li onClick={() => {deleteIndividualNotification(notification._id as string, 'SINGLE'); setIsNotficationMenuOpened(false)}} className="text-xs cursor-pointer flex items-center gap-2 text-red-500"><BiTrash /> Delete</li>
-                        </ul>
-
-                    </div>
-                )
-              }
             </div>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* Metadata Preview (Comments/Likes) */}
+      {['COMMENT', 'LIKE', 'COMMENT_REPLY'].includes(notification.category as string) && (
+        <div className="mt-2 pl-3 border-l-2 border-gray-100 italic">
+          <p className="text-[13px] text-gray-500 leading-relaxed">
+            "{notification.metadata.content}"
+          </p>
+        </div>
+      )}
+
+      {/* Action Buttons for Requests */}
+      {notification.category === 'CONNECTION_REQUEST' && !notification.isRead && (
+        <div className="flex gap-2 mt-3">
+          <button 
+            onClick={() => acceptAUserRequest(notification._id as string)} 
+            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-full shadow-sm transition-all"
+          >
+            Accept
+          </button>
+          <button 
+            onClick={() => rejectAConnectionRequest(notification.actorId as string)} 
+            className="px-4 py-1.5 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 text-xs font-semibold rounded-full transition-all"
+          >
+            Ignore
+          </button>
+        </div>
+      )}
+
+      {/* Timestamp */}
+      <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-gray-400">
+        <BsClock size={10} />
+        <span>{formatRelativeTime(notification.createdAt || new Date())}</span>
+      </div>
+    </div>
+  </div>
+</div>
     </>
   );
 }

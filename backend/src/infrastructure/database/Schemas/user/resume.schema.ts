@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Resume from '../../../../domain/entities/user/resume.entity';
+import Resume from '../../../../domain/entities/resume/resume.entity';
 
 export const ResumeSchema = new Schema<Resume>(
   {

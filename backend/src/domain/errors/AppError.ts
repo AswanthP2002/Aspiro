@@ -71,6 +71,12 @@ export class ValidationError extends AppError {
   }
 }
 
+export class ResourceAlreadyExistError extends AppError {
+  constructor(resource: string) {
+    super('RESOURCE_ALREADY_EXIST', `Duplicate: ${resource} already exist`);
+  }
+}
+
 export class UserBlockedError extends AppError {
   constructor() {
     super(
@@ -86,5 +92,11 @@ export class UserBannedError extends AppError {
       'USER_BANNED',
       'Your account has ben banned due to violation of our community guidelines. Check email for further information'
     );
+  }
+}
+
+export class ServiceBusyError extends AppError {
+  constructor(service: string) {
+    super('SERVICE_BUISY', `All of the ${service} are busy now, please try after some time`);
   }
 }

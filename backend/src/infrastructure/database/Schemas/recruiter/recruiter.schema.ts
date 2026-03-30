@@ -1,11 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 import { NewRecruiter } from '../../../../domain/entities/recruiter/recruiter.entity';
-import SocialLinks from '../../../../domain/entities/SocialLinks';
+// import SocialLinks from '../../../../domain/entities/user/SocialLinks';
 
-const SocialLinkSchema = new Schema<SocialLinks>({
-  domain: { type: String },
-  url: { type: String },
-});
+// const SocialLinkSchema = new Schema<SocialLinks>({
+//   domain: { type: String },
+//   url: { type: String },
+// });
 
 const VerificationTimeLineSchema = new Schema<{
   action: string;

@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Education from '../../../../domain/entities/user/educations.entity';
+import Education from '../../../../domain/entities/education/educations.entity';
 
 export const EducationSchema = new Schema<Education>(
   {

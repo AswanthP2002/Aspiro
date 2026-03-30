@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
-import SavePost from '../../../../domain/entities/user/savePost.entity';
+import SavePost from '../../../../domain/entities/post/savePost.entity';
 
 const SavePostSchema = new Schema<SavePost>(
   {

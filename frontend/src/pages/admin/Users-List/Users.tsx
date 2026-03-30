@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Notify } from 'notiflix';
-import { banUser, deleteUser, getUsers, userBlock, userUnblock } from '../../../services/adminServices';
+import { getUsers } from '../../../services/userServices';
+import { userBlock, banUser, userUnblock, deleteUser } from '../../../services/userServices';
+// import { banUser } from '../../../services/adminServices';
 import { UserType } from '../../../types/entityTypes';
 import { FaSortAmountUp } from 'react-icons/fa';
 import { FiFilter } from 'react-icons/fi';
@@ -15,6 +16,8 @@ import { formattedDateMoment } from '../../../services/util/formatDate';
 import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { MdBlock } from 'react-icons/md';
+import { Modal } from '@mui/material';
+import { toast } from 'react-toastify';
 
 interface FilterOptions {
   status: boolean[]; 
@@ -46,18 +49,18 @@ export function OptionsMenu({
         <button onClick={toggleOptionsMenu}><BsThreeDotsVertical /></button>
       
         {isMenuOpen && (
-          <div className='absolute border border-gray-200 rounded-ms shadow-lg z-10 bg-white p-3 right-20'>
-            <ul className='space-y-2 text-xs'>
-              <li onClick={() => {navigateUserDetails(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><LuUser /> View Profile</li>
+          <div className='absolute border border-gray-200 rounded-md shadow-lg z-10 bg-white right-20'>
+            <ul className='text-xs'>
+              <li onClick={() => {navigateUserDetails(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer px-4 py-2 hover:bg-gray-100 flex gap-2 items-center'><LuUser /> View Profile</li>
               {
                 row.isBlocked
-                  ? (!row.isBanned && (<li onClick={() => {onUnBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><MdBlock /> Unsuspend Account</li>))
-                  : (!row.isBanned && (<li onClick={() => {onBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><MdBlock /> Suspend Account</li>))
+                  ? (!row.isBanned && (<li onClick={() => {onUnBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer px-4 py-2 hover:bg-gray-100 flex gap-2 items-center'><MdBlock /> Unsuspend Account</li>))
+                  : (!row.isBanned && (<li onClick={() => {onBlock(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer px-4 py-2 hover:bg-gray-100 flex gap-2 items-center'><MdBlock /> Suspend Account</li>))
               }
               {
-                !row.isBanned && (<li onClick={() => {onBan(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer flex gap-2 items-center'><LuShieldBan /> Permanent Ban</li>)
+                !row.isBanned && (<li onClick={() => {onBan(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer px-4 py-2 flex gap-2 items-center'><LuShieldBan /> Permanent Ban</li>)
               }
-              <li onClick={() => {onDelete(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer text-red-500 flex gap-2 items-center'><BiTrash /> Delete User</li>
+              <li onClick={() => {onDelete(row._id as string); setIsMenuOpen(false)}} className='cursor-pointer text-red-500 px-4 py-2 flex gap-2 items-center'><BiTrash /> Delete User</li>
             </ul>
           </div>
         )}
@@ -74,20 +77,27 @@ export default function Users() {
   const [page, setPage] = useState(1); 
   const [totalPage, setTotalPage] = useState(0); 
   const [search, setSearch] = useState(""); 
-  const [pagination, setPagination] = useState<number[]>([]); 
-  const [selectedUser, setSelectedUser] = useState<UserType>()
-
+  // const [pagination, setPagination] = useState<number[]>([]); 
+  // const [selectedUser, setSelectedUser] = useState<UserType>()
+  const [viewUserProfilePicture, setViewUserProfilePicture] = useState(false)
+  const [clickedUserProfilePicture, setClickedUserProfilePicture] = useState<string | null>(null)
   const [sortVisible, setSortVisible] = useState(false);
   const [sort, setSort] = useState('joined-latest'); 
 
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
-  const [error, setError] = useState<string | null>(null)
+  // const [isLoading, setIsLoading] = useState(true); 
+  // const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterOptions>({
     status: [],
     roles: [],
     verification: [],
   });
+
+  const openProfileImage = (url: string) => {
+    setClickedUserProfilePicture(url)
+    setViewUserProfilePicture(true)
+  }
+  const closeProfileImage = () => setViewUserProfilePicture(false)
 
   const handleFilterChange = (
     category: keyof FilterOptions,
@@ -130,7 +140,7 @@ export default function Users() {
       if(response.isConfirmed){
         try {
       await userBlock(id)
-      Notify.success('User blocked Successfully', {timeout: 2000})
+      toast.success('User blocked')
       setUsers((prvUsers: UserType[]) => {
         return prvUsers.map((user: UserType) => {
           if(user._id === id){
@@ -141,7 +151,7 @@ export default function Users() {
         })
       })
     } catch (error: unknown) {
-      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
     }
       }else{
         return
@@ -165,7 +175,7 @@ export default function Users() {
       if(response.isConfirmed){
         try {
       await userUnblock(id)
-      Notify.success('User Unblocked', {timeout: 3000})
+      toast.success('Removed user suspension')
       setUsers((prvUsers: UserType[]) => {
         return prvUsers.map((user: UserType) => {
           if(user._id === id){
@@ -176,7 +186,7 @@ export default function Users() {
         })
       })
     } catch (error: unknown) {
-      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
     }
       }else {
         return
@@ -201,7 +211,7 @@ export default function Users() {
       if(response.isConfirmed){
         try {
       const result = await banUser(userId)
-      Notify.success(result.message)
+      toast.success(result?.message)
       setUsers((prvUsers: UserType[]) => {
         return prvUsers.map((user: UserType) => {
           if(user._id === userId){
@@ -212,7 +222,7 @@ export default function Users() {
         })
       })
     } catch (error: unknown) {
-      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
     }
       }else{
         return
@@ -240,9 +250,9 @@ export default function Users() {
           setUsers((prv: UserType[]) => {
             return prv.filter((user: UserType) => user._id !== userId)
           })
-          Notify.success(result.message)
+          toast.success(result?.message)
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
       }
     })
@@ -254,45 +264,25 @@ export default function Users() {
 
   useEffect(() => {
     async function fetchCandidateLists(){
-      setIsLoading(true); 
-      setError(null); 
-
-      try {
+       try {
         const result = await getUsers(search, page, sort, filter);
         
         if (result && result.success) {
-            // console.log('users list from the backend', result); // Removed debug log
             setUsers(result.result?.users || []);
             setTotalPage(result?.result?.totalPages || 0);
-            setPagination(Array.from({ length: result?.result?.totalPages || 0 }, (_, i) => i + 1));
             
-            if (result?.result?.users.length > 0) {
-              setSelectedUser(result?.result?.users[0]);
-            }
         } else if (result && result.message) {
-           
-            setError(result.message);
-            Notify.failure(result.message);
+            toast.error(result.memssage)
             setUsers([]); 
-            setPagination([]);
-            setSelectedUser(undefined);
         } else {
-            setError("An unknown error occurred while fetching users.");
-            Notify.failure("An unknown error occurred while fetching users.");
+           toast.error("An unknown error occurred while fetching users.");
             setUsers([]);
-            setPagination([]);
-            setSelectedUser(undefined);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch user list:', err);
-        setError(err.message || "Failed to fetch user list.");
-        Notify.failure(err.message || "Failed to fetch user list.");
+        toast.error(err instanceof Error ? err.message : 'Something went wrong')
         setUsers([]); 
-        setPagination([]);
-        setSelectedUser(undefined);
-      } finally {
-        setIsLoading(false); 
-      }
+      } 
     }
 
     fetchCandidateLists()
@@ -322,7 +312,12 @@ export default function Users() {
     header: "USER",
     render: (row: UserType) => (
       <div className='flex gap-2'>
-        <div className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-400 rounded-full">{row.name ? row.name[0] : 'U'}</div>
+        {row.profilePicture?.cloudinarySecureUrl
+          ? <div onClick={() => openProfileImage(row.profilePicture?.cloudinarySecureUrl as string)} className="w-10 h-10 cursor-pointer rounded-full ring-1 ring-blue-500">
+            <img src={row.profilePicture.cloudinarySecureUrl} className='object-cover h-full w-full rounded-full' alt="" />
+          </div>
+          : <div className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-400 rounded-full">{row.name ? row.name[0] : 'U'}</div>
+        }
         <div>
           <p className='font-medium'>{row.name}</p>
           <p className='text-xs'>{row.email}</p>
@@ -515,6 +510,23 @@ export default function Users() {
         onPageChange={(page: number) => setPage(page)}
       />
     </div>
+
+    {viewUserProfilePicture && (
+      <ProfilePictureView imgUrl={clickedUserProfilePicture as string} open={viewUserProfilePicture} onClose={closeProfileImage} />
+    )}
     </>
   );
+}
+
+function ProfilePictureView({imgUrl, open, onClose}: {imgUrl: string, open: boolean, onClose: () => void}){
+  return(
+    <>
+    <Modal className='flex flex-col items-center justify-center backdrop-blur-lg' open={open} onClose={onClose}>
+        <div className='shadow-2xl w-50 h-50 rounded-full relative'>
+          <img className='w-full h-full object-cover rounded-full' src={imgUrl} alt="" />
+          <button onClick={onClose} className='absolute top-0 right-0'><CgClose size={25} color='white' /></button>
+        </div>
+    </Modal>
+    </>
+  )
 }
