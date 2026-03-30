@@ -4,8 +4,10 @@ import { IoMdPaper, IoMdVideocam } from "react-icons/io";
 import { LuUsers } from "react-icons/lu";
 import { MdAutoAwesome } from "react-icons/md";
 import { TbBuildingSkyscraper } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
 
 export default function InterviewOverviewPage(){
+    const navigate = useNavigate()
     return(
         <>
             <div className="min-h-screen bg-gray-50 px-5 py-15 lg:px-20">
@@ -15,7 +17,7 @@ export default function InterviewOverviewPage(){
                         Practice real-world interview scenarios tailored to your industry 
                         and get instant feedback powered by AI.
                     </p>
-                    <button className="flex items-center gap-2 text-sm font-medium bg-white p-2 rounded-md mt-3 text-indigo-500 hover:bg-gray-200 shadow-xl">
+                    <button onClick={() => navigate('personalization')} className="flex items-center gap-2 text-sm font-medium bg-white p-2 rounded-md mt-3 text-indigo-500 hover:bg-gray-200 shadow-xl">
                         <MdAutoAwesome />
                         Start preperations
                     </button>
