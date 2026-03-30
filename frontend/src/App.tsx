@@ -118,6 +118,7 @@ import ResumeToolsPage from './pages/user/Aspiro-career/ResumeTools';
 import AutoResumeCreationPage from './pages/user/Aspiro-career/AutoResume.profile';
 import ResumeAnalyzer from './pages/user/Aspiro-career/ResumeAnalyzePage';
 import DetailedAnalysisReportPage from './pages/user/Aspiro-career/DetailedAnalysisReportPage';
+import InterviewOverviewPage from './pages/user/Aspiro-career/AI-Interviews/InterviewOverviewPage';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -330,6 +331,7 @@ function App() {
               <Route path='aspiro-career/resume-tools/auto-create' element={<AutoResumeCreationPage />} />
               <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzer />} />
               <Route path='aspiro-career/resume-tools/analyze/report' element={<DetailedAnalysisReportPage />} />
+              <Route path='aspiro-career/interview' element={<InterviewOverviewPage />} />
             </Route>
           </Route>
         </Route>
