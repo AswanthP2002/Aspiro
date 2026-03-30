@@ -1,4 +1,4 @@
-import { SalaryPeriod } from '../../../domain/entities/recruiter/job.entity';
+import { SalaryPeriod } from '../../../domain/entities/job/job.entity';
 
 export interface LoadSavedJobsRequestDTO {
   candidateId: string;

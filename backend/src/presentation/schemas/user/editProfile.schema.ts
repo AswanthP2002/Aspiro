@@ -9,5 +9,5 @@ export const EditProfileSchema = z.object({
   state: z.string(),
   country: z.string(),
   pincode: z.string(),
-  phone: z.string()
+  phone: z.string(),
 });

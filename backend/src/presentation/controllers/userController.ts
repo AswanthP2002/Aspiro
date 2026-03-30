@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import url from 'url';
 
-import { Auth } from '../../middlewares/auth';
+// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
-import IAddResumeUseCase from '../../application/interfaces/usecases/user/IAddResume.usecase.FIX';
 import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase.FIX';
 import IEditProfileUseCase from '../../application/interfaces/usecases/user/IEditProfile.usecase.FIX';
-import ICheckIsJobSavedUseCase from '../../application/interfaces/usecases/user/ICheckIsJobSaved.usecase.FIX';
-import IUnsaveJobUseCase from '../../application/interfaces/usecases/user/IUnsaveJob.usecase.FIX';
+import ICheckIsJobSavedUseCase from '../../application/interfaces/usecases/savedJobs/ICheckIsJobSaved.usecase.FIX';
+import IUnsaveJobUseCase from '../../application/interfaces/usecases/savedJobs/IUnsaveJob.usecase.FIX';
 import IAddSocialLinkUsecase from '../../application/interfaces/usecases/user/IAddSocialLink.usecase.FIX';
 import IDeleteSocialLinkUseCase from '../../application/interfaces/usecases/user/IDeleteSocialLink.usecase.FIX';
 import IRemoveCoverphotoUseCase from '../../application/interfaces/usecases/user/IRemoveUserCoverPhoto.usecase.FIX';
@@ -19,49 +18,37 @@ import ISaveUserBasicsUsecase from '../../application/interfaces/usecases/user/I
 import IUploadUserCoverPhotoUsecase from '../../application/interfaces/usecases/user/IUploadUserCoverPhoto.usecase.FIX';
 import IUploadUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IUploadUserProfilePicture.usecase.FIX';
 import IRemoveUserProfilePictureUsecase from '../../application/interfaces/usecases/user/IRemoveUserProfilePciture.usecase.FIX';
-import IAddUserExperienceUsecase from '../../application/interfaces/usecases/user/IAddUserExperience.usecase.FIX';
-import IGetUserExperiencesUsecase from '../../application/interfaces/usecases/user/IGetUserExperiences.usecase.FIX';
-import IAddUserEducationUsecase from '../../application/interfaces/usecases/user/IAddUserEducation.usecase.FIX';
-import IGetUserEducationsUsecase from '../../application/interfaces/usecases/user/IGetUserEducations.usecase.FIX';
-import IAddUsersSkillUsecase from '../../application/interfaces/usecases/user/IAddUsersSkill.usecase.FIX';
-import IGetUserSkillsUsecase from '../../application/interfaces/usecases/user/IGetUserSkills.usecase.FIX';
-import IEditUserEducationUsecase from '../../application/interfaces/usecases/user/IEditUserEducation.usecase.FIX';
-import IEditUserExperienceUsecase from '../../application/interfaces/usecases/user/IEditUserExperience.usecase.FIX';
-import IDeleteUserExperienceUsecase from '../../application/interfaces/usecases/user/IDeleteUserExperience.usecase.FIX';
-import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/user/IDeleteUserEducation.usecase.FIX';
-import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/user/IDeleteUserSkill.usecase.FIX';
-import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/user/IloadJobsAggregated.usecase.FIX';
-import SendResetPassworLinkUsecase from '../../application/usecases/user/SendPasswordResetLink.usecase.FIX';
-import ResetPasswordUsecase from '../../application/usecases/user/ResetPassword.usecase.FIX';
+import ILoadJobsAggregatedUsecase from '../../application/interfaces/usecases/job/IloadJobsAggregated.usecase.FIX';
 import ILoadUserAggregatedProfileUsecase from '../../application/interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
 import ILoadUserMetaDataUsecase from '../../application/interfaces/usecases/user/ILoadUserMetaData.usecase.FIX';
 import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase.FIX';
-import ISaveJobUsecase from '../../application/interfaces/usecases/user/ISaveJob.usecase.FIX';
-import IGetSavedJobsUsecase from '../../application/interfaces/usecases/user/IGetSavedJobs.usecase.FIX';
-import IApplyJobUsecase from '../../application/interfaces/usecases/user/IApplyJob.usecase.FIX';
-import IGetMyApplicationsUsecase from '../../application/interfaces/usecases/user/IGetMyApplications.usecase.FIX';
+import ISaveJobUsecase from '../../application/interfaces/usecases/savedJobs/ISaveJob.usecase.FIX';
+import IGetSavedJobsUsecase from '../../application/interfaces/usecases/savedJobs/IGetSavedJobs.usecase.FIX';
+import IApplyJobUsecase from '../../application/interfaces/usecases/jobApplication/IApplyJob.usecase.FIX';
+import IGetMyApplicationsUsecase from '../../application/interfaces/usecases/jobApplication/IGetMyApplications.usecase.FIX';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { ValidationError } from '../../domain/errors/AppError';
 import { ResendOtpDto } from '../../application/DTOs/user/resendOtp.dto.FIX';
-import ILoadResumeUseCase from '../../application/interfaces/usecases/user/ILoadResumes.usecase.FIX';
-import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase.FIX';
-import IAddCertificateUseCase from '../../application/interfaces/usecases/user/IAddCertificate.usecase.FIX';
-import ILoadCertificateUseCase from '../../application/interfaces/usecases/user/IGetCeritificates.usecase.FIX';
 import AddJobFavoriteDTO from '../../application/DTOs/user/addJobFavorite.dto.FIX';
-import IDeleteCertificateUsecase from '../../application/interfaces/usecases/user/IDeleteCertificate.usecase';
-import ISetResumePrimaryUsecase from '../../application/interfaces/usecases/user/ISetResumePrimary.usecase';
 import IGetUsersForPublicUsecase from '../../application/interfaces/usecases/user/IGetUsersforPublic.usecase';
 import ILoadMyProfileUsecase from '../../application/interfaces/usecases/user/ILoadMyProfile.usecase.FIX';
-import IGetUserAlertsUsecase from '../../application/interfaces/usecases/user/IGetUserAlerts.usecase';
-import ISendConnectionRequestUsecase from '../../application/interfaces/usecases/user/ISendConnectionRequest.usecase';
-import IRejectConnectionRequestUsecase from '../../application/interfaces/usecases/user/IRejectConnectionRequest.usecase';
-import ICancelConnectionRequestUsecase from '../../application/interfaces/usecases/user/ICancelConnectionRequest.usecase';
-import IAcceptConnectionRequestUsecase from '../../application/interfaces/usecases/user/IAcceptConnectionRequest.usecase';
 import { generateToken, verifyToken } from '../../services/jwt';
-import ICheckIsJobApplied from '../../application/interfaces/usecases/user/ICheckJobApplied.usecase';
+import ICheckIsJobApplied from '../../application/interfaces/usecases/jobApplication/ICheckJobApplied.usecase';
 import ISendResetPassworLinkUsecase from '../../application/interfaces/usecases/user/ISendPasswordResetLink.usecase.FIX';
 import IResetPasswordUsecase from '../../application/interfaces/usecases/user/IResetPassword.usecase.FIX';
+import { ITrackMyJobApplicationDetailsUsecase } from '../../application/interfaces/usecases/jobApplication/ITrackMyJobApplicationDetails.usecase';
+import { IGetMyScheduledInterviewsUsecase } from '../../application/interfaces/usecases/interview/IGetMyScheduledInterviews.usecase';
+import IWithdrawApplicationUsecase from '../../application/interfaces/usecases/jobApplication/IWithdrawApplication.usecase';
+import ILoadUsersAdminUseCase from '../../application/interfaces/usecases/user/ILoadUsersAdmin.usecase.FIX';
+import IAdminLoadUserDetailsUsecase from '../../application/interfaces/usecases/user/IAdminLoadUsersDetails.usecase';
+import IAdminBlockUserUsecase from '../../application/interfaces/usecases/user/IAdminBlockUser.usecase.FIX';
+import { StatusMessage } from '../../constants/Messages/statusMessages';
+import IAdminUnblockUserUsecase from '../../application/interfaces/usecases/user/IAdminUnblockUser.usecase.FIX';
+import IAdminDeleteUserUsecase from '../../application/interfaces/usecases/user/IAdminDeleteUser.usecase';
+import IAdminPermanentBanUserUsecase from '../../application/interfaces/usecases/user/IAdminPermanentBanUser.usecase';
+import { IGetSimilarUserUsecase } from '../../application/interfaces/usecases/user/IGetSimilarUsers.usecase';
+import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -127,19 +114,6 @@ export class UserController {
     private _removeUserCoverPhotoUC: IRemoveCoverphotoUseCase,
     @inject('IRemoveUserProfilePictureUsecase')
     private _removeUserProfPictureUC: IRemoveUserProfilePictureUsecase,
-    @inject('IAddUserExperienceUsecase') private _addUserExperience: IAddUserExperienceUsecase,
-    @inject('IGetUserExperiencesUsecase') private _getUserExperiencesUC: IGetUserExperiencesUsecase,
-    @inject('IAddUserEducationUsecase') private _addUserEducationUC: IAddUserEducationUsecase, // private _verifyUserUC: IVerifyUserUseCase, //usecase interface // private _registerCandidateUC: IRegisterCandidateUseCase, //usecase interface // private _loginCandidateUC: ILoginCandidateUseCase, //usecase interface // private _SaveBasicsCandidateUC: ISaveBasicsCandidateUseCase, //usecase interface // private _loadCandidatePersonalDataUC: ILoadCandidatePersonalDataUseCase, //usecase interface // private _addExperienceUC: IAddExperience, //usecase interface // private _getExperiencesUC: ILoadExperiencesUseCase, //usecase interface // private _deleteExperienceUC: IDeleteExperienceUseCase, //usecase interface // private _editExperienceUC: IEditExperienceUseCase, //usecase interface // private _loadJobsUC: ILoadJobCandidateSideUseCase, //usecase interface // private _loadJobDetailsUC: ILoadJobDetailsCandidateSideUseCase, //usecase interface // private _addSkillsUC: IAddSkillsUseCase, //usecase interface // private _getSkillsUC: ILoadSkillsUseCase, //usecase interface // private _deleteSkillUC: IDeleteSkillsUseCase, //usecase interface // private _addEducationUC: IAddEducationUseCase, //usecase interface // private _getEducationsUC: ILoadEducationsUseCase, //usecase interface // private _deleteEducationUC: IDeleteEducationUseCase, //usecase interface // private _editEducationUC: IEditEducationUseCase, //usecase interface // private _addResumeUC: IAddResumeUseCase, //usecase interface // private _loadResumeUC: ILoadResumeUseCase, //usecase interface // private _deleteResumeUC: IDeleteResumeUseCase, //usecase interface // private _addCertificate: IAddCertificateUseCase, //usecase interface // private _getCertificates: ILoadCertificateUseCase, //usecase interface // private _saveJobApplicationUC: ISaveJobApplicationUseCase, //usecase interface // private _searchJobFromHomeUC: ISearchJobsFromHomeUseCase, //usecase interface, // private _editCandidateProfileUC: IEditProfileUseCase, //usecase interface // private _getNotificationsUC: IGetNotificationsUseCase, // private _saveJobUC: ISaveFavoriteJobUseCase, // private _checkIsJobSavedUC: ICheckIsJobSavedUseCase, // private _getSavedJobsUC: IGetFavoriteJobUseCase, // private _unsaveJobUC: IUnsaveJobUseCase, // private _addSocialLinkUC: IAddSocialLinkUsecase, // private _deleteSocialLinkUC: IDeleteSocialLinkUseCase, // private _uploadProfilePictureUC: IUploadProfilePictureUseCase, // private _removeProfilePictureUC: IRemoveProfilePictureUseCase, // private _uploadCoverphotoUC: IUploadCoverPhotoUseCase, // private _removeCoverphotoUC: IRemoveCoverphotoUseCase, // private _getCandidatesUC: IGetCandidatesUseCase, // private _getCandidateDetailsUC: IGetCandidateDetailsUseCase, // private _getCandidateApplicationsUC: IGetCandidateApplicationsUseCase, // private _updateNotificationReadStatus: IUpdateNotificationReadStatus, // private _createUserUC: ICreateUserUseCase, // private _findCandidateByUserIdUC: IFindCandidateByUserIdUseCase
-    @inject('IGetUserEducationsUsecase') private _getUserEducationsUC: IGetUserEducationsUsecase,
-    @inject('IAddUsersSkillUsecase') private _addUserSkillUC: IAddUsersSkillUsecase,
-    @inject('IGetUsersSkillsUsecase') private _getUserSkillsUC: IGetUserSkillsUsecase,
-    @inject('IEditUserEducationUsecase') private _editUserEducationUC: IEditUserEducationUsecase,
-    @inject('IEditUserExperienceUsecase') private _editUserExperienceUC: IEditUserExperienceUsecase,
-    @inject('IDeleteUserExperienceUsecase')
-    private _deleteUserExperienceUC: IDeleteUserExperienceUsecase,
-    @inject('IDeleteUserEducationUsecase')
-    private _deleteUserEducationUC: IDeleteUserEducationUsecase,
-    @inject('IDeleteUserSkillUsecase') private _deleteUserSkillUC: IDeleteUserSkillUsecase,
     @inject('ILoadJobsAggregatedUsecase') private _loadJobs: ILoadJobsAggregatedUsecase,
     @inject('ISendResetPasswordLinkUsecase')
     private _sendResetPasswordLink: ISendResetPassworLinkUsecase,
@@ -156,29 +130,27 @@ export class UserController {
     @inject('IUnsaveJobUsecase') private _unsaveJob: IUnsaveJobUseCase,
     @inject('IGetSavedJobsUsecase') private _getSavedJobs: IGetSavedJobsUsecase,
     @inject('IApplyJobUsecase') private _applyJob: IApplyJobUsecase,
-    @inject('IAddResumeUsecase') private _addResume: IAddResumeUseCase,
     @inject('IGetMyApplicationsUsecase') private _getMyApplications: IGetMyApplicationsUsecase,
-    @inject('ILoadResumeUsecase') private _loadResumes: ILoadResumeUseCase,
-    @inject('IDeleteResumeUsecase') private _deleteResume: IDeleteResumeUseCase,
-    @inject('IAddCertificate') private _addCertificate: IAddCertificateUseCase,
-    @inject('ILoadCertificates') private _loadCertificates: ILoadCertificateUseCase,
-    @inject('IDeleteCertificateUsecase') private _deleteCertificate: IDeleteCertificateUsecase,
-    @inject('ISetResumePrimary') private _setResumePrimary: ISetResumePrimaryUsecase,
     @inject('IGetUsersForPublicUsecase') private _getUsersForPublic: IGetUsersForPublicUsecase,
-    @inject('IGetUserAlertsUsecase') private _getUserAlerts: IGetUserAlertsUsecase,
-    @inject('ISendConnectionRequestUsecase')
-    private _sendConnectionRequest: ISendConnectionRequestUsecase,
-    @inject('IRejectConnectionRequestUsecase')
-    private _rejectConnectionRequest: IRejectConnectionRequestUsecase,
-    @inject('ICancelConnectionRequestUsecase')
-    private _cancelConnectionRequest: ICancelConnectionRequestUsecase,
-    @inject('IAcceptConnectionRequestUsecase')
-    private _acceptConnectionRequest: IAcceptConnectionRequestUsecase,
-    @inject('ICheckIsJobAppliedUsecase') private _checkIsJobApplied: ICheckIsJobApplied
+    @inject('ICheckIsJobAppliedUsecase') private _checkIsJobApplied: ICheckIsJobApplied,
+    @inject('ITrackMyJobApplicationDetailsUsecase')
+    private _trackMyApplication: ITrackMyJobApplicationDetailsUsecase,
+    @inject('IGetMyInterviews')
+    private _getSchedueldInterviews: IGetMyScheduledInterviewsUsecase,
+    @inject('IWithdrawApplicationUsecase')
+    private _withdrawApplication: IWithdrawApplicationUsecase,
+    @inject('ILoadUsersAdminUsecase') private _loadUsersAdminUC: ILoadUsersAdminUseCase,
+    @inject('IAdminLoadUserDetailsUsecase') private _loadUserDetails: IAdminLoadUserDetailsUsecase,
+    @inject('IAdminBlockUserUsecase') private _blockUser: IAdminBlockUserUsecase,
+    @inject('IAdminUnblockUserUsecase') private _unblockUser: IAdminUnblockUserUsecase,
+    @inject('IAdminDeleteUserUsecase') private _deleteUser: IAdminDeleteUserUsecase,
+    @inject('IAdminPermanentBanUserUsecase') private _banUser: IAdminPermanentBanUserUsecase,
+    @inject('IGetSimilarUser') private _similarUsers: IGetSimilarUserUsecase,
+    @inject('ILoadusersFullDetailsForResumeBuilding')
+    private _getUserFullProfileForResumeBuiding: ILoadUserDetailsForResumeBuildingUsecase
   ) {}
 
   async testInfinityScroll(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const search = req.query.search || '';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 4;
     try {
@@ -195,7 +167,7 @@ export class UserController {
 
       res.status(StatusCodes.CREATED).json({
         success: true,
-        message: 'User created need to verify before continue',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('User'),
         userId: createUser?._id,
         userEmail: createUser?.email,
       });
@@ -210,7 +182,7 @@ export class UserController {
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Email verified successfully, please login to continue',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Email Verification status'),
         verifiedUser,
       });
     } catch (error: unknown) {
@@ -228,7 +200,7 @@ export class UserController {
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'OTP sent successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('OTP'),
         result: { id: result?._id, email: result?.email },
       });
     } catch (error: unknown) {
@@ -251,7 +223,7 @@ export class UserController {
         })
         .json({
           success: true,
-          message: 'User login successfull',
+          message: StatusMessage.AUTH_MESSAGE.LOGIN('User'),
           result: { user: result.user, accessToken: result.accessToken, role: result.role },
         });
     } catch (error: unknown) {
@@ -259,19 +231,24 @@ export class UserController {
     }
   }
 
-  async reAuthenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async reAuthenticate(req: Request, res: Response): Promise<void> {
+    console.log('request reached under the reauthenticate controller');
     try {
       const refreshToken = req.cookies.refreshToken;
+      console.log('refresh token - ', refreshToken);
       if (!refreshToken) {
         console.log('--Refreshtoken not provided--');
         res
           .status(StatusCodes.NOT_ACCEPTABLE)
-          .json({ success: false, message: 'No refresh token provided' });
+          .json({ success: false, message: StatusMessage.AUTH_MESSAGE.NO_REFRESH_TOKEN });
         return;
       }
-      const decoded = (await verifyToken(refreshToken)) as JWTTokenVerifyResult; //chance for error
 
+      console.log('refresh token exist so going to decode');
+      const decoded = (await verifyToken(refreshToken)) as JWTTokenVerifyResult; //chance for error
+      console.log('decoded without problem', decoded);
       const result = await this._loadUserMetaData.execute(decoded.id);
+      console.log('-- received user meta data after reauthentiction--', result);
       const accessToken = await generateToken({
         id: decoded?.id as string,
         email: decoded?.email as string,
@@ -279,7 +256,7 @@ export class UserController {
       });
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Metadata fetched successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('New Accestoken'),
         userData: result,
         accessToken,
       });
@@ -288,9 +265,10 @@ export class UserController {
         console.log('Error occured while refreshing accessToken', error);
         switch (error.name) {
           case 'TokenExpiredError':
+            console.log('inside the reauthenticate controller token expired');
             res.status(StatusCodes.UNAUTHORIZED).json({
               success: false,
-              message: 'Your session has expired, please login again',
+              message: StatusMessage.COMMON_MESSAGE.SESSION_EXPIRED,
               errors: {
                 code: 'REFRESH_TOKEN_EXPIRED',
                 message: 'Refresh token expired, please login again',
@@ -299,9 +277,10 @@ export class UserController {
             break;
 
           case 'JsonWebTokenError':
+            console.log('inside the reauthenticate controller toke error');
             res.status(StatusCodes.UNAUTHORIZED).json({
               success: false,
-              message: 'Invalid Token, please login again',
+              message: StatusMessage.AUTH_MESSAGE.INVALID_TOKEN,
               errors: {
                 code: 'INVALID_TOKEN',
                 message: 'Invalid token, please login again',
@@ -313,15 +292,15 @@ export class UserController {
             console.log('Refresh token verification failed');
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
               success: false,
-              message: 'Something went wrong, please try again after some time',
+              message: StatusMessage.COMMON_MESSAGE.SOMETHING_WENT_WRONG,
             });
         }
       }
     }
   } //fixed
 
-  async saveUsersBasics(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const id = req.user.id as string;
+  async saveUsersBasics(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user?.id as string;
 
     try {
       const result = await this._saveUserBasicsUC.execute({
@@ -343,7 +322,7 @@ export class UserController {
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Basic details saved, login to your profile to continue',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Basic Details updated'),
         updatedCandidate: result,
       });
     } catch (error: unknown) {
@@ -351,15 +330,14 @@ export class UserController {
     }
   } //fixed
 
-  async loadUserProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const id = req.user.id;
-    console.log('-- Inspecting user id from the controller --', id);
+  async loadUserProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user?.id as string;
     try {
       const userDetails = await this._loadMyProfile.execute(id);
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'User Profile data fetched successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('User Profile'),
         userDetails,
       });
       return;
@@ -376,59 +354,36 @@ export class UserController {
         sameSite: 'lax',
       });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'User logout successful' });
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: StatusMessage.AUTH_MESSAGE.LOGOUT });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async addExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
-    try {
-      const result = await this._addUserExperience.execute({ userId, ...req.body });
+  async withdrawApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const applicationId = req.params.applicationId;
 
-      res.status(StatusCodes.CREATED).json({
-        success: true,
-        message: 'Experience added successfully',
-        result,
-      });
+    try {
+      await this._withdrawApplication.execute(applicationId);
+
+      res.status(StatusCodes.OK).json({ success: true, message: 'application deleted' });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async deleteExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { experienceId } = req.params;
-
+  async getScheduledInterviews(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req?.user?.id as string;
     try {
-      await this._deleteUserExperienceUC.execute(experienceId);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Experience deleted' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async getExperiences(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req?.user?.id;
-    try {
-      const experience = await this._getUserExperiencesUC.execute(userId);
+      const result = await this._getSchedueldInterviews.execute(userId);
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Experience details fetched successfully',
-        experience,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Scheduled interviews'),
+        result,
       });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async editExperience(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { experienceId } = req.params;
-    try {
-      const result = await this._editUserExperienceUC.execute({ experienceId, ...req.body });
-      res.status(StatusCodes.OK).json({ success: true, message: 'Edited', result });
     } catch (error: unknown) {
       next(error);
     }
@@ -453,9 +408,11 @@ export class UserController {
         locationSearch,
       });
 
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'Jobs fetched successfully', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Jobs'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
@@ -466,9 +423,11 @@ export class UserController {
     try {
       const result = await this._loadUserPublicProfile.execute(userId);
 
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'Profile fetched successfully', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('User public profile'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
@@ -479,260 +438,44 @@ export class UserController {
 
     try {
       const jobDetails = await this._getJobDetails.execute(jobId);
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'Job details fetched', jobDetails });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async addSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-    try {
-      const result = await this._addUserSkillUC.execute({ userId, ...req.body });
-      res.status(StatusCodes.OK).json({ success: true, message: 'added', result });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async getSkills(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-    try {
-      const skills = await this._getUserSkillsUC.execute(userId);
-
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Skills fetched successfully',
-        skills,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job Details'),
+        jobDetails,
       });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async deleteSkill(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { skillId } = req.params;
-
-    try {
-      await this._deleteUserSkillUC.execute(skillId);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Skill removed' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async addEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      const result = await this._addUserEducationUC.execute({ userId, ...req.body });
-
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: 'Education added successfully',
-        result,
-      });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async getEducations(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      const result = await this._getUserEducationsUC.execute(userId);
-
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: 'Educations fetched successfully',
-        educations: result,
-      });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async deleteEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { educationId } = req.params;
-    try {
-      await this._deleteUserEducationUC.execute(educationId);
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async editEducation(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { educationId } = req.params;
-
-    try {
-      const result = await this._editUserEducationUC.execute({ _id: educationId, ...req.body });
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Education edited', result });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async sendResetPasswordLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async sendResetPasswordLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email } = req.body;
 
     try {
       await this._sendResetPasswordLink.execute(email);
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Email sent successfully' });
+      res
+        .status(StatusCodes.OK)
+        .json({ success: true, message: StatusMessage.AUTH_MESSAGE.PASSWORD_RESET_LINK_SEND });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async resetPassword(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       await this._resetPassword.execute(req.body);
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Password reset successfully' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async addResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      if (req.file) {
-        const resume = req.file.buffer;
-
-        const result = await this._addResume.execute({
-          userId,
-          file: resume,
-          path: req.file.originalname,
-          ...req.body,
-        });
-
-        if (!result) {
-          res
-            .status(StatusCodes.BAD_REQUEST)
-            .json({ success: false, message: 'Failed to process resume' });
-          return;
-        }
-
-        res.status(StatusCodes.OK).json({
-          success: true,
-          message: 'Resume added successfully',
-          result,
-        });
-        return;
-      }
-      console.log('No file found in request for addResume');
-      res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Can not add resume' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async loadResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      const resumes = await this._loadResumes.execute(userId);
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: 'Resumes fetched successfully',
-        resumes,
-      });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async setResumePrimary(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId = req.user.id;
-      const resumeId = req.params.resumeId;
-
-      const result = await this._setResumePrimary.execute({ resumeId, userId });
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Resume set to primary', result });
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
-
-  async deleteResume(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const { resumeId } = req.params;
-    const cloudinaryPublicId = req.query?.cloudinaryPublicId as string;
-
-    try {
-      await this._deleteResume.execute({ cloudinaryPublicId, resumeId });
-
-      res.status(StatusCodes.OK).json({ success: true, message: 'Deleted' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async addCertificate(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      if (req.file) {
-        const arrayBuffer = req.file.buffer;
-        const filePathName = req.file.originalname.split('.')[0];
-
-        const result = await this._addCertificate.execute({
-          file: arrayBuffer,
-          path: filePathName,
-          userId,
-          ...req.body,
-        });
-
-        res
-          .status(StatusCodes.OK)
-          .json({ success: true, message: 'Certificate added successfully', result });
-        return;
-      }
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async getCertificates(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-
-    try {
-      const result = await this._loadCertificates.execute(userId);
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: 'Certificates fetched successfully',
-        certificates: result,
-      });
-    } catch (error: unknown) {
-      next(error);
-    }
-  } //fixed
-
-  async deleteCertificate(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const cloudinaryPublicId = req.query.cloudinaryPublicId as string;
-    const certificateId = req.params.certificateId;
-
-    try {
-      await this._deleteCertificate.execute({ certificateId, cloudinaryPublicId });
       res
         .status(StatusCodes.OK)
-        .json({ success: true, message: 'Certificate deleted successfully' });
+        .json({ success: true, message: StatusMessage.AUTH_MESSAGE.PASSWORD_RESET_SUCCESS });
     } catch (error: unknown) {
       next(error);
     }
-  }
+  } //fixed
 
-  async applyJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
+  async applyJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const { jobId } = req.params;
     const { coverLetterContent, resumeId } = req.body;
     try {
@@ -743,14 +486,18 @@ export class UserController {
         resumeId,
       });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'success', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Job application'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async editMyProfile(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const id = req.user.id;
+  async editMyProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const id = req.user?.id as string;
 
     const data = {
       name: req.body.name,
@@ -771,7 +518,7 @@ export class UserController {
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Profile details updated successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Profile details'),
         result,
       });
     } catch (error: unknown) {
@@ -779,47 +526,58 @@ export class UserController {
     }
   } //fixed
 
-  async saveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
+  async saveJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const { jobId } = req.params;
     try {
       const dto = plainToInstance(AddJobFavoriteDTO, { candidateId, jobId });
       const errors = await validate(dto);
       if (errors.length > 0) throw new ValidationError();
 
-      const result = await this._saveJob.execute({ candidateId, jobId });
+      await this._saveJob.execute({ candidateId, jobId });
 
-      res.status(StatusCodes.CREATED).json({ success: true, message: 'Job saved' });
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Job Saved'),
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async checkIsJobSaved(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
+  async checkIsJobSaved(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const jobId = req.params.jobId as string;
     try {
       const result = await this._checkIsJobSaved.execute(jobId, candidateId);
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'checked', isSaved: result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job saved status'),
+        isSaved: result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async checkIsJobApplied(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
+  async checkIsJobApplied(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const jobId = req.params.jobId;
     try {
       const result = await this._checkIsJobApplied.execute(jobId, candidateId);
-      res.status(StatusCodes.OK).json({ success: true, message: 'result', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job applied status'),
+        result,
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async getFavoriteJobs(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user.id;
+  async getFavoriteJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
@@ -835,7 +593,7 @@ export class UserController {
 
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Favorite jobs fetched sucessfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Favorite jobs'),
         result: result,
       });
     } catch (error: unknown) {
@@ -843,18 +601,21 @@ export class UserController {
     }
   }
 
-  async unsaveJob(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async unsaveJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     const savedId = req.params.id;
 
     try {
       await this._unsaveJob.execute(savedId);
-      res.status(StatusCodes.OK).json({ success: true, message: 'Unsaved' });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Job unsave status'),
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async addSocialLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
+  async addSocialLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
     const urlObj = url.parse(req.body?.url);
     const domain = urlObj?.hostname as string;
@@ -862,28 +623,36 @@ export class UserController {
     try {
       const result = await this._addSocialLink.execute({ userId, domain, ...req.body });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Social link added', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Social media'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async deleteSocialLink(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
+  async deleteSocialLink(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
     const domain = req.body?.domain as string;
 
     try {
       const result = await this._deleteSocialLink.execute({ userId, domain });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Removed', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Social media link'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //fixed
 
-  async uploadProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
-    const img = req.file?.buffer;
+  async uploadProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
+    const img = req.file?.buffer as Buffer<ArrayBufferLike>;
     const publicId = req.query?.publicId as string;
 
     try {
@@ -893,30 +662,38 @@ export class UserController {
         publicId,
       });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Profile photo updated', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Profile photo'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async removeProfilePicture(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
+  async removeProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
     const cloudinaryPublicId = req.body.cloudinaryPublicId as string;
 
     try {
       const result = await this._removeUserProfPictureUC.execute({ cloudinaryPublicId, userId });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Photo removed', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Profile photo'),
+        result,
+      });
       return;
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async uploadCoverphoto(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
+  async uploadCoverphoto(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
     const publicId = (req.query?.publicId as string) || '';
-    const imgFile = req.file?.buffer;
+    const imgFile = req.file?.buffer as Buffer<ArrayBufferLike>;
 
     try {
       const result = await this._uploadUserCoverPhotoUC.execute({
@@ -925,20 +702,28 @@ export class UserController {
         imageFile: imgFile,
       });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo updated', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Cover photo'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   } //rfixed
 
-  async removeCoverphoto(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user?.id;
+  async removeCoverphoto(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
     const cloudinaryPublicId = req.query?.publicId as string;
 
     try {
       const result = await this._removeUserCoverPhotoUC.execute({ cloudinaryPublicId, userId });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Cover photo removed', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Cover photo'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
@@ -965,7 +750,7 @@ export class UserController {
       });
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'users list fetched successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Users'),
         result,
       });
     } catch (error: unknown) {
@@ -973,20 +758,8 @@ export class UserController {
     }
   } //reworked : void
 
-  async getMyAlerts(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const userId = req.user.id;
-    try {
-      const result = await this._getUserAlerts.execute(userId);
-      res
-        .status(StatusCodes.OK)
-        .json({ success: true, message: 'User Alerts fetched successfully', result });
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
-
-  async getCandidateApplications(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const candidateId = req.user?.id;
+  async getCandidateApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const candidateId = req.user?.id as string;
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
@@ -1003,7 +776,7 @@ export class UserController {
       });
       res.status(StatusCodes.OK).json({
         success: true,
-        message: 'Applications fetched successfully',
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Candidate applications'),
         result,
       });
     } catch (error: unknown) {
@@ -1011,63 +784,149 @@ export class UserController {
     }
   } //reworked : void
 
-  async sendConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const sender = req.user.id;
-    const receiver = req.params.receiverId;
-    const { acted_by, acted_user_avatar } = req.body;
+  async trackMyApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const applicationId = req.params.applicationId;
+    try {
+      const result = await this._trackMyApplication.execute(applicationId);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job application details'),
+        result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async loadUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const sort = (req.query.sort as string) || '';
+    const filter = JSON.parse(req.query?.filter as string) || {};
 
     try {
-      const result = await this._sendConnectionRequest.execute({
-        sender,
-        receiver,
-        acted_by,
-        acted_user_avatar,
+      const result = await this._loadUsersAdminUC.execute({ search, page, limit, sort, filter });
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Users'),
+        result,
+        pagination: { page, limit },
       });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async loadUserDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { userId } = req.params;
+
+    try {
+      const result = await this._loadUserDetails.execute(userId);
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('User details'),
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async blockUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const result = await this._blockUser.execute(userId);
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('User block status'),
+        result,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async unBlockUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const result = await this._unblockUser.execute(userId);
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('User unblock status'),
+        result,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userId } = req.params;
+
+      await this._deleteUser.execute(userId);
 
       res
-        .status(StatusCodes.CREATED)
-        .json({ success: true, message: 'Connection Request send', result });
+        .status(StatusCodes.OK)
+        .json({ success: true, message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('User') });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async cancelConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const sender = req.user.id;
-    const receiver = req.params.receiverId;
+  async userBan(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const authorizedAdminId = req.user?.id as string;
+    const userId = req.params.userId;
     try {
-      const result = await this._cancelConnectionRequest.execute({ sender, receiver });
-      res.status(StatusCodes.OK).json({ success: true, message: 'Canceled', result });
+      if (authorizedAdminId !== userId) {
+        const result = await this._banUser.execute(userId);
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('User ban status'),
+          result,
+        });
+      }
+      return;
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async rejectConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const sender = req.body.sender;
-    const receiver = req.user.id;
-
+  async getSimilarUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const logedUser = req.user.id;
+    console.log('-- requrest for similar user fetching --');
     try {
-      const result = await this._rejectConnectionRequest.execute({ receiver, sender });
-      res.status(StatusCodes.OK).json({ success: true, message: 'Request rejected' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
-
-  async acceptConnectionRequest(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const receiver = req.user.id;
-    const { sender, acted_by, acted_user_avatar } = req.body;
-
-    try {
-      const result = await this._acceptConnectionRequest.execute({
-        senderId: sender,
-        myId: receiver,
-        myName: acted_by,
-        myAvatar: acted_user_avatar,
+      const result = await this._similarUsers.execute({ logedUserId: logedUser });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Similar Users'),
+        result,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Accepted', result });
+  async loadUserFullProfileForResumeBuidling(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._getUserFullProfileForResumeBuiding.execute(userId);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('User full profile'),
+        result,
+      });
+      return;
     } catch (error) {
       next(error);
     }

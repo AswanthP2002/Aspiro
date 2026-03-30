@@ -1,8 +1,8 @@
-import mapToNotificationsFromCreateNotification from '../../mappers/mapToNotificationsFromCreateNotification.mapper';
-import CreateNotificationDTO, { NotificationDTO } from '../../DTOs/notifications.dto';
-import mapToNotificationDTO from '../../mappers/mapToCreateNotificationDTO.mapper';
+import mapToNotificationsFromCreateNotification from '../../mappers/notification/mapToNotificationsFromCreateNotification.mapper';
+import CreateNotificationDTO, { NotificationDTO } from '../../DTOs/notification/notifications.dto';
+import mapToNotificationDTO from '../../mappers/notification/mapToCreateNotificationDTO.mapper';
 import { inject, injectable } from 'tsyringe';
-import ICreateNotificationUsecase from '../../interfaces/usecases/shared/ICreateNotification.usecase';
+import ICreateNotificationUsecase from '../../interfaces/usecases/notification/ICreateNotification.usecase';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
 
 @injectable()

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { Button, CircularProgress, Modal } from '@mui/material';
+import { Button, CircularProgress, Modal, Skeleton } from '@mui/material';
 import { logout } from '../../../redux/candidateAuthSlice';
 import {
   addSocialmediaLinks,
@@ -14,7 +14,7 @@ import {
 import GeneralModal from '../../../components/common/Modal';
 import EditProfilePictureComponent from '../../../components/candidate/EditProfilePhotoComponent';
 import EditCoverphotoComponent from '../../../components/candidate/EditCoverPhotoComponent';
-import { MyProfileDTO, SocialLinks } from '../../../types/entityTypes';
+import { FollowerData, MyProfileDTO, SocialLinks } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
 import { FaEye, FaGithub, FaGlobe, FaInstagram, FaLinkedin, FaPenSquare, FaPlus } from 'react-icons/fa';
 import { BsEnvelope } from 'react-icons/bs';
@@ -23,6 +23,10 @@ import { LuPhone, LuUser } from 'react-icons/lu';
 import { BiAlignLeft, BiCheckCircle, BiMapPin, BiSearch } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { toast } from 'react-toastify';
+import { getFollowers, removeAFollower } from '../../../services/followServices';
+import FollowersModal from '../../../components/user/Followers.modal';
+import FollowingsModal from '../../../components/user/Followings.modal';
+import ConnectionsModal from '../../../components/user/Connections.modal';
 
 interface ProfileFormState {
   name: string;
@@ -42,11 +46,16 @@ export default function ProfilePersonal() {
   const [loading, setloading] = useState<boolean>(false);
   const [openprofileedit, setopenprofileedit] = useState(false);
   const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false)
+  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false)
+
   const [isConnectionsModalOpen, setIsConnectionsModalOpen] = useState(false)
 
 
   const openFollowersModal = () => setIsFollowersModalOpen(true)
   const closeFollowerModal = () => setIsFollowersModalOpen(false)
+
+  const openFollowingModal = () => setIsFollowingModalOpen(true)
+  const closeFollowingModal = () => setIsFollowingModalOpen(false)
 
   const openConnectionsModal = () => setIsConnectionsModalOpen(true)
   const closeConnectionsModal = () => setIsConnectionsModalOpen(false)
@@ -215,6 +224,36 @@ export default function ProfilePersonal() {
     closeCoverphoto();
   };
 
+  const onRemovingFollower = () => {
+    setUser((userData: MyProfileDTO | null) => {
+      if(!userData) return null
+      return {
+        ...userData,
+        followers: userData.followers && userData.followers > 0 ? userData.followers -1 : 0
+      }
+    })
+  }
+
+  const onRemoveconnection = () => {
+    setUser((userData: MyProfileDTO | null) => {
+      if(!userData) return null
+      return {
+        ...userData,
+        connections: userData.connections && userData.connections > 0 ? userData.connections - 1 : 0
+      }
+    })
+  }
+
+  const onUnFollow = () => {
+    setUser((userData: MyProfileDTO | null) => {
+      if(!userData) return null
+      return {
+        ...userData,
+        following: userData.following && userData.following > 0 ? userData.following - 1 : 0
+      }
+    })
+  }
+
   useEffect(() => {
     const fetchCandidateData = async () => {
       setloading(true);
@@ -263,6 +302,7 @@ export default function ProfilePersonal() {
         country: user.location?.country,
         summary: user.summary,
         pincode: user.location?.pincode,
+        phone: user.phone
       });
     }
   }, [user, openprofileedit]);
@@ -352,6 +392,7 @@ export default function ProfilePersonal() {
     })
   }
 
+
   return (
     <>
     <div className="min-h-screen bg-gray-50 pb-12">
@@ -390,8 +431,8 @@ export default function ProfilePersonal() {
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{user?.name}</h1>
                 <p className="text-blue-600 font-medium text-lg">{user?.headline}</p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3 text-sm text-gray-500 font-medium">
-                  <span className="hover:text-blue-600 cursor-pointer">{user?.followers} followers</span>
-                  <span className="hover:text-blue-600 cursor-pointer">{user?.connections} connections</span>
+                  <span onClick={openFollowersModal} className="hover:text-blue-600 cursor-pointer">{user?.followers} followers</span>
+                  <span onClick={openConnectionsModal} className="hover:text-blue-600 cursor-pointer">{user?.connections} connections</span>
                   <span className="flex items-center gap-1"><BiMapPin size={14}/> {user?.location?.city}, {user?.location?.district}, {user?.location?.state}, {user?.location?.country}</span>
                 </div>
               </div>
@@ -438,7 +479,7 @@ export default function ProfilePersonal() {
                 <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><BsEnvelope size={20}/></div>
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase">Email</p>
-                  <p className="text-sm text-gray-900 font-medium break-all">aswanthp.personal@gmail.com</p>
+                  <p className="text-sm text-gray-900 font-medium break-all">{user?.email}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -455,7 +496,7 @@ export default function ProfilePersonal() {
                 <div className="p-2 bg-purple-50 rounded-lg text-purple-600"><BiMapPin size={20}/></div>
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase">Location</p>
-                  <p className="text-sm text-gray-900 font-medium">Mussoorie, Dehradun, Uttarakhand</p>
+                  <p className="text-sm text-gray-900 font-medium">{`${user?.location?.city}, ${user?.location?.district}, ${user?.location?.state}`}</p>
                 </div>
               </div>
             </div>
@@ -712,82 +753,9 @@ export default function ProfilePersonal() {
         />
       </GeneralModal>
 
-      {isFollowersModalOpen && (<FollowersModal followers={[]} isOpen={isFollowersModalOpen} onClose={closeFollowerModal} />)}
-      {isConnectionsModalOpen && (<ConnectionsModal connections={[]} isOpen={isConnectionsModalOpen} onClose={closeConnectionsModal} />)}
+      {isFollowersModalOpen && (<FollowersModal onFollowerRemoval={onRemovingFollower} isOpen={isFollowersModalOpen} onClose={closeFollowerModal} userId={user?._id as string} />)}
+      {isFollowingModalOpen && (<FollowingsModal onUnFollow={onUnFollow} isOpen={isFollowingModalOpen} onClose={closeFollowingModal} userId={user?._id as string} />)}
+      {isConnectionsModalOpen && (<ConnectionsModal isOpen={isConnectionsModalOpen} onClose={closeConnectionsModal} userId={user?._id as string} onRemoveConnection={onRemoveconnection} />)}
     </>
   );
 }
-
-
-// function FollowersModal({followers, isOpen, onClose}: {followers: any, isOpen: boolean, onClose: () => void}){
-//   return(
-//     <>
-//       <Modal open={isOpen} className='flex items-center justify-center'>
-//         <div className='p-5 bg-white rounded-md shadow-lg'>
-//             <div className="header flex justify-between w-md border-b border-gray-300 pb-5">
-//               <p className='font-medium'>My Followers</p>
-//               <button onClick={onClose}><CgClose /></button>
-//             </div>
-//             <div className="py-3">
-//               <div className="my-2">
-//                 <div className="border border-gray-200 rounded-md p-2 flex items-center gap-2">
-//                   <BiSearch color='gray' />
-//                   <input type="text" className='rounded-md w-full !text-xs py-1' placeholder='Search by name' />
-//                 </div>
-//               </div>
-//               <div className="grid grid-cols-1 max-h-[300px] overflow-y-auto">
-//                 {Array.from(new Array(5).fill({name: "Xabi Alonso", headline: 'Head Coach Real Madrid'})).map((data, index) => (
-//                   <div className='p-2 flex items-center gap-3'>
-//                     <div className='bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center w-10 h-10 rounded-full'>
-//                       <p>{data.name.split(' ')[0][0]}{data.name.split(' ')[1][0]}</p>
-//                     </div>
-//                     <div>
-//                       <p className='text-sm'>{data.name}</p>
-//                       <p className='text-xs text-gray-500'>{data.headline}</p>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//         </div>
-//       </Modal>
-//     </>
-//   )
-// }
-
-
-// function ConnectionsModal({connections, isOpen, onClose}: {connections: any, isOpen: boolean, onClose: () => void}){
-//   return(
-//     <>
-//       <Modal open={true} className='flex items-center justify-center'>
-//         <div className='p-5 bg-white rounded-md shadow-lg'>
-//             <div className="header flex justify-between w-md border-b border-gray-300 pb-5">
-//               <p className='font-medium'>My Connections</p>
-//               <button onClick={onClose}><CgClose /></button>
-//             </div>
-//             <div className="py-3">
-//               <div className="my-2">
-//                 <div className="border border-gray-200 rounded-md p-2 flex items-center gap-2">
-//                   <BiSearch color='gray' />
-//                   <input type="text" className='rounded-md w-full !text-xs py-1' placeholder='Search by name' />
-//                 </div>
-//               </div>
-//               <div className="grid grid-cols-1 max-h-[300px] overflow-y-auto">
-//                 {Array.from(new Array(3).fill({name: "Aitana Bonmatti", headline: 'Hiring Manager'})).map((data, index) => (
-//                   <div className='p-2 flex items-center gap-3'>
-//                     <div className='bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center w-10 h-10 rounded-full'>
-//                       <p>{data.name.split(' ')[0][0]}{data.name.split(' ')[1][0]}</p>
-//                     </div>
-//                     <div>
-//                       <p className='text-sm'>{data.name}</p>
-//                       <p className='text-xs text-gray-500'>{data.headline}</p>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//         </div>
-//       </Modal>
-//     </>
-//   )
-// }

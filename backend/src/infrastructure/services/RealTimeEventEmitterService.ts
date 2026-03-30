@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import IRealTimeEventEmitter from '../../application/interfaces/services/IRealTimeEventEmitter';
 import { inject, injectable } from 'tsyringe';
 import { ConnectionManager } from '../socketio/connectionManager';
-import Notification from '../../domain/entities/notification.entity';
+import Notification from '../../domain/entities/notification/notification.entity';
 import { SocketEvents } from '../socketio/events';
 
 @injectable()

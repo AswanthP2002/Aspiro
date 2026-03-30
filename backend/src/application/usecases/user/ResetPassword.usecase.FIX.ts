@@ -36,6 +36,11 @@ export default class ResetPasswordUsecase implements IResetPasswordUsecase {
     //update user
     const updatedUser = await this._userRepository.update(user._id as string, { password: hashed });
     if (updatedUser) {
+      await this._userRepository.updateAccountAction(updatedUser._id as string, {
+        action: 'Password Reset',
+        actor: 'User',
+        date: new Date(),
+      });
       const userDto = this._mapper.userToUserDto(updatedUser);
       return userDto;
     }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { formatRelativeTime, transformDate } from '../../services/util/formatDate'
 import {CiBookmark, CiMonitor} from 'react-icons/ci'
 import {MdBookmarkAdded} from 'react-icons/md'
-import { checkIsSaved, saveJob, unsaveJob } from '../../services/userServices'
+import { checkIsJobApplied, checkIsSaved, saveJob, unsaveJob } from '../../services/userServices'
 import { Notify } from 'notiflix'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -12,11 +12,14 @@ import moment from 'moment'
 import { BsClock } from 'react-icons/bs'
 import { BarChart } from 'recharts'
 import { currencyFormatter } from '../../helpers/Currency.helper'
+import { TbBookmarkFilled } from 'react-icons/tb'
+import { toast } from 'react-toastify'
 
 
 export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     const navigateTo = useNavigate()
     const [isJobSave, setIsJobSaved] = useState<boolean>(false)
+    const [isJobApplied, setIsJobApplied] = useState(false)
 
     const logedUser = useSelector((state : any) => {
         return state.userAuth
@@ -29,10 +32,10 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     async function saveTheJob(jobId : string){
         const result = await saveJob(jobId)
         if(result?.success){
-            Notify.success('Job Saved', {timeout:1500})
-            setTimeout(() => window.location.reload(), 1500)
+            toast.success('Job saved')
+            setIsJobSaved(true)
         }else{
-            Notify.failure('Can not save job', {timeout:1500})
+            toast.error('Can not save job')
         }
         
     }
@@ -41,8 +44,8 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
         const result = await unsaveJob(jobId)
 
         if(result?.success){
-            Notify.success('Unsaved', {timeout:1500})
-            setTimeout(() => window.location.reload(), 1500)
+            toast.success('Removed from saved collection')
+            setIsJobSaved(false)
         }else{
             Notify.failure('Something went wrong', {timeout:1500})
         }
@@ -55,6 +58,10 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     useEffect(() => {
         if (logedUser) {
             (async function () {
+              const [jobSavedResult, jobAppliedResult] = await Promise.all([checkIsSaved(data._id as string), checkIsJobApplied(data._id as string)])
+
+              setIsJobSaved(jobSavedResult ? true : false)
+              setIsJobApplied(jobAppliedResult?.result ? true : false)
                 const result = await checkIsSaved(data._id as string)
                 setIsJobSaved(result)
             })()
@@ -92,8 +99,11 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
           </div>
         </div>
         <div className="flex gap-3 text-slate-400">
-          <button className="hover:text-blue-500 transition-colors"><BiShare size={20} /></button>
-          <button className="hover:text-blue-500 transition-colors"><CiBookmark size={20} /></button>
+          {/* <button className="hover:text-blue-500 transition-colors"><BiShare size={20} /></button> */}
+          {isJobSave
+            ? <button onClick={() => unSaveJob(data._id as string)} className="hover:text-blue-500 transition-colors"><TbBookmarkFilled color="blue" size={20} /></button>
+            : <button onClick={() => saveTheJob(data._id as string)} className="hover:text-blue-500 transition-colors"><CiBookmark size={20} /></button>
+          }
         </div>
       </div>
 

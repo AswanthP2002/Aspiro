@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Alert from '../../../../domain/entities/user/alerts';
+import Alert from '../../../../domain/entities/alerts/alerts';
 
 export const AlertSchema = new Schema<Alert>(
   {

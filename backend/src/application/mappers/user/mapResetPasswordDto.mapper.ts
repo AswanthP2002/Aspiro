@@ -1,7 +1,7 @@
-import { ResetPasswordDTO } from "../../DTOs/user/resetPassword.dto.FIX";
+import { ResetPasswordDTO } from '../../DTOs/user/resetPassword.dto.FIX';
 
-export default function mapResetPasswordDtoMapper(dto: ResetPasswordDTO) : ResetPasswordDTO {
-    return {
-        ...dto
-    }
+export default function mapResetPasswordDtoMapper(dto: ResetPasswordDTO): ResetPasswordDTO {
+  return {
+    ...dto,
+  };
 }

@@ -1,66 +1,70 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import AddCertificateForm from "../../../components/candidate/Forms/CertificateAdd"
-import { deleteUserCertificate, deleteUserResume, loadUserCertificates, loadUserResumes, setUserResumePrimary } from "../../../services/userServices"
+import { loadUserCertificates, deleteUserCertificate } from "../../../services/certificateServices"
+// import {  } from "../../../services/userServices"
+import { deleteUserResume, loadUserResumes, setUserResumePrimary } from "../../../services/resumeServices"
 import { BiMedal, BiStar, BiTrash } from "react-icons/bi"
-import { BsThreeDotsVertical } from "react-icons/bs"
+import { BsArrowLeft, BsThreeDotsVertical } from "react-icons/bs"
 import { FiFileText } from "react-icons/fi"
 import { Certificates, Resumes } from "../../../types/entityTypes"
 import { formattedDateMoment } from "../../../services/util/formatDate"
-import { Modal } from "@mui/material"
+import { Modal, Skeleton } from "@mui/material"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { CgClose } from "react-icons/cg"
 import { Notify } from "notiflix"
 import ResumeAddForm from "../../../components/candidate/Forms/ResumeAddForm"
+import { toast } from "react-toastify"
+import { AxiosError } from "axios"
+import { useNavigate } from "react-router-dom"
 
-const CertificateCard = ({certificate, deleteCertificate}: {certificate: Certificates, deleteCertificate: any}) => {
+interface CertificateCardProps {
+    certificate: Certificates,
+    deleteCertificate: () => void
+}
+
+const CertificateCard = ({certificate, deleteCertificate}: CertificateCardProps) => {
     const [isCertificateMenuOpened, setIsCertificateMenuOpened] = useState<boolean>(false)
     const toggleCertificateMenu = () => setIsCertificateMenuOpened(prv => !prv)
-    const [showCertificatePreview, setShowCertificatePreview] = useState<boolean>(true)
+    const [showCertificatePreview, setShowCertificatePreview] = useState<boolean>(false)
     const openCertificatePreview = () => setShowCertificatePreview(true)
     const closeCertificatePreview = () => setShowCertificatePreview(false)
 
     return(
         <>
-            <div className="p-3 bg-white border border-gray-200 rounded-md flex gap-3">
-                                <div className="flex gap-3 flex-1">
-                                    <div className="bg-pink-200 rounded-md flex items-center justify-center w-10 h-10">
-                                    <BiMedal />
-                                </div>
-                                <div>
-                                    <p className="text-gray-900">{certificate.name}</p>
-                                    <p className="text-sm mt-1 text-gray-700 font-light">{certificate.issuedOrganization}</p>
-                                    <div className="flex gap-3 text-xs mt-2">
-                                        <span className="border px-2 text-gray-500 border-gray-200 rounded-full">PDF</span>
-                                        <p className="text-gray-500">{'1 MB'}</p>
-                                    </div>
-                                    <p className="text-xs mt-2 text-gray-500">Issued Date: {formattedDateMoment(certificate.issuedDate as string, "MMM DD YYYY")}</p>
-                                </div>
-                                </div>
-                                <div className="relative">
-                                    <button onClick={toggleCertificateMenu}><BsThreeDotsVertical color="gray" /></button>
-                                    {
-                                        isCertificateMenuOpened && (
-                                            <div className="certificate-menu space-y-2 border border-gray-200 shadow-sm px-5 py-3 bg-white absolute right-0 text-xs">
-                                        <div className="">
-                                            <button onClick={openCertificatePreview}>Preview</button>
-                                        </div>
-                                        <div className="">
-                                            <a 
-                                                href={certificate.certificateUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                download={certificate.name}
-                                            >Download</a>
-                                        </div>
-                                        <div className="">
-                                            <button onClick={deleteCertificate} className="flex items-center text-red-500 gap-2"><BiTrash color="red" /> Delete</button>
-                                        </div>
-                                    </div>
-                                        )
-                                    }
-                                </div>
-                            </div>
+            <div className="p-4 bg-white border border-gray-100 rounded-xl flex gap-4 hover:shadow-md transition-shadow duration-200">
+  <div className="flex gap-4 flex-1">
+    <div className="bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center w-12 h-12 flex-shrink-0">
+      <BiMedal size={24} />
+    </div>
+    <div className="flex flex-col justify-center">
+      <p className="text-gray-900 font-semibold text-base leading-none">{certificate.name}</p>
+      <p className="text-sm mt-1.5 text-gray-500 font-medium">{certificate.issuedOrganization}</p>
+      
+      <div className="flex items-center gap-3 mt-3">
+        <span className="bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600 rounded uppercase tracking-wider">PDF</span>
+        <span className="text-gray-400 text-xs">{'1 MB'}</span>
+        <span className="text-gray-300">•</span>
+        <p className="text-xs text-gray-500">Issued {formattedDateMoment(certificate.issuedDate as string, "MMM DD YYYY")}</p>
+      </div>
+    </div>
+  </div>
+
+  <div className="relative">
+    <button onClick={toggleCertificateMenu} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+      <BsThreeDotsVertical className="text-gray-400" />
+    </button>
+    {isCertificateMenuOpened && (
+      <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 shadow-xl rounded-lg z-10">
+        <button onClick={() => {openCertificatePreview(); setIsCertificateMenuOpened(false)}} className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">Preview</button>
+        <a href={certificate.certificateUrl} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">Download</a>
+        <button onClick={() => {deleteCertificate(); setIsCertificateMenuOpened(false)}} className="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2">
+          <BiTrash size={14} /> Delete
+        </button>
+      </div>
+    )}
+  </div>
+</div>
 
                 {
                     showCertificatePreview && (
@@ -71,7 +75,7 @@ const CertificateCard = ({certificate, deleteCertificate}: {certificate: Certifi
                                 </div>
                                 <div className="flex justify-center">
                                     <ViewPDFDocument
-                                        fileUrl={certificate.certificateUrl}
+                                        fileUrl={certificate.certificateUrl as string}
                                         docWidth={700}
                                     />
                                 </div>
@@ -89,7 +93,12 @@ interface EditResumeResponsePayload {
     result: Resumes
 }
 
-const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function}) => {
+interface ResumeCardProps {
+    resume: Resumes,
+    setResumes: Function
+}
+
+const ResumeCard = ({resume, setResumes}: ResumeCardProps) => {
     const [isResumeMenuOpen, setIsResumeMenuOpen] = useState<boolean>(false)
     const toggleResumeMenu = () => setIsResumeMenuOpen(prv => !prv)
     const [isResumePreviewOpen, setIsResumePreviewOpen] = useState<boolean>(false)
@@ -115,7 +124,7 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
                     const result: EditResumeResponsePayload = await setUserResumePrimary(resumeId)
                     
                     if(result?.success){
-                        Notify.success(result?.message, {timeout: 3000})
+                        toast.success(result?.success)
                         setResumes((prv: Resumes[]) => {
                             return prv.map((res: Resumes) => {
                                 return {...res, isPrimary: res._id === result.result._id}
@@ -124,11 +133,11 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
                         setIsResumeMenuOpen(false)
                         return
                     }else{
-                        Notify.warning('Can not set resume primary, please try again after some time', {timeout: 3000})
+                        toast.warn('Can not set resume as primary, try after some time')
                         return
                     }
                 } catch (error: unknown) {
-                    Notify.failure(error instanceof Error ? error.message: 'Something went wrong', {timeout: 3000})
+                   toast.error(error instanceof Error ? error.message : 'Something went wrong')
                 }
             }else{
                 return
@@ -151,21 +160,30 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
         }).then(async (result) => {
             if(result.isConfirmed){
                 try {
-                    const result = await deleteUserResume(resumeId, cloudinaryPublicId)
+                    const result = await toast.promise(
+                        deleteUserResume(resumeId, cloudinaryPublicId),
+                        {
+                            pending: 'Deleting resume...',
+                            success: 'Resume deleted',
+                            error:{
+                                render(props) {
+                                    const data = props.data as AxiosError<{message: string}>
+                                    return data.message
+                                },
+                            }
+                        }
+                    )
 
                     if(result?.success){
-                        Notify.success(result?.message, {timeout: 3000})
                         setResumes((prv: Resumes[]) => {
                             return prv.filter((res: Resumes) => res._id !== resumeId)
                         })
-                        setIsResumeMenuOpen(false)
-                        return
-                    }else{
-                        Notify.warning('Can not set resume primary, please try again after some time', {timeout: 3000})
                         return
                     }
                 } catch (error: unknown) {
-                    Notify.failure(error instanceof Error ? error.message: 'Something went wrong', {timeout: 3000})
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
+                } finally {
+                    setIsResumeMenuOpen(false)
                 }
             }else{
                 return
@@ -175,56 +193,48 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
 
     return (
         <>
-        <div className="p-3 bg-white border border-gray-200 rounded-md flex gap-3">
-                                <div className="flex gap-3 flex-1">
-                                    <div className="bg-red-300 rounded-md flex items-center justify-center w-10 h-10">
-                                    <FiFileText />
-                                </div>
-                                <div>
-                                    <p className="text-gray-900">{resume.name}</p>
-                                    <div className="flex gap-3 items-center text-xs mt-2">
-                                        <span className="border px-2 text-gray-500 border-gray-200 rounded-full">PDF</span>
-                                        <p className="text-gray-500">{resume.size || '1 MB'}</p>
-                                        {
-                                            resume.isPrimary && (
-                                                <span className="bg-blue-200 px-2 text-blue-700 rounded-full border-2 border-blue-500 flex items-center gap-1"><BiStar /> Primary</span>
-                                            )
-                                        }
-                                    </div>
-                                    <p className="text-xs mt-2 text-gray-500">Uploaded on: {formattedDateMoment(resume.createdAt, "MMM DD YYYY")}</p>
-                                </div>
-                                </div>
-                                <div className="relative">
-                                    <button onClick={toggleResumeMenu}><BsThreeDotsVertical color="gray" /></button>
-                                    {
-                                        isResumeMenuOpen && (
-                                            <div className="certificate-menu space-y-2 border border-gray-200 shadow-sm px-5 py-3 bg-white absolute right-0 w-[120px] text-xs">
-                                        <div className="">
-                                            <button onClick={showResumePreview}>Preview</button>
-                                        </div>
-                                        <div className="">
-                                            <a
-                                                href={resume.resumeUrlCoudinary}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                download={resume.name}
-                                            >Download</a>
-                                        </div>
-                                        {
-                                            !resume.isPrimary && (
-                                                <div>
-                                                    <button onClick={() => setResumePrimary(resume._id as string)}>Set Primary</button>
-                                                </div>
-                                            )
-                                        }
-                                        <div className="">
-                                            <button onClick={() => deleteResume(resume._id as string, resume.resumePublicIdCloudinary as string)} className="flex items-center text-red-500 gap-2"><BiTrash color="red" /> Delete</button>
-                                        </div>
-                                    </div>
-                                        )
-                                    }
-                                </div>
-                            </div>
+        <div className="p-4 bg-white border border-gray-100 rounded-xl flex gap-4 hover:shadow-md transition-shadow duration-200">
+  <div className="flex gap-4 flex-1">
+    <div className="bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center w-12 h-12 flex-shrink-0">
+      <FiFileText size={24} />
+    </div>
+    <div className="flex flex-col justify-center">
+      <div className="flex items-center gap-3">
+        <p className="text-gray-900 font-semibold text-base leading-none">{resume.name}</p>
+        {resume.isPrimary && (
+          <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100 text-[10px] font-bold flex items-center gap-1">
+            <BiStar size={12} /> PRIMARY
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 mt-3">
+        <span className="bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600 rounded uppercase tracking-wider">PDF</span>
+        <span className="text-gray-400 text-xs">{resume.size || '1 MB'}</span>
+        <span className="text-gray-300">•</span>
+        <p className="text-xs text-gray-500 font-light italic">Uploaded {formattedDateMoment(resume.createdAt as string, "MMM DD YYYY")}</p>
+      </div>
+    </div>
+  </div>
+
+  <div className="relative">
+    <button onClick={toggleResumeMenu} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+      <BsThreeDotsVertical className="text-gray-400" />
+    </button>
+    {isResumeMenuOpen && (
+      <div className="absolute right-4 top-0 w-44 bg-white border border-gray-100 shadow-xl rounded-lg z-10">
+        <button onClick={() => {showResumePreview(); setIsResumeMenuOpen(false)}} className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">Preview</button>
+        <a href={resume.resumeUrlCoudinary} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">Download</a>
+        {!resume.isPrimary && (
+          <button onClick={() => {setResumePrimary(resume._id as string); setIsResumeMenuOpen(false)}} className="w-full text-left px-4 py-2 text-xs text-blue-600 hover:bg-blue-50">Set as Primary</button>
+        )}
+        <button onClick={() => {deleteResume(resume._id as string, resume.resumePublicIdCloudinary as string); setIsResumeMenuOpen(false)}} className="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2">
+          <BiTrash size={14} /> Delete
+        </button>
+      </div>
+    )}
+  </div>
+</div>
 
                             {
                     isResumePreviewOpen && (
@@ -235,7 +245,7 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
                                 </div>
                                 <div className="flex justify-center">
                                     <ViewPDFDocument
-                                        fileUrl={resume.resumeUrlCoudinary}
+                                        fileUrl={resume.resumeUrlCoudinary as string}
                                         docWidth={700}
                                     />
                                 </div>
@@ -250,18 +260,17 @@ const ResumeCard = ({resume, setResumes}: {resume: Resumes, setResumes: Function
 export default function DocumentsPage(){
     const [certificates, setCertificates] = useState<Certificates[]>([])
     const [resumes, setResumes] = useState<Resumes[]>([])
-    const [pdfile, setpdffile] = useState<any>("")
-    const [loading, setloading] = useState(false)
     const [certificateModalOpen, setCertificateModalOpen] = useState(false)
     const [resumeModalOpen, setResumeModalOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
+
+    const navigate = useNavigate()
 
     const openCertificateAddModal = () => setCertificateModalOpen(true)
     const closeCertificateAddModal = () => setCertificateModalOpen(false)
 
     const openResumeModal = () => setResumeModalOpen(true)
     const closeResumeModal = () => setResumeModalOpen(false)
-
-    const fileFieldRef : any = useRef(null)
 
     const deleteCertificate = async (certificateId : string, publicId : string) => {
         if(!certificateId || !publicId)return
@@ -278,17 +287,28 @@ export default function DocumentsPage(){
         }).then(async (result) => {
             if(result.isConfirmed){
                 try {
-            const result = await deleteUserCertificate(certificateId, publicId)
+            const result = await toast.promise(
+                deleteUserCertificate(certificateId, publicId),
+                {
+                    pending: 'Deleting certificate...',
+                    success: 'Certificate deleted',
+                    error:{
+                        render(props) {
+                            const data = props.data as AxiosError<{message: string}>
+                            return data.message
+                        },
+                    }
+                }
+            )
+
             if(result?.success){
-                Notify.success(result?.message, {timeout: 3000})
-                //local state updation
                 setCertificates((prv: Certificates[]) => {
                     return prv.filter((certificate: Certificates) => certificate._id !== certificateId)
                 })
                 return
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
             console.log(error)
         }
             }else{
@@ -312,90 +332,126 @@ export default function DocumentsPage(){
     }
     
     useEffect(() => {
+        
        (async function(){
-
+                setLoading(true)
                try {
-                const resumeResult = await loadUserResumes()
-                console.log('--checking resume result from the backend--', resumeResult)
-                const certificateResult = await loadUserCertificates()
- 
-                if (resumeResult?.success && certificateResult.success) {
-                 
-                setResumes(resumeResult?.resumes)
-                setCertificates(certificateResult?.certificates)
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops',
-                        text: 'Sorry!, something went wrong'
-                    })
-                }
+                const [resumePromiseResult, certificatePromiseResult] = await Promise.all([loadUserResumes(), loadUserCertificates()])
+    
+                setResumes(resumePromiseResult.resumes)
+                setCertificates(certificatePromiseResult.certificates)
+                
                } catch (error: unknown) {
                     console.log('--error--', error)
-                    Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')
+               } finally {
+                setLoading(false)
                }
        })()
     }, [])
 
     return(
         <>
-        <div className="px-5 py-10 lg:px-20">
-            <p className="text-xl font-medium">Documents</p>
-            <p className="font-light text-sm mt-1">Manage your Resume, CV, Certificates</p>
-            <div className="mt-10 w-full">
-                <div className="flex justify-between">
-                    <div>
-                        <p className="font-light">Your Certifications</p>
-                        <p className="text-xs text-gray-700">Showcase your professional certifications</p>
-                    </div>
-                    <div>
-                        <button onClick={openCertificateAddModal} className="bg-blue-500 text-white px-3 py-2 rounded-md text-xs">Add Certificate</button>
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 gap-3 mt-3">
-                    {   certificates.length > 0 &&
-                        certificates.map((certificate, index: number) => (
-                            <CertificateCard key={index} deleteCertificate={() => deleteCertificate(certificate._id as string, certificate.certificatePublicId as string)} certificate={certificate}/>
-                        ))
-                    }
-                    {
-                        certificates.length === 0 && (
-                            <div className="w-full flex items-center justify-center text-xs text-gray-500 mt-5">
-                                <p>No Certificates Added</p>
-                            </div>
-                        )
-                    }
-                </div>
-            </div>
-            
-            <div className="border border-gray-300 w-full mt-8"></div>
+<div className="px-6 pt-15 pb-20 lg:px-24 lg:py-10 max-w-6xl mx-auto">
+    <header className="mb-10">
+        <button onClick={() => navigate(-1)} className="flex mb-2 gap-3 items-center text-xs text-gray-500 p-2 rounded-md hover:bg-gray-200">
+            <BsArrowLeft />
+            Back
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Documents</h1>
+        <p className="text-sm text-gray-500 mt-1 font-medium">Manage your professional assets, including resumes and certifications.</p>
+    </header>
 
-            <div className="mt-10 w-full">
-                <div className="flex justify-between">
-                    <div>
-                        <p className="font-light">Your Resume / CV</p>
-                        <p className="text-xs text-gray-700">Upload and manage yoru Resume documents</p>
-                    </div>
-                    <div>
-                        <button onClick={openResumeModal} className="bg-blue-500 text-white px-3 py-2 rounded-md text-xs">Add Resume</button>
-                    </div>
+    <div className="space-y-12">
+        <section>
+            <div className="flex items-end justify-between mb-6">
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-800">Certifications</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Showcase your professional achievements and verified skills.</p>
                 </div>
-                <div className="grid grid-cols-1 gap-3 mt-3">
-                    {   resumes.length > 0 &&
-                        resumes.map((resume: Resumes, index: number) => (
-                            <ResumeCard key={index} setResumes={setResumes} resume={resume} />
-                        ))
-                    }
-                    {
-                        resumes.length === 0 && (
-                            <div className="w-full flex items-center justify-center mt-5">
-                                <p className="text-gray-500 text-xs">No Resumes Added</p>
-                            </div>
-                        )
-                    }
-                </div>
+                <button 
+                    onClick={openCertificateAddModal} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm active:scale-95"
+                >
+                    + Add Certificate
+                </button>
             </div>
-        </div>
+
+            {loading
+                ? <>
+                    <div className="flex gap-3">
+                        <div>
+                            <Skeleton variant="circular" height={40} width={40} />
+                        </div>
+                        <div>
+                            <Skeleton width={300} />
+                            <Skeleton height={10} />
+                        </div>
+                    </div>
+                </>
+                : <div className="grid grid-cols-1 gap-4">
+                {certificates.length > 0 ? (
+                    certificates.map((certificate, index) => (
+                        <>
+                            <CertificateCard 
+                            key={index} 
+                            deleteCertificate={() => deleteCertificate(certificate._id as string, certificate.certificatePublicId as string)} 
+                            certificate={certificate}
+                        />
+                        </>
+                    ))
+                ) : (
+                    <div className="w-full py-12 border-2 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center bg-gray-50/50">
+                        <p className="text-xs text-gray-400 font-medium">No certificates added yet.</p>
+                    </div>
+                )}
+            </div>
+            }
+        </section>
+
+        <hr className="border-gray-100" />
+
+        <section>
+            <div className="flex items-end justify-between mb-6">
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-800">Resume / CV</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Manage multiple versions of your resume for different roles.</p>
+                </div>
+                <button 
+                    onClick={openResumeModal} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm active:scale-95"
+                >
+                    + Add Resume
+                </button>
+            </div>
+
+            {loading
+                ? <>
+                    <div className="flex gap-3">
+                        <div>
+                            <Skeleton variant="circular" height={40} width={40} />
+                        </div>
+                        <div>
+                            <Skeleton width={300} />
+                            <Skeleton height={10} />
+                        </div>
+                    </div>
+                  </>
+                : <div className="grid grid-cols-1 gap-4">
+                {resumes.length > 0 ? (
+                    resumes.map((resume, index) => (
+                        <ResumeCard key={index} setResumes={setResumes} resume={resume} />
+                    ))
+                ) : (
+                    <div className="w-full py-12 border-2 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center bg-gray-50/50">
+                        <p className="text-xs text-gray-400 font-medium">No resumes uploaded yet.</p>
+                    </div>
+                )}
+            </div>
+            }
+        </section>
+    </div>
+</div>
         {
             certificateModalOpen && (
                 <AddCertificateForm certificateModalOpen={certificateModalOpen} closeCertificateModal={closeCertificateAddModal} onCertificateAdd={onCertificateAdd} />

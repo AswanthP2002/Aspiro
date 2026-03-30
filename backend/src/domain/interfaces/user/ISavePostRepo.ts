@@ -1,4 +1,4 @@
-import SavePost from '../../entities/user/savePost.entity';
+import SavePost from '../../entities/post/savePost.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface ISavePostRepo extends IBaseRepo<SavePost> {

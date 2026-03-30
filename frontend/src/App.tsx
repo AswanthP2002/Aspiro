@@ -1,6 +1,6 @@
 
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import {ToastContainer, Bounce} from 'react-toastify'
+import {ToastContainer, Bounce, toast} from 'react-toastify'
 import './App.css';
 // import LoginPage from './pages/admin/Login/Login';
 import Home from './pages/common/Home/Home';
@@ -71,7 +71,7 @@ import UserPublicProfile from './pages/candidate/Candidate-List-Details/Candidat
 import PostProvider from './context/PostContext';
 import RecruiterApplications from './pages/admin/Recruiter-applications/RecruiterApplications';
 import RecruiterApplicationDetailsPage from './pages/admin/Recruiter-applications/RecruiterApplicationDetailsPage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix';
 import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
 import JobApplyPage from './pages/candidate/Job-apply/Apply';
@@ -87,8 +87,9 @@ import { AnimatePresence } from 'motion/react';
 import AlertsPage from './pages/user/Alerts/Alerts';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alerts, Notification } from './types/entityTypes';
-import { setAlerts } from './redux/alertSlice';
-import { fetchUserAlerts, getNotifications } from './services/userServices';
+import { setAlerts, unreadAlertsCountThunk } from './redux/alertSlice';
+import { fetchUserAlerts } from './services/alertsServices';
+import { getNotifications } from './services/userServices';
 import { disconnectSocket, getSocket, initializeSocket } from './socket';
 import { addLiveNotification, deleteNotificationFromStore, notificationThunk, setNotifications } from './redux/notificationSlice';
 import { UserRoutes } from './constants/routs/user.routes';
@@ -105,6 +106,18 @@ import AppConfigPage from './pages/admin/Company-list/SkillsManagement';
 import JobDetails from './pages/admin/JobDetails/JobDetails';
 import ApplySuccessPage from './pages/candidate/Job-apply/Apply-Success';
 import ApplicationTrack from './pages/user/Application-track/Application.track';
+import PlanConfiguration from './pages/admin/Subscription & Plans/AddPlan';
+import Plans from './pages/admin/Subscription & Plans/Planst';
+import EditPlan from './pages/admin/Subscription & Plans/EditPlan';
+import PricingPage from './pages/user/Plans/PlanModal';
+import PaymentSuccessPage from './pages/user/Plans/PaymentSuccessPage';
+import { AdminAnalytics } from './pages/admin/Analytics/Analytics';
+import SubscriptionPage from './pages/user/Manage Billings/Billings';
+import AspiroCareer from './pages/user/Aspiro-career/Aspiro.career';
+import ResumeToolsPage from './pages/user/Aspiro-career/ResumeTools';
+import AutoResumeCreationPage from './pages/user/Aspiro-career/AutoResume.profile';
+import ResumeAnalyzer from './pages/user/Aspiro-career/ResumeAnalyzePage';
+import DetailedAnalysisReportPage from './pages/user/Aspiro-career/DetailedAnalysisReportPage';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -121,7 +134,7 @@ interface FetchNotificationsResponsePayload {
 
 interface RootState {
   userAuth: {
-    user: {_id: string} | null,
+    user: {_id: string, role: string, subscription: {planId: string, name: string}} | null,
     userToken: any,
     userRole: any,
     initialLoading: boolean,
@@ -129,6 +142,7 @@ interface RootState {
 }
 
 function App() {
+  const [showPlansModal, setShowPlansModal] = useState(false)
   const logedUser = useSelector((state: RootState) => {
     return state.userAuth.user
   })
@@ -147,15 +161,15 @@ function App() {
     store.dispatch(reAuthenticateThunk())
   }, [])
   
-  useEffect(() => {
-    //Notify.info('Notification useEffect running')
-    if(logedUser){
-      //Notify.success('Loged user exist so thunk will run')
-      store.dispatch(notificationThunk())
-    }else{
-      //Notify.warning('Loged user does not exist so thunk won run')
-    }
-  }, [logedUser, initialLoading, dispatch])
+  // useEffect(() => {
+  //   //Notify.info('Notification useEffect running')
+  //   if(logedUser){
+  //     //Notify.success('Loged user exist so thunk will run')
+  //     store.dispatch(notificationThunk())
+  //   }else{
+  //     //Notify.warning('Loged user does not exist so thunk won run')
+  //   }
+  // }, [logedUser, initialLoading, dispatch]) //**** Notification useEffect commented temporarily */
 
   useEffect(() => {
     console.log('--This is from app.tsx useeffect for socket')
@@ -200,52 +214,59 @@ function App() {
     }
   }, [logedUser, dispatch])
 
-  // useEffect(() => {
-  //   Notify.info('Useeffect for Notification is running')
-  //   if(logedUser){
-  //     async function getUserNotifications(){
-  //       try {
-  //         const result: FetchNotificationsResponsePayload = await getNotifications()
-  //         if(result.success){
-  //           console.log('User notifications', result.notifications)
-  //           dispatch(setNotifications({notifications: result.notifications, unReadNotificationsCount: result.unRead}))
-  //           Notify.info(result.message)
-  //         }
-  //       } catch (error: unknown) {
-  //         Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
-  //       }
-  //     }
-
-  //     getUserNotifications()
-  //   }
-  // }, [logedUser, initialLoading, dispatch])
-
-  // 1) fetch alerts
-  useEffect(() => { 
+  useEffect(() => {
+    //Notify.info('Useeffect for Notification is running')
     if(logedUser){
-      async function getUserAlerts(){
-        try {
-          const result: FetchAlertsPayloadResponse = await fetchUserAlerts()
-          if(result.success){
-            dispatch(setAlerts({alerts: result.result, unReadAlertsCount: result.result.length}))
-            //Notify.info(result.message)
-          }
-        } catch (error: unknown) {
-          //Notify.failure(error instanceof Error ? error.message : 'something went wrong')
-        }
-      }
+      store.dispatch(notificationThunk())
+      // async function getUserNotifications(){
+      //   try {
+      //     const result: FetchNotificationsResponsePayload = await getNotifications(1, 5, '', '', 0)
+      //     if(result.success){
+      //       console.log('User notifications', result.notifications)
+      //       dispatch(setNotifications({notifications: result.notifications, unRead: result.unRead}))
+      //       Notify.info(result.message)
+      //     }notifi
+      //   } catch (error: unknown) {
+      //     Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+      //   }
+      // }
 
-      getUserAlerts()
+      // getUserNotifications()
     }
-  }, [logedUser, initialLoading, dispatch]) 
-  
+  }, [logedUser, initialLoading, dispatch])
+
+  //1) fetch alerts
+  // useEffect(() => { 
+  //   if(logedUser){
+  //     store.dispatch(unreadAlertsCountThunk())
+  //     // async function getUserAlerts(){
+  //     //   try {
+  //     //     const result: FetchAlertsPayloadResponse = await fetchUserAlerts()
+  //     //     if(result.success){
+  //     //       dispatch(setAlerts({alerts: result.result, unReadAlertsCount: result.result.length}))
+  //     //       toast.success(result.message)
+  //     //     }
+  //     //   } catch (error: unknown) {
+  //     //     toast.error(error instanceof Error ? error.message : 'Something went wrong')
+  //     //   }
+  //     // }
+
+  //     // getUserAlerts()
+  //   }
+  // }, [logedUser, initialLoading, dispatch]) //*** Alert fetching useEffect commented temporarly */
+
+  useEffect(() => {
+    if(logedUser && logedUser.role === 'user' && !logedUser?.subscription?.planId){
+      setShowPlansModal(true)
+    }
+  }, [logedUser])
 
   const location = useLocation()
   return (
         <>
         <ToastContainer
           position="top-right"
-          autoClose={5000}
+          autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick={false}
@@ -256,6 +277,10 @@ function App() {
           theme="light"
           transition={Bounce}
         />
+
+        {showPlansModal && (
+          <PricingPage open={showPlansModal} onClose={() => setShowPlansModal(false)} />
+        )}
 
         <PostProvider>
       <AnimatePresence mode='wait'>
@@ -296,9 +321,15 @@ function App() {
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
               <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
               <Route path={UserRoutes.FAVORITE_JOBS} element={<SavedJobs />} />
-              <Route path='my-applications' element={<MyApplications />} />
-              <Route path='my-applications/:id' element={<ApplicationTrack />} />
+              <Route path={UserRoutes.MY_APPLICATIONS} element={<MyApplications />} />
+              <Route path={UserRoutes.MY_APPLICATION_TRACK} element={<ApplicationTrack />} />
               <Route path='alerts' element={<AlertsPage />} />
+              <Route path='billings' element={<SubscriptionPage />} />
+              <Route path='aspiro-career' element={<AspiroCareer />} />
+              <Route path='aspiro-career/resume-tools' element={<ResumeToolsPage />} />
+              <Route path='aspiro-career/resume-tools/auto-create' element={<AutoResumeCreationPage />} />
+              <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzer />} />
+              <Route path='aspiro-career/resume-tools/analyze/report' element={<DetailedAnalysisReportPage />} />
             </Route>
           </Route>
         </Route>
@@ -333,6 +364,10 @@ function App() {
           <Route path={AdminRoutes.ADMIN_JOB_DETAILS_BY_ID} element={<JobDetails />} />
           <Route path={AdminRoutes.ADMIN_RECRUITERS_LIST} element={<Recruiters />} />
           <Route path={AdminRoutes.ADMIN_APP_CONFIG} element={<AppConfigPage />} />
+          <Route path='subscription/plans/create' element={<PlanConfiguration />} />
+          <Route path='subscription/plans' element={<Plans />} />
+          <Route path='subscription/plans/edit/:id' element={<EditPlan />} />
+          <Route path='analytics' element={<AdminAnalytics />} />
           </Route>
         </Route>
 
@@ -367,6 +402,7 @@ function App() {
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
         <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
         <Route path='/action/termination' element={<TerminationPage />} />
+        <Route path='/payment-success' element={<PaymentSuccessPage />} />
 
         <Route path='/test' element={<ApplicationTrack />} />
 

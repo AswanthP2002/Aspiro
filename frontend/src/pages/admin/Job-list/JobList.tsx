@@ -11,6 +11,7 @@ import { formatRelativeTime } from '../../../services/util/formatDate';
 import { FaUserSlash, FaUsersSlash } from 'react-icons/fa';
 import { TbBriefcaseOff } from 'react-icons/tb';
 import { CiWarning } from 'react-icons/ci';
+import { BiUserX } from 'react-icons/bi';
 
 interface filterType {
   industry:string[]
@@ -53,12 +54,19 @@ export default function Jobs() {
     {
       header: 'RECRUITER',
       key: 'recruiterName',
-      render: (row: AdminJobListsData) => (
-        <div className='flex items-center gap-2'>
-          <div className='w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-semibold'>{row.recruiterName[0]}</div>
+      render: (row: AdminJobListsData) => {
+        if(row.recruiterName){
+          return <div className='flex items-center gap-2'>
+          <div className='w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-full flex items-center justify-center text-white font-semibold'>{'R'}</div>
           <p className='font-medium text-xs'>{row.recruiterName}</p>
         </div>
-      )
+        }else{
+          return <div className='flex items-center gap-2'>
+            <BiUserX />
+            <p className='text-xs font-medium'>No Recruiter exist</p>
+          </div>
+        }
+      }
     },
     {
       header: 'COMPANY',
@@ -82,7 +90,7 @@ export default function Jobs() {
       )
     },
     {
-      header: 'REPORTS COUNT',
+      header: 'REPORTS',
       key: 'reportsCount',
       render: (row: AdminJobListsData) => (
         <div>

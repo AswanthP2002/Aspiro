@@ -1,11 +1,11 @@
-import NotificationsQuery from '../../application/DTOs/shared/notifications.query';
-import Notification from '../entities/notification.entity';
+import NotificationsQuery from '../../application/DTOs/notification/notifications.query';
+import Notification from '../entities/notification/notification.entity';
 import IBaseRepo from './IBaseRepo';
 
 export default interface INotificationRepo extends IBaseRepo<Notification> {
   getNotificationsByUserId(
     query: NotificationsQuery
-  ): Promise<{ notifications: Notification[]; hasMore: boolean } | null>;
+  ): Promise<{ notifications: Notification[] } | null>;
   softDeleteNotificationByFollowerFollowingId(recipientId: string, actedId: string): Promise<void>;
   softDeleteNotificationById(notificationId: string): Promise<void>;
   softDeleteNotificationByTypeAndUserIds(
@@ -22,4 +22,9 @@ export default interface INotificationRepo extends IBaseRepo<Notification> {
     sender: string,
     category: string
   ): Promise<Notification | null>;
+  deleteLikeNotificationByActorCategoryPostId(
+    postId: string,
+    actorId: string,
+    category: 'LIKE'
+  ): Promise<void>;
 }

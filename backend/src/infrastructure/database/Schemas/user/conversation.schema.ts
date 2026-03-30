@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 import Conversation, {
   ConversationParticipants,
-} from '../../../../domain/entities/user/conversation.entity';
+} from '../../../../domain/entities/conversation/conversation.entity';
 
 const ConversationParticipantsSchema = new Schema<ConversationParticipants>(
   {

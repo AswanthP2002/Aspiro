@@ -6,26 +6,29 @@ import { UserDAO } from '../infrastructure/database/DAOs/user.dao.refactored';
 import mongoose from 'mongoose';
 import { UserBannedError, UserBlockedError } from '../domain/errors/AppError';
 
-export interface Auth extends Request {
-  user?: any;
-}
+// export interface Auth extends Request {
+//   user?: {
+//     id: string;
+//     role: string;
+//   };
+// }
 
 type JWTVerificationResultPayload = {
-  id: string
-  name: string
-  role: string
-  email: string
-}
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+};
 
-export interface AdminAuth extends Request {
-  admin: any;
-  candidateId?: string;
-}
+// export interface AdminAuth extends Request {
+//   admin: any;
+//   candidateId?: string;
+// }
 
 export const refreshAccessToken = async (
-  req: Auth,
-  res: Response,
-  next: NextFunction
+  req: Request,
+  res: Response
+  // {next: NextFunction
 ): Promise<void> => {
   const refreshToken = req.cookies?.refreshToken;
 
@@ -87,6 +90,7 @@ export const centralizedAuthentication = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  // console.log('Checking auth header for the request -----', req.headers)
   const auth = req.headers.authorization;
   if (!auth) {
     res.status(406).json({
@@ -98,19 +102,16 @@ export const centralizedAuthentication = async (
 
   try {
     const decoded = (await verifyToken(auth.split(' ')[1])) as JWTVerificationResultPayload;
-    //check is user blocked or not
-    console.log('-- this user authenticated succesfully --')
-    console.log('-- authenticated user decoded data', decoded)
     const userData = await UserDAO.findById(new mongoose.Types.ObjectId(decoded.id));
     if (userData?.isBlocked) {
       throw new UserBlockedError();
     }
-    console.log('-- user not blocked --')
+    console.log('-- user not blocked --');
     if (userData?.isBanned) {
       throw new UserBannedError();
     }
 
-    console.log('-- user not banned --')
+    console.log('-- user not banned --');
     req.user = decoded;
     next();
   } catch (error: unknown) {
@@ -119,8 +120,10 @@ export const centralizedAuthentication = async (
 };
 
 export const authorization = (roles: string[]) => {
-  return async (req: Auth, res: Response, next: NextFunction): Promise<void> => {
-    if (!roles.includes(req?.user?.role)) {
+  // console.log('Entered inside the authorization;;;')
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!roles.includes(req.user.role as string)) {
+      console.log('- inside authorization :: failed');
       res.status(StatusCodes.FORBIDEN).json({ success: false, message: 'Forbidden request' });
       return;
     }

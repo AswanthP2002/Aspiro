@@ -5,7 +5,7 @@ import {
   SalaryPeriod,
   JobLevel,
   JobStatus,
-} from '../../../domain/entities/recruiter/job.entity';
+} from '../../../domain/entities/job/job.entity';
 import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import User from '../../../domain/entities/user/User.FIX';
 
@@ -102,7 +102,6 @@ export default class JobAggregatedDTO {
   expiresAt!: string;
 }
 
-
 export interface AdminJobDetailsDTO {
   _id?: string;
   jobTitle: string;
@@ -119,15 +118,15 @@ export interface AdminJobDetailsDTO {
   reportsCount?: number;
   requiredSkills: string[];
   optionalSkills: string[];
-  status?: JobStatus; 
-  views?: number; 
-  applicationsCount?: number; 
+  status?: JobStatus;
+  views?: number;
+  applicationsCount?: number;
   isDeleted?: boolean;
   isArchived?: boolean;
-  isFlagged?: boolean
+  isFlagged?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: string;
   companyName?: string;
-  recruiterName?: string
+  recruiterName?: string;
 }

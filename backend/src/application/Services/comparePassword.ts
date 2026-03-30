@@ -5,5 +5,4 @@ const comparePassword = async (password: string, hashedPassword: string) => {
   return result;
 };
 
-
-export default comparePassword
+export default comparePassword;

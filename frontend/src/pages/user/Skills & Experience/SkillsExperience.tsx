@@ -6,13 +6,19 @@ import EditExperienceForm from "../../../components/candidate/Forms/ExperienceEd
 import AddSkillsForm from "../../../components/candidate/Forms/SkillsAdd";
 import AddEducationForm from "../../../components/candidate/Forms/EducationAdd";
 import EditEducationForm from "../../../components/candidate/Forms/EducationEdit";
-import { deleteUserEducation, deleteUserExperience, deleteUserSkill, getUserExperiences, getUserSkills, getUserEducations } from "../../../services/userServices";
+import { getUserExperiences, deleteUserExperience } from "../../../services/experienceServices";
+import { getUserEducations, deleteUserEducation } from "../../../services/educationServices";
+import { getUserSkills, deleteUserSkill } from "../../../services/skillService";
+// import { deleteUserSkill } from "../../../services/userServices";
 import { Education, Experience, Skills } from "../../../types/entityTypes";
 import { Notify } from "notiflix";
 import { FaGraduationCap, FaPlus, FaSuitcase, FaTrash } from "react-icons/fa";
 import { FaCircleXmark, FaPencil } from "react-icons/fa6";
 import { CiCalendar } from "react-icons/ci";
 import formatDate from "../../../services/util/formatDate";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
+import { Skeleton } from "@mui/material";
 
 
 export default function ExperiencePage(){
@@ -81,7 +87,7 @@ export default function ExperiencePage(){
     const deleteExperience = useCallback(async (expId?: string) => {
         if (!expId) return;
         const result = await Swal.fire({
-            icon: 'warning',
+            icon: 'question',
             title: 'Confirm Delete?',
             text: 'Are you sure to delete this experience',
             showConfirmButton: true,
@@ -90,34 +96,64 @@ export default function ExperiencePage(){
         });
 
         if (result.isConfirmed) {
-            await deleteUserExperience(expId);
-            Swal.fire({
-                icon: 'success',
-                title: 'Deleted',
-                showCancelButton: false,
-                showConfirmButton: false,
-                timer: 2000
-            });
-            onDeleteExperience(expId);
+            try {
+                const result = await toast.promise(
+                    deleteUserExperience(expId),
+                    {
+                        pending: 'Deleting experience...',
+                        success: 'Experience Deleted',
+                        error:{
+                            render(props) {
+                                const data = props.data as AxiosError<{message: string}>
+                                return data.message
+                            },
+                        }
+                    }
+                )
+                onDeleteExperience(expId);
+            } catch (error) {
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            }
         }
     }, [onDeleteExperience]);
 
     const deleteSkill = useCallback(async (skillId: string, skill: string) => {
-        await deleteUserSkill(skillId);
         Swal.fire({
-            icon: 'success',
-            title: 'Deleted',
-            showConfirmButton: false,
-            showCancelButton: false,
-            timer: 1500
-        });
-        onRemoveSkill(skill);
+            icon: 'question',
+            title: 'Delete skill?',
+            showConfirmButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then(async (response) => {
+            if(response.isConfirmed){
+                try {
+                    await toast.promise(
+                        deleteUserSkill(skillId),
+                        {
+                            pending: 'Deleting...',
+                            success: 'Skill deleted',
+                            error:{
+                                render(props) {
+                                    const data = props.data as AxiosError<{message: string}>
+                                    return data.message
+                                },
+                            }
+                        }
+                    )
+                    onRemoveSkill(skill)
+                } catch (error) {
+                    toast.error(error instanceof Error ? error.message : 'Something went wrong')   
+                }
+            }
+        })
     }, [onRemoveSkill]);
 
     const deleteEducation = useCallback(async (educationId?: string) => {
         if (!educationId) return;
             Swal.fire({
-                icon:'warning',
+                icon:'question',
                 title:'Confirm Delete',
                 text:'Are you sure to delete this education?',
                 showCancelButton:true,
@@ -125,15 +161,24 @@ export default function ExperiencePage(){
                 confirmButtonText:'Delete'
             }).then(async (result) => {
                 if(result.isConfirmed){
-                    await deleteUserEducation(educationId);
-                    Swal.fire({
-                        icon:'success',
-                        title:'Deleted',
-                        showConfirmButton:false,
-                        showCancelButton:false,
-                        timer:1500
-                    });
-                    onDeleteEducation(educationId);
+                    try {
+                        await toast.promise(
+                            deleteUserEducation(educationId),
+                            {
+                                pending: 'Deleting education...',
+                                success: 'Education deleted',
+                                error:{
+                                    render(props) {
+                                        const data = props.data as AxiosError<{message: string}>
+                                        return data.message
+                                    },
+                                }
+                            }
+                        )
+                        onDeleteEducation(educationId);
+                    } catch (error) {
+                        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+                    }
                 }
             });
     }, [onDeleteEducation]);
@@ -172,15 +217,18 @@ export default function ExperiencePage(){
                     getUserEducations()
                 ]);
                 //checking experience value from the backend
-                setLoading(false)
+                console.log('- checking experience only data from the backend------', experienceResult)
+                //setLoading(false)
                 if (experienceResult?.success) setexperiences(experienceResult.experience || []);
                 if (skillResult?.success) setskills(skillResult.skills || []);
                 if (educationResult?.success) seteducation(educationResult.educations || []);
 
             } catch (error) {
-                setLoading(false)
+                // setLoading(false)
                 console.error("Failed to fetch candidate data:", error);
                 Notify.failure('Failed to fetch candidate data', {timeout: 2000})
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -198,39 +246,101 @@ export default function ExperiencePage(){
                         Add experience
                     </button>
                 </div>
-                <div className="grid grid-cols-1 mt-5 w-full gap-3">
+                {loading
+                    ? <>
+                        <div className="flex gap-3 mt-5">
+                            <div>
+                                <Skeleton width={40} height={40} variant="circular" />
+                            </div>
+                            <div>
+                                <Skeleton width={250} />
+                                <Skeleton width={180} height={12} />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-5">
+                            <div>
+                                <Skeleton width={40} height={40} variant="circular" />
+                            </div>
+                            <div>
+                                <Skeleton width={250} />
+                                <Skeleton width={180} height={12} />
+                            </div>
+                        </div>
+                        </>
+                    : <>
+                        <div className="grid grid-cols-1 mt-5 w-full gap-3">
                     {
                         experiences.map((exp: Experience, index: number) => (
-                            <div key={index} className="border flex gap-3 border-gray-200 bg-white p-5 rounded-md">
-                                <div className="bg-blue-100 w-10 h-10 flex items-center justify-center rounded-md">
-                                    <FaSuitcase color="blue" />
-                                </div>
-                                <div>
-                                  <p className="text-gray-700">{exp.jobRole}</p>
-                                  <p className="text-sm font-light text-gray-700 mt-1">{exp.organization}</p>
-                                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                        <IoLocation />
-                                        {exp.location}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <CiCalendar />
-                                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
-                                    </span>
-                                  </div>
-                                  <div className="flex gap-2 mt-2">
-                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">On-site</span>
-                                    <span className="bg-blue-100 text-blue-700 !px-2 rounded-full text-xs">Full-time</span>
-                                  </div>
-                                </div>
-                                <div className="flex-1 flex gap-5 justify-end items-start">
-                                    <button onClick={() => selecteEditableExperience(index)}><FaPencil size={12} color="gray" /></button>
-                                    <button onClick={() => deleteExperience(exp._id)}><FaTrash size={12} color="gray" /></button>
-                                </div>
-                            </div>
+                            <div key={index} className="group relative border border-gray-100 bg-white p-6 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all duration-200">
+    <div className="flex items-start gap-4">
+        {/* Icon - More subtle and modern */}
+        <div className="flex-shrink-0 w-12 h-12 bg-gray-50 flex items-center justify-center rounded-lg border border-gray-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
+            <FaSuitcase className="text-gray-400 group-hover:text-blue-600" size={20} />
+        </div>
+
+        {/* Content Section */}
+        <div className="flex-1">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="text-base font-semibold text-gray-900 leading-tight">
+                        {exp.jobRole}
+                    </h3>
+                    <p className="text-sm font-medium text-blue-600 mt-0.5">
+                        {exp.organization}
+                    </p>
+                </div>
+                
+                {/* Actions - Hidden by default, appears on hover for that "clean" look */}
+                <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        onClick={() => selecteEditableExperience(index)}
+                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                        <FaPencil size={14} />
+                    </button>
+                    <button 
+                        onClick={() => deleteExperience(exp._id)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                    >
+                        <FaTrash size={14} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5">
+                    <IoLocation className="text-gray-400" />
+                    {exp.location}
+                </span>
+                <span className="flex items-center gap-1.5">
+                    <CiCalendar className="text-gray-400" size={16} />
+                    {formatDate(exp.startDate)} — {exp.endDate && exp.endDate.length > 5 ? formatDate(exp.endDate) : 'Present'}
+                </span>
+            </div>
+
+            {/* Badges - Using more professional "Ghost" styling */}
+            <div className="flex gap-2 mt-4">
+                <span className="px-2.5 py-0.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-md text-[10px] font-bold uppercase tracking-wider">
+                    {exp.workMode}
+                </span>
+                <span className="px-2.5 py-0.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-md text-[10px] font-bold uppercase tracking-wider">
+                    {exp.jobType}
+                </span>
+            </div>
+
+            <div className="mt-3">
+                <p className="text-xs text-slate-600 leading-relaxed">{exp.description}</p>
+            </div>
+        </div>
+    </div>
+</div>
                         ))
                     }
                 </div>
+                      </>
+                }
                 {
                     experiences.length === 0 && (
                         <p className="text-center text-xs text-gray-500">No Experience added</p>
@@ -247,36 +357,92 @@ export default function ExperiencePage(){
                         Add Education
                     </button>
                 </div>
-                <div className="grid grid-cols-1 mt-5 w-full gap-3">
-                    {
-                        education.map((edu: any, index: number) => (
-                            <div key={index} className="border flex gap-3 border-gray-200 bg-white p-5 rounded-md">
-                                <div className="bg-rose-100 w-10 h-10 flex items-center justify-center rounded-md">
-                                    <FaGraduationCap color="indigo" />
-                                </div>
-                                <div>
-                                  <p className="text-gray-700">{edu.educationStream}</p>
-                                  <p className="text-xs rounded-md font-light text-black mt-1 bg-gray-200 w-fit px-2 font-medium">{edu.educationLevel}</p>
-                                    <p className="text-sm mt-2 font-light">{edu.institution}</p>
-                                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                        <IoLocation />
-                                        {edu.location}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <CiCalendar />
-                                        {formatDate(edu.startYear)} - {edu.endYear ? formatDate(edu.endYear) : 'Present'}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div className="flex-1 flex gap-5 justify-end items-start">
-                                    <button onClick={() => selecteEditableEducation(index)}><FaPencil size={12} color="gray" /></button>
-                                    <button onClick={() => deleteEducation(edu._id)}><FaTrash size={12} color="gray" /></button>
-                                </div>
+                {loading
+                    ? <>
+                        <div className="flex gap-3 mt-5">
+                            <div>
+                                <Skeleton width={40} height={40} variant="circular" />
                             </div>
+                            <div>
+                                <Skeleton width={250} />
+                                <Skeleton width={180} height={12} />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-5">
+                            <div>
+                                <Skeleton width={40} height={40} variant="circular" />
+                            </div>
+                            <div>
+                                <Skeleton width={250} />
+                                <Skeleton width={180} height={12} />
+                            </div>
+                        </div>
+                      </>
+                    : <>
+                        <div className="grid grid-cols-1 mt-5 w-full gap-3">
+                    {
+                        education.map((edu: Education, index: number) => (
+                            <div key={index} className="group relative border border-gray-100 bg-white p-6 rounded-xl hover:border-indigo-100 hover:shadow-md transition-all duration-300">
+    <div className="flex items-start gap-5">
+        
+        {/* Icon - Using a consistent, professional indigo theme */}
+        <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 flex items-center justify-center rounded-lg border border-indigo-100 group-hover:scale-110 transition-transform">
+            <FaGraduationCap className="text-indigo-600" size={22} />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1">
+            <div className="flex justify-between items-start">
+                <div>
+                    {/* Level Badge - Small, clean, and uppercase */}
+                    <span className="inline-block text-[10px] font-bold tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded uppercase border border-indigo-100 mb-2">
+                        {edu.educationLevel}
+                    </span>
+                    <h3 className="text-base font-bold text-gray-900 leading-tight">
+                        {edu.educationStream}
+                    </h3>
+                    <p className="text-sm font-medium text-gray-600 mt-1">
+                        {edu.institution}
+                    </p>
+                </div>
+
+                {/* Actions - Grouped and subtle */}
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        onClick={() => selecteEditableEducation(index)}
+                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    >
+                        <FaPencil size={14} />
+                    </button>
+                    <button 
+                        onClick={() => deleteEducation(edu._id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                        <FaTrash size={14} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Meta Info with better icons and alignment */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5 font-medium">
+                    <IoLocation className="text-gray-400" />
+                    {edu.location}
+                </span>
+                <span className="flex items-center gap-1.5 font-medium">
+                    <CiCalendar className="text-gray-400" size={16} />
+                    {formatDate(edu.startYear)} — {edu.endYear ? formatDate(edu.endYear) : 'Present'}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
                         ))
                     }
                 </div>
+                      </>
+                }
                 {
                     education.length === 0 && (
                         <p className="text-center text-xs text-gray-500">No Education added</p>
@@ -285,33 +451,84 @@ export default function ExperiencePage(){
             </section>
             <div className="border-b border-gray-300 w-full my-10"></div>
 
-            <section className="">
-                <div className="w-full flex justify-between items-center">
-                    <p className="font-light">Skills</p>
-                    <button onClick={() => toggleModal('skillsAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
-                        <FaPlus />
-                        Add Skills
-                    </button>
-                </div>
-                <div className="w-full flex flex-wrap gap-3 mt-5">
-                    {
-                        skills.map((skill: Skills, index: number) => (
-                            <div key={index} className="text-xs flex items-center gap-2 font-medium bg-gray-200 rounded-full !px-3 !py-1">
-                                <p>{skill.skill}</p>
-                                <button onClick={() => deleteSkill(skill._id as string, skill.skill)}>
-                                    <FaCircleXmark size={15} color="gray" />
-                                </button>
-                            </div>
-                        ))
-                    }
-                    
-                </div>
-                {
-                    skills.length === 0 && (
-                        <p className="text-center text-xs text-gray-500">No Skills added</p>
-                    )
-                }
-            </section>
+            <section className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+    <div className="w-full flex justify-between items-center mb-6">
+        <div>
+            <p className="font-bold text-gray-900 uppercase tracking-wider">Skills</p>
+        </div>
+        <button 
+            onClick={() => toggleModal('skillsAdd', true)} 
+            className="text-white bg-blue-600 hover:bg-blue-700 text-[11px] font-bold flex items-center gap-2 py-1.5 px-3 rounded-lg transition-all active:scale-95 shadow-sm"
+        >
+            <FaPlus size={10} />
+            Add Skills
+        </button>
+    </div>
+    <div>
+        <p className="text-sm text-gray-500 font-medium mt-0.5 uppercase">technical</p>
+    
+    {loading
+        ? <>
+            <Skeleton />
+        </>
+        : <>
+            <div className="w-full flex mt-5 flex-wrap gap-2.5">
+        {skills.map((skill: Skills, index: number) => {
+            if(skill.skillType === 'Technical-Skill'){
+                return <div 
+                key={index} 
+                className="group flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-default"
+            >
+                <span className="text-xs font-semibold tracking-tight">{skill.skill}</span>
+                <button 
+                    onClick={() => deleteSkill(skill._id as string, skill.skill)}
+                    className="text-slate-400 hover:text-red-500 transition-colors"
+                >
+                    <FaCircleXmark size={14} />
+                </button>
+            </div>
+            }
+        })}
+
+        {skills.length === 0 && (
+            <div className="w-full py-8 border-2 border-dashed border-gray-50 rounded-xl flex flex-col items-center">
+                <p className="text-xs text-gray-400 font-medium italic">No skills added yet</p>
+            </div>
+        )}
+    </div>
+          </>
+    }
+    </div>
+
+    <div className="mt-5">
+        <p className="text-sm text-gray-500 font-medium mt-0.5 uppercase">soft</p>
+    
+    <div className="w-full flex mt-5 flex-wrap gap-2.5">
+        {skills.map((skill: Skills, index: number) => {
+            if(skill.skillType === 'Soft-Skill'){
+                return <div 
+                key={index} 
+                className="group flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all cursor-default"
+            >
+                <span className="text-xs font-semibold tracking-tight">{skill.skill}</span>
+                <button 
+                    onClick={() => deleteSkill(skill._id as string, skill.skill)}
+                    className="text-slate-400 hover:text-red-500 transition-colors"
+                >
+                    <FaCircleXmark size={14} />
+                </button>
+            </div>
+            }
+        })}
+
+        {skills.length === 0 && (
+            <div className="w-full py-8 border-2 border-dashed border-gray-50 rounded-xl flex flex-col items-center">
+                <p className="text-xs text-gray-400 font-medium italic">No skills added yet</p>
+            </div>
+        )}
+    </div>
+    </div>
+</section>
             <div className="border-b border-gray-300 w-full my-10"></div>
             
         </div>

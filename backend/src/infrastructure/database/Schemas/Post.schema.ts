@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Post from '../../../domain/entities/user/Post';
+import Post from '../../../domain/entities/post/Post';
 
 export const PostSchema = new Schema<Post>(
   {

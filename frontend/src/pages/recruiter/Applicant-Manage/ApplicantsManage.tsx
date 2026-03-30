@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'
@@ -26,6 +26,8 @@ import { ApplicationsAggregated, Education, Experience, JobApplicationsListForRe
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { HiPaperClip } from "react-icons/hi2"
 import { BsArrowLeft, BsClock } from "react-icons/bs"
+import { toast } from "react-toastify"
+import { AxiosError } from "axios"
 
 interface Application {
     _id: string;
@@ -49,7 +51,7 @@ export default function ApplicantManagePage(){
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalDocs, setTotalDocs] = useState(0)
-    const [limit, setLimit] = useState(1)
+    const [limit, setLimit] = useState(5)
     const [selectionMode, setSelectionMode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [jobDetails, setJobDetails] = useState<any>(null);
@@ -120,32 +122,7 @@ const interviewTypes = [
     }
   });
 
-  const onSubmit = async (data: InterviewFormData) => {
-    Notify.info('called', {timeout:2000})
-    console.log("Form Data:", {
-      ...data,
-      date: dayjs(data.date).format("DD-MM-YYYY")
-    //   time: data.time instanceof Dayjs ? data.time?.format("HH:mm") : '02:22'
-    });
-    reset();
-    setScheduleInterviewModalOpen(false)
-
-    try {
-        const result = await scheduleInterview(
-            '', '', 
-            data.interviewType, data.interviewerName,
-            dayjs(data.date).format("DD-MM-YYYY"),
-            data.interviewerName, data.gmeetUrl,
-            data.note
-        )
-
-        if(result.success){
-            Notify.success('Interview Scheduled', {timeout:2000})
-        }
-    } catch (error: unknown) {
-        
-    }
-  };
+  
 
     function rejectIndividualCandidate(candidateId : string, applicationId : string){
         Swal.fire({
@@ -261,12 +238,12 @@ const interviewTypes = [
     const [applications, setApplications] = useState<JobApplicationsListForRecruiter[]>([])
     
     // const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
-    const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
-    const [screening, setScreening] = useState<ApplicationsAggregated[]>([])
-    const [interview, setInterview] = useState<ApplicationsAggregated[]>([])
-    const [offer, setOffer] = useState<ApplicationsAggregated[]>([])
-    const [hired, setHired] = useState<ApplicationsAggregated[]>([])
-    const [rejected, setRejected] = useState<ApplicationsAggregated[]>([])
+    const [applied, setApplied] = useState(0)
+    const [screening, setScreening] = useState(0)
+    const [interview, setInterview] = useState(0)
+    const [offer, setOffer] = useState(0)
+    const [hired, setHired] = useState(0)
+    const [rejected, setRejected] = useState(0)
 
     const [selectedCandidateForManaging, setSelectedCandidateForManaging] = useState<ApplicationsAggregated | null | undefined>(null)
 
@@ -276,12 +253,20 @@ const interviewTypes = [
     const [notes, setNotes] = useState<string>('')
 
     //function for seting notes locally
-    const updateNoteStateLocally = (e: any) => {
-        setNotes(e.target.value)
-        //console.log('--testing data--', e.target.value)
-        Notify.info(`Update note ${notes}`)
+    
+
+    const searchApplicant = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        setSearch(value)
     }
 
+    const updateNoteStateLocally = (e: any) => {
+        //toast.info(e.target.value)
+        setNotes(e.target.value)
+        //console.log('--testing data--', e.target.value)
+        // toast.success('Note updated')
+    }
+    
     const debounced = (fn: Function, delay: number) => {
         let timer: any
         return function(...args: any){
@@ -293,72 +278,73 @@ const interviewTypes = [
     }
 
     const updateCandidateNote = debounced(updateNoteStateLocally, 2000)
+    const dSearch = debounced(searchApplicant, 500)
 
-    const selectOneFromApplied = (id: string) => {
-        const candidate = applied.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromApplied = (id: string) => {
+    //     const candidate = applied.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
-    const selectOneFromScreening = (id: string) => {
-        const candidate = screening.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromScreening = (id: string) => {
+    //     const candidate = screening.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
-    const selectOneFromInterview = (id: string) => {
-        const candidate = interview.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromInterview = (id: string) => {
+    //     const candidate = interview.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
-    const selectOneFromOffer = (id: string) => {
-        const candidate = offer.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromOffer = (id: string) => {
+    //     const candidate = offer.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
-    const selectOneFromHired = (id: string) => {
-        const candidate = hired.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromHired = (id: string) => {
+    //     const candidate = hired.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
-    const selectOneFromRejected = (id: string) => {
-        const candidate = rejected.find((app: ApplicationsAggregated) => {
-            if(app._id === id){
-                return app
-            }
-        })
-        //seting selected candidate
-        setSelectedCandidateForManaging(candidate)
-        setControlBarOpen(true)
-    }
+    // const selectOneFromRejected = (id: string) => {
+    //     const candidate = rejected.find((app: ApplicationsAggregated) => {
+    //         if(app._id === id){
+    //             return app
+    //         }
+    //     })
+    //     //seting selected candidate
+    //     setSelectedCandidateForManaging(candidate)
+    //     setControlBarOpen(true)
+    // }
 
     const updateStatus = async (e: any) => {
         const existingStatus = selectedCandidateForManaging?.status
@@ -381,75 +367,75 @@ const interviewTypes = [
             })
 
             //update status based arrays to add selected application  status based array
-            switch(status){
-                case 'applied' :
-                    setApplied((prv: ApplicationsAggregated[]) => {
-                        return [...prv, selectedCandidateForManaging as ApplicationsAggregated]
-                    })
-                    break
-                case 'screening' :
-                    setScreening((prv: ApplicationsAggregated[]) => {
-                        return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-                    })
-                    break
-                case 'interview' :
-                    setInterview((prv: ApplicationsAggregated[]) => {
-                        return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-                    })
-                    break
-                case 'offer' :
-                    setOffer((prv: ApplicationsAggregated[]) => {
-                        return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-                    })
-                    break
-                case 'hired' :
-                    setHired((prv: ApplicationsAggregated[]) => {
-                        return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-                    })
-                    break
-                case 'rejected' :
-                    setRejected((prv: ApplicationsAggregated[]) => {
-                        return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-                    })
-                    break
-                default :
-                    return
+            // switch(status){
+            //     case 'applied' :
+            //         setApplied((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, selectedCandidateForManaging as ApplicationsAggregated]
+            //         })
+            //         break
+            //     case 'screening' :
+            //         setScreening((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
+            //         })
+            //         break
+            //     case 'interview' :
+            //         setInterview((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
+            //         })
+            //         break
+            //     case 'offer' :
+            //         setOffer((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
+            //         })
+            //         break
+            //     case 'hired' :
+            //         setHired((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
+            //         })
+            //         break
+            //     case 'rejected' :
+            //         setRejected((prv: ApplicationsAggregated[]) => {
+            //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
+            //         })
+            //         break
+            //     default :
+            //         return
                 
-            }
+            // }
 
             //update current status based arrays to removed selected application from current status based array
-            switch(existingStatus){
-                case 'applied':
-                    setApplied((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-                case 'screening':
-                    setScreening((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-                case 'interview':
-                    setInterview((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-                case 'offer':
-                    setOffer((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-                case 'hired':
-                    setHired((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-                case 'rejected':
-                    setRejected((prv: ApplicationsAggregated[]) => {
-                        return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-                    })
-                    break
-            }
+            // switch(existingStatus){
+            //     case 'applied':
+            //         setApplied((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            //     case 'screening':
+            //         setScreening((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            //     case 'interview':
+            //         setInterview((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            //     case 'offer':
+            //         setOffer((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            //     case 'hired':
+            //         setHired((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            //     case 'rejected':
+            //         setRejected((prv: ApplicationsAggregated[]) => {
+            //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
+            //         })
+            //         break
+            // }
         } catch (error: unknown) {
             Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:3000})
         }
@@ -482,6 +468,17 @@ const interviewTypes = [
     }
 
     
+    const onApplicationStatusUpdate = (applicationId: string, status: string) => {
+        setApplications((prv: JobApplicationsListForRecruiter[]) => {
+            return prv.map((app: JobApplicationsListForRecruiter) => {
+                if(app._id === applicationId){
+                    return {...app, status: status}
+                }else{
+                    return app
+                }
+            })
+        })
+    }
 
 
     useEffect(() => {
@@ -496,15 +493,12 @@ const interviewTypes = [
                 if (appResult?.success) {
                     console.log('--checking inner value of data--', appResult.result)
                     setApplications(appResult.result.applications)
-                    // setJob(appResult?.result[0].job.jobTitle)
-                    // setApplications(appResult.result);
-                    // setApplied(filterApplications(appResult.result, "applied"))
-                    // setScreening(filterApplications(appResult.result, "screening"))
-                    // setInterview(filterApplications(appResult?.result, "interview"))
-                    // setOffer(filterApplications(appResult?.result, "offer"))
-                    // setHired(filterApplications(appResult?.result, "hired"))
-                    // setRejected(filterApplications(appResult?.result, "rejected"))
-                    // setAppCount(appResult?.result?.length)
+                    setApplied(appResult?.result?.applied)
+                    setScreening(appResult?.result?.screening)
+                    setInterview(appResult?.result?.interview)
+                    setOffer(appResult.result?.offer)
+                    setHired(appResult?.result?.hired)
+                    setRejected(appResult?.result?.rejected)
                 } else {
                     Notify.failure(appResult?.message || "Could not fetch applications.");
                 }
@@ -523,11 +517,14 @@ const interviewTypes = [
         })()
     }, [search, page, filter])
     //checking problem here..............
+    
     useEffect(() => {
-        if(selectedCandidateForManaging?._id){
+        if(selectedApplication){
+            
             (async function(){
             try {
-                await updateCandidateNotes(selectedCandidateForManaging?._id as string, notes)
+                await updateCandidateNotes(selectedApplication as string, notes)
+                toast.success('Note updated')
             } catch (error: unknown) {
                 console.log('-- error occured while adding note for the candidate --', error)
                 Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
@@ -553,7 +550,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuFileArchive color="blue" />
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{applied}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Applied</p>
@@ -563,7 +560,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuPhone  color="blue"/>
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{screening}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Screening</p>
@@ -573,7 +570,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuCalendar color="blue" />
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{interview}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Interview</p>
@@ -583,7 +580,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuSend color="blue" />
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{offer}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Offer</p>
@@ -593,7 +590,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuUserCheck color="blue" />
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{hired}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Hired</p>
@@ -603,7 +600,7 @@ const interviewTypes = [
                 <div className="bg-white p-3 border border-slate-200 rounded-md shadow">
                     <div className="flex items-center gap-2">
                         <LuUserX color="blue" />
-                        <p className="text-xl">0</p>
+                        <p className="text-xl">{rejected}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-500">Rejected</p>
@@ -614,7 +611,7 @@ const interviewTypes = [
             <div className="mt-5 bg-white border border-slate-200 rounded-md p-2 grid grid-cols-12 gap-2">
                 <div className="col-span-12 lg:col-span-6 bg-gray-100 p-2 rounded flex items-center gap-2">
                     <LuSearch color="gray" />
-                    <input className="w-full !text-xs" type="text" placeholder="Search name, email" />
+                    <input onChange={(e) => dSearch(e)} className="w-full !text-xs" type="text" placeholder="Search name, email" />
                 </div>
                 <div className="col-span-12 lg:col-span-3 relative">
                     <div className="flex items-center justify-between w-full bg-gray-100 rounded-md p-2">
@@ -697,7 +694,7 @@ const interviewTypes = [
             </div>
         </div>
         {isControlBarMenuOpen && (
-            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} />
+            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e: any) => updateCandidateNote(e)} />
         )}
         
         </>
@@ -705,18 +702,95 @@ const interviewTypes = [
 }
 
 export function StatusPhills({status}: {status: string}){
-    switch(status){
-        case 'applied':
-            return <span className="bg-blue-200 text-xs px-3 rounded-full text-blue-700">{status}</span>
-    }
+  switch (status) {
+    case 'applied':
+      return <span className="bg-blue-100 text-blue-700 text-xs font-medium px-3 py-0.5 rounded-full">Applied</span>;
+    case 'screening':
+      return <span className="bg-purple-100 text-purple-700 text-xs font-medium px-3 py-0.5 rounded-full">Screening</span>;
+    case 'interview':
+      return <span className="bg-orange-100 text-orange-700 text-xs font-medium px-3 py-0.5 rounded-full">Interview</span>;
+    case 'offer':
+      return <span className="bg-yellow-100 text-yellow-700 text-xs font-medium px-3 py-0.5 rounded-full">Offer</span>;
+    case 'hired':
+      return <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-0.5 rounded-full">Hired</span>;
+    case 'rejected':
+      return <span className="bg-red-100 text-red-700 text-xs font-medium px-3 py-0.5 rounded-full">Rejected</span>;
+    default:
+      return <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-0.5 rounded-full">{status || 'Unknown'}</span>;
+  }
 }
 
-export function ControlBarModal({open, applicationId, onClose}: {open: boolean, applicationId: string, onClose: () => void}){
+export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e: any) => void}){
+    
+    type InterviewFormData = {
+  date: Dayjs | null;
+  time: Dayjs | null;
+  interviewType: string;
+  gmeetUrl: string;
+  interviewerName: string;
+  note: string;
+  sendEmail: boolean;
+};
+
+const interviewTypes = [
+  "Technical",
+  "HR",
+  "Managerial",
+  "General"
+];
+
     const [isStatusMenuOpened, setIsStatusMenuOpened] = useState(false)
     const [applicationDetails, setApplicationDetails] = useState<SingleJobApplicationDetailsData | null>(null)
     const [loading, setLoading] = useState(false)
     const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
+    const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState(false)
 
+    const openInterviewScheduleModal = () => setScheduleInterviewModalOpen(true)
+    const closeInterviewScheduleModal = () => setScheduleInterviewModalOpen(false)
+
+    const {
+    control,
+    handleSubmit,
+    reset,
+    formState:{errors}
+  } = useForm<InterviewFormData>({
+    defaultValues: {
+      date: null,
+      time: null,
+      interviewType: "",
+      gmeetUrl: "",
+      interviewerName: "",
+      note: "",
+      sendEmail: false
+    }
+  });
+
+  const onSubmit = async (data: InterviewFormData) => {
+    console.log("Form Data:", {
+      ...data,
+      date: dayjs(data.date).format("DD-MM-YYYY")
+    //   time: data.time instanceof Dayjs ? data.time?.format("HH:mm") : '02:22'
+    });
+    reset();
+    setScheduleInterviewModalOpen(false)
+
+    try {
+        const result = await scheduleInterview(
+            applicationDetails?.candidateDetails?._id as string,
+            applicationDetails?.jobDetails?._id as string,
+            data.interviewType, data.interviewerName,
+            dayjs(data.date).format("YYYY-MM-DD"),
+            data.interviewerName, data.gmeetUrl,
+            data.note
+        )
+
+        if(result.success){
+            toast.success('Interview Scheduled')
+        }
+    } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  };
 
     const navigate = useNavigate()
 
@@ -725,18 +799,68 @@ export function ControlBarModal({open, applicationId, onClose}: {open: boolean, 
         navigate(`/users/${userId}`, {state:{userId: userId}})
     }
 
+    const updateACandidateApplicationStatus = async (applicationId: string, status: string, name: string, email: string, jobTitle: string) => {
+        if(!applicationId) return
+        const result = await Swal.fire({
+            icon: 'question',
+            title: `Update status to ${status}`,
+            showConfirmButton: true,
+            showCancelButton: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen:() => {
+                const container = Swal.getContainer()
+                if(container){
+                    container.style.zIndex = '999999'
+                }
+            }
+        })
+
+        if(!result.isConfirmed) return
+        try {
+            const result = await toast.promise(
+                updateJobApplicationStatus(applicationId, status, name, email, jobTitle),
+                {
+                    pending: 'Updating...',
+                    success: 'Updated',
+                    error:{
+                        render(props) {
+                            const data = props.data as AxiosError<{message: string}>
+                            return data.message
+                        },
+                    }
+                }
+            )
+
+            if(result?.success){
+                setApplicationDetails((prv: SingleJobApplicationDetailsData | null) => {
+                if(!prv) return null
+                return {
+                    ...prv,
+                    status: result.result?.status || status
+                }
+            })
+            onApplicationStatusUpdate(applicationId, status)
+            }else{
+                toast.warn('Can not update status now')
+            }
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
+        }
+    }
+
     useEffect(() => {
         async function fetchSingleApplicationDetails(){
             setLoading(true)
             try {
                 const result = await getSingleApplicationDetails(applicationId)
                 if(result.success){
-                    Notify.success('Application details loaded')
+                    toast.success('Application details loaded')
                     setApplicationDetails(result.result)
                 }
 
             } catch (error) {
-                Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
             } finally {
                 setLoading(false)
             }
@@ -781,9 +905,36 @@ export function ControlBarModal({open, applicationId, onClose}: {open: boolean, 
                                 </div>
                                 {isStatusMenuOpened && (
                                     <div className="bg-white w-full rounded-md border border-slate-200 shadow">
-                                        {Array.from(["applied", "screening", "interview", "offer", "hired", "rejected"]).map((status, index) => (
+                                        {/* {Array.from(["applied", "screening", "interview", "offer", "hired", "rejected"]).map((status, index) => (
                                             <button className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">{status}</button>
-                                        ))}
+                                        ))} */}
+                                        {applicationDetails.status === 'applied' && (
+                                            <button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'applied', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">applied</button>
+                                        )}
+                                        {(applicationDetails.status === 'applied' ||
+                                            applicationDetails.status === 'screening'
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'screening', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">screening</button>)}
+                                        {(applicationDetails.status === 'applied' ||
+                                            applicationDetails.status === 'screening' ||
+                                            applicationDetails.status === 'interview'
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'interview', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">interview</button>)}
+                                        {(applicationDetails.status === 'applied' ||
+                                            applicationDetails.status === 'screening' ||
+                                            applicationDetails.status === 'interview' || 
+                                            applicationDetails.status === 'offer'
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'offer', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">offer</button>)}
+                                        {(applicationDetails.status === 'applied' ||
+                                            applicationDetails.status === 'screening' ||
+                                            applicationDetails.status === 'interview' || 
+                                            applicationDetails.status === 'offer' || 
+                                            applicationDetails.status === 'hired'
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'hired', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        {(applicationDetails.status === 'applied' ||
+                                            applicationDetails.status === 'screening' ||
+                                            applicationDetails.status === 'interview' || 
+                                            applicationDetails.status === 'offer' || 
+                                            applicationDetails.status === 'rejected'
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'rejected', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
                                     </div>
                                 )}
                             </div>
@@ -883,7 +1034,7 @@ export function ControlBarModal({open, applicationId, onClose}: {open: boolean, 
 
                         <div className="mt-5">
                      <p className="font-light">Notes</p>
-                     <textarea onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+                     <textarea value={applicationDetails.notes} onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
                  </div>
                  <div className="mt-5 space-y-2">
                      <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
@@ -910,6 +1061,185 @@ export function ControlBarModal({open, applicationId, onClose}: {open: boolean, 
                     <ViewPDFDocument fileUrl={applicationDetails?.resumeDetails?.url as string} />
                 </div>
             </Modal>
+        )
+      }
+
+      {
+        scheduleInterviewModalOpen && (
+            <Modal 
+  open={scheduleInterviewModalOpen} 
+  onClose={() => setScheduleInterviewModalOpen(false)}
+  className="flex items-center justify-center"
+>
+  <div className="bg-white rounded-xl shadow-2xl w-[450px] overflow-hidden outline-none">
+    
+    {/* Header */}
+    <div className="px-6 py-4 flex justify-between items-center border-b border-gray-100">
+      <h2 className="text-lg font-bold text-gray-800">Schedule Interview</h2>
+      <button 
+        onClick={() => setScheduleInterviewModalOpen(false)}
+        className="text-gray-400 hover:text-red-500 transition-colors"
+      >
+        <FaRegCircleXmark size={20} />
+      </button>
+    </div>
+
+    {/* Candidate Info - Soft & Professional */}
+    <div className="mx-6 mt-6 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
+      <div className="bg-blue-600 w-10 h-10 flex items-center justify-center text-white font-bold rounded-full shadow-sm">
+        {applicationDetails?.candidateDetails?.name?.charAt(0) || 'U'}
+      </div>
+      <div>
+        <p className="text-sm font-bold text-blue-900 leading-tight">
+          {applicationDetails?.candidateDetails?.name || "Candidate Name"}
+        </p>
+        <p className="text-xs text-blue-700 font-medium">
+          {applicationDetails?.candidateDetails?.headline || "Headline/Role"}
+        </p>
+      </div>
+    </div>
+
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      className="p-6 flex flex-col gap-4"
+    >
+      {/* Date */}
+      <Controller
+        name="date"
+        control={control}
+        rules={{ required: "Date is required" }}
+        render={({ field }) => (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateField
+              label="Interview Date"
+              {...field}
+              fullWidth
+              size="small"
+              error={Boolean(errors.date)}
+              helperText={errors.date?.message}
+            />
+          </LocalizationProvider>
+        )}
+      />
+
+      {/* Time */}
+      <Controller
+        name="time"
+        control={control}
+        rules={{ required: "Time is required" }}
+        render={({ field }) => (
+          <TextField
+            label="Interview Time"
+            type="time"
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+            {...field}
+            error={Boolean(errors.time)}
+            helperText={errors.time?.message}
+          />
+        )}
+      />
+
+      {/* Interview Type */}
+      <Controller
+        name="interviewType"
+        control={control}
+        rules={{ required: "Interview type is required" }}
+        render={({ field }) => (
+          <TextField 
+            select 
+            label="Interview Type" 
+            fullWidth 
+            size="small"
+            {...field} 
+            error={Boolean(errors.interviewType)} 
+            helperText={errors.interviewType?.message}
+          >
+            {interviewTypes.map(type => (
+              <MenuItem key={type} value={type}>{type}</MenuItem>
+            ))}
+          </TextField>
+        )}
+      />
+
+      {/* Google Meet URL */}
+      <Controller
+        name="gmeetUrl"
+        control={control}
+        rules={{ required: "Google Meet URL is required" }}
+        render={({ field }) => (
+          <TextField
+            label="Google Meet URL"
+            placeholder="https://meet.google.com/..."
+            fullWidth
+            size="small"
+            {...field}
+            error={Boolean(errors.gmeetUrl)}
+            helperText={errors.gmeetUrl?.message}
+          />
+        )}
+      />
+
+      {/* Interviewer Name */}
+      <Controller
+        name="interviewerName"
+        control={control}
+        rules={{ required: "Interviewer name is required" }}
+        render={({ field }) => (
+          <TextField
+            label="Interviewer Name"
+            fullWidth
+            size="small"
+            {...field}
+            error={Boolean(errors.interviewerName)}
+            helperText={errors.interviewerName?.message}
+          />
+        )}
+      />
+
+      {/* Note */}
+      <Controller
+        name="note"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            label="Note"
+            multiline
+            rows={3}
+            fullWidth
+            size="small"
+            {...field}
+          />
+        )}
+      />
+
+      {/* Checkbox */}
+      <Controller
+        name="sendEmail"
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            className="text-gray-600"
+            control={<Checkbox {...field} checked={field.value} size="small" />}
+            label={<span className="text-sm">Send email invitation</span>}
+          />
+        )}
+      />
+
+      {/* Submit Button */}
+      <Button 
+        variant="contained" 
+        type="submit" 
+        fullWidth 
+        className="bg-blue-600 hover:bg-blue-700 py-2.5 rounded-lg font-bold capitalize shadow-none"
+      >
+        Schedule Now
+      </Button>
+    </Box>
+  </div>
+</Modal>
         )
       }
         </>
@@ -1493,166 +1823,166 @@ export function ControlBarModal({open, applicationId, onClose}: {open: boolean, 
 //         </>
 //       )}
 
-//       {
-//         scheduleInterviewModalOpen && (
-//             <Modal className="flex flex-col items-center justify-center" open={scheduleInterviewModalOpen} onClose={() => setScheduleInterviewModalOpen(false)}>
-//                 <div className="p-5 bg-white shadow-xl rounded-md w-md lg:w-lg">
-//                     <div className="header w-full items-center flex justify-between">
-//                         <p>Schedule Interview</p>
-//                         <button onClick={() => setScheduleInterviewModalOpen(false)}>
-//                             <FaRegCircleXmark />
-//                         </button>
-//                     </div>
-//                     <div className="mt-2 bg-blue-100 flex gap-3 w-full p-3">
-//                         <div className="bg-blue-500 w-10 h-10 flex items-center justify-center text-sm text-white rounded-full">
-//                             <p>U</p>
-//                         </div>
-//                         <div>
-//                             <p className="text-sm">Name of the can</p>
-//                             <p className="text-xs">Headline if</p>
-//                         </div>
-//                     </div>
+    //   {
+    //     scheduleInterviewModalOpen && (
+    //         <Modal className="flex flex-col items-center justify-center" open={scheduleInterviewModalOpen} onClose={() => setScheduleInterviewModalOpen(false)}>
+    //             <div className="p-5 bg-white shadow-xl rounded-md w-md lg:w-lg">
+    //                 <div className="header w-full items-center flex justify-between">
+    //                     <p>Schedule Interview</p>
+    //                     <button onClick={() => setScheduleInterviewModalOpen(false)}>
+    //                         <FaRegCircleXmark />
+    //                     </button>
+    //                 </div>
+    //                 <div className="mt-2 bg-blue-100 flex gap-3 w-full p-3">
+    //                     <div className="bg-blue-500 w-10 h-10 flex items-center justify-center text-sm text-white rounded-full">
+    //                         <p>U</p>
+    //                     </div>
+    //                     <div>
+    //                         <p className="text-sm">Name of the can</p>
+    //                         <p className="text-xs">Headline if</p>
+    //                     </div>
+    //                 </div>
 
-//                     <Box
-//       component="form"
-//       onSubmit={handleSubmit(onSubmit)}
-//       sx={{ maxWidth: 500, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}
-//     >
-//       {/* Date */}
-//       <FormControl error={Boolean(errors.date)}>
-//         <Controller
-//         name="date"
-//         control={control}
-//         rules={{ required: "Date is required" }}
-//         render={({ field }) => (
-//           <LocalizationProvider dateAdapter={AdapterDayjs}>
-//             <DemoContainer components={['DateField']}>
-//                 <DateField
-//             label="Interview Date"
-//             {...field}
-//             error={Boolean(errors.date)}
-//             onChange={(fieldVAlue) => field.onChange(fieldVAlue)} value={field.value}
-//             slotProps={{
-//               textField: { fullWidth: true }
-//             }}
-//           />
-//             </DemoContainer>
-//           </LocalizationProvider>
-//         )}
-//       />
-//       <FormHelperText>{errors.date?.message}</FormHelperText>
-//       </FormControl>
+    //                 <Box
+    //   component="form"
+    //   onSubmit={handleSubmit(onSubmit)}
+    //   sx={{ maxWidth: 500, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}
+    // >
+    //   {/* Date */}
+    //   <FormControl error={Boolean(errors.date)}>
+    //     <Controller
+    //     name="date"
+    //     control={control}
+    //     rules={{ required: "Date is required" }}
+    //     render={({ field }) => (
+    //       <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //         <DemoContainer components={['DateField']}>
+    //             <DateField
+    //         label="Interview Date"
+    //         {...field}
+    //         error={Boolean(errors.date)}
+    //         onChange={(fieldVAlue) => field.onChange(fieldVAlue)} value={field.value}
+    //         slotProps={{
+    //           textField: { fullWidth: true }
+    //         }}
+    //       />
+    //         </DemoContainer>
+    //       </LocalizationProvider>
+    //     )}
+    //   />
+    //   <FormHelperText>{errors.date?.message}</FormHelperText>
+    //   </FormControl>
 
-//       {/* Time */}
-//       <FormControl>
-//         <Controller
-//         name="time"
-//         control={control}
-//         rules={{ required: "Time is required" }}
-//         render={({ field }) => (
-//           <TextField
-//                 label="Interview Time"
-//                 type="time"
-//                 InputLabelProps={{ shrink: true }}
-//                 fullWidth
-//                 {...field}
-//                 error={Boolean(errors.time)}
-//                 helperText={errors.time?.message}
-//               />
-//         )}
-//       />
-//       </FormControl>
+    //   {/* Time */}
+    //   <FormControl>
+    //     <Controller
+    //     name="time"
+    //     control={control}
+    //     rules={{ required: "Time is required" }}
+    //     render={({ field }) => (
+    //       <TextField
+    //             label="Interview Time"
+    //             type="time"
+    //             InputLabelProps={{ shrink: true }}
+    //             fullWidth
+    //             {...field}
+    //             error={Boolean(errors.time)}
+    //             helperText={errors.time?.message}
+    //           />
+    //     )}
+    //   />
+    //   </FormControl>
 
-//       {/* Interview Type */}
-//       <FormControl error={Boolean(errors.interviewType)}>
-//         <Controller
-//         name="interviewType"
-//         control={control}
-//         rules={{ required: "Interview type is required" }}
-//         render={({ field }) => (
-//           <TextField select label="Interview Type" fullWidth {...field} error={Boolean(errors.interviewType)} helperText={errors.interviewType?.message}>
-//             {interviewTypes.map(type => (
-//               <MenuItem key={type} value={type}>
-//                 {type}
-//               </MenuItem>
-//             ))}
-//           </TextField>
-//         )}
-//       />
-//       </FormControl>
+    //   {/* Interview Type */}
+    //   <FormControl error={Boolean(errors.interviewType)}>
+    //     <Controller
+    //     name="interviewType"
+    //     control={control}
+    //     rules={{ required: "Interview type is required" }}
+    //     render={({ field }) => (
+    //       <TextField select label="Interview Type" fullWidth {...field} error={Boolean(errors.interviewType)} helperText={errors.interviewType?.message}>
+    //         {interviewTypes.map(type => (
+    //           <MenuItem key={type} value={type}>
+    //             {type}
+    //           </MenuItem>
+    //         ))}
+    //       </TextField>
+    //     )}
+    //   />
+    //   </FormControl>
 
-//       {/* Google Meet URL */}
-//       <FormControl error={Boolean(errors.gmeetUrl)}>
-//         <Controller
-//         name="gmeetUrl"
-//         control={control}
-//         rules={{ required: "Google Meet URL is required" }}
-//         render={({ field }) => (
-//           <TextField
-//             label="Google Meet URL"
-//             fullWidth
-//             {...field}
-//             error={Boolean(errors.gmeetUrl)}
-//             helperText={errors.gmeetUrl?.message}
-//           />
-//         )}
-//       />
-//       </FormControl>
+    //   {/* Google Meet URL */}
+    //   <FormControl error={Boolean(errors.gmeetUrl)}>
+    //     <Controller
+    //     name="gmeetUrl"
+    //     control={control}
+    //     rules={{ required: "Google Meet URL is required" }}
+    //     render={({ field }) => (
+    //       <TextField
+    //         label="Google Meet URL"
+    //         fullWidth
+    //         {...field}
+    //         error={Boolean(errors.gmeetUrl)}
+    //         helperText={errors.gmeetUrl?.message}
+    //       />
+    //     )}
+    //   />
+    //   </FormControl>
 
-//       {/* Interviewer Name */}
-//       <FormControl error={Boolean(errors.interviewerName)}>
-//         <Controller
-//         name="interviewerName"
-//         control={control}
-//         rules={{ required: "Interviewer name is required" }}
-//         render={({ field }) => (
-//           <TextField
-//             label="Interviewer Name"
-//             fullWidth
-//             {...field}
-//             error={Boolean(errors.interviewerName)}
-//             helperText={errors.interviewerName?.message}
-//           />
-//         )}
-//       />
-//       </FormControl>
+    //   {/* Interviewer Name */}
+    //   <FormControl error={Boolean(errors.interviewerName)}>
+    //     <Controller
+    //     name="interviewerName"
+    //     control={control}
+    //     rules={{ required: "Interviewer name is required" }}
+    //     render={({ field }) => (
+    //       <TextField
+    //         label="Interviewer Name"
+    //         fullWidth
+    //         {...field}
+    //         error={Boolean(errors.interviewerName)}
+    //         helperText={errors.interviewerName?.message}
+    //       />
+    //     )}
+    //   />
+    //   </FormControl>
 
-//       {/* Note */}
-//       <Controller
-//         name="note"
-//         control={control}
-//         render={({ field }) => (
-//           <TextField
-//             label="Note"
-//             multiline
-//             rows={4}
-//             fullWidth
-//             {...field}
-//           />
-//         )}
-//       />
+    //   {/* Note */}
+    //   <Controller
+    //     name="note"
+    //     control={control}
+    //     render={({ field }) => (
+    //       <TextField
+    //         label="Note"
+    //         multiline
+    //         rows={4}
+    //         fullWidth
+    //         {...field}
+    //       />
+    //     )}
+    //   />
 
-//       {/* Checkbox */}
-//       <Controller
-//         name="sendEmail"
-//         control={control}
-//         render={({ field }) => (
-//           <FormControlLabel
-//             control={<Checkbox {...field} checked={field.value} />}
-//             label="Send email invitation to the email also"
-//           />
-//         )}
-//       />
+    //   {/* Checkbox */}
+    //   <Controller
+    //     name="sendEmail"
+    //     control={control}
+    //     render={({ field }) => (
+    //       <FormControlLabel
+    //         control={<Checkbox {...field} checked={field.value} />}
+    //         label="Send email invitation to the email also"
+    //       />
+    //     )}
+    //   />
 
-//       {/* Submit Button */}
-//       <Button variant="contained" type="submit" fullWidth>
-//         Submit
-//       </Button>
-//     </Box>
-//                 </div>
-//             </Modal>
-//         )
-//       }
+    //   {/* Submit Button */}
+    //   <Button variant="contained" type="submit" fullWidth>
+    //     Submit
+    //   </Button>
+    // </Box>
+    //             </div>
+    //         </Modal>
+    //     )
+    //   }
 
 
 //       {/* Modal for viewing resume */}

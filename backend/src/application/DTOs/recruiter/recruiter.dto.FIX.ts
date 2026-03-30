@@ -1,16 +1,16 @@
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 
 export default interface CreateRecruiterDTO {
   userId?: string;
   recruiterType?: 'self' | 'corporate';
   companyId?: string;
   fullName?: string;
-  profiessionalTitle?: string;
+  professionalTitle?: string;
   email?: string;
   phone?: string;
   yearOfExperience?: string;
   linkedinUrl?: string;
-  verificationDocumentFile?: any;
+  verificationDocumentFile: Buffer<ArrayBufferLike>;
   verificationDocumentFilePath?: string;
 }
 
@@ -40,7 +40,7 @@ export interface RecruiterDTO {
   };
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   applicationResendBufferDate?: Date;
-  verificationHistory?: any;
+  // verificationHistory?: any;
   createdAt?: string;
   updatedAt?: string;
 }

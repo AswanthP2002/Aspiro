@@ -1,6 +1,5 @@
-import GoogleTokenVerificationDTO from '../../DTOs/googleTokenVerification.dto';
+import GoogleTokenVerificationDTO from '../../DTOs/user/googleTokenVerification.dto';
 
 export default interface IGoogleAuthService {
   verify(token: string): Promise<GoogleTokenVerificationDTO>;
 }
-

@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import SkillSet from '../../../domain/entities/skills.entity';
+import SkillSet from '../../../domain/entities/skill.admin/skills.entity';
 
 export const SkillSetSchema = new Schema<SkillSet>({
   skills: { type: String },

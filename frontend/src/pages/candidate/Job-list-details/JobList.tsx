@@ -8,6 +8,7 @@ import { BiChevronDown, BiMapPin } from 'react-icons/bi';
 import { TbBriefcaseOff } from 'react-icons/tb';
 import { Button } from '@mui/material';
 import { recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from '../../../services/recruiterServices';
+import { toast } from 'react-toastify';
 
 export default function JobListing() {
   const [jobs, setjobs] = useState<LoadJobsForPublicData[]>([]);
@@ -84,7 +85,7 @@ export default function JobListing() {
           setjobs(result?.result?.jobs);
           settotalpages(result?.result?.totalPages);
         }else{
-          Notify.failure(result?.message, {timeout:2000})
+          toast.error(result?.message)
         }
 
         setJobLevelOptions(jobLevelResult.result)
@@ -92,7 +93,7 @@ export default function JobListing() {
         setWorkModeOptions(workModeResult.result)
 
       } catch (error: unknown) {
-        Notify.failure('Something went wrong', {timeout:2000})
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
       } finally {
         setLoading(false)
       }
@@ -119,8 +120,97 @@ export default function JobListing() {
 
   return(
     <>
-      <section className='job-listing-container pb-10'>
-          <div className="header px-5 py-3 bg-white rounded-md border border-slate-200">
+      <section className='job-listing-container pt-15 lg:pt-0 pb-10'>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+  {/* Header Title Section */}
+  <div className="px-6 py-4 border-b border-gray-100">
+    <h1 className="text-xl font-bold text-gray-900">Find your opportunities</h1>
+    <p className="text-sm text-gray-500 mt-0.5">Discover roles that match your expertise and career goals</p>
+  </div>
+
+  <div className="p-5 bg-gray-50/50">
+    {/* Integrated Search Bar */}
+    <div className="flex flex-col md:flex-row items-stretch gap-0 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+      
+      {/* Job Title Search */}
+      <div className="flex-1 flex items-center gap-3 px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
+        <BsSearch size={16} className="text-gray-400" />
+        <input 
+          onKeyUp={(event) => dSearch(event)} 
+          type="text" 
+          className="w-full text-sm outline-none bg-transparent placeholder-gray-400" 
+          placeholder="Job title, skills, or company" 
+        />
+      </div>
+
+      {/* Location Search */}
+      <div className="flex-1 flex items-center gap-3 px-4 py-3">
+        <BiMapPin size={18} className="text-gray-400" />
+        <input 
+          ref={locationSearchInputField} 
+          type="text" 
+          className="w-full text-sm outline-none bg-transparent placeholder-gray-400" 
+          placeholder="City, state, or remote" 
+        />
+      </div>
+
+      {/* Main Search Button */}
+      <div className="p-1.5">
+        <button 
+          onClick={setSearchingLocation} 
+          disabled={loading}
+          className="h-full px-8 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center min-w-[120px]"
+        >
+          {loading ? 'Searching...' : 'Find Jobs'}
+        </button>
+      </div>
+    </div>
+
+    {/* Quick Filters Row */}
+    <div className="mt-4 flex flex-wrap gap-3">
+      {[
+        { label: jobTypeFilter, toggle: toggleJobTypeFilterOpen, isOpen: isJobTypeFilterOpen, options: jobTypeOptions, set: setJobTypeFilter, setOpen: setIsJobTypeFilterOpen },
+        { label: jobLevelFilter, toggle: toggleJobLevelFilterOpen, isOpen: isJobLevelFilterOpen, options: jobLevelOptions, set: setJobLevelFilter, setOpen: setIsJobLevelFilterOpen },
+        { label: workModeFilter, toggle: toggleWorkModeFilter, isOpen: isWorkModeFilterOpen, options: workModeOptions, set: setWorkModeFilter, setOpen: setIsWorkModeFilterOpen },
+      ].map((filter, idx) => (
+        <div key={idx} className="relative">
+          <button 
+            onClick={filter.toggle}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-medium border rounded-full transition-all ${
+              filter.label !== 'All' 
+                ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+            }`}
+          >
+            {filter.label}
+            <BiChevronDown size={16} className={`${filter.isOpen ? 'rotate-180' : ''} transition-transform`} />
+          </button>
+
+          {filter.isOpen && (
+            <div className="absolute top-full mt-2 z-30 bg-white w-48 border border-gray-200 rounded-lg shadow-xl py-1 animate-in fade-in zoom-in duration-100">
+              <button 
+                onClick={() => {filter.set('All'); filter.setOpen(false)}} 
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs"
+              >
+                All
+              </button>
+              {filter.options.map((option, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => {filter.set(option.name); filter.setOpen(false)}} 
+                  className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs text-gray-700"
+                >
+                  {option.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+          {/* <div className="header px-5 py-3 bg-white rounded-md border border-slate-200">
               <p >Find your opportunities</p>
               <p className='text-xs text-gray-500'>Discover opportunities that matches your skills</p>
               <div className="mt-3 grid grid-cols-12 gap-2">
@@ -178,7 +268,7 @@ export default function JobListing() {
                   )}
                 </div>
               </div>
-          </div>
+          </div> */}
           <div className="mt-5 grid grid-cols-1 gap-3">
             {jobs.length > 0 && (
               jobs.map((job: LoadJobsForPublicData) => (
@@ -199,10 +289,23 @@ export default function JobListing() {
           )}
           {
             jobs.length === 0 && (
-              <div className='text-xs text-center flex justify-center flex-col items-center gap-2'>
-                <TbBriefcaseOff size={50} color='gray' />
-                <p>No jobs found</p>
-              </div>
+              <div className="flex flex-col items-center justify-center py-12 px-4 bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-2xl">
+  {/* Icon Container with a soft glow/bg */}
+  <div className="relative mb-4">
+    <div className="absolute inset-0 bg-slate-200 rounded-full blur-xl opacity-50 scale-150"></div>
+    <div className="relative bg-white p-4 rounded-full shadow-sm border border-slate-100">
+      <TbBriefcaseOff size={42} className="text-slate-400" />
+    </div>
+  </div>
+
+  {/* Text Content */}
+  <div className="text-center max-w-[250px]">
+    <h3 className="text-slate-900 font-semibold text-lg">No jobs found</h3>
+    {/* <p className="text-slate-500 text-sm mt-1 leading-relaxed">
+      This recruiter hasn't posted any active job listings yet.
+    </p> */}
+  </div>
+</div>
             )
           }
           

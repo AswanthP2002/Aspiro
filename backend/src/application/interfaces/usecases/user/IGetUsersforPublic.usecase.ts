@@ -1,4 +1,4 @@
-import { GetUsersForPublicDTO } from '../../../DTOs/user/candidate.dto';
+import { GetUsersForPublicDTO } from '../../../DTOs/user/getUsersForPublic.dto';
 import { PaginatedUserOverviewForPublicDTO } from '../../../DTOs/user/userOverviewForPublic.dto';
 
 export default interface IGetUsersForPublicUsecase {

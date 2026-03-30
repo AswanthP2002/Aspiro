@@ -1,7 +1,7 @@
-import Follow from '../../../domain/entities/follow.entity';
-import ConnectionRequest from '../../../domain/entities/user/connectionRequest.entity';
-import Experience from '../../../domain/entities/user/experience.entity';
-import Skills from '../../../domain/entities/user/skills.entity';
+import Follow from '../../../domain/entities/follow/follow.entity';
+import ConnectionRequest from '../../../domain/entities/connection/connectionRequest.entity';
+import Experience from '../../../domain/entities/experience/experience.entity';
+import Skills from '../../../domain/entities/skill.user/skills.entity';
 import { Role } from '../../../domain/entities/user/User.FIX';
 
 export default interface UserOverviewForPublicDTO {
@@ -20,6 +20,7 @@ export default interface UserOverviewForPublicDTO {
   };
   experience?: Experience[];
   isRecruiter?: boolean;
+  isVerifiedRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

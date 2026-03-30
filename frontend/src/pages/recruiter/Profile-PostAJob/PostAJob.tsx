@@ -13,7 +13,9 @@ import { DateField } from "@mui/x-date-pickers/DateField"
 import { Notify } from "notiflix"
 import axiosInstance, { AxiosRequest } from "../../../services/util/AxiosInstance"
 import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityTypes"
-import { adminGetSkills } from "../../../services/adminServices"
+import { adminGetSkills } from "../../../services/skillService"
+// import {  } from "../../../services/adminServices"
+import { toast } from "react-toastify"
 
 interface JobDetails {
     jobTitle: string,
@@ -137,11 +139,11 @@ export default function PostAJobForm(){
                 }).then(() => navigator('/profile/recruiter/my-jobs'))
             }else{
                 setloading(false)
-                Notify.failure(result?.message, {timeout:2000})
+               toast.error(result?.message)
             }
 
         } catch (error: unknown) {
-            Notify.failure('Something went wrong', {timeout:2000})
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
             setloading(false)
         }
     
@@ -324,7 +326,7 @@ export default function PostAJobForm(){
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
                     <p className="font-medium text-lg">Compensation</p>
-                    <div className="flex gap-10 justify-between mt-5 w-full">
+                    <div className="grid grid-cols-2 gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth>
                             <Controller
                                 name="minSalary"
@@ -417,7 +419,7 @@ export default function PostAJobForm(){
 
                 <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
                     <p className="font-medium text-lg">Candidate Requirements</p>
-                    <div className="flex gap-10 justify-between mt-5 w-full">
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth error={Boolean(errors.jobLevel)}>
                             <InputLabel id="job-level-id">Job Level</InputLabel>
                             <Controller 

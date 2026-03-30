@@ -1,4 +1,4 @@
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import ICandidateRepo from '../../../domain/interfaces/user/ICandidateRepo.GARBAGE';
 import IGetSocialLinksUseCase from './interface/IGetSocialLinks.usecase';
 

@@ -3,12 +3,13 @@
 import { Server } from 'socket.io';
 import { container } from 'tsyringe';
 import { ConnectionManager } from './connectionManager';
-import Chat from '../../domain/entities/user/chat.entity';
+import Chat from '../../domain/entities/chat/chat.entity';
 import { ChatDAO } from '../database/Schemas/user/chat.schema';
 import { ConversationDAO } from '../database/DAOs/user/conversation.dao';
 import mongoose from 'mongoose';
+import { Server as HttpServer } from 'http';
 
-export const initSocket = (server: any) => {
+export const initSocket = (server: HttpServer) => {
   console.log('socket initialization called');
   const io = new Server(server, {
     cors: {
@@ -24,15 +25,15 @@ export const initSocket = (server: any) => {
 
   //socket connection
   io.on('connection', (socket) => {
-    console.info('Connection happened inside backend')
+    // console.info('Connection happened inside backend')
     const userId = socket.handshake.auth.userId as string | undefined;
-    console.info('User id of the socket', userId)
+    //console.info('User id of the socket', userId)
 
     if (!userId) {
       console.warn(`Anonymous connection attempt: ${socket.id}`);
       return;
     }
-    console.log('new user connected', userId, socket.id);
+    //console.log('new user connected', userId, socket.id);
 
     socket.data.userId = userId;
     connectionManager.addConnection(userId, socket.id);
@@ -40,8 +41,6 @@ export const initSocket = (server: any) => {
     io.emit('USER_STATUS_CHANGED', { userId, status: 'online' });
 
     socket.emit('message', 'hello from server');
-
-    
 
     //event listening for m essage sended
     socket.on('message-send', (message: string) => {

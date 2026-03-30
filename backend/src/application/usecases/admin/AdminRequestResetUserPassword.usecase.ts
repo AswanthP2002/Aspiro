@@ -10,7 +10,9 @@ export default class AdminRequestResetUserPasswordUsecase implements IAdminReque
 
   async execute(id: string, email: string): Promise<{ token: string } | null> {
     const code = generateCode();
-    const subject = 'User password reset request';
+    console.log(email);
+    //const subject = 'User password reset request';
+    console.log(this._emailService);
     console.log('code for reset', code);
     const token = await generateOtherSecurityToken({ id, code });
     return { token };

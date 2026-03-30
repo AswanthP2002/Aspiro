@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import JobType from '../../../../domain/entities/admin/jobType.entity';
+import JobType from '../../../../domain/entities/jobType/jobType.entity';
 
 export const JobTypeSchema = new Schema<JobType>(
   {
@@ -10,5 +10,4 @@ export const JobTypeSchema = new Schema<JobType>(
   { timestamps: true }
 );
 
-
-export const JobTypeDAO = model<JobType>('jobtype', JobTypeSchema)
+export const JobTypeDAO = model<JobType>('jobtype', JobTypeSchema);

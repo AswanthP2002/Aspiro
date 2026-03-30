@@ -1,9 +1,9 @@
 import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
 import BaseRepository from '../baseRepository';
-import FavoriteJobs from '../../../domain/entities/user/favoriteJobs.entity';
+import FavoriteJobs from '../../../domain/entities/savedJob/favoriteJobs.entity';
 import mongoose from 'mongoose';
 import { FavoriteJobsDAO } from '../../database/DAOs/user/faovriteJobs.dao';
-import FavoriteJobsAggregated from '../../../domain/entities/user/favoriteJobsAggregated.entity';
+import FavoriteJobsAggregated from '../../../domain/entities/savedJob/favoriteJobsAggregated.entity';
 
 export default class FavoriteJobsRepsitory
   extends BaseRepository<FavoriteJobs>

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import ISoftDeleteNotificationUsecase from '../../interfaces/usecases/shared/ISoftDeleteNotification.usecase';
+import ISoftDeleteNotificationUsecase from '../../interfaces/usecases/notification/ISoftDeleteNotification.usecase';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
-import { UpdateNotificationDTO } from '../../DTOs/notifications.dto';
+import { UpdateNotificationDTO } from '../../DTOs/notification/notifications.dto';
 
 @injectable()
 export default class SoftDeleteNotificationUsecase implements ISoftDeleteNotificationUsecase {

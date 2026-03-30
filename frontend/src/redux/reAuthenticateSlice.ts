@@ -13,8 +13,8 @@ export const reAuthenticateThunk = createAsyncThunk(
     async (_, {rejectWithValue}) => {
         try {
             const result: ReAuthenticateResultPayload = await reAuthenticate()
-            Notify.info(`new token ${result.accessToken}`, {timeout: 10000})
-            Notify.info(`User role ${result.userData.role}`)
+            // Notify.info(`new token ${result.accessToken}`, {timeout: 10000})
+            // Notify.info(`User role ${result.userData.role}`)
             return result
         } catch (error: unknown) {
             const err = error as AxiosError

@@ -1,6 +1,12 @@
-import SocialLinks from '../SocialLinks';
+import SocialLinks from './SocialLinks';
 
 export type Role = 'user' | 'recruiter' | 'admin';
+
+export interface AccountAction {
+  action: string;
+  actor: string;
+  date?: string | Date;
+}
 
 export default interface User {
   _id?: string;
@@ -46,6 +52,7 @@ export default interface User {
   createdAt?: string;
   updatedAt?: string;
   verificationToken?: string;
+  accountActions?: AccountAction[];
   otpExpiresAt?: Date;
   hiddenPosts?: string[];
   lastLogin?: Date;

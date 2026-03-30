@@ -1,9 +1,9 @@
 import { inject, injectable } from 'tsyringe';
-import Resume from '../../../domain/entities/user/resume.entity';
+import Resume from '../../../domain/entities/resume/resume.entity';
 import IResumeRepo from '../../../domain/interfaces/user/IResumeRepo';
-import ResumeDTO from '../../DTOs/user/resume.dto';
-import ILoadResumeUseCase from '../../interfaces/usecases/user/ILoadResumes.usecase.FIX';
-import ResumeMapper from '../../mappers/user/Resume.mapperClass';
+import ResumeDTO from '../../DTOs/resume/resume.dto';
+import ILoadResumeUseCase from '../../interfaces/usecases/resume/ILoadResumes.usecase.FIX';
+import ResumeMapper from '../../mappers/resume/Resume.mapperClass';
 
 @injectable()
 export default class LoadResumesUseCase implements ILoadResumeUseCase {

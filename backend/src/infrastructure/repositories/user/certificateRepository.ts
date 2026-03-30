@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Certificates from '../../../domain/entities/user/certificates.entity';
+import Certificates from '../../../domain/entities/certificate/certificates.entity';
 import ICertificateRepo from '../../../domain/interfaces/user/ICertificateRepo';
 import BaseRepository from '../baseRepository';
 import { CertificateDAO } from '../../database/DAOs/user/certificate.dao';
@@ -15,7 +15,7 @@ export default class CertificateRepository
   async findWithCandidateId(id?: string): Promise<Certificates[] | null> {
     const result = await CertificateDAO.find({
       userId: new mongoose.Types.ObjectId(id),
-    });
+    }).sort({ issuedDate: -1 });
     return result;
   }
 }

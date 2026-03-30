@@ -13,16 +13,17 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import { editUserExperience } from '../../../services/userServices';
+import { editUserExperience } from '../../../services/experienceServices';
+// import { editUserExperience } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
-import { Notify } from 'notiflix';
 import { Experience } from '../../../types/entityTypes';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 interface EditExperienceResponsePayload {
   success: boolean
@@ -30,18 +31,25 @@ interface EditExperienceResponsePayload {
   result: Experience
 }
 
+interface EditExperienceFormProps {
+  experience: Experience
+  editExperienceModalOpen: boolean
+  closeExpEditModal: () => void
+  onEditExperience: (data: Experience) => void
+}
+
 export default function EditExperienceForm({
   experience,
   editExperienceModalOpen,
   closeExpEditModal,
   onEditExperience,
-}: any) {
+}: EditExperienceFormProps) {
   type Inputs = {
     role: string;
     jobType: string;
     organization: string;
-    startDate: any;
-    endDate: any;
+    startDate: Dayjs | null;
+    endDate: Dayjs | null;
     location: string;
     workMode: string;
     isPresent: boolean;
@@ -66,8 +74,8 @@ export default function EditExperienceForm({
         role: experience.jobRole,
         jobType: experience.jobType,
         organization: experience.organization,
-        startDate: dayjs(experience.startDate),
-        endDate: dayjs(experience.endDate),
+        startDate: experience.startDate ? dayjs(experience.startDate) : null,
+        endDate: experience.endDate ? dayjs(experience.endDate) : null,
         location: experience.location,
         isPresent: experience.isPresent ? true : false,
         workMode: experience.workMode,
@@ -94,37 +102,41 @@ export default function EditExperienceForm({
     setLoading(true)
     console.log('editable data');
     const { role, jobType, organization, startDate, endDate, location, workMode } = data;
-    const formatedStartDate = startDate.format("YYYY-MM-DD")
+    const formatedStartDate = startDate ? startDate.format("YYYY-MM-DD") : ""
     const formatedEndDate = endDate ? endDate.format("YYYY-MM-DD") : ""
     
     try {
-      const result: EditExperienceResponsePayload = await editUserExperience(
-      experience?._id as string,
-      role,
-      jobType,
-      organization,
-      editableIsPresent,
-      formatedStartDate,
-      formatedEndDate,
-      location,
-      workMode
-    );
+      const result: EditExperienceResponsePayload = await toast.promise(
+        editUserExperience(
+            experience?._id as string,
+            role,
+            jobType,
+            organization,
+            editableIsPresent,
+            formatedStartDate,
+            formatedEndDate,
+            location,
+            workMode
+        ),
+        {
+          pending: 'Updating experience...',
+          success:'Experience updated',
+          error:{
+            render(props) {
+              const data = props.data as AxiosError<{message: string}>
+              return data.message
+            },
+          }
+        }
+      )
     if(!result?.success){
-      Notify.failure(result?.message, {timeout:2000})
+      toast.error(result.message)
       return
     }
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Edited',
-      showConfirmButton: false,
-      showCancelButton: false,
-      timer: 2000,
-    }).then(() => {
-      onEditExperience(result.result)
-    });
+    onEditExperience(result.result)
     } catch (error : unknown) {
-      Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2000})
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       closeExpEditModal()
       setLoading(false)

@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import BaseRepository from './baseRepository';
-import Company from '../../domain/entities/company.entity';
+import Company from '../../domain/entities/company/company.entity';
 import ICompanyRepo from '../../domain/interfaces/ICompanyRepo';
 import { CompanyDAO } from '../database/Schemas/recruiter/company.schema';
 
@@ -18,6 +18,8 @@ export default class CompanyRepository extends BaseRepository<Company> implement
     // if (filter?.location) {
     //   query.location = { $regex: new RegExp(filter.location, 'i') };
     // }
+
+    console.log(filter);
     const result = await CompanyDAO.find();
     return result;
   }

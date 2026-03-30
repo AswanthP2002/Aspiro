@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import IGetCompanyListUsecase from '../../interfaces/usecases/IGetCompanyList.usecase';
+import IGetCompanyListUsecase from '../../interfaces/usecases/company/IGetCompanyList.usecase';
 import ICompanyRepo from '../../../domain/interfaces/ICompanyRepo';
-import CompanyDTO from '../../DTOs/recruiter/company.dto';
+import CompanyDTO from '../../DTOs/company/company.dto';
 
 @injectable()
 export default class GetCompanyListUsecase implements IGetCompanyListUsecase {

@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import defaultProfileImage from '/default-img-instagram.png'
 import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import { adminDeleteJob, blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
-import { BiChevronDown, BiFlag, BiMapPin, BiMessageSquare, BiRupee, BiTrash } from 'react-icons/bi'
-import { BsClock, BsEye } from 'react-icons/bs'
+import { adminBlockJob, adminDeleteJob, adminToggleFlagJob, adminUnblockJob, blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
+import { BiBlock, BiChevronDown, BiFlag, BiMapPin, BiMessageSquare, BiRupee, BiTrash } from 'react-icons/bi'
+import { BsClock, BsEye, BsLayers } from 'react-icons/bs'
 import { LuUsers } from 'react-icons/lu'
 import { FiBarChart2 } from 'react-icons/fi'
 import { AdminJobDetailsData } from '../../../types/entityTypes'
 import { Notify } from 'notiflix'
+import { CiLocationOn } from 'react-icons/ci'
+import { toast } from 'react-toastify'
 
 
 export default function JobDetails(){
@@ -76,6 +78,68 @@ export default function JobDetails(){
         })
     }
 
+    const blockJob = async (id: string) => {
+      if(!id) return
+      
+      const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: "block this job?",
+        showConfirmButton: true,
+        showCancelButton: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      })
+
+      if(!confirmResult.isConfirmed) return
+
+      try {
+        const result = await adminBlockJob(id)
+        if(result.success){
+          toast.success('Blocked')
+          setjobdetails((prv: AdminJobDetailsData | null) => {
+            if(!prv) return null
+            return {
+              ...prv,
+              status: 'blocked'
+            }
+          })
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      }
+    }
+
+     const unblockJOb = async (id: string) => {
+      if(!id) return
+      
+      const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: "unblock this job?",
+        showConfirmButton: true,
+        showCancelButton: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      })
+
+      if(!confirmResult.isConfirmed) return
+
+      try {
+        const result = await adminUnblockJob(id)
+        if(result.success){
+          toast.success('Unblocked')
+          setjobdetails((prv: AdminJobDetailsData | null) => {
+            if(!prv) return null
+            return {
+              ...prv,
+              status: 'active'
+            }
+          })
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      }
+    }
+
     async function rejectUnRejectJob(jobId : any, operation : string){
     
         const result = await rejectJobUnrejectJob(jobId, operation)
@@ -89,12 +153,51 @@ export default function JobDetails(){
                     timer:2000
                 }).then(() => window.location.reload())
     }
+
+    async function toggleFlagJob(jobId: string, action: 'flag' | 'un-flag'){
+      const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: action === 'flag' ? "Flag This job?" : "Remove flag from job",
+        showConfirmButton: true,
+        showCancelButton: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      })
+
+      if(!confirmResult.isConfirmed) return
+      try {
+        const result = await adminToggleFlagJob(jobId, action)
+        if(result.success){
+         if(action === 'flag'){
+          toast.success('Job flagged succesfully')
+          setjobdetails((job: AdminJobDetailsData | null) => {
+            if(!job) return null
+            return {
+              ...job,
+              isFlagged: true
+            }
+          })
+         }else{
+          toast.success('Job flag removed succesfully')
+          setjobdetails((job: AdminJobDetailsData | null) => {
+            if(!job) return null
+            return {
+              ...job,
+              isFlagged: false
+            }
+          })
+         }
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      }
+    }
     return(
         <>
             <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans text-slate-700">
       {/* Header Area */}
       <div className="max-w-6xl mx-auto mb-4">
-        <button className="text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
+        <button onClick={() => navigate(-1)} className="text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
           ← Back to Jobs
         </button>
       </div>
@@ -104,20 +207,20 @@ export default function JobDetails(){
         {/* Top Header Section */}
         <div className="p-6 border-b border-slate-100 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{jobdetails?.jobTitle}</h1>
+            <p className="text-xl font-bold text-slate-900">{jobdetails?.jobTitle}</p>
             <p className="text-slate-500 mt-1">
-              {jobdetails?.companyName} • <span className="text-blue-600 cursor-pointer hover:underline">{jobdetails?.recruiterName}</span>
+              {jobdetails?.companyName ? jobdetails?.companyName : 'Freelancer'} • <span className="text-blue-600 cursor-pointer hover:underline">{jobdetails?.recruiterName}</span>
             </p>
           </div>
           
           <div className="relative">
             <p className="text-[10px] font-bold text-slate-400 mb-1 text-right uppercase tracking-wider">Job Status</p>
-            <button 
-              onClick={() => setShowStatusMenu(!showStatusMenu)}
-              className="bg-green-100 text-green-700 px-4 py-1.5 text-xs rounded-lg font-normal flex items-center gap-2 min-w-[100px] justify-between border border-green-200"
+            <span 
+              // onClick={() => setShowStatusMenu(!showStatusMenu)}
+              className="bg-green-100 text-green-700 px-4 py-1.5 text-xs rounded-lg font-normal flex items-center gap-2 min-w-[100px] justify-center border border-green-200"
             >
-              {jobdetails?.status} <BiChevronDown size={16} />
-            </button>
+              {jobdetails?.status}
+            </span>
             
             {showStatusMenu && (
               <div className="absolute right-0 mt-2 w-full bg-white border border-slate-200 rounded-lg shadow-lg z-10 py-1">
@@ -140,12 +243,14 @@ export default function JobDetails(){
           
           {/* Left Column: Job Details */}
           <div className="lg:col-span-2 p-6 border-r border-slate-100">
-            <h2 className="font-bold text-lg mb-4">Job Details</h2>
+            <p className="font-semibold text-lg mb-4">Job Details</p>
             
             <div className="flex flex-wrap gap-3 mb-6">
               <Badge icon={<BiMapPin size={14}/>} text={jobdetails?.location} color="bg-blue-50 text-blue-600" />
               <Badge icon={<BiRupee size={14}/>} text={`${jobdetails?.minSalary} - ${jobdetails?.maxSalary}`} color="bg-green-50 text-green-600" />
               <Badge icon={<BsClock size={14}/>} text={jobdetails?.jobType} color="bg-purple-50 text-purple-600" />
+              <Badge icon={<BsLayers size={14} />} text={jobdetails?.jobLevel} color="bg-orange-50 text-orange-600" />
+              <Badge icon={<CiLocationOn size={14} />} text={jobdetails?.workMode} color="bg-red-50 text-red-600" />
             </div>
 
             <section className="mb-6">
@@ -157,12 +262,20 @@ export default function JobDetails(){
 
             <section className="mb-6">
               <h3 className="font-bold mb-2">Requirements</h3>
-              <p>{jobdetails?.requirements}</p>
+              <ul className='list-disc ps-5'>
+                {jobdetails?.requirements.split(".").map((req: string, index: number) => (
+                  <li className='text-sm leading-relaxed'>{req}</li>
+                ))}
+              </ul>
             </section>
 
             <section>
               <h3 className="font-bold mb-3">Responsibilities</h3>
-              <p>{jobdetails?.responsibilities}</p>
+              <ul className='list-disc ps-5'>
+                {jobdetails?.responsibilities.split(".").map((req: string, index: number) => (
+                  <li className='text-sm leading-relaxed'>{req}</li>
+                ))}
+              </ul>
             </section>
           </div>
 
@@ -189,13 +302,26 @@ export default function JobDetails(){
         {/* Footer: Admin Actions */}
         <div className="p-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h3 className="font-bold text-slate-800">Admin Actions</h3>
-          <div className="flex gap-3 w-full sm:w-auto">
+          <div className="flex flex-col lg:flex-row gap-3 w-full sm:w-auto">
             <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
               <BiMessageSquare size={18} /> Message Recruiter
             </button>
-            <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
-              <BiFlag size={18} /> Flag Job Post
+            {jobdetails?.isFlagged
+              ? <button onClick={() => toggleFlagJob(jobdetails._id, 'un-flag')} className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+              <BiFlag size={18} /> Remove flag
             </button>
+              : <button onClick={() => toggleFlagJob(jobdetails?._id, 'flag')} className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+              <BiFlag size={18} /> Flag Job
+            </button>
+            }
+            {jobdetails?.status === 'blocked'
+              ? <button onClick={() => unblockJOb(jobdetails._id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+              <BiBlock size={18} /> Un Block Job
+            </button>
+              : <button onClick={() => blockJob(jobdetails?._id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+              <BiBlock size={18} /> Block Job
+            </button>
+            }
             <button onClick={() => deleteJob(jobdetails?._id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 border border-red-200 text-red-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
               <BiTrash size={18} /> Delete Post
             </button>

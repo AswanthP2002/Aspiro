@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Notification } from "../types/entityTypes";
-import { getNotifications, getUnReadNotificationsCount } from "../services/userServices";
+import { getNotifications } from "../services/userServices";
+import { getUnReadNotificationsCount } from "../services/notificationServices";
 import { Notify } from "notiflix";
 import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 interface NotificationPayloadValues {
     notifications: Notification[]
@@ -39,8 +41,19 @@ const notificationSlice = createSlice({
     initialState: initialState,
     reducers:{
         setNotifications(state, action: PayloadAction<NotificationPayloadValues>){
-            state.notifications = action.payload.notifications
-            state.unReadNotificationsCount = action.payload.unRead
+            const newNotifications = action.payload.notifications
+            console.log('--new notificationss upcoming --', newNotifications)
+            const existingNotifications = new Set(state.notifications.map((n) => n._id))
+            console.log('existing ids')
+            existingNotifications.forEach((noti) => console.log(noti))
+            const uniqueNotifications = newNotifications.filter((notification) => !existingNotifications.has(notification._id))
+            console.log('-- Unique notifications --', uniqueNotifications)
+            if(newNotifications.length > 0){
+                state.notifications.push(...uniqueNotifications)
+            }else{
+                state.notifications = []
+            }
+            // state.unReadNotificationsCount = action.payload.unRead
         },
         setNotificationsCount(state, action: PayloadAction<{count: number}>){
             Notify.info(`Notification count seting ${action.payload.count}`)
@@ -59,6 +72,8 @@ const notificationSlice = createSlice({
             if(state.notifications.length > 0){
                 state.unReadNotificationsCount--
             }
+
+            state.notifications = state.notifications.filter((notification: Notification) => notification._id !== action.payload.notificationId)
         },
         markAllNotificationAsRead(state){
             state.notifications = state.notifications.map((notification: Notification) => {
@@ -98,7 +113,7 @@ const notificationSlice = createSlice({
             .addCase(notificationThunk.fulfilled, (state, action: PayloadAction<UnReadNotificationsCountResponsePayload>) => {
               state.unReadNotificationsCount = action.payload.result
               state.initialLoading = false
-               Notify.success('Notification fetched using thunk succesfully')
+            //    toast.success('Notification fetched using thunk succesfully')
                console.log('This is final fetched notifications', action.payload.result)
             })
             .addCase(notificationThunk.rejected, (state) => {

@@ -12,8 +12,11 @@ export default function exceptionhandle(
   let code: number;
   let errors: { code: string; message: string } = { code: '', message: '' }; //from any changed to proper structure
 
+  console.log('-- error exception page executed succesfully --');
+  console.log('-- loging errors --');
   console.error(err.stack);
 
+  console.log('going to check error.name');
   switch (err.name) {
     case 'DUPLICATE_MOBILE':
       responseMessage = 'This mobile number is already taken, please use another one';
@@ -24,7 +27,14 @@ export default function exceptionhandle(
       code = StatusCodes.CONFLICT;
       break;
     //Another errors
+    case 'RESOURCE_ALREADY_EXIST':
+      responseMessage = err.message;
+      code = StatusCodes.CONFLICT;
+      break;
     case 'INVALID_USER':
+      console.log('-User not found error encountered--');
+      console.log('sending message -- User not found');
+      console.log('-- status code ', StatusCodes.NOT_FOUND);
       responseMessage = 'User not found';
       code = StatusCodes.NOT_FOUND;
       break;
@@ -62,6 +72,10 @@ export default function exceptionhandle(
       responseMessage = 'Your request contains incorrect data';
       code = StatusCodes.BAD_REQUEST;
       break;
+    case 'SERVICE_BUISY':
+      responseMessage = err.message;
+      code = StatusCodes.TOO_MANY_REQUESTS;
+      break;
 
     //jwt based errors
     case 'TokenExpiredError':
@@ -84,10 +98,15 @@ export default function exceptionhandle(
       };
       break;
     default:
-      console.log('Internal server error executed', err); 
+      console.log('Internal server error executed', err);
       responseMessage = 'Internal server error, please try again after some time';
       code = StatusCodes.INTERNAL_SERVER_ERROR;
       break;
+  }
+
+  if (res.headersSent) {
+    console.warn('Response header already send');
+    return next(err);
   }
 
   res.status(code).json({ success: false, message: responseMessage, errors: errors });

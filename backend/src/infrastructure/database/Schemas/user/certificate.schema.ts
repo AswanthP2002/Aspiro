@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Certificates from '../../../../domain/entities/user/certificates.entity';
+import Certificates from '../../../../domain/entities/certificate/certificates.entity';
 
 export const CertificateSchema = new Schema<Certificates>(
   {

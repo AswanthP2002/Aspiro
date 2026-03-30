@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { UserController } from '../controllers/UserController';
+import { UserController } from '../controllers/userController';
 import { container } from 'tsyringe';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
@@ -8,9 +8,6 @@ import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.d
 import { loginSchema } from '../schemas/user/userLoginRequest.zod.schema';
 import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';
-import { userExperienceSchema } from '../schemas/user/userExperience.schema';
-import { addUserEducationSchema } from '../schemas/user/createUserEducation.schema';
-import parsePdf from '../../middlewares/parsePdf';
 import { CreateUserSchema } from '../schemas/user/createUserRequest.zod.schema.FIX';
 import { verifyUserInputsSchema } from '../schemas/user/userVerifyRequest.zod.schema';
 import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasicsRequest.zod.schema';
@@ -39,13 +36,12 @@ function createUserRouter() {
   );
   userRouter.post('/logout', userController.userLogout.bind(userController));
   userRouter.get('/v1/token/refresh', userController.reAuthenticate.bind(userController));
-  // candidateRouter.post(
-  //   '/login',
-  //   candidateController.loginCandidate.bind(candidateController)
-  // );
-  userRouter.get('/jobs', userController.loadJobs.bind(userController)); //no zod validation for load jobs query
+  userRouter.get(UserApiRoutes.USER_PUBLIC.LOAD_JOBS, userController.loadJobs.bind(userController)); //no zod validation for load jobs query
 
-  userRouter.get('/jobs/details/:jobId', userController.loadJobDetails.bind(userController));
+  userRouter.get(
+    UserApiRoutes.USER_PUBLIC.LOAD_JOB_DETAILS_BY_ID,
+    userController.loadJobDetails.bind(userController)
+  );
 
   userRouter.patch(
     '/v1/user/me/store-basics',
@@ -61,134 +57,13 @@ function createUserRouter() {
     userController.loadUserProfile.bind(userController)
   );
   userRouter.post(
-    '/v1/user/me/experience',
-    centralizedAuthentication,
-    authorization(['user']),
-    Validator(userExperienceSchema),
-    userController.addExperience.bind(userController)
-  );
-  userRouter.get(
-    '/v1/user/me/experiences',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.getExperiences.bind(userController)
-  );
-  userRouter.delete(
-    '/v1/user/me/experience/:experienceId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.deleteExperience.bind(userController)
-  );
-  userRouter.put(
-    '/v1/user/me/experience/:experienceId',
-    centralizedAuthentication,
-    authorization(['user']),
-    Validator(userExperienceSchema),
-    userController.editExperience.bind(userController)
-  );
-  userRouter.post(
-    '/v1/user/me/skill',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.addSkill.bind(userController)
-  );
-  userRouter.get(
-    '/v1/user/me/skills',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.getSkills.bind(userController)
-  );
-  userRouter.delete(
-    '/v1/user/me/skills/:skillId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.deleteSkill.bind(userController)
-  );
-  userRouter.post(
-    '/v1/user/me/education',
-    centralizedAuthentication,
-    authorization(['user']),
-    Validator(addUserEducationSchema),
-    userController.addEducation.bind(userController)
-  );
-  userRouter.get(
-    '/v1/user/me/educations',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.getEducations.bind(userController)
-  );
-  userRouter.delete(
-    '/v1/user/me/education/:educationId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.deleteEducation.bind(userController)
-  );
-  userRouter.put(
-    '/v1/user/me/education/:educationId',
-    centralizedAuthentication,
-    authorization(['user']),
-    Validator(addUserEducationSchema),
-    userController.editEducation.bind(userController)
-  );
-  userRouter.post(
     '/reset-password/link/send',
     userController.sendResetPasswordLink.bind(userController)
   );
-
   userRouter.post(
     '/reset-password',
     Validator(ResetPasswordSchema),
     userController.resetPassword.bind(userController)
-  );
-  userRouter.delete(
-    '/v1/user/me/resume/:resumeId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.deleteResume.bind(userController)
-  );
-  userRouter.post(
-    '/v1/user/me/certificate/add',
-    upload.single('certificate'),
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.addCertificate.bind(userController)
-  );
-  userRouter.get(
-    '/v1/user/me/certificates',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.getCertificates.bind(userController)
-  );
-  userRouter.delete(
-    '/v1/user/me/certificate/:certificateId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.deleteCertificate.bind(userController)
-  );
-
-  // //candidateRouter.get('/home/jobs', testMiddleWare, candidateController.searchJobFromHomePage.bind(candidateController))
-
-  userRouter.post(
-    '/v1/user/me/resume',
-    centralizedAuthentication,
-    authorization(['user']),
-    upload.single('resume'),
-    parsePdf,
-    userController.addResume.bind(userController)
-  );
-
-  userRouter.get(
-    '/v1/user/me/resumes',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.loadResume.bind(userController)
-  );
-
-  userRouter.patch(
-    '/v1/user/me/resume/:resumeId/set-primary',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.setResumePrimary.bind(userController)
   );
 
   userRouter.patch(
@@ -203,6 +78,7 @@ function createUserRouter() {
     UserApiRoutes.USER_JOB_MANAGE.APPLY_BY_JOBID,
     centralizedAuthentication,
     authorization(['user']),
+    testMiddleware,
     userController.applyJob.bind(userController)
   );
   userRouter.get(
@@ -274,12 +150,30 @@ function createUserRouter() {
     authorization(['user']),
     userController.removeCoverphoto.bind(userController)
   );
-  userRouter.get(
-    '/v1/user/me/alerts',
+  userRouter.delete(
+    UserApiRoutes.USER_JOB_MANAGE.WITHDRAW_APPLICATION,
     centralizedAuthentication,
-    authorization(['user', 'recruiter', 'admin']),
-    userController.getMyAlerts.bind(userController)
+    authorization(['user']),
+    userController.withdrawApplication.bind(userController)
   );
+  userRouter.get(
+    UserApiRoutes.USER_JOB_MANAGE.GET_MY_INTERVIEWS,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.getScheduledInterviews.bind(userController)
+  );
+  userRouter.get(
+    UserApiRoutes.USER_JOB_MANAGE.TRACK_MY_APPLICATION,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.trackMyApplication.bind(userController)
+  );
+  // userRouter.get(
+  //   '/v1/user/me/alerts',
+  //   centralizedAuthentication,
+  //   authorization(['user', 'recruiter', 'admin']),
+  //   userController.getMyAlerts.bind(userController)
+  // );
   userRouter.get(
     '/v1/users/:userId',
     centralizedAuthentication,
@@ -293,11 +187,73 @@ function createUserRouter() {
   //   userController.loadUserMetaData.bind(userController)
   // );
   userRouter.get(
-    '/v1/users',
+    UserApiRoutes.USER_PUBLIC.LOAD_USERS,
     centralizedAuthentication,
     authorization(['user']),
     userController.getUsers.bind(userController)
   );
+
+  userRouter.get(
+    UserApiRoutes.USERS.LOAD_ALL_USERS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.loadUsers.bind(userController)
+  );
+
+  userRouter.get(
+    UserApiRoutes.USERS.LOAD_USER_DETAILS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.loadUserDetails.bind(userController)
+  );
+
+  userRouter.patch(
+    UserApiRoutes.USERS.BLOCK_USER_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.blockUser.bind(userController)
+  );
+
+  userRouter.patch(
+    UserApiRoutes.USERS.UNBLOCK_USER_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.unBlockUser.bind(userController)
+  );
+
+  userRouter.delete(
+    UserApiRoutes.USERS.DELETE_USER_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.deleteUser.bind(userController)
+  );
+
+  userRouter.patch(
+    UserApiRoutes.USERS.BAN_USER_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    userController.userBan.bind(userController)
+  );
+
+  userRouter.get(
+    '/v1/similar-people',
+    (req: Request, res: Response, next: NextFunction) => {
+      console.log('Passed through the api endpoint going to the auth');
+      next();
+    },
+    centralizedAuthentication,
+    (req: Request, res: Response, next: NextFunction) => {
+      console.log('Passed through the authentication endpoint going to the authroization');
+      next();
+    },
+    authorization(['user']),
+    (req: Request, res: Response, next: NextFunction) => {
+      console.log('Passed through the authorization endpoint going to the controller');
+      next();
+    },
+    userController.getSimilarUsers.bind(userController)
+  );
+
   // candidateRouter.get(
   //   '/candidates/:candidateId',
   //   candidateController.getCandidateDetails.bind(candidateController)
@@ -308,36 +264,43 @@ function createUserRouter() {
     authorization(['user']),
     userController.getCandidateApplications.bind(userController)
   );
-  userRouter.post(
-    '/v1/user/connect-request/:receiverId',
+
+  userRouter.get(
+    UserApiRoutes.USERS.LOAD_USER_FULL_PROFILE_DETAILS,
     centralizedAuthentication,
     authorization(['user']),
-    userController.sendConnectionRequest.bind(userController)
-  );
-  userRouter.patch(
-    '/v1/user/connection-request-cancel/:receiverId',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.cancelConnectionRequest.bind(userController)
-  );
-  userRouter.patch(
-    '/v1/user/connection-request-reject',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.rejectConnectionRequest.bind(userController)
-  );
-  userRouter.patch(
-    '/v1/user/connection-request-accept/',
-    centralizedAuthentication,
-    authorization(['user']),
-    userController.acceptConnectionRequest.bind(userController)
-  );
+    userController.loadUserFullProfileForResumeBuidling.bind(userController)
+  )
+  // userRouter.post(
+  //   '/v1/user/connect-request/:receiverId',
+  //   centralizedAuthentication,
+  //   authorization(['user']),
+  //   userController.sendConnectionRequest.bind(userController)
+  // );
+  // userRouter.patch(
+  //   '/v1/user/connection-request-cancel/:receiverId',
+  //   centralizedAuthentication,
+  //   authorization(['user']),
+  //   userController.cancelConnectionRequest.bind(userController)
+  // );
+  // userRouter.patch(
+  //   '/v1/user/connection-request-reject',
+  //   centralizedAuthentication,
+  //   authorization(['user']),
+  //   userController.rejectConnectionRequest.bind(userController)
+  // );
+  // userRouter.patch(
+  //   '/v1/user/connection-request-accept/',
+  //   centralizedAuthentication,
+  //   authorization(['user']),
+  //   userController.acceptConnectionRequest.bind(userController)
+  // );
 
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
 
   function testMiddleware(req: Request, res: Response, next: NextFunction) {
     console.log('--inspectng request body', req.body);
-    return;
+    next();
     ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }
 

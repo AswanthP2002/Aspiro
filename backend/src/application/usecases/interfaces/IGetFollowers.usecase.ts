@@ -1,5 +1,5 @@
-import Follow from '../../../domain/entities/follow.entity';
+// import { FollowersDTO } from '../../DTOs/follow/follow.dto';
 
-export default interface IGetFollowersUseCase {
-  execute(userId: string): Promise<Follow[] | null>;
-}
+// export default interface IGetFollowersUseCase {
+//   execute(userId: string): Promise<FollowersDTO[] | null>;
+// }

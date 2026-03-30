@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { container } from 'tsyringe';
 import RecruiterController from '../controllers/recruiterController';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
@@ -17,6 +17,7 @@ function createRecruiterRouter() {
     upload.single('document'),
     centralizedAuthentication,
     authorization(['user']),
+    // testMiddleware,
     recruiterController.createRecruiter.bind(recruiterController)
   );
   recruiterRouter.get(
@@ -69,6 +70,12 @@ function createRecruiterRouter() {
     authorization(['user', 'recruiter']),
     recruiterController.LoadRecruiterJobs.bind(recruiterController)
   );
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITER_JOB_MANAGE.LOAD_SINGLE_JOB_DETAILS_BY_ID,
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.loadRecruiterJobDetails.bind(recruiterController)
+  );
 
   recruiterRouter.post(
     RecruiterApiRoutes.RECRUITER_JOB_APPLICATIONS_MANAGE.SCHEDULE_INTERVIEW,
@@ -108,11 +115,67 @@ function createRecruiterRouter() {
     recruiterController.getRecentJobs.bind(recruiterController)
   );
 
-  function testMiddleware(req: Request, res: Response, next: NextFunction) {
-    console.log('checking request body', req.body);
-    next();
-    // res.status(200).json({success:true, message:'Ok'})
-  }
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITERS.LOAD_ALL_RECRUITER_APPLICATIONS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.loadRecruiterApplications.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.REJECT_APPLICATION_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.rejectRecruiterApplication.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.APPROVE_APPLICATION_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.approveRecruiterApplication.bind(recruiterController)
+  );
+
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITERS.LOAD_ALL_RECRUITERS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.loadRecruiters.bind(recruiterController)
+  );
+
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITERS.LOAD_RECRUITER_DETAILS_BY_ID,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.recruiterDetails.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.HANDLE_RECRUITER_VERIFICATION,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.handleRecruiterVerification.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.HANDLE_RECRUITER_PERMISSIONS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.handleRecruiterPermission.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.CHANGE_STATUS_UNDER_REVIEW,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.changeStatusToUnderReview.bind(recruiterController)
+  );
+
+  // function testMiddleware(req: Request, res: Response, next: NextFunction) {
+  //   console.log('checking request body', req.body);
+
+  //   res.status(200).json({ success: true, message: 'Ok' });
+  // }
 
   return recruiterRouter;
 }

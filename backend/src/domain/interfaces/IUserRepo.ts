@@ -1,11 +1,12 @@
-import { FindUsersQuery } from '../../application/queries/users.query';
-import UserProfileAggregatedAdmin from '../entities/userProfileAggregated';
-import User from '../entities/user/User.FIX';
+import { FindUsersQuery } from '../../application/queries/user/users.query';
+import UserProfileAggregatedAdmin from '../entities/user/userProfileAggregated';
+import User, { AccountAction } from '../entities/user/User.FIX';
 import IBaseRepo from './IBaseRepo';
-import LoadUsersForPublicDBQuery from '../../application/queries/loadUsersForPublicDB.query';
-import UserProfileAggregated from '../entities/userProfileAggregated';
+import LoadUsersForPublicDBQuery from '../../application/queries/user/loadUsersForPublicDB.query';
+import UserProfileAggregated from '../entities/user/userProfileAggregated';
 import UserCachedData from '../entities/user/user.cachedData.entity';
 import MyProfileAggregated from '../entities/user/myProfileAggregated.entity';
+import UserFullProfileData from '../entities/user/userFullProfile.entity';
 
 export default interface IUserRepository extends IBaseRepo<User> {
   findByUserId(userId: string): Promise<MyProfileAggregated | null>;
@@ -27,4 +28,20 @@ export default interface IUserRepository extends IBaseRepo<User> {
   getUserMetaData(userId: string): Promise<UserCachedData | null>;
   addToHiddenPost(userId: string, postId: string): Promise<User | null>;
   removeFromHiddenPost(userId: string, postId: string): Promise<User | null>;
+  updateAccountAction(userId: string, action: AccountAction): Promise<User | null>;
+  getSimilarUsersWithSkills(
+    skills: string[],
+    userId: string,
+    similarEducations: string[],
+    similarStudiedInstitutions: string[],
+    similarJobRoleWorked: string[],
+    similarCompanyWorked: string[],
+    similarHeadline: string[],
+    similarCity: string[],
+    similarDistrict: string[],
+    similarState: string[],
+    similarCountry: string[],
+    similarPincode: string[]
+  ): Promise<User[] | null>;
+  getUserFullProfileDataAggregated(userId: string): Promise<UserFullProfileData | null>;
 }

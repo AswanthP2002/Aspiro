@@ -1,20 +1,27 @@
-import { NextFunction, Response } from 'express';
-import IFollowUserUseCase from '../../application/interfaces/usecases/user/IFollowUser.usecase';
+import { NextFunction, Request, Response } from 'express';
+import IFollowUserUseCase from '../../application/interfaces/usecases/follow/IFollowUser.usecase';
 import IUnFollowUserUsercase from '../../application/usecases/interfaces/IUnFollowUser.usecase';
-import { Auth } from '../../middlewares/auth';
+// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { inject, injectable } from 'tsyringe';
+import { StatusMessage } from '../../constants/Messages/statusMessages';
+import IGetFollowersUsecase from '../../application/interfaces/usecases/follow/IGetFollowers.usecase';
+import IRemoveAFollowerUsecase from '../../application/interfaces/usecases/follow/IRemoveAFollower.usecase';
+import { IGetFollowingsUsecase } from '../../application/interfaces/usecases/follow/IGetFollowingsUsecase';
 
 @injectable()
 export default class FollowController {
   constructor(
     @inject('IFollowUserUsecase') private _followUseCase: IFollowUserUseCase,
-    @inject('IUnfollowUserUsecase') private _unfollowUseCase: IUnFollowUserUsercase //private _unfollowUseCase: IUnFollowUserUsercase,
-  ) {
-  }
+    @inject('IUnfollowUserUsecase') private _unfollowUseCase: IUnFollowUserUsercase,
+    @inject('IGetFollowersUsecase') private _getFollowers: IGetFollowersUsecase,
+    @inject('IGetFollowingsUsecase') private _getFollowings: IGetFollowingsUsecase,
+    @inject('IRemoveAFollowerUsecase') private _removeAFollower: IRemoveAFollowerUsecase
+    //private _unfollowUseCase: IUnFollowUserUsercase,
+  ) {}
 
-  async followUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const followerId = req.user.id;
+  async followUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const followerId = req.user?.id as string;
     const followingId = req.params.id;
     const { acted_by, acted_user_avatar } = req.body;
 
@@ -33,14 +40,18 @@ export default class FollowController {
         return;
       }
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Followed', result });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Follow'),
+        result,
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  async unfollowUser(req: Auth, res: Response, next: NextFunction): Promise<void> {
-    const followerId = req.user.id;
+  async unfollowUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const followerId = req.user?.id as string;
     const followingId = req.params.id;
     const { acted_by, acted_user_avatar } = req.body;
 
@@ -58,40 +69,55 @@ export default class FollowController {
     }
   }
 
-  // async getFollowers(req: Auth, res: Response): Promise<void> {
-  //   const id = req.user.id;
-  //   try {
-  //     const result = await this._getFollowers.execute(id);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Fetched followers', result });
-  //     return;
-  //   } catch (error: unknown) {
-  //     console.log('Error occured while geting followers of user', error);
-  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  //       success: false,
-  //       message: 'Internal server error, please try again after some time',
-  //     });
-  //     return;
-  //   }
-  // }
+  async getFollowers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // const id = req.user?.id as string;
+    const userId = req.params.userId;
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    try {
+      const result = await this._getFollowers.execute({ userId, search, page, limit });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Followers'),
+        result,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  // async getFollowing(req: Auth, res: Response): Promise<void> {
-  //   const id = req.user.id;
+  async getFollowings(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // const id = req.user?.id as string;
+    const userId = req.params.userId;
+    const search = (req.query.search as string) || '';
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    try {
+      const result = await this._getFollowings.execute({ userId, search, page, limit });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Followings'),
+        result,
+      });
+      return;
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 
-  //   try {
-  //     const result = await this._getFollowing.execute(id);
-  //     res
-  //       .status(StatusCodes.OK)
-  //       .json({ success: true, message: 'Fetched following', result });
-  //     return;
-  //   } catch (error: unknown) {
-  //     console.log('Error occured while geting folloiwng of user', error);
-  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  //       success: false,
-  //       message: 'Internal server error, please try again after some time',
-  //     });
-  //     return;
-  //   }
-  // }
+  async removeAFollower(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user?.id as string;
+    const followerId = req.params.followerId;
+    try {
+      await this._removeAFollower.execute({ followingId: userId, followerId });
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Follower'),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

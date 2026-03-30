@@ -7,6 +7,9 @@ import { FaArrowTrendUp } from 'react-icons/fa6';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAlerts } from '../../../redux/alertSlice';
+import { AlertsData } from '../../../types/entityTypes';
+import { fetchUserAlerts } from '../../../services/alertsServices';
+import { toast } from 'react-toastify';
 
 const alerts = [
   {
@@ -92,27 +95,65 @@ const alerts = [
   },
 ];
 
+type AlertFetchingResponsePayload = {
+  success: boolean;
+  message: string
+  result: AlertsData[]
+}
+
 export default function AlertsPage() {
   const [isNotificationMenuOpen, setIsNotificationMenuOpen] = useState<boolean>(false);
-  const [alertsData, setAlertsData] = useState<any[]>([])
+  const [alertsData, setAlertsData] = useState<AlertsData[]>([])
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'RESOLVED'>('ALL')
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(4)
   const toggleNotificationMenu = () => setIsNotificationMenuOpen((prv) => !prv);
+
+  const dipsatch = useDispatch()
 
   const alerts = useSelector((state: any) => {
       return state.alert.alerts
-    })
+  })
+  const unreadCount = useSelector((state: any) => {
+    return state.alert.unReadAlertsCount
+  })
 
   useEffect(() => {
+    async function fetchAlerts(){
+      setLoading(true)
+      try {
+        const result: AlertFetchingResponsePayload = await fetchUserAlerts(status, page, limit)
+        if(result?.success){
+          toast.success('Alerts fetched')
+          console.log('going to')
+          dipsatch(setAlerts({alerts: result.result, unReadAlertsCount: 0}))
+        }else{
+          toast.warn('Can not fetch alerts now')
+          dipsatch(setAlerts({alerts: [], unReadAlertsCount: 0}))
+        }
+      } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAlerts()
     
+  }, [status, page])
+
+  useEffect(() => {
     if(alerts){
       setAlertsData(alerts)
     }
-  }, [])
+  }, [alerts])
 
   return (
     <>
 
       <div className="w-full min-h-screen p-5 md:-p-10 lg:px-20">
-        <p className="text-xl font-semibold">Alerts ({alertsData.length})</p>
+        <p className="text-xl font-semibold">Alerts ({unreadCount})</p>
         <p className="text-sm mt-2 font-light">Stay updated with opportunity alerts</p>
         <div className="my-5 bg-white flex p-3 w-full rounded-md border border-gray-300">
           <div className="space-x-2 flex-1">
@@ -120,7 +161,7 @@ export default function AlertsPage() {
               All
             </button>
             <button className="text-xs font-semibold bg-white px-5 py-2 border border-gray-200 rounded-md">
-              Unread (3)
+              Unread ({unreadCount})
             </button>
           </div>
           <div className="relative">
@@ -192,8 +233,8 @@ function AlertsCard({ alert }: { alert: any }) {
           <div className="flex-1 flex">
             <div className='flex-1'>
               <div>
-                <p className="font-semibold text-sm">{alert.title}</p>
-                <p className="text-sm font-light mt-1">{alert.body}</p>
+                <p className="font-semibold text-gray-900 text-[15px] leading-tight truncate">{alert.title}</p>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2 leading-relaxed">{alert.body}</p>
               </div>
               <div className="mt-5">
                 <p className="flex items-center text-xs text-gray-500 gap-2">
@@ -207,9 +248,9 @@ function AlertsCard({ alert }: { alert: any }) {
               </button>
               {
                 isAlertSingleMenuOpened && (
-                    <div className="absolute bg-white shadow-sm rounded-md p-3 right-0 w-40 space-y-2 ">
-                        <button className='text-xs flex items-center gap-2'><BiCheckDouble /> Mark as read</button>
-                        <button className='text-xs text-red-500 flex items-center gap-2'><BiTrash /> Delete</button>
+                    <div className="absolute bg-white border border-slate-200 shadow-xl rounded-md right-0 w-40 ">
+                        <button className='text-xs hover:bg-gray-100 flex items-center gap-2 px-3 py-3 w-full'><BiCheckDouble /> Mark as read</button>
+                        <button className='text-xs hover:bg-gray-100 text-red-500 flex items-center gap-2 px-3 py-3 w-full'><BiTrash /> Delete</button>
                     </div>
                 )
               }

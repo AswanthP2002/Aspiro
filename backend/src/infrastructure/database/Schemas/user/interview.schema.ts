@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import Interviews from '../../../../domain/entities/user/interview.entity';
+import Interviews from '../../../../domain/entities/interview/interview.entity';
 
 export const IntervivewSchema = new Schema<Interviews>(
   {

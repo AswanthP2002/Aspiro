@@ -8,6 +8,11 @@ interface User {
   name?: string;
   profilePicture?: string
   role?: string
+  subscription?: {
+    subscriptionId: string;
+    planId: string;
+    name: string
+  }
 }
 
 interface UserAuthState {

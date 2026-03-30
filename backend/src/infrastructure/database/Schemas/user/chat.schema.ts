@@ -1,5 +1,5 @@
-import { model, Schema } from 'mongoose';
-import Chat from '../../../../domain/entities/user/chat.entity';
+import mongoose, { model, Schema } from 'mongoose';
+import Chat from '../../../../domain/entities/chat/chat.entity';
 
 export const ChatSchema = new Schema<Chat>(
   {
@@ -9,6 +9,7 @@ export const ChatSchema = new Schema<Chat>(
     text: { type: String, required: true },
     isRead: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
+    deleteFor: { type: [mongoose.Schema.Types.ObjectId] },
   },
   { timestamps: true }
 );

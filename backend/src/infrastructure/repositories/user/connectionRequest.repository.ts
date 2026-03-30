@@ -1,5 +1,7 @@
 import { injectable } from 'tsyringe';
-import ConnectionRequest from '../../../domain/entities/user/connectionRequest.entity';
+import ConnectionRequest, {
+  ConnectionWithSenderDetails,
+} from '../../../domain/entities/connection/connectionRequest.entity';
 import IConnectionRequestRepository from '../../../domain/interfaces/IConnectionRequest.repo';
 import { ConnectionRequestDAO } from '../../database/DAOs/user/connectionRequest.dao';
 import BaseRepository from '../baseRepository';
@@ -51,5 +53,47 @@ export default class ConnectionRequestRepository
     );
 
     return result;
+  }
+
+  async getConnections(
+    userId: string,
+    page: number,
+    limit: number,
+    search: string
+  ): Promise<ConnectionWithSenderDetails[] | null> {
+    const skip = (page - 1) * limit;
+    const result = await ConnectionRequestDAO.aggregate([
+      {
+        $match: {
+          receiver: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $facet: {
+          connections: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'sender',
+                foreignField: '_id',
+                as: 'senderDetails',
+              },
+            },
+            { $unwind: { path: '$senderDetails', preserveNullAndEmptyArrays: true } },
+            {
+              $match: {
+                'senderDetails.name': { $regex: new RegExp(search, 'i') },
+              },
+            },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+        },
+      },
+    ]);
+
+    const connections = result[0]?.connections;
+
+    return connections;
   }
 }

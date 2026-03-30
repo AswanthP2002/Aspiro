@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import JobLevel from '../../../domain/entities/admin/jobLevel.entity';
+import JobLevel from '../../../domain/entities/jobLevel/jobLevel.entity';
 import IJobLevelRepository from '../../../domain/interfaces/admin/IJobLevel.repository';
 import { JobLevelDAO } from '../../database/Schemas/admin/jobLevel.schema';
 import BaseRepository from '../baseRepository';
@@ -20,22 +20,25 @@ export default class JobLevelRepository
   ): Promise<{ jobLevels: JobLevel[]; totalPages: number } | null> {
     const skip = (page - 1) * limit;
 
-    // const result = await JobLevelDAO.aggregate([
-    //   { $match: { $regex: new RegExp(search, 'i') } },
-    //   {
-    //     $facet: {
-    //       data: [{ $skip: skip }, { $limit: limit }],
-    //       metaData: [{ $count: 'totalDocs' }],
-    //     },
-    //   },
-    // ]);
+    const result = await JobLevelDAO.aggregate([
+      {
+        $facet: {
+          jobLevels: [{ $sort: { createdAt: -1 } }, { $skip: skip }, { $limit: limit }],
+          metaData: [{ $count: 'totalDocs' }],
+        },
+      },
+    ]);
 
-    const jobLevels = await JobLevelDAO.find()
-    const totalPages = 1
+    const jobLevels = result[0]?.jobLevels;
+    const totalPages = Math.ceil(result[0]?.metaData[0]?.totalDocs / limit);
 
     return { jobLevels, totalPages };
   }
-}
 
+  async findJobLevelWithSlugName(slug: string): Promise<JobLevel | null> {
+    const jobLevel = await JobLevelDAO.findOne({ slug });
+    return jobLevel;
+  }
+}
 
 //stoped here -> job level is not being added properly

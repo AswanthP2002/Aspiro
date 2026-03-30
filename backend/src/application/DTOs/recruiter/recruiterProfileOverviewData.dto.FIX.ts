@@ -1,6 +1,6 @@
-import Job from '../../../domain/entities/recruiter/job.entity';
+import Job from '../../../domain/entities/job/job.entity';
 import User from '../../../domain/entities/user/User.FIX';
-import CompanyDTO from './company.dto';
+import CompanyDTO from '../company/company.dto';
 
 export default interface RecruiterProfilelOverviewDataDTO {
   _id?: string;
@@ -28,7 +28,7 @@ export default interface RecruiterProfilelOverviewDataDTO {
   isRejected?: boolean;
   applicationResendBufferDate?: Date;
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
-  verificationHistory?: any;
+  // verificationHistory?: any;
   createdAt?: string;
   updatedAt?: string;
   userProfile: User;
@@ -37,6 +37,27 @@ export default interface RecruiterProfilelOverviewDataDTO {
 }
 
 export interface AdminRecruiterApplicationsDTO {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
+  // professionalTitle?: string;
+  email?: string;
+  // phone?: string;
+  // yearOfExperience?: string;
+  // linkedinUrl?: string;
+  // verificationDocument?: {
+  //   publicId?: string;
+  //   url?: string;
+  // };
+  isVerified?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  createdAt?: string;
+  // updatedAt?: string;
+  // userProfile?: User;
+  // companyDetails?: CompanyDTO;
+}
+
+export interface AdminRecruiterApplicationDetailsDTO {
   _id?: string;
   recruiterType?: 'self' | 'corporate';
   fullName?: string;
@@ -52,7 +73,7 @@ export interface AdminRecruiterApplicationsDTO {
   isVerified?: boolean;
   profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
   createdAt?: string;
-  updatedAt?: string;
+  // updatedAt?: string;
   userProfile?: User;
   companyDetails?: CompanyDTO;
 }
@@ -82,7 +103,8 @@ export interface AdminRecruiterDetailsDTO {
     url?: string;
   };
   isVerified?: boolean;
-  isPermissionRevoked?: boolean
+  isOrphan?: boolean;
+  isPermissionRevoked?: boolean;
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   createdAt?: string;
   updatedAt?: string;

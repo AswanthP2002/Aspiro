@@ -19,6 +19,34 @@ export default interface Candidate {
 
 export type Role = 'candidate' | 'recruiter' | 'admin';
 
+export interface FollowerData {
+   _id?: string;
+  follower?: string;
+  following?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  userDetails?: {
+    _id?: string,
+    name?: string,
+    headline?: string,
+    profilePicture?: string
+  }
+}
+
+export interface FollowingsData {
+   _id?: string;
+  follower?: string;
+  following?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  userDetails?: {
+    _id?: string,
+    name?: string,
+    headline?: string,
+    profilePicture?: string
+  }
+}
+
 export interface User {
   _id?: string;
   password?: string;
@@ -90,6 +118,7 @@ export interface Experience {
     isPresent : boolean
     endDate? : string //for checking
     location : string
+    description?: string;
     workMode : string
     createdAt? : string
     updatedAt? : string
@@ -299,6 +328,29 @@ export interface Notification {
   isRead?: boolean;
   metadata?: { [key: string]: any };
   createdAt?: string;
+  actorDetails?:{
+    _id?: string,
+    name?: string,
+    profilePicture?: string,
+    headline?: string
+  }
+}
+
+type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+
+export interface ConnectionDetails {
+  _id?: string;
+  receiver?: string;
+  sender?: string;
+  status: ConnectionRequestStatus;
+  createdAt?: string;
+  updatedAt?: string;
+  senderDetails?:{
+    _id?: string,
+    name?: string,
+    headline?: string,
+    profilePicture?: string
+  }
 }
 
 export interface Comments {
@@ -377,6 +429,7 @@ export interface AdminRecruiterDetailsData {
     url?: string;
   };
   isVerified?: boolean;
+  isOrphan?: boolean;
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   createdAt?: string;
   updatedAt?: string;
@@ -482,6 +535,27 @@ export interface LoadJobsForPublicData {
   };
 }
 
+export interface SimilarSkillUserData {
+  _id: string;
+  name: string;
+  headline: string;
+  profilePicture: string
+}
+
+export interface RecommendedJobsData {
+  _id?: string;
+  jobTitle?: string;
+  recruiterDetails: {
+    _id: string;
+    name: string;
+  };
+  companyDetails: {
+    _id: string;
+    name: string;
+  };
+}
+
+
 export interface JobDetailsForPublicData {
   _id?: string;
     recruiterId?: string;
@@ -514,6 +588,7 @@ export interface JobDetailsForPublicData {
       name: string;
       recruiterType: string;
       professionalTitle: string;
+      isVerifiedRecruiter: boolean;
     };
     companyProfileDetails?: {
       _id: string;
@@ -551,6 +626,16 @@ export interface MySavedJobData {
   };
 }
 
+export type JobApplicationStatusData =
+  | 'applied'
+  | 'opened'
+  | 'screening'
+  | 'interview'
+  | 'offer'
+  | 'hired'
+  | 'rejected';
+
+
 export interface JobApplicationsListForRecruiter {
     _id?: string;
   status?: string;
@@ -580,6 +665,10 @@ export interface SingleJobApplicationDetailsData {
     location?: string;
     match?: number;
   };
+  jobDetails?:{
+    _id: string,
+    jobTitle: string
+  }
   experiences?: Experience[];
   educations?: Education[];
   skills?: Skills[];
@@ -590,10 +679,45 @@ export interface SingleJobApplicationDetailsData {
   };
 }
 
+export interface InterviewData {
+   _id?: string;
+  candidateId?: string;
+  jobId?: string;
+  interviewersName?: string;
+  interviewType?: 'Technical' | 'HR' | 'Mnaegirial' | 'General';
+  interviewDate?: string | Date;
+  interviewTime?: string;
+  gmeetUrl?: string;
+  note?: string;
+  status?: 'Scheduled' | 'Completed' | 'Cancelled';
+  createdAt?: string | Date;
+  upddatedAt?: string | Date;
+}
+
+export interface TrackMyJobApplicationData {
+  _id?: string;
+  status?: JobApplicationStatusData;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  jobDetails?:{
+    _id: string,
+    jobTitle: string,
+  },
+  recruiterDetails?:{
+    _id: string,
+    name: string
+  },
+  companyDetails?:{
+    _id: string
+    name: string
+  }
+}
+
 export interface RecruiterProfileData {
   _id?: string;
   userId?: string;
-  recruiterType?: 'feelance' | 'corporate';
+  recruiterType?: 'freelance' | 'corporate';
   companyId?: string;
   fullName?: string;
   profiessionalTitle?: string;
@@ -622,6 +746,33 @@ export interface RecruiterProfileData {
   companyDetails?: Company
   verificationTimeline?: { action: string; actor: string; createdAt: string; updatedAt: string }[];
   jobs: Job[];
+}
+
+export interface RecruiterJobDetailsData {
+  _id?: string;
+  jobTitle: string;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  duration?: string;
+  jobType?: JobType;
+  workMode?: WorkMode;
+  location: string;
+  minSalary: number;
+  maxSalary: number;
+  salaryCurrency: string;
+  salaryPeriod?: SalaryPeriod;
+  qualification: string;
+  experienceInYears: number;
+  jobLevel?: JobLevel;
+  requiredSkills: string[];
+  optionalSkills: string[];
+  status?: JobStatus;
+  views?: number;
+  applicationsCount?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  expiresAt?: string;
 }
 
 export interface JobAggregatedData {
@@ -742,6 +893,20 @@ export interface Alerts {
     expiresAt?: string;
     metaData?: { [key: string]: any };
     createdAt?: string;
+}
+
+export interface AlertsData {
+  _id?: string;
+  recipientId?: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  type: 'JOB_MATCH' | 'APPLICATION_UPDATE' | 'SYSTEM_SECURITY' | 'EXPIRY';
+  status: 'ACTIVE' | 'RESOLVED' | 'DISMISSED';
+  title: string;
+  body: string;
+  actionUrl?: string;
+  expiresAt?: string;
+  metaData?: { [key: string]: string | boolean | number | object };
+  createdAt?: string;
 }
 
 export interface Resumes {
@@ -931,7 +1096,7 @@ export interface ConversationParticipants {
 export interface Conversation {
     _id?: string;
     type?: "private" | "group";
-    participants?:ConversationParticipants[];
+    participants?:UserType[];
     lastMessage?:{
         text?: string,
         senderId?: string,
@@ -972,6 +1137,139 @@ export interface Chat {
   updatedAt?: string
 }
 
+export interface PlanData {
+  _id?: string;
+  name: string;
+  description: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  trialPeriod: number;
+  badgeIcon: string;
+  isListed: boolean;
+  currency: 'INR' | 'USD';
+  billingCycle: 'monthly' | 'yearly';
+  features: string[];
+  featuresListed: { [key: string]: string | number };
+  isActive: boolean;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface SubscriptionAnalyticsData {
+  stats: {
+    totalMRR: number;
+    activeRecruiters: number;
+    churnRate: number;
+  };
+  revenueGrowth: { month: string; amount: number }[];
+  subscribers: SubscriberDetailsData[]
+}
+
+export interface SubscriberDetailsData {
+  userName: string;
+  userEmail: string;
+  planName: string;
+  billingCycle: string;
+  nextRenewal: Date | string;
+  amount: number;
+  paymentStatus: string;
+  status: string;
+}
+
+export interface DetailedResumeAnalysisAiData {
+  overallScore: number;
+  metrics: {
+    atsCompatibility: number;
+    contentQuality: number;
+    formatStructure: number;
+    keywordMatch: number;
+  };
+  feedback: {
+    criticalIssues: string[];
+    recommendations: string[];
+  };
+  keywords: {
+    found: string[];
+    missing: string[];
+  };
+  sectionAnalysis: [
+    { section: 'Contact Information'; status: 'Incomplete' | 'Complete'; score: number },
+    { section: 'Professional Summary'; status: 'Incomplete' | 'Complete'; score: number },
+    { section: 'Work Experience'; status: 'Incomplete' | 'Complete'; score: number },
+    { section: 'Education'; status: 'Incomplete' | 'Complete'; score: number },
+    { section: 'Skills'; status: 'Incomplete' | 'Complete'; score: number },
+    { section: 'Certifications'; status: 'Incomplete' | 'Complete'; score: number },
+  ];
+}
+
+
+export interface UserSubscriptionAndPlanDetailsData {
+  _id?: string;
+  userId?: string;
+  planId?: string;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  status: 'active' | 'canceled' | 'incomplete' | 'past_due';
+  currentPeriodStart?: string | Date;
+  currentPeriodEnd?: string | Date;
+  isCanceled?: boolean;
+  paymentStatus?: 'paid' | 'pending' | 'failed';
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  planDetails: PlanData;
+}
+
+export interface InvoiceData {
+  id?: string;
+  amount?: number;
+  status?: string;
+  date?: string | Date;
+  downloadUrl?: string;
+  hostedUrl?: string;
+}
+
+export interface PaymentMethodsStripeData {
+  brand: string;
+  last4: string;
+  expMonth: string;
+  expYear: string;
+}
+
+export interface UserFullProfileData {
+  _id?: string;
+  name?: string;
+  headline?: string;
+  summary?: string;
+  //   socialLinks?: SocialLinks[];
+  location?: {
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pincode: string;
+    coords?: {
+      type: 'Point';
+      coordinates: [number, number]; //long lat order
+    };
+  };
+  phone?: string;
+  email?: string;
+  connections?: string[];
+  profilePicture?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  coverPhoto?: {
+    cloudinaryPublicId: string;
+    cloudinarySecureUrl: string;
+  };
+  experiences: Experience[];
+  educations: Education[];
+  skills: Skills[];
+  certificates: Certificates[];
+}
+
+
 export interface MyProfileDTO {
     _id?: string;
   name?: string;
@@ -1001,6 +1299,7 @@ export interface MyProfileDTO {
   createdAt?: string;
   updatedAt?: string;
   followers?: number;
+  following?: number
 }
 
 export interface UserOverviewForPublic {
@@ -1020,6 +1319,7 @@ export interface UserOverviewForPublic {
   isRecruiter?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  isVerifiedRecruiter?: boolean;
 }
 
 
@@ -1046,9 +1346,11 @@ export interface AdminUserDetailsData {
   };
   isRecruiter?: boolean;
   isBanned?: boolean;
+  accountActions?: {action: string, actor: string, date: string}[]
   isVerified?: boolean;
   isBlocked?: boolean;
   createdAt?: string;
+  googleId?: string
   updatedAt?: string;
   experiences: Experience[];
   educations: Education[];
@@ -1106,6 +1408,27 @@ export interface AdminRecruiterApplicationsData {
   _id?: string;
   recruiterType?: 'self' | 'corporate';
   fullName?: string;
+  // professionalTitle?: string;
+  email?: string;
+  // phone?: string;
+  // yearOfExperience?: string;
+  // linkedinUrl?: string;
+  // verificationDocument?: {
+  //   publicId?: string;
+  //   url?: string;
+  // };
+  isVerified?: boolean;
+  profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
+  createdAt?: string;
+  //updatedAt?: string;
+  //userProfile?: User;
+  //companyDetails?: Company;
+}
+
+export interface AdminRecruiterApplicationDetailsData {
+  _id?: string;
+  recruiterType?: 'self' | 'corporate';
+  fullName?: string;
   professionalTitle?: string;
   email?: string;
   phone?: string;
@@ -1118,7 +1441,7 @@ export interface AdminRecruiterApplicationsData {
   isVerified?: boolean;
   profileStatus?: 'pending' | 'under-review' | 'approved' | 'rejected' | 'closed';
   createdAt?: string;
-  updatedAt?: string;
+  // updatedAt?: string;
   userProfile?: User;
   companyDetails?: Company;
 }

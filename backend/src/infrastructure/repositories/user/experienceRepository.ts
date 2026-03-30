@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Experience from '../../../domain/entities/user/experience.entity';
+import Experience from '../../../domain/entities/experience/experience.entity';
 import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
 import BaseRepository from '../baseRepository';
 import { experienceDAO } from '../../database/DAOs/user/candidateExperience.dao';
@@ -27,9 +27,11 @@ export default class ExperienceRepository
   }
 
   async findWihUserId(userId: string): Promise<Experience[] | null> {
-    const result = await experienceDAO.find({
-      userId: new mongoose.Types.ObjectId(userId),
-    });
+    const result = await experienceDAO
+      .find({
+        userId: new mongoose.Types.ObjectId(userId),
+      })
+      .sort({ startDate: -1 });
     return result;
   }
 }

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Education from '../../../domain/entities/user/educations.entity';
+import Education from '../../../domain/entities/education/educations.entity';
 import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
 import BaseRepository from '../baseRepository';
 import { EducationDAO } from '../../database/DAOs/user/education.dao';

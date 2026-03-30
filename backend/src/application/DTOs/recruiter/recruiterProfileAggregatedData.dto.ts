@@ -1,4 +1,4 @@
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 
 export default interface RecruiterProfileAggregated {
   _id?: string;
@@ -27,7 +27,7 @@ export default interface RecruiterProfileAggregated {
     foundIn?: string;
     website?: string;
     vision?: string;
-    benefit?: String;
+    benefit?: string;
   };
   location?: {
     city: string;
@@ -69,7 +69,7 @@ export interface RecruiterProfileAggregatedDTO {
     foundIn?: string;
     website?: string;
     vision?: string;
-    benefit?: String;
+    benefit?: string;
   };
   location?: {
     city: string;

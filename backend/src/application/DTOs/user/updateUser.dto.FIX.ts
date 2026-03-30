@@ -1,5 +1,5 @@
 import { Role } from '../../../domain/entities/user/User.FIX';
-import SocialLinks from '../../../domain/entities/SocialLinks';
+import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import { IsDefined, IsOptional, IsString } from 'class-validator';
 
 export interface UpdataeUserDto {

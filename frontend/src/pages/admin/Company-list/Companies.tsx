@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRecruiters } from '../../../services/adminServices';
+// import { getRecruiters } from '../../../services/adminServices';
+import { getRecruiters } from '../../../services/recruiterServices';
 import { Notify } from 'notiflix';
 import { AdminRecruiterListData, RecruiterProfileData } from '../../../types/entityTypes';
 import { IoSearchOutline } from 'react-icons/io5';
 import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
 import { FaUsersSlash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 export default function Recruiters() {
   const [recruiters, setRecruiters] = useState<AdminRecruiterListData[]>([])
@@ -109,10 +111,10 @@ export default function Recruiters() {
             // setpagination(new Array(result?.result?.totalPages).fill(0))
             // setCurrentSort(result?.result?.currentSort) 
            }else{
-            Notify.failure('Canot fetch recruiters')
+            toast.error('Canot fetch recruiters')
            }
         } catch (error: unknown) {
-          Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout: 3000})
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
         
     }

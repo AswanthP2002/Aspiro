@@ -10,15 +10,13 @@ import { v4 } from 'uuid';
 
 @injectable()
 export default class CreateRecruiterUsecase implements ICreateRecruiterUsecase {
-  private _mapper: RecruiterMapper;
-  constructor(@inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo) {
-    this._mapper = new RecruiterMapper();
-  }
+  constructor(
+    @inject('IRecruiterRepository') private _recruiterRepo: IRecruiterRepo,
+    @inject('RecruiterMapper') private _mapper: RecruiterMapper
+  ) {}
 
   async execute(createRecruiterDto: CreateRecruiterDTO): Promise<RecruiterDTO | null> {
-    console.log('-Checking dto- before maping', createRecruiterDto)
     const newRecruiter = this._mapper.createRecruiterDtoToRecruiter(createRecruiterDto);
-    console.log('-recruiter after mapping', newRecruiter)
     const result: UploadApiResponse | undefined = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {

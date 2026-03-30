@@ -18,7 +18,7 @@ import { FaFileAlt, FaPlus } from "react-icons/fa";
 import { CgCheck } from "react-icons/cg";
 import { AiOutlineVerified } from "react-icons/ai";
 import { BiBuildings, BiEnvelope, BiPhone, BiShield, BiShieldQuarter } from "react-icons/bi";
-import { FiSettings } from "react-icons/fi";
+import { FiAlertCircle, FiArrowRightCircle, FiSettings } from "react-icons/fi";
 import moment, { Moment } from "moment";
 import { TbBrandDaysCounter } from "react-icons/tb";
 
@@ -107,7 +107,67 @@ export default function RecruiterProfilePage(){
                 {
                     profileData?.profileStatus === "pending" || profileData?.profileStatus === "under-review"
                     ? <>
-                        <div>
+                        <div className="max-w-md mx-auto mt-10 p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+  <div className="text-center mb-8">
+    <h2 className="text-xl font-bold text-gray-900 tracking-tight">Application under review</h2>
+    <p className="text-xs text-gray-500 mt-2 font-medium">Hang tight! Our team is carefully reviewing your credentials.</p>
+  </div>
+
+  <div className="relative space-y-8">
+    {/* The Vertical Connecting Line */}
+    <div className="absolute left-6 top-2 bottom-2 w-0.5 bg-gray-400 -translate-x-1/2">
+        <div className={`bg-green-500 w-full -translate-x-1/2 ${profileData.profileStatus === 'under-review' ? "h-[50%]" : "h-0"}`}></div>
+    </div>
+
+    {/* Step 1: Application Sent */}
+    <div className="relative flex gap-5 group">
+      <div className={`z-10 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-colors ${profileData.profileStatus !== 'pending' ? 'bg-green-500' : 'bg-blue-600'}`}>
+        <CgCheck className="text-white" size={32} />
+      </div>
+      <div>
+        <h4 className={`text-sm font-bold ${profileData.profileStatus !== 'pending' ? 'text-gray-900' : 'text-blue-600'}`}>Application Sent</h4>
+        <p className="text-xs text-gray-500 mt-0.5">Your application has been successfully received.</p>
+        <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase tracking-wider">{moment(profileData.createdAt).format("MMM DD, YYYY • h:mm a")}</p>
+      </div>
+    </div>
+
+    {/* Step 2: Admin Verification */}
+    <div className="relative flex gap-5 group">
+      {/* Dynamic line color for the active segment */}
+      {/* <div className={`absolute -left-6 -top-8 w-0.5 h-8 -translate-x-1/2 ${profileData.profileStatus !== 'pending' ? 'bg-green-500' : 'bg-gray-100'}`} /> */}
+      
+      <div className={`z-10 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+        profileData.profileStatus === 'under-review' ? 'bg-blue-600 ring-4 ring-blue-50' : 
+        profileData.profileStatus === 'verified' ? 'bg-green-500' : 'bg-gray-100'
+      }`}>
+        <BiShieldQuarter className={profileData.profileStatus === 'pending' ? 'text-gray-400' : 'text-white'} size={24} />
+      </div>
+      <div>
+        <h4 className={`text-sm font-bold ${profileData.profileStatus === 'under-review' ? 'text-blue-600' : (profileData.profileStatus === 'pending' ? 'text-gray-400' : 'text-gray-900')}`}>Admin Verification</h4>
+        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">Our team is verifying your profile for industrial standards.</p>
+        {profileData.profileStatus === 'under-review' && (
+          <span className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold uppercase tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" /> In Progress
+          </span>
+        )}
+      </div>
+    </div>
+
+    {/* Step 3: Final Decision */}
+    <div className="relative flex gap-5 group">
+       <div className={`absolute -left-6 -top-8 w-0.5 h-8 -translate-x-1/2 ${profileData.profileStatus === 'verified' ? 'bg-green-500' : 'bg-gray-100'}`} />
+      
+      <div className="z-10 w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100">
+        <FaUsersGear className="text-gray-300" size={20} />
+      </div>
+      <div>
+        <h4 className="text-sm font-bold text-gray-400">Final Decision</h4>
+        <p className="text-xs text-gray-400 mt-0.5">You will be notified via email once the process is complete.</p>
+      </div>
+    </div>
+  </div>
+</div>
+                        {/* <div>
                             <p className="text-center text-2xl">Application under review</p>
                             <p className="text-xs text-center mt-1">Hang tight! our team is carefully reviewing your credentials</p>
                             <div className="mt-5 p-5 relative bg-white space-y-5 rounded-md w-md lg:w-lg m-auto">
@@ -125,7 +185,6 @@ export default function RecruiterProfilePage(){
                                     </div>
                                 </div>
                                 
-                                {/* <div className="px-1 bg-gray-300 w-1 h-5 absolute left-1"></div> */}
                                 <div className="flex gap-3">
                                     <div className={`${profileData.profileStatus === "under-review" ? "bg-blue-500" : (profileData.profileStatus === "pending" ? "bg-gray-300" : "bg-green-500")} w-12 h-12 rounded-md flex items-center justify-center`}>
                                         <BiShieldQuarter color="white" size={40} />
@@ -146,13 +205,10 @@ export default function RecruiterProfilePage(){
                                     <div className="space-y-1">
                                         <p className={`text-gray-400 text-sm font-medium`}>Final Descision</p>
                                         <p className={`text-xs text-gray-400`}>You will be notified of the outcome</p>
-                                        {/* {
-                                            profileData.profileStatus === 'approved' && (<span className="mt-2 flex items-center gap-2 w-fit bg-blue-200 rounded-md px-2 text-xs text-blue-500" style={{fontSize: '.65rem'}}><div className="rounded-full w-2 h-2 bg-blue-500"></div> In Progress</span>)
-                                        } */}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                       </>
                     : <></>
                 }
@@ -164,7 +220,7 @@ export default function RecruiterProfilePage(){
                 {
                     profileData?.profileStatus === 'approved' && (
                         <>
-                            <p className="text-2xl font-light">Dashboard</p>
+                            <p className="text-2xl font-semibold mt-10 lg:mt-0">Dashboard</p>
                     <p className="text-sm text-gray-500 mt-2">Welcome back!, Here is an overview of your recruiting activity</p>
                     <div className="mt-5 border border-gray-200 bg-white rounded-md">
                         <div className="w-full p-5 flex jusityf-between">
@@ -179,6 +235,9 @@ export default function RecruiterProfilePage(){
                                     </p>
                                     {profileData.recruiterType === 'corporate' && (
                                         <p className="text-xs text-gray-700">{profileData.companyDetails?.name} ~ {profileData.companyDetails?.slogan}</p>
+                                    )}
+                                    {profileData.recruiterType === 'freelance' && (
+                                        <p>{profileData?.profiessionalTitle}</p>
                                     )}
                                 </div>
                             </div>
@@ -233,6 +292,40 @@ export default function RecruiterProfilePage(){
                                     </>
                                 )
                             }
+                            {
+                                profileData?.recruiterType === 'freelance' && (
+                                    <>
+                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                            <BiEnvelope size={25} color="blue" />
+                                            <div>
+                                                <p className="text-xs text-gray-500 font-medium">Email</p>
+                                                <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                            <BsLinkedin size={25} color="blue" />
+                                            <div>
+                                                <p className="text-xs text-gray-500 font-medium">LinkedIn</p>
+                                                <a href={profileData.linkedinUrl} className="text-xs font-semibold text-blue-500 mt-1">LinkedIn.com</a>
+                                            </div>
+                                        </div>
+                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                            <TbBrandDaysCounter size={25} color="blue" />
+                                            <div>
+                                                <p className="text-xs text-gray-500 font-medium">Years of Experience</p>
+                                                <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.yearOfExperience}</p>
+                                            </div>
+                                        </div>
+                                       <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                            <BiPhone size={25} color="blue" />
+                                            <div>
+                                                <p className="text-xs text-gray-500 font-medium">Contact</p>
+                                                <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.phone}</p>
+                                            </div>
+                                        </div>
+                                    </>
+                                )
+                            }
                         </div>
                         <div className="border border-gray-200"></div>
                         <div className="p-5">
@@ -269,10 +362,10 @@ export default function RecruiterProfilePage(){
                             </div>
                         </div>
                         <div className="border border-gray-200"></div>
-                        <div className="p-5">
+                        {profileData.recruiterType === 'corporate' && (<div className="p-5">
                             <p className="text-xs text-gray-700 font-medium">Summary</p>
                             <p className="text-xs mt-2 font-normal text-gray-500 text-justify leading-relaxed mt-1">{profileData?.companyDetails?.description}</p>
-                        </div>
+                        </div>)}
                     </div>
 
                     <div className="my-5">
@@ -387,31 +480,83 @@ const CooldownScreen = ({recruiterData}: {recruiterData: RecruiterProfileData}) 
     }, [])
     
     return(
-        <div className="flex flex-col items-center">
-            <p className="font-semibold text-2xl text-center">Application Not Approved</p>
-            <p className="text-center text-sm mt-1 text-gray-700">You can reapply after the cooldown period ends</p>
-            <div className="mt-5 bg-white p-5 border border-2 border-red-300 rounded-md w-md lg:w-xl">
-                <p className="text-center uppercase font-medium text-red-500">cooldown period</p>
-                <p className="text-xs mt-3">Your application does not meet our current requirements. You may reapply after the cooldown period</p>
-                <p className="mt-3 font-medium text-sm">Reason</p>
-                <p className="text-xs">{recruiterData.rejection?.reason}</p>
-                <p className="mt-3 font-medium text-sm">Feedback</p>
-                <p className="text-xs">{recruiterData.rejection?.feedback}</p>
-                <div className="my-3 p-3 border border-2 border-red-300 rounded-md bg-gradient-to-br from-red-50 to-red-200">
-                    <p className="text-center text-xs text-red-900">Time remining</p>
-                    <p className="text-center font-bold mt-2 text-2xl text-red-800">{bufferDate?.diff(currentDate, "days")} Days</p>
-                    <p className="text-center text-red-900 text-xs mt-2">Until you can apply</p>
-                </div>
-                <div className="mt-3 p-3 border border-2 border-red-300 rounded-md bg-white">
-                    <p className="text-sm font-semibold">What happen next ?</p>
-                    <ul className="space-y-2 mt-3">
-                        <li className="text-xs text-gray-700">Your application will be automatically unlocked after {bufferDate?.diff(currentDate, "days")} days</li>
-                        <li className="text-xs text-gray-700">We recommend you to review our recruiter profile guidelines before applying</li>
-                        <li className="text-xs text-gray-700">You will also receive an email notification when you are eligible to reapply</li>
-                    </ul>
-                </div>
-            </div>
+        <div className="max-w-2xl mx-auto py-12 px-4">
+  {/* Header Section */}
+  <div className="text-center mb-10">
+    <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full mb-4">
+      <FiAlertCircle className="text-amber-600" size={32} />
+    </div>
+    <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Application Status: Not Approved</h2>
+    <p className="text-sm text-gray-500 mt-2">You can reapply once your cooldown period concludes.</p>
+  </div>
+
+  {/* Main Content Card */}
+  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+    
+    {/* Cooldown Header */}
+    <div className="bg-slate-50 border-b border-gray-100 p-6 flex justify-between items-center">
+      <div>
+        <h3 className="text-xs font-black uppercase tracking-[0.15em] text-slate-400">Cooldown Period</h3>
+        <p className="text-sm text-gray-600 mt-1 font-medium">Temporary restriction active</p>
+      </div>
+      <div className="text-right">
+        <span className="text-2xl font-black text-slate-800">{bufferDate?.diff(currentDate, "days")}</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase ml-1">Days Left</span>
+      </div>
+    </div>
+
+    <div className="p-8">
+      {/* Feedback Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+        <div>
+          <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-3">Reason</h4>
+          <p className="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100 italic">
+            "{recruiterData.rejection?.reason}"
+          </p>
         </div>
+        <div>
+          <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-3">Admin Feedback</h4>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {recruiterData.rejection?.feedback}
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Line Visual */}
+      {/* <div className="relative h-2 w-full bg-gray-100 rounded-full mb-10 overflow-hidden">
+        <div 
+          className="absolute top-0 left-0 h-full bg-amber-500 transition-all duration-700"
+          style={{ width: `${(1 - (bufferDate?.diff(currentDate, "days") / 30)) * 100}%` }} 
+        />
+      </div> */}
+
+      {/* Next Steps Section */}
+      <div className="bg-blue-50/50 rounded-xl p-6 border border-blue-100">
+        <h4 className="text-sm font-bold text-blue-900 mb-4 flex items-center gap-2">
+          <FiArrowRightCircle className="text-blue-500" />
+          Next Steps & Recommendations
+        </h4>
+        <ul className="space-y-3">
+          {[
+            `Your account will automatically unlock in ${bufferDate?.diff(currentDate, "days")} days.`,
+            "Review our updated Recruiter Profile Guidelines to ensure compliance.",
+            "You'll receive an automated email notification when you're eligible to reapply."
+          ].map((text, i) => (
+            <li key={i} className="flex items-start gap-3 text-xs text-blue-800/80 leading-snug">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1 flex-shrink-0" />
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {/* Footer Help */}
+  <p className="text-center mt-8 text-xs text-gray-400">
+    Have questions? <a href="#" className="text-blue-600 font-semibold hover:underline">Contact Aspiro Support</a>
+  </p>
+</div>
     )
 }
   // Mock target date: 30 days from now
