@@ -1,0 +1,126 @@
+import { useState } from "react"
+import { BiChart, BiCheckCircle, BiInfoCircle, BiRefresh, BiShareAlt, BiTrendingUp } from "react-icons/bi"
+import { BsArrowRight } from "react-icons/bs"
+
+export default function InterviewCompletePage(){
+    const [questionFeedback, setQuestionFeedback] = useState<{q: String, f: string, s: number}[]>([
+        {
+            q: 'Tell me about yourself',
+            f: 'Strong self awareness and presentation skills',
+            s: 80
+        },
+        {
+            q: 'Why did you leaved your previous job',
+            f: 'Lack of clarity and phillar words',
+            s: 60
+        },
+        {
+            q: 'Tell me about your strength and weekness',
+            f: 'Strong self awareness and presentation skills',
+            s: 90
+        },
+        {
+            q: 'How do you manage time?',
+            f: 'Lack of clarity and phillar words',
+            s: 60
+        }
+    ])
+    return(
+        <>
+            <div className="w-full min-h-screen bg-gray-50 px-5 py-15 lg:px-20">
+                <p className="font-semibold text-xl">Interview Completed Result</p>
+                <p className="text-xs text-slate-600 mt-2">Here is your detailed performance and analysis</p>
+                <div className="mt-10 w-full bg-gradient-to-br from-blue-50 flex flex-col items-center to-indigo-100 ring-1 ring-blue-500 p-10 rounded-md">
+                    <p className="font-semibold text-3xl text-green-500">70%</p>
+                    <p className="text-sm font-normal">Overall score</p>
+                    <p className="bg-green-500 text-white text-xs px-2 rounded-full mt-2">Good Performance</p>
+                </div>
+                <div className="mt-5 grid grid-cols-3 gap-2 md:gap-5 lg:gap-10">
+                    <div className="bg-white p-3 border border-slate-200 rounded-md">
+                        <div className="flex justify-between items-end mb-1">
+                            <p className="text-xs font-medium text-gray-700">Content Quality</p>
+                            <p className="text-xs font-medium text-gray-700">0%</p>
+                        </div>
+                        <div className="w-full h-3 bg-gray-300 rounded-full">
+                            <div className="h-full bg-black w-[50%] rounded-full"></div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 border border-slate-200 rounded-md">
+                        <div className="flex justify-between items-end mb-1">
+                            <p className="text-xs font-medium text-gray-700">Communication</p>
+                            <p className="text-xs font-medium text-gray-700">0%</p>
+                        </div>
+                        <div className="w-full h-3 bg-gray-300 rounded-full">
+                            <div className="h-full bg-black w-[50%] rounded-full"></div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 border border-slate-200 rounded-md">
+                        <div className="flex justify-between items-end mb-1">
+                            <p className="text-xs font-medium text-gray-700">Confidence</p>
+                            <p className="text-xs font-medium text-gray-700">0%</p>
+                        </div>
+                        <div className="w-full h-3 bg-gray-300 rounded-full">
+                            <div className="h-full bg-black w-[50%] rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="bg-white border border-slate-200 rounded-md p-5">
+                        <p className="font-semibold text-sm">Strengths</p>
+                        <ul className="mt-3 space-y-2">
+                            {["Strength one", "Strength two", "Strenght three"].map((v: string) => (
+                                <li className="text-xs flex items-center gap-2">
+                                    <BiCheckCircle color="green" size={15} />
+                                    <p>{v}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-md p-5">
+                        <p className="font-semibold text-sm">Areas to improve</p>
+                        <ul className="mt-3 space-y-2">
+                            {["Improve one", "Improve two", "Improve three"].map((v: string) => (
+                                <li className="text-xs flex items-center gap-2">
+                                    <BiInfoCircle color="red" size={15} />
+                                    <p>{v}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+                <div className="mt-5 bg-white border border-slate-200 p-5 rounded-md">
+                    <p className="text-sm font-semibold">Question by Question Analysis</p>
+                    <div className="mt-5 space-y-3">
+                        {questionFeedback.map((q) => (
+                            <div className="flex items-center bg-gray-100 rounded-md p-3">
+                                <div className="flex-1">
+                                    <p className="font-medium text-sm">{q.q}</p>
+                                    <p className="text-xs text-slate-500">{q.f}</p>
+                                </div>
+                                <p className="font-medium text-sm">{q.s}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <button className="text-sm font-medium text-white bg-blue-500 p-2 rounded-md flex items-center justify-center gap-2">
+                        <BiShareAlt />
+                        Share acheivment on feed
+                    </button>
+                    <button className="flex items-center justify-center gap-2 text-sm font-medium text-slate-800 border border-slate-300 bg-white p-2 rounded-md">
+                        <BiRefresh />
+                        practice again
+                    </button>
+                    <button className="flex items-center justify-center gap-2 text-sm font-medium text-slate-800 border border-slate-300 bg-white p-2 rounded-md">
+                        <BiTrendingUp />
+                        View Dashboard
+                    </button>
+                    <button className="flex items-center justify-center gap-2 text-sm font-medium text-slate-800 border border-slate-300 bg-white p-2 rounded-md">
+                        <BsArrowRight />
+                        Continue Practicing
+                    </button>
+                </div>
+            </div>
+        </>
+    )
+}

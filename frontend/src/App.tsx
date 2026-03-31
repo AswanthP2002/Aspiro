@@ -122,6 +122,7 @@ import InterviewOverviewPage from './pages/user/Aspiro-career/AI-Interviews/Inte
 import InterviewPersonalizationPage from './pages/user/Aspiro-career/AI-Interviews/PersonalizationPage';
 import InterviewModeSelectionPage from './pages/user/Aspiro-career/AI-Interviews/ModeSelectionPage';
 import InterviewPage from './pages/user/Aspiro-career/AI-Interviews/InterviewPage';
+import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/InterviewResultPage';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -338,6 +339,7 @@ function App() {
               <Route path='aspiro-career/interview/personalization' element={<InterviewPersonalizationPage />} />
               <Route path='aspiro-career/interview/mode-select' element={<InterviewModeSelectionPage />} />
               <Route path='aspiro-career/interview/start' element={<InterviewPage />} />
+              <Route path='aspiro-career/interview/completed-result' element={<InterviewCompletePage />} />
             </Route>
           </Route>
         </Route>
