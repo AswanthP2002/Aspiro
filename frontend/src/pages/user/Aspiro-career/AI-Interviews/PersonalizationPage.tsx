@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
 
 export default function InterviewPersonalizationPage(){
     const [selectedRole, setSelectedRole] = useState('')
@@ -13,6 +15,26 @@ export default function InterviewPersonalizationPage(){
             }
         })
     }
+
+    const navigate = useNavigate()
+    
+    const navigateToModeSelectionPage = async () => {
+        const confirmationResult = await Swal.fire({
+            icon: 'question',
+            title: 'Continue?',
+            text: `Are you sure to continue with the selected role ${selectedRole} and experience level as ${experienceLevel}`,
+            showConfirmButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Continue',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        })
+
+        if(!confirmationResult.isConfirmed) return
+
+        navigate('/profile/aspiro-career/interview/mode-select', {state: {role: selectedRole, experienceLevel: experienceLevel}})
+    }
+
 
     return(
         <>
@@ -68,8 +90,8 @@ export default function InterviewPersonalizationPage(){
                             </div>
                         </div>
                         <div className="mt-5 grid grid-cols-2 gap-10">
-                            <button className="bg-blue-500 text-white p-2 rounded-md text-sm font-medium">Continue</button>
-                            <button className="bg-white text-slate-800 p-2 rounded-md text-sm font-medium border border-slate-300">Cancel</button>
+                            <button disabled={!selectedRole} onClick={navigateToModeSelectionPage} className={`${selectedRole ? "bg-blue-500" : "bg-gray-300"} text-white p-2 rounded-md text-sm font-medium`}>Continue</button>
+                            <button onClick={() => navigate(-1)} className="bg-white text-slate-800 p-2 rounded-md text-sm font-medium border border-slate-300">Cancel</button>
                         </div>
                     </div>
                 </div>

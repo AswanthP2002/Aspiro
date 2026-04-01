@@ -49,6 +49,7 @@ import IAdminDeleteUserUsecase from '../../application/interfaces/usecases/user/
 import IAdminPermanentBanUserUsecase from '../../application/interfaces/usecases/user/IAdminPermanentBanUser.usecase';
 import { IGetSimilarUserUsecase } from '../../application/interfaces/usecases/user/IGetSimilarUsers.usecase';
 import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
+import IAiInterviewUsecase from '../../application/interfaces/usecases/AI/IAiInterview.usecase';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -147,7 +148,8 @@ export class UserController {
     @inject('IAdminPermanentBanUserUsecase') private _banUser: IAdminPermanentBanUserUsecase,
     @inject('IGetSimilarUser') private _similarUsers: IGetSimilarUserUsecase,
     @inject('ILoadusersFullDetailsForResumeBuilding')
-    private _getUserFullProfileForResumeBuiding: ILoadUserDetailsForResumeBuildingUsecase
+    private _getUserFullProfileForResumeBuiding: ILoadUserDetailsForResumeBuildingUsecase,
+    @inject('IAiInterviewUsecase') private _aiInterview: IAiInterviewUsecase
   ) {}
 
   async testInfinityScroll(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -929,6 +931,20 @@ export class UserController {
       return;
     } catch (error) {
       next(error);
+    }
+  }
+
+  async aiInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._aiInterview.execute(req.body);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('AI Interview repsponse'),
+        result
+      });
+
+    } catch (error) {
+      next(error)
     }
   }
 }

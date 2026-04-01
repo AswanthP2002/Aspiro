@@ -1,21 +1,34 @@
 import { BiChevronRight } from "react-icons/bi";
 import { LuClock } from "react-icons/lu";
 import { MdAutoAwesome } from "react-icons/md";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function InterviewModeSelectionPage(){
+    const location = useLocation()
+    const {role, experienceLevel} = location.state || {}
+
+    const navigate = useNavigate()
+
+    const navigateToInterviewStartPage = () => {
+        if(!role || !experienceLevel) return toast.warning('Can not attend interview now')
+        
+        navigate('/profile/aspiro-career/interview/start', {state: {role, experienceLevel}})
+    }
+
     return(
         <>
             <div className="bg-gray-50 w-full min-h-screen px-5 lg:px-20 py-15">
                 <p className="text-center font-semibold text-xl">Choose your practice mode</p>
                 <div className="flex items-center justify-center gap-2 text-xs mt-3">
                     <p>Preparing for</p>
-                    <p className="text-blue-500">software engineer</p>
+                    <p className="text-blue-500">{role}</p>
                     <BiChevronRight />
-                    <p className="text-blue-500">Entry Level</p>
+                    <p className="text-blue-500">{experienceLevel}</p>
                 </div>
                 <div className="mt-10 w-full">
                     {/* Mode */}
-                    <div className="bg-white w-full border border-slate-200 rounded-md p-5">
+                    <div onClick={navigateToInterviewStartPage} className="cursor-pointer transition-all bg-white w-full border border-slate-200 rounded-md p-5">
                         <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-13 h-13 rounded-md flex items-center justify-center">
                             <MdAutoAwesome size={25} color="white" />
                         </div>

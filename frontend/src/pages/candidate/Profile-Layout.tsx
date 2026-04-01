@@ -2,7 +2,7 @@ import { Link, Outlet } from 'react-router-dom';
 import { CiGrid42, CiBellOn, CiBookmark } from 'react-icons/ci';
 import { FiFileText } from 'react-icons/fi';
 import { PiMedal } from 'react-icons/pi';
-import { FaCreditCard, FaUserTie } from 'react-icons/fa';
+import { FaCreditCard, FaCrown, FaUserTie } from 'react-icons/fa';
 import { useContext, useEffect } from 'react';
 import { appContext } from '../../context/AppContext';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -177,9 +177,10 @@ export default function ProfileLayout() {
                 className={`rounded-lg px-2 py-2.5 transition-all ${isActiveTab('aspiro-career') ? 'shadow-sm bg-white text-blue-500' : 'hover:bg-white hover:text-blue-500 text-white'}`}
               >
                 <Link to="/profile/aspiro-career">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 relative">
                     <SiSmartthings size={25} />
                     <p className="text-sm font-medium">Aspiro Career</p>
+                    <FaCrown size={20} />
                   </div>
                 </Link>
               </li>
@@ -188,9 +189,10 @@ export default function ProfileLayout() {
                 className={`rounded-lg px-2 py-2.5 transition-all ${isActiveTab('recruiter-profile') ? 'shadow-sm bg-white text-blue-500' : 'hover:bg-white hover:text-blue-500 text-white'}`}
               >
                 <Link to="/profile/recruiter/overview">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 relative">
                     <FaUserTie size={25} />
                     <p className="text-sm font-medium">Aspiro Recruiter</p>
+                    <FaCrown size={20} />
                   </div>
                 </Link>
               </li>

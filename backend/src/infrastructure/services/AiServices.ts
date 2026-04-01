@@ -211,4 +211,44 @@ STRICTNESS RULES:
 
     throw new ServiceBusyError('AI models');
   }
+
+  async aiInterview(
+    persona: { role: 'system' | 'user' | 'assistant'; content: string }[]
+  ): Promise<string> {
+    console.log('-- checking persona before sending to the ai --', persona)
+    for (const model of this._models) {
+      try {
+        const response = await axios.post(
+          this._apiUrl,
+          {
+            model,
+            messages: persona,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.ASPIRO_AI_API_KEY}`,
+              'Content-Type': 'application/json',
+              'X-Title': 'Aspiro',
+            },
+          }
+        );
+
+        console.log('response from the ai', response.data?.choices);
+        return '';
+      } catch (error) {
+        const err = error as AxiosError;
+        if (
+          (err.response && err.response.status >= 500) ||
+          err.response?.status === 400 ||
+          err.response?.status === 429
+        ) {
+          console.log('Error occured', err.message);
+          console.log(`${model} failed: switching to next model`);
+        } else {
+          throw err;
+        }
+      }
+    }
+    throw new ServiceBusyError('Ai Models');
+  }
 }

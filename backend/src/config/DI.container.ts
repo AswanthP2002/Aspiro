@@ -465,6 +465,8 @@ import IAnalyzeResumeUsecase from '../application/interfaces/usecases/AI/IAnalyz
 import AnalyzeResumeUsecase from '../application/usecases/AI/AnalyzeResume.ai.usecase.ts';
 import IAnalyzeResumeDetailedUsecase from '../application/interfaces/usecases/AI/IAnalyzeResumeDetailed.usecase';
 import AnalyzeResumeDetailedUsecase from '../application/usecases/AI/AiAnalyzeResumeDetailed.usecase';
+import IAiInterviewUsecase from '../application/interfaces/usecases/AI/IAiInterview.usecase';
+import AiInterviewUsecase from '../application/usecases/AI/AiInterview.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -1015,6 +1017,7 @@ container.registerSingleton<IAnalyzeResumeDetailedUsecase>(
   'IAnalyzeResumeDetailsUsecase',
   AnalyzeResumeDetailedUsecase
 );
+container.registerSingleton<IAiInterviewUsecase>('IAiInterviewUsecase', AiInterviewUsecase);
 container.registerSingleton<IAdminDeleteJobTypeUsecase>(
   'IAdminDeleteJobTypeUsecase',
   AdminDeleteJobTypeUsecase

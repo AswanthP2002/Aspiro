@@ -85,4 +85,8 @@ export const UserApiRoutes = {
     BAN_USER_BY_ID: '/v2/user/ban/:userId',
     LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
   },
+
+  AI_INTERVIEW:{
+    START: '/v2/interview/ai'
+  }
 } as const;
