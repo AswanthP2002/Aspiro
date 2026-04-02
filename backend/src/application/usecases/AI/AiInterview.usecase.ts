@@ -7,9 +7,10 @@ export default class AiInterviewUsecase implements IAiInterviewUsecase {
   constructor(@inject('IAiServices') private _aiServices: IAiServices) {}
 
   async execute(
-    persona: { role: 'system' | 'user' | 'assistant'; content: string }[]
+    persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
+    isStoped: boolean
   ): Promise<string> {
-    const result = await this._aiServices.aiInterview(persona);
+    const result = await this._aiServices.aiInterview(persona, isStoped);
     return result as string;
   }
 }

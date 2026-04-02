@@ -1576,9 +1576,10 @@ export const loadUserFullProfileDetails = async () => {
     }
 }
 
-export const getInterviewResponse = async (persona: {role: "user" | "assistant" | "system", content: string}[]) => {
+export const getInterviewResponse = async (persona: {role: "user" | "assistant" | "system", content: string}[], isStopped: boolean) => {
     try {
     const response = await axiosInstance.post(EndPoints.START_AI_INTERVIEW, persona, {
+            params:{isStopped},
             sendAuthToken: true
         } as AxiosRequest)
 

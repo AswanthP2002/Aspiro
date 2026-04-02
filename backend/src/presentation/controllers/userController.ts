@@ -935,16 +935,16 @@ export class UserController {
   }
 
   async aiInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const isStoped = req.query.isStoped || false;
     try {
-      const result = await this._aiInterview.execute(req.body);
+      const result = await this._aiInterview.execute(req.body, isStoped as boolean);
       res.status(StatusCodes.OK).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('AI Interview repsponse'),
-        result
+        result,
       });
-
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

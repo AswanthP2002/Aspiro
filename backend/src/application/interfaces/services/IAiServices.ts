@@ -15,6 +15,7 @@ export default interface IAiServices {
     targettedRole: string
   ): Promise<DetailedResumeAnalysisAiDTO | null>;
   aiInterview(
-    persona: { role: 'system' | 'user' | 'assistant'; content: string }[]
+    persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
+    isStoped: boolean
   ): Promise<string | null>;
 }
