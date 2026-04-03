@@ -64,12 +64,12 @@ export default function InterviewPersonalizationPage(){
                                     <div onClick={() => toggleRoleSelection(role)} key={index} className={`text-xs cursor-pointer border border-slate-300 p-2 ${selectedRole === role ? "ring-2 ring-blue-500 text-blue-500 font-semibold" : ""} text-center rounded`}><p>{role}</p></div>
                                 ))}
                             </div>
-                            {!selectedRole && (
+                            {/* {!selectedRole && ( */}
                                 <div className="mt-5">
                                     <p className="text-sm font-medium">Didn't find your desired role ?</p>
-                                    <input type="text" className="bg-gray-100 w-full p-2 mt-2 rounded-md border border-slate-200 focus:ring-1 focus:ring-blue-400 focus:shadow" placeholder="Enter your role" />
+                                    <input value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)} type="text" className="bg-gray-100 w-full p-2 mt-2 rounded-md border border-slate-200 focus:ring-1 focus:ring-blue-400 focus:shadow" placeholder="Enter your role" />
                                 </div>
-                            )}
+                            {/* )} */}
                             <div className="my-5 border-t border-slate-300 w-full"></div>
                             <p className="text-sm font-semibold">Experience Level</p>
                             <div className="mt-5 gap-2 grid grid-cols-3">

@@ -23,11 +23,6 @@ export default class AiServices implements IAiServices {
     'meta-llama/llama-3.2-3b-instruct:free',
     'minimax/minimax-m2.5:free',
     'google/gemma-3-4b-it:free',
-    // 'openai/gpt-oss-120b:free',
-    // 'meta-llama/llama-3.2-3b-instruct:free',
-    // 'google/gemma-3-12b-it:free',
-    // 'openai/gpt-oss-20b:free',
-    // 'google/gemma-3-4b-it:free',
   ];
   private _apiUrl: string = 'https://openrouter.ai/api/v1/chat/completions';
   private _systemPrompt: string = `
@@ -215,8 +210,10 @@ STRICTNESS RULES:
   async aiInterview(
     persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
     isStoped: boolean
-  ): Promise<string> {
-    const scorerPrompt = `
+  ): Promise<any> {
+    let finalMessage;
+    if (isStoped) {
+      const scorerPrompt = `
 # ROLE
 You are an expert Technical Hiring Lead and Data Analyst.
 
@@ -242,21 +239,29 @@ Return ONLY a raw JSON object. No markdown backticks, no preamble, no "Here is y
     {
       "question": "string",
       "response": "string",
+      "feedback": "string",
       "score": number // 0-100
     }
   ]
 }
 
 # TRANSCRIPT TO ANALYZE
-${persona.slice(1)}`;
-    console.log('-- checking persona before sending to the ai --', persona);
+${JSON.stringify(persona.slice(1), null, 2)}`;
+      finalMessage = [{ role: 'system', content: scorerPrompt }];
+    } else {
+      finalMessage = persona;
+    }
+
+    console.log('-checking final message for the ai before calling', finalMessage)
+    // console.log('-- checking persona before sending to the ai --', persona);
     for (const model of this._models) {
+      console.log(`Is interview stoped ${isStoped}`);
       try {
         const response = await axios.post(
           this._apiUrl,
           {
             model,
-            messages: isStoped ? { role: 'system', content: scorerPrompt } : persona,
+            messages: finalMessage,
           },
           {
             headers: {
@@ -267,8 +272,9 @@ ${persona.slice(1)}`;
           }
         );
 
-        // console.log('response from the ai', response.data?.choices);
-        return response.data.choices[0]?.message?.content;
+        console.log('response from the ai', response.data?.choices[0]?.message?.content);
+        const result = response.data.choices[0]?.message?.content;
+        return isStoped ? JSON.parse(result) : result;
       } catch (error) {
         const err = error as AxiosError;
         if (
@@ -286,60 +292,3 @@ ${persona.slice(1)}`;
     throw new ServiceBusyError('Ai Models');
   }
 }
-
-// const interviewerPrompt = `
-// # ROLE
-// You are "Apiro AI Interviewer," a professional, supportive, and structured job recruiter.
-
-// # CONTEXT
-// Target Role: ${'web Developer'}
-// Experience Level: ${'Entry Level'}
-
-// # OPERATIONAL RULES
-// 1. ASK ONE QUESTION AT A TIME. Never double-ask.
-// 2. Structure: Acknowledge the user's previous answer briefly -> Ask the next relevant question.
-// 3. Tone: Professional but encouraging. Keep it "genuine" and avoid "robotic" filler.
-// 4. Scope: Focus on technical skills, past projects, and behavioral fit for the ${''}.
-// 5. Termination: If the user says "stop", "exit", or "I'm done", say a professional goodbye and nothing else.
-
-// # STRICT NEGATIVE CONSTRAINTS
-// - DO NOT provide scores or feedback during the interview.
-// - DO NOT output any JSON or code blocks.
-// - DO NOT explain your internal logic.
-// - Keep responses concise (under 3 sentences).
-
-// Let's begin the interview.`;
-
-const scorerPrompt = `
-# ROLE
-You are an expert Technical Hiring Lead and Data Analyst.
-
-# TASK
-Analyze the provided interview transcript between "Apiro AI Interviewer" and the candidate. Generate a structured performance report.
-
-# EVALUATION CRITERIA
-- Content Quality: Depth and technical accuracy of answers.
-- Communication: Clarity and articulation.
-- Confidence: Poise and directness.
-
-# OUTPUT FORMAT
-Return ONLY a raw JSON object. No markdown backticks, no preamble, no "Here is your report."
-
-{
-  "overall_score": number, // 0-100
-  "content_quality_score": number, 
-  "communication_score": number,
-  "confidence_score": number,
-  "strengths": ["string"],
-  "areas_to_improve": ["string"],
-  "question_by_question_analysis": [
-    {
-      "question": "string",
-      "response": "string",
-      "score": number // 0-100
-    }
-  ]
-}
-
-# TRANSCRIPT TO ANALYZE
-[INSERT FULL CHAT HISTORY HERE]`;

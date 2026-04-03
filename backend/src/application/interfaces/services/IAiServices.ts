@@ -17,5 +17,5 @@ export default interface IAiServices {
   aiInterview(
     persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
     isStoped: boolean
-  ): Promise<string | null>;
+  ): Promise<any>;
 }

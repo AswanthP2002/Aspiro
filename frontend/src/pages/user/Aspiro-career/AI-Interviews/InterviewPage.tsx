@@ -3,13 +3,15 @@ import { BiChevronRight } from "react-icons/bi";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { IoMdSend } from "react-icons/io";
 import { MdAutoAwesome, MdKeyboardVoice, MdOutlineKeyboardVoice, MdSlowMotionVideo } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getInterviewResponse } from "../../../../services/userServices";
 import { toast } from "react-toastify";
 import {} from 'spinners-react'
 import BouncingLoader from "../../../../components/common/Bouncing.loader";
 import { LuSpeech } from "react-icons/lu";
 import SpeechRecognition, {useSpeechRecognition} from "react-speech-recognition";
+import {useSpeech} from 'react-text-to-speech'
+import Swal from "sweetalert2";
 
 export default function InterviewPage(){
     const [isStarted, setIsStarted] = useState(false)
@@ -21,6 +23,8 @@ export default function InterviewPage(){
     const [loading, setLoading] = useState(false)
     const [isAiResponding, setIsAiResponding] = useState(false)
     const [isInterviewStoped, setIsInterviewStoped] = useState(false)
+
+    const navigate = useNavigate()
 
     const [chats, setChats] = useState<{role: 'user' | 'ai', message: string}[]>([
         {
@@ -38,27 +42,22 @@ export default function InterviewPage(){
     ])
     const [personas, setPersonas] = useState<{role: 'system' | 'user' | 'assistant', content: string}[]>([
         {role: 'system', content: `
-# ROLE
-You are "Apiro AI Interviewer," a professional, supportive, and structured job recruiter.
-
-# CONTEXT
-Target Role: ${role}
-Experience Level: ${experienceLevel}
-
-# OPERATIONAL RULES
-1. ASK ONE QUESTION AT A TIME. Never double-ask.
-2. Structure: Acknowledge the user's previous answer briefly -> Ask the next relevant question.
-3. Tone: Professional but encouraging. Keep it "genuine" and avoid "robotic" filler.
-4. Scope: Focus on technical skills, past projects, and behavioral fit for the ${role}.
-5. Termination: If the user says "stop", "exit", or "I'm done", say a professional goodbye and nothing else.
-
-# STRICT NEGATIVE CONSTRAINTS
-- DO NOT provide scores or feedback during the interview.
-- DO NOT output any JSON or code blocks.
-- DO NOT explain your internal logic.
-- Keep responses concise (under 3 sentences).
-
-Let's begin the interview.`
+          # ROLE
+          You are "Apiro AI Interviewer," a professional, supportive, and structured job recruiter.
+          # CONTEXT
+          Target Role: ${role} Experience Level: ${experienceLevel}
+          # OPERATIONAL RULES
+          1. ASK ONE QUESTION AT A TIME. Never double-ask.
+          2. Structure: Acknowledge the user's previous answer briefly -> Ask the next relevant question.
+          3. Tone: Professional but encouraging. Keep it "genuine" and avoid "robotic" filler.
+          4. Scope: Focus on technical skills, past projects, and behavioral fit for the ${role}.
+          5. Termination: If the user says "stop", "exit", or "I'm done", say a professional goodbye and nothing else.
+          # STRICT NEGATIVE CONSTRAINTS
+          - DO NOT provide scores or feedback during the interview.
+          - DO NOT output any JSON or code blocks.
+          - DO NOT explain your internal logic.
+          - Keep responses concise (under 3 sentences).
+          Let's begin the interview.`
         }
     ])
 
@@ -121,6 +120,36 @@ Let's begin the interview.`
 
     }
 
+    const endInterview = async () => {
+      const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: 'Stop Interview?',
+        text: 'Are you sure to stop this interview process?. This will terminate the inteview and you will be given the score you achived yet.',
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Stop Interview',
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      })
+
+      if(!confirmResult.isConfirmed) return 
+      setIsInterviewStoped(true)
+      setLoading(true)
+      setIsAiResponding(true)
+      
+      try {
+        const result = await getInterviewResponse(personas, true)
+        if(result?.success){
+          setLoading(false)
+          setIsAiResponding(false)
+          navigate('/profile/aspiro-career/interview/completed-result', {state: {result: result?.result}})
+        }
+      } catch (error) {
+        console.log('Error occured while ', error)
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      }
+    }
+
     return (
       <>
         <div className="bg-gray-50 w-full min-h-screen px-5 lg:px-20 py-15">
@@ -134,10 +163,10 @@ Let's begin the interview.`
                 <p className="text-blue-500">Entry Level</p>
               </div>
             </div>
-            {isStarted && (
+            {isStarted && ( 
               <div>
                 <button
-                  onClick={stopInterview}
+                  onClick={endInterview}
                   className="text-xs bg-white border border-slate-200 p-2 rounded-md text-slate-500"
                 >
                   End Interview
@@ -252,7 +281,7 @@ Let's begin the interview.`
                 </div>
               </div>
               <div className="w-full flex flex-col items-center mt-5">
-                <button className="text-sm bg-green-500 text-white px-4 py-2 rounded-md font-medium">
+                <button onClick={endInterview} className="text-sm bg-green-500 text-white px-4 py-2 rounded-md font-medium">
                   Finish Interview & Get Feedback
                 </button>
               </div>
@@ -262,8 +291,41 @@ Let's begin the interview.`
 
         {/* Testing voice recognition */}
         {/* <SpeechComponent /> */}
+        <TextToSpeech />
       </>
     );
+}
+
+function TextToSpeech(){
+  const {Text, start, pause, stop, speechStatus} = useSpeech({
+    text: "Hello, I’m the Aspiro AI Interviewer. I’ll be guiding you through a structured interview for the Business Development Excecutive position to help us understand your technical background and problem-solving approach. I’ll ask one question at a time. Are you ready to begin?",
+    stableText: true,
+    voiceURI: 'Google UK English Female',
+    pitch: 1,
+    rate: 0.9
+  })
+
+
+  // useEffect(() => {
+  //   const voices = window.speechSynthesis.getVoices()
+  //   console.log("checking available voices", voices)
+  //   voices.forEach((voice) => {
+  //     console.log(voice.voiceURI)
+  //   })
+  // }, [])
+
+  return(
+    <div>
+      <Text />
+      <div>
+        {speechStatus !== "started"
+          ? <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={start}>Start</button>
+          : <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={pause}>Pause</button>
+        }
+        <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={stop}>Stop</button>
+      </div>
+    </div>
+  )
 }
 
 // function SpeechComponent(){
