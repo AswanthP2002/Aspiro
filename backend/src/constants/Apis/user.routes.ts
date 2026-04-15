@@ -86,7 +86,8 @@ export const UserApiRoutes = {
     LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
   },
 
-  AI_INTERVIEW:{
-    START: '/v2/interview/ai'
-  }
+  AI_INTERVIEW: {
+    START: '/v2/interview/ai',
+    LOAD_DASHBOARD: '/v2/interview/ai/dashboard',
+  },
 } as const;

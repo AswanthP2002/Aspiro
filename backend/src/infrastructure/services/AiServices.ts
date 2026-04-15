@@ -3,6 +3,7 @@ import IAiServices from '../../application/interfaces/services/IAiServices';
 import axios, { AxiosError, HttpStatusCode } from 'axios';
 import { ServiceBusyError } from '../../domain/errors/AppError';
 import DetailedResumeAnalysisAiDTO from '../../application/DTOs/resume/DetailedResumeAnalysis.ai.dto';
+import AiInterviewResultDTO from '../../application/DTOs/interview/interview.ai.dto';
 
 @injectable()
 export default class AiServices implements IAiServices {
@@ -210,7 +211,7 @@ STRICTNESS RULES:
   async aiInterview(
     persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
     isStoped: boolean
-  ): Promise<any> {
+  ): Promise<string | AiInterviewResultDTO> {
     let finalMessage;
     if (isStoped) {
       const scorerPrompt = `

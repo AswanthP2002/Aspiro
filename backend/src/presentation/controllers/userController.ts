@@ -50,6 +50,7 @@ import IAdminPermanentBanUserUsecase from '../../application/interfaces/usecases
 import { IGetSimilarUserUsecase } from '../../application/interfaces/usecases/user/IGetSimilarUsers.usecase';
 import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 import IAiInterviewUsecase from '../../application/interfaces/usecases/AI/IAiInterview.usecase';
+import ILoadInterviewDashboardUsecase from '../../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -149,7 +150,9 @@ export class UserController {
     @inject('IGetSimilarUser') private _similarUsers: IGetSimilarUserUsecase,
     @inject('ILoadusersFullDetailsForResumeBuilding')
     private _getUserFullProfileForResumeBuiding: ILoadUserDetailsForResumeBuildingUsecase,
-    @inject('IAiInterviewUsecase') private _aiInterview: IAiInterviewUsecase
+    @inject('IAiInterviewUsecase') private _aiInterview: IAiInterviewUsecase,
+    @inject('ILoadInterviewDashboardUsecase')
+    private _loadInterviewDashboard: ILoadInterviewDashboardUsecase
   ) {}
 
   async testInfinityScroll(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -936,17 +939,32 @@ export class UserController {
 
   async aiInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
     const isStoped = req.query.isStoped === 'true';
+    const userId = req.user.id;
     // console.log('-- checking request body', req.body);
     // res.status(StatusCodes.OK).json({ success: true, message: 'TEstin gflow' });
     // return;
     try {
-      const result = await this._aiInterview.execute(req.body, isStoped);
+      const result = await this._aiInterview.execute(req.body, isStoped, userId);
       res.status(StatusCodes.OK).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('AI Interview repsponse'),
         result,
       });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async loadInterviewDashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._loadInterviewDashboard.execute(userId);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Interview dashboard result'),
+        result,
+      });
+    } catch (error: unknown) {
       next(error);
     }
   }

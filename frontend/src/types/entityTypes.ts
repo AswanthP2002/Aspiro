@@ -1202,6 +1202,15 @@ export interface DetailedResumeAnalysisAiData {
   ];
 }
 
+export interface InterviewDashboardData {
+  totalInterviews: number;
+  averageScore: number;
+  streak: number;
+  totalPracticeTime: string;
+  performance: { attempt: number; score: number }[];
+  history: { title: string; score: number, createdAt: string }[];
+}
+
 
 export interface UserSubscriptionAndPlanDetailsData {
   _id?: string;

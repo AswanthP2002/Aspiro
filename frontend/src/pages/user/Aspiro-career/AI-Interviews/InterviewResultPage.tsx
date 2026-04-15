@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { BiChart, BiCheckCircle, BiInfoCircle, BiRefresh, BiShareAlt, BiTrendingUp } from "react-icons/bi"
 import { BsArrowRight } from "react-icons/bs"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type InterviewResultType = {
     areas_to_improve: string[]
@@ -18,6 +18,7 @@ export default function InterviewCompletePage(){
     const location = useLocation()
     const result = location.state || {}
     const [resultData, setResultData] = useState<InterviewResultType | null>(null)
+    const navigate = useNavigate()
 
     console.log('Checking result from the interview ', result)
     
@@ -68,7 +69,7 @@ export default function InterviewCompletePage(){
                             <p className="text-xs font-medium text-gray-700">{resultData?.content_quality_score}%</p>
                         </div>
                         <div className="w-full h-3 bg-gray-300 rounded-full">
-                            <div className={`h-full bg-black w-[${resultData?.content_quality_score}%] rounded-full`}></div>
+                            <div style={{width: `${resultData?.content_quality_score}%`}} className={`h-full bg-black rounded-full`}></div>
                         </div>
                     </div>
                     <div className="bg-white p-3 border border-slate-200 rounded-md">
@@ -77,16 +78,16 @@ export default function InterviewCompletePage(){
                             <p className="text-xs font-medium text-gray-700">{resultData?.communication_score}%</p>
                         </div>
                         <div className="w-full h-3 bg-gray-300 rounded-full">
-                            <div className={`h-full bg-black w-[${resultData?.communication_score}%] rounded-full`}></div>
+                            <div style={{width: `${resultData?.communication_score}%`}} className={`h-full bg-black rounded-full`}></div>
                         </div>
                     </div>
                     <div className="bg-white p-3 border border-slate-200 rounded-md">
                         <div className="flex justify-between items-end mb-1">
                             <p className="text-xs font-medium text-gray-700">Confidence</p>
-                            <p className="text-xs font-medium text-gray-700">{resultData?.communication_score}%</p>
+                            <p className="text-xs font-medium text-gray-700">{resultData?.confidence_score}%</p>
                         </div>
                         <div className="w-full h-3 bg-gray-300 rounded-full">
-                            <div className={`h-full bg-black w-[${resultData?.communication_score}%] rounded-full`}></div>
+                            <div style={{width: `${resultData?.confidence_score}%`}} className={`h-full bg-black rounded-full`}></div>
                         </div>
                     </div>
                 </div>
@@ -122,6 +123,7 @@ export default function InterviewCompletePage(){
                                 <div className="flex-1">
                                     <p className="font-medium text-sm">{q.question}</p>
                                     <p className="text-xs mt-2 text-slate-500">{q.response.slice(0, 50)}...</p>
+                                    <p className="text-xs mt-2 text-slate-400 leading-relaxed">{q.feedback}</p>
                                 </div>
                                 <p className="font-medium text-sm">{q.score}</p>
                             </div>
@@ -137,7 +139,7 @@ export default function InterviewCompletePage(){
                         <BiRefresh />
                         practice again
                     </button>
-                    <button className="flex items-center justify-center gap-2 text-sm font-medium text-slate-800 border border-slate-300 bg-white p-2 rounded-md">
+                    <button onClick={() => navigate('/profile/aspiro-career/interview/dashboard')} className="flex items-center justify-center gap-2 text-sm font-medium text-slate-800 border border-slate-300 bg-white p-2 rounded-md">
                         <BiTrendingUp />
                         View Dashboard
                     </button>

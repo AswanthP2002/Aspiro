@@ -3,7 +3,7 @@ import { BiAward, BiBriefcase, BiChart, BiCheck, BiCheckCircle, BiChevronDown, B
 import { BsInfo } from 'react-icons/bs';
 import { FaGraduationCap } from 'react-icons/fa';
 import { GiLightBulb } from 'react-icons/gi';
-import { LuFileCode2, LuGlobe, LuLinkedin, LuMail, LuMapPin, LuPhone, LuUser } from 'react-icons/lu';
+import { LuFileCode2, LuFileText, LuGlobe, LuLinkedin, LuMail, LuMapPin, LuPhone, LuUser } from 'react-icons/lu';
 import { loadUserFullProfileDetails } from '../../../services/userServices';
 import { toast } from 'react-toastify';
 import { Certificates, Education, Experience, Skills, UserFullProfileData } from '../../../types/entityTypes';
@@ -25,6 +25,7 @@ const GenerateFromProfile = () => {
   const [isSkillAdding, setIsSkillAdding] = useState(false)
 
   const [personalInfoSectionIncluded, setPersonalInfoSectionIncluded] = useState(true)
+  const [summarySectionIncluded, setSummarySectionIncluded] = useState(true)
   const [experienceSectionIncluded, setExperienceSectionIncluded] = useState(true)
   const [educationSectionIncluded, setEducationSectionIncluded] = useState(true)
   const [skillSectionIncluded, setSkillSectionInclude] = useState(true)
@@ -42,6 +43,7 @@ const GenerateFromProfile = () => {
     skills: true,
     certificates: true
   });
+  const [summary, setSummary] = useState('')
   const [userFullProfileDetails, setUserFullProfileDetails] = useState<UserFullProfileData | null>(null)
   const [analyticsData, setAnalyticsData] = useState<{score: string, feedback: string, strength: string[], improvements: string[]} | null>(null)
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false)
@@ -329,6 +331,21 @@ const GenerateFromProfile = () => {
                 <BiCheckCircle size={14} className="text-emerald-500" />{' '}
                 {`${userFullProfileDetails?.location?.city}, ${userFullProfileDetails?.location?.district}, ${userFullProfileDetails?.location?.state}, ${userFullProfileDetails?.location?.pincode}`}
               </div>
+            </div>
+          </SectionWrapper>
+
+          <SectionWrapper
+            title="Summary"
+            sectionValueAddingStatus={true}
+            icon={<LuFileText />}
+            onToggleSectionValueAdd={() => console.log('test')}
+            isChecked={summarySectionIncluded}
+            toggleCheck={() => setSummarySectionIncluded(prv => !prv)}
+
+          >
+            <div>
+              <p className='text-sm leading-relaxed text-gray-700'>{userFullProfileDetails?.summary}</p>
+              {/* <textarea className='border border-slate-300 rounded-md w-full outline-none p-3' rows={8} /> */}
             </div>
           </SectionWrapper>
 

@@ -467,6 +467,11 @@ import IAnalyzeResumeDetailedUsecase from '../application/interfaces/usecases/AI
 import AnalyzeResumeDetailedUsecase from '../application/usecases/AI/AiAnalyzeResumeDetailed.usecase';
 import IAiInterviewUsecase from '../application/interfaces/usecases/AI/IAiInterview.usecase';
 import AiInterviewUsecase from '../application/usecases/AI/AiInterview.usecase';
+import IInterviewAiResultRepo from '../domain/entities/interview/interview.ai.result.repo';
+import InterviewAIResultRepository from '../infrastructure/repositories/user/interview.ai.result.repository';
+import InterviewAIMapper from '../application/mappers/Interview-AI/InterviewAi.mapperClass';
+import ILoadInterviewDashboardUsecase from '../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
+import LoadInterviewDashboard from '../application/usecases/AI/LoadInterviewDashboard.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -486,6 +491,10 @@ container.registerSingleton<IAlertRepo>('IAlertsRepository', AlertRepository);
 container.registerSingleton<IConnectionRequestRepository>(
   'IConnectionRequestRepository',
   ConnectionRequestRepository
+);
+container.registerSingleton<IInterviewAiResultRepo>(
+  'IInterviewAiResultRepository',
+  InterviewAIResultRepository
 );
 container.registerSingleton<IChatRepository>('IChatRepository', ChatRepository);
 container.registerSingleton<IConversationRepo>('IConversationRepository', ConversationRepository);
@@ -1035,6 +1044,10 @@ container.registerSingleton<IDeleteChatForMeUsecase>(
   'IDeleteChatForMeUsecase',
   DeleteChatForMeUsecase
 );
+container.registerSingleton<ILoadInterviewDashboardUsecase>(
+  'ILoadInterviewDashboardUsecase',
+  LoadInterviewDashboard
+);
 container.registerSingleton<IGetPlansForUserUsecase>(
   'IGetPlansForUsersUsecase',
   GetPlansForUsersUsecase
@@ -1112,5 +1125,6 @@ container.registerSingleton('SavedJobsMapper', SavedJobsMapper);
 container.registerSingleton('AlertsMapper', AlertMapper);
 container.registerSingleton('ConnectionRequestMapper', ConnectionRequestMapper);
 container.registerSingleton('PlanMapper', PlanMapper);
+container.registerSingleton('InterviewAIMapper', InterviewAIMapper);
 
 //register socket

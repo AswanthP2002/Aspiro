@@ -259,7 +259,14 @@ function createUserRouter() {
     centralizedAuthentication,
     authorization(['user']),
     userController.aiInterview.bind(userController)
-  )
+  );
+
+  userRouter.get(
+    UserApiRoutes.AI_INTERVIEW.LOAD_DASHBOARD,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadInterviewDashboard.bind(userController)
+  );
 
   // candidateRouter.get(
   //   '/candidates/:candidateId',
@@ -277,7 +284,7 @@ function createUserRouter() {
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUserFullProfileForResumeBuidling.bind(userController)
-  )
+  );
   // userRouter.post(
   //   '/v1/user/connect-request/:receiverId',
   //   centralizedAuthentication,
@@ -317,53 +324,3 @@ function createUserRouter() {
 }
 
 export default createUserRouter;
-
-/**
- * overall score : number,
- * contentquality score : number,
- * communication score : number,
- * confidence score : number
- * strength : string[]
- * areas to improve : string[]
- * question by question analysis [
- *  {
- *    question: '......',
- *    response: 'user response.........'
- *    score: number
- *  }
- * ]
- */
-
-const test = `
-  Act as a professional job interviewer. Introduce yourself as “Apiro AI Interviewer” and 
-  explain that you will ask a series of tailored questions based on the user’s role and experience. 
-  The user is applying for [insert job role] with [insert experience level]. Ask one clear, 
-  open-ended question at a time. After the user responds, acknowledge their answer and follow up with the next question. 
-  Continue until all key areas relevant to the role have been covered or until the user explicity stop the interview.
-
-  Once the interview is complete, provide a detailed evaluation in JSON format with the following structure:
-
-{
-  "overall_score": number,  //out of 100
-  "content_quality_score": number, // Score for depth, relevance, and accuracy of answers
-  "communication_score": number,  // Score for clarity, articulation, and language use
-  "confidence_score": number,  // Score for confidence and poise during the interview
-  "strengths": [string],  // List of major strengths observed
-  "areas_to_improve": [string], // List of areas needing improvement
-  "question_by_question_analysis": [
-    {
-      "question": "string",  // The question asked
-      "response": "string",  // User’s answer
-      "score": number  // Individual score out of 100
-    }
-  ]
-}
-
-Guidelines for the AI:
-
--Do not include any introductory text, markdown backticks (like \`\`\`json), or conversational filler.
--Evaluate each answer based on content, communication, and confidence.
--Assign a score out of 10 for each question and for overall performance.
--Summarize strengths and areas to improve clearly and concisely.
--Maintain a professional, supportive, and structured tone throughout.
-`

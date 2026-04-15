@@ -12,6 +12,7 @@ import { LuSpeech } from "react-icons/lu";
 import SpeechRecognition, {useSpeechRecognition} from "react-speech-recognition";
 import {useSpeech} from 'react-text-to-speech'
 import Swal from "sweetalert2";
+import { Modal } from "@mui/material";
 
 export default function InterviewPage(){
     const [isStarted, setIsStarted] = useState(false)
@@ -23,24 +24,19 @@ export default function InterviewPage(){
     const [loading, setLoading] = useState(false)
     const [isAiResponding, setIsAiResponding] = useState(false)
     const [isInterviewStoped, setIsInterviewStoped] = useState(false)
+    const [sepeachableText, setSpeachableText] = useState('')
+    const [isInterviewResultCalculating, setIsInterviewResultCalculating] = useState(false)
+
 
     const navigate = useNavigate()
+    // const {start: StartSpeeking, speechStatus, stop, pause} = useSpeech({
+    //   rate: 0.93,
+    //   pitch: 1,
+    //   text: sepeachableText,
+    //   voiceURI: 'Google UK English Female'
+    // })
 
-    const [chats, setChats] = useState<{role: 'user' | 'ai', message: string}[]>([
-        {
-            role: 'ai',
-            message: 'Hi, I am your AI interviewer. Lets starts with an easy question. "Tell me about yourself".'
-        },
-        {
-            role: 'user',
-            message: 'I am aswanth from kannur, I am a fullstack Developer...'
-        },
-        {
-            role: 'ai',
-            message: 'Great answer, your response demonstrate good self awareness.'
-        }
-    ])
-    const [personas, setPersonas] = useState<{role: 'system' | 'user' | 'assistant', content: string}[]>([
+    const [personas, setPersonas] = useState<{role: string, content: string}[]>([
         {role: 'system', content: `
           # ROLE
           You are "Apiro AI Interviewer," a professional, supportive, and structured job recruiter.
@@ -74,6 +70,7 @@ export default function InterviewPage(){
             setConversations((prv) => {
                 return [...prv, {role: 'ai', message: result.result} ]
             })
+            // setSpeachableText(result.result)
             
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Something went wrong')
@@ -100,15 +97,16 @@ export default function InterviewPage(){
         if(!message) return
         const msgData = message
         setMessage('')
-        setPersonas((prv) => {
-            return [...prv, {role: "user", content: msgData}]
-        })
+        const updatedPerona = [...personas, {role: "user", content: msgData}]
+        setPersonas(updatedPerona)
         setConversations((prv) => [...prv, {role: 'user', message: msgData}])
         setIsAiResponding(true)
         try {
-            const result = await getInterviewResponse([...personas, {role: 'user', content: msgData}], isInterviewStoped)
+            const result = await getInterviewResponse(updatedPerona, isInterviewStoped)
             if(result.success){
+                setPersonas((prv) => [...prv, {role: "assistant", content: result.result}])
                 setConversations((prv) => ([...prv, {role: 'ai', message: result?.result}]))
+                // setSpeachableText(result?.result)
             }
         } catch (error) {
             console.log(error)
@@ -132,7 +130,8 @@ export default function InterviewPage(){
         allowEscapeKey: false
       })
 
-      if(!confirmResult.isConfirmed) return 
+      if(!confirmResult.isConfirmed) return
+      setIsInterviewResultCalculating(true) 
       setIsInterviewStoped(true)
       setLoading(true)
       setIsAiResponding(true)
@@ -140,15 +139,31 @@ export default function InterviewPage(){
       try {
         const result = await getInterviewResponse(personas, true)
         if(result?.success){
-          setLoading(false)
+          // setLoading(false)
           setIsAiResponding(false)
+          setIsInterviewResultCalculating(false)
           navigate('/profile/aspiro-career/interview/completed-result', {state: {result: result?.result}})
         }
       } catch (error) {
+        setIsInterviewResultCalculating(false)
         console.log('Error occured while ', error)
         toast.error(error instanceof Error ? error.message : 'Something went wrong')
       }
     }
+
+    // useEffect(() => {
+    //   console.log('Checking speechable notification', sepeachableText)
+    //   if(!sepeachableText) return
+    //   if(speechStatus === 'started'){
+    //     stop()
+    //   }
+
+    //   const timer = setTimeout(() => {
+    //     StartSpeeking()
+    //   }, 180);
+
+    //   return () => clearTimeout(timer)
+    // }, [sepeachableText])
 
     return (
       <>
@@ -174,11 +189,11 @@ export default function InterviewPage(){
               </div>
             )}
           </header>
-          <div>
+          {/* <div>
             <BouncingLoader />
-          </div>
+          </div> */}
           <div className="mt-10">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="bg-white p-5 border border-slate-200 rounded-md flex flex-col items-center">
                 <p className="font-semibold text-sm">Question</p>
                 <p className="text-xs text-slate-500">0 out of 10</p>
@@ -189,10 +204,10 @@ export default function InterviewPage(){
                   {Math.floor(seconds / 60)}:{seconds % 60} Minutes
                 </p>
               </div>
-              <div className="bg-white p-5 border border-slate-200 rounded-md flex flex-col items-center">
+              {/* <div className="bg-white p-5 border border-slate-200 rounded-md flex flex-col items-center">
                 <p className="font-semibold text-sm">Score</p>
                 <p className="text-xs text-slate-500">0%</p>
-              </div>
+              </div> */}
             </div>
           </div>
           {!isStarted && (
@@ -291,42 +306,51 @@ export default function InterviewPage(){
 
         {/* Testing voice recognition */}
         {/* <SpeechComponent /> */}
-        <TextToSpeech />
+        {/* <TextToSpeech /> */}
+
+        {isInterviewResultCalculating && (
+          <Modal className="flex flex-col items-center justify-center backdrop-blur-lg" open>
+            <div className="flex flex-col items-center">
+              <BouncingLoader />
+              <p className="text-sm text-white text-center">Calculating result...</p>
+            </div>
+          </Modal>
+        )}
       </>
     );
 }
 
-function TextToSpeech(){
-  const {Text, start, pause, stop, speechStatus} = useSpeech({
-    text: "Hello, I’m the Aspiro AI Interviewer. I’ll be guiding you through a structured interview for the Business Development Excecutive position to help us understand your technical background and problem-solving approach. I’ll ask one question at a time. Are you ready to begin?",
-    stableText: true,
-    voiceURI: 'Google UK English Female',
-    pitch: 1,
-    rate: 0.9
-  })
+// function TextToSpeech(){
+//   const {Text, start, pause, stop, speechStatus} = useSpeech({
+//     text: "Hello, I’m the Aspiro AI Interviewer. I’ll be guiding you through a structured interview for the Business Development Excecutive position to help us understand your technical background and problem-solving approach. I’ll ask one question at a time. Are you ready to begin?",
+//     stableText: true,
+//     voiceURI: 'Google UK English Female',
+//     pitch: 1,
+//     rate: 0.9
+//   })
 
 
-  // useEffect(() => {
-  //   const voices = window.speechSynthesis.getVoices()
-  //   console.log("checking available voices", voices)
-  //   voices.forEach((voice) => {
-  //     console.log(voice.voiceURI)
-  //   })
-  // }, [])
+//   // useEffect(() => {
+//   //   const voices = window.speechSynthesis.getVoices()
+//   //   console.log("checking available voices", voices)
+//   //   voices.forEach((voice) => {
+//   //     console.log(voice.voiceURI)
+//   //   })
+//   // }, [])
 
-  return(
-    <div>
-      <Text />
-      <div>
-        {speechStatus !== "started"
-          ? <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={start}>Start</button>
-          : <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={pause}>Pause</button>
-        }
-        <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={stop}>Stop</button>
-      </div>
-    </div>
-  )
-}
+//   return(
+//     <div>
+//       <Text />
+//       <div>
+//         {speechStatus !== "started"
+//           ? <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={start}>Start</button>
+//           : <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={pause}>Pause</button>
+//         }
+//         <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={stop}>Stop</button>
+//       </div>
+//     </div>
+//   )
+// }
 
 // function SpeechComponent(){
 //     const [isRecording, setIsRecording] = useState(false)
