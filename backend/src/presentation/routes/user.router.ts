@@ -254,6 +254,20 @@ function createUserRouter() {
     userController.getSimilarUsers.bind(userController)
   );
 
+  userRouter.post(
+    UserApiRoutes.AI_INTERVIEW.START,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.aiInterview.bind(userController)
+  );
+
+  userRouter.get(
+    UserApiRoutes.AI_INTERVIEW.LOAD_DASHBOARD,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.loadInterviewDashboard.bind(userController)
+  );
+
   // candidateRouter.get(
   //   '/candidates/:candidateId',
   //   candidateController.getCandidateDetails.bind(candidateController)
@@ -270,7 +284,7 @@ function createUserRouter() {
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUserFullProfileForResumeBuidling.bind(userController)
-  )
+  );
   // userRouter.post(
   //   '/v1/user/connect-request/:receiverId',
   //   centralizedAuthentication,

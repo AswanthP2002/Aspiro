@@ -96,3 +96,30 @@ input:read-only{
 .text-striked{
   text-decoration: line-through;
 }
+.bouncing-loader {
+  display: flex;
+  justify-content: center;
+}
+.bouncing-loader > div {
+  background-color: rgb(191, 191, 191);
+  width: 10px;
+  height: 10px;
+  border-radius: '100%'!important;
+  margin: 3px 3px;
+  opacity: 1;
+  animation: bouncing-loader 0.6s infinite alternate;
+}
+
+@keyframes bouncing-loader {
+  to {
+    opacity: 0.1;
+    transform: translateY(-16px);
+  }
+}
+
+.bouncing-loader > div:nth-child(2){
+  animation-delay: 0.2s;
+}
+.bouncing-loader > div:nth-child(3){
+  animation-delay: 0.4s;
+}

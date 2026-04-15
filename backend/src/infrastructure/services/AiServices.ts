@@ -3,6 +3,7 @@ import IAiServices from '../../application/interfaces/services/IAiServices';
 import axios, { AxiosError, HttpStatusCode } from 'axios';
 import { ServiceBusyError } from '../../domain/errors/AppError';
 import DetailedResumeAnalysisAiDTO from '../../application/DTOs/resume/DetailedResumeAnalysis.ai.dto';
+import AiInterviewResultDTO from '../../application/DTOs/interview/interview.ai.dto';
 
 @injectable()
 export default class AiServices implements IAiServices {
@@ -23,11 +24,6 @@ export default class AiServices implements IAiServices {
     'meta-llama/llama-3.2-3b-instruct:free',
     'minimax/minimax-m2.5:free',
     'google/gemma-3-4b-it:free',
-    // 'openai/gpt-oss-120b:free',
-    // 'meta-llama/llama-3.2-3b-instruct:free',
-    // 'google/gemma-3-12b-it:free',
-    // 'openai/gpt-oss-20b:free',
-    // 'google/gemma-3-4b-it:free',
   ];
   private _apiUrl: string = 'https://openrouter.ai/api/v1/chat/completions';
   private _systemPrompt: string = `
@@ -210,5 +206,90 @@ STRICTNESS RULES:
     }
 
     throw new ServiceBusyError('AI models');
+  }
+
+  async aiInterview(
+    persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
+    isStoped: boolean
+  ): Promise<string | AiInterviewResultDTO> {
+    let finalMessage;
+    if (isStoped) {
+      const scorerPrompt = `
+# ROLE
+You are an expert Technical Hiring Lead and Data Analyst.
+
+# TASK
+Analyze the provided interview transcript between "Apiro AI Interviewer" and the candidate. Generate a structured performance report.
+
+# EVALUATION CRITERIA
+- Content Quality: Depth and technical accuracy of answers.
+- Communication: Clarity and articulation.
+- Confidence: Poise and directness.
+
+# OUTPUT FORMAT
+Return ONLY a raw JSON object. No markdown backticks, no preamble, no "Here is your report."
+
+{
+  "overall_score": number, // 0-100
+  "content_quality_score": number, 
+  "communication_score": number,
+  "confidence_score": number,
+  "strengths": ["string"],
+  "areas_to_improve": ["string"],
+  "question_by_question_analysis": [
+    {
+      "question": "string",
+      "response": "string",
+      "feedback": "string",
+      "score": number // 0-100
+    }
+  ]
+}
+
+# TRANSCRIPT TO ANALYZE
+${JSON.stringify(persona.slice(1), null, 2)}`;
+      finalMessage = [{ role: 'system', content: scorerPrompt }];
+    } else {
+      finalMessage = persona;
+    }
+
+    console.log('-checking final message for the ai before calling', finalMessage)
+    // console.log('-- checking persona before sending to the ai --', persona);
+    for (const model of this._models) {
+      console.log(`Is interview stoped ${isStoped}`);
+      try {
+        const response = await axios.post(
+          this._apiUrl,
+          {
+            model,
+            messages: finalMessage,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.ASPIRO_AI_API_KEY}`,
+              'Content-Type': 'application/json',
+              'X-Title': 'Aspiro',
+            },
+          }
+        );
+
+        console.log('response from the ai', response.data?.choices[0]?.message?.content);
+        const result = response.data.choices[0]?.message?.content;
+        return isStoped ? JSON.parse(result) : result;
+      } catch (error) {
+        const err = error as AxiosError;
+        if (
+          (err.response && err.response.status >= 500) ||
+          err.response?.status === 400 ||
+          err.response?.status === 429
+        ) {
+          console.log('Error occured', err.message);
+          console.log(`${model} failed: switching to next model`);
+        } else {
+          throw err;
+        }
+      }
+    }
+    throw new ServiceBusyError('Ai Models');
   }
 }

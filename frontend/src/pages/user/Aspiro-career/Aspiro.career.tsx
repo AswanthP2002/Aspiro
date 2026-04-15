@@ -44,7 +44,7 @@ const AspiroCareer = () => {
           <p className="text-gray-600 mb-6">
             Sharpen your responses and technical explanations through interactive, AI-driven mock interview sessions.
           </p>
-          <div className="flex items-center text-emerald-600 font-medium">
+          <div onClick={() => navigate('interview')} className="flex items-center text-emerald-600 font-medium">
             Start Practice <LuArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>

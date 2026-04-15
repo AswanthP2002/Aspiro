@@ -1575,3 +1575,32 @@ export const loadUserFullProfileDetails = async () => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const getInterviewResponse = async (persona: {role: string, content: string}[], isStoped: boolean) => {
+    try {
+    const response = await axiosInstance.post(EndPoints.START_AI_INTERVIEW, persona, {
+            params:{isStoped},
+            sendAuthToken: true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const loadInterviewDashboard = async () => {
+    try {
+    const response = await axiosInstance.get(EndPoints.LOAD_DASHBOARD, 
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+
+        return response.data
+    } catch (error) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

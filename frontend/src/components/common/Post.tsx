@@ -21,6 +21,7 @@ import { GoReport } from 'react-icons/go';
 import { deletePost, likeComment, togglePostSave } from '../../services/userServices';
 import Swal from 'sweetalert2';
 import { RiBookMarkedFill } from 'react-icons/ri';
+import { toast } from 'react-toastify';
 
 export default function Post({ postData }: { postData: UserPosts }) {
     
@@ -50,6 +51,11 @@ export default function Post({ postData }: { postData: UserPosts }) {
 
     const togglePostOptionMenuVisibility = () => setIsPostOptionMenuOPened(prv => !prv)
     const toggleCommentBoxOpen = () => setIsCommentBoxOpen(prv => !prv)
+
+    const collapseText = () => {
+      setIsTextExpanded(prv => !prv)
+      toggleDescriptionVisibility()
+    }
 
     type CommentInput = {
         comment: string
@@ -109,8 +115,11 @@ export default function Post({ postData }: { postData: UserPosts }) {
     }
 
     const likeAComment = async (postId: string, commentId: string, postOwnerId: string) => {
-      if(!postId || !commentId || !postOwnerId) return
-      likeACommentOnAPost(postId, commentId, postOwnerId)
+      if(!postId || !commentId || !postOwnerId) return toast.warn('If condition failed due to comment or post owner id or post id')
+      console.log('- post id', postId)
+      console.log('- comment id', commentId)
+      console.log('- post owner id', postOwnerId)
+        likeACommentOnAPost(postId, commentId, postOwnerId)
       setCommentLiked(true)
     }
 
@@ -266,7 +275,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
     )}
     
     <p className="text-[14px] leading-relaxed text-gray-800 whitespace-pre-wrap">{showDescription(postData?.description)}</p>
-    <button onClick={toggleDescriptionVisibility} className={`text-[12px] font-bold mt-2 ${isTextExpanded ? 'text-gray-400' : 'text-blue-600 hover:underline'}`}>
+    <button onClick={collapseText} className={`text-[12px] font-bold mt-2 ${isTextExpanded ? 'text-gray-400' : 'text-blue-600 hover:underline'}`}>
       {isTextExpanded ? 'Read less' : 'Read more'}
     </button>
   </div>

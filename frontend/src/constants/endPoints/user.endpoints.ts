@@ -75,4 +75,6 @@ export const EndPoints = {
     BAN_USER_BY_ID: (userId: string) => `/v2/user/ban/${userId}`,
 
     LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
+    START_AI_INTERVIEW: '/v2/interview/ai',
+    LOAD_DASHBOARD: '/v2/interview/ai/dashboard'
 } as const

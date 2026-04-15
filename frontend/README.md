@@ -52,3 +52,33 @@ export default tseslint.config({
   },
 })
 ```
+
+
+
+Microsoft David - English (United States)
+Microsoft Hazel - English (United Kingdom) //eligible
+Microsoft Susan - English (United Kingdom) //eligible
+Microsoft Heera - English (India)
+Microsoft Ravi - English (India) //halfly-eligible
+Microsoft George - English (United Kingdom) //eligible
+Microsoft Mark - English (United States)
+Microsoft Zira - English (United States) //eligible
+Google Deutsch
+Google US English //highly eligible
+Google UK English Female //great professionalism : higly eligible
+Google UK English Male
+Google español
+Google español de Estados Unidos
+Google français
+Google हिन्दी
+Google Bahasa Indonesia
+Google italiano
+Google 日本語
+Google 한국의
+Google Nederlands
+Google polski
+Google português do Brasil
+Google русский
+Google 普通话（中国大陆）
+Google 粤語（香港）
+Google 國語（臺灣）
