@@ -13,6 +13,8 @@ import { toast } from "react-toastify";
 import { InterviewDashboardData } from "../../../../types/entityTypes";
 import moment from "moment";
 import { MdOutlineEventBusy } from "react-icons/md";
+import { BsArrowLeft } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 
 export default function InterviewDashboardPage(){
@@ -26,6 +28,8 @@ export default function InterviewDashboardPage(){
         {attempt: 6, score: 0},
         {attempt: 7, score: 0}
     ])
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         async function loadDashboardDetails(){
@@ -48,6 +52,12 @@ export default function InterviewDashboardPage(){
     return(
         <>
             <div className="px-5 lg:px-20 py-15">
+                <div className="mb-2">
+                    <button onClick={() => navigate(-1)} className="text-xs flex items-center gap-2 p-2 rounded-md hover:bg-gray-200">
+                        <BsArrowLeft />
+                        <p>Back</p>
+                    </button>
+                </div>
                 <p className="font-semibold text-xl">Your progress dashboard</p>
                 <p className="text-xs mt-2 text-slate-700">Track your improvements and stay motivated</p>
                 <div className="mt-10 grid grid-cols-2 gap-5 gap-y-5 md:grid-cols-4">
