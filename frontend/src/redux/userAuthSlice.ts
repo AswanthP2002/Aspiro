@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { reAuthenticateThunk } from './reAuthenticateSlice';
+// import { reAuthenticateThunk } from './reAuthenticateSlice';
 
 interface User {
   _id: string;
@@ -66,24 +66,24 @@ const userAuthSlice = createSlice({
       state.initialLoading = false
     }
   },
-  extraReducers(builder) {
-    builder
-      .addCase(reAuthenticateThunk.pending, (state) => {
-        state.initialLoading = true
-      })
-      .addCase(reAuthenticateThunk.fulfilled, (state, action: any) => {
-        state.user = action.payload.userData
-        state.userToken = action.payload.accessToken
-        state.userRole = action.payload.userData.role
-        state.initialLoading = false
-      })
-      .addCase(reAuthenticateThunk.rejected, (state) => {
-        state.initialLoading = false
-        state.user = null
-        state.userRole = null
-        state.userToken = null
-      })
-  },
+  // extraReducers(builder) {
+  //   builder
+  //     .addCase(reAuthenticateThunk.pending, (state) => {
+  //       state.initialLoading = true
+  //     })
+  //     .addCase(reAuthenticateThunk.fulfilled, (state, action: any) => {
+  //       state.user = action.payload.userData
+  //       state.userToken = action.payload.accessToken
+  //       state.userRole = action.payload.userData.role
+  //       state.initialLoading = false
+  //     })
+  //     .addCase(reAuthenticateThunk.rejected, (state) => {
+  //       state.initialLoading = false
+  //       state.user = null
+  //       state.userRole = null
+  //       state.userToken = null
+  //     })
+  // },
 })
     
 export const { loginSuccess, logout, tokenRefresh, updateUserMetaData } = userAuthSlice.actions;
