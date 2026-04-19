@@ -7,7 +7,7 @@ import { FaArrowTrendUp } from 'react-icons/fa6';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAlerts } from '../../../redux/alertSlice';
-import { AlertsData } from '../../../types/entityTypes';
+import { Alerts, AlertsData } from '../../../types/entityTypes';
 import { fetchUserAlerts } from '../../../services/alertsServices';
 import { toast } from 'react-toastify';
 
@@ -113,10 +113,10 @@ export default function AlertsPage() {
 
   const dipsatch = useDispatch()
 
-  const alerts = useSelector((state: any) => {
+  const alerts = useSelector((state: {alert: {alerts: Alerts[]}}) => {
       return state.alert.alerts
   })
-  const unreadCount = useSelector((state: any) => {
+  const unreadCount = useSelector((state: {alert: {unReadAlertsCount: number}}) => {
     return state.alert.unReadAlertsCount
   })
 
@@ -195,7 +195,7 @@ export default function AlertsPage() {
   );
 }
 
-function AlertsCard({ alert }: { alert: any }) {
+function AlertsCard({ alert }: { alert: Alerts }) {
     const [isAlertSingleMenuOpened, setIsAlertsingleMenuOpened] = useState<boolean>(false)
     const toggleAlertSingleMenu = () => setIsAlertsingleMenuOpened(prv => !prv)
     

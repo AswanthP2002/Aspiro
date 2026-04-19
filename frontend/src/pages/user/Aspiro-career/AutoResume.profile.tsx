@@ -16,8 +16,10 @@ import { AxiosError } from 'axios';
 import { FiAlertCircle, FiX } from 'react-icons/fi';
 import { MdAutoAwesome } from 'react-icons/md';
 import { CgClose } from 'react-icons/cg';
+import BouncingLoader from '../../../components/common/Bouncing.loader';
 
 const GenerateFromProfile = () => {
+  const [loading, setLoading] = useState(true)
   // Example state to manage selections
   const [isExperienceAdding, setIsExperienceAdding] = useState(false)
   const [isEducationAdding, setIsEducationAdding] = useState(false)
@@ -111,6 +113,7 @@ const GenerateFromProfile = () => {
 
   useEffect(() => {
     async function LoadFullUserProfile(){
+      setLoading(true)
         try {
             const result = await loadUserFullProfileDetails()
             console.log('-- full details result from the backend --', result)
@@ -120,6 +123,10 @@ const GenerateFromProfile = () => {
         } catch (error) {
             console.log('error', error)
             toast.error(error instanceof Error ? error.message : 'Something went wrong')
+        } finally {
+          setTimeout(() => {
+            setLoading(false)
+          }, 3000);
         }
     }
 
@@ -976,6 +983,14 @@ const GenerateFromProfile = () => {
       </div>
     </div>
     <AnalysisModal open={isAnalysisModalOpen} handleClose={closeAnalysisModal} data={analyticsData} />
+    {loading && (
+      <Modal className='backdrop-blur-md flex items-center justify-center' open>
+        <div className='flex flex-col items-center'>
+          <BouncingLoader />
+          <p className='text-xs text-white'>Fetching details...</p>
+        </div>
+      </Modal>
+    )}
     </>
   );
 };

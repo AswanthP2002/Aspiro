@@ -1,4 +1,6 @@
-export default function TileGuide({data} : any){
+import React from "react";
+
+export default function TileGuide({data} : {data: {icon: React.ReactNode, title: string, description: string}}){
     return(
         <>
         <div className="aspiro-guide-tile card hover:shadow-lg hover:-translate-y-1 transitio-all duration-200 easi-in-out flex flex-col justify-center items-center rounded-md p-5 w-full gap-5">

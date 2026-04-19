@@ -5,9 +5,9 @@ import Loader from '../candidate/Loader';
 
 interface RootState {
   userAuth: {
-    user: any,
+    user: {_id: string, name: string},
     initialLoading: boolean,
-    userRole: any,
+    userRole: string,
     userToken: string
   }
 }

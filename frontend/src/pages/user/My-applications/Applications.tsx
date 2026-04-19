@@ -59,9 +59,9 @@ export default function MyApplications() {
     setSearch(value)
   }
 
-  const dbouncedSearch = (fn: Function, delay: number) => {
-    let timer: any
-    return function(...args: any){
+  const dbouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
+    let timer: ReturnType<typeof setTimeout>
+    return function(...args: Parameters<T>){
       clearTimeout(timer)
       timer = setTimeout(() => {
           fn(...args)

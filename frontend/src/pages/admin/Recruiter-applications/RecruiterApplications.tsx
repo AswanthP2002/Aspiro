@@ -43,21 +43,21 @@ const reasons = [
 ];
 
 
-function ProfileStatusTileCard({data}: {data: {title: string, icon: any, count: number, customClass: string, customTitleClass: string}}){
-    return (
-        <div className={`border border-gray-200 rounded-md p-5 ${data.customClass}`}>
-            <div className="flex justify-between">
-                <div>
-                   <p className={`font-light text-sm ${data.customTitleClass}`}>{data.title}</p>
-                    <p className="text-lg mt-2">{data.count}</p>
-                </div>
-                <div>
-                    {data.icon}
-                </div>
-            </div>
-        </div>
-    )
-}
+// function ProfileStatusTileCard({data}: {data: {title: string, icon: any, count: number, customClass: string, customTitleClass: string}}){
+//     return (
+//         <div className={`border border-gray-200 rounded-md p-5 ${data.customClass}`}>
+//             <div className="flex justify-between">
+//                 <div>
+//                    <p className={`font-light text-sm ${data.customTitleClass}`}>{data.title}</p>
+//                     <p className="text-lg mt-2">{data.count}</p>
+//                 </div>
+//                 <div>
+//                     {data.icon}
+//                 </div>
+//             </div>
+//         </div>
+//     )
+// }
 
 function ApplicationStatusPills({status}: {status: string}){
     switch(status){

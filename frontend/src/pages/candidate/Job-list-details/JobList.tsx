@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import JobListTile from '../../../components/common/JobListTile';
 import { getJobs } from '../../../services/userServices';
 import { Notify } from 'notiflix';
@@ -102,13 +102,13 @@ export default function JobListing() {
     fetchJobs();
   }, [search, page, workModeFilter, jobLevelFilter, jobTypeFilter, locationSearch]);
 
-  function searchJobs(event: any) {
+  function searchJobs(event: React.ChangeEvent<HTMLInputElement>) {
     setsearch(event.target.value);
   }
 
-  function debouncedSearch(fn: Function, dealy: number) {
-    let timer: any;
-    return function (...args: any) {
+  function debouncedSearch <T extends (...args: never[]) => void>(fn: T, dealy: number) {
+    let timer: ReturnType<typeof setTimeout>;
+    return function (...args: Parameters<T>) {
       clearTimeout(timer);
       timer = setTimeout(() => {
         fn(...args);

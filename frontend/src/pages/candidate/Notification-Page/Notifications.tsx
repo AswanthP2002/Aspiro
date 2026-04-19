@@ -97,20 +97,6 @@ const notifications = [
   },
 ];
 
-type DummyNotification = {
-  _id: number;
-  notificationType: 'user' | 'app' | 'job';
-  title: string;
-  userDetails?: {
-    name: string;
-    headline: string;
-    photo: string;
-  };
-  message: string;
-  relativeTime: string;
-  icon?: any;
-  status: 'delivered' | 'read';
-};
 
   const getClippedText = (text: string, buffer: number) => {
     if (text?.length <= buffer) return text;
@@ -174,10 +160,10 @@ export default function NotificationPage() {
     }
   };
 
-  const notificationsFromRedux = useSelector((state: any) => {
+  const notificationsFromRedux = useSelector((state: {notification: {notifications: Notification[]}}) => {
     return state.notification.notifications;
   });
-  const unReadNotificationsCount = useSelector((state: any) => {
+  const unReadNotificationsCount = useSelector((state: {notification: {unReadNotificationsCount: number}}) => {
     return state.notification.unReadNotificationsCount
   })
 
@@ -418,7 +404,7 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
     
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const logedUser = useSelector((state: any) => {
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
       return state.userAuth.user
     })
 

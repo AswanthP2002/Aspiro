@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiPlus } from 'react-icons/bi';
 import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
@@ -138,16 +138,16 @@ const SkillsLibrary = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentSkill, setCurrentSkill] = useState<SkillData | null>(null);
 
-    const searchMethod = (e: any) => {
+    const searchMethod = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(/^[a-zA-Z0-9 ]*$/.test(e.target.value)){
             setSearch(e.target.value)
         }
         //Notify.info(e.target.value, {timeout: 1000})
     }
 
-    const dbounceSearch = (fn: Function, delay: number) => {
-        let timer: any
-        return function(...args: any){
+    const dbounceSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
+        let timer: ReturnType<typeof setTimeout>
+        return function(...args: Parameters<T>){
             clearTimeout(timer)
             timer = setTimeout(() => {
                 fn(...args)
@@ -431,7 +431,7 @@ const WorkModes = () => {
     // const openModal = () => setIsAddWorkModeModalOpen(true)
     const closeModal = () => setIsAddWorkModeModalOpen(false)
 
-    const toggleStatus = (e: any, id: string) => {
+    const toggleStatus = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
         const isChecked = e.target.checked
         setWorkModes((prv: WorkModeData[]) => {
             return prv.map((workMode: WorkModeData) => {
@@ -791,7 +791,7 @@ const JobLevel = () => {
     // const openModal = () => setIsJobLeveModalOpen(true)
     const closeModal = () => setIsJobLeveModalOpen(false)
 
-    const toggleStatus = (e: any, id: string) => {
+    const toggleStatus = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
         const isChecked = e.target.checked
         setJobLevelData((prv: JobLevelData[]) => {
             return prv.map((jobLevel: JobLevelData) => {
@@ -1158,7 +1158,7 @@ const JobTypes = () => {
     // const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
 
-    const toggleStatus = (e: any, id: string) => {
+    const toggleStatus = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
         const isChecked = e.target.checked
         setJobTypesData((prv: JobTypesData[]) => {
             return prv.map((jobType: JobTypesData) => {

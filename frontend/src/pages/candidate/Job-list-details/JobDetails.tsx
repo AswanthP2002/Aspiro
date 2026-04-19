@@ -35,9 +35,9 @@ export default function JObDetailsCandidateSide() {
     
     const params = useParams()
     const jobId  = params?.id as string
-    const logedUser = useSelector((state : any) => {
-        return state.userAuth.user
-    })
+    // const logedUser = useSelector((state : any) => {
+    //     return state.userAuth.user
+    // })
 
     console.log('params is here', jobId)
     const navigator = useNavigate()

@@ -810,7 +810,7 @@ export const removeSocialLink = async (domain : string) => {
     }
 }
 
-export const updateProfilePicture = async (formData : any, publicId : string = "") => {
+export const updateProfilePicture = async (formData : FormData, publicId : string = "") => {
     try {
         const response = await axiosInstance.patch('/v1/user/me/profile-picture', formData,
             {
@@ -847,7 +847,7 @@ export const removeProfilePicture = async (cloudinaryPublicId : string) => {
     }
 }
 
-export const updateCoverPhoto = async (formData : any, publicId : string = "") => {
+export const updateCoverPhoto = async (formData : FormData, publicId : string = "") => {
     try {
         const response = await axiosInstance.patch(EndPoints.UPLOAD_COVER_PHOTO, formData,
             {   params:{publicId},
@@ -999,7 +999,7 @@ export const trackMyApplication = async (applicationId: string) => {
 
 export const updateNOtificationReadStatus = async (id : string) => {
     try {
-        const response = await axiosInstance.patch(`/candidate/notification/${id}`, {}, {sendAuthTokenCandidate:true} as AxiosRequest)
+        const response = await axiosInstance.patch(`/candidate/notification/${id}`, {}, {sendAuthToken:true} as AxiosRequest)
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
@@ -1008,7 +1008,7 @@ export const updateNOtificationReadStatus = async (id : string) => {
     }
 }
 
-export const createPost = async (formdata : any, onProgress?: (percentage: number) => void) => {
+export const createPost = async (formdata : FormData, onProgress?: (percentage: number) => void) => {
     try {
         const response = await axiosInstance.post(EndPoints.CREATE_FEED_POST,
             formdata,
@@ -1345,7 +1345,7 @@ export const initializeConversation = async (receiver: string) => {
 //     }
 // }
 
-export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: any) => {
+export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: string) => {
     try {
         const response = await axiosInstance.post(EndPoints.UNFOLLOW_A_USER(userId), {
             acted_by,

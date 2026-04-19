@@ -87,7 +87,7 @@ export default function PostAJobForm(){
             if (result?.success) {
                 console.log('--checking fetching skills --', result)
                 // Adjust based on your actual API response structure
-                const skills = result.result.skills.map((s: any) => s.skills);
+                const skills = result.result.skills.map((s: {skills: string}) => s.skills);
                 console.log('--checking mapped skils', skills)
                 setSkillOptions(skills);
             }
@@ -99,9 +99,9 @@ export default function PostAJobForm(){
     };
 
     // Debounce function for search
-    const debounce = (func: Function, delay: number) => {
-        let timer: any;
-        return (...args: any[]) => {
+    const debounce = <T extends (...args: never[]) => void>(func: T, delay: number) => {
+        let timer: ReturnType<typeof setTimeout>;
+        return (...args: Parameters<T>) => {
             clearTimeout(timer);
             timer = setTimeout(() => func(...args), delay);
         };

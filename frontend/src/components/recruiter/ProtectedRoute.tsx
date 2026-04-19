@@ -1,15 +1,15 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import { Navigate, Outlet } from "react-router-dom";
 
-function RecruiterProtectedRoutes(){
+// function RecruiterProtectedRoutes(){
     
-    const recruiter = useSelector((state : any) => {
-        return state.recruiterAuth.recruiter
-    })
+//     const recruiter = useSelector((state : any) => {
+//         return state.recruiterAuth.recruiter
+//     })
 
-    return recruiter ? <Outlet /> : <Navigate to='/recruiter/login' replace />
-}
+//     return recruiter ? <Outlet /> : <Navigate to='/recruiter/login' replace />
+// }
 
 
 
-export default RecruiterProtectedRoutes
+// export default RecruiterProtectedRoutes

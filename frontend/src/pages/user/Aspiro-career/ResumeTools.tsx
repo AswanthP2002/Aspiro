@@ -1,13 +1,17 @@
-import React from 'react';
+import { Modal } from '@mui/material';
+import React, { useState } from 'react';
 import { BiCheckCircle, BiDownload } from 'react-icons/bi';
 import { BsEye } from 'react-icons/bs';
 import { CgMoreVertical } from 'react-icons/cg';
 import { FiEdit3 } from 'react-icons/fi';
 import { LuFileText, LuLayoutDashboard, LuPlus, LuStar } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
+import BouncingLoader from '../../../components/common/Bouncing.loader';
 
 const ResumeToolsPage = () => {
+  const navigate = useNavigate()
   return (
+    <>
     <div className="min-h-screen bg-[#F8FAFC] p-8 font-sans text-[#1E293B]">
       {/* Header Section */}
       <header className="mb-10">
@@ -16,14 +20,14 @@ const ResumeToolsPage = () => {
       </header>
 
       {/* Top Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <ActionCard
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        {/* <ActionCard
           url={""}
           icon={<LuPlus className="text-white w-6 h-6" />} 
           iconBg="bg-blue-500"
           title="Create a new Resume" 
           desc="Build a professional resume from scratch" 
-        />
+        /> */}
         <ActionCard
           url={"auto-create"}
           icon={<LuStar className="text-white w-6 h-6" />} 
@@ -41,7 +45,7 @@ const ResumeToolsPage = () => {
       </div>
 
       <div className="flex justify-end mb-8">
-        <button className="bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-700 transition-colors">
+        <button onClick={() => navigate('auto-create')} className="bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-700 transition-colors">
           <LuPlus size={18} /> Create new resume
         </button>
       </div>
@@ -87,6 +91,7 @@ const ResumeToolsPage = () => {
         </ul>
       </footer>
     </div>
+    </>
   );
 };
 

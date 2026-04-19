@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import { Navigate, Outlet } from "react-router-dom";
 
-export default function RecruiterLogedInRoutes(){
-    const recruiter = useSelector((state : any) => {
-        console.log('this is state', state)
-        return state.recruiterAuth.recruiterToken
-    })
+// export default function RecruiterLogedInRoutes(){
+//     const recruiter = useSelector((state : any) => {
+//         console.log('this is state', state)
+//         return state.recruiterAuth.recruiterToken
+//     })
 
-    return recruiter ? <Navigate to='/recruiter' /> : <Outlet />
-}
+//     return recruiter ? <Navigate to='/recruiter' /> : <Outlet />
+// }

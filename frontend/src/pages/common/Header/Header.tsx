@@ -15,14 +15,14 @@ export default function Header(){
 
     const {openCreatePostModal} = useContext(appContext)
 
-    const [notifications, setNotifications] = useState<any[]>([])
+    // const [notifications, setNotifications] = useState<any[]>([])
     // let notificationstest : any[] = []
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const user = useSelector((state : any) => {
+    const user = useSelector((state : {userAuth: {user: {_id: string, name: string}}}) => {
         return state.userAuth.user
     })
-    const userRole = useSelector((state : any) => {
+    const userRole = useSelector((state : {userAuth: {user:{_id: string}, userRole: string}}) => {
         return state.userAuth.userRole
     })
     

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../components/candidate/Loader";
@@ -37,7 +37,7 @@ export default function RecruiterVerificationPage(){
 
     const navigator = useNavigate()
 
-    function submitOtp(event : any) : void {
+    function submitOtp(event : React.FormEvent<HTMLFormElement>) : void {
         setloading(true)
         event.preventDefault()
         const typedOtpError = !otp || false

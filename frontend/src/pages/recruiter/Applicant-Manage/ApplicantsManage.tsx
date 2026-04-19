@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import defaultProfile from '../../../../public/default-img-instagram.png'
-import { finalizeShortList, getApplicationDetails, getSingleApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus } from "../../../services/recruiterServices"
-import ApplicantCard from "../../../components/recruiter/ApplicantCard"
+import { getApplicationDetails, getSingleApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus } from "../../../services/recruiterServices"
+// import ApplicantCard from "../../../components/recruiter/ApplicantCard"
 import Swal from "sweetalert2"
 import Loader from "../../../components/candidate/Loader"
 import { Notify } from "notiflix"
@@ -441,31 +441,31 @@ const interviewTypes = [
         }
     }
 
-    async function finalizeShortlistMethod(){
-        const shortlistedIds = shortList.map((app) => {
-            return app._id
-        })
+    // async function finalizeShortlistMethod(){
+    //     const shortlistedIds = shortList.map((app) => {
+    //         return app._id
+    //     })
 
-        const result = await finalizeShortList(jobId, shortlistedIds)
-        if(result?.success){
-            Swal.fire({
-                icon:'success',
-                title:'Finalized',
-                text:'You will redirected to the details page',
-                showConfirmButton:false,
-                showCancelButton:false,
-                timer:2400
-            }).then(() => {
-                navigator('finalized', {state:{jobId}})
-            })
-        }else{
-            Swal.fire({
-                icon:'error',
-                title:'Oops',
-                text:result?.message
-            })
-        }
-    }
+    //     const result = await finalizeShortList(jobId, shortlistedIds)
+    //     if(result?.success){
+    //         Swal.fire({
+    //             icon:'success',
+    //             title:'Finalized',
+    //             text:'You will redirected to the details page',
+    //             showConfirmButton:false,
+    //             showCancelButton:false,
+    //             timer:2400
+    //         }).then(() => {
+    //             navigator('finalized', {state:{jobId}})
+    //         })
+    //     }else{
+    //         Swal.fire({
+    //             icon:'error',
+    //             title:'Oops',
+    //             text:result?.message
+    //         })
+    //     }
+    // }
 
     
     const onApplicationStatusUpdate = (applicationId: string, status: string) => {

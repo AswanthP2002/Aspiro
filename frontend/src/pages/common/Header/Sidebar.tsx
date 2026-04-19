@@ -15,7 +15,7 @@ export default function Sidebar() {
   const { openCreatePostModal } = useContext(appContext);
   // const { socket } = useContext(SocketContext)
 
-  const unReadNotificationsCount = useSelector((state: any) => {
+  const unReadNotificationsCount = useSelector((state: {notification: {unReadNotificationsCount: number}}) => {
     return state.notification.unReadNotificationsCount;
   });
   return (

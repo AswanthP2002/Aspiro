@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
@@ -16,7 +16,7 @@ import { toast } from "react-toastify"
 
 export default function JobApplyPage() {
     
-    const [resume, setResume] = useState<any>(null)
+    const [resume, setResume] = useState<File | null>(null)
     const [myResumesList, setMyResumesList] = useState<Resumes[]>([])
     const [resumeLoader, setResumeLoader] = useState(false)
     const [savedResumeId, setSavedResumeId] = useState("")
@@ -26,9 +26,9 @@ export default function JobApplyPage() {
     const [coverLetterContent, setCoverLetterContent] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [coverLetterContentNillError, setResumeCoverLetterContentNillError] = useState('')
-    const resumeFieldRef : any = useRef(null)
+    const resumeFieldRef = useRef<HTMLInputElement | null>(null)
 
-    const params : any = useParams()
+    const params = useParams()
 
     const selectOneResumeFromList = (resumeId: string) => {
         setSavedResumeId((prv) => {
@@ -52,7 +52,7 @@ export default function JobApplyPage() {
         resumeFieldRef.current.click()
     }
 
-    function selectResume(event : any){
+    function selectResume(event : React.ChangeEvent<HTMLInputElement>){
         const file = event.target.files[0]
         console.log('checking the file', file)
         if(file){
@@ -121,7 +121,7 @@ export default function JobApplyPage() {
             let resumeResult
             if(!savedResumeId){
                 const formData = new FormData();
-                formData.append('resume', resume);
+                formData.append('resume', resume as Blob);
 
                 resumeResult = await addUserResume(formData);
                 console.log('-- recently uploadred recume id response--', resumeResult, resumeResult?.result?._id)

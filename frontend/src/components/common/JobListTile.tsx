@@ -15,13 +15,19 @@ import { currencyFormatter } from '../../helpers/Currency.helper'
 import { TbBookmarkFilled } from 'react-icons/tb'
 import { toast } from 'react-toastify'
 
-
+interface RootUser {
+  userAuth: {
+    user:{
+      id: string
+    }
+  }
+}
 export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     const navigateTo = useNavigate()
     const [isJobSave, setIsJobSaved] = useState<boolean>(false)
     const [isJobApplied, setIsJobApplied] = useState(false)
 
-    const logedUser = useSelector((state : any) => {
+    const logedUser = useSelector((state : RootUser) => {
         return state.userAuth
     })
 
@@ -144,7 +150,7 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     )
 }
 
-const InfoItem = ({ icon, label, value, bgColor }: { icon: React.ReactNode, label: string, value: any, bgColor: string }) => (
+const InfoItem = ({ icon, label, value, bgColor }: { icon: React.ReactNode, label: string, value: number | string | undefined, bgColor: string }) => (
   <div className="flex items-center gap-3">
     <div className={`w-8 h-8 ${bgColor} rounded flex items-center justify-center shrink-0`}>
       {icon}

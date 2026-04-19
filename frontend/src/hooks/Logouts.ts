@@ -54,12 +54,12 @@ export async function candidateLogout(token : string){
                     }
                 })
             }
-        } catch (error : any) {
+        } catch (error : unknown) {
             console.log('Error occured while candidate logout', error)
             Swal.fire({
                 icon:'error',
                 title:'Error',
-                text:error.message,
+                text:error instanceof Error ? error.message : 'Something went wrong',
                 confirmButtonText:'Home',
                 showCancelButton:false
             }).then((result) => {

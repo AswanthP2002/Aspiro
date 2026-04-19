@@ -1,20 +1,18 @@
 import landingPageImage from '/Illustration.png'
 import './Home.css'
-import datas from '../../../assets/data/dummyintrodata'
+// import datas from '../../../assets/data/dummyintrodata'
 import jobVacancies from '../../../assets/data/dummyjobvacancies'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Tile from '../../../components/common/Tile'
 import TileGuide from '../../../components/common/TileGuide'
 import { guideData } from '../../../assets/data/guideData'
-import {FaSuitcase, FaBriefcase, FaUsers, FaConnectdevelop} from 'react-icons/fa'
+import {FaConnectdevelop} from 'react-icons/fa'
 import {PiBuildingOfficeFill, PiRocket, PiSuitcase} from 'react-icons/pi'
-import reviews from '../../../assets/data/dummyReviews'
+// import reviews from '../../../assets/data/dummyReviews'
 import arrowupdown from '/Arrows-up-down.png'
 import arrowdownup from '/Arrows-down-up.png'
-import Testimonial from '../../../components/common/testimonials'
-import { TileRegisterAsCandidate, TileRegisterAsRecruiter } from '../../../components/common/AccountInfoTile'
-import { commonService } from '../../../services/commonServices'
-import Swal from 'sweetalert2'
+// import { commonService } from '../../../services/commonServices'
+// import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import { IoChatbubble, IoLocation, IoSearch } from 'react-icons/io5'
 import { LuUsers } from 'react-icons/lu'
@@ -25,12 +23,9 @@ import { FiInstagram } from 'react-icons/fi'
 
 
 export default function Home(){
-    const [tileData, setTiledata] = useState(datas)
     const [jobvacancies, setjobvacancies] = useState(jobVacancies)
     const [tileguideData, settileguideData] = useState(guideData)
-    const [reviewData, setreviews] = useState(reviews)
-    const [jobKeywordSearch, setJobKeywordSearch] = useState('')
-    const [searchedJobs, setSearchedJobs] = useState<any[]>([])
+    // const [searchedJobs, setSearchedJobs] = useState([])
 
     const cardData = [
         {
@@ -100,44 +95,44 @@ export default function Home(){
 
     const navigator = useNavigate()
 
-    async function searchJob(event : any){
-        console.log('search value for everykeyup', event.target.value)
-        try {
-            const searchResponse = await commonService.homePageSearch(event.target.value)
-            const result = await searchResponse.json()
+    // async function searchJob(event : React.ChangeEvent<HTMLInputElement>){
+    //     console.log('search value for everykeyup', event.target.value)
+    //     try {
+    //         const searchResponse = await commonService.homePageSearch(event.target.value)
+    //         const result = await searchResponse.json()
             
-            if(result?.success && event.target.value){
-                setSearchedJobs(result?.jobs)
-            }else{
-                setSearchedJobs([])
-            }
-        } catch (error : unknown) {
-            console.log('Error occured while searching the job from the homepage', error)
-            if(error instanceof Error){
-                Swal.fire({
-                    icon:'error',
-                    title:'CAUTION',
-                    text:error?.message
-                })
-            }
-        }
-    }
+    //         if(result?.success && event.target.value){
+    //             setSearchedJobs(result?.jobs)
+    //         }else{
+    //             setSearchedJobs([])
+    //         }
+    //     } catch (error : unknown) {
+    //         console.log('Error occured while searching the job from the homepage', error)
+    //         if(error instanceof Error){
+    //             Swal.fire({
+    //                 icon:'error',
+    //                 title:'CAUTION',
+    //                 text:error?.message
+    //             })
+    //         }
+    //     }
+    // }
 
-    function debouncedSearch(fn : Function, delay : number){
-        let timer : any
-        return function(...args : any) {
-            clearTimeout(timer)
-            timer = setTimeout(() => {
-                fn(...args)
-            }, delay)
-        }
-    }
+    // function debouncedSearch <T extends (...args: never[]) => void>(fn : T, delay : number){
+    //     let timer : ReturnType<typeof setTimeout>
+    //     return function(...args : Parameters<T>) {
+    //         clearTimeout(timer)
+    //         timer = setTimeout(() => {
+    //             fn(...args)
+    //         }, delay)
+    //     }
+    // }
 
-    function goToJobDetails(jobId : string) : void {
-        navigator(`jobs/${jobId}`)
-    }
+    // function goToJobDetails(jobId : string) : void {
+    //     navigator(`jobs/${jobId}`)
+    // }
 
-    const dSearch = debouncedSearch(searchJob, 600)
+    // const dSearch = debouncedSearch(searchJob, 600)
 
     return(
         <>
@@ -297,7 +292,7 @@ export default function Home(){
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10">
                     {
-                        cardDataTwo.map((data:{icon:any, title:string, text:string}, index: number) => (
+                        cardDataTwo.map((data:{icon:React.ReactNode, title:string, text:string}, index: number) => (
                             <div className='border border-gray-200 rounded-md shadow-lg p-5' key={index}>
                                 <div className='bg-blue-600 text-white w-10 h-10 rounded-md flex items-center justify-center'>
                                     {data.icon}

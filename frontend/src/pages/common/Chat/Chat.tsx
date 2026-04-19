@@ -57,9 +57,9 @@ export default function ChatPage() {
       
     }
 
-    const debouncedSearch = (fn: Function, delay: number) => {
-      let timer: NodeJS.Timeout
-      return function(...args: any){
+    const debouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
+      let timer: ReturnType<typeof setTimeout>
+      return function(...args: Parameters<T>){
         clearTimeout(timer)
         timer = setTimeout(() => {
           fn(...args)
@@ -100,7 +100,7 @@ export default function ChatPage() {
     }
 
 
-    const logedUser = useSelector((state: any) => {
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
         return state.userAuth.user
     })
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import defaultProfileImage from '/default-img-instagram.png'
 import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import { adminBlockJob, adminDeleteJob, adminToggleFlagJob, adminUnblockJob, blockJobUnblockJob, getJobDetails, rejectJobUnrejectJob } from '../../../services/adminServices'
+import { adminBlockJob, adminDeleteJob, adminToggleFlagJob, adminUnblockJob, getJobDetails } from '../../../services/adminServices'
 import { BiBlock, BiChevronDown, BiFlag, BiMapPin, BiMessageSquare, BiRupee, BiTrash } from 'react-icons/bi'
 import { BsClock, BsEye, BsLayers } from 'react-icons/bs'
 import { LuUsers } from 'react-icons/lu'
@@ -16,7 +16,7 @@ import { toast } from 'react-toastify'
 export default function JobDetails(){
 
     const [jobdetails, setjobdetails] = useState<AdminJobDetailsData | null>(null)
-    const params : any = useParams()
+    const params = useParams() //removed any
     const jobId = params.id
 
     const navigate = useNavigate()
@@ -45,21 +45,21 @@ export default function JobDetails(){
         return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
     }
 
-    async function blockUnblockJob(jobId : any, operation : string){
+    // async function blockUnblockJob(jobId : string, operation : string){
         
         
-            const result = await blockJobUnblockJob(jobId, operation)
+    //         const result = await blockJobUnblockJob(jobId, operation)
             
-                Swal.fire({
-                    icon:'success',
-                    title:'Success',
-                    text:result.message,
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:2000
-                }).then(() => window.location.reload())
+    //             Swal.fire({
+    //                 icon:'success',
+    //                 title:'Success',
+    //                 text:result.message,
+    //                 showConfirmButton:false,
+    //                 showCancelButton:false,
+    //                 timer:2000
+    //             }).then(() => window.location.reload())
            
-    }
+    // }
 
     const deleteJob = async (jobId: string) => {
         if(!jobId) return jobId
@@ -140,19 +140,19 @@ export default function JobDetails(){
       }
     }
 
-    async function rejectUnRejectJob(jobId : any, operation : string){
+    // async function rejectUnRejectJob(jobId : any, operation : string){
     
-        const result = await rejectJobUnrejectJob(jobId, operation)
+    //     const result = await rejectJobUnrejectJob(jobId, operation)
             
-                Swal.fire({
-                    icon:'success',
-                    title:'Success',
-                    text:result.message,
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:2000
-                }).then(() => window.location.reload())
-    }
+    //             Swal.fire({
+    //                 icon:'success',
+    //                 title:'Success',
+    //                 text:result.message,
+    //                 showConfirmButton:false,
+    //                 showCancelButton:false,
+    //                 timer:2000
+    //             }).then(() => window.location.reload())
+    // }
 
     async function toggleFlagJob(jobId: string, action: 'flag' | 'un-flag'){
       const confirmResult = await Swal.fire({

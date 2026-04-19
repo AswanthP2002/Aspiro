@@ -1,10 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Notification } from "../types/entityTypes";
-import { getNotifications } from "../services/userServices";
 import { getUnReadNotificationsCount } from "../services/notificationServices";
 import { Notify } from "notiflix";
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 
 interface NotificationPayloadValues {
     notifications: Notification[]

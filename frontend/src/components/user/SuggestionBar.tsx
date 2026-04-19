@@ -32,7 +32,7 @@ const suggestedJobs = [
 export default function SuggessionBar(){
     const [familiarUsers, setFamiliarUsers] = useState<SimilarSkillUserData[]>([])
     const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJobsData[]>([])
-    const [suitableJobs, setSuitableJobs] = useState<any>(suggestedJobs)
+    // const [suitableJobs, setSuitableJobs] = useState<any>(suggestedJobs)
     const [loading, setLoading] = useState(true)
     const [loadingFamiliarUsers, setLodingFamiliarUsers] = useState(true)
     const [loadingSuitableJobs, setLoadingSuitableJobs] = useState(true)

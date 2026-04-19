@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import RecruiterInfoCard from "../../../components/recruiter/RecruiterInfoCard"
+// import RecruiterInfoCard from "../../../components/recruiter/RecruiterInfoCard"
 import defaultProfile from '/default-img-instagram.png';
 import { Link, useNavigate } from "react-router-dom";
 import { Job, RecruiterProfileData } from "../../../types/entityTypes";
