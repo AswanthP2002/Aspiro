@@ -11,7 +11,7 @@ export function transformDate(date : string) {
     return formatedDate
 }
 
-export function formatRelativeTime(date : any){
+export function formatRelativeTime(date : string | Date){
     return formatDistanceToNow(date, {addSuffix:true})
 }
 

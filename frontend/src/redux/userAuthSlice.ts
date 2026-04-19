@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { reAuthenticateThunk } from './reAuthenticateSlice';
-import store from './store';
 
 interface User {
   _id: string;

@@ -15,7 +15,7 @@ interface FilterComponentProps {
   currentFilters: FilterOptions;
   closeFilter: () => void;
   filterType: 'user' | 'candidate'; // To control which filters are shown
-  jobRole?: any[]; // Optional, for other filter types
+  jobRole?: string[]; // Optional, for other filter types //changed any to string
 }
 
 const FilterComponent: React.FC<FilterComponentProps> = ({

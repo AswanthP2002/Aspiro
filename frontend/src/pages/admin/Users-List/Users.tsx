@@ -294,9 +294,9 @@ export default function Users() {
   }
 
   
-  const debouncedSearch = (fn: Function, delay: number): Function => {
+  const debouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
       let timer: ReturnType<typeof setTimeout>;
-      return function(...args: any[]) {
+      return function(...args: Parameters<T>) {
         clearTimeout(timer);
         timer = setTimeout(() => {
           fn(...args);

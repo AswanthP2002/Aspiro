@@ -23,6 +23,15 @@ import Swal from 'sweetalert2';
 import { RiBookMarkedFill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
 
+
+interface RootUser {
+  userAuth: {
+    user: {
+      _id: string,
+      name: string
+    }
+  }
+}
 export default function Post({ postData }: { postData: UserPosts }) {
     
     const {
@@ -62,7 +71,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
     }
 
     console.log('checkign post data', postData)
-    const logedUser = useSelector((state: any) => {
+    const logedUser = useSelector((state: RootUser) => {
         return state.userAuth.user
     })
 
@@ -99,7 +108,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
     const navigate = useNavigate();
 
     const navigateToPublicProfile = (userId: string) => {
-      if(logedUser.id === userId){
+      if(logedUser._id === userId){
         return navigate('/profile/personal')
       }else{
         return navigate(`/users/${userId}}`, {state:{userId}})
@@ -353,7 +362,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
                   className='text-[11px] font-bold text-gray-500 hover:text-blue-600 transition-colors'>
                   {commentLiked ? 'Unlike' : 'Like'}
                 </button>
-                <button onClick={() => setReplyTo({ commentId: comment._id as string, name: comment.userDetails.name })} className='text-[11px] font-bold text-gray-500 hover:text-blue-600'>
+                <button onClick={() => setReplyTo({ commentId: comment._id as string, name: comment?.userDetails?.name as string })} className='text-[11px] font-bold text-gray-500 hover:text-blue-600'>
                   Reply
                 </button>
                 <p className="text-gray-400 font-medium" style={{fontSize: '.65rem'}}>{formatRelativeTime(comment?.createdAt || new Date())}</p>

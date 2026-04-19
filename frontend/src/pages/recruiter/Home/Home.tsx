@@ -50,7 +50,7 @@ export default function RecruiterHome(){
                 </div>
                 <div className="tiles flex justify-between gap-10">
                     {
-                        tileData ? tileData.map((data : any) => {
+                        tileData ? tileData.map((data : {title: string, count: number, icon: React.ReactNode}) => {
                             return <Tile tileData={data} />
                         })
                         : null

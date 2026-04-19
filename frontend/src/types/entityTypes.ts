@@ -156,7 +156,7 @@ export interface Post {
   }
   description : string
   
-  likes?: any[]       
+  likes?: string[]       
   createdAt?: string
   updatedAt?: string
 }
@@ -326,7 +326,7 @@ export interface Notification {
   targetUrl?: string;
   message?: string;
   isRead?: boolean;
-  metadata?: { [key: string]: any };
+  metadata?: { [key: string]: string | number | null | undefined | object | Date };
   createdAt?: string;
   actorDetails?:{
     _id?: string,
@@ -891,7 +891,7 @@ export interface Alerts {
     body: string;
     actionUrl?: string;
     expiresAt?: string;
-    metaData?: { [key: string]: any };
+    metaData?: { [key: string]: string | number | boolean | Date | object | null | undefined };
     createdAt?: string;
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { getRecruiterDetails, handleRecruiterVerification, handleRecruiterPermissions } from '../../../services/recruiterServices'
@@ -424,7 +424,7 @@ export default function RecruiterDetails(){
 
 // --- Sub-Components for Clean Code ---
 
-const StatCard = ({ icon, label, value, color }: any) => (
+const StatCard = ({ icon, label, value, color }: {icon: React.ReactNode, label: string, value: string | number | undefined, color: string}) => (
   <div className="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm flex flex-col items-center">
     <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center mb-4`}>
       {icon}
@@ -434,7 +434,7 @@ const StatCard = ({ icon, label, value, color }: any) => (
   </div>
 );
 
-const ActionButton = ({ children, className, onClick }: any) => (
+const ActionButton = ({ children, className, onClick }: {children: React.ReactNode, className: string, onClick: () => void}) => (
   <button 
     onClick={onClick}
     className={`w-full py-3 rounded-lg text-sm font-bold transition-all active:scale-[0.98] ${className}`}
@@ -443,7 +443,7 @@ const ActionButton = ({ children, className, onClick }: any) => (
   </button>
 );
 
-const InfoRow = ({ label, value, color = "text-slate-900" }: any) => (
+const InfoRow = ({ label, value, color = "text-slate-900" }: {label: string, value: string | number | undefined, color: string}) => (
   <div className="flex justify-between items-center text-xs">
     <span className="text-slate-400 font-medium">{label}</span>
     <span className={`font-bold ${color}`}>{value}</span>

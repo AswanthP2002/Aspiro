@@ -81,7 +81,7 @@ export default function InterviewPage(){
     }
 
     useEffect(() => {
-        let interval: any
+        let interval: ReturnType<typeof setInterval>
         if(!isStarted){
             return () => clearTimeout(interval)
         }

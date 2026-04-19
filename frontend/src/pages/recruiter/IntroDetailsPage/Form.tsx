@@ -1,7 +1,6 @@
 import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2'
-import { addCoverPhotoCloudinary, addLogoCloudinary, saveIntroDetails } from "../../../services/recruiterServices"
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { Recruiter } from "../../../types/entityTypes"
 import { Controller, useForm } from "react-hook-form"
@@ -264,30 +263,30 @@ export default function IntroDetailsPageForm(){
         }
     }
 
-    function handleLogoFileUpload(event : any){
-        const file = event.target.files[0]
-        if(file){
-            setlogo(file)
-            setlogopreview(URL.createObjectURL(file))
-        }
-    }
+    // function handleLogoFileUpload(event : any){
+    //     const file = event.target.files[0]
+    //     if(file){
+    //         setlogo(file)
+    //         setlogopreview(URL.createObjectURL(file))
+    //     }
+    // }
 
-    function handleCoverPhotoFileUpload(event : any){
-        const file = event.target.files[0]
-        if(file){
-            setcoverphoto(file)
-            setcoverphotoprevew(URL.createObjectURL(file))
-        }
-    }
+    // function handleCoverPhotoFileUpload(event : any){
+    //     const file = event.target.files[0]
+    //     if(file){
+    //         setcoverphoto(file)
+    //         setcoverphotoprevew(URL.createObjectURL(file))
+    //     }
+    // }
 
-    function handleData(event : any){
-        setdetails((prev : any) => {
-            return {
-                ...prev,
-                [event.target.name]:event.target.value
-            }
-        })
-    }
+    // function handleData(event : any){
+    //     setdetails((prev : any) => {
+    //         return {
+    //             ...prev,
+    //             [event.target.name]:event.target.value
+    //         }
+    //     })
+    // }
 
     const nextStep = async () => {
         let isValidated = false
@@ -339,8 +338,8 @@ export default function IntroDetailsPageForm(){
                 //         }
                 //     })
                 // }
-            } catch (error : any) {
-                console.log('Error occured while saving company/recruiter details', error.message)
+            } catch (error : unknown) {
+                console.log('Error occured while saving company/recruiter details', error instanceof Error ? error.message : error)
                 Swal.fire({
                     icon:'error',
                     title:'Oops',

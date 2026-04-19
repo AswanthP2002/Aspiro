@@ -1,7 +1,14 @@
 
 import defaultImage from '/default-img-instagram.png'
 
-export default function Testimonial({reviewData} : any){
+interface ReviewData {
+    rating: number;
+    comment: string;
+    user: string;
+    designation: string
+}
+
+export default function Testimonial({reviewData} : {reviewData: ReviewData}){
     const stars = Array.from({length:5})
     return (
         <div className="card rounded-lg bg-white shadow p-6">

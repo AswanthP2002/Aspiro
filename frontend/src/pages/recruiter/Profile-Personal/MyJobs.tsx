@@ -18,45 +18,16 @@ import { Box, IconButton, Modal, Skeleton } from "@mui/material";
 import { FiAward, FiCalendar, FiClock, FiEye, FiLayers, FiMapPin, FiUserCheck, FiX } from "react-icons/fi";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 
-///Experimental
-interface Job {
-    _id: string;
-    jobTitle: string;
-    workMode: 'On-site' | 'Remote' | 'Hybrid';
-    location?: string;
-    status: 'draft' | 'active' | 'expired' | 'closed' | 'rejected' | 'blocked';
-    applicationsCount: number;
-    expiresAt: string;
-    logo?: string;
-    createdAt: string;
-}
 
-function debouncedSearch(fn: Function, delay: number) {
-    let timer: NodeJS.Timeout;
-    return function (...args: any) {
+
+function debouncedSearch <T extends (...args: never[]) => void>(fn: T, delay: number) {
+    let timer: ReturnType<typeof setTimeout>
+    return function (...args: Parameters<T>) {
         clearTimeout(timer);
         timer = setTimeout(() => fn(...args), delay);
     }
 }
 
-const dummyMyJob = {
-  "jobTitle": "Senior MERN Stack Developer",
-  "jobLevel": "Senior",
-  "jobType": "Full-Time",
-  "workMode": "Remote",
-  "location": "Malappuram, Kerala",
-  "duration": "Indefinite",
-  "description": "We are looking for a developer to architect scalable social platforms...",
-  "requirements": ["5+ years experience", "Strong TS knowledge"],
-  "responsibilities": ["Lead code reviews", "Architect API endpoints"],
-  "salary": "₹12L - ₹18L per annum",
-  "expiresAt": "2026-04-15",
-  "postedOn": "2026-03-11",
-  "qualification": "B.Tech in Computer Science or Equivalent",
-  "experience": "5",
-  "requiredSkills": ["React", "Node.js", "MongoDB", "TypeScript"],
-  "optionalSkills": ["AWS S3", "Docker", "Redux Thunk"]
-}
 
 export default function MyJobs() {
 
@@ -80,7 +51,7 @@ export default function MyJobs() {
       setSelectedJobId('')
     }
 
-    const searchByJobTitle = (e: any) => {
+    const searchByJobTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log('the value being entered', e.target.value)
         setSearch(e.target.value)
     }

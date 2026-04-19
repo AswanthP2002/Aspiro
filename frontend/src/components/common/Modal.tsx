@@ -1,6 +1,7 @@
 import {Box, Modal} from '@mui/material'
+import React from 'react'
 
-export default function GeneralModal({openModal, closeModal, children, size = 'medium'} : {openModal : boolean, closeModal : any, children : any, size : string}){
+export default function GeneralModal({openModal, closeModal, children, size = 'medium'} : {openModal : boolean, closeModal : () => void, children : React.ReactNode, size : string}){
     const modalStyle = {
         background:'white', 
         padding:'10px', 

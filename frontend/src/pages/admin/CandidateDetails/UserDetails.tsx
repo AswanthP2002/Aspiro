@@ -385,7 +385,7 @@ export default function CandidateDetails(){
     )
 }
 
-export const PasswordResetModal = ({data, openModal, closeModal}: {data: any, openModal: boolean, closeModal: () => void}) => {
+export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUserDetailsData, openModal: boolean, closeModal: () => void}) => {
     type PasswordResetFormInputs = {
         newPassword: string,
         confirmPasswor: string
@@ -471,7 +471,7 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: any, op
         }
     }, [data])
 
-    const logedAdmin = useSelector((state: any) => {
+    const logedAdmin = useSelector((state: {userAuth: {user: {_id: string}}}) => {
         return state.userAuth.user
     })
     

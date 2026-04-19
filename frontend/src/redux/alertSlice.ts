@@ -1,10 +1,8 @@
 import { createAsyncThunk, createSlice, current, PayloadAction } from "@reduxjs/toolkit";
-import { Notify } from "notiflix";
 import { Alerts, AlertsData } from "../types/entityTypes";
 import { getUnreadAlertsCount } from "../services/alertsServices";
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
-import store from "./store";
+// import store from "./store";
 
 interface AlertPayloadvalues {
     alerts: AlertsData[] | any[]

@@ -15,13 +15,17 @@ interface CommentAddingResponsePayload {
     comment: Comments
 }
 
-export const PostContext = createContext<any>(null)
-
+export const PostContext = createContext<unknown>(null) //changed to unknown from any
+interface RootUser {
+    userAuth: {
+        user:{_id: string}
+    }
+}
 export default function PostProvider({children}: {children: React.ReactNode}){
     //get socket from socket context
     const socket = null
     
-    const logedUser = useSelector((state: any) => {
+    const logedUser = useSelector((state: RootUser) => {
         return state.userAuth.user
     })
     const dispatch = useDispatch()

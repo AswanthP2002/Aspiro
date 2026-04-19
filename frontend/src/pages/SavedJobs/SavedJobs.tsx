@@ -30,9 +30,9 @@ export default function SavedJobs(){
         setSearch(value)
     }
 
-    function debounceSearch(fn: Function, delay: number){
-        let timer: any;
-        return function(...args: any){
+    function debounceSearch <T extends (...args: never[]) => void>(fn: T, delay: number){
+        let timer: ReturnType<typeof setTimeout>;
+        return function(...args: Parameters<T>){
             clearTimeout(timer)
             timer = setTimeout(() => {
                 fn(...args)

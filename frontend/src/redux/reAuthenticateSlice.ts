@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { reAuthenticate } from "../services/commonServices";
 import { AxiosError } from "axios";
-import { Notify } from "notiflix";
 
 interface ReAuthenticateResultPayload {
     accessToken: string,

@@ -24,10 +24,10 @@ export default function UsersFindingPage() {
   const [suggestions, setSuggestion] = useState([]);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
-  const observer = useRef<any>(null)
+  const observer = useRef<IntersectionObserver | null>(null)
   // const [selectedLocation, setSelectedLocation] = useState()
 
-  const logedUser = useSelector((state: any) => {
+  const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
     return state.userAuth.user;
   });
 
@@ -51,7 +51,7 @@ export default function UsersFindingPage() {
     }
   };
 
-  const handleLocationSelect = (place: any) => {
+  const handleLocationSelect = (place: {display_name: string}) => {
     setQuery(place.display_name);
     setSuggestion([]);
   };
@@ -62,9 +62,9 @@ export default function UsersFindingPage() {
     setSearch(e.target.value);
   };
 
-  const debouncedSearch = (fn: Function, delay: number) => {
-    let timer: any;
-    return function (...args: any) {
+  const debouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
+    let timer: ReturnType<typeof setTimeout>;
+    return function (...args: Parameters<T>) {
       clearTimeout(timer);
       timer = setTimeout(() => {
         fn(...args);

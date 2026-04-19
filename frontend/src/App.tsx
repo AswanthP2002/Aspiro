@@ -13,11 +13,11 @@ import StoreDetails from './pages/user/User-Intro Details/StoreDetails';
 // import RecruiterLogin from './pages/recruiter/Login/Login';
 // import RecruiterRegister from './pages/recruiter/Register/Register';
 // import RecruiterVerificationPage from './pages/recruiter/Verification';
-import RecruiterLayouts from './pages/recruiter/Layouts';
+// import RecruiterLayouts from './pages/recruiter/Layouts';
 import RecruiterHome from './pages/recruiter/Home/Home';
 import RecruiterProfileLayout from './pages/recruiter/ProfileLayout';
-import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Personal';
-import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute';
+// import RecruiterProfilePersonal from './pages/recruiter/Profile-Personal/Personal';
+// import RecruiterProtectedRoutes from './components/recruiter/ProtectedRoute';
 import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form';
 import MyJobs from './pages/recruiter/Profile-Personal/MyJobs';
 import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob';
@@ -44,7 +44,7 @@ import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList';
 // import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
 // import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList';
 // import MyApplications from './pages/candidate/My-applications/Applications';
-import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication';
+// import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication';
 import NotificationPage from './pages/candidate/Notification-Page/Notifications';
 import Feed from './pages/common/Feed/Feed';
 import CommonLayout from './pages/common/SidebarLayout';
@@ -383,7 +383,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="/recruiter" element={<RecruiterLayouts />}>
+        {/* <Route path="/recruiter" element={<RecruiterLayouts />}>
            <Route index element={<RecruiterHome />} />
 
            <Route element={<RecruiterProtectedRoutes />}>
@@ -409,7 +409,7 @@ function App() {
               />
             </Route>
           </Route>
-        </Route>
+        </Route> */}
 
         <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
         <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />

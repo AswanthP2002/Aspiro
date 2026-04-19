@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import defautImage from '../../../../public/default-img-instagram.png'
 import { useNavigate } from 'react-router-dom';
@@ -125,47 +125,47 @@ export default function Jobs() {
   const openFilter = () => setFilterVisibility(true)
   const closeFilter = () => setFilterVisibility(false)
 
-  function handleIndustrySelect(industry : string, isChecked : boolean){
-    setFilter((prevState : any) => {
-      if(isChecked){
-        return {...prevState, industry:[...prevState.industry, industry]}
-      }else {
-        return {...prevState, industry:prevState.industry.filter((ind : string) => industry !== ind)}
-      }
-    })
-  }
+  // function handleIndustrySelect(industry : string, isChecked : boolean){
+  //   setFilter((prevState : any) => {
+  //     if(isChecked){
+  //       return {...prevState, industry:[...prevState.industry, industry]}
+  //     }else {
+  //       return {...prevState, industry:prevState.industry.filter((ind : string) => industry !== ind)}
+  //     }
+  //   })
+  // }
 
-  function handleJobTypeSelect(jobType : string, isChecked : boolean) {
-    setFilter((prevState : any) => {
-      if(isChecked){
-        return {...prevState, jobType:[...prevState.jobType, jobType]}
-      }else {
-        return {...prevState, jobType:prevState.jobType.filter((jt : string) => jt !== jobType)}
-      }
-    })
-  }
+  // function handleJobTypeSelect(jobType : string, isChecked : boolean) {
+  //   setFilter((prevState : any) => {
+  //     if(isChecked){
+  //       return {...prevState, jobType:[...prevState.jobType, jobType]}
+  //     }else {
+  //       return {...prevState, jobType:prevState.jobType.filter((jt : string) => jt !== jobType)}
+  //     }
+  //   })
+  // }
 
-  function handleLocationTypeSelect(locationType : string, isChecked : boolean) {
-    setFilter((prevState : any) => {
-      if(isChecked){
-        return {...prevState, locationType:[...prevState.locationType, locationType]}
-      }else{
-        return {...prevState, locationType:prevState.locationType.filter((location : string) => location !== locationType)}
-      }
-    })
-  }
+  // function handleLocationTypeSelect(locationType : string, isChecked : boolean) {
+  //   setFilter((prevState : any) => {
+  //     if(isChecked){
+  //       return {...prevState, locationType:[...prevState.locationType, locationType]}
+  //     }else{
+  //       return {...prevState, locationType:prevState.locationType.filter((location : string) => location !== locationType)}
+  //     }
+  //   })
+  // }
 
-  function handleMinSalary(salary : string){
-    setFilter((prevState : any) => {
-      return {...prevState, minSalary:salary}
-    })
-  }
+  // function handleMinSalary(salary : string){
+  //   setFilter((prevState : any) => {
+  //     return {...prevState, minSalary:salary}
+  //   })
+  // }
 
-  function handleMaxSalary(salary : string) {
-    setFilter((prevState : any) => {
-      return {...prevState, maxSalary:salary}
-    })
-  }
+  // function handleMaxSalary(salary : string) {
+  //   setFilter((prevState : any) => {
+  //     return {...prevState, maxSalary:salary}
+  //   })
+  // }
 
   console.log('This is updated state', filter)
 
@@ -194,22 +194,22 @@ export default function Jobs() {
     return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
   }
 
-  function selectjob(job : any){
-    setselectedjob(job)
-    console.log('Selected company ', selectedjob)
-  }
+  // function selectjob(job : any){
+  //   setselectedjob(job)
+  //   console.log('Selected company ', selectedjob)
+  // }
 
-  function viewJobDetails(jobId : any){
+  function viewJobDetails(jobId : string){
     navigator(`/admin/job/details/${jobId}`)
   }
 
-  function searchJobs(event : any){
+  function searchJobs(event : React.ChangeEvent<HTMLInputElement>){
     setsearch(event.target.value)
   }
 
-  function debouncedSearchJobs(fn : Function, delay : number){
-    let timer : any
-    return function(...args : any){
+  function debouncedSearchJobs <T extends (...args: never[]) => void>(fn : T, delay : number){
+    let timer : ReturnType<typeof setTimeout>
+    return function(...args : Parameters<T>){
       clearTimeout(timer)
       timer = setTimeout(() => {
         fn(...args)

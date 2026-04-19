@@ -12,7 +12,7 @@ import { Notify } from "notiflix"
 
 interface OverviewModalProps {
     open: boolean,
-    onclose: any,
+    onclose: () => void,
     data: RecruiterProfileData,
     setRecruiters: any,
     setSelectedRecruiter: any

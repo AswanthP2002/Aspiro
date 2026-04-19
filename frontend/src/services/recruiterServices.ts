@@ -65,91 +65,91 @@ export const recruiterLogin = async (email : string, password : string) => {
     }
 }
 
-export const saveIntroDetails = async (recruiterDetails : Recruiter) => {
-    try {
-        const response = await axiosInstance.post('/recruiter/intro/details',
-            recruiterDetails,
-            {
-                headers:{'Content-Type' : 'application/json'},
-                sendAuthToken:true
-            } as AxiosRequest
-        )
+// export const saveIntroDetails = async (recruiterDetails : Recruiter) => {
+//     try {
+//         const response = await axiosInstance.post('/recruiter/intro/details',
+//             recruiterDetails,
+//             {
+//                 headers:{'Content-Type' : 'application/json'},
+//                 sendAuthToken:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
+//         if(err.response && err.response.data){
+//             const {message} : any = err.response.data
 
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:message
+//             })
+//         }
 
-        console.log('Error occured while saving basic details', err)
-    }
-}
+//         console.log('Error occured while saving basic details', err)
+//     }
+// }
 
-export const addLogoCloudinary = async (logoFormData : any) => {
-    try {
-        const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', logoFormData)
-        return response.data
-    } catch (error : unknown) {
-        if(error instanceof Error){
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:error.message
-            })
-        }
+// export const addLogoCloudinary = async (logoFormData : any) => {
+//     try {
+//         const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', logoFormData)
+//         return response.data
+//     } catch (error : unknown) {
+//         if(error instanceof Error){
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:error.message
+//             })
+//         }
 
-        console.log('Error occured while saving logo into cloudinary', error)
+//         console.log('Error occured while saving logo into cloudinary', error)
 
-    }
-}
+//     }
+// }
 
-export const addCoverPhotoCloudinary = async (coverFormData : any) => {
-    try {
-        const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', coverFormData)
-        return response.data
-    } catch (error : unknown) {
-        if(error instanceof Error){
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:error.message
-            })
-        }
+// export const addCoverPhotoCloudinary = async (coverFormData : any) => {
+//     try {
+//         const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', coverFormData)
+//         return response.data
+//     } catch (error : unknown) {
+//         if(error instanceof Error){
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:error.message
+//             })
+//         }
 
-        console.log('Error occured while saving coverphoto into cloudinary', error)
-    }
-}
+//         console.log('Error occured while saving coverphoto into cloudinary', error)
+//     }
+// }
 
-export const logoutRecruiter = async () => {
-    try {
-        const response = await axiosInstance.post('/recruiter/logout', null, {
-            sendAuthTokenRecruiter:true
-        } as AxiosRequest)
+// export const logoutRecruiter = async () => {
+//     try {
+//         const response = await axiosInstance.post('/recruiter/logout', null, {
+//             sendAuthTokenRecruiter:true
+//         } as AxiosRequest)
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+//         if(err.response && err.response.data){
+//             const {message} : any = err.response.data
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:message
+//             })
+//         }
 
-        console.log('Error occured while recruiter logout', err)
-    }
-}
+//         console.log('Error occured while recruiter logout', err)
+//     }
+// }
 
 export const getProfileOverview = async () => {
     try {
@@ -400,20 +400,20 @@ export const rejectJobApplication = async (candidateId : string, applicationId :
     }
 }
 
-export const finalizeShortList = async (jobId : string, applications : any) => {
-    try {
-        const response = await axiosInstance.post(`/recruiter/applications/finalize/${jobId}`,
-            {applications},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthTokenRecruiter:true
-            } as AxiosRequest
-        )
-        return response.data
-    } catch (error) {
+// export const finalizeShortList = async (jobId : string, applications : any) => {
+//     try {
+//         const response = await axiosInstance.post(`/recruiter/applications/finalize/${jobId}`,
+//             {applications},
+//             {
+//                 headers:{'Content-Type':'application/json'},
+//                 sendAuthTokenRecruiter:true
+//             } as AxiosRequest
+//         )
+//         return response.data
+//     } catch (error) {
         
-    }
-}
+//     }
+// }
 
 export const getFinalizedShortlistData = async (jobId : string) => {
     try {

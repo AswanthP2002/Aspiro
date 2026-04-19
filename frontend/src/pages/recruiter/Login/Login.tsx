@@ -3,7 +3,7 @@ import facebookIcon from '/icons/icons8-facebook-48.png'
 import googleIcon from '/icons/icons8-google-48.png'
 
 import './Login.css'
-import { useState } from "react";
+import React, { useState } from "react";
 import Loader from "../../../components/candidate/Loader";
 import { useDispatch } from "react-redux";
 import { recruiterLogedIn } from "../../../redux/recruiterAuthSlice";
@@ -27,7 +27,7 @@ export default function RecruiterLogin(){
         setshowpassword(prev => !prev)
     }
 
-    async function login(event : any) {
+    async function login(event : React.FormEvent<HTMLFormElement>) {
         setloading(true)
         event.preventDefault()
         const typedEmailerror = !email || false

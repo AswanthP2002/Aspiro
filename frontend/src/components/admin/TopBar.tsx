@@ -5,7 +5,7 @@ import { useContext, useEffect } from 'react';
 import { appContext } from '../../context/AppContext';
 
 export default function TopBar() {
-    const {windowSize, setWindowSize, adminSidebarOpen, setAdminSidebarOpen} = useContext(appContext)
+    const {windowSize, setWindowSize, setAdminSidebarOpen} = useContext(appContext)
 
     useEffect(() => {
         const checkResizeParameters = () => {

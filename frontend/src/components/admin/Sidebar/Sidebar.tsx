@@ -19,7 +19,7 @@ const checkPresentPath = (path: string) => {
 
 
 export default function Sidebar(){
-  const {adminSidebarOpen, setAdminSidebarOpen, windowSize} = useContext(appContext)
+  const {setAdminSidebarOpen, windowSize} = useContext(appContext)
 
   const dispatcher = useDispatch()
   const navigate = useNavigate()

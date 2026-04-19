@@ -1,4 +1,4 @@
-export default function SocialmediaLinks({data, removeLink} : any) {
+export default function SocialmediaLinks({data, removeLink} : {data: {domain: string, url: string}, removeLink: () => void}) {
     return(
         <div className="card flex justify-between gap-5 mt-2">
             <div className="link border rounded border-gray-300 w-full px-2 gap-10 py-1 flex items-center">

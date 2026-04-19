@@ -32,7 +32,7 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
 
   console.log('-- checking loged user -- ', logedUser)
 
-  const observer = useRef<any>(null)
+  const observer = useRef<null | IntersectionObserver>(null)
   const lastFollowerRef = useCallback((node) => {
     if(loading) return
     if(observer.current) observer.current.disconnect()
@@ -85,9 +85,9 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
     setSearch(e.target.value)
   }
 
-  const debouncedSearch = (fn: Function, delay: number) => {
-    let timer: NodeJS.Timeout
-    return function(...args: any){
+  const debouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
+    let timer: ReturnType<typeof setTimeout>
+    return function(...args: Parameters<T>){
       clearTimeout(timer)
       timer = setTimeout(() => {
         fn(...args)

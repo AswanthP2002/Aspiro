@@ -1,4 +1,6 @@
-export default function Tile({tileData} : any){
+import React from "react";
+
+export default function Tile({tileData} : {tileData: {title: string, count: number, icon: React.ReactNode}}){
     return(
         <div className="border border-gray-200 shadow-xs rounded-md hover:-translate-y-1 hover:shadow-lg transition-all duration-200 ease-in-out flex gap-4 bg-white w-full p-3 group hover:shadow-lg">
             <div className="p-4 bg-blue-600 rounded-md flex items-center justify-center">

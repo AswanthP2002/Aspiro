@@ -144,10 +144,10 @@ export default function StoreDetails(){
 
     const navigateTo = useNavigate()
 
-      useEffect(() : any => {
+      useEffect(() => {
         if(!userId || !userName){
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Required user information is missing.' });
-            return navigateTo(-1)
+            navigateTo(-1)
         }
       }, [])
       

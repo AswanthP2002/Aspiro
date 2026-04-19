@@ -53,7 +53,7 @@ export default function Feed() {
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(4)
 
-    const observer = useRef<any>(null)
+    const observer = useRef<IntersectionObserver | null>(null)
     
     const mediaFileRef = useRef<HTMLInputElement | null>(null)
 

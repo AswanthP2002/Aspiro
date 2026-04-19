@@ -79,61 +79,61 @@ export const getJobDetails = async (jobId : string) => {
     }
 }
 
-export const blockJobUnblockJob = async (jobId : string, operation : string) => {
-    let url: string = ''
-        url = operation === 'Block'
-            ? `/admin/job/block/${jobId}`
-            : `/admin/job/unblock/${jobId}`
+// export const blockJobUnblockJob = async (jobId : string, operation : string) => {
+//     let url: string = ''
+//         url = operation === 'Block'
+//             ? `/admin/job/block/${jobId}`
+//             : `/admin/job/unblock/${jobId}`
         
-        try {
-            const response = await axiosInstance.put(url, null, {
-                sendAuthTokenAdmin:true
-            } as AxiosRequest)
+//         try {
+//             const response = await axiosInstance.put(url, null, {
+//                 sendAuthTokenAdmin:true
+//             } as AxiosRequest)
 
-            return response.data
-        } catch (error : unknown) {
-            const err = error as AxiosError
-            if(err.response && err.response.data){
-                const {message} : any = err.response.data
+//             return response.data
+//         } catch (error : unknown) {
+//             const err = error as AxiosError
+//             if(err.response && err.response.data){
+//                 const {message} : any = err.response.data
 
-                Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:message
-                })
-            }
+//                 Swal.fire({
+//                     icon:'error',
+//                     title:'Error',
+//                     text:message
+//                 })
+//             }
 
-            console.log('Error occured while blocking / unblocking job', err)
+//             console.log('Error occured while blocking / unblocking job', err)
 
-        }
-}
+//         }
+// }
 
-export const rejectJobUnrejectJob = async (jobId : string, operation : string) => {
-    let url: string = ''
-        url = operation === 'Reject'
-            ? `/admin/job/reject/${jobId}`
-            : `/admin/job/unreject/${jobId}`
+// export const rejectJobUnrejectJob = async (jobId : string, operation : string) => {
+//     let url: string = ''
+//         url = operation === 'Reject'
+//             ? `/admin/job/reject/${jobId}`
+//             : `/admin/job/unreject/${jobId}`
 
-    try {
-        const response = await axiosInstance.put(url, null, {
-            sendAuthTokenAdmin:true
-        } as AxiosRequest)
+//     try {
+//         const response = await axiosInstance.put(url, null, {
+//             sendAuthTokenAdmin:true
+//         } as AxiosRequest)
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
+//         if(err.response && err.response.data){
+//             const {message} : any = err.response.data
 
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
-    }
-}
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:message
+//             })
+//         }
+//     }
+// }
 
 // export const getRecruiters = async (search: string, page: number, sort : string, recruiterType: string, recruiterStatus: string) => {
 //     try {
@@ -169,28 +169,28 @@ export const rejectJobUnrejectJob = async (jobId : string, operation : string) =
 //     }
 // } moved for modularity
 
-export const getCompanyDetails = async (companyId : string) => {
-    try {
-        const response = await axiosInstance.get(`/admin/company/details/${companyId}`, {
-            sendAuthTokenAdmin:true
-        } as AxiosRequest)
+// export const getCompanyDetails = async (companyId : string) => {
+//     try {
+//         const response = await axiosInstance.get(`/admin/company/details/${companyId}`, {
+//             sendAuthTokenAdmin:true
+//         } as AxiosRequest)
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        if(err.response && err.response.data){
-            const {message} : any = err.response.data
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:message
-            })
-        }
+//         if(err.response && err.response.data){
+//             const {message} : any = err.response.data
+//             Swal.fire({
+//                 icon:'error',
+//                 title:'Error',
+//                 text:message
+//             })
+//         }
 
-        console.log('Error occured while geting company details')
-    }
-}
+//         console.log('Error occured while geting company details')
+//     }
+// }
 
 
 

@@ -54,7 +54,7 @@ export default function UserPublicProfile() {
     const {userMetaData} = useContext(appContext)
 
     const [userDetails, setUserDetails] = useState<UserPublicProfileData | undefined>()
-    const logedUser = useSelector((state: any) => {
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
         return state?.userAuth?.user
     })
     const [followed, setFollowed] = useState<boolean>(false)
@@ -395,7 +395,7 @@ export default function UserPublicProfile() {
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Social Presence</h3>
               <div className="space-y-4">
-                {userDetails.socialLinks.map((link: any, i: number) => (
+                {userDetails.socialLinks.map((link: {domain: string, url: string}, i: number) => (
                   <div key={i} className="flex gap-3 items-center group cursor-pointer">
                     <div className="bg-blue-50 w-10 h-10 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                       <FaLinkedin size={18} />
@@ -414,7 +414,7 @@ export default function UserPublicProfile() {
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Skills</h3>
               <div className="flex flex-wrap gap-2">
-                {userDetails.skills.map((skill: any, i: number) => (
+                {userDetails.skills.map((skill: {skill: string}, i: number) => (
                   <span key={i} className="bg-gray-100 text-gray-700 text-[12px] font-semibold rounded-full px-4 py-1.5 hover:bg-gray-200 transition-colors cursor-default">
                     {skill.skill}
                   </span>
@@ -434,7 +434,7 @@ export default function UserPublicProfile() {
                 <h3 className="text-lg font-bold text-gray-900">Experience</h3>
               </div>
               <div className="space-y-8">
-                {userDetails.experiences.map((exp: any, i: number) => (
+                {userDetails.experiences.map((exp: Experience, i: number) => (
                   <div key={i} className="flex gap-4 group">
                     <div className="flex flex-col items-center">
                       <div className="bg-blue-50 w-10 h-10 rounded-xl flex items-center justify-center text-blue-600 border border-blue-100">

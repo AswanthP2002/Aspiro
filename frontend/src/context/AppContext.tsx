@@ -5,15 +5,15 @@ import { loadUserMetaData } from '../services/userServices';
 import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
 
-export const appContext = createContext<any>(null);
+export const appContext = createContext<unknown>(null); //changed to unknown from any
 
 const AppContextProvider = ({ children }: { children: JSX.Element }) => {
   const [createPostModalOpen, setCreatePostModalOpen] = useState(false);
   const [userMetaData, setUserMetaData] = useState<UserMetaData | null>(null)
   
-  const logedUser = useSelector((state: any) => {
-    return state.userAuth.user
-  })
+  // const logedUser = useSelector((state: any) => {
+  //   return state.userAuth.user
+  // })
   
   //state management for admin sidebar visibility
   const [adminSidebarOpen, setAdminSidebarOpen] = useState(false)
