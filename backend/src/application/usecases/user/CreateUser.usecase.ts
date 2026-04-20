@@ -63,7 +63,7 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
     const result = await this._repo.create(newUser);
 
     // 2. Then, send the verification email.
-    await this._emailService.sendEmail(newUser.email as string, subject, content);
+    // await this._emailService.sendEmail(newUser.email as string, subject, content);
 
     if (result) {
       const dto = this._mapper.userToUserDto(result);
