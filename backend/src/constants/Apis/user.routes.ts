@@ -34,6 +34,7 @@ export const UserApiRoutes = {
       UPLOAD: '/v1/user/me/cover-photo',
       REMOVE: '/v1/user/me/cover-photo/remove',
     },
+    PROFILE_VIEW_UPDATE: '/v2/user/profile/:id/viewed',
   },
 
   USER_DOCUMENTS_MANAGE: {

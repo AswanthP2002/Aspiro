@@ -1308,7 +1308,9 @@ export interface MyProfileDTO {
   createdAt?: string;
   updatedAt?: string;
   followers?: number;
-  following?: number
+  following?: number;
+  applicationsCount?: JobApplicationStatusData[];
+  savedJobs?: FavoriteJob[];
 }
 
 export interface UserOverviewForPublic {

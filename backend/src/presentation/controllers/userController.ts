@@ -51,6 +51,8 @@ import { IGetSimilarUserUsecase } from '../../application/interfaces/usecases/us
 import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 import IAiInterviewUsecase from '../../application/interfaces/usecases/AI/IAiInterview.usecase';
 import ILoadInterviewDashboardUsecase from '../../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
+import IUpdateProfileViewUsecase from '../../application/interfaces/usecases/user/IUpdateProfileView.usecase';
+import ResponseHandler from '../../utilities/response.handler';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -101,6 +103,7 @@ type JWTTokenVerifyResult = {
 
 @injectable()
 export class UserController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('ICreateUserUsecase') private _createUserUsecase: ICreateUserUseCase,
     @inject('IVerifyUserUsecase') private _verifyUserUC: IVerifyUserUseCase,
@@ -152,8 +155,11 @@ export class UserController {
     private _getUserFullProfileForResumeBuiding: ILoadUserDetailsForResumeBuildingUsecase,
     @inject('IAiInterviewUsecase') private _aiInterview: IAiInterviewUsecase,
     @inject('ILoadInterviewDashboardUsecase')
-    private _loadInterviewDashboard: ILoadInterviewDashboardUsecase
-  ) {}
+    private _loadInterviewDashboard: ILoadInterviewDashboardUsecase,
+    @inject('IUpdateProfileViewUsecase') private _updateProfileView: IUpdateProfileViewUsecase
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async testInfinityScroll(req: Request, res: Response, next: NextFunction): Promise<void> {
     const page = parseInt(req.query.page as string) || 1;
@@ -965,6 +971,28 @@ export class UserController {
         result,
       });
     } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async updateProfileView(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const viewerId = req.user.id;
+    const profileId = req.params.id;
+
+    try {
+      const result = await this._updateProfileView.execute({ profileId, viewerId });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('User profile view updated'),
+        StatusCodes.OK,
+        result
+      );
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Profile view'),
+      //   result,
+      // });
+    } catch (error) {
       next(error);
     }
   }

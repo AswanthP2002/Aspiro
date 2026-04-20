@@ -44,4 +44,8 @@ export default interface IUserRepository extends IBaseRepo<User> {
     similarPincode: string[]
   ): Promise<User[] | null>;
   getUserFullProfileDataAggregated(userId: string): Promise<UserFullProfileData | null>;
+  updateProfileView(
+    viewerId: string,
+    profileId: string
+  ): Promise<{ _id: string; views: string[] } | null>;
 }

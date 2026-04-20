@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import AppError from '../domain/errors/AppError';
 import { StatusCodes } from '../presentation/statusCodes';
 import { StatusMessage } from '../constants/Messages/statusMessages';
+import { ZodError } from 'zod';
 
 export default function exceptionhandle(
   err: unknown,
@@ -11,11 +12,12 @@ export default function exceptionhandle(
 ) {
   let responseMessage: string = StatusMessage.COMMON_MESSAGE.INTERNA_SERVER_ERROR;
   let code: number = StatusCodes.INTERNAL_SERVER_ERROR;
-  const errors: { code: string | number; message: string } = {
+  let errors: { code: string | number; message: string } = {
     code: '',
     message: '',
   };
 
+  console.log('Error occured type of this error', typeof err);
   if (err instanceof AppError) {
     console.log('App Error occured ', err.stack);
     switch (err.name) {
@@ -34,7 +36,22 @@ export default function exceptionhandle(
       case 'WRONG_CREDENTIALS':
         responseMessage = 'Incorrect Otp';
         code = StatusCodes.BAD_REQUEST;
+        break;
+      case 'INVALID_USER':
+        responseMessage = 'User not found';
+        code = StatusCodes.NOT_FOUND;
+        break;
+      case 'WRONG_PASSWORD':
+        responseMessage = 'Wrong password';
+        code = StatusCodes.UNAUTHORIZED;
+        errors = {
+          code: 'AUTH_FAILED',
+          message: 'Incorrect Password',
+        };
+        break;
     }
+  } else if (err instanceof ZodError) {
+    console.log('Zod error happened in narrowing', err);
   }
 
   if (res.headersSent) {

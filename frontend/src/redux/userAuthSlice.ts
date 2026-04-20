@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ReAuthenticateResultPayload, reAuthenticateThunk } from './reAuthenticateSlice';
 // import { reAuthenticateThunk } from './reAuthenticateSlice';
 
 interface User {
   _id: string;
   email: string;
   name?: string;
+  headline?: string;
   profilePicture?: string
   role?: string
   subscription?: {
@@ -30,7 +32,7 @@ const loadInitialState = (): UserAuthState => {
       user: null, //currently not geting any data from localstorage
       userToken: null, // Always initialize token as null
       userRole: null, //currently not geting any data from localstorage
-      initialLoading: true
+      initialLoading: false
     };
   } catch (e) {
     console.error('Could not load state from localStorage', e);
@@ -65,6 +67,24 @@ const userAuthSlice = createSlice({
       state.user = action.payload.user;
       state.initialLoading = false
     }
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(reAuthenticateThunk.pending, (state) => {
+        state.initialLoading = true;
+      })
+      .addCase(reAuthenticateThunk.fulfilled, (state, action: PayloadAction<ReAuthenticateResultPayload>) => {
+        state.userToken = action.payload.accessToken;
+        state.user = action.payload.userData;
+        state.userRole = action.payload.userData.role as string;
+        state.initialLoading = false;
+      })
+      .addCase(reAuthenticateThunk.rejected, (state) => {
+        state.initialLoading = false;
+        state.user = null;
+        state.userRole = null;
+        state.userToken = null;
+      })
   },
   // extraReducers(builder) {
   //   builder

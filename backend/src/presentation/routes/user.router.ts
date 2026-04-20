@@ -87,6 +87,13 @@ function createUserRouter() {
     authorization(['user']),
     userController.checkIsJobApplied.bind(userController)
   );
+
+  userRouter.patch(
+    UserApiRoutes.USER_PROFILE_MANAGE.PROFILE_VIEW_UPDATE,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.updateProfileView.bind(userController)
+  );
   userRouter.post(
     UserApiRoutes.USER_JOB_MANAGE.SAVE_JOB,
     centralizedAuthentication,

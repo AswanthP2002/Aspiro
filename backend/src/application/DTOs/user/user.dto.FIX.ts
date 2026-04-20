@@ -1,6 +1,8 @@
 import { AccountAction, Role } from '../../../domain/entities/user/User.FIX';
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import { Expose, Exclude } from 'class-transformer';
+import { JobApplicationDTO } from '../jobApplication/jobApplication.dto.FIX';
+import FavoriteJobDTO from './favoriteJob.dto.FIX';
 
 @Exclude()
 export class UserDto {
@@ -173,6 +175,8 @@ export interface MyProfileDTO {
   updatedAt?: string;
   // verificationToken?: string;
   // otpExpiresAt?: Date;
+  applicationsCount?: JobApplicationDTO[];
+  savedJobs?: FavoriteJobDTO[];
 }
 
 export interface SimilarSkillUserDTO {

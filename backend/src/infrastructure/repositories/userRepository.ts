@@ -509,6 +509,22 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           as: 'followers',
         },
       },
+      {
+        $lookup: {
+          from: 'jobapplications',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'applicationsCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'favoriteJobs',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'savedJobs',
+        },
+      },
     ]);
 
     return result[0];
@@ -641,5 +657,20 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     ]);
 
     return result[0];
+  }
+
+  async updateProfileView(
+    viewerId: string,
+    profileId: string
+  ): Promise<{ _id: string; views: string[] } | null> {
+    if (!mongoose.isValidObjectId(viewerId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(profileId) },
+      { $addToSet: { views: viewerId } },
+      { returnDocument: 'after' }
+    );
+
+    return result as { _id: string; views: string[] };
   }
 }

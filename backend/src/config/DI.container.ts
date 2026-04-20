@@ -472,6 +472,8 @@ import InterviewAIResultRepository from '../infrastructure/repositories/user/int
 import InterviewAIMapper from '../application/mappers/Interview-AI/InterviewAi.mapperClass';
 import ILoadInterviewDashboardUsecase from '../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
 import LoadInterviewDashboard from '../application/usecases/AI/LoadInterviewDashboard.usecase';
+import IUpdateProfileViewUsecase from '../application/interfaces/usecases/user/IUpdateProfileView.usecase';
+import UpdateProfileViewUsecase from '../application/usecases/user/UpdateProfileView.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -587,6 +589,10 @@ container.registerSingleton<ILoadMyProfileUsecase>('ILoadMyProfileUsecase', Load
 container.registerSingleton<ISaveUserBasicsUsecase>(
   'ISaveUserBasicsUsecase',
   SaveUserBasicsUsecase
+);
+container.registerSingleton<IUpdateProfileViewUsecase>(
+  'IUpdateProfileViewUsecase',
+  UpdateProfileViewUsecase
 );
 container.registerSingleton<IUploadUserProfilePictureUsecase>(
   'IUploadUserProfilePictureUsecase',

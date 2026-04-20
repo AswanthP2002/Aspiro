@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react'
 import { getCandidateDetails } from '../../../services/commonServices'
 import formatDate, { transformDate } from '../../../services/util/formatDate'
 import { cancelConnectionRequest, sendConnectionRequest } from '../../../services/connectionServices'
-import { followUser, loadUserPublicProfile, unfollowUser } from '../../../services/userServices'
+import { followUser, loadUserPublicProfile, unfollowUser, updateUserProfileView } from '../../../services/userServices'
 import { Notify } from 'notiflix'
 import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
@@ -269,6 +269,22 @@ export default function UserPublicProfile() {
                 toast.error(error instanceof Error ? error.message : 'Something went wrong')
             }
         })()
+    }, [])
+
+    useEffect(() => {
+        async function userProfileViewd(){
+            try {
+                await updateUserProfileView(userDetails?._id as string)
+                
+            } catch (error: unknown) {
+                console.log('Error occured while updating user profile view')
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            }
+        }
+
+        if(userDetails?._id && logedUser._id !== userDetails?._id){
+            userProfileViewd()
+        }
     }, [])
 
     return (

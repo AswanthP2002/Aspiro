@@ -656,22 +656,22 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
 //     }
 // }
 
-export const getCandidateFavoriteJobs = async () => {
-    try {
-        const response = await axiosInstance.get('/candidate/favorites',
-            {
-                sendAuthTokenCandidate:true
-            } as AxiosRequest
-        )
+// export const getCandidateFavoriteJobs = async () => {
+//     try {
+//         const response = await axiosInstance.get('/candidate/favorites',
+//             {
+//                 sendAuthTokenCandidate:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
 
-        console.log('error occured while geting candidate favorite jobs')
-    }
-}
+//         console.log('error occured while geting candidate favorite jobs')
+//     }
+// }
 
 export const saveJob = async (jobId : string) => {
     try {
@@ -1327,6 +1327,20 @@ export const initializeConversation = async (receiver: string) => {
     } catch (error: unknown) {
         const err = error as AxiosError
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+export const updateUserProfileView = async (profileId: string) => {
+    try {
+        const response = await axiosInstance.patch(EndPoints.USER_PROFILE_VIEWED(profileId), null, 
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err;
     }
 }
 // export const getChats = async (conversationId: string) => {
