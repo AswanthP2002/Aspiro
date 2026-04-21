@@ -138,6 +138,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                                 userId:logedUser._id,
                                 postId,
                                 text,
+                                depth: parentId ? 1 : 0,
                                 userDetails:{
                                     name: logedUser.name,
                                     headline: logedUser.headline,
@@ -150,6 +151,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                                 userId:logedUser._id,
                                 postId,
                                 text,
+                                depth: parentId ? 1 : 0,
                                 userDetails:{
                                     name: logedUser.name,
                                     headline: logedUser.headline,
