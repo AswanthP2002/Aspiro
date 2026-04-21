@@ -18,7 +18,13 @@ interface CommentAddingResponsePayload {
 export const PostContext = createContext<unknown>(null) //changed to unknown from any
 interface RootUser {
     userAuth: {
-        user:{_id: string}
+        user:{
+            _id: string;
+            name: string;
+            profilePicture: string;
+            headline: string;
+            email: string;
+        }
     }
 }
 export default function PostProvider({children}: {children: React.ReactNode}){
@@ -127,15 +133,29 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                     if(post._id === postId){
                         return {
                             ...post,
-                            comments: [...post.comments, {
+                            comments: post.comments ? [...post.comments, {
                                 _id,
-                                userId:logedUser.id,
+                                userId:logedUser._id,
                                 postId,
                                 text,
                                 userDetails:{
                                     name: logedUser.name,
-                                    headline: logedUser.headline
+                                    headline: logedUser.headline,
+                                    socialLinks: []
                                 },
+                                likes: 0,
+                                createdAt:`${new Date()}`
+                            }] : [{
+                                _id,
+                                userId:logedUser._id,
+                                postId,
+                                text,
+                                userDetails:{
+                                    name: logedUser.name,
+                                    headline: logedUser.headline,
+                                    socialLinks: []
+                                },
+                                likes: 0,
                                 createdAt:`${new Date()}`
                             }]
                         }

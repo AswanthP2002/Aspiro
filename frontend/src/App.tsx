@@ -261,11 +261,11 @@ function App() {
   //   }
   // }, [logedUser, initialLoading, dispatch]) //*** Alert fetching useEffect commented temporarly */
 
-  useEffect(() => {
-    if(logedUser && logedUser.role === 'user' && !logedUser?.subscription?.planId){
-      setShowPlansModal(true)
-    }
-  }, [logedUser])
+  // useEffect(() => {
+  //   if(logedUser && logedUser.role === 'user' && !logedUser?.subscription?.planId){
+  //     setShowPlansModal(true)
+  //   }
+  // }, [logedUser]) commented as part of testing
 
   const location = useLocation()
   return (
