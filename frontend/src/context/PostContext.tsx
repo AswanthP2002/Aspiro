@@ -176,7 +176,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
     const deleteCommentOnPost = async (postId: string, commentId: string) => {
         if(!postId || !commentId) return
         Swal.fire({
-            icon:'warning',
+            icon:'question',
             title:'Delete Comment?',
             width:'300',
             showConfirmButton:true,
@@ -193,7 +193,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                     return
                 }
 
-                //update ui
+                //update ui removing main comment
                 setUserPosts((posts: UserPosts[]) => {
                     return posts.map((post: UserPosts) => {
                         if(post._id === postId){
@@ -206,6 +206,21 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                         }
                     })
                 })
+
+                setUserPosts((posts: UserPosts[]) => {
+                    return posts.map((post: UserPosts) => {
+                        if(post._id === postId){
+                            return {
+                                ...post,
+                                comments: post.comments.filter((comment: Comments) => comment.parentId !== commentId)
+                            }
+                        }else{
+                            return post
+                        }
+                    })
+                })
+
+                
 
                 
             }else{
