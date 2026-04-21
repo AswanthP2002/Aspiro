@@ -310,12 +310,6 @@ export default function Feed() {
                         <p className="text-xs text-gray-500 mt-2">No post available</p>
                     </div>
                 )}
-                <div>
-                    <p>Posts structured</p>
-                    
-                        {JSON.stringify(userPosts, null, 2)}
-                    
-                </div>
             </div>
             
         </div>

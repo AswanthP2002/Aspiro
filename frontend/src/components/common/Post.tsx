@@ -342,7 +342,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
                     <p className='text-xs font-bold text-gray-900 leading-tight'>{comment.userDetails?.name}</p>
                     <p className='text-[10px] text-gray-500 leading-tight'>{comment.userDetails?.headline}</p>
                   </div>
-                  {comment.userDetails?._id === logedUser._id && (
+                  {comment.userId === logedUser._id && (
                     <button onClick={() => deleteCommentOnPost(postData._id as string, comment._id as string)} className="text-gray-300 hover:text-red-500 transition-colors">
                       <FaTrash size={10} />
                     </button>
