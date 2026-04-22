@@ -238,7 +238,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                         if(post._id === postId){
                             return {
                                 ...post,
-                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment?.likes + 1} : comment)
+                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment.likes ? comment.likes + 1 : 1} : comment)
                             }
                         }else{
                             return post

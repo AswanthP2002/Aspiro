@@ -284,9 +284,11 @@ export default function Post({ postData }: { postData: UserPosts }) {
     )}
     
     <p className="text-[14px] leading-relaxed text-gray-800 whitespace-pre-wrap">{showDescription(postData?.description)}</p>
-    <button onClick={collapseText} className={`text-[12px] font-bold mt-2 ${isTextExpanded ? 'text-gray-400' : 'text-blue-600 hover:underline'}`}>
+    {postData.description.length > 50 && (
+      <button onClick={collapseText} className={`text-[12px] font-bold mt-2 ${isTextExpanded ? 'text-gray-400' : 'text-blue-600 hover:underline'}`}>
       {isTextExpanded ? 'Read less' : 'Read more'}
     </button>
+    )}
   </div>
 
   {/* Stats */}
@@ -330,45 +332,53 @@ export default function Post({ postData }: { postData: UserPosts }) {
   {commentBoxOpen && (
     <div className="bg-gray-50 border-t border-gray-100 p-4">
       <div className="space-y-4">
-        {postData?.comments?.map((comment: Comments, index: number) => (
-          <div key={index} className="flex gap-3" style={{ marginLeft: `${(comment.depth || 0) * 32}px` }}>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex-shrink-0 flex items-center justify-center text-white border border-white shadow-sm">
-              <p className="text-xs font-bold">{comment?.userDetails?.name ? comment?.userDetails?.name[0] : 'U'}</p>
-            </div>
-            <div className="flex-1">
-              <div className="bg-white border border-gray-200 rounded-2xl px-3 py-2 shadow-sm relative">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className='text-xs font-bold text-gray-900 leading-tight'>{comment.userDetails?.name}</p>
-                    <p className='text-[10px] text-gray-500 leading-tight'>{comment.userDetails?.headline}</p>
-                  </div>
-                  {comment.userId === logedUser._id && (
-                    <button onClick={() => deleteCommentOnPost(postData._id as string, comment._id as string)} className="text-gray-300 hover:text-red-500 transition-colors">
-                      <FaTrash size={10} />
-                    </button>
-                  )}
-                </div>
-                <div className="mt-1.5 flex gap-4">
-                  <div className='flex-1'><p className='text-[13px] text-gray-800 leading-relaxed'>{comment.text}</p></div>
-                  <div className='flex flex-col items-center justify-center min-w-[20px]'>
-                    {commentLiked ? <FaHeart color='#ef4444' size={11} /> : <CiHeart size={14} className="text-gray-400" />}
-                    <p className="text-gray-400 font-bold" style={{fontSize: '.65rem'}}>{comment.likes}</p>
-                  </div>
-                </div>
-              </div>
+        {postData?.comments?.map((comment: Comments) => (
+          <CommentCard
+            key={comment._id}
+            comment={comment}
+            commentLike={() => likeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string)}
+            commentUnlike={() => unlikeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string)}
+            setReplyTo={() => setReplyTo({commentId: comment._id as string, name: comment.userDetails?.name as string})}
+            deleteCommentOnPost={() => deleteCommentOnPost(postData._id as string, comment._id as string)}
+          />
+          // <div key={index} className="flex gap-3" style={{ marginLeft: `${(comment.depth || 0) * 32}px` }}>
+          //   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex-shrink-0 flex items-center justify-center text-white border border-white shadow-sm">
+          //     <p className="text-xs font-bold">{comment?.userDetails?.name ? comment?.userDetails?.name[0] : 'U'}</p>
+          //   </div>
+          //   <div className="flex-1">
+          //     <div className="bg-white border border-gray-200 rounded-2xl px-3 py-2 shadow-sm relative">
+          //       <div className="flex justify-between items-start">
+          //         <div>
+          //           <p className='text-xs font-bold text-gray-900 leading-tight'>{comment.userDetails?.name}</p>
+          //           <p className='text-[10px] text-gray-500 leading-tight'>{comment.userDetails?.headline}</p>
+          //         </div>
+          //         {comment.userId === logedUser._id && (
+          //           <button onClick={() => deleteCommentOnPost(postData._id as string, comment._id as string)} className="text-gray-300 hover:text-red-500 transition-colors">
+          //             <FaTrash size={10} />
+          //           </button>
+          //         )}
+          //       </div>
+          //       <div className="mt-1.5 flex gap-4">
+          //         <div className='flex-1'><p className='text-[13px] text-gray-800 leading-relaxed'>{comment.text}</p></div>
+          //         <div className='flex flex-col items-center justify-center min-w-[20px]'>
+          //           {commentLiked ? <FaHeart color='#ef4444' size={11} /> : <CiHeart size={14} className="text-gray-400" />}
+          //           <p className="text-gray-400 font-bold" style={{fontSize: '.65rem'}}>{comment.likes}</p>
+          //         </div>
+          //       </div>
+          //     </div>
               
-              <div className='flex items-center gap-4 mt-1 px-1'>
-                <button onClick={() => commentLiked ? unlikeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string) : likeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string)} 
-                  className='text-[11px] font-bold text-gray-500 hover:text-blue-600 transition-colors'>
-                  {commentLiked ? 'Unlike' : 'Like'}
-                </button>
-                <button onClick={() => setReplyTo({ commentId: comment._id as string, name: comment?.userDetails?.name as string })} className='text-[11px] font-bold text-gray-500 hover:text-blue-600'>
-                  Reply
-                </button>
-                <p className="text-gray-400 font-medium" style={{fontSize: '.65rem'}}>{formatRelativeTime(comment?.createdAt || new Date())}</p>
-              </div>
-            </div>
-          </div>
+          //     <div className='flex items-center gap-4 mt-1 px-1'>
+          //       <button onClick={() => commentLiked ? unlikeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string) : likeAComment(postData._id as string, comment._id as string, postData.userDetails._id as string)} 
+          //         className='text-[11px] font-bold text-gray-500 hover:text-blue-600 transition-colors'>
+          //         {commentLiked ? 'Unlike' : 'Like'}
+          //       </button>
+          //       <button onClick={() => setReplyTo({ commentId: comment._id as string, name: comment?.userDetails?.name as string })} className='text-[11px] font-bold text-gray-500 hover:text-blue-600'>
+          //         Reply
+          //       </button>
+          //       <p className="text-gray-400 font-medium" style={{fontSize: '.65rem'}}>{formatRelativeTime(comment?.createdAt || new Date())}</p>
+          //     </div>
+          //   </div>
+          // </div>
         ))}
       </div>
 
@@ -659,5 +669,109 @@ export default function Post({ postData }: { postData: UserPosts }) {
 //   </div>
 // )}
 //     </div>
+  );
+}
+
+export function CommentCard({
+  comment, commentLike, commentUnlike, deleteCommentOnPost, setReplyTo
+}: {
+  comment: Comments, 
+  commentLike: () => void, 
+  commentUnlike: () => void, 
+  deleteCommentOnPost: () => void
+  setReplyTo: (data: {commentId: string, name: string} | null) => void
+}) {
+  const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string, email: string}}}) => {
+    return state.userAuth.user
+  })
+  const [commentLiked, setCommentLiked] = useState(false)
+
+  const likeAComment = () => {
+    commentLike()
+    setCommentLiked(true)
+  }
+
+  const unLikeAComment = () => {
+    commentUnlike()
+    setCommentLiked(false)
+  }
+
+  return (
+    <>
+      <div
+        className="flex gap-3"
+        style={{ marginLeft: `${(comment.depth || 0) * 32}px` }}
+      >
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex-shrink-0 flex items-center justify-center text-white border border-white shadow-sm">
+          <p className="text-xs font-bold">
+            {comment?.userDetails?.name ? comment?.userDetails?.name[0] : 'U'}
+          </p>
+        </div>
+        <div className="flex-1">
+          <div className="bg-white border border-gray-200 rounded-2xl px-3 py-2 shadow-sm relative">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-bold text-gray-900 leading-tight">
+                  {comment.userDetails?.name}
+                </p>
+                <p className="text-[10px] text-gray-500 leading-tight">
+                  {comment.userDetails?.headline}
+                </p>
+              </div>
+              {comment.userId === logedUser._id && (
+                <button
+                  onClick={() => deleteCommentOnPost()}
+                  className="text-gray-300 hover:text-red-500 transition-colors"
+                >
+                  <FaTrash size={10} />
+                </button>
+              )}
+            </div>
+            <div className="mt-1.5 flex gap-4">
+              <div className="flex-1">
+                <p className="text-[13px] text-gray-800 leading-relaxed">{comment.text}</p>
+              </div>
+              <div className="flex flex-col items-center justify-center min-w-[20px]">
+                {commentLiked ? (
+                  <FaHeart color="#ef4444" size={11} />
+                ) : (
+                  <CiHeart size={14} className="text-gray-400" />
+                )}
+                <p className="text-gray-400 font-bold" style={{ fontSize: '.65rem' }}>
+                  {comment.likes}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 mt-1 px-1">
+            <button
+              onClick={() =>
+                commentLiked
+                  ? unLikeAComment()
+                  : likeAComment()
+              }
+              className="text-[11px] font-bold text-gray-500 hover:text-blue-600 transition-colors"
+            >
+              {commentLiked ? 'Unlike' : 'Like'}
+            </button>
+            <button
+              onClick={() =>
+                setReplyTo({
+                  commentId: comment._id as string,
+                  name: comment?.userDetails?.name as string,
+                })
+              }
+              className="text-[11px] font-bold text-gray-500 hover:text-blue-600"
+            >
+              Reply
+            </button>
+            <p className="text-gray-400 font-medium" style={{ fontSize: '.65rem' }}>
+              {formatRelativeTime(comment?.createdAt || new Date())}
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
