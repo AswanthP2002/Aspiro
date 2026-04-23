@@ -123,6 +123,7 @@ export default class UserMapper {
       followers: data.followers?.length,
       applicationsCount: data.applicationsCount as JobApplicationDTO[],
       savedJobs: data.savedJobs as FavoriteJobDTO[],
+      views: data.views,
     };
   }
 

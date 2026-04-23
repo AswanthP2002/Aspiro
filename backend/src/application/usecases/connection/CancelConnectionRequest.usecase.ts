@@ -44,10 +44,10 @@ export default class CancelConnectionRequestUsecase implements ICancelConnection
           sender as string
         );
 
-        this._realTimeEventEmitter.removeNotification(
-          receiver as string,
-          removablNotification._id as string
-        );
+        // this._realTimeEventEmitter.removeNotification(
+        //   receiver as string,
+        //   removablNotification._id as string
+        // );
       }
 
       return this._mapper.connectionRequestToConnectionRequestDTO(canceledConnectionRequest);

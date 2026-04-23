@@ -1311,6 +1311,7 @@ export interface MyProfileDTO {
   following?: number;
   applicationsCount?: JobApplicationStatusData[];
   savedJobs?: FavoriteJob[];
+  views?: string[];
 }
 
 export interface UserOverviewForPublic {
@@ -1320,6 +1321,7 @@ export interface UserOverviewForPublic {
   summary?: string;
   role?: Role[];
   connections?: string[];
+  connectionRequests?: ConnectionRequests[]
   followers?: Follow[];
   skills?: Skills[]
   profilePicture?: {

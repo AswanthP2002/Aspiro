@@ -455,7 +455,7 @@ export default function ProfilePersonal() {
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-gray-900 flex items-center justify-center gap-1">
-                <FaEye size={20} className="text-gray-400" /> 14
+                <FaEye size={20} className="text-gray-400" /> {user?.views?.length}
               </p>
               <p className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Profile Views</p>
             </div>

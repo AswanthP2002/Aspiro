@@ -8,9 +8,11 @@ import IGetConnectionsUsecase from '../../application/interfaces/usecases/connec
 // import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
+import ResponseHandler from '../../utilities/response.handler';
 
 @injectable()
 export class ConnectionController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('ISendConnectionRequestUsecase')
     private _sendConnectionRequest: ISendConnectionRequestUsecase,
@@ -21,7 +23,9 @@ export class ConnectionController {
     @inject('IAcceptConnectionRequestUsecase')
     private _acceptConnectionRequest: IAcceptConnectionRequestUsecase,
     @inject('IGetConnectionsUsecase') private _getConnections: IGetConnectionsUsecase
-  ) {}
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async sendConnectionRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sender = req.user?.id as string;
@@ -36,11 +40,18 @@ export class ConnectionController {
         acted_user_avatar,
       });
 
-      res.status(StatusCodes.CREATED).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection request'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection requested'),
+        StatusCodes.CREATED,
+        result
+      );
+
+      // res.status(StatusCodes.CREATED).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection request'),
+      //   result,
+      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -51,11 +62,17 @@ export class ConnectionController {
     const receiver = req.params.receiverId;
     try {
       const result = await this._cancelConnectionRequest.execute({ sender, receiver });
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection request'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection cancelled'),
+        StatusCodes.OK,
+        result
+      );
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection request'),
+      //   result,
+      // });
     } catch (error: unknown) {
       next(error);
     }

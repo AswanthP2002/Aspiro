@@ -169,6 +169,7 @@ export interface MyProfileDTO {
   };
   // isBlocked?: boolean;
   isVerified?: boolean;
+  views?: string[];
   // isAdmin?: boolean;
   // isRecruiter?: boolean;
   createdAt?: string;

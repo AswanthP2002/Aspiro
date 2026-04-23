@@ -42,7 +42,7 @@ export default class RejectConnectionRequestUsecase implements IRejectConnection
           sender as string
         );
 
-        this._realTimeEventEmitter.removeNotification(receiver as string, sender as string);
+        // this._realTimeEventEmitter.removeNotification(receiver as string, sender as string);
       }
       return this._mapper.connectionRequestToConnectionRequestDTO(rejectedRequest);
     }

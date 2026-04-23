@@ -285,7 +285,7 @@ export default function UserPublicProfile() {
         if(userDetails?._id && logedUser._id !== userDetails?._id){
             userProfileViewd()
         }
-    }, [])
+    }, [userDetails])
 
     return (
         <>

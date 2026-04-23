@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BiGridAlt, BiListUl, BiSearch, BiUserPlus } from 'react-icons/bi';
-import { Experience, Follow, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
+import { BiGridAlt, BiListUl, BiSearch, BiUserCheck, BiUserPlus } from 'react-icons/bi';
+import { ConnectionRequests, Experience, Follow, Skills, UserOverviewForPublic, UserPublicProfileData } from '../../../types/entityTypes';
 import { followUser, getLocationDetails, getUsersForPublic, unfollowUser } from '../../../services/userServices';
 import { Notify } from 'notiflix';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { MdVerified } from 'react-icons/md';
 import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { cancelConnectionRequest, sendConnectionRequest } from '../../../services/connectionServices';
 
 export default function UsersFindingPage() {
   const [view, setView] = useState<'list' | 'grid'>('list');
@@ -203,6 +204,84 @@ export default function UsersFindingPage() {
     }
   }
 
+  const sendConnectionRequestToAUser = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirm = await Swal.fire({
+      icon: 'question',
+      title: 'Send connection request?',
+      text: `Your request will be pending until ${name} accepts it`,
+      showConfirmButton: true,
+      confirmButtonText: 'Send',
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirm.isConfirmed) return
+
+    try {
+      const result = await sendConnectionRequest(userId, logedUser.name, "")
+      if(result.success){
+        toast.success('Connection request send')
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connectionRequests: [...user.connectionRequests as ConnectionRequests[], result?.result]
+              }
+            }else {
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('error occured while sending connection request', error)
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
+  const cancelConnectionRequests = async (userId: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: 'Cancel Request',
+      showConfirmButton: true,
+      showCancelButton: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false
+    })
+    if(!confirmation.isConfirmed) return
+    try {
+      const result = await cancelConnectionRequest(userId)
+      if(result.success){
+        toast.info('Connection Request Cancelled')
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connectionRequests: user.connectionRequests?.filter((connection: ConnectionRequests) => connection.sender !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  // const isThisUserMyConnection = (user: UserPublicProfileData) => {
+  //   if(!user) return
+  //   for(let i = 0; i < user.conn)
+  // }
+
   const navigateToUserPublicProfile = (userId: string) => {
     if (!userId) return;
 
@@ -290,6 +369,31 @@ export default function UsersFindingPage() {
       return `${text.slice(0, buffer)}...`;
     }
   };
+
+  const isConnectionRequestSend = (user: UserOverviewForPublic) => {
+    for(let i = 0; i < user?.connectionRequests?.length; i++){
+      if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'PENDING'){
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const isAConnection = (user: UserOverviewForPublic) => {
+    if(user.connections?.includes(logedUser._id)){
+      return true
+    }else{
+      return false
+    }
+    // for(let i = 0; i < user?.connectionRequests?.length; i++){
+    //   if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'ACCEPTED'){
+    //     return true
+    //   }
+    // }
+
+    // return false
+  }
 
   const amIFollowingThisUser = (user: UserOverviewForPublic): boolean => {
     for (let i = 0; i < user?.followers?.length; i++) {
@@ -540,9 +644,21 @@ export default function UsersFindingPage() {
                       <div
                       className={`mt-5 flex items-center gap-2 ${view === 'grid' ? 'justify-center w-full' : ''}`}
                     >
-                      <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
-                        <BiUserPlus className="text-lg" /> Connect
-                      </button>
+                      {
+                        isAConnection(user) ? (
+                          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            <BiUserCheck className="text-lg" /> Connected
+                          </button>
+                        ) : isConnectionRequestSend(user) ? (
+                          <button onClick={() => cancelConnectionRequests(user._id as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            Pending
+                          </button>
+                        ) : (
+                          <button onClick={() => sendConnectionRequestToAUser(user._id as string, user.name as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            <BiUserPlus className="text-lg" /> Connect
+                          </button>
+                        )
+                      }
                       {
                         amIFollowingThisUser(user)
                           ? <button
