@@ -8,9 +8,11 @@ import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IGetFollowersUsecase from '../../application/interfaces/usecases/follow/IGetFollowers.usecase';
 import IRemoveAFollowerUsecase from '../../application/interfaces/usecases/follow/IRemoveAFollower.usecase';
 import { IGetFollowingsUsecase } from '../../application/interfaces/usecases/follow/IGetFollowingsUsecase';
+import ResponseHandler from '../../utilities/response.handler';
 
 @injectable()
 export default class FollowController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('IFollowUserUsecase') private _followUseCase: IFollowUserUseCase,
     @inject('IUnfollowUserUsecase') private _unfollowUseCase: IUnFollowUserUsercase,
@@ -18,7 +20,9 @@ export default class FollowController {
     @inject('IGetFollowingsUsecase') private _getFollowings: IGetFollowingsUsecase,
     @inject('IRemoveAFollowerUsecase') private _removeAFollower: IRemoveAFollowerUsecase
     //private _unfollowUseCase: IUnFollowUserUsercase,
-  ) {}
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async followUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const followerId = req.user?.id as string;
@@ -33,18 +37,18 @@ export default class FollowController {
         acted_user_avatar,
       });
 
-      if (!result) {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ success: false, message: 'Something went wrong' });
-        return;
-      }
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Follow created'),
+        StatusCodes.CREATED,
+        result
+      );
 
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Follow'),
-        result,
-      });
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Follow'),
+      //   result,
+      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -63,7 +67,12 @@ export default class FollowController {
         acted_user_avatar,
       });
 
-      res.status(StatusCodes.OK).json({ success: true, message: 'Unfollowed' });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Follow deleted'),
+        StatusCodes.OK
+      );
+      // res.status(StatusCodes.OK).json({ success: true, message: 'Unfollowed' });
     } catch (error: unknown) {
       next(error);
     }

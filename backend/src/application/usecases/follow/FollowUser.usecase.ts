@@ -19,7 +19,7 @@ export default class FollowUseruseCse implements IFollowUserUseCase {
 
   async execute(followUserDto: FollowUserDTO): Promise<FollowUserResDTO | null> {
     const { follower, following, acted_by, acted_user_avatar } = followUserDto;
-
+    console.info('-- checking follower and following before saving --', followUserDto);
     if (follower === following) {
       throw new Error('Duplicate : You cant follow yourself');
     }
@@ -29,39 +29,39 @@ export default class FollowUseruseCse implements IFollowUserUseCase {
     const result = await this._repo.create(newFollow);
 
     //create notification and store it
-    const notify = await this._notificationRepo.create({
-      recepientId: following,
-      category: 'FOLLOW',
-      actorId: follower,
-      message: `${acted_by} started following you`,
-      targetType: 'USER',
-      targetId: follower,
-      targetUrl: `http://localhost:5173/users/${follower}`,
-      metadata: {
-        acted_by,
-        acted_user_avatar,
-      },
-      isRead: false,
-    });
+    // const notify = await this._notificationRepo.create({
+    //   recepientId: following,
+    //   category: 'FOLLOW',
+    //   actorId: follower,
+    //   message: `${acted_by} started following you`,
+    //   targetType: 'USER',
+    //   targetId: follower,
+    //   targetUrl: `http://localhost:5173/users/${follower}`,
+    //   metadata: {
+    //     acted_by,
+    //     acted_user_avatar,
+    //   },
+    //   isRead: false,
+    // });
 
     //here i need to call the notification event !
     //live notification testing
-    if (notify) {
-      this._eventEmitter.follow({
-        _id: notify._id,
-        recepientId: following,
-        actorId: follower,
-        category: notify.category,
-        message: notify.message,
-        targetId: notify.targetId,
-        targetUrl: notify.targetUrl,
-        targetType: notify.targetType,
-        isDeleted: notify.isDeleted,
-        isRead: notify.isRead,
-        metadata: notify.metadata,
-        createdAt: notify.createdAt,
-      });
-    } //stoped live notification now
+    // if (notify) {
+    //   this._eventEmitter.follow({
+    //     _id: notify._id,
+    //     recepientId: following,
+    //     actorId: follower,
+    //     category: notify.category,
+    //     message: notify.message,
+    //     targetId: notify.targetId,
+    //     targetUrl: notify.targetUrl,
+    //     targetType: notify.targetType,
+    //     isDeleted: notify.isDeleted,
+    //     isRead: notify.isRead,
+    //     metadata: notify.metadata,
+    //     createdAt: notify.createdAt,
+    //   });
+    // } //stoped live notification now
 
     if (result) {
       const dto = this._mapper.followEntityToFollowResponseDTO(result);

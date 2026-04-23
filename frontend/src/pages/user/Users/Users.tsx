@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BiGridAlt, BiListUl, BiSearch, BiUserPlus } from 'react-icons/bi';
-import { Experience, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
-import { getLocationDetails, getUsersForPublic } from '../../../services/userServices';
+import { Experience, Follow, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
+import { followUser, getLocationDetails, getUsersForPublic, unfollowUser } from '../../../services/userServices';
 import { Notify } from 'notiflix';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { MdVerified } from 'react-icons/md';
 import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 export default function UsersFindingPage() {
   const [view, setView] = useState<'list' | 'grid'>('list');
@@ -129,6 +130,79 @@ export default function UsersFindingPage() {
     return experienceLabel;
   };
 
+  const followAUser = async (userId: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    try {
+      const result = await followUser(userId, logedUser.name, '')
+      if(result?.success){
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                followers:[
+                  ...user.followers as Follow[],
+                  {
+                    _id: result?.result._id,
+                    follower: result?.result.follower,
+                    following: result?.result.following,
+                    createdAt: result?.result.createdAt,
+                    updatedAt: result?.result.updatedAt,
+                    type: 'candidate'
+                  }
+                ]
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('Error occured while following a user')
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
+  const unfollowAUser = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: `Unfollow ${name}?`,
+      showConfirmButton: true, 
+      showCancelButton: true,
+      confirmButtonText:'Unfollow',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirmation.isConfirmed) return
+
+    try {
+      const result = await unfollowUser(userId, logedUser.name, '')
+      if(result.success){
+        toast.info(`Unfollowed ${name}`)
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                followers: user.followers?.filter((follow: Follow) => follow.follower !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('error occured while unfollowing a user', error)
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
   const navigateToUserPublicProfile = (userId: string) => {
     if (!userId) return;
 
@@ -219,7 +293,7 @@ export default function UsersFindingPage() {
 
   const amIFollowingThisUser = (user: UserOverviewForPublic): boolean => {
     for (let i = 0; i < user?.followers?.length; i++) {
-      if (user.followers[i].follower === logedUser.id) {
+      if (user.followers && user.followers[i].follower === logedUser._id) {
         return true;
       }
     }
@@ -462,23 +536,33 @@ export default function UsersFindingPage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div
+                    {user._id !== logedUser._id && (
+                      <div
                       className={`mt-5 flex items-center gap-2 ${view === 'grid' ? 'justify-center w-full' : ''}`}
                     >
                       <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
                         <BiUserPlus className="text-lg" /> Connect
                       </button>
-
-                      <button
-                        className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                          amIFollowingThisUser(user)
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-gray-900 text-white hover:bg-black'
-                        }`}
+                      {
+                        amIFollowingThisUser(user)
+                          ? <button
+                          onClick={() => unfollowAUser(user._id as string, user.name as string)}
+                         className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200`}
                       >
-                        {amIFollowingThisUser(user) ? 'Following' : 'Follow'}
+                        Following
                       </button>
+                      : <button
+                        onClick={() => followAUser(user._id as string)}
+                        className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-gray-900 text-white hover:bg-black`}
+                      >
+                        Follow
+                      </button>
+                      }
+                      
+
+                      
                     </div>
+                    )}
                   </div>
                 </div>
               </div>

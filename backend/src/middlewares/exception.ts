@@ -18,6 +18,7 @@ export default function exceptionhandle(
   };
 
   console.log('Error occured type of this error', typeof err);
+  console.log('Error --- >', err);
   if (err instanceof AppError) {
     console.log('App Error occured ', err.stack);
     switch (err.name) {
