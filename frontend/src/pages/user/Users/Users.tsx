@@ -9,7 +9,7 @@ import { MdVerified } from 'react-icons/md';
 import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { cancelConnectionRequest, sendConnectionRequest } from '../../../services/connectionServices';
+import { cancelConnectionRequest, removeConnection, sendConnectionRequest } from '../../../services/connectionServices';
 
 export default function UsersFindingPage() {
   const [view, setView] = useState<'list' | 'grid'>('list');
@@ -277,10 +277,43 @@ export default function UsersFindingPage() {
     }
   }
 
-  // const isThisUserMyConnection = (user: UserPublicProfileData) => {
-  //   if(!user) return
-  //   for(let i = 0; i < user.conn)
-  // }
+  const removeFromMyConnection = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: 'Break Connection ?',
+      text: `Are you sure to remove ${name} from your connection?.`,
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Remove',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirmation.isConfirmed) return
+
+    try {
+      const result = await removeConnection(userId)
+      if(result.success){
+        toast.info(`${name} removed from your connection`)
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connections: user.connections?.filter((connection: string) => connection !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
 
   const navigateToUserPublicProfile = (userId: string) => {
     if (!userId) return;
@@ -646,7 +679,7 @@ export default function UsersFindingPage() {
                     >
                       {
                         isAConnection(user) ? (
-                          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                          <button onClick={() => removeFromMyConnection(user._id as string, user.name as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
                             <BiUserCheck className="text-lg" /> Connected
                           </button>
                         ) : isConnectionRequestSend(user) ? (

@@ -32,7 +32,7 @@ const loadInitialState = (): UserAuthState => {
       user: null, //currently not geting any data from localstorage
       userToken: null, // Always initialize token as null
       userRole: null, //currently not geting any data from localstorage
-      initialLoading: false
+      initialLoading: true
     };
   } catch (e) {
     console.error('Could not load state from localStorage', e);

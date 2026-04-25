@@ -4,4 +4,5 @@ export const ConnectionApiRoutes = {
   CANCEL_CONNECTION_REQUEST: '/v2/user/connection-request-cancel/:receiverId',
   REJECT_CONNECTION_REQUEST: '/v2/user/connection-request-reject',
   ACCEPT_CONNECTION_REQUEST: '/v2/user/connection-request-accept/',
+  REMOVE_CONNECTION: '/v2/user/connection/remove/:id',
 } as const;

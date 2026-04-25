@@ -7,6 +7,7 @@ import UserProfileAggregated from '../entities/user/userProfileAggregated';
 import UserCachedData from '../entities/user/user.cachedData.entity';
 import MyProfileAggregated from '../entities/user/myProfileAggregated.entity';
 import UserFullProfileData from '../entities/user/userFullProfile.entity';
+import { ConnectionWithSenderDetails } from '../entities/connection/connectionRequest.entity';
 
 export default interface IUserRepository extends IBaseRepo<User> {
   findByUserId(userId: string): Promise<MyProfileAggregated | null>;
@@ -48,4 +49,10 @@ export default interface IUserRepository extends IBaseRepo<User> {
     viewerId: string,
     profileId: string
   ): Promise<{ _id: string; views: string[] } | null>;
+  getConnections(
+    userId: string,
+    page: number,
+    limit: number,
+    search: string
+  ): Promise<ConnectionWithSenderDetails[] | null>;
 }

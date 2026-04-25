@@ -340,16 +340,11 @@ type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 
 export interface ConnectionDetails {
   _id?: string;
-  receiver?: string;
-  sender?: string;
-  status: ConnectionRequestStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  senderDetails?:{
-    _id?: string,
-    name?: string,
-    headline?: string,
-    profilePicture?: string
+  connectedUserDetails: {
+    _id: string;
+    name: string;
+    headline?: string;
+    profilePicture?: string;
   }
 }
 

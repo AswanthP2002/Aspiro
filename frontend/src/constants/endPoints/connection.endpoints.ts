@@ -3,5 +3,6 @@ export const ConnectionEndpoints = {
   FETCH_CONNECTIONS: (userId: string) => `/v2/connections/${userId}`,
   CANCEL_CONNECTION_REQUEST: (receiverId: string) => `/v2/user/connection-request-cancel/${receiverId}`,
   REJECT_CONNECTION_REQUEST: '/v2/user/connection-request-reject',
-  ACCEPT_CONNECTION_REQUEST: '/v2/user/connection-request-accept/'
+  ACCEPT_CONNECTION_REQUEST: '/v2/user/connection-request-accept/',
+  REMOVE_CONNECTION: (removingConnectionId: string) => `/v2/user/connection/remove/${removingConnectionId}`
 } as const;
