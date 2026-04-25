@@ -35,8 +35,6 @@ export default function AdminLoginPage(){
             password:""
         }
     })
-
-    const [loading, setloading] = useState(false)
     const [loginErrorText, setLoginErrorText] = useState("")
     const [showPassword, setShowPassword] = useState(false)
 
@@ -44,7 +42,6 @@ export default function AdminLoginPage(){
     const dispatcher = useDispatch()
     
     async function adminLoginOnSubmit(data : Inputs){
-        // setloading(true)
         setLoginErrorText("")
         const {email, password} = data
         
@@ -58,11 +55,8 @@ export default function AdminLoginPage(){
                 userRole: result.result.role
             }))
             setLoginErrorText('')
-            // setloading(false)
             navigate('/admin/dashboard')
         }else{
-            // setloading(false)
-            // setLoginError(true)
             setLoginErrorText(result?.message)
         }
     }

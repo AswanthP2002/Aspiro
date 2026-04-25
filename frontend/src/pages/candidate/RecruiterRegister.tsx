@@ -5,7 +5,7 @@ import { Button, FormControl, FormHelperText,Modal} from '@mui/material';
 import { addCompany, createRecruiterService, getCompaniesList } from '../../services/recruiterServices';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { BiBuildings, BiCheckCircle} from 'react-icons/bi';
-import { LuUser } from 'react-icons/lu';
+import { LuCircleCheck, LuUser } from 'react-icons/lu';
 import { FaUpload} from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
@@ -180,31 +180,35 @@ export default function RecruiterRegisterPage() {
     return (
         <>
 
-        <div className='w-full p-10 lg:px-50'>
-            <p className='font-semibold text-xl text-center'>Join as a recruiter</p>
-            <p className='text-xs text-center'>Connect top talent with exceptional opportunities. Start your journey with Aspiro's professional network.</p>
-            <div className="mt-10 rounded-md bg-white p-5 border border-gray-300 shadow md:p-10">
+        <div className='w-full p-10 lg:px-50 bg-gray-50'>
+            <p className='font-bold text-2xl text-center track-wider'>Join as a recruiter</p>
+            <p className='text-center text-sm mt-2 leading-relaxed text-gray-700'>Connect top talent with exceptional opportunities. Start your journey with Aspiro's professional network.</p>
+            <div className="mt-10 rounded-lg bg-white p-5 border border-transparent shadow-xl md:p-10">
                 <form onSubmit={handleSubmit(handleApplicationSubmit)}>
 
-                    <p className='text-xs'>I am joining as <span className="red-500">*</span></p>
-                    <div className="grid grid-cols-2 gap-5 mt-2">
-                    <div onClick={() => selectRecruiterType('freelance')} className={`cursor-pointer border ${selectedRecruiterType === 'freelance' ? 'border-2 border-blue-300' : 'border-gray-300'} rounded-md flex flex-col items-center py-10`}>
-                        <LuUser color='gray' size={20} />
-                        <p className='mt-2 text-sm font-medium'>Freelance Recruiter</p>
+                    <p className='text-sm font-medium text-gray-500 uppercase'>I am joining as <span className="text-red-500">*</span></p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
+                    <div onClick={() => selectRecruiterType('freelance')} className={`cursor-pointer border ${selectedRecruiterType === 'freelance' ? 'ring-2 ring-blue-400 border-blue-300 bg-blue-50' : 'border-gray-300'} rounded-md px-5 py-10`}>
+                        <div className={`${selectedRecruiterType === 'freelance' ? "bg-blue-500" : "bg-gray-100"} w-11 h-11 rounded-md flex items-center justify-center group hover:bg-blue-500 transition-color duration-300`}>
+                            <LuUser className={`${selectedRecruiterType === 'freelance' ? "text-white" : "text-gray-500"} group-hover:text-white`} size={20} />
+                        </div>
+                        <p className='mt-2 text-sm font-bold'>Freelance Recruiter</p>
                         <p className='text-xs text-gray-700 mt-1'>Independant / self employed</p>
                     </div>
-                    <div onClick={() => selectRecruiterType('corporate')} className={`cursor-pointer border ${selectedRecruiterType === 'corporate' ? 'border-2 border-blue-300' : 'border-gray-300'} rounded-md flex flex-col items-center py-10`}>
-                        <BiBuildings color='gray' size={20} />
-                        <p className='mt-2 text-sm font-medium'>Corpoarate Recruiter</p>
+                    <div onClick={() => selectRecruiterType('corporate')} className={`cursor-pointer border ${selectedRecruiterType === 'corporate' ? 'ring-2 ring-blue-400 border-blue-300 bg-blue-50' : 'border-gray-300'} rounded-md px-5 py-10`}>
+                        <div className={`w-11 h-11 rounded-md flex items-center justify-center ${selectedRecruiterType === 'corporate' ? "bg-blue-500" : "bg-gray-100"} hover:bg-blue-500 transition-color duration-300`}>
+                            <BiBuildings className={`${selectedRecruiterType === 'corporate' ? "text-white" : "text-gray-500"} group-hover:text-white`} size={20} />
+                        </div>
+                        <p className='mt-2 text-sm font-bold'>Corpoarate Recruiter</p>
                         <p className='text-xs text-gray-700 mt-1'>Recruiting for a company</p>
                     </div>
                     </div>
-                    <div className="mt-5">
-                        <p className='font-medium text-sm'>Professional Credentials</p>
+                    <div className="mt-10">
+                        <p className='font-semibold uppercase track-wider'>Professional Credentials</p>
                         <div className="mt-3">
-                            <div className="flex gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <FormControl fullWidth error={Boolean(errors.fullName)}>
-                                    <label htmlFor="" className='!text-xs'>Full Name <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='uppercase font-semibold !text-gray-400 '>Full Name <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='fullName'
@@ -212,13 +216,13 @@ export default function RecruiterRegisterPage() {
                                             required: {value: true, message: "This field is required"}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.fullName?.message}</FormHelperText>
                                 </FormControl>
                                 <FormControl fullWidth error={Boolean(errors.professionalTitle)}>
-                                    <label htmlFor="" className='!text-xs'>Professional Title <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='uppercase font-semibold !text-gray-400'>Professional Title <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='professionalTitle'
@@ -226,15 +230,15 @@ export default function RecruiterRegisterPage() {
                                             required: {value: true, message: "This field is required"}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.professionalTitle?.message}</FormHelperText>
                                 </FormControl>
                             </div>
-                            <div className="flex gap-5 mt-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-3">
                                 <FormControl fullWidth error={Boolean(errors.email)}>
-                                    <label htmlFor="" className='!text-xs'>Email <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='font-semibold uppercase !text-gray-400'>Email <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='email'
@@ -242,13 +246,13 @@ export default function RecruiterRegisterPage() {
                                             required: {value: true, message: "This field is required"}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.email?.message}</FormHelperText>
                                 </FormControl>
                                 <FormControl fullWidth error={Boolean(errors.phone)}>
-                                    <label htmlFor="" className='!text-xs'>Phone <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='uppercase font-semibold !text-gray-400'>Phone <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='phone'
@@ -256,15 +260,15 @@ export default function RecruiterRegisterPage() {
                                             required: {value: true, message: "This field is required"}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.phone?.message}</FormHelperText>
                                 </FormControl>
                             </div>
-                            <div className="flex gap-5 mt-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-3">
                                 <FormControl fullWidth error={Boolean(errors.yearOfExperience)}>
-                                    <label htmlFor="" className='!text-xs'>Years of experience <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='uppercase font-semibold !text-gray-400'>Years of experience <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='yearOfExperience'
@@ -274,13 +278,13 @@ export default function RecruiterRegisterPage() {
                                             pattern:{value: /^[0-9]$/, message: 'Enter a valid number'}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} type='number' className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} type='number' className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.yearOfExperience?.message}</FormHelperText>
                                 </FormControl>
                                 <FormControl fullWidth error={Boolean(errors.linkedin)}>
-                                    <label htmlFor="" className='!text-xs'>Linkedin URL <span className="text-red-500">*</span></label>
+                                    <label htmlFor="" className='uppercase font-semibold !text-gray-400'>Linkedin URL <span className="text-red-500">*</span></label>
                                     <Controller
                                         control={control}
                                         name='linkedin'
@@ -288,15 +292,15 @@ export default function RecruiterRegisterPage() {
                                             required: {value: true, message: "This field is required"}
                                         }}
                                         render={({field}) => (
-                                            <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' />
+                                            <input {...field} className='border !border-slate-200 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:!border-blue-300 rounded-md p-3 !text-xs bg-gray-50' />
                                         )}
                                     />
                                     <FormHelperText>{errors.linkedin?.message}</FormHelperText>
                                 </FormControl>
                             </div>
                         </div>
-                        <p className="mt-5 font-medium text-sm">Identity Verification</p>
-                        <p className="mt-3 text-xs">Goverment Issued ID <span className="text-red-500">*</span></p>
+                        <p className="mt-5 font-semibold uppercase track-wider">Identity Verification</p>
+                        <p className="mt-3 text-sm font-medium uppercase text-gray-400 mt-5">Goverment Issued ID <span className="text-red-500">*</span></p>
                         {verificationDoc
                             ? <div className='mt-2 border border-gray-200 rounded-md p-3 flex justify-between items-center bg-gray-50'>
                                 <div className='flex items-center gap-2'>
@@ -307,19 +311,21 @@ export default function RecruiterRegisterPage() {
                               </div>
                             : <div 
                                 onClick={() => fileInputRef.current?.click()} 
-                                className='mt-2 cursor-pointer border border-dotted border-gray-300 rounded-md p-10 bg-gray-50 flex flex-col items-center hover:bg-gray-100 transition-colors'
+                                className='mt-2 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 p-10 bg-gray-50 group hover:bg-white flex flex-col items-center hover:bg-gray-100 transition-colors'
                               >
                                 <input type="file" ref={fileInputRef} className='hidden' onChange={handleFileChange} accept="application/pdf" />
-                                <FaUpload size={24} className='text-gray-500' />
-                                <p className='mt-2 text-sm font-medium'>Click to upload</p>
-                                <p className="text-xs text-gray-500 mt-1">Upload any goverment approved ID profe; Driving licence, Aadhar, Voter ID card</p>
+                                <div className='bg-white w-11 h-11 rounded-md flex items-center justify-center shadow-xl'>
+                                    <FaUpload size={20} className='text-gray-500 group-hover:text-blue-500' />
+                                </div>
+                                <p className='mt-2 font-semibold'>Click to upload</p>
+                                <p className="text-xs text-gray-500 leading-relaxed mt-1 text-center">Upload any goverment approved ID profe; Driving licence, Aadhar, Voter ID card</p>
                             </div>
                         }
                         {selectedRecruiterType === 'corporate' && (
     <div className="mt-5">
-        <p className='font-medium text-sm'>Company Information</p>
-        <FormControl className='!mt-5' fullWidth error={Boolean(errors.companyName)}>
-            <label className='!text-xs text-gray-600'>Company Name <span className="text-red-500">*</span></label>
+        <p className='font-semibold uppercase'>Company Information</p>
+        <FormControl className='!mt-10' fullWidth error={Boolean(errors.companyName)}>
+            <label className='uppercase font-semibold !text-gray-400'>Company Name <span className="text-red-500">*</span></label>
             <div className='w-full relative'>
                 <Controller 
                     control={control}
@@ -364,7 +370,7 @@ export default function RecruiterRegisterPage() {
             <FormHelperText>{errors.companyName?.message}</FormHelperText>
         </FormControl>
         
-        <p className='text-xs text-gray-600 mt-3'>
+        <p className='text-sm text-gray-600 mt-3'>
             Can't find your company? 
             <span onClick={openCompanyAddModal} className='ml-1 font-semibold text-blue-600 cursor-pointer hover:underline'>
                 Add it here
@@ -373,7 +379,13 @@ export default function RecruiterRegisterPage() {
     </div>
 )}
                     </div>
-                    <Button disabled={loading} type='submit' variant='contained' fullWidth className='!mt-5'>{loading ? 'Submitting...' : 'Submit'} <BiCheckCircle className='ml-2' /></Button>
+                    <button type="submit" className='bg-gradient-to-br from-blue-400 to-indigo-500 w-full rounded-lg flex items-center justify-center gap-3 p-3 text-white font-semibold mt-5 shadow-xl hover:shadow-2xl'>
+                        {loading
+                            ? "Processing..."
+                            : "Complete Registration"
+                        }
+                        <LuCircleCheck color='white' />
+                    </button>
                 </form>
             </div>
         </div>
