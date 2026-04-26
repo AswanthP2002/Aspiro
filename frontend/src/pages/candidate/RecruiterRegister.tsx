@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Notify } from 'notiflix';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, FormControl, FormHelperText,Modal} from '@mui/material';
-import { addCompany, createRecruiterService, getCompaniesList } from '../../services/recruiterServices';
+import { addCompany, createRecruiterService } from '../../services/recruiterServices';
+import { getCompaniesList } from '../../services/companyServices';
 import { FaCircleCheck } from 'react-icons/fa6';
-import { BiBuildings, BiCheckCircle} from 'react-icons/bi';
-import { LuCircleCheck, LuUser } from 'react-icons/lu';
+import { BiBuildings} from 'react-icons/bi';
+import { LuBuilding2, LuCircleCheck, LuUser } from 'react-icons/lu';
 import { FaUpload} from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +48,7 @@ export default function RecruiterRegisterPage() {
 
     const [verificationDoc, setVerificationDoc] = useState<File | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const companySearchInputRef = useRef<HTMLInputElement>(null)
 
     const logedUser = useSelector((state: RootState) => {
         return state.userAuth.user
@@ -59,7 +61,7 @@ export default function RecruiterRegisterPage() {
 
     const { control, watch, setValue, reset, handleSubmit, formState: { errors } } = useForm<RecruiterFormInputs>({
         defaultValues:{
-           employerType: 'freelance',
+           employerType: 'corporate',
            email: logedUser.email,
            phone: "",
            professionalTitle: logedUser.headline,
@@ -134,7 +136,9 @@ export default function RecruiterRegisterPage() {
             setLoading(false)
         }
     };
-      
+    
+    const selectedcompanyName = watch('companyName')
+    const selectedcompanyId = watch('companyId')
 
     const [searchResultList, setSearchResultList] = useState<Company[]>([])
     const [isSearching, setIsSearching] = useState(false)
@@ -148,7 +152,7 @@ export default function RecruiterRegisterPage() {
         }
         const debouncedFunction = setTimeout(async () => {
             
-                setIsSearching(true)
+                // setIsSearching(true)
 
                 try {
                     console.log('fetching for :', typedCompanyName)
@@ -161,9 +165,7 @@ export default function RecruiterRegisterPage() {
                 } catch (error: unknown) {
                     console.log('error occured while fetching company list', error)
                     Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
-                } finally {
-                    setIsSearching(false)
-                }
+                } 
         }, 500)
         
 
@@ -171,10 +173,43 @@ export default function RecruiterRegisterPage() {
     }, [typedCompanyName])
 
     const selectCompanyFromList = (company: Company) => {
+        toast.success('Clicked')
+        toast.info(`Company name ${company.name}`)
+        toast.info(`Company id ${company._id}`)
         setValue('companyName', company.name)
         setValue('companyId', company._id)
+        setIsSearching(false)
 
         setSearchResultList([])
+    }
+
+    const openCompanyLoadList = async () => {
+        setIsSearching(true)
+        setLoading(true)
+
+        try {
+            const result: FetchCompaniesListResponsePayload = await getCompaniesList('')
+            if(result?.success){
+                toast.success('Company loaded')
+                setSearchResultList(result?.result)
+            }else{
+                setSearchResultList([])
+            }
+        } catch (error: unknown) {
+            console.log('Error occured while loading company list', error)
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            setSearchResultList([])
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const closeCompanyLoadList = async (company: Company | null = null) => {
+        if(!company){
+            setIsSearching(false)
+        }else{
+            selectCompanyFromList(company)
+        }
     }
 
     return (
@@ -333,7 +368,10 @@ export default function RecruiterRegisterPage() {
                     rules={{ required: selectedRecruiterType === 'corporate' ? "Company is required" : false }}
                     render={({ field }) => (
                         <input 
-                            {...field} 
+                            {...field}
+                            ref={companySearchInputRef}
+                            onFocus={openCompanyLoadList}
+                            // onBlur={() => closeCompanyLoadList(null)}
                             autoComplete="off"
                             className='border border-gray-200 w-full p-3 rounded-md !text-xs focus:ring-1 focus:ring-blue-400 outline-none' 
                             placeholder='Start typing company name...' 
@@ -341,8 +379,28 @@ export default function RecruiterRegisterPage() {
                     )}
                 />
                 
+                {isSearching && (
+                    <div className="absolute bg-white bottom-12 border border-slate-100 shadow-xl rounded-lg w-full">
+                    {searchResultList.length > 0 && searchResultList.map((company) => (
+                        <div key={company._id} onClick={() => closeCompanyLoadList(company)} className='flex cursor-pointer gap-2 group hover:bg-blue-100 transition-color p-2'>
+                            <div className='bg-gray-100 w-10 h-10 rounded-md group-hover:bg-blue-500 transition-color duration-300 flex items-center justify-center'>
+                                <LuBuilding2 className='text-gray-700 group-hover:text-white' />
+                            </div>
+                            <div>
+                                <p className='font-semibold text-sm'>{company.name}</p>
+                                <p className='text-xs text-gray-600'>{company.location}</p>
+                            </div>
+                        </div>
+                    ))}
+                    {searchResultList.length === 0 && (
+                        <div className='p-5'>
+                            <p className='text-center text-xs text-gray-600'>No companies found</p>
+                        </div>
+                    )}
+                </div>
+                )}
                 {/* Suggestions Dropdown */}
-                { (searchResultList.length > 0 || isSearching) && (
+                {/* { (searchResultList.length > 0 || isSearching) && (
                     <div className="absolute z-10 bg-white border border-gray-200 rounded-md shadow-lg w-full mt-1 max-h-[250px] overflow-y-auto">
                         {isSearching ? (
                             <p className="p-3 text-xs text-gray-500">Searching...</p>
@@ -365,7 +423,7 @@ export default function RecruiterRegisterPage() {
                             ))
                         )}
                     </div>
-                )}
+                )} */}
             </div>
             <FormHelperText>{errors.companyName?.message}</FormHelperText>
         </FormControl>
@@ -442,13 +500,13 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
             <Modal open={open} onClose={onClose} className='flex items-center justify-center'>
                 <div className='bg-white w-lg rounded-md'>
                     <div className="header p-5 border-b border-gray-200 flex justify-between">
-                        <p>Add new company</p>
+                        <p className='font-bold uppercase tracking-wide'>Add new company</p>
                         <button onClick={onClose}><CgClose /></button>
                     </div>
                     <div className="body p-5 max-h-[600px] overflow-y-auto">
                         <form onSubmit={handleSubmit(addNewCompany)}>
                             <FormControl fullWidth error={Boolean(errors.name)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Company name <span className="text-red-500">*</span></label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Company name <span className="text-red-500">*</span></label>
                                 <Controller
                                     control={control}
                                     name='name'
@@ -458,14 +516,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         maxLength: {value: 100, message: 'Maximum 100 charecters'}
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='Enter company name' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='Enter company name' />
                                     )}
                                 />
                                 <FormHelperText>{errors.name?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.website)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Website</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Website</label>
                                 <Controller
                                     control={control}
                                     name='website'
@@ -474,14 +532,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         pattern:{value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, message: 'Enter a valid url'}
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='https://www.company.com' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='https://www.company.com' />
                                     )}
                                 />
                                 <FormHelperText>{errors.website?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.linkedin)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Linkedin</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Linkedin</label>
                                 <Controller
                                     control={control}
                                     name='linkedin'
@@ -490,14 +548,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         pattern:{value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, message: 'Enter a valid url'}
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='https://www.linkedin.com/company...' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='https://www.linkedin.com/company...' />
                                     )}
                                 />
                                 <FormHelperText>{errors.linkedin?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.slogan)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Slogan</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Slogan</label>
                                 <Controller
                                     control={control}
                                     name='slogan'
@@ -505,14 +563,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         required: {value: true, message: 'Company slogan can not be empty'},
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='Enter company slogan or tagline' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='Enter company slogan or tagline' />
                                     )}
                                 />
                                 <FormHelperText>{errors.slogan?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.location)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Location</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Location</label>
                                 <Controller
                                     control={control}
                                     name='location'
@@ -520,14 +578,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         required: {value: true, message: 'Location can not be empty'},
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='City, State, Country' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='City, State, Country' />
                                     )}
                                 />
                                 <FormHelperText>{errors.location?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.industry)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Industry</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Industry</label>
                                 <Controller
                                     control={control}
                                     name='industry'
@@ -536,14 +594,14 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         pattern:{value: /^[A-Z][A-Za-z\s\&\-\/]{2,49}$/, message: 'Enter a name'}
                                     }}
                                     render={({field}) => (
-                                        <input {...field} className='border border-gray-200 rounded-md p-3 !text-xs' placeholder='Information Technology' />
+                                        <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='Information Technology' />
                                     )}
                                 />
                                 <FormHelperText>{errors.industry?.message}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth className='!mt-3' error={Boolean(errors.description)}>
-                                <label htmlFor="" className='!text-xs !text-black'>Company Description</label>
+                                <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Company Description</label>
                                 <Controller
                                     control={control}
                                     name='description'
@@ -553,16 +611,23 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                         maxLength: {value: 300, message: 'Maximum 300 charecters'}
                                     }}
                                     render={({field}) => (
-                                        <textarea {...field} className='border border-gray-200 rounded-md p-3 !text-xs' rows={6} placeholder='Describe the company, its mission what make its unique...' />
+                                        <textarea {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 outline-none focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' rows={6} placeholder='Describe the company, its mission what make its unique...' />
                                     )}
                                 />
                                 <FormHelperText>{errors.description?.message}</FormHelperText>
                             </FormControl>
-                            <p className="text-xs text-gray-500">After adding your company you will be able to find your company in the search box</p>
+                            <p className="text-xs text-gray-600 mt-3 leading-relaxed">After adding your company you will be able to find your company in the search box</p>
                             <div className="border border-gray-200 my-3"></div>
                             <div className="mt-5 flex justify-iitems-end gap-2">
-                                    <button onClick={onClose} className='text-xs border border-gray-200 px-3 py-2 rounded-md'>Cancel</button>
-                                    <Button type='submit' variant='contained' loading={loading}>Add Company</Button>
+                                    <button onClick={onClose} className='border border-slate-200 px-5 py-2 text-sm font-semibold rounded-lg text-gray-700 shadow-xl'>Cancel</button>
+                                    {/* <Button type='submit' variant='contained' loading={loading}>Add Company</Button> */}
+                                    <button type="submit" className='flex items-center text-sm font-semibold gap-2 px-5 py-2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl hover:!shadow-2xl rounded-lg'>
+                                        {loading
+                                            ? "Processing..."
+                                            : "Add Company"
+                                        }
+                                        <LuCircleCheck />
+                                    </button>
                             </div>  
                         </form>
                     </div>
