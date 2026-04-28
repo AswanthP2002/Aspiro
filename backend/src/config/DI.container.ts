@@ -476,6 +476,8 @@ import IUpdateProfileViewUsecase from '../application/interfaces/usecases/user/I
 import UpdateProfileViewUsecase from '../application/usecases/user/UpdateProfileView.usecase';
 import IRemoveConnectionUsecase from '../application/interfaces/usecases/connection/IRemoveConnection.usecase';
 import RemoveConnectionUsecase from '../application/usecases/connection/RemoveConnection.usecase';
+import IValidateTokenUsecase from '../application/interfaces/usecases/user/IValidateToken.usecase';
+import ValidateTokenUsecase from '../application/usecases/user/ValidateToken.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -596,6 +598,7 @@ container.registerSingleton<IUpdateProfileViewUsecase>(
   'IUpdateProfileViewUsecase',
   UpdateProfileViewUsecase
 );
+container.registerSingleton<IValidateTokenUsecase>('IValidateTokenUsecase', ValidateTokenUsecase);
 container.registerSingleton<IRemoveConnectionUsecase>(
   'IRemoveConnectionUsecase',
   RemoveConnectionUsecase

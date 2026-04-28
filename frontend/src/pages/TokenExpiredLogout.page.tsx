@@ -1,11 +1,12 @@
 import { Button, Modal } from "@mui/material";
 import { useEffect, useState } from "react";
 import { userLogout } from "../services/userServices";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Notify } from "notiflix";
 import { BsClock } from "react-icons/bs";
 import { BiArrowFromLeft } from "react-icons/bi";
+import { toast } from "react-toastify";
 
 export default function TokenExpiredLogoutPage(){
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -13,13 +14,22 @@ export default function TokenExpiredLogoutPage(){
     const dispatcher = useDispatch()
     const navigate = useNavigate()
     
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string}}}) => {
+        return state.userAuth.user
+    })
+
     useEffect(() => {
         setIsModalOpen(true)
 
         return () => setIsModalOpen(false)
     }, [])
 
+    
+
     const handleLogout = async () => {
+        if(!logedUser._id){
+            return navigate('/login')
+        }
         setLoading(true)
         try {
             await userLogout(dispatcher, navigate)
@@ -27,7 +37,7 @@ export default function TokenExpiredLogoutPage(){
             
         } catch (error: unknown) {
             setLoading(false)
-            Notify.failure('Something went wrong, please try again later', {timeout:2000})
+            toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
     }
 
@@ -41,7 +51,7 @@ export default function TokenExpiredLogoutPage(){
                 <p className="mt-3 text-sm text-gray-700">Your session has expired, please relogin to continue</p>
                 <div className="actions w-full mt-5">
                     <button onClick={handleLogout} className="bg-black text-white w-full flex items-center gap-2 justify-center py-1 rounded-md font-light">
-                        Login
+                        Understood
                         <BiArrowFromLeft />
                     </button>
                 </div>

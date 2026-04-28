@@ -53,6 +53,8 @@ import IAiInterviewUsecase from '../../application/interfaces/usecases/AI/IAiInt
 import ILoadInterviewDashboardUsecase from '../../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
 import IUpdateProfileViewUsecase from '../../application/interfaces/usecases/user/IUpdateProfileView.usecase';
 import ResponseHandler from '../../utilities/response.handler';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import ValidateTokenUsecase from '../../application/usecases/user/ValidateToken.usecase';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -156,7 +158,8 @@ export class UserController {
     @inject('IAiInterviewUsecase') private _aiInterview: IAiInterviewUsecase,
     @inject('ILoadInterviewDashboardUsecase')
     private _loadInterviewDashboard: ILoadInterviewDashboardUsecase,
-    @inject('IUpdateProfileViewUsecase') private _updateProfileView: IUpdateProfileViewUsecase
+    @inject('IUpdateProfileViewUsecase') private _updateProfileView: IUpdateProfileViewUsecase,
+    @inject('IValidateTokenUsecase') private _validateToken: ValidateTokenUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -243,23 +246,17 @@ export class UserController {
   }
 
   async reAuthenticate(req: Request, res: Response): Promise<void> {
-    console.log('request reached under the reauthenticate controller');
     try {
       const refreshToken = req.cookies.refreshToken;
-      console.log('refresh token - ', refreshToken);
       if (!refreshToken) {
-        console.log('--Refreshtoken not provided--');
         res
           .status(StatusCodes.NOT_ACCEPTABLE)
           .json({ success: false, message: StatusMessage.AUTH_MESSAGE.NO_REFRESH_TOKEN });
         return;
       }
 
-      console.log('refresh token exist so going to decode');
       const decoded = (await verifyToken(refreshToken)) as JWTTokenVerifyResult; //chance for error
-      console.log('decoded without problem', decoded);
       const result = await this._loadUserMetaData.execute(decoded.id);
-      console.log('-- received user meta data after reauthentiction--', result);
       const accessToken = await generateToken({
         id: decoded?.id as string,
         email: decoded?.email as string,
@@ -272,40 +269,60 @@ export class UserController {
         accessToken,
       });
     } catch (error: unknown) {
-      if (error instanceof Error) {
+      if (error instanceof JsonWebTokenError) {
+        console.log('inside the reauthenticate controller toke error');
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: StatusMessage.AUTH_MESSAGE.INVALID_TOKEN,
+          errors: {
+            code: 'INVALID_TOKEN',
+            message: 'Invalid token, please login again',
+          },
+        });
+      } else if (error instanceof TokenExpiredError) {
+        console.log('inside the reauthenticate controller token expired');
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: StatusMessage.COMMON_MESSAGE.SESSION_EXPIRED,
+          errors: {
+            code: 'REFRESH_TOKEN_EXPIRED',
+            message: 'Refresh token expired, please login again',
+          },
+        });
+      } else if (error instanceof Error) {
         console.log('Error occured while refreshing accessToken', error);
-        switch (error.name) {
-          case 'TokenExpiredError':
-            console.log('inside the reauthenticate controller token expired');
-            res.status(StatusCodes.UNAUTHORIZED).json({
-              success: false,
-              message: StatusMessage.COMMON_MESSAGE.SESSION_EXPIRED,
-              errors: {
-                code: 'REFRESH_TOKEN_EXPIRED',
-                message: 'Refresh token expired, please login again',
-              },
-            });
-            break;
+        // switch (error.name) {
+        //   case 'TokenExpiredError':
+        //     console.log('inside the reauthenticate controller token expired');
+        //     res.status(StatusCodes.UNAUTHORIZED).json({
+        //       success: false,
+        //       message: StatusMessage.COMMON_MESSAGE.SESSION_EXPIRED,
+        //       errors: {
+        //         code: 'REFRESH_TOKEN_EXPIRED',
+        //         message: 'Refresh token expired, please login again',
+        //       },
+        //     });
+        //     break;
 
-          case 'JsonWebTokenError':
-            console.log('inside the reauthenticate controller toke error');
-            res.status(StatusCodes.UNAUTHORIZED).json({
-              success: false,
-              message: StatusMessage.AUTH_MESSAGE.INVALID_TOKEN,
-              errors: {
-                code: 'INVALID_TOKEN',
-                message: 'Invalid token, please login again',
-              },
-            });
-            break;
+        //   case 'JsonWebTokenError':
+        //     console.log('inside the reauthenticate controller toke error');
+        //     res.status(StatusCodes.UNAUTHORIZED).json({
+        //       success: false,
+        //       message: StatusMessage.AUTH_MESSAGE.INVALID_TOKEN,
+        //       errors: {
+        //         code: 'INVALID_TOKEN',
+        //         message: 'Invalid token, please login again',
+        //       },
+        //     });
+        //     break;
 
-          default:
-            console.log('Refresh token verification failed');
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-              success: false,
-              message: StatusMessage.COMMON_MESSAGE.SOMETHING_WENT_WRONG,
-            });
-        }
+        //   default:
+        console.log('Refresh token verification failed');
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: StatusMessage.COMMON_MESSAGE.SOMETHING_WENT_WRONG,
+        });
+        // }
       }
     }
   } //fixed
@@ -524,7 +541,6 @@ export class UserController {
       },
     };
     try {
-      console.log('--edit profile details in controller--', req.body);
       const result = await this._editProfile.execute({ _id: id, ...data });
 
       res.status(StatusCodes.OK).json({
@@ -911,7 +927,6 @@ export class UserController {
 
   async getSimilarUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     const logedUser = req.user.id;
-    console.log('-- requrest for similar user fetching --');
     try {
       const result = await this._similarUsers.execute({ logedUserId: logedUser });
       res.status(StatusCodes.OK).json({
@@ -946,9 +961,7 @@ export class UserController {
   async aiInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
     const isStoped = req.query.isStoped === 'true';
     const userId = req.user.id;
-    // console.log('-- checking request body', req.body);
-    // res.status(StatusCodes.OK).json({ success: true, message: 'TEstin gflow' });
-    // return;
+
     try {
       const result = await this._aiInterview.execute(req.body, isStoped, userId);
       res.status(StatusCodes.OK).json({
@@ -992,6 +1005,16 @@ export class UserController {
       //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Profile view'),
       //   result,
       // });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const token = req.body.token;
+    try {
+      const result = await this._validateToken.execute(token);
+      this._responseHandler.success(res, 'Validated', StatusCodes.OK, result);
     } catch (error) {
       next(error);
     }

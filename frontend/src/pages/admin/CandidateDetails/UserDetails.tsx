@@ -111,10 +111,10 @@ export default function CandidateDetails(){
     
         Swal.fire({
           icon: 'warning',
-          title: 'Block ?',
-          text: 'Are you sure, you want to block this user ?',
+          title: 'Suspend ?',
+          text: 'Are you sure, you want to suspend this user ?',
           showConfirmButton: true, 
-          confirmButtonText: 'Block',
+          confirmButtonText: 'Suspend',
           showCancelButton: true,
           cancelButtonText: 'No',
           allowOutsideClick: false,
@@ -128,7 +128,8 @@ export default function CandidateDetails(){
             if(!userData) return null
             return {
                 ...userData,
-                isBlocked: true
+                isBlocked: true,
+                accountActions:[...userData.accountActions as {action: string, actor: string, date: string}[], {action: 'blocked', actor: 'Admin', date: new Date().toString()}]
             }
           })
         } catch (error: unknown) {
@@ -145,10 +146,10 @@ export default function CandidateDetails(){
     
         Swal.fire({
           icon:'warning',
-          title: 'Unblock ?',
-          text: 'Are you sure, you want to unblock this user ?',
+          title: 'Unsuspend ?',
+          text: 'Are you sure, you want to Unsuspend this user ?',
           showConfirmButton: true, 
-          confirmButtonText: 'Unblock',
+          confirmButtonText: 'Unsuspend',
           showCancelButton: true,
           cancelButtonText: 'No',
           allowOutsideClick: false,
@@ -163,7 +164,8 @@ export default function CandidateDetails(){
             if(!data) return null
             return {
                 ...data,
-                isBlocked: false
+                isBlocked: false,
+                accountActions: [...data.accountActions as {action: string, actor: string, date: string}[], {action: 'unblocked', actor: 'Admin', date: new Date().toString()}]
             }
           })
         } catch (error: unknown) {
@@ -211,26 +213,26 @@ export default function CandidateDetails(){
 
     return(
         <>
-        <div className="w-full min-h-screen p-5 lg:p-10">
+        <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-50">
             <div className="w-full">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-light text-gray-700 hover:bg-gray-200 rounded-md !p-2">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-light text-gray-700 hover:bg-gray-200 rounded-md !p-2 mb-5">
                     <FaArrowLeft />
                     Back to users
                 </button>
 
                 {/* Profile card */}
                 <section>
-                    <p className="text-lg">User Management</p>
-                    <p className="text-xs mt-1">Detailed user information and account management</p>
+                    <p className="text-2xl font-bold tracking-wide text-gray-900">User Management</p>
+                    <p className="text-sm font-medium text-gray-700 mt-1">Detailed user information and account management</p>
 
                     <div className="grid grid-cols-12 gap-5 mt-5">
                         <div className="col-span-12 lg:col-span-8 space-y-5">
-                            <div className="border border-gray-200 rounded-md bg-white p-5">
-                                <div className="flex justify-between">
+                            <div className="border border-slate-100 shadow-xl rounded-lg bg-white p-5">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                                     <div className="flex gap-2">
                                         {userDetails?.profilePicture?.cloudinarySecureUrl
-                                            ? <div className="w-18 h-18 rounded-full border border-slate-300 p-1">
-                                                <img className="h-full w-full rounded-full object-cover" src={userDetails.profilePicture.cloudinarySecureUrl} alt="" />
+                                            ? <div className="w-18 h-18 rounded-md border border-slate-300 p-1">
+                                                <img className="h-full drop-shadow w-full rounded-md object-cover" src={userDetails.profilePicture.cloudinarySecureUrl} alt="" />
                                               </div>
                                             : <div className="w-15 h-15 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
                                                 <p className="text-white text-xl">S</p>
@@ -238,12 +240,15 @@ export default function CandidateDetails(){
                                         }
                                         <div>
                                             <p className="font-semibold">{userDetails?.name}</p>
-                                            <p className="text-xs">{userDetails?.email}</p>
-                                            <p className="text-xs font-light mt-2">Joined {formattedDateMoment(userDetails?.createdAt, "MMM DD YYYY")}</p>
+                                            <p className="text-sm text-gray-700">{userDetails?.email}</p>
+                                            <div className="flex items-center mt-2 gap-2">
+                                                <span className="uppercase text-xs bg-gray-50 rounded-md px-[5px] text-gray-500 border border-gray-200">id: {userDetails?._id.slice(userDetails._id.length - 5)}</span>
+                                                <p className="text-xs font-light">Joined {formattedDateMoment(userDetails?.createdAt, "MMM DD YYYY")}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <span className="block text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role[0]}</span>
+                                    <div className="flex items-start justify-start md:justify-end gap-2">
+                                        <span className="text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role[0]}</span>
                                         {userDetails?.role && userDetails.role.length > 1 && (
                                             <span className="block text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role[1]}</span>
                                         )}
@@ -254,18 +259,18 @@ export default function CandidateDetails(){
                                     
                                 </div>
                                 <div className="mt-5">
-                                    <p className="text-xs leading-relaxed">{userDetails?.summary}</p>
+                                    <p className="text-xs font-medium text-gray-700 leading-relaxed">{userDetails?.summary}</p>
                                 </div>
                             </div>
                             {userDetails?.educations && userDetails.educations.length > 0 && (
-                                <div className="bg-white p-5 rounded-md border border-gray-200">
-                                <p className="font-semibold">Educations</p>
+                                <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold uppercase tracking-wide text-gray-800">Educations</p>
                                 <div className="mt-5 space-y-2">
                                     {
                                         userDetails.educations.map((education: Education) => (
                                             <div className="border-l-3 border-blue-500 px-2 py-1">
-                                        <p className="text-sm font-medium">{education.educationStream}</p>
-                                        <p className="text-xs text-gray-700">{education.institution}</p>
+                                        <p className="text-sm font-bold text-gray-800">{education.educationStream}</p>
+                                        <p className="text-xs text-gray-700 font-medium mt-1">{education.institution}</p>
                                         <div className="mt-2 text-xs text-gray-500">{education.startYear} - {education.endYear}</div>
                                     </div>
                                         ))
@@ -274,35 +279,35 @@ export default function CandidateDetails(){
                                 </div>
                             )}
                             {userDetails?.experiences && userDetails.experiences.length > 0 && (
-                                <div className="bg-white p-5 rounded-md border border-gray-200">
-                                <p className="font-semibold">Experiences</p>
+                                <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold tracking-wide text-gray-800">Experiences</p>
                                 <div className="mt-5 space-y-2">
                                     {userDetails.experiences.map((experience: Experience) => (
                                         <div className="border-l-3 border-blue-500 px-2 py-1">
-                                        <p className="text-sm font-medium">{experience.jobRole}</p>
+                                        <p className="text-sm font-bold text-gray-800">{experience.jobRole}</p>
                                         <p className="text-xs text-gray-700">{experience.jobType}</p>
-                                        <p className="text-xs text-gray-700">{experience.organization} | {experience.location}</p>
-                                        <div className="mt-2 text-xs text-gray-500">{formattedDateMoment(experience.startDate as string, "MMM DD YYYY")} - {experience.isPresent ? "Present" : formattedDateMoment(experience.endDate, "MMM DD YYYY")}</div>
+                                        <p className="text-xs text-gray-700 font-medium">{experience.organization} | {experience.location}</p>
+                                        <div className="mt-2 text-xs text-gray-500">{formattedDateMoment(experience.startDate as string, "MMM DD YYYY")} - {experience.isPresent ? "Present" : formattedDateMoment(experience.endDate as string, "MMM DD YYYY")}</div>
                                     </div>
                                     ))}
                                 </div>
                             </div>
                             )}
-                            <div className="bg-white p-5 rounded-md border border-gray-200">
-                                <p className="font-semibold">Technical Skills</p>
+                            <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold uppercase tracking-wide text-gray-800">Technical Skills</p>
                                 <div className="mt-5 flex flex-wrap gap-2">
                                     {userDetails?.skills.map((skill: Skills) => {
                                             return <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">{skill.skill}</span>
                                     })}
                                 </div>
-                                <p className="font-semibold mt-5">Soft Skills</p>
+                                <p className="font-semibold mt-5 uppercase tracking-wide text-gray-800">Soft Skills</p>
                                 <div className="mt-5">
                                     {/* <span className="bg-gray-200 text-gray-500 px-2 py-1 text-xs rounded-md">MongoDB</span> */}
                                 </div>
                             </div>
                             {userDetails?.posts && userDetails.posts.length > 0 && (
-                                <div className="bg-white p-5 rounded-md border border-gray-200">
-                                <p className="font-semibold">Posts</p>
+                                <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold uppercase tracking-wide text-gray-800">Posts</p>
                                 <div className="mt-5">
                                     <div className="border border-gray-300 bg-gray-100 p-3 rounded-md">
                                         <p className="mb-2 text-xs font-medium">Exited to share about my new achivement</p>
@@ -321,47 +326,47 @@ export default function CandidateDetails(){
                             )}
                         </div>
                         <div className="col-span-12 lg:col-span-4 space-y-5">
-                            <div className="bg-white p-5 rounded-md border border-gray-200">
-                                <p className="font-semibold">Account Actions</p>
+                            <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold uppercase tracking-wide text-gray-800 !mb-2">Account Actions</p>
                                 <div className="mt-3 space-y-2">
-                                    <button disabled={userDetails?.googleId ? true : false} onClick={openPasswordResetModal} className={`${userDetails?.googleId ? "bg-gray-300" : "bg-blue-500"} block w-full rounded-md py-2 text-sm ${userDetails?.googleId ? "text-gray-400" : "text-white"}`}>Reset Password</button>
+                                    <button disabled={userDetails?.googleId ? true : false} onClick={openPasswordResetModal} className={`${userDetails?.googleId ? "bg-gray-300" : "bg-blue-500"} block w-full rounded-lg p-3 text-sm font-semibold shadow-xl hover:bg-blue-700 transition-color duration-300 ${userDetails?.googleId ? "text-gray-400" : "text-white"}`}>Reset Password</button>
                                     {userDetails?.isBlocked
-                                        ? <button onClick={() => unblockUser(userDetails._id as string)} className="bg-orange-500 block w-full rounded-md py-2 text-sm text-white">Unsuspend Account</button>
-                                        : <button onClick={() => bloackUser(userDetails?._id as string)} className="bg-orange-500 block w-full rounded-md py-2 text-sm text-white">Suspend Account</button>
+                                        ? <button onClick={() => unblockUser(userDetails._id as string)} className="border border-transparent p-3 rounded-lg w-full text-sm font-semibold text-white bg-blue-500 transition-color duration-300 hover:bg-blue-700 shadow-xl">Unsuspend Account</button>
+                                        : <button onClick={() => bloackUser(userDetails?._id as string)} className="border border-transparent p-3 w-full font-semibold text-sm rounded-lg bg-amber-500 text-white shadow-xl transition-color duration-300 hover:bg-amber-700 hover:shadow-2xl">Suspend Account</button>
                                     }
-                                    {!userDetails?.isBanned && (<button onClick={() => banUserPermanently(userDetails?._id as string)} className="bg-red-500 block w-full rounded-md py-2 text-sm text-white">Permanent Ban</button>)}
+                                    {!userDetails?.isBanned && (<button onClick={() => banUserPermanently(userDetails?._id as string)} className="border border-transparent w-full p-3 rounded-lg bg-red-500 text-white transition-color duration-300 font-semibold text-sm shadow-xl hover:!bg-red-700 hover:shadow-2xl">Permanent Ban</button>)}
                                 </div>
                                 <div className="border border-gray-200 w-full mt-3 mb-2"></div>
-                                <button onClick={() => deleteSingleUser(userDetails?._id as string)} className="bg-white border border-red-500 w-full py-2 text-sm text-red-500 rounded-md">Delete User</button>
+                                <button onClick={() => deleteSingleUser(userDetails?._id as string)} className="border border-red-500 w-full p-3 font-semibold text-sm text-red-500 rounded-lg shadow-xl transition-color duration-300 hover:bg-red-500 hover:text-white">Delete User</button>
                                 <div className="border border-gray-200 w-full mt-3 mb-2"></div>
                                 <div className="mt-2">
-                                    <p className="font-medium text-gray-500">Security Status</p>
+                                    <p className="font-semibold textsm uppercase text-gray-400">Security Status</p>
                                     <ul className="mt-2 space-y-2">
                                         <li className="flex justify-between text-xs">
-                                            <p>Email Status</p>
-                                            <p className="text-green-500">Verified</p>
+                                            <p className="text-gray-600">Email Status</p>
+                                            <p className="text-green-500 font-medium uppercase">Verified</p>
                                         </li>
                                         <li className="flex justify-between text-xs">
-                                            <p>Last Login</p>
-                                            <p className="">{formattedDateMoment(new Date(), "MMM DD YYYY")}</p>
+                                            <p className="text-gray-600">Last Login</p>
+                                            <p className="font-medium">{formattedDateMoment(userDetails?.lastLogin as string, "MMM DD YYYY")}</p>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-                            <div className="bg-white p-5 rounded-md border border-slate-200">
-                                <p className="font-semibold">Account action History</p>
+                            <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-xl">
+                                <p className="font-semibold uppercase text-gray-900">Account action History</p>
                                 {userDetails?.accountActions && userDetails?.accountActions?.length > 0 
                                     ? <>
                                         <div className="grid grid-cols-1 gap-2 mt-5">
                                             {userDetails.accountActions.map((history: {action: string, actor: string, date: string}, index: number) => (
-                                                <div className={`${history.action === 'Blocked' ? "bg-red-500" : (history.action === 'Un blocked' ? "bg-green-500" : "bg-blue-500")} ps-1 rounded-md`}>
-                                                    <div className={`flex gap-2 p-2 rounded-md ${history.action === 'Blocked' ? "bg-red-100" : (history.action === 'Un blocked' ? "bg-green-100" : "bg-blue-100")}`}>
+                                                <div className={`${history.action === 'Blocked' ? "bg-red-500" : (history.action === 'Un blocked' ? "bg-green-500" : "bg-blue-500")} ps-1 rounded-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}>
+                                                    <div className={`flex gap-2 p-3 rounded-md ${history.action === 'Blocked' ? "bg-red-100" : (history.action === 'Un blocked' ? "bg-green-100" : "bg-blue-100")}`}>
                                                     <div className="flex-1">
-                                                        <p className="text-sm font-semibold">{history.action}</p>
-                                                        <p className="text-sm mt-2">Acted by : <span className="font-semibold">{history.actor}</span></p>
+                                                        <p className="text-sm font-semibold uppercase text-gray-700">{history.action}</p>
+                                                        <p className="text-xs mt-2">Acted by : <span className="font-semibold">{history.actor}</span></p>
                                                     </div>
                                                     <div className="flex items-end text-xs text-gray-700">
-                                                        <p>{formattedDateMoment(history.date, "MMM DD YYYY")}</p>
+                                                        <p className="italic">{formattedDateMoment(history.date, "MMM DD YYYY")}</p>
                                                     </div>
                                                 </div>
                                                 </div>
@@ -450,15 +455,17 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
                     Notify.failure(result.message)
                     return
                 }
-                Notify.success("Password reset link send to user")
+                toast.success("Password reset link send to user")
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+                const err = error as AxiosError<{message: string}>
+                const finalErrorMessage = err.response?.data.message || err.message || 'Something went wrong'
+                toast.error(finalErrorMessage)
             } finally {
                 setLoading(false)
                 setToken("")
                 setCode("")
-                setIsCodeSend(false)
-                closeModal()
+                // setIsCodeSend(false)
+                // closeModal()
             }
         }else {
             return
@@ -478,19 +485,19 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
     return(
         <>
             <Modal  className="flex items-center justify-center" open={openModal} onClose={handleModalClose}>
-                <div className="bg-white p-5 rounded-md w-md">
+                <div className="bg-white p-5 rounded-lg shadow-xl w-md">
                     <div className="flex justify-between">
-                        <p>Reset Password</p>
+                        <p className="font-semibold text-xl tracking-wide">Reset Password</p>
                         <button onClick={closeModal}><CgClose /></button>
                     </div>
-                    <div className="mt-5 bg-blue-200 p-3 rounded-md flex gap-2">
+                    <div className="mt-5 bg-blue-200 p-3 rounded-lg border border-blue-300 ring-2 ring-blue-100 flex gap-2">
                         <div className="rounded-full flex justify-center items-center w-15 h-15 border border-blue-500 bg-blue-300">
                             <p className="text-xl font-semibold text-gray-700">{userDetails?.name[0]}</p>
                         </div>
                         <div>
-                            <p>{data.name}</p>
-                            <span className="flex items-center gap-2 text-xs mt-2"><BiEnvelope /> <p>{userDetails?.email}</p></span>
-                            <span className="flex items-center gap-2 text-xs"><LuUser /> <p>User ID: {userDetails?._id}</p></span>
+                            <p className="font-semibold text-sm">{data.name}</p>
+                            <span className="flex items-center gap-2 text-xs mt-2 font-medium text-gray-700"><BiEnvelope /> <p>{userDetails?.email}</p></span>
+                            <span className="flex items-center gap-2 text-xs mt-1 font-medium text-gray-700"><LuUser /> <p>User ID: {userDetails?._id}</p></span>
                         </div>
                     </div>
                     <div className="my-3">
@@ -506,7 +513,7 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
                                 </div>
                             )
                         }
-                        {!isCodeSend && (<Button onClick={() => requestAReset("request")} variant="contained" fullWidth loading={loading} className="!mt-5">PROCEED</Button>)}
+                        {!isCodeSend && (<button onClick={() => requestAReset("request")} className="!mt-5 border border-transparent w-full p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold text-sm uppercase shadow-xl">Proceed</button>)}
                     </div>
                     
                 </div>

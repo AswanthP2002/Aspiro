@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import store from '../../redux/store';
 import { tokenRefresh, updateUserMetaData } from '../../redux/userAuthSlice';
 import { reAuthenticate } from '../commonServices';
+import { toast } from 'react-toastify';
 
 const baseUrl = import.meta.env.VITE_SERVER_URL
 
@@ -81,9 +82,10 @@ axiosInstance.interceptors.response.use(
                 }
             })
         }
-        else if(response && response.status === 406 && !originalRequest.url.includes('login')){
-           window.location.replace(`/action/termination?message=${response.data.message}`)
-           return
+        else if(response && response.status === 406 && !window.location.href.includes('login')){
+            // alert(originalRequest.url)
+            // toast.warn(originalRequest.url)
+            return window.location.replace(`/action/termination?message=${response.data.message}`)
        }
         else if(response && response.status === 403){
             Swal.fire({

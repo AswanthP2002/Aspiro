@@ -1231,6 +1231,15 @@ export const followUser = async (userId : string, acted_by: string, acted_user_a
     }
 }
 
+export const validateToken = async (token: string) => {
+    try {
+        const response = await axiosInstance.post(EndPoints.VALIDATE_TOKEN, {token})
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
 // export const sendConnectionRequest = async (receiverId: string, acted_by: string, acted_user_avatar: string) => {
 //     try {
 //         const response = await axiosInstance.post(`/v1/user/connect-request/${receiverId}`,

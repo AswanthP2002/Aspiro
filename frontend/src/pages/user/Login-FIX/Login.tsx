@@ -18,7 +18,7 @@ import { BiPointer } from 'react-icons/bi';
 import { LuUsers } from 'react-icons/lu';
 
 interface UserSuccessfullLoginResult {
-  user: {
+  user: { 
     id: string;
     name: string;
     profilePicture: string;

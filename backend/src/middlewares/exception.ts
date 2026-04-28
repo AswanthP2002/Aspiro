@@ -3,6 +3,7 @@ import AppError from '../domain/errors/AppError';
 import { StatusCodes } from '../presentation/statusCodes';
 import { StatusMessage } from '../constants/Messages/statusMessages';
 import { ZodError } from 'zod';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 export default function exceptionhandle(
   err: unknown,
@@ -17,8 +18,7 @@ export default function exceptionhandle(
     message: '',
   };
 
-  console.log('Error occured type of this error', typeof err);
-  console.log('Error --- >', err);
+  console.error('Error occured in backend', err);
   if (err instanceof AppError) {
     console.log('App Error occured ', err.stack);
     switch (err.name) {
@@ -50,9 +50,53 @@ export default function exceptionhandle(
           message: 'Incorrect Password',
         };
         break;
+      case 'USER_SUSPENDED':
+        responseMessage =
+          'Your account has been temporarily suspended by the admin. Check email for further information';
+        code = StatusCodes.NOT_ACCEPTABLE;
+        break;
+      case 'USER_BANNED':
+        responseMessage =
+          'Your account has been permanently banned due to violation of our community guidelines';
+        code = StatusCodes.NOT_ACCEPTABLE;
+        break;
+      // case 'TokenExpiredError':
+      //   console.log('-- TOKEN EXPIRED-- response - session expired : 401');
+      //   responseMessage = 'Your session has expired, please re login';
+      //   code = StatusCodes.UNAUTHORIZED;
+      //   errors = {
+      //     code: 'ACCESS_TOKEN_EXPIRED',
+      //     message: 'Access Token Expired, required refresh',
+      //   };
+      //   break;
+      // case 'JsonWebTokenError':
+      //   console.log('-- JSON WEB TOKEN ERROR : MALFORM -- RESPONSE - Invalid token : 401');
+      //   responseMessage = 'Invalid token';
+      //   code = StatusCodes.UNAUTHORIZED;
+      //   errors = {
+      //     code: 'INVALID_ACCESS_TOKEN',
+      //     message: 'Invalid toke or jwt token malformed',
+      //   };
+      //   break;
     }
   } else if (err instanceof ZodError) {
     console.log('Zod error happened in narrowing', err);
+  } else if (err instanceof TokenExpiredError) {
+    console.log('-- TOKEN EXPIRED-- response - session expired : 401');
+    responseMessage = 'Your session has expired, please re login';
+    code = StatusCodes.UNAUTHORIZED;
+    errors = {
+      code: 'ACCESS_TOKEN_EXPIRED',
+      message: 'Access Token Expired, required refresh',
+    };
+  } else if (err instanceof JsonWebTokenError) {
+    console.log('-- JSON WEB TOKEN ERROR : MALFORM -- RESPONSE - Invalid token : 401');
+    responseMessage = 'Invalid token';
+    code = StatusCodes.UNAUTHORIZED;
+    errors = {
+      code: 'INVALID_ACCESS_TOKEN',
+      message: 'Invalid toke or jwt token malformed',
+    };
   }
 
   if (res.headersSent) {
@@ -127,25 +171,25 @@ export default function exceptionhandle(
   //     break;
 
   //   //jwt based errors
-  //   case 'TokenExpiredError':
-  //     console.log('--Un Authorized Error Occured in Authentication :: TOKEN EXPIRED--');
-  //     responseMessage = 'Your session has expired, please re login';
-  //     code = StatusCodes.UNAUTHORIZED;
-  //     errors = {
-  //       code: 'ACCESS_TOKEN_EXPIRED',
-  //       message: 'Access Token Expired, required refresh',
-  //     };
-  //     break;
+  // case 'TokenExpiredError':
+  //   console.log('--Un Authorized Error Occured in Authentication :: TOKEN EXPIRED--');
+  //   responseMessage = 'Your session has expired, please re login';
+  //   code = StatusCodes.UNAUTHORIZED;
+  //   errors = {
+  //     code: 'ACCESS_TOKEN_EXPIRED',
+  //     message: 'Access Token Expired, required refresh',
+  //   };
+  //   break;
 
-  //   case 'JsonWebTokenError':
-  //     console.log('--Un Authorized Error Occured in Authentication :: JSON WEB TOKEN ERROR--');
-  //     responseMessage = 'Invalid token';
-  //     code = StatusCodes.UNAUTHORIZED;
-  //     errors = {
-  //       code: 'INVALID_ACCESS_TOKEN',
-  //       message: 'Invalid toke or jwt token malformed',
-  //     };
-  //     break;
+  // case 'JsonWebTokenError':
+  //   console.log('--Un Authorized Error Occured in Authentication :: JSON WEB TOKEN ERROR--');
+  //   responseMessage = 'Invalid token';
+  //   code = StatusCodes.UNAUTHORIZED;
+  //   errors = {
+  //     code: 'INVALID_ACCESS_TOKEN',
+  //     message: 'Invalid toke or jwt token malformed',
+  //   };
+  //   break;
   //   default:
   //     console.log('Internal server error executed', err);
   //     responseMessage = 'Internal server error, please try again after some time';

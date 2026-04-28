@@ -16,6 +16,7 @@ export const UserApiRoutes = {
   USER_AUTH_MANAGE: {
     GOOGLE_LOGIN: '/v1/google/sign-up',
     NORMAL_LOGIN: '/v1/user/login',
+    VALIDATE_TOKEN: '/v1/token-verify',
   },
 
   USER_PROFILE_MANAGE: {

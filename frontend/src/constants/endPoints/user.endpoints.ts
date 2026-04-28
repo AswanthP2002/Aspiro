@@ -78,5 +78,7 @@ export const EndPoints = {
 
     LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
     START_AI_INTERVIEW: '/v2/interview/ai',
-    LOAD_DASHBOARD: '/v2/interview/ai/dashboard'
+    LOAD_DASHBOARD: '/v2/interview/ai/dashboard',
+
+    VALIDATE_TOKEN: '/v1/token-verify'
 } as const
