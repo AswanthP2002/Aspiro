@@ -132,9 +132,9 @@ function createAdminRouter() {
 }
 
 function testMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log('testing logout flow');
-  console.log('--req url for testing--', req.url);
-  console.log(req.body);
+  // console.log('testing logout flow');
+  // console.log('--req url for testing--', req.url);
+  // console.log(req.body);
   next();
 }
 

@@ -90,10 +90,11 @@ export const centralizedAuthentication = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // console.log('Checking auth header for the request -----', req.headers)
   const auth = req.headers.authorization;
+  console.info('-- AUTH --> ', auth);
   if (!auth) {
-    res.status(406).json({
+    console.log('NO authorization provided - response - No authorization : 401');
+    res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
       message: 'No authorization header provided, please login again',
     });
@@ -104,14 +105,16 @@ export const centralizedAuthentication = async (
     const decoded = (await verifyToken(auth.split(' ')[1])) as JWTVerificationResultPayload;
     const userData = await UserDAO.findById(new mongoose.Types.ObjectId(decoded.id));
     if (userData?.isBlocked) {
+      console.log('User blocked / suspended');
       throw new UserBlockedError();
     }
-    console.log('-- user not blocked --');
+    // console.log('-- user not blocked --');
     if (userData?.isBanned) {
+      console.log('User banned');
       throw new UserBannedError();
     }
 
-    console.log('-- user not banned --');
+    // console.log('-- user not banned --');
     req.user = decoded;
     next();
   } catch (error: unknown) {
@@ -123,7 +126,7 @@ export const authorization = (roles: string[]) => {
   // console.log('Entered inside the authorization;;;')
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (!roles.includes(req.user.role as string)) {
-      console.log('- inside authorization :: failed');
+      // console.log('- inside authorization :: failed');
       res.status(StatusCodes.FORBIDEN).json({ success: false, message: 'Forbidden request' });
       return;
     }

@@ -30,6 +30,8 @@ const UserProtectedRoute = () => {
 
   if(user && userRole === 'user'){
     return <Outlet />
+  } else if(userRole === 'admin'){
+    return <Navigate to='/admin/dashboard' replace />
   }
 
   return <Navigate to='/login' replace />

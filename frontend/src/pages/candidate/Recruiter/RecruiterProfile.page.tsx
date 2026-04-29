@@ -1,51 +1,21 @@
 import { useEffect, useState } from "react";
-// import RecruiterInfoCard from "../../../components/recruiter/RecruiterInfoCard"
-import defaultProfile from '/default-img-instagram.png';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Job, RecruiterProfileData } from "../../../types/entityTypes";
 import { getProfileOverview } from "../../../services/recruiterServices";
 import { Notify } from "notiflix";
 import getReminingDays from "../../../helpers/DateTime.helper";
-import InfinitySpinner from "../../../components/common/InfinitySpinner";
 import ThreeDotLoading from "../../../components/common/ThreeDotLoading";
 import { PiClock, PiEye, PiSuitcase } from "react-icons/pi";
-import { BsGlobe, BsLinkedin, BsQuestionCircle, BsShieldCheck, BsThreeDotsVertical } from "react-icons/bs";
-import { FaCircleXmark, FaUsersGear } from "react-icons/fa6";
-import { LuUserCheck } from "react-icons/lu";
+import { BsGlobe, BsLinkedin, BsThreeDotsVertical } from "react-icons/bs";
+import { FaUsersGear } from "react-icons/fa6";
+import { LuBriefcase, LuCirclePlus, LuClock, LuEye, LuUserCheck } from "react-icons/lu";
 import { IoLocation } from "react-icons/io5";
-import { formatRelativeTime } from "../../../services/util/formatDate";
 import { FaFileAlt, FaPlus } from "react-icons/fa";
 import { CgCheck } from "react-icons/cg";
-import { AiOutlineVerified } from "react-icons/ai";
-import { BiBuildings, BiEnvelope, BiPhone, BiShield, BiShieldQuarter } from "react-icons/bi";
-import { FiAlertCircle, FiArrowRightCircle, FiSettings } from "react-icons/fi";
+import { BiBuildings, BiEnvelope, BiPhone, BiShieldQuarter } from "react-icons/bi";
+import { FiAlertCircle, FiArrowRightCircle } from "react-icons/fi";
 import moment, { Moment } from "moment";
 import { TbBrandDaysCounter } from "react-icons/tb";
-
-
-const dummyUserWithRecruiterDetails = {
-    isRecruiter: true,
-    recruiterDetails: {
-         _id: '12',
-        userId: '11',
-        employerType: 'company',
-        organizationDetails: {
-        organizationName: 'Aspiro',
-        organizationType: 'Startup',
-        industry: 'Information Technology',
-        organizationContactNumber: '7560856614',
-        organizationEmail: 'aspiro.hiring@gmail.com',
-        socialLinks: [],
-        teamStrength: '1-3',
-        aboutCompany: 'Innovate Inc. is a leading provider of cutting-edge software solutions, dedicated to pushing the boundaries of technology and innovation. We foster a collaborative and creative environment.',
-        website: 'https://www.aspiro.com',
-        vision: 'To be the global leader in next-generation software solutions that empower businesses and individuals.',
-    },
-    }
-};
-
-const showDummyRecruiterProfile = true;
-
 
 export default function RecruiterProfilePage(){
     const navigateTo = useNavigate();
@@ -220,16 +190,16 @@ export default function RecruiterProfilePage(){
                 {
                     profileData?.profileStatus === 'approved' && (
                         <>
-                            <p className="text-2xl font-semibold mt-10 lg:mt-0">Dashboard</p>
-                    <p className="text-sm text-gray-500 mt-2">Welcome back!, Here is an overview of your recruiting activity</p>
-                    <div className="mt-5 border border-gray-200 bg-white rounded-md">
+                            <p className="text-2xl font-semibold mt-10 lg:mt-0 tracking-wide text-gray-900">Dashboard</p>
+                    <p className="text-sm text-gray-700 mt-2">Welcome back!, Here is an overview of your recruiting activity</p>
+                    <div className="mt-5 border border-slate-100 bg-white rounded-lg shadow-xl">
                         <div className="w-full p-5 flex jusityf-between">
                             <div className="flex gap-3">
                                 <div className="w-13 bg-gradient-to-br text-white text-lg from-blue-500 to-indigo-600 h-13 flex items-center justify-center rounded-md">
                                     <p>{profileData?.userProfile?.name ? profileData?.userProfile?.name[0] : 'U'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-lg font-semibold flex gap-2 items-center">
+                                    <p className="text-lg font-semibold flex gap-2 items-center tracking-wide">
                                         {profileData?.userProfile?.name}
                                         <span className="text-xs bg-blue-200 text-violet-700 !font-normal px-3 rounded-full">{profileData?.recruiterType} Recruiter</span>
                                     </p>
@@ -242,47 +212,47 @@ export default function RecruiterProfilePage(){
                                 </div>
                             </div>
                         </div>
-                        <div className=" border border-gray-200"></div>
+                        
                         <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-5">
                             {
                                 profileData?.recruiterType === 'corporate' && (
                                     <>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 shadow-xl flex items-center gap-2">
                                             <BiBuildings size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Company Name</p>
                                                 <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.companyDetails?.name}</p>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BiEnvelope size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Email</p>
                                                 <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.email}</p>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 transition-all duration-300 shadow-xl hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BsLinkedin size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">LinkedIn</p>
                                                 <a href={profileData.linkedinUrl} className="text-xs font-semibold text-blue-500 mt-1">LinkedIn.com</a>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <TbBrandDaysCounter size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Years of Experience</p>
                                                 <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.yearOfExperience}</p>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BsGlobe size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Website</p>
                                                 <a href={profileData.companyDetails?.website} className="text-xs font-semibold text-blue-500 mt-1">Go to website</a>
                                             </div>
                                         </div>
-                                       <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                       <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BiPhone size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Contact</p>
@@ -295,28 +265,28 @@ export default function RecruiterProfilePage(){
                             {
                                 profileData?.recruiterType === 'freelance' && (
                                     <>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BiEnvelope size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Email</p>
                                                 <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.email}</p>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BsLinkedin size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">LinkedIn</p>
                                                 <a href={profileData.linkedinUrl} className="text-xs font-semibold text-blue-500 mt-1">LinkedIn.com</a>
                                             </div>
                                         </div>
-                                        <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <TbBrandDaysCounter size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Years of Experience</p>
                                                 <p className="text-xs font-semibold text-gray-700 mt-1">{profileData?.yearOfExperience}</p>
                                             </div>
                                         </div>
-                                       <div className="border border-slate-200 rounded-lg p-3 flex items-center gap-2">
+                                       <div className="border border-slate-100 shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-lg p-5 flex items-center gap-2">
                                             <BiPhone size={25} color="blue" />
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium">Contact</p>
@@ -327,10 +297,9 @@ export default function RecruiterProfilePage(){
                                 )
                             }
                         </div>
-                        <div className="border border-gray-200"></div>
                         <div className="p-5">
                             <div>
-                                <p className="font-semibold">Security</p>
+                                <p className="font-semibold uppercase text-gray-700 tracking-wide">Security</p>
                                 <div className="mt-2">
                                     <p className="text-xs text-gray-500 font-medium">Verification</p>
                                     <p className={`text-xs font-semibold ${profileData.isVerified ? "text-green-600" : "text-red-600"} mt-1`}>{profileData.isVerified ? "Verified" : "Not Verified"}</p>
@@ -350,8 +319,8 @@ export default function RecruiterProfilePage(){
                             </div>
                             )}
                             <div className="mt-5">
-                                <p className="font-semibold">Verification Document</p>
-                                <div className="mt-3 p-3 flex gap-3 border border-gray-200 rounded-md shadow-sm cursor-pointer">
+                                <p className="font-semibold tracking-wide uppercase text-gray-700">Verification Document</p>
+                                <div className="mt-3 p-5 flex gap-3 border border-slate-100 rounded-md shadow-xl cursor-pointer">
                                     <div className="bg-red-200 w-10 h-10 rounded-md flex items-center justify-center">
                                         <FaFileAlt color="white" size={20} />
                                     </div>
@@ -361,53 +330,52 @@ export default function RecruiterProfilePage(){
                                 </div>
                             </div>
                         </div>
-                        <div className="border border-gray-200"></div>
                         {profileData.recruiterType === 'corporate' && (<div className="p-5">
-                            <p className="text-xs text-gray-700 font-medium">Summary</p>
-                            <p className="text-xs mt-2 font-normal text-gray-500 text-justify leading-relaxed mt-1">{profileData?.companyDetails?.description}</p>
+                            <p className="text-gray-700 font-semibold tracking-wide uppercase">Summary</p>
+                            <p className="text-sm mt-2 font-normal text-gray-500 text-justify leading-relaxed mt-1">{profileData?.companyDetails?.description}</p>
                         </div>)}
                     </div>
 
                     <div className="my-5">
-                        <p className="text-lg">Manage Jobs</p>
+                        <p className="text-lg font-semibold text-gray-700 uppercase tracking-wide">Manage Jobs</p>
                         <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 xl:grid-cols-4">
-                            <div className="border border-blue-500 bg-blue-100 p-5 flex gap-3 rounded-md">
+                            <div className="border border-slate-100 shadow-xl bg-white p-5 flex gap-3 rounded-lg">
                                 <div>
-                                    <p className="text-sm text-blue-600">Active Jobs</p>
-                                    <p className="mt-2 text-xl">0</p>
+                                    <p className="text-sm uppercase font-medium text-slate-500">Active Jobs</p>
+                                    <p className="mt-2 text-xl font-semibold text-gray-800">0</p>
                                 </div>
                                 <div className="flex-1 flex justify-end">
-                                    <PiSuitcase color="blue" size={25} />
+                                    <LuBriefcase className="text-blue-500" size={25} />
                                 </div>
                             </div>
 
-                            <div className="border border-orange-500 bg-orange-100 p-5 flex gap-3 rounded-md">
+                            <div className="border border-slate-100 shadow-xl bg-white p-5 flex gap-3 rounded-lg">
                                 <div>
-                                    <p className="text-sm text-orange-600">Average Job Views</p>
-                                    <p className="mt-2 text-xl">0</p>
+                                    <p className="text-sm uppercase font-medium text-slate-500">average job views</p>
+                                    <p className="mt-2 text-xl font-semibold text-gray-800">0</p>
                                 </div>
                                 <div className="flex-1 flex justify-end">
-                                    <PiEye color="orange" size={25} />
+                                    <LuEye className="text-blue-500" size={25} />
                                 </div>
                             </div>
 
-                            <div className="border border-green-500 bg-green-100 p-5 flex gap-3 rounded-md">
+                            <div className="border border-slate-100 shadow-xl bg-white p-5 flex gap-3 rounded-lg">
                                 <div>
-                                    <p className="text-sm text-green-600">Jobs Expiring Soon</p>
-                                    <p className="mt-2 text-xl">0</p>
+                                    <p className="text-sm uppercase font-medium text-slate-500">job expiring soon</p>
+                                    <p className="mt-2 text-xl font-semibold text-gray-800">0</p>
                                 </div>
                                 <div className="flex-1 flex justify-end">
-                                    <PiClock color="green" size={25} />
+                                    <LuClock className="text-blue-500" size={25} />
                                 </div>
                             </div>
 
-                            <div className="border border-violet-500 bg-violet-50 p-5 flex gap-3 rounded-md">
+                            <div className="border border-slate-100 shadow-xl bg-white p-5 flex gap-3 rounded-lg">
                                 <div>
-                                    <p className="text-sm text-violet-600">Total Hires</p>
-                                    <p className="mt-2 text-xl">0</p>
+                                    <p className="text-sm uppercase font-medium text-slate-500">total hires</p>
+                                    <p className="mt-2 text-xl font-semibold text-gray-800">0</p>
                                 </div>
                                 <div className="flex-1 flex justify-end">
-                                    <LuUserCheck color="violet" size={25} />
+                                    <LuUserCheck className="text-blue-500" size={25} />
                                 </div>
                             </div>
                         </div>
@@ -415,9 +383,9 @@ export default function RecruiterProfilePage(){
 
                     <div className="my-5">
                         <div className="flex justify-between">
-                            <p className="text-lg">Recent Jobs</p>
+                            <p className="text-lg font-semibold uppercase tracking-wide text-gray-700">Recent Jobs</p>
                             <button onClick={() => navigateTo('/profile/recruiter/my-jobs')}>
-                                <p className="text-xs text-blue-500">See all</p>
+                                <p className="text-sm text-blue-500 font-medium underline transition-color duration-300 hover:text-blue-700">See all</p>
                             </button>
                         </div>
                         <div className="mt-5 grid grid-cols-1 gap-3">
@@ -455,8 +423,8 @@ export default function RecruiterProfilePage(){
                             }
                         </div>
 
-                        <button onClick={() => navigateTo('/profile/recruiter/post-a-job')} className="flex gap-2 items-center justify-center mt-5 text-white bg-blue-500 rounded-md w-full py-2">
-                            <FaPlus color="white" size={14} />
+                        <button onClick={() => navigateTo('/profile/recruiter/post-a-job')} className="border border-transparent p-3 bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-full flex items-center gap-2 rounded-md shadow-[0_0_30px_2px_rgba(0,0,256,0.2)] transition-color duration-300 hover:!bg-blue-500 uppercase justify-center font-semibold text-sm">
+                            <LuCirclePlus color="white" size={18} />
                             <p>Post new job</p>
                         </button>
                     </div>

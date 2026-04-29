@@ -281,8 +281,6 @@ export default class RecruiterController {
   async updateCandidateNotes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const applicationId = req.params.applicationId;
-      console.log('checking params', req.params);
-      console.log('-- checking body from the controller --', req.body);
       const result = await this._updateCandidateNotes.execute({
         _id: applicationId,
         ...req.body,

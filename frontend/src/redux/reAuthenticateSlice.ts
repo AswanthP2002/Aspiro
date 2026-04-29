@@ -2,9 +2,21 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { reAuthenticate } from "../services/commonServices";
 import { AxiosError } from "axios";
 
-interface ReAuthenticateResultPayload {
+export interface ReAuthenticateResultPayload {
     accessToken: string,
-    userData: any
+    userData: {
+        _id: string;
+        name?: string;
+        email: string;
+        role?: string;
+        headline?: string;
+        profilePicture?: string;
+        subscription?: {
+            name: string;
+            planId: string;
+            subscriptionId: string;
+        }
+    }
 }
 
 export const reAuthenticateThunk = createAsyncThunk(
@@ -12,8 +24,6 @@ export const reAuthenticateThunk = createAsyncThunk(
     async (_, {rejectWithValue}) => {
         try {
             const result: ReAuthenticateResultPayload = await reAuthenticate()
-            // Notify.info(`new token ${result.accessToken}`, {timeout: 10000})
-            // Notify.info(`User role ${result.userData.role}`)
             return result
         } catch (error: unknown) {
             const err = error as AxiosError

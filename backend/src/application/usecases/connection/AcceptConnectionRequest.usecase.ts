@@ -65,20 +65,20 @@ export default class AcceptConnectionRequestUsecase implements IAcceptConnection
       });
 
       //live notification
-      this._realTimeEventEmitter.connectionAccepted({
-        _id: newNotification?._id,
-        category: 'CONNECTION_ACCEPTED',
-        actorId: myId,
-        message: `${myName} accepted your connection request`,
-        recepientId: senderId,
-        targetType: 'USER',
-        targetId: myId,
-        targetUrl: `http://localhost:5000/users/${myId}`,
-        metadata: newNotification?.metadata,
-        createdAt: newNotification?.createdAt,
-        isRead: newNotification?.isRead,
-        isDeleted: newNotification?.isDeleted,
-      });
+      // this._realTimeEventEmitter.connectionAccepted({
+      //   _id: newNotification?._id,
+      //   category: 'CONNECTION_ACCEPTED',
+      //   actorId: myId,
+      //   message: `${myName} accepted your connection request`,
+      //   recepientId: senderId,
+      //   targetType: 'USER',
+      //   targetId: myId,
+      //   targetUrl: `http://localhost:5000/users/${myId}`,
+      //   metadata: newNotification?.metadata,
+      //   createdAt: newNotification?.createdAt,
+      //   isRead: newNotification?.isRead,
+      //   isDeleted: newNotification?.isDeleted,
+      // });
       console.log('-- Inside the usecase backend returning actual dto');
       return this._mapper.connectionRequestToConnectionRequestDTO(acceptedRequest);
     }

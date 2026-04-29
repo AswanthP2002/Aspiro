@@ -512,21 +512,21 @@ export const addCompany = async (name: string, linkedin: string, website: string
     }
 }
 
-export const getCompaniesList = async (search: string) => {
-    try {
-        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
-            {
-                params:{search},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const getCompaniesList = async (search: string) => {
+//     try {
+//         const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
+//             {
+//                 params:{search},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
 
 export const updateJobApplicationStatus = async (
@@ -636,7 +636,7 @@ export const rejectRecruiterApplication = async (recruiterId: string, reason: st
 
 export const approveRecruiterApplication = async (recruiterId: string) => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_RECRUITER_APPLICATION(recruiterId), {},
+        const response = await axiosInstance.patch(RecruiterEndPoints.APPROVE_APPLICATION_BY_ID(recruiterId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest

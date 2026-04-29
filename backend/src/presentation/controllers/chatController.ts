@@ -86,7 +86,6 @@ export default class ChatController {
   }
 
   async deleteChatForMe(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('delete for me triggered');
     const chatId = req.params.chatId;
     const logedUserId = req.user.id;
 

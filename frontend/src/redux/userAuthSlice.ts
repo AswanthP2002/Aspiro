@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { reAuthenticateThunk } from './reAuthenticateSlice';
+import { ReAuthenticateResultPayload, reAuthenticateThunk } from './reAuthenticateSlice';
+// import { reAuthenticateThunk } from './reAuthenticateSlice';
 
 interface User {
   _id: string;
   email: string;
   name?: string;
+  headline?: string;
   profilePicture?: string
   role?: string
   subscription?: {
@@ -69,21 +71,39 @@ const userAuthSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(reAuthenticateThunk.pending, (state) => {
-        state.initialLoading = true
+        state.initialLoading = true;
       })
-      .addCase(reAuthenticateThunk.fulfilled, (state, action: any) => {
-        state.user = action.payload.userData
-        state.userToken = action.payload.accessToken
-        state.userRole = action.payload.userData.role
-        state.initialLoading = false
+      .addCase(reAuthenticateThunk.fulfilled, (state, action: PayloadAction<ReAuthenticateResultPayload>) => {
+        state.userToken = action.payload.accessToken;
+        state.user = action.payload.userData;
+        state.userRole = action.payload.userData.role as string;
+        state.initialLoading = false;
       })
       .addCase(reAuthenticateThunk.rejected, (state) => {
-        state.initialLoading = false
-        state.user = null
-        state.userRole = null
-        state.userToken = null
+        state.initialLoading = false;
+        state.user = null;
+        state.userRole = null;
+        state.userToken = null;
       })
   },
+  // extraReducers(builder) {
+  //   builder
+  //     .addCase(reAuthenticateThunk.pending, (state) => {
+  //       state.initialLoading = true
+  //     })
+  //     .addCase(reAuthenticateThunk.fulfilled, (state, action: any) => {
+  //       state.user = action.payload.userData
+  //       state.userToken = action.payload.accessToken
+  //       state.userRole = action.payload.userData.role
+  //       state.initialLoading = false
+  //     })
+  //     .addCase(reAuthenticateThunk.rejected, (state) => {
+  //       state.initialLoading = false
+  //       state.user = null
+  //       state.userRole = null
+  //       state.userToken = null
+  //     })
+  // },
 })
     
 export const { loginSuccess, logout, tokenRefresh, updateUserMetaData } = userAuthSlice.actions;

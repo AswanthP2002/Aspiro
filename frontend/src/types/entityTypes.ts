@@ -340,16 +340,11 @@ type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 
 export interface ConnectionDetails {
   _id?: string;
-  receiver?: string;
-  sender?: string;
-  status: ConnectionRequestStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  senderDetails?:{
-    _id?: string,
-    name?: string,
-    headline?: string,
-    profilePicture?: string
+  connectedUserDetails: {
+    _id: string;
+    name: string;
+    headline?: string;
+    profilePicture?: string;
   }
 }
 
@@ -1308,7 +1303,10 @@ export interface MyProfileDTO {
   createdAt?: string;
   updatedAt?: string;
   followers?: number;
-  following?: number
+  following?: number;
+  applicationsCount?: JobApplicationStatusData[];
+  savedJobs?: FavoriteJob[];
+  views?: string[];
 }
 
 export interface UserOverviewForPublic {
@@ -1318,6 +1316,7 @@ export interface UserOverviewForPublic {
   summary?: string;
   role?: Role[];
   connections?: string[];
+  connectionRequests?: ConnectionRequests[]
   followers?: Follow[];
   skills?: Skills[]
   profilePicture?: {

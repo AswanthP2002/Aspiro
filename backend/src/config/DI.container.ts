@@ -472,6 +472,12 @@ import InterviewAIResultRepository from '../infrastructure/repositories/user/int
 import InterviewAIMapper from '../application/mappers/Interview-AI/InterviewAi.mapperClass';
 import ILoadInterviewDashboardUsecase from '../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
 import LoadInterviewDashboard from '../application/usecases/AI/LoadInterviewDashboard.usecase';
+import IUpdateProfileViewUsecase from '../application/interfaces/usecases/user/IUpdateProfileView.usecase';
+import UpdateProfileViewUsecase from '../application/usecases/user/UpdateProfileView.usecase';
+import IRemoveConnectionUsecase from '../application/interfaces/usecases/connection/IRemoveConnection.usecase';
+import RemoveConnectionUsecase from '../application/usecases/connection/RemoveConnection.usecase';
+import IValidateTokenUsecase from '../application/interfaces/usecases/user/IValidateToken.usecase';
+import ValidateTokenUsecase from '../application/usecases/user/ValidateToken.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -587,6 +593,15 @@ container.registerSingleton<ILoadMyProfileUsecase>('ILoadMyProfileUsecase', Load
 container.registerSingleton<ISaveUserBasicsUsecase>(
   'ISaveUserBasicsUsecase',
   SaveUserBasicsUsecase
+);
+container.registerSingleton<IUpdateProfileViewUsecase>(
+  'IUpdateProfileViewUsecase',
+  UpdateProfileViewUsecase
+);
+container.registerSingleton<IValidateTokenUsecase>('IValidateTokenUsecase', ValidateTokenUsecase);
+container.registerSingleton<IRemoveConnectionUsecase>(
+  'IRemoveConnectionUsecase',
+  RemoveConnectionUsecase
 );
 container.registerSingleton<IUploadUserProfilePictureUsecase>(
   'IUploadUserProfilePictureUsecase',

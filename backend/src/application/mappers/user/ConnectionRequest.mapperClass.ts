@@ -3,6 +3,7 @@ import ConnectionRequest, {
 } from '../../../domain/entities/connection/connectionRequest.entity';
 import {
   ConnectionRequestDTO,
+  ConnectionUserDetailsDTO,
   ConnectionWithSenderDetailsDTO,
 } from '../../DTOs/connection/connectionRequest.dto';
 
@@ -20,19 +21,14 @@ export default class ConnectionRequestMapper {
 
   public connectionWithSenderDetailsDataToDTO(
     data: ConnectionWithSenderDetails
-  ): ConnectionWithSenderDetailsDTO {
+  ): ConnectionUserDetailsDTO {
     return {
       _id: data._id,
-      sender: data.sender,
-      receiver: data.receiver,
-      status: data.status,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      senderDetails: {
-        _id: data.senderDetails?._id,
-        name: data.senderDetails?.name,
-        profilePicture: data.senderDetails?.profilePicture?.cloudinarySecureUrl,
-        headline: data.senderDetails?.headline,
+      connectedUserDetails: {
+        _id: data.connectedUserDetails._id,
+        name: data.connectedUserDetails.name,
+        headline: data.connectedUserDetails.headline,
+        profilePicture: data.connectedUserDetails?.profilePicture?.cloudinarySecureUrl,
       },
     };
   }

@@ -34,10 +34,15 @@ function CreateConnectionRouter() {
   );
   connectionRouter.get(
     ConnectionApiRoutes.FETCH_CONNECTIONS,
-    // '/v2/connections/:userId',
     centralizedAuthentication,
     authorization(['user']),
     connectionController.getConnections.bind(connectionController)
+  );
+  connectionRouter.delete(
+    ConnectionApiRoutes.REMOVE_CONNECTION,
+    centralizedAuthentication,
+    authorization(['user']),
+    connectionController.removeConnection.bind(connectionController)
   );
 
   return connectionRouter;

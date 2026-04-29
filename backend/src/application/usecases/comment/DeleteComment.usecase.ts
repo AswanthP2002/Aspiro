@@ -12,6 +12,7 @@ export default class DeleteCommentUsecase implements IDeleteCommentUsecase {
 
   async execute(commentId: string, postId: string, userId: string): Promise<void> {
     await this._commentRepo.delete(commentId);
+    await this._commentRepo.deleteCommentsByParentId(commentId);
 
     this._realTimeEventEmitter.deletePostComment(postId, commentId, userId);
   }

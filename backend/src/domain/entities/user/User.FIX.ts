@@ -56,4 +56,5 @@ export default interface User {
   otpExpiresAt?: Date;
   hiddenPosts?: string[];
   lastLogin?: Date;
+  views?: string[];
 }

@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react"
-import { BsCheckCircle, BsClock, BsEye, BsFilter, BsGlobe, BsLinkedin, BsSearch } from "react-icons/bs"
-import { CiCircleCheck } from "react-icons/ci"
-import { FaEye, FaFileAlt, FaSearch, FaUsersSlash } from "react-icons/fa"
-import { FaCircleXmark, FaRegCircleXmark, FaUserTie } from "react-icons/fa6"
+import { BsClock, BsLinkedin } from "react-icons/bs"
+import { FaEye, FaFileAlt, FaUsersSlash } from "react-icons/fa"
+import { FaRegCircleXmark, FaUserTie } from "react-icons/fa6"
 import { loadRecruiterApplications, changeStatusToUnderReview, rejectRecruiterApplication, approveRecruiterApplication } from "../../../services/recruiterServices"
 import { loadRecruiterAppicationDetails } from "../../../services/adminServices"
 import { AdminRecruiterApplicationDetailsData, AdminRecruiterApplicationsData, RecruiterProfileData } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
-import { Box, Button, IconButton, Modal, Skeleton, Table, TableHead, TextareaAutosize, Typography } from "@mui/material"
-import formatDate, { formatRelativeTime } from "../../../services/util/formatDate"
+import { Box, Button, IconButton, Modal, Skeleton, TextareaAutosize, Typography } from "@mui/material"
+import { formatRelativeTime } from "../../../services/util/formatDate"
 import { useNavigate } from "react-router-dom"
-import { BiGlobe } from "react-icons/bi"
-import moment from "moment"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { Controller, useForm } from "react-hook-form"
 import { CgClose } from "react-icons/cg"
@@ -118,7 +115,7 @@ export default function RecruiterApplications(){
     const openVerificationDocuemtn = () => setIsVerificationDocuemtnOpened(true)
 
     const onRejectApplication = () => {
-      Notify.info('Rejected')
+      toast.success('Rejected')
       setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
         if(!prv) return null
         return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== selectedApp?._id)
@@ -138,24 +135,29 @@ export default function RecruiterApplications(){
         showCancelButton: true
       }).then(async (response) => {
         if(response.isConfirmed){
-          const result = await approveRecruiterApplication(applicationId)
-          if(result?.success){
-            Swal.fire({
-              icon: 'success',
-              title: 'Recruiter Verified',
-              showConfirmButton: false,
-              showCancelButton: false,
-              allowOutsideClick: false,
-              allowEscapeKey: false,
-              timer: 2000
-            }).then(() => {
-              setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
-                if(!prv) return null
-                return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== applicationId)
-              })
-              setSelectedApp(null)
-            })
-          }
+         try {
+           const result = await approveRecruiterApplication(applicationId)
+           if(result?.success){
+             Swal.fire({
+               icon: 'success',
+               title: 'Recruiter Verified',
+               showConfirmButton: false,
+               showCancelButton: false,
+               allowOutsideClick: false,
+               allowEscapeKey: false,
+               timer: 2000
+             })
+           }
+         } catch (error: unknown) {
+              console.log('Error occured while approving recruiter application', error)
+              toast.error(error instanceof Error ? error.message : 'Something went wrong')
+         } finally {
+          setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
+                 if(!prv) return null
+                 return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== applicationId)
+               })
+               setSelectedApp(null)
+         }
         }
       })
     }
@@ -212,24 +214,24 @@ export default function RecruiterApplications(){
     if(application.profileStatus === 'pending') {
       try {
         const result: RecruiterApplicationUpdateResponsePayload = await changeStatusToUnderReview(application._id as string)
-        // if(result.success){
-        //   toast.info('Application is currently under review')
-        //   setSelectedApp((app: AdminRecruiterApplicationsData | null) => {
-        //     if(!app) return null
-        //     return {...app, profileStatus: 'under-review'}
-        //   })
+        if(result.success){
+          toast.info('Application is currently under review')
+          setSelectedApp((app: AdminRecruiterApplicationsData | null) => {
+            if(!app) return null
+            return {...app, profileStatus: 'under-review'}
+          })
 
-        //   setRecruiterApplications((applications: AdminRecruiterApplicationsData[] | null) => {
-        //     if(!applications) return null
-        //     return applications?.map((app: AdminRecruiterApplicationsData) => {
-        //       if(app._id === application._id){
-        //         return {...app, profileStatus: 'under-review'}
-        //       }else{
-        //         return app
-        //       }
-        //     })
-        //   })
-        // }
+          setRecruiterApplications((applications: AdminRecruiterApplicationsData[] | null) => {
+            if(!applications) return null
+            return applications?.map((app: AdminRecruiterApplicationsData) => {
+              if(app._id === application._id){
+                return {...app, profileStatus: 'under-review'}
+              }else{
+                return app
+              }
+            })
+          })
+        }
       } catch (error) {
         Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
       }
@@ -282,8 +284,8 @@ export default function RecruiterApplications(){
       {/* Sidebar - Application List */}
       <div className="w-1/3 border-r border-gray-200 bg-white flex flex-col">
         <div className="p-3 border-b border-gray-100">
-          <p className="font-medium text-lg">Pending Applications</p>
-          <p className="text-xs text-gray-500">{recruiterApplications?.length} Applications awaiting review</p>
+          <p className="font-semibold text-lg text-gray-900 tracking-wide">Pending Applications</p>
+          <p className="text-sm text-gray-500">{recruiterApplications?.length} Applications awaiting review</p>
         </div>
 
         <div className="overflow-y-auto flex-1">
@@ -339,9 +341,9 @@ export default function RecruiterApplications(){
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div>
-              {loading ? <Skeleton width={250} /> : <h1 className="text-2xl font-medium">{selectedApp?.fullName}</h1>}
-              {loading ? <Skeleton height={15} /> : <p className="text-gray-500 text-sm">{selectedApp?.email}</p>}
-              {loading ? <Skeleton sx={{marginTop: '10px'}} width={150} height={10} /> : <p className="text-sm text-gray-400 mt-2">Submitted {formatRelativeTime(selectedApp?.createdAt || new Date())}</p>}
+              {loading ? <Skeleton width={250} /> : <h1 className="text-2xl font-semibold tracking-wide text-gray-900">{selectedApp?.fullName}</h1>}
+              {loading ? <Skeleton height={15} /> : <p className="text-gray-700 mt-1 text-sm">{selectedApp?.email}</p>}
+              {loading ? <Skeleton sx={{marginTop: '10px'}} width={150} height={10} /> : <p className="text-xs text-gray-500 mt-2">Submitted {formatRelativeTime(selectedApp?.createdAt || new Date())}</p>}
             </div>
             {!loading && <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">
                 {selectedApp?.profileStatus}
@@ -352,8 +354,8 @@ export default function RecruiterApplications(){
           {loading
             ? <Skeleton height={250} />
             : <>
-                <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
-            <p className="font-semibold mb-4">Profile Links</p>
+                <div className="bg-white rounded-xl border border-slate-100 shadow-xl p-6 mb-6">
+            <p className="font-semibold uppercase mb-4 text-gray-900">Profile Links</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="flex items-center gap-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="bg-blue-600 p-2 rounded text-white"><BsLinkedin size={20} /></div>
@@ -376,8 +378,8 @@ export default function RecruiterApplications(){
           {loading
             ? <Skeleton />
             : <>
-                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-10">
-            <p className="font-semibold mb-6">{selectedApp?.recruiterType} Information</p>
+                <div className="bg-white rounded-xl border border-slate-100 shadow-xl p-6 mb-10">
+            <p className="uppercase tracking-wide font-semibold mb-6 text-gray-900">{selectedApp?.recruiterType} Information</p>
             
             {
               selectedApp?.recruiterType === 'corporate'
@@ -443,8 +445,8 @@ export default function RecruiterApplications(){
           {loading
             ? <Skeleton />
             : <>
-                <div className="mt-5 bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-            <p className="font-semibold">Verification Document</p>
+                <div className="mt-5 bg-white border border-slate-100 rounded-xl shadow-xl p-5">
+            <p className="font-semibold uppercase tracking-wide text-gray-900">Verification Document</p>
             <div className="grid grid-cols-2 gap-2 mt-3 cursor-pointer">
               <div className="border flex justify-between items-center gap-2 border-gray-200 rounded-md p-3">
                   <div className="flex items-center gap-2">
@@ -480,10 +482,10 @@ export default function RecruiterApplications(){
         )}
         {!selectedApp && (
           <>
-            <div className="bg-white p-5 flex flex-col py-10 items-center rounded-md border border-gray-200">
-              <FaUsersSlash color="gray" size={45} />
-              <p className="font-medium text-lg mt-2">No Selected Application</p>
-              {applications.length > 0 && (<p className="text-xs mt-2">select one application for view details</p>)}
+            <div className="bg-white p-5 flex flex-col py-10 items-center rounded-lg border border-slate-100 shadow-xl">
+              <FaUsersSlash className="text-gray-400" size={45} />
+              <p className="font-semibold text-lg mt-2 text-gray-900 tracking-wide">No Selected Application</p>
+              {applications.length > 0 && (<p className="text-sm text-gray-700 mt-2">select one application for view details</p>)}
               <p className="text-xs !mt-2 text-gray-500">Application details will show here</p>
             </div>
           </>
@@ -553,14 +555,13 @@ function DeclineApplicationModal({ isOpen, onClose, applicantData, onConfirmDecl
           allowEscapeKey: false,
           allowOutsideClick: false,
           timer: 3000
-        }).then(() => {
-          onConfirmDecline()
         })
       }
     } catch (error: unknown) {
       console.log(error)
       toast.error(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
+      onConfirmDecline()
       onClose()
     }
       }

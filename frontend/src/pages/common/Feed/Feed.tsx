@@ -23,6 +23,7 @@ interface RootState {
         user: {
             _id: string
             profilePicture: string,
+            headline: string,
             name: string
         }
     }
@@ -127,10 +128,13 @@ export default function Feed() {
                         {
                             ...result.result,
                             userDetails:{
+                                _id: currentlyLogedUserDetails._id,
                                 name: currentlyLogedUserDetails.name,
+                                headline: currentlyLogedUserDetails.headline,
                                 profilePicture:{
                                     cloudinarySecureUrl: currentlyLogedUserDetails.profilePicture
-                                }
+                                },
+                                
                             }
                         }, 
                         ...(prev || [])
@@ -306,7 +310,6 @@ export default function Feed() {
                         <p className="text-xs text-gray-500 mt-2">No post available</p>
                     </div>
                 )}
-                
             </div>
             
         </div>

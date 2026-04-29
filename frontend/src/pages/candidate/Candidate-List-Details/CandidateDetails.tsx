@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
 import { getCandidateDetails } from '../../../services/commonServices'
 import formatDate, { transformDate } from '../../../services/util/formatDate'
-import { cancelConnectionRequest, sendConnectionRequest } from '../../../services/connectionServices'
-import { followUser, loadUserPublicProfile, unfollowUser } from '../../../services/userServices'
+import { cancelConnectionRequest, removeConnection, sendConnectionRequest } from '../../../services/connectionServices'
+import { followUser, loadUserPublicProfile, unfollowUser, updateUserProfileView } from '../../../services/userServices'
 import { Notify } from 'notiflix'
 import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
@@ -148,6 +148,38 @@ export default function UserPublicProfile() {
         })
     }
 
+    const removeFromMyConnection = async (userId: string, name: string) => {
+        if(!userId) return toast.error('Something went wrong')
+        const confirmation = await Swal.fire({
+          icon: 'question',
+          title: 'Break Connection ?',
+          text: `Are you sure to remove ${name} from your connection?.`,
+          showConfirmButton: true,
+          showCancelButton: true,
+          confirmButtonText: 'Remove',
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        })
+    
+        if(!confirmation.isConfirmed) return
+    
+        try {
+          const result = await removeConnection(userId)
+          if(result.success){
+            toast.info(`${name} removed from your connection`)
+            setUserDetails((data: UserPublicProfileData | undefined) => {
+                if(!data) return undefined
+                return {
+                    ...data,
+                    connections: data.connections.filter((connection: string) => connection !== logedUser._id)
+                }
+            })
+          }
+        } catch (error: unknown) {
+          toast.error(error instanceof Error ? error.message : 'Something went wrong')
+        }
+      }
+
     const cancelThisConnectionRequest = async (userId: string) => {
         if(!userId) return
 
@@ -271,6 +303,22 @@ export default function UserPublicProfile() {
         })()
     }, [])
 
+    useEffect(() => {
+        async function userProfileViewd(){
+            try {
+                await updateUserProfileView(userDetails?._id as string)
+                
+            } catch (error: unknown) {
+                console.log('Error occured while updating user profile view')
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            }
+        }
+
+        if(userDetails?._id && logedUser._id !== userDetails?._id){
+            userProfileViewd()
+        }
+    }, [userDetails])
+
     return (
         <>
         <div className="w-full min-h-screen bg-gray-50 pb-12">
@@ -346,7 +394,7 @@ export default function UserPublicProfile() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 mt-6">
                 {isConnectedThisUser(logedUser._id) ? (
-                  <button className="flex items-center gap-2 px-6 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full border border-gray-200 cursor-default">
+                  <button onClick={() => removeFromMyConnection(userDetails?._id as string, userDetails?.name as string)} className="flex items-center gap-2 px-6 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full border border-gray-200 cursor-default">
                     <LuUserCheck /> Connected
                   </button>
                 ) : isConnectionIsPending(logedUser._id) ? (

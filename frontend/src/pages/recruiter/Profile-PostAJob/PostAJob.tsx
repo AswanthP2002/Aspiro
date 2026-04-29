@@ -16,6 +16,7 @@ import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityT
 import { adminGetSkills } from "../../../services/skillService"
 // import {  } from "../../../services/adminServices"
 import { toast } from "react-toastify"
+import { LuCircleCheck } from "react-icons/lu"
 
 interface JobDetails {
     jobTitle: string,
@@ -173,15 +174,73 @@ export default function PostAJobForm(){
         fetchJobConfigOptionsList()
     }, [])
 
+    const inputStyles = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '10px',
+    backgroundColor: '#fff',
+    '& fieldset': { borderColor: '#e2e8f0' }, // slate-200
+    '&:hover fieldset': { borderColor: '#cbd5e1' }, // slate-300
+    '&.Mui-focused fieldset': { borderColor: '#2563eb' }, // blue-600
+  },
+  '& .MuiInputLabel-root': { color: '#64748b' }, // slate-500
+};
+
+const textareaStyles = {
+  width: '100%',
+  padding: '12px',
+  borderRadius: '10px',
+  backgroundColor: '#fff',
+  border: '1px solid #e2e8f0',
+  outline: 'none',
+  fontFamily: 'inherit',
+  fontSize: '1rem',
+  '&:hover': {
+    borderColor: '#cbd5e1',
+  },
+  '&:focus': {
+    borderColor: '#2563eb',
+    boxShadow: '0 0 0 1px #2563eb', // Simulates the MUI focus look
+  },
+};
+
+const selectStyles = {
+  // Target the root of the OutlinedInput
+  borderRadius: '10px',
+  backgroundColor: '#fff',
+  
+  // Target the border (notchedOutline)
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#e2e8f0', // slate-200
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#cbd5e1', // slate-300
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#2563eb', // blue-600
+    borderWidth: '2px',
+  },
+  
+  // Icon and Label
+  '& .MuiSvgIcon-root': { color: '#64748b' },
+};
+
+// Usage: <Select sx={selectStyles} ... />
+
+// Usage: <TextareaAutosize style={textareaStyles} ... />
     return(
         <>
         <div className="bg-white">
-            <form onSubmit={handleSubmit(submitJob)} className="border border-gray-200 shadow-xl max-w-4xl !mx-auto !my-10 rounded-md !py-5 !px-5">
-                <p className="text-center font-bold text-2xl">Create a New Job Posting</p>
-                <p className="text-sm mt-3 text-gray-700 text-center">Fill out the details below to find your next great hirie.</p>
+            <form onSubmit={handleSubmit(submitJob)} className="border border-slate-100 shadow-xl max-w-4xl !mx-auto !my-10 rounded-lg p-5 lg:p-10">
+                <p className="font-semibold text-2xl tracking-wide text-gray-900">Create a New Job Posting</p>
+                <p className="text-sm font-medium mt-1 text-gray-700">Fill out the details below to find your next great hirie.</p>
 
-                <div className="form-group border border-gray-200 rounded-md mt-5 !p-5">
-                    <p className="font-medium text-lg">Core Job Details</p>
+                <div className="form-group rounded-md mt-5 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
+                            <p className="text-sm font-semibold text-blue-500 !p-0">1</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Core Job Details</p>
+                    </div>
                     <FormControl fullWidth sx={{marginTop:'15px'}}>
                         <Controller
                             name="jobTitle"
@@ -197,6 +256,8 @@ export default function PostAJobForm(){
                                     label="Job title"
                                     error={Boolean(errors.jobTitle)}
                                     helperText={errors?.jobTitle?.message}
+                                    placeholder="eg; Software Developer, Teacher, Accountant"
+                                    sx={inputStyles}
                                 
                                 />
                             )}
@@ -217,6 +278,7 @@ export default function PostAJobForm(){
                                     labelId="job-type-label"
                                     variant="outlined"
                                     error={Boolean(errors.jobType)}
+                                    sx={selectStyles}
                                 >
                                     {jobTypeOptions.length > 0 && (
                                         jobTypeOptions.map((data: JobTypesData) => (
@@ -244,6 +306,8 @@ export default function PostAJobForm(){
                                   variant="outlined"
                                   label="Duration (Internships & Contracts only)"
                                   error={Boolean(errors.duration)}
+                                  placeholder="eg; 6 months, 12 weeks;"
+                                  sx={inputStyles}
                                   helperText={errors?.duration?.message}
                                 />
                             )}
@@ -252,8 +316,13 @@ export default function PostAJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Location & Logistics</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
+                            <p className="text-sm font-semibold text-blue-500 !p-0">2</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Location & Logistics</p>
+                    </div>
                     <div className="flex gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth>
                             <Controller
@@ -271,6 +340,7 @@ export default function PostAJobForm(){
                                         type="number"
                                         error={Boolean(errors.vacancies)}
                                         helperText={errors?.vacancies?.message}
+                                        sx={inputStyles}
                                      />
                                 )}
                             />
@@ -289,6 +359,7 @@ export default function PostAJobForm(){
                                     labelId="word-mode-label"
                                     variant="outlined"
                                     error={Boolean(errors.workMode)}
+                                    sx={selectStyles}
                                 >
                                     {workModeOptions.length > 0 && (
                                         workModeOptions.map((workmode: WorkModeData) => (
@@ -317,6 +388,7 @@ export default function PostAJobForm(){
                                     disabled={enteredWorkMode === 'Remote' ? true : false}
                                     error={Boolean(errors.location)}
                                     helperText={errors?.location?.message}
+                                    sx={inputStyles}
                                 />
                             )}
                         />
@@ -324,8 +396,13 @@ export default function PostAJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Compensation</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
+                            <p className="text-sm font-semibold text-blue-500 !p-0">3</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Compensation</p>
+                    </div>
                     <div className="grid grid-cols-2 gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth>
                             <Controller
@@ -343,6 +420,7 @@ export default function PostAJobForm(){
                                         type="number"
                                         error={Boolean(errors.minSalary)}
                                         helperText={errors?.minSalary?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -364,6 +442,7 @@ export default function PostAJobForm(){
                                         type="number"
                                         error={Boolean(errors.maxSalary)}
                                         helperText={errors?.maxSalary?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -382,6 +461,7 @@ export default function PostAJobForm(){
                                         labelId="salary-currency-label"
                                         variant="outlined"
                                         error={Boolean(errors.salaryCurrency)}
+                                        sx={selectStyles}
                                     >
                                         <MenuItem value="INR">INR</MenuItem>
                                         <MenuItem value="USD">USD</MenuItem>
@@ -404,6 +484,7 @@ export default function PostAJobForm(){
                                         labelId="salary-period-label"
                                         variant="outlined"
                                         error={Boolean(errors.salaryPeriod)}
+                                        sx={selectStyles}
                                     >
                                         <MenuItem value="annually">Annually</MenuItem>
                                         <MenuItem value="monthly">Monthly</MenuItem>
@@ -417,8 +498,13 @@ export default function PostAJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Candidate Requirements</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
+                            <p className="text-sm font-semibold text-blue-500 !p-0">4</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Candidate Requirements</p>
+                    </div>
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth error={Boolean(errors.jobLevel)}>
                             <InputLabel id="job-level-id">Job Level</InputLabel>
@@ -433,6 +519,7 @@ export default function PostAJobForm(){
                                         labelId="job-level-id"
                                         variant="outlined"
                                         error={Boolean(errors.jobLevel)}
+                                        sx={selectStyles}
                                     >
                                         {jobLevelOptions.length > 0 && (
                                             jobLevelOptions.map((jobLevel: JobLevelData) => (
@@ -460,6 +547,7 @@ export default function PostAJobForm(){
                                         label="Qualification"
                                         error={Boolean(errors.qualification)}
                                         helperText={errors?.qualification?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -481,6 +569,7 @@ export default function PostAJobForm(){
                                         type="number"
                                         error={Boolean(errors.experienceInYears)}
                                         helperText={errors?.experienceInYears?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -488,8 +577,13 @@ export default function PostAJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-medium text-lg">Job Descriptions</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
+                            <p className="text-sm font-semibold text-blue-500 !p-0">5</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Location & Logistics</p>
+                    </div>
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.description)}>
                         <Controller 
                             name="description"
@@ -504,7 +598,7 @@ export default function PostAJobForm(){
                                   {...field}
                                   placeholder="About the job"
                                   error={Boolean(errors.description)}
-                                  
+                                  sx={textareaStyles}
                                 />
                             )}
                         />
@@ -525,7 +619,7 @@ export default function PostAJobForm(){
                                   {...field}
                                   placeholder="Requirements"
                                   error={Boolean(errors.requirements)}
-                                  
+                                  sx={textareaStyles}
                                 />
                             )}
                         />
@@ -546,7 +640,7 @@ export default function PostAJobForm(){
                                   {...field}
                                   placeholder="Responsibilities"
                                   error={Boolean(errors.responsibilities)}
-                                  
+                                  sx={textareaStyles}
                                 />
                             )}
                         />
@@ -578,6 +672,7 @@ export default function PostAJobForm(){
                                                 placeholder="Select or type skills"
                                                 error={!!errors.requiredSkills}
                                                 helperText={errors.requiredSkills?.message}
+                                                sx={inputStyles}
                                                 InputProps={{
                                                     ...params.InputProps,
                                                     endAdornment: (
@@ -612,6 +707,7 @@ export default function PostAJobForm(){
                                                 label="Optional Skills"
                                                 variant="outlined"
                                                 placeholder="Select or type skills"
+                                                sx={inputStyles}
                                             />
                                         )}
                                     />
@@ -645,7 +741,10 @@ export default function PostAJobForm(){
                         </DemoContainer>
                     </LocalizationProvider>
 
-                    <Button type="submit" variant="contained" loading={loading}>Post Job</Button>      
+                    <button type="submit" className="bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-semibold text-sm px-5 py-3 rounded-lg flex items-center gap-2 shadow-[0_0_30px_2px_rgba(0,0,230,0.2)]">
+                        Post Job
+                        <LuCircleCheck size={18} />
+                    </button>      
                 </div>
                 
             </form>

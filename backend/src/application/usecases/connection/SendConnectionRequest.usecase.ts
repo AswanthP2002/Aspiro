@@ -50,23 +50,23 @@ export class SendConnectionRequestUsecase implements ISendConnectionRequestUseca
         },
       });
 
-      //live notification testing
-      if (notify) {
-        this._realTimeEventEmitter.connectionRequest({
-          _id: notify._id,
-          category: notify.category,
-          actorId: sender,
-          recepientId: receiver,
-          message: `${acted_by} send you a connection request`,
-          targetType: notify.targetType,
-          targetId: sender,
-          targetUrl: `http://localhost:5173/users/${sender}`,
-          metadata: notify.metadata,
-          createdAt: notify.createdAt,
-          isDeleted: notify.isDeleted,
-          isRead: notify.isRead,
-        });
-      }
+      // //live notification testing
+      // if (notify) {
+      //   this._realTimeEventEmitter.connectionRequest({
+      //     _id: notify._id,
+      //     category: notify.category,
+      //     actorId: sender,
+      //     recepientId: receiver,
+      //     message: `${acted_by} send you a connection request`,
+      //     targetType: notify.targetType,
+      //     targetId: sender,
+      //     targetUrl: `http://localhost:5173/users/${sender}`,
+      //     metadata: notify.metadata,
+      //     createdAt: notify.createdAt,
+      //     isDeleted: notify.isDeleted,
+      //     isRead: notify.isRead,
+      //   });
+      // }
 
       return this._mapper.connectionRequestToConnectionRequestDTO(newConnectionRequest);
     }

@@ -4,7 +4,9 @@ import UserCachedData from '../../../domain/entities/user/user.cachedData.entity
 import User from '../../../domain/entities/user/User.FIX';
 import UserFullProfileData from '../../../domain/entities/user/userFullProfile.entity';
 import UserProfileAggregated from '../../../domain/entities/user/userProfileAggregated';
+import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto.FIX';
 import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
+import FavoriteJobDTO from '../../DTOs/user/favoriteJob.dto.FIX';
 import ProfilePictureUPloadResponseDTO from '../../DTOs/user/profileUploadResponse.dto';
 import UpdateUserDTO from '../../DTOs/user/updateUser.dto.FIX';
 import UploadCoverPhotoResponseDTO from '../../DTOs/user/uploadCoverPhotoResponse.dto';
@@ -119,6 +121,9 @@ export default class UserMapper {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       followers: data.followers?.length,
+      applicationsCount: data.applicationsCount as JobApplicationDTO[],
+      savedJobs: data.savedJobs as FavoriteJobDTO[],
+      views: data.views,
     };
   }
 
@@ -244,7 +249,7 @@ export default class UserMapper {
         district: data.location?.district as string,
         state: data.location?.state as string,
         country: data.location?.country as string,
-        pincode: data.location?.pincode as string
+        pincode: data.location?.pincode as string,
       },
       educations: data.educations,
       experiences: data.experiences,
