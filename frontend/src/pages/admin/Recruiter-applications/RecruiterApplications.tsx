@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react"
-import { BsCheckCircle, BsClock, BsEye, BsFilter, BsGlobe, BsLinkedin, BsSearch } from "react-icons/bs"
-import { CiCircleCheck } from "react-icons/ci"
-import { FaEye, FaFileAlt, FaSearch, FaUsersSlash } from "react-icons/fa"
-import { FaCircleXmark, FaRegCircleXmark, FaUserTie } from "react-icons/fa6"
+import { BsClock, BsLinkedin } from "react-icons/bs"
+import { FaEye, FaFileAlt, FaUsersSlash } from "react-icons/fa"
+import { FaRegCircleXmark, FaUserTie } from "react-icons/fa6"
 import { loadRecruiterApplications, changeStatusToUnderReview, rejectRecruiterApplication, approveRecruiterApplication } from "../../../services/recruiterServices"
 import { loadRecruiterAppicationDetails } from "../../../services/adminServices"
 import { AdminRecruiterApplicationDetailsData, AdminRecruiterApplicationsData, RecruiterProfileData } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
-import { Box, Button, IconButton, Modal, Skeleton, Table, TableHead, TextareaAutosize, Typography } from "@mui/material"
-import formatDate, { formatRelativeTime } from "../../../services/util/formatDate"
+import { Box, Button, IconButton, Modal, Skeleton, TextareaAutosize, Typography } from "@mui/material"
+import { formatRelativeTime } from "../../../services/util/formatDate"
 import { useNavigate } from "react-router-dom"
-import { BiGlobe } from "react-icons/bi"
-import moment from "moment"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { Controller, useForm } from "react-hook-form"
 import { CgClose } from "react-icons/cg"
@@ -118,7 +115,7 @@ export default function RecruiterApplications(){
     const openVerificationDocuemtn = () => setIsVerificationDocuemtnOpened(true)
 
     const onRejectApplication = () => {
-      Notify.info('Rejected')
+      toast.success('Rejected')
       setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
         if(!prv) return null
         return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== selectedApp?._id)
@@ -138,24 +135,29 @@ export default function RecruiterApplications(){
         showCancelButton: true
       }).then(async (response) => {
         if(response.isConfirmed){
-          const result = await approveRecruiterApplication(applicationId)
-          if(result?.success){
-            Swal.fire({
-              icon: 'success',
-              title: 'Recruiter Verified',
-              showConfirmButton: false,
-              showCancelButton: false,
-              allowOutsideClick: false,
-              allowEscapeKey: false,
-              timer: 2000
-            }).then(() => {
-              setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
-                if(!prv) return null
-                return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== applicationId)
-              })
-              setSelectedApp(null)
-            })
-          }
+         try {
+           const result = await approveRecruiterApplication(applicationId)
+           if(result?.success){
+             Swal.fire({
+               icon: 'success',
+               title: 'Recruiter Verified',
+               showConfirmButton: false,
+               showCancelButton: false,
+               allowOutsideClick: false,
+               allowEscapeKey: false,
+               timer: 2000
+             })
+           }
+         } catch (error: unknown) {
+              console.log('Error occured while approving recruiter application', error)
+              toast.error(error instanceof Error ? error.message : 'Something went wrong')
+         } finally {
+          setRecruiterApplications((prv: AdminRecruiterApplicationsData[] | null) => {
+                 if(!prv) return null
+                 return prv.filter((app: AdminRecruiterApplicationsData) => app._id !== applicationId)
+               })
+               setSelectedApp(null)
+         }
         }
       })
     }
@@ -553,14 +555,13 @@ function DeclineApplicationModal({ isOpen, onClose, applicantData, onConfirmDecl
           allowEscapeKey: false,
           allowOutsideClick: false,
           timer: 3000
-        }).then(() => {
-          onConfirmDecline()
         })
       }
     } catch (error: unknown) {
       console.log(error)
       toast.error(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
+      onConfirmDecline()
       onClose()
     }
       }

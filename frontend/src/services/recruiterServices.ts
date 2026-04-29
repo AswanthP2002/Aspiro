@@ -636,7 +636,7 @@ export const rejectRecruiterApplication = async (recruiterId: string, reason: st
 
 export const approveRecruiterApplication = async (recruiterId: string) => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_RECRUITER_APPLICATION(recruiterId), {},
+        const response = await axiosInstance.patch(RecruiterEndPoints.APPROVE_APPLICATION_BY_ID(recruiterId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
