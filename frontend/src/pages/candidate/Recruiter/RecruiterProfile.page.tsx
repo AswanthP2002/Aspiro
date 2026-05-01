@@ -5,12 +5,12 @@ import { getProfileOverview } from "../../../services/recruiterServices";
 import { Notify } from "notiflix";
 import getReminingDays from "../../../helpers/DateTime.helper";
 import ThreeDotLoading from "../../../components/common/ThreeDotLoading";
-import { PiClock, PiEye, PiSuitcase } from "react-icons/pi";
+import { PiClock } from "react-icons/pi";
 import { BsGlobe, BsLinkedin, BsThreeDotsVertical } from "react-icons/bs";
 import { FaUsersGear } from "react-icons/fa6";
 import { LuBriefcase, LuCirclePlus, LuClock, LuEye, LuUserCheck } from "react-icons/lu";
 import { IoLocation } from "react-icons/io5";
-import { FaFileAlt, FaPlus } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
 import { CgCheck } from "react-icons/cg";
 import { BiBuildings, BiEnvelope, BiPhone, BiShieldQuarter } from "react-icons/bi";
 import { FiAlertCircle, FiArrowRightCircle } from "react-icons/fi";
@@ -388,24 +388,24 @@ export default function RecruiterProfilePage(){
                                 <p className="text-sm text-blue-500 font-medium underline transition-color duration-300 hover:text-blue-700">See all</p>
                             </button>
                         </div>
-                        <div className="mt-5 grid grid-cols-1 gap-3">
+                        <div className="mt-5 mb-10 grid grid-cols-1 gap-3">
                             {
                                 profileData?.jobs?.length > 0 && (
                                     profileData?.jobs.map((job: Job, index: number) => (
                                         <>
-                                            <div key={index} className="bg-white rounded-md hover:border hover:border-blue-200 hover:shadow-lg p-5">
+                                            <div key={index} className="bg-white group hover:bg-blue-100 transition-color duration-300 shadow-[0_0_30px_2px_rgba(0,0,0,0.1)] rounded-md border !border-slate-100 transition-all duration-300 hover:shadow-xl p-5 hover:ring-2 hover:ring-blue-100 hover:!border-blue-200">
                                         <div className="flex justify-between gap-2">
                                             <div className="flex gap-3">
-                                                <div>
-                                                    <PiSuitcase />
+                                                <div className="border border-transparent bg-slate-100 w-10 h-10 group-hover:bg-blue-500 transition-color duration-300 flex items-center justify-center rounded-lg">
+                                                    <LuBriefcase size={20} className="text-gray-500 group-hover:text-white transition-color duration-300" />
                                                 </div>
                                                 <div>
-                                                    <p>{job?.jobTitle}</p>
+                                                    <p className="font-semibold tracking-wide text-gray-900">{job?.jobTitle}</p>
                                                     <div className="flex gap-3 items-center">
-                                                        <span className="flex text-xs text-gray-500 gap-1 items-center"><IoLocation /> {job.workMode}</span>
-                                                        <span className="flex text-xs text-gray-500 gap-1 items-center"><PiClock /> {getReminingDays(job.expiresAt)} Day left</span>
+                                                        <span className="flex text-sm font-medium mt-1 text-gray-500 gap-1 items-center"><IoLocation /> {job.workMode}</span>
+                                                        <span className="flex text-sm font-medium mt-1 text-gray-500 gap-1 items-center"><PiClock /> {getReminingDays(job.expiresAt)} Day left</span>
                                                     </div>
-                                                    <div className="flex gap-2 items-center mt-2">
+                                                    <div className="flex gap-2 items-center mt-5">
                                                         {getStatusPill(job?.status as Job['status'])}
                                                         <p className="text-xs">{job.applicationsCount || 0} Applications</p>
                                                     </div>
@@ -413,7 +413,7 @@ export default function RecruiterProfilePage(){
                                             </div>
                                             <div className="flex flex-col justify-between items-end">
                                                 <button><BsThreeDotsVertical color="gray" size={15} /></button>
-                                                <button onClick={() => goToApplicantManagePage(job._id as string)} className="bg-blue-500 text-white rounded-md text-xs py-2 px-3">Manage</button>
+                                                <button onClick={() => goToApplicantManagePage(job._id as string)} className="text-sm font-medium bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl text-white rounded-lg py-2 px-3">Manage</button>
                                             </div>
                                         </div>
                                     </div>

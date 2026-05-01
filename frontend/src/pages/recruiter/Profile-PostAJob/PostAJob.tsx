@@ -237,7 +237,7 @@ const selectStyles = {
                 <div className="form-group rounded-md mt-5 !p-5">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
-                            <p className="text-sm font-semibold text-blue-500 !p-0">1</p>
+                            <p className="text-sm font-semibold text-blue-500 !m-0">1</p>
                         </div>
                         <p className="font-semibold text-gray-700 uppercase">Core Job Details</p>
                     </div>
@@ -742,7 +742,10 @@ const selectStyles = {
                     </LocalizationProvider>
 
                     <button type="submit" className="bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-semibold text-sm px-5 py-3 rounded-lg flex items-center gap-2 shadow-[0_0_30px_2px_rgba(0,0,230,0.2)]">
-                        Post Job
+                        {loading
+                            ? "Processing"
+                            : "Post Job"
+                        }
                         <LuCircleCheck size={18} />
                     </button>      
                 </div>
