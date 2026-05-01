@@ -17,7 +17,7 @@ function CreateWorkModeRouter() {
   workModeRouter.get(
     WorkModeApiRoutes.LOAD,
     centralizedAuthentication,
-    authorization(['admin']),
+    authorization(['admin', 'user', 'recruiter']),
     workModeController.getWorkModes.bind(workModeController)
   );
   workModeRouter.patch(

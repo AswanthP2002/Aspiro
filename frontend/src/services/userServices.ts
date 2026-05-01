@@ -911,7 +911,8 @@ export const getJobs = async (search: string, locationSearch: string, page: numb
                 jobLevel,
                 workMode,
                 jobType
-            }
+            },
+            sendAuthToken: true
         } as AxiosRequest)
 
         return response.data

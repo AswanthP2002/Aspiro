@@ -100,7 +100,7 @@ export default function Recruiters() {
     async function fetchCompanyList(){
 
         try {
-          const result = await getRecruiters(search, page, '', recruiterType, '')
+          const result = await getRecruiters(search, page, '', recruiterType, recruiterStatus)
           console.log('full result before successcheck', result)
            if(result.success){
              console.log('Data from the backend company list fetch result', result?.result)

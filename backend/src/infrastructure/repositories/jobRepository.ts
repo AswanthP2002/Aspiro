@@ -500,7 +500,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   }
 
   async getRecommendedJobs(query: string): Promise<JobAggregated[] | null> {
-    console.log('- checking constructed query --', query);
+    // console.log('- checking constructed query --', query);
     const result = await JobDAO.aggregate([
       {
         $match: {

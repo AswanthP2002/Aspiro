@@ -58,7 +58,7 @@ export default class RecommendedJobUsecase implements IGetRecommendedJobsUsecase
     }
 
     const recommendedJobs = await this._jobRepo.getRecommendedJobs(query);
-    console.log('-- checking returing suggested users --', recommendedJobs);
+    // console.log('-- checking returing suggested users --', recommendedJobs);
     if (recommendedJobs) {
       const dto: RecommendedJobDTO[] = [];
       recommendedJobs.forEach((data: JobAggregated) => {

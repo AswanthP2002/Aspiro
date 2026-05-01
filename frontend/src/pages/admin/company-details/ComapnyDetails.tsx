@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
 import { getRecruiterDetails, handleRecruiterVerification, handleRecruiterPermissions } from '../../../services/recruiterServices'
 import { deleteRecruiterData } from '../../../services/adminServices'
 import { BiArrowBack, BiBriefcase, BiBuildings, BiCheckCircle, BiMessageSquare, BiUserPlus } from 'react-icons/bi'
-import { LuShieldAlert, LuUser } from 'react-icons/lu'
+import { LuBuilding, LuBuilding2, LuShieldAlert, LuUser } from 'react-icons/lu'
 import { AdminRecruiterDetailsData } from '../../../types/entityTypes'
 import {TbBrandDaysCounter} from 'react-icons/tb'
 import { Notify } from 'notiflix'
@@ -251,13 +251,13 @@ export default function RecruiterDetails(){
         <div className="flex-1 space-y-6">
           
           {/* 1. Profile Header Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-8 flex items-center gap-6 shadow-sm">
+          <div className="bg-white rounded-lg border border-slate-100 p-8 flex flex-col gap-6 shadow-[0_0_30px_2px_rgba(200,0,200,0.1)]">
             <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold">
               {recruiterDetails && recruiterDetails.fullName?.split(" ")[0][0]}{recruiterDetails && recruiterDetails.fullName?.split(" ")[1][0]}
             </div>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-xl font-semibold">{recruiterDetails?.fullName}</h1>
+                <h1 className="text-xl font-semibold tracking-wide">{recruiterDetails?.fullName}</h1>
                 {recruiterDetails?.isVerified
                     ? <>
                         <span className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-600 text-[10px] font-bold rounded uppercase">
@@ -275,7 +275,10 @@ export default function RecruiterDetails(){
                 </span>
               </div>
               <p className="text-slate-500 text-sm">{recruiterDetails?.email}</p>
-              <p className="text-slate-400 text-sm mt-1">{recruiterDetails?.companyDetails?.name}</p>
+              <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+                <LuBuilding2 />
+                {recruiterDetails?.companyDetails?.name}
+              </p>
             </div>
           </div>
 
@@ -286,28 +289,28 @@ export default function RecruiterDetails(){
             <StatCard icon={<LuUser size={22} className="text-purple-500" />} label="Applications" value={recruiterDetails?.totalApplications} color="bg-purple-50" />
           </div>
           
-           <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
-            <p className="font-bold text-lg mb-6">Details</p>
+           <div className="bg-white rounded-lg border border-slate-100 p-8 shadow-[0_0_30px_2px_rgba(200,0,200,0.1)]">
+            <p className="font-semibold text-lg uppercase text-gray-700 tracking-wide mb-6">Details</p>
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
               <div className='flex gap-3 items-center border border-slate-200 rounded-lg p-3'>
                 <TbBrandDaysCounter color='blue' size={25} />
                 <div>
-                  <p className='text-sm font-semibold turncate'>Experience in years</p>
+                  <p className='text-sm font-semibold turncate text-gray-600'>Experience in years</p>
                   <p className='text-sm mt-1 text-gray-500'>{recruiterDetails?.yearOfExperience}</p>
                 </div>
               </div>
               <div className='flex gap-3 items-center border border-slate-200 rounded-lg p-3'>
                 <BsLinkedin color='blue' size={25} />
                 <div>
-                  <p className='text-sm font-semibold turncate'>LinkedIn</p>
+                  <p className='text-sm font-semibold turncate text-gray-600'>LinkedIn</p>
                   <a href={recruiterDetails?.linkedinUrl} target='_blank' rel='noopener noreferrer' className='text-sm mt-1 text-underline text-blue-500'>LikedIn.com</a>
                 </div>
               </div>
               {recruiterDetails?.recruiterType === 'corporate' && (
                 <div className='flex gap-3 items-center border border-slate-200 rounded-lg p-3'>
-                <BiBuildings color='blue' size={25} />
+                <LuBuilding2 color='blue' size={25} />
                 <div>
-                  <p className='text-sm font-semibold turncate'>Company</p>
+                  <p className='text-sm font-semibold turncate text-gray-600'>Company</p>
                   <p className='text-sm mt-1 text-gray-500'>{recruiterDetails?.companyDetails?.name}</p>
                 </div>
               </div>
@@ -318,8 +321,8 @@ export default function RecruiterDetails(){
 
 
           {/* 3. Verification History Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
-            <h2 className="font-bold text-lg mb-6">Verification History</h2>
+          <div className="bg-white rounded-lg border border-slate-100 p-8 shadow-[0_0_30px_2px_rgba(200,0,200,0.1)]">
+            <p className="font-semibold text-lg mb-6 uppercase text-gray-700 tracking-wide">Verification History</p>
             <div className="space-y-4">
               {recruiterDetails?.verificationTimeline && recruiterDetails?.verificationTimeline.map((item, idx) => (
                 <div key={idx} className={`flex items-center justify-between p-4 bg-${item.action === 'Verified' ? "green" : "red"}-50 border-l-4 border-l-${item.action === 'Verified' ? "green" : "red"}-500 rounded-r-lg`}>
@@ -330,14 +333,19 @@ export default function RecruiterDetails(){
                   <span className="text-slate-400 text-xs font-medium">{moment(recruiterDetails?.updatedAt).format("MMM DD YYYY")}</span>
                 </div>
               ))}
+              {recruiterDetails?.verificationTimeline?.length === 0 && (
+                <div>
+                  <p className='text-center text-sm text-gray-600 italic'>No History found</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Sidebar Actions */}
         <div className="w-full lg:w-80 space-y-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <h2 className="font-bold text-lg mb-6">Actions</h2>
+          <div className="bg-white rounded-lg border border-slate-100 p-6 shadow-[0_0_30px_2px_rgba(200,0,200,0.1)]">
+            <p className="font-semibold text-lg mb-6 uppercase text-gray-700 tracking-wide">Actions</p>
             
             <div className="flex flex-col gap-3 mb-8">
               {recruiterDetails?.isVerified
@@ -425,7 +433,7 @@ export default function RecruiterDetails(){
 // --- Sub-Components for Clean Code ---
 
 const StatCard = ({ icon, label, value, color }: {icon: React.ReactNode, label: string, value: string | number | undefined, color: string}) => (
-  <div className="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm flex flex-col items-center">
+  <div className="bg-white rounded-lg border border-slate-100 p-8 text-center shadow-[0_0_30px_2px_rgba(200,0,200,0.1)] flex flex-col items-center">
     <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center mb-4`}>
       {icon}
     </div>

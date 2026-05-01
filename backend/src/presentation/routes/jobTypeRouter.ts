@@ -17,7 +17,7 @@ function CreateJobTypeRouter() {
   jobTypeRouter.get(
     JobTypeApiRoutes.LOAD,
     centralizedAuthentication,
-    authorization(['admin']),
+    authorization(['admin', 'user', 'recruiter']),
     jobTypeController.getJobTypes.bind(jobTypeController)
   );
   jobTypeRouter.patch(

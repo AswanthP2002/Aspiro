@@ -127,11 +127,13 @@ axiosInstance.interceptors.response.use(
                 // Handle refresh token failure (e.g., redirect to login)
                 return Promise.reject(refreshError);
             }   //given an auth failed flag, which is for wrong password
-        }else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
+        }
+        // else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
             // alert(`This one is still executing ${response.data.errors.code}`)
             // console.log('not executed')
-            window.location.replace('http://localhost:5173/token/expired')
-        }else if(response && response.status === 404 && !window.location.href.includes('/login')){
+            // window.location.replace('http://localhost:5173/token/expired')
+        // }
+        else if(response && response.status === 404 && !window.location.href.includes('/login')){
             console.log('--checking 404 error--', response)
             //window.location.replace('http://localhost:5173/404') //only if it is not in the login page
         }
