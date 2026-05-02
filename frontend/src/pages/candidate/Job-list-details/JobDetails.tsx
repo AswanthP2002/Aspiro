@@ -3,21 +3,19 @@ import { useNavigate, useParams } from "react-router-dom"
 import { loadJobDetails } from "../../../services/commonServices"
 import { checkIsJobApplied, checkIsSaved, saveJob, unsaveJob } from "../../../services/userServices"
 import { formattedDateMoment } from "../../../services/util/formatDate"
-import { Notify } from "notiflix"
-import { BiBriefcase, BiChat, BiShare } from "react-icons/bi"
+import { BiBriefcase, BiChat } from "react-icons/bi"
 import { BsThreeDots } from "react-icons/bs"
-import { CiBookmark } from "react-icons/ci"
-import { LuBriefcase, LuBuilding2, LuFileText, LuGraduationCap, LuListChecks, LuShieldCheck } from "react-icons/lu"
+import { LuBan, LuBookmark, LuBookmarkCheck, LuBriefcase, LuBuilding2, LuFileText, LuGraduationCap, LuListChecks, LuShare, LuShare2, LuShieldCheck } from "react-icons/lu"
 import { JobDetailsForPublicData } from "../../../types/entityTypes"
 import { FaHeart } from "react-icons/fa"
 import { CgArrowLeft } from "react-icons/cg"
-import { GoBookmarkSlash, GoReport } from "react-icons/go"
 import { toast } from "react-toastify"
 import { MdVerified } from "react-icons/md"
 import { RiSpam2Fill } from "react-icons/ri"
 import { Modal, Backdrop, Fade, Box } from "@mui/material"
 import { HiOutlineExclamationTriangle, HiOutlineInformationCircle, HiOutlineShieldCheck } from "react-icons/hi2"
 import moment from "moment"
+import { AxiosError } from "axios"
 
 export default function JObDetailsCandidateSide() {
     const [jobDetails, setjobDetails] = useState<JobDetailsForPublicData | null >(null)
@@ -35,9 +33,6 @@ export default function JObDetailsCandidateSide() {
     
     const params = useParams()
     const jobId  = params?.id as string
-    // const logedUser = useSelector((state : any) => {
-    //     return state.userAuth.user
-    // })
 
     console.log('params is here', jobId)
     const navigator = useNavigate()
@@ -51,8 +46,7 @@ export default function JObDetailsCandidateSide() {
                     jobSavedResult,
                     jobAppliedResult
                 ] = await Promise.all([loadJobDetails(jobId), checkIsSaved(jobId), checkIsJobApplied(jobId)])
-                
-                                
+                               
                 if(jobDetailsResult.success){
                     console.log('job details fetched', jobDetailsResult)
                     console.log('job saved result', jobSavedResult)
@@ -91,14 +85,15 @@ export default function JObDetailsCandidateSide() {
             const result = await saveJob(jobId)
     
             if(result?.success){
-                Notify.success('Saved', {timeout:1200})
+                toast.success('Saved')
                 setIsJobSaved(true)
-                setTimeout(() => setIsJobSaved(true), 1200)
             }else{
-                Notify.failure('Can not save job', {timeout:1200})
+                toast.error('Can not save job')
             }
         } catch (error: unknown) {
-            Notify.failure('Something went wrong', {timeout:1200})
+            const err = error as AxiosError<{message: string}>
+            const finalErrorMessage = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(finalErrorMessage)
         } finally {
             setIsLoading(false)
         }
@@ -110,14 +105,15 @@ export default function JObDetailsCandidateSide() {
             setIsLoading(true)
             const result = await unsaveJob(jobId)
             if(result?.success){
-                Notify.success('Unsaved', {timeout:1200})
+                toast.success('Unsaved')
                 setIsJobSaved(false)
-                setTimeout(() => setIsJobSaved(false), 1200)
             }else{
-                Notify.failure('Something went wrong', {timeout:1200})
+                toast.error('Can not unsave job')
             }
         } catch (error: unknown) {
-            Notify.failure('Something went wrong', {timeout:1200})   
+            const err = error as AxiosError<{message: string}>
+            const finalErrorMessage = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(finalErrorMessage)
         } finally {
             setIsLoading(false)
         }
@@ -160,10 +156,10 @@ export default function JObDetailsCandidateSide() {
                   <BsThreeDots />
                 </button>
                 {isJobOptionsMenuOpened && (
-                  <div className="absolute bg-white rounded border w-30 right-0 border-slate-200">
-                    <button className="text-xs flex items-center p-2 gap-2 hover:bg-gray-200 w-full">
-                      <GoReport color="red" />
-                      <p className="text-red-500">Report job</p>
+                  <div className="absolute bg-white rounded-lg border w-35 right-0 shadow-xl border-slate-100">
+                    <button className="text-xs flex items-center p-3 gap-2 hover:bg-gray-200 w-full">
+                      <LuBan size={18} color="red" />
+                      <p className="text-red-500 text-xs font-medium">Report job</p>
                     </button>
                     {isJobSaved ? (
                       <>
@@ -172,10 +168,10 @@ export default function JObDetailsCandidateSide() {
                             unsaveAJob(jobId as string);
                             setIsJobOptionsMenuOpened(false);
                           }}
-                          className="text-xs flex items-center p-2 gap-2 hover:bg-gray-200 w-full"
+                          className="text-xs flex items-center p-3 gap-2 hover:bg-gray-200 w-full"
                         >
-                          <GoBookmarkSlash />
-                          <p className="">Unsave Job</p>
+                          <LuBookmarkCheck size={18} />
+                          <p className="text-xs font-medium text-gray-700">Unsave Job</p>
                         </button>
                       </>
                     ) : (
@@ -185,16 +181,16 @@ export default function JObDetailsCandidateSide() {
                             saveAJob(jobDetails?._id as string);
                             setIsJobOptionsMenuOpened(false);
                           }}
-                          className="text-xs flex items-center p-2 gap-2 hover:bg-gray-200 w-full"
+                          className="text-xs flex items-center p-3 gap-2 hover:bg-gray-200 w-full"
                         >
-                          <CiBookmark />
-                          <p className="">Save Job</p>
+                          <LuBookmark size={18} />
+                          <p className="text-xs font-medium text-gray-700">Save Job</p>
                         </button>
                       </>
                     )}
-                    <button className="text-xs flex items-center p-2 gap-2 hover:bg-gray-200 w-full">
-                      <BiShare />
-                      <p className="">Share Job</p>
+                    <button className="text-xs flex items-center p-3 gap-2 hover:bg-gray-200 w-full">
+                      <LuShare2 size={18} />
+                      <p className="font-medium text-xs">Share Job</p>
                     </button>
                   </div>
                 )}
@@ -252,12 +248,10 @@ export default function JObDetailsCandidateSide() {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-3">
-                  {/* <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-md">{jobDetails?.recruiterProfileDetails?.recruiterType}</span> */}
                   {isJobSaved ? <FaHeart title="Favorite" color="blue" /> : null}
                 </div>
               </div>
               <div className="mt-1 flex items-center">
-                {/* <p className="text-xs ms-5 text-gray-500">{formatRelativeTime(jobDetails?.createdAt || new Date())}</p> */}
               </div>
             </div>
           </div>
@@ -360,16 +354,6 @@ export default function JObDetailsCandidateSide() {
                 <p className="font-normal text-xs text-gray-500">
                   {jobDetails?.recruiterProfileDetails?.professionalTitle}
                 </p>
-                {/* {jobDetails?.recruiterProfileDetails?.recruiterType === 'corporate' && (
-                  <div className="mt-5">
-                    <p className="text-sm text-gray-700">
-                      Hiring for{' '}
-                      <span className="font-semibold">
-                        {jobDetails.companyProfileDetails?.name}
-                      </span>
-                    </p>
-                  </div>
-                )} */}
               </div>
               
             </div>
