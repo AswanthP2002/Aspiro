@@ -733,3 +733,18 @@ export const changeStatusToUnderReview = async (applicationId: string) => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const verifyBeforePostingJob = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_VERIFICATION_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

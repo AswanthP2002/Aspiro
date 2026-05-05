@@ -24,5 +24,6 @@ export const RecruiterEndPoints = {
     LOAD_RECRUITER_DETAILS_BY_ID: (recruiterId: string) =>  `/v2/recruiters/${recruiterId}`,
     BLOCK_RECRUITER_BY_ID: (recruiterId: string) => `/recruiter/block/${recruiterId}`,
     HANDLE_RECRUITER_VERIFICATION: (recruiterId: string) => `/v2/recruiter/${recruiterId}/verification/action`,
-    HANDLE_RECRUITER_PERMISSIONS: (recruiterId: string) => `/v2/recruiter/${recruiterId}/permissions/update`
+    HANDLE_RECRUITER_PERMISSIONS: (recruiterId: string) => `/v2/recruiter/${recruiterId}/permissions/update`,
+    CHECK_VERIFICATION_STATUS: '/v2/recruiter/verification-status'
 } as const

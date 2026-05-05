@@ -2,6 +2,7 @@ export const RecruiterApiRoutes = {
   RECRUITER_PROFILE: {
     CREATE: '/v1/recruiter/create',
     LOAD_MY_RECRUITER_PROFILE: '/v1/recruiter/profile/overview',
+    CHECK_VERIFICATION_STATUS: '/v2/recruiter/verification-status',
   },
   RECRUITER_JOB_CONFIG_LISTS: {
     JOB_LEVEL_LIST_FETCH: '/v1/recruiter/joblevels',

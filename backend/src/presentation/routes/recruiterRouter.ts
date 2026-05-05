@@ -122,6 +122,13 @@ function createRecruiterRouter() {
     recruiterController.loadRecruiterApplications.bind(recruiterController)
   );
 
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITER_PROFILE.CHECK_VERIFICATION_STATUS,
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.verifyBeforePostingJob.bind(recruiterController)
+  );
+
   recruiterRouter.patch(
     RecruiterApiRoutes.RECRUITERS.REJECT_APPLICATION_BY_ID,
     centralizedAuthentication,

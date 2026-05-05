@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from "../../../services/recruiterServices"
+import { postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists, verifyBeforePostingJob } from "../../../services/recruiterServices"
 import { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
-import { Autocomplete, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField } from "@mui/material"
 import { Textarea } from "@mui/joy"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
@@ -49,6 +49,7 @@ export default function PostAJobForm(){
     const [jobTypeOptions, setJobTypeOptions] = useState<JobTypesData[]>([])
     const [jobLevelOptions, setJobLevelOptions] = useState<JobLevelData[]>([])
     const [workModeOptions, setWorkModeOptions] = useState<WorkModeData[]>([])
+    const [isVerified, setIsVerified] = useState<boolean>(true)
 
     const {control, watch, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
         defaultValues: {
@@ -159,10 +160,9 @@ export default function PostAJobForm(){
                     workModes
                 ] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchJobTypeLists(), recruiterFetchWorkModeLists()])
                 
-                console.log('Individually checking promise all data')
-                console.log('job level', jobLevels)
-                console.log('job type', jobTypes)
-                console.log('work mode', workModes)
+                const verificationResult = await verifyBeforePostingJob()
+                console.log('-- checking verification result --', verificationResult)
+                setIsVerified(verificationResult.result)
                 setJobTypeOptions(jobTypes?.result)
                 setJobLevelOptions(jobLevels?.result)
                 setWorkModeOptions(workModes?.result)
@@ -752,6 +752,34 @@ const selectStyles = {
                 
             </form>
         </div>
+
+        <CanNotProceedModal open={!isVerified} />
+        </>
+    )
+}
+
+export const CanNotProceedModal = ({open}: {open: boolean}) => {
+    const navigate = useNavigate()
+
+    const navigateToDashboard = () => {
+        return navigate('/profile/recruiter/overview')
+    }
+
+    return(
+        <>
+            <Modal className="backdrop-blur-md flex flex-col items-center justify-center" open={open}>
+                <div className="bg-white p-5 lg:p-10 rounded-lg w-md max-w-[90%] shadow-xl">
+                    <p className="font-semibold text-lg tracking-wide text-gray-900">Verification Revoked</p>
+                    <p className="text-sm font-medium  text-gray-700 mt-1">Your account is not verified to post jobs</p>
+                    <div className="my-5 p-3 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-xs leading-relaxed text-gray-600">As per our guidelines and policies, A recruiter profile need valid verification before posting jobs. Currently your account <span className="text-red-500 italic font-medium">verifications has been revoked</span> by the admin. You cant post any jobs now</p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <button onClick={navigateToDashboard} className="bg-blue-600  text-white  shadow-[0_0_30px_2px_rgba(100,0,250,0.2)] transition-color duration-300 hover:bg-blue-700 w-full p-3 text-sm font-semibold rounded-lg">Understood</button>
+                        <button disabled={true} className="border border-slate-400 text-slate-700 transition-color duration-300 hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none hover:shadow-xl w-full p-3 text-sm font-semibold rounded-lg">Help</button>
+                    </div>           
+                </div>
+            </Modal>
         </>
     )
 }

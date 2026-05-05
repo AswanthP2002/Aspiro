@@ -478,6 +478,8 @@ import IRemoveConnectionUsecase from '../application/interfaces/usecases/connect
 import RemoveConnectionUsecase from '../application/usecases/connection/RemoveConnection.usecase';
 import IValidateTokenUsecase from '../application/interfaces/usecases/user/IValidateToken.usecase';
 import ValidateTokenUsecase from '../application/usecases/user/ValidateToken.usecase';
+import IVerifyBeforePostingJobUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforePostingJob.usecase';
+import VerifyBeforePostingJobUsecase from '../application/usecases/recruiter/VerifyBeforePostingJob.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -602,6 +604,10 @@ container.registerSingleton<IValidateTokenUsecase>('IValidateTokenUsecase', Vali
 container.registerSingleton<IRemoveConnectionUsecase>(
   'IRemoveConnectionUsecase',
   RemoveConnectionUsecase
+);
+container.registerSingleton<IVerifyBeforePostingJobUsecase>(
+  'IVerifyBeforePostingJob',
+  VerifyBeforePostingJobUsecase
 );
 container.registerSingleton<IUploadUserProfilePictureUsecase>(
   'IUploadUserProfilePictureUsecase',
