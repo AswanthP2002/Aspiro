@@ -112,4 +112,10 @@ export interface AdminRecruiterDetailsDTO {
   totalJobs?: number;
   activeJobs?: number;
   totalApplications: number;
+  isAllJobsHidden?: boolean;
+  allowPostJobs?: boolean;
+  allowEditJobs?: boolean;
+  allowDeletePosts?: boolean;
+  allowManageApplications?: boolean;
+  allowScheduleInterviews?: boolean;
 }

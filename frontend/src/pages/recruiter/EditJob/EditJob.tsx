@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { editJob, getPostedJobDetails, postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from "../../../services/recruiterServices"
+import { editJob, getPostedJobDetails, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists, verifyBeforeEditJob } from "../../../services/recruiterServices"
 import dayjs, { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
-import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField } from "@mui/material"
 import { Textarea } from "@mui/joy"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
-import { Notify } from "notiflix"
 import { toast } from "react-toastify"
 import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityTypes"
 
@@ -41,15 +40,14 @@ export default function EditJobForm(){
     const location = useLocation()
     const jobData = location.state?.jobData || {}
 
-    const [requiredSkills, setRequiredSkills] = useState<string[]>([])
     const requiredSkillRef = useRef<HTMLInputElement | null>(null)
     const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
     const [jobTypeData, setJobTypeData] = useState<JobTypesData[]>([])
     const [workModeData, setWorkModeData] = useState<WorkModeData[]>([])
-    const [optionalSkills, setOptionalSkills] = useState<string[]>([])
     const optionalSkillRef = useRef<HTMLInputElement | null>(null)
     const navigator = useNavigate()
     const [loading, setloading] = useState(false)
+    const [isAllowedToEditJobs, setIsAllowedToEditJobs] = useState<boolean>(true)
 
     const {control, watch, reset, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
         defaultValues: {
@@ -79,6 +77,11 @@ export default function EditJobForm(){
                     workModeDataResult,
                     jobTypeDataResult
                 ] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchWorkModeLists(), recruiterFetchJobTypeLists()])
+
+                const eidPermissionResult = await verifyBeforeEditJob()
+                if(eidPermissionResult.success){
+                    setIsAllowedToEditJobs(eidPermissionResult.result)
+                }
                 
                 if(jobDetailsFetchResult.success){
                     reset({
@@ -118,31 +121,6 @@ export default function EditJobForm(){
             toast.warn('Can not edit job now')
             navigator(-1)
         }
-        // if(jobData){
-        //     const jobDetailsResult = await
-        //     console.log('this is job data for editing', jobData)
-        //     reset({
-        //         jobTitle: jobData.jobTitle,
-        //         description: jobData.description,
-        //         requirements: jobData.requirements,
-        //         responsibilities: jobData.responsibilities,
-        //         duration: jobData.duration,
-        //         jobType: jobData.jobType,
-        //         workMode: jobData.workMode,
-        //         location: jobData.location,
-        //         minSalary: jobData.minSalary,
-        //         maxSalary: jobData.maxSalary,
-        //         salaryCurrency: jobData.salaryCurrency,
-        //         salaryPeriod: jobData.salaryPeriod,
-        //         vacancies: jobData.vacancies,
-        //         qualification: jobData.qualification,
-        //         experienceInYears: jobData.experienceInYears,
-        //         jobLevel: jobData.jobLevel,
-        //         requiredSkills: jobData.requiredSkills,
-        //         optionalSkills: jobData.optionalSkills,
-        //         expiresAt: dayjs(jobData.expiresAt)
-        //     })
-        // }
     }, [jobData, reset])
 
     const enteredJobType = watch('jobType')
@@ -241,24 +219,6 @@ export default function EditJobForm(){
   '& .MuiInputLabel-root': { color: '#64748b' }, // slate-500
 };
 
-const textareaStyles = {
-  width: '100%',
-  padding: '12px',
-  borderRadius: '10px',
-  backgroundColor: '#fff',
-  border: '1px solid #e2e8f0',
-  outline: 'none',
-  fontFamily: 'inherit',
-  fontSize: '1rem',
-  '&:hover': {
-    borderColor: '#cbd5e1',
-  },
-  '&:focus': {
-    borderColor: '#2563eb',
-    boxShadow: '0 0 0 1px #2563eb', // Simulates the MUI focus look
-  },
-};
-
 const selectStyles = {
   // Target the root of the OutlinedInput
   borderRadius: '10px',
@@ -279,6 +239,8 @@ const selectStyles = {
   // Icon and Label
   '& .MuiSvgIcon-root': { color: '#64748b' },
 };
+
+
 
     return(
         <>
@@ -777,6 +739,36 @@ const selectStyles = {
                 
             </form>
         </div>
+
+        {!isAllowedToEditJobs && (
+            <CanNotProceedModal open={!isAllowedToEditJobs} />
+        )}
+        </>
+    )
+}
+
+export const CanNotProceedModal = ({open}: {open: boolean}) => {
+    const navigate = useNavigate()
+
+    const navigateToDashboard = () => {
+        return navigate('/profile/recruiter/overview')
+    }
+
+    return(
+        <>
+            <Modal className="backdrop-blur-md flex flex-col items-center justify-center" open={open}>
+                <div className="bg-white p-5 lg:p-10 rounded-lg w-md max-w-[90%] shadow-xl">
+                    <p className="font-semibold text-lg tracking-wide text-gray-900">Permission Denied</p>
+                    <p className="text-sm font-medium  text-gray-700 mt-1">Your are not allowed to edit jobs</p>
+                    <div className="my-5 p-3 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-xs leading-relaxed text-gray-600">Your account permissions are updated by the admin. Currently you are not allowed to edit existing jobs</p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <button onClick={navigateToDashboard} className="bg-blue-600  text-white  shadow-[0_0_30px_2px_rgba(100,0,250,0.2)] transition-color duration-300 hover:bg-blue-700 w-full p-3 text-sm font-semibold rounded-lg">Understood</button>
+                        <button disabled={true} className="border border-slate-400 text-slate-700 transition-color duration-300 hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none hover:shadow-xl w-full p-3 text-sm font-semibold rounded-lg">Help</button>
+                    </div>           
+                </div>
+            </Modal>
         </>
     )
 }

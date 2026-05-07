@@ -44,4 +44,5 @@ export default interface Job {
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: string;
+  isHidden?: boolean;
 }

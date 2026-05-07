@@ -480,6 +480,12 @@ import IValidateTokenUsecase from '../application/interfaces/usecases/user/IVali
 import ValidateTokenUsecase from '../application/usecases/user/ValidateToken.usecase';
 import IVerifyBeforePostingJobUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforePostingJob.usecase';
 import VerifyBeforePostingJobUsecase from '../application/usecases/recruiter/VerifyBeforePostingJob.usecase';
+import IManageRecruiterPermissionsUsecase from '../application/interfaces/usecases/recruiter/IManageRecruiterPermissions.usecase';
+import ManageRecruiterPermissionsUsecase from '../application/usecases/recruiter/ManageRecruiterPermissions.usecase';
+import IVerifyBeforeEditJobUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforeEditJob.usecase';
+import VerifyBeforeEditJobUsecase from '../application/usecases/recruiter/VerifyBeforeEditJob.usecase';
+import IVerifyBeforeManagingApplicationsUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforeManagingApplications.usecase';
+import VerifyBeforeManagingApplicationsUsecase from '../application/usecases/recruiter/VerifyBeforeManagingApplications.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -574,7 +580,18 @@ container.registerSingleton<IAdminResetUserPasswordUsecase>(
   'IAdminResetUserPasswordUsecase',
   AdminResetUserPasswordUsecase
 );
-
+container.registerSingleton<IManageRecruiterPermissionsUsecase>(
+  'IManageRecruiterPermissions',
+  ManageRecruiterPermissionsUsecase
+);
+container.registerSingleton<IVerifyBeforeEditJobUsecase>(
+  'IVerifyBeforeEditJobUsecase',
+  VerifyBeforeEditJobUsecase
+);
+container.registerSingleton<IVerifyBeforeManagingApplicationsUsecase>(
+  'IVerifyBeforeManageApplicationsUsecase',
+  VerifyBeforeManagingApplicationsUsecase
+)
 container.registerSingleton<ILoadRecruiterRecentJobs>(
   'ILoadRecruiterRecentJobs',
   LoadRecruiterRecentJobsUsecase

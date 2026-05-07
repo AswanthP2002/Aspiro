@@ -43,6 +43,12 @@ export interface RecruiterDTO {
   // verificationHistory?: any;
   createdAt?: string;
   updatedAt?: string;
+  isAllJobsHidden?: boolean;
+  allowPostJobs?: boolean;
+  allowEditJobs?: boolean;
+  allowDeletePosts?: boolean;
+  allowManageApplications?: boolean;
+  allowScheduleInterviews?: boolean;
 }
 
 export interface UpdateRecriterDTO {

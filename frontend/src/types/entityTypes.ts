@@ -432,6 +432,12 @@ export interface AdminRecruiterDetailsData {
   totalJobs?: number;
   activeJobs?: number;
   totalApplications: number;
+  isAllJobsHidden?: boolean;
+  allowPostJobs?: boolean;
+  allowEditJobs?: boolean;
+  allowDeletePosts?: boolean;
+  allowManageApplications?: boolean;
+  allowScheduleInterviews?: boolean;
 }
 
 export interface MyJobData {

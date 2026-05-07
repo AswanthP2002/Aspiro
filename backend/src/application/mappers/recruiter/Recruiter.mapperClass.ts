@@ -130,6 +130,12 @@ export default class RecruiterMapper {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       isOrphan: data.userProfile ? false : true,
+      isAllJobsHidden: data.isAllJobsHidden,
+      allowPostJobs: data.allowPostJobs,
+      allowEditJobs: data.allowEditJobs,
+      allowDeletePosts: data.allowDeletePosts,
+      allowManageApplications: data.allowManageApplications,
+      allowScheduleInterviews: data.allowScheduleInterviews,
     };
   }
 

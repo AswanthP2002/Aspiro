@@ -748,3 +748,61 @@ export const verifyBeforePostingJob = async () => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const verifyBeforeEditJob = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_EDIT_JOB_VERIFICATION_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const verifyBeforeManageApplications = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_MANAGE_APPLICATIONS_VERIFICATIONS_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const manageRecruiterPermissions = async (
+  recruiterId: string,
+  isAllJobsHidden: boolean,
+  allowPostJobs: boolean,
+  allowEditJobs: boolean,
+  allowDeletePosts: boolean,
+  allowManageApplications: boolean,
+  allowScheduleInterviews: boolean,
+) => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.MANAGE_RECRUITER_PERMISSIONS(recruiterId),
+        {isAllJobsHidden, allowPostJobs, allowEditJobs, allowDeletePosts, allowManageApplications, allowScheduleInterviews},
+        {
+            sendAuthToken: true,
+            headers:{'Content-Type': 'application/json'}
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while managing recruiter permissions', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw err
+        }
+    }
+}
