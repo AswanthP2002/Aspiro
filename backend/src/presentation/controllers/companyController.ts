@@ -6,6 +6,7 @@ import IAddCompanyUsecase from '../../application/interfaces/usecases/company/IA
 import IGetcompaniesBySuggesionUsecase from '../../application/interfaces/usecases/company/IGetCompaniesBySuggession.usecase';
 import ResponseHandler from '../../utilities/response.handler';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
+import IAdminLoadAllCompaniesDataUsecase from '../../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
 
 @injectable()
 export default class CompanyController {
@@ -13,7 +14,9 @@ export default class CompanyController {
   constructor(
     @inject('IGetCompanyListUsecase') private _getCompanyList: IGetCompanyListUsecase,
     @inject('IAddCompanyUsecase') private _addCompany: IAddCompanyUsecase,
-    @inject('IGetcompaniesBySuggesion') private _getCompaniesList: IGetcompaniesBySuggesionUsecase
+    @inject('IGetcompaniesBySuggesion') private _getCompaniesList: IGetcompaniesBySuggesionUsecase,
+    @inject('IAdminLoadAllCompaniesDataUsecase')
+    private _adminLoadAllCompaniesData: IAdminLoadAllCompaniesDataUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -62,6 +65,22 @@ export default class CompanyController {
       // res
       //   .status(StatusCodes.OK)
       //   .json({ success: true, message: 'Companies fetched succesfully', result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async adminLoadAllCompaniesData(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const page = parseInt(req.query.page as string);
+    const limit = parseInt(req.query.limit as string) || 5;
+    try {
+      const result = await this._adminLoadAllCompaniesData.execute(page, limit);
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Companies'),
+        StatusCodes.OK,
+        result
+      );
     } catch (error) {
       next(error);
     }

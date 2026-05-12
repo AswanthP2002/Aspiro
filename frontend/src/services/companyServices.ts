@@ -17,3 +17,19 @@ export const getCompaniesList = async (search: string) => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const adminLoadCompaniesData = async (page: number) => {
+    try {
+        const response = await axiosInstance.get(CompanyEndpoinds.ADMIN_LOAD_COMPANIES_DATA,
+            {
+                sendAuthToken: true,
+                params:{page}
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

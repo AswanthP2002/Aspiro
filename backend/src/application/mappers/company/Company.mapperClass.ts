@@ -1,4 +1,7 @@
-import Company from '../../../domain/entities/company/company.entity';
+import Company, {
+  CompanyWithRecruitersAndJobs,
+} from '../../../domain/entities/company/company.entity';
+import AdminCompanyDataDTO from '../../DTOs/company/adminCompanyData.dto';
 import CompanyDTO, { AddCompanyDTO } from '../../DTOs/company/company.dto';
 
 export default class CompanyMapper {
@@ -26,6 +29,24 @@ export default class CompanyMapper {
       location: entity.location,
       logo: entity.logo,
       createdAt: entity.createdAt,
+    };
+  }
+
+  public companyWithJobsAndRecruitersToCompanyDataForAdminDTO(
+    data: CompanyWithRecruitersAndJobs
+  ): AdminCompanyDataDTO {
+    return {
+      _id: data._id,
+      name: data.name,
+      description: data.description,
+      slogan: data.slogan,
+      industry: data.industry,
+      website: data.website,
+      linkedin: data.linkedin,
+      location: data.location,
+      jobs: data.jobs.length,
+      recruiters: data.recruiters.length,
+      createdAt: data.createdAt,
     };
   }
 }

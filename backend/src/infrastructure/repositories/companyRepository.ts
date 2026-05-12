@@ -1,6 +1,8 @@
 import { injectable } from 'tsyringe';
 import BaseRepository from './baseRepository';
-import Company from '../../domain/entities/company/company.entity';
+import Company, {
+  CompanyWithRecruitersAndJobs,
+} from '../../domain/entities/company/company.entity';
 import ICompanyRepo from '../../domain/interfaces/ICompanyRepo';
 import { CompanyDAO } from '../database/Schemas/recruiter/company.schema';
 
@@ -32,5 +34,47 @@ export default class CompanyRepository extends BaseRepository<Company> implement
       .lean();
 
     return result;
+  }
+
+  async getAllComapniesDataForAdmin(
+    page: number,
+    limit: number
+  ): Promise<{
+    companyData: CompanyWithRecruitersAndJobs[];
+    totalPages: number;
+  } | null> {
+    const skip = (page - 1) * limit;
+    const result = await CompanyDAO.aggregate([
+      {
+        $facet: {
+          data: [
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: '_id',
+                foreignField: 'companyId',
+                as: 'recruiters',
+              },
+            },
+            {
+              $lookup: {
+                from: 'jobs',
+                localField: 'recruiters.userId',
+                foreignField: 'recruiterId',
+                as: 'jobs',
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          metaData: [{ $count: 'count' }],
+        },
+      },
+    ]);
+    const data = result[0]?.data;
+    const totalDocs = result[0]?.metaData[0]?.count;
+    const totalPages = Math.floor(totalDocs / limit);
+    return { companyData: data, totalPages };
   }
 }

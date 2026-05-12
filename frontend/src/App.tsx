@@ -89,9 +89,11 @@ import store from './redux/store';
 import { AdminRoutes } from './constants/routs/admin.routes';
 import TerminationPage from './pages/user/Action-Termination/Termination';
 import { SocketEvents } from './socket/socket.events';
-import Recruiters from './pages/admin/Company-list/Companies';
-import RecruiterDetails from './pages/admin/company-details/ComapnyDetails';
-import AppConfigPage from './pages/admin/Company-list/SkillsManagement';
+// import Recruiters from './pages/admin/Recruiters/Companies';
+import Recruiters from './pages/admin/Recruiters-list/Companies';
+import RecruiterDetails from './pages/admin/Recruiter-details/ComapnyDetails';
+// import AppConfigPage from './pages/admin/Recruiters/SkillsManagement';
+import AppConfigPage from './pages/admin/Recruiters-list/SkillsManagement';
 import JobDetails from './pages/admin/JobDetails/JobDetails';
 import ApplySuccessPage from './pages/candidate/Job-apply/Apply-Success';
 import ApplicationTrack from './pages/user/Application-track/Application.track';
@@ -113,6 +115,7 @@ import InterviewModeSelectionPage from './pages/user/Aspiro-career/AI-Interviews
 import InterviewPage from './pages/user/Aspiro-career/AI-Interviews/InterviewPage';
 import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/InterviewResultPage';
 import InterviewDashboardPage from './pages/user/Aspiro-career/AI-Interviews/Dashboard';
+import CompaniesPage from './pages/admin/Companies/Companies';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -314,6 +317,7 @@ function App() {
           <Route path={AdminRoutes.ADMIN_JOBS} element={<Jobs />} />
           <Route path={AdminRoutes.ADMIN_JOB_DETAILS_BY_ID} element={<JobDetails />} />
           <Route path={AdminRoutes.ADMIN_RECRUITERS_LIST} element={<Recruiters />} />
+          <Route path={AdminRoutes.ADMIN_COMPANIES} element={<CompaniesPage />} />
           <Route path={AdminRoutes.ADMIN_APP_CONFIG} element={<AppConfigPage />} />
           <Route path='subscription/plans/create' element={<PlanConfiguration />} />
           <Route path='subscription/plans' element={<Plans />} />

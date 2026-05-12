@@ -125,9 +125,16 @@ export default function Recruiters() {
   return(
     <>
       <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-100">
-  <p className='text-lg font-medium'>Recruiter Management</p>
+  <div className="flex justify-between items-start">
+    <div>
+    <p className='text-lg font-medium'>Recruiter Management</p>
   <p className='text-xs mt-1 mb-5 text-gray-500'>Manage all recruiters & permissions</p>
-  
+  </div>
+  <div className="bg-white w-fit border border-slate-200 flex gap-2 rounded-md">
+                            <button onClick={() => navigate('/admin/recruiters')} className={`text-xs p-1 rounded-md ${window.location.href.includes('recruiters') ? "bg-blue-500 text-white" : "bg-white text-black"}`}>Recruiters</button>
+                            <button onClick={() => navigate('/admin/companies')} className={`text-xs p-1 rounded-md ${window.location.href.includes('companies') ? "bg-blue-500 text-white" : "bg-white text-black"}`}>Companies</button>
+                        </div>
+  </div>
   <div className="p-3 border border-gray-200 bg-white rounded-md mb-3">
     {/* Main Grid Container */}
     <div className="grid grid-cols-12 gap-4 items-center">

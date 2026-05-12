@@ -486,6 +486,8 @@ import IVerifyBeforeEditJobUsecase from '../application/interfaces/usecases/recr
 import VerifyBeforeEditJobUsecase from '../application/usecases/recruiter/VerifyBeforeEditJob.usecase';
 import IVerifyBeforeManagingApplicationsUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforeManagingApplications.usecase';
 import VerifyBeforeManagingApplicationsUsecase from '../application/usecases/recruiter/VerifyBeforeManagingApplications.usecase';
+import IAdminLoadAllCompaniesDataUsecase from '../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
+import AdminLoadAllCompaniesDataUsecase from '../application/usecases/company/AdminLoadCompaniesData.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -584,6 +586,10 @@ container.registerSingleton<IManageRecruiterPermissionsUsecase>(
   'IManageRecruiterPermissions',
   ManageRecruiterPermissionsUsecase
 );
+container.registerSingleton<IAdminLoadAllCompaniesDataUsecase>(
+  'IAdminLoadAllCompaniesDataUsecase',
+  AdminLoadAllCompaniesDataUsecase
+);
 container.registerSingleton<IVerifyBeforeEditJobUsecase>(
   'IVerifyBeforeEditJobUsecase',
   VerifyBeforeEditJobUsecase
@@ -591,7 +597,7 @@ container.registerSingleton<IVerifyBeforeEditJobUsecase>(
 container.registerSingleton<IVerifyBeforeManagingApplicationsUsecase>(
   'IVerifyBeforeManageApplicationsUsecase',
   VerifyBeforeManagingApplicationsUsecase
-)
+);
 container.registerSingleton<ILoadRecruiterRecentJobs>(
   'ILoadRecruiterRecentJobs',
   LoadRecruiterRecentJobsUsecase
