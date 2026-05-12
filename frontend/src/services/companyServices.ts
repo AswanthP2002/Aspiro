@@ -33,3 +33,22 @@ export const adminLoadCompaniesData = async (page: number) => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const adminEditCompany = async (companyId: string, name: string, slogan: string, description: string, website: string, industry: string, linkedin: string, location: string) => {
+    try {
+        const response = await axiosInstance.patch(CompanyEndpoinds.ADMIN_EDIT_COMPANY(companyId),
+            {name, slogan, description, website, linkedin, industry, location},
+            {
+                headers:{
+                    "Content-Type": 'application/json'
+                },
+                sendAuthToken: true,
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

@@ -2,16 +2,57 @@ import { useEffect, useState } from "react";
 import { FaLocationPin } from "react-icons/fa6";
 import { MdLocationOn } from "react-icons/md";
 import { AdminCompanyData } from "../../../types/entityTypes";
-import { adminLoadCompaniesData } from "../../../services/companyServices";
+import { adminEditCompany, adminLoadCompaniesData } from "../../../services/companyServices";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { FormControl, FormHelperText, Modal } from "@mui/material";
+import { LuX } from "react-icons/lu";
+import { Controller, useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 
 export default function CompaniesPage(){
     const [companies, setCompanies] = useState<AdminCompanyData[]>([])
     const [companyDetails, setCompanyDetails] = useState<AdminCompanyData | null>(null)
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [isEditing, setIsEditing] = useState(false)
+    
+    const closeEditing = () => setIsEditing(false)
+
+    const onCompanyEdit = (editedData: AdminCompanyData) => {
+        setCompanies((prv: AdminCompanyData[]) => {
+            return prv.map((company: AdminCompanyData) => {
+                if(company._id === editedData._id){
+                    return {
+                        ...company,
+                        name: editedData.name,
+                        slogan: editedData.slogan,
+                        description: editedData.description,
+                        website: editedData.website,
+                        linkedin: editedData.linkedin,
+                        industry: editedData.industry,
+                        location: editedData.location,
+                    }
+                }else{
+                    return company
+                }
+            })
+        })
+
+        setCompanyDetails((prv: AdminCompanyData | null) => {
+            return {
+                ...prv,
+                name: editedData.name,
+                slogan: editedData.slogan,
+                description: editedData.description,
+                website: editedData.website,
+                linkedin: editedData.linkedin,
+                industry: editedData.industry,
+                location: editedData.location
+            }
+        })
+    }
 
     const selectACompany = (index: number) => {
         if(index){
@@ -147,7 +188,7 @@ export default function CompaniesPage(){
                                 </div>
                             </div>
                             <div className="mt-3">
-                                <button className="bg-blue-600 text-white w-full p-3 rounded-md text-sm font-semibold shadow-xl shadow-blue-100 transition-color duration-300 hover:bg-blue-400 hover:shadow-xl">Edit Company profile</button>
+                                <button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white w-full p-3 rounded-md text-sm font-semibold shadow-xl shadow-blue-100 transition-color duration-300 hover:bg-blue-400 hover:shadow-xl">Edit Company profile</button>
                                 <button className="mt-3 bg-red-600 w-full text-white p-3 text-sm font-semibold rounded-md shadow-xl shadow-red-100 transition-color duration-300 hover:bg-red-400 hover:shadow-xl">Delete Company</button>
                             </div>
                                   </>
@@ -159,6 +200,218 @@ export default function CompaniesPage(){
                     </div>
                 </div>
             </div>
+
+            {isEditing && (
+                <CompanyEditModal open={isEditing} closeModal={closeEditing} data={companyDetails} onCompanyEdit={onCompanyEdit} />
+            )}
+        </>
+    )
+}
+
+const CompanyEditModal = ({data, open, closeModal, onCompanyEdit}: {data: AdminCompanyData | null, open: boolean, closeModal: () => void, onCompanyEdit: (editableData: AdminCompanyData) => void}) => {
+    
+    const [loading, setLoading] = useState<boolean>(false)
+
+    type CompanyEditFormData = {
+        name: string;
+        description: string;
+        slogan: string;
+        website: string;
+        linkedin: string;
+        industry: string;
+        location: string;
+    }
+
+    const {formState: {errors}, control, reset, setValue, handleSubmit} = useForm<CompanyEditFormData>({
+        defaultValues: {
+            name:'',
+            description: '',
+            slogan: '',
+            website: '',
+            linkedin: '',
+            industry: '',
+            location: ''
+        }
+    })
+
+    const submitOnEdit = async (formData: CompanyEditFormData) => {
+        const confirmation = await Swal.fire({
+            icon: 'question',
+            title: 'Confirm Changes',
+            showConfirmButton: true,
+            showCancelButton: true,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                const container = Swal.getContainer()
+                if(container){
+                    container.style.zIndex = '99999'
+                }
+            }
+        })
+
+        if(!confirmation.isConfirmed) return
+
+        // console.log(formData)
+        setLoading(true)
+        try {
+            const result = await adminEditCompany(data?._id as string, formData.name, formData.slogan, formData.description, formData.website, formData.industry, formData.linkedin, formData.location)
+            if(result.success){
+                toast.success('Company information updated')
+                onCompanyEdit({_id: data?._id, ...formData})
+            }
+        } catch (error: unknown) {
+            const err = error as AxiosError<{message: string}>
+            const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(finalMessage)
+        } finally {
+            setLoading(false)
+            closeModal()
+        }
+    }
+
+    useEffect(() => {
+        if(data){
+            setValue('name', data.name)
+            setValue('slogan', data.slogan as string)
+            setValue('description', data.description as string)
+            setValue('website', data.website as string)
+            setValue('linkedin', data.linkedin as string)
+            setValue('industry', data.industry as string)
+            setValue('location', data.location as string)
+        }
+    }, [data])
+
+    return(
+        <>
+            <Modal className="flex items-center justify-center" open={open} onClose={closeModal}>
+                <div className="bg-white w-md lg:w-xl rounded-lg shadow-xl p-5 lg:p-10">
+                    <div className="flex items-center justify-between border-b pb-4 border-slate-300">
+                        <div>
+                            <p className="font-bold text-xl text-gray-800 tracking-wide">Edit Company</p>
+                            <p className="text-sm mt-1 text-gray-700">Edit and manage company informations</p>
+                        </div>
+                        <button onClick={closeModal} className="p-2 hover:bg-slate-200 rounded-md transition-color duration-300"><LuX /></button>
+                    </div>
+                    <div className="mt-5 max-h-[500px] overflow-y-auto">
+                        <form onSubmit={handleSubmit(submitOnEdit)}>
+                            <FormControl error={Boolean(errors.name)} fullWidth>
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">company name</label>
+                                <Controller
+                                    control={control}
+                                    name="name"
+                                    rules={{
+                                        required:{value: true, message: 'Company name can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.name?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.slogan)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">slogan</label>
+                                <Controller
+                                    control={control}
+                                    name="slogan"
+                                    rules={{
+                                        required:{value: true, message: 'Slogan can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.slogan?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.description)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">description</label>
+                                <Controller
+                                    control={control}
+                                    name="description"
+                                    rules={{
+                                        required:{value: true, message: 'description can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.description?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.website)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">website</label>
+                                <Controller
+                                    control={control}
+                                    name="website"
+                                    rules={{
+                                        required:{value: true, message: 'website url can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.website?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.linkedin)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">linkedin</label>
+                                <Controller
+                                    control={control}
+                                    name="linkedin"
+                                    rules={{
+                                        required:{value: true, message: 'Linkedin url can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.linkedin?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.industry)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">industry</label>
+                                <Controller
+                                    control={control}
+                                    name="industry"
+                                    rules={{
+                                        required:{value: true, message: 'Industry can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.industry?.message}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl error={Boolean(errors.location)} fullWidth className="!mt-3">
+                                <label className="uppercase !text-xs font-semibold !text-gray-400 tracking-wide" htmlFor="">location</label>
+                                <Controller
+                                    control={control}
+                                    name="location"
+                                    rules={{
+                                        required:{value: true, message: 'Location can not be empty'}
+                                    }}
+                                    render={({field}) => (
+                                        <input {...field} className="border border-slate-200 rounded-lg bg-gray-50 mt-1 w-full p-3 focus:bg-white transition-all duration-300 focus:ring-2 focus:ring-blue-100 focus:border-1 focus:!border-blue-300" />
+                                    )}
+                                />
+                                <FormHelperText>{errors.location?.message}</FormHelperText>
+                            </FormControl>
+                            <div className="mt-5 flex justify-end gap-3">
+                                <button className="border border-slate-300 p-3 rounded-lg bg-white text-gray-500">Cancel</button>
+                                <button className="border border-transparent p-3 rounded-lg bg-blue-600 text-white text-sm font-medium transition-all duration-300 shadow-xl shadow-blue-100 hover:bg-blue-400">
+                                    {loading
+                                        ? "ProcessIng..."
+                                        : "Submit Changes"
+                                    }
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </Modal>
         </>
     )
 }

@@ -7,6 +7,7 @@ import IGetcompaniesBySuggesionUsecase from '../../application/interfaces/usecas
 import ResponseHandler from '../../utilities/response.handler';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IAdminLoadAllCompaniesDataUsecase from '../../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
+import IAdminEditCompanyUsecase from '../../application/interfaces/usecases/company/IAdminEditCompany.usecase';
 
 @injectable()
 export default class CompanyController {
@@ -16,7 +17,8 @@ export default class CompanyController {
     @inject('IAddCompanyUsecase') private _addCompany: IAddCompanyUsecase,
     @inject('IGetcompaniesBySuggesion') private _getCompaniesList: IGetcompaniesBySuggesionUsecase,
     @inject('IAdminLoadAllCompaniesDataUsecase')
-    private _adminLoadAllCompaniesData: IAdminLoadAllCompaniesDataUsecase
+    private _adminLoadAllCompaniesData: IAdminLoadAllCompaniesDataUsecase,
+    @inject('IAdminEditCompanyUsecase') private _adminEditCompany: IAdminEditCompanyUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -78,6 +80,24 @@ export default class CompanyController {
       this._responseHandler.success(
         res,
         StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Companies'),
+        StatusCodes.OK,
+        result
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async adminEditCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const companyId = req.params.id;
+    try {
+      const result = await this._adminEditCompany.execute({
+        _id: companyId as string,
+        ...req.body,
+      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Company'),
         StatusCodes.OK,
         result
       );

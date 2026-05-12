@@ -488,6 +488,8 @@ import IVerifyBeforeManagingApplicationsUsecase from '../application/interfaces/
 import VerifyBeforeManagingApplicationsUsecase from '../application/usecases/recruiter/VerifyBeforeManagingApplications.usecase';
 import IAdminLoadAllCompaniesDataUsecase from '../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
 import AdminLoadAllCompaniesDataUsecase from '../application/usecases/company/AdminLoadCompaniesData.usecase';
+import IAdminEditCompanyUsecase from '../application/interfaces/usecases/company/IAdminEditCompany.usecase';
+import AdminEditCompanyUsecase from '../application/usecases/company/AdminEditCompanyUsecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -585,6 +587,10 @@ container.registerSingleton<IAdminResetUserPasswordUsecase>(
 container.registerSingleton<IManageRecruiterPermissionsUsecase>(
   'IManageRecruiterPermissions',
   ManageRecruiterPermissionsUsecase
+);
+container.registerSingleton<IAdminEditCompanyUsecase>(
+  'IAdminEditCompanyUsecase',
+  AdminEditCompanyUsecase
 );
 container.registerSingleton<IAdminLoadAllCompaniesDataUsecase>(
   'IAdminLoadAllCompaniesDataUsecase',
