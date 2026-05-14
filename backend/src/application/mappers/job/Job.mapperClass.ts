@@ -174,6 +174,8 @@ export default class JobMapper {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       expiresAt: data.expiresAt,
+      isFlagged: data.isFlagged,
+      status: data.status,
       companyDetails: {
         _id: data.companyProfileDetails?._id,
         name: data.companyProfileDetails?.name,

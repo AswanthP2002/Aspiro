@@ -536,6 +536,7 @@ export interface LoadJobsForPublicData {
   requiredSkills: string[];
   createdAt?: Date;
   updatedAt?: Date;
+  isFlagged?: boolean;
   expiresAt?: string;
   companyDetails?: {
     _id?: string;
