@@ -490,6 +490,9 @@ import IAdminLoadAllCompaniesDataUsecase from '../application/interfaces/usecase
 import AdminLoadAllCompaniesDataUsecase from '../application/usecases/company/AdminLoadCompaniesData.usecase';
 import IAdminEditCompanyUsecase from '../application/interfaces/usecases/company/IAdminEditCompany.usecase';
 import AdminEditCompanyUsecase from '../application/usecases/company/AdminEditCompanyUsecase';
+import ConversationMapper from '../application/mappers/conversations/Conversation.mapperClass';
+import IDeleteConversationUsecase from '../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
+import DeleteConversationUsecase from '../application/usecases/conversation/DeleteConversations.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -876,6 +879,10 @@ container.registerSingleton<IGetConversationsUsecase>(
   'IGetConversationsUsecase',
   GetconversationsUsecase
 );
+container.registerSingleton<IDeleteConversationUsecase>(
+  'IDeleteConversationUsecase',
+  DeleteConversationUsecase
+);
 container.registerSingleton<IInitializeConversation>(
   'IInitializeConversation',
   InitializeConversationUsecase
@@ -1176,5 +1183,6 @@ container.registerSingleton('AlertsMapper', AlertMapper);
 container.registerSingleton('ConnectionRequestMapper', ConnectionRequestMapper);
 container.registerSingleton('PlanMapper', PlanMapper);
 container.registerSingleton('InterviewAIMapper', InterviewAIMapper);
+container.registerSingleton('ConversationMapper', ConversationMapper);
 
 //register socket

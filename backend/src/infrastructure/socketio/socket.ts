@@ -33,7 +33,7 @@ export const initSocket = (server: HttpServer) => {
       console.warn(`Anonymous connection attempt: ${socket.id}`);
       return;
     }
-    //console.log('new user connected', userId, socket.id);
+    console.log('new user connected', userId, socket.id);
 
     socket.data.userId = userId;
     connectionManager.addConnection(userId, socket.id);
@@ -49,10 +49,11 @@ export const initSocket = (server: HttpServer) => {
 
     socket.to('socketcid').emit('message', 'hi');
     socket.on('JOIN_ROOM', (data) => {
-      socket.join(data.targetId);
+      socket.join(data.targetId); //conversation id == targetId
       console.log('User joined room: ', data.targetId);
     });
     socket.on('SEND_PRIVATE_MESSAGE', async (data: Chat) => {
+      console.log('-- inspecting private message from the client --', data);
       const { conversationId, senderId, receiverId, text } = data;
 
       try {
@@ -74,6 +75,7 @@ export const initSocket = (server: HttpServer) => {
           }
         );
 
+        console.log('-- emiting private message --')
         io.to(conversationId as string).emit('RECEIVE_PRIVATE_MESSAGE', newMessage);
       } catch (error: unknown) {
         console.log('Error occured while saving message', error);
@@ -81,11 +83,15 @@ export const initSocket = (server: HttpServer) => {
     });
 
     socket.on('MARK_MESSAGE_AS_READ', async ({ conversationId, userId }) => {
+      console.log('Event occured for reading  message')
+      console.log('Conversation id', conversationId)
+      console.log('userid')
       await ChatDAO.updateMany(
         { conversationId, receiverId: userId, isRead: false },
         { $set: { isRead: true } }
       );
 
+      console.log('Going to emit message read update event')
       io.to(conversationId).emit('MESSAGES_READ_UPDATE', { conversationId, readerId: userId });
     });
 

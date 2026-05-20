@@ -107,7 +107,7 @@ export default function UserPublicProfile() {
     }
 
     const navigateToUserChat = () => {
-       return navigateTo(`/chats`, {state:{_id: userDetails?._id, name: userDetails?.name, email: userDetails?.email}})
+       return navigateTo(`/chats`, {state:{_id: userDetails?._id, name: userDetails?.name, email: userDetails?.email, profilePicture: userDetails?.profilePicture?.cloudinarySecureUrl}})
     }
 
     const sendConnectionRequestToUser = async (userId: string) => {

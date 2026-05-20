@@ -1,4 +1,6 @@
-import Conversation from '../../entities/conversation/conversation.entity';
+import Conversation, {
+  ConversationWithUnreadMessageCount,
+} from '../../entities/conversation/conversation.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface IConversationRepo extends IBaseRepo<Conversation> {
@@ -7,6 +9,6 @@ export default interface IConversationRepo extends IBaseRepo<Conversation> {
     search: string,
     page: number,
     limit: number
-  ): Promise<Conversation[] | null>;
+  ): Promise<ConversationWithUnreadMessageCount[] | null>;
   initializeConversation(senderId: string, recipientId: string): Promise<Conversation | null>;
 }

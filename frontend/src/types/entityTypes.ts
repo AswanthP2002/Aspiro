@@ -168,7 +168,7 @@ export interface UserType {
   summary?: string;
   password?: string;
   dateOfBirth?: string;
-  socialLinks: SocialLinks[];
+  socialLinks?: SocialLinks[]; //required to optional
   location?: {
     city?: string;
     district?: string;
@@ -1121,6 +1121,7 @@ export interface Conversation {
     userInfo?: UserType
     createdAt?: string
     updatedAt?: string
+    unreadMessage?: number
 }
 
 export interface MessageReadBy {

@@ -1,8 +1,11 @@
 import { injectable } from 'tsyringe';
-import Conversation from '../../../domain/entities/conversation/conversation.entity';
+import Conversation, {
+  ConversationWithUnreadMessageCount,
+} from '../../../domain/entities/conversation/conversation.entity';
 import IConversationRepo from '../../../domain/interfaces/user/IConversationRepo';
 import { ConversationDAO } from '../../database/DAOs/user/conversation.dao';
 import BaseRepository from '../baseRepository';
+import mongoose from 'mongoose';
 
 @injectable()
 export default class ConversationRepository
@@ -18,7 +21,7 @@ export default class ConversationRepository
     search: string,
     page: number,
     limit: number
-  ): Promise<Conversation[] | null> {
+  ): Promise<ConversationWithUnreadMessageCount[] | null> {
     const skip = (page - 1) * limit;
 
     const result = await ConversationDAO.aggregate([
@@ -40,6 +43,22 @@ export default class ConversationRepository
           lastMessage: { $first: '$lastMessage' },
           createdAt: { $first: '$createdAt' },
           updatedAt: { $first: '$updatedAt' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'chats',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                isRead: false,
+                receiverId: new mongoose.Types.ObjectId(logedUserId),
+              },
+            },
+          ],
+          as: 'unReadMessage',
         },
       },
       {

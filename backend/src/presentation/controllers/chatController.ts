@@ -8,6 +8,7 @@ import IGetchatsUsecase from '../../application/interfaces/usecases/chat/IGetCha
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IDeleteChatUsecase from '../../application/interfaces/usecases/chat/IDeleteChat.usecase';
 import IDeleteChatForMeUsecase from '../../application/interfaces/usecases/chat/IDeleteChatForMe.usecase';
+import IDeleteConversationUsecase from '../../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
 
 @injectable()
 export default class ChatController {
@@ -16,7 +17,8 @@ export default class ChatController {
     @inject('IInitializeConversation') private _initializeConversation: IInitializeConversation,
     @inject('IGetChatsUsecase') private _getChats: IGetchatsUsecase,
     @inject('IDeleteChatUsecase') private _deleteChat: IDeleteChatUsecase,
-    @inject('IDeleteChatForMeUsecase') private _deleteChatForMe: IDeleteChatForMeUsecase
+    @inject('IDeleteChatForMeUsecase') private _deleteChatForMe: IDeleteChatForMeUsecase,
+    @inject('IDeleteConversationUsecase') private _deleteConversation: IDeleteConversationUsecase
   ) {}
 
   async getConversations(req: Request, res: Response, next: NextFunction): Promise<void> {

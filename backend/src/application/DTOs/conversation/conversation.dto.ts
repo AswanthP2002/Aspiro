@@ -19,3 +19,7 @@ export interface FetchConversationsRequestDTO {
   pageg: number;
   limit: number;
 }
+
+export interface ConversationsWithUnreadCountDTO extends ConversationDTO {
+  unreadMessage: number;
+}

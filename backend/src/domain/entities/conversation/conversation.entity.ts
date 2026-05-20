@@ -1,3 +1,5 @@
+import Chat from '../chat/chat.entity';
+
 export interface ConversationParticipants {
   userId?: string;
   joinedAt: string | Date;
@@ -13,4 +15,8 @@ export default interface Conversation {
   };
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ConversationWithUnreadMessageCount extends Conversation {
+  unReadMessage: Chat[];
 }
