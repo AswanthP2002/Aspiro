@@ -35,21 +35,15 @@ function createChatRouter() {
   );
   chatRouter.patch(
     ChatApiRoutes.DELETE_CHAT_FOR_ME,
-    (req: Request, res: Response, next: NextFunction) => {
-      console.log('Api route also passed by the request going for authentication');
-      next();
-    },
     centralizedAuthentication,
-    (req: Request, res: Response, next: NextFunction) => {
-      console.log('Authorization is also passed by the request going for authorization');
-      next();
-    },
     authorization(['user']),
-    (req: Request, res: Response, next: NextFunction) => {
-      console.log('Authorization is also passed by the request');
-      next();
-    },
     chatController.deleteChatForMe.bind(chatController)
+  );
+  chatRouter.get(
+    ChatApiRoutes.GET_NEW_UNREAD_CONVERSATIONS_COUNT,
+    centralizedAuthentication,
+    authorization(['user']),
+    chatController.getNewUnreadConversationsCount.bind(chatController)
   );
 
   return chatRouter;

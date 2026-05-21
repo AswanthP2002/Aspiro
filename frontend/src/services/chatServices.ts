@@ -62,3 +62,18 @@ export const deleteChatForMe = async (chatId: string) => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const getNewUnreadConversationsCount = async () => {
+    try {
+        const response = await axiosInstance.get(ChatEndpoints.GET_NEW_UNREAD_CONVERSATIONS_COUNT,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

@@ -75,7 +75,11 @@ export const initSocket = (server: HttpServer) => {
           }
         );
 
-        console.log('-- emiting private message --')
+        //emitting notification to the receivers socket
+        const reciversSocket = connectionManager.getSockets(data.receiverId as string);
+        reciversSocket.forEach((s) => {
+          io.to(s).emit('NEW_MESSAGE_RECEIVED', newMessage);
+        });
         io.to(conversationId as string).emit('RECEIVE_PRIVATE_MESSAGE', newMessage);
       } catch (error: unknown) {
         console.log('Error occured while saving message', error);
@@ -83,15 +87,15 @@ export const initSocket = (server: HttpServer) => {
     });
 
     socket.on('MARK_MESSAGE_AS_READ', async ({ conversationId, userId }) => {
-      console.log('Event occured for reading  message')
-      console.log('Conversation id', conversationId)
-      console.log('userid')
+      // console.log('Event occured for reading  message')
+      // console.log('Conversation id', conversationId)
+      // console.log('userid')
       await ChatDAO.updateMany(
         { conversationId, receiverId: userId, isRead: false },
         { $set: { isRead: true } }
       );
 
-      console.log('Going to emit message read update event')
+      console.log('Going to emit message read update event');
       io.to(conversationId).emit('MESSAGES_READ_UPDATE', { conversationId, readerId: userId });
     });
 

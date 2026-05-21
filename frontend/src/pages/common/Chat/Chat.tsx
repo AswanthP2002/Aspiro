@@ -220,6 +220,38 @@ export default function ChatPage() {
 
     }, [selectedConversation?._id])
 
+    //a temporary useeffect for live updating unread message count for each chat
+    useEffect(() => {
+      if(!tempSocket){
+        return
+      }
+
+      tempSocket.on('NEW_MESSAGE_RECEIVED', (message: Chat) => {
+        let i = 1
+        console.log('checking i value', i++)
+        console.log('-- checking upcoming message from the bakcend', message)
+        toast.info('New message received')
+        setConversations((conversations: Conversation[]) => {
+          return conversations.map((conv) => {
+            if(conv._id === message.conversationId){
+              return {
+                ...conv,
+                unreadMessage: conv.unreadMessage + 1,
+                lastMessage:{
+                  text: message.text,
+                  senderId: message.senderId,
+                  sendAt: message.createdAt
+                },
+                updatedAt: new Date().toISOString(),
+              }
+            }else{
+              return conv
+            }
+          })
+        })
+      })
+    }, [tempSocket])
+
 
     // useEffect(() => {
     //   console.log('This useeffect will run when selected conversation OR chating person changed')

@@ -1,6 +1,6 @@
 
 import { Route, Routes, useLocation } from 'react-router-dom';
-import {ToastContainer, Bounce} from 'react-toastify'
+import {ToastContainer, Bounce, toast} from 'react-toastify'
 import './App.css';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
@@ -116,6 +116,7 @@ import InterviewPage from './pages/user/Aspiro-career/AI-Interviews/InterviewPag
 import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/InterviewResultPage';
 import InterviewDashboardPage from './pages/user/Aspiro-career/AI-Interviews/Dashboard';
 import CompaniesPage from './pages/admin/Companies/Companies';
+import { newUnreadConversationsCountFetchThunk } from './redux/chatSlice';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -158,6 +159,13 @@ function App() {
   useEffect(() => {
     store.dispatch(reAuthenticateThunk())
   }, [])
+
+  useEffect(() => {
+    if(logedUser?._id && logedUser.role === 'user'){
+      toast.info('dispatching unread chat thunk')
+      store.dispatch(newUnreadConversationsCountFetchThunk())
+    }
+  }, [logedUser?._id])
 
   useEffect(() => {
     console.log('--This is from app.tsx useeffect for socket')

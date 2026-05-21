@@ -9,17 +9,24 @@ import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IDeleteChatUsecase from '../../application/interfaces/usecases/chat/IDeleteChat.usecase';
 import IDeleteChatForMeUsecase from '../../application/interfaces/usecases/chat/IDeleteChatForMe.usecase';
 import IDeleteConversationUsecase from '../../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
+import IGetNewUnreadConversationsCount from '../../application/interfaces/usecases/conversation/IGetNewUnreadConversationsCount.usecase';
+import ResponseHandler from '../../utilities/response.handler';
 
 @injectable()
 export default class ChatController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('IGetConversationsUsecase') private _getConversations: IGetConversationsUsecase,
     @inject('IInitializeConversation') private _initializeConversation: IInitializeConversation,
     @inject('IGetChatsUsecase') private _getChats: IGetchatsUsecase,
     @inject('IDeleteChatUsecase') private _deleteChat: IDeleteChatUsecase,
     @inject('IDeleteChatForMeUsecase') private _deleteChatForMe: IDeleteChatForMeUsecase,
-    @inject('IDeleteConversationUsecase') private _deleteConversation: IDeleteConversationUsecase
-  ) {}
+    @inject('IDeleteConversationUsecase') private _deleteConversation: IDeleteConversationUsecase,
+    @inject('IGetNewUnreadConversationsCountUsecase')
+    private _getNewUnreadChatsCount: IGetNewUnreadConversationsCount
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async getConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
@@ -99,6 +106,25 @@ export default class ChatController {
         result,
       });
     } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async getNewUnreadConversationsCount(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._getNewUnreadChatsCount.execute(userId);
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Chats count'),
+        StatusCodes.OK,
+        result
+      );
+    } catch (error) {
       next(error);
     }
   }

@@ -493,6 +493,8 @@ import AdminEditCompanyUsecase from '../application/usecases/company/AdminEditCo
 import ConversationMapper from '../application/mappers/conversations/Conversation.mapperClass';
 import IDeleteConversationUsecase from '../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
 import DeleteConversationUsecase from '../application/usecases/conversation/DeleteConversations.usecase';
+import IGetNewUnreadConversationsCount from '../application/interfaces/usecases/conversation/IGetNewUnreadConversationsCount.usecase';
+import GetNewUnreadConversationsCountUsecase from '../application/usecases/conversation/GetNewUnreadConversationsCount.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -883,6 +885,10 @@ container.registerSingleton<IDeleteConversationUsecase>(
   'IDeleteConversationUsecase',
   DeleteConversationUsecase
 );
+container.registerSingleton<IGetNewUnreadConversationsCount>(
+  'IGetNewUnreadConversationsCountUsecase',
+  GetNewUnreadConversationsCountUsecase
+)
 container.registerSingleton<IInitializeConversation>(
   'IInitializeConversation',
   InitializeConversationUsecase

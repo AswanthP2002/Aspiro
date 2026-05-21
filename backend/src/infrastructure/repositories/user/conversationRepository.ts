@@ -65,6 +65,7 @@ export default class ConversationRepository
         $match: {
           $expr: { $gte: [{ $size: '$participants' }, 2] },
           'participants.name': { $regex: new RegExp(search, 'i') },
+          'participants._id': new mongoose.Types.ObjectId(logedUserId),
         },
       },
       { $sort: { updatedAt: -1 } },
@@ -124,5 +125,36 @@ export default class ConversationRepository
     }
 
     return conversation;
+  }
+
+  async getUnreadConversationsCount(logedUserId: string): Promise<number | null> {
+    if (!mongoose.isValidObjectId(logedUserId)) return null;
+    const result = await ConversationDAO.aggregate([
+      {
+        $lookup: {
+          from: 'chats',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                isRead: false,
+                receiverId: new mongoose.Types.ObjectId(logedUserId),
+              },
+            },
+          ],
+          as: 'chats',
+        },
+      },
+      {
+        $match: {
+          $expr: { $gt: [{ $size: '$chats' }, 0] },
+        },
+      },
+      { $count: 'newMessagesCount' },
+    ]);
+
+    const count = result[0]?.newMessagesCount;
+    return count;
   }
 }
