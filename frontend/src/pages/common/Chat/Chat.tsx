@@ -10,12 +10,13 @@ import { useLocation } from "react-router-dom";
 import { getSocket } from "../../../socket";
 import { getConversations, getChats, deleteChat, deleteChatForMe } from "../../../services/chatServices";
 import { initializeConversation } from "../../../services/userServices";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AxiosError } from "axios";
+import { newUnreadChatArrived, openedUnreadChat } from "../../../redux/chatSlice";
 // import { SocketContext } from "../../../context/SocketContext";
 
 interface FetchConversationsResponsePayload {
@@ -54,6 +55,8 @@ export default function ChatPage() {
     const logedUser = useSelector((state: {userAuth: {user:{_id: string, email: string, name: string}}}) => {
       return state.userAuth.user
     })
+
+    const dispatch = useDispatch()
 
     const tempSocket = getSocket()
     
@@ -214,7 +217,23 @@ export default function ChatPage() {
       }
 
       tempSocket.emit('MARK_MESSAGE_AS_READ', {conversationId: selectedConversation._id, userId: logedUser._id})
-      // toast.info('Message readed by me')
+      //if that selected conversation hav any unread messages i should set the unread count 0 and global newUnread count minus one
+      if(selectedConversation.unreadMessage && selectedConversation.unreadMessage > 0){
+        setConversations((conversations: Conversation[]) => {
+          return conversations.map((conv) => {
+            if(conv._id === selectedConversation._id){
+              return {
+                ...conv,
+                unreadMessage: 0
+              }
+            }else{
+              return conv
+            }
+          })
+        })
+        
+        dispatch(openedUnreadChat({conversationId:selectedConversation._id as string}))
+      }
 
       return () => tempSocket.off('MARK_MESSAGE_AS_READ')
 
@@ -231,6 +250,7 @@ export default function ChatPage() {
         console.log('checking i value', i++)
         console.log('-- checking upcoming message from the bakcend', message)
         toast.info('New message received')
+        // dispatch(newUnreadChatArrived({conversationId: message.conversationId as string}))
         setConversations((conversations: Conversation[]) => {
           return conversations.map((conv) => {
             if(conv._id === message.conversationId){
@@ -709,7 +729,7 @@ export default function ChatPage() {
                     <p className={`text-sm font-semibold truncate ${isSelected ? "text-white" : "text-gray-900"}`}>{partner?.name || 'User'}</p>
                     <span className={`text-[10px] ${isSelected ? "text-blue-100" : "text-gray-400"}`}>{timeLineForMessages(conv.updatedAt)}</span>
                   </div>
-                  <p className={`text-xs truncate mt-0.5 ${isSelected ? "text-blue-50" : "text-gray-500"}`}>
+                  <p className={`text-xs truncate w-[70%] mt-0.5 ${isSelected ? "text-blue-50" : "text-gray-500"}`}>
                     {conv?.lastMessage?.text || 'Start a conversation'}
                   </p>
                   {/* <p>Checking {conv.unreadMessage}</p> */}

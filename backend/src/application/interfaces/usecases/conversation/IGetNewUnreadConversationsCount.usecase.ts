@@ -1,3 +1,3 @@
 export default interface IGetNewUnreadConversationsCount {
-  execute(logedUserId: string): Promise<number | null>;
+  execute(logedUserId: string): Promise<{ conversationIds: string[]; count: number } | null>;
 }

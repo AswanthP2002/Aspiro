@@ -11,5 +11,5 @@ export default interface IConversationRepo extends IBaseRepo<Conversation> {
     limit: number
   ): Promise<ConversationWithUnreadMessageCount[] | null>;
   initializeConversation(senderId: string, recipientId: string): Promise<Conversation | null>;
-  getUnreadConversationsCount(logedUserId: string): Promise<number | null>;
+  getUnreadConversationsCount(logedUserId: string): Promise<{ _id?: string }[] | null>;
 }

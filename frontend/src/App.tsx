@@ -75,7 +75,7 @@ import UsersFindingPage from './pages/user/Users/Users';
 import { AnimatePresence } from 'motion/react';
 import AlertsPage from './pages/user/Alerts/Alerts';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alerts, Notification } from './types/entityTypes';
+import { Alerts, Chat, Notification } from './types/entityTypes';
 // import { setAlerts, unreadAlertsCountThunk } from './redux/alertSlice';
 // import { fetchUserAlerts } from './services/alertsServices';
 // import { getNotifications } from './services/userServices';
@@ -116,7 +116,7 @@ import InterviewPage from './pages/user/Aspiro-career/AI-Interviews/InterviewPag
 import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/InterviewResultPage';
 import InterviewDashboardPage from './pages/user/Aspiro-career/AI-Interviews/Dashboard';
 import CompaniesPage from './pages/admin/Companies/Companies';
-import { newUnreadConversationsCountFetchThunk } from './redux/chatSlice';
+import { newUnreadChatArrived, newUnreadConversationsCountFetchThunk } from './redux/chatSlice';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -200,12 +200,17 @@ function App() {
         dispatch(addLiveNotification({notification}))
       })
 
+      socket.on('NEW_MESSAGE_RECEIVED', (message: Chat) => {
+        dispatch(newUnreadChatArrived({conversationId: message.conversationId as string}))
+      })
+
       //Cleanups
       return () => {
         socket.off(SocketEvents.FOLLOWED)
         socket.off(SocketEvents.CONNECTION_REQUEST)
         socket.off(SocketEvents.CONNECTION_REQUEST_CANCELLED)
         socket.off(SocketEvents.CONNECTION_REQUEST_ACCEPTED)
+        socket.off('NEW_MESSAGE_RECEIVED')
       }
     }
   }, [logedUser, dispatch])

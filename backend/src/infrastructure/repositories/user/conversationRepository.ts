@@ -127,7 +127,7 @@ export default class ConversationRepository
     return conversation;
   }
 
-  async getUnreadConversationsCount(logedUserId: string): Promise<number | null> {
+  async getUnreadConversationsCount(logedUserId: string): Promise<{ _id?: string }[] | null> {
     if (!mongoose.isValidObjectId(logedUserId)) return null;
     const result = await ConversationDAO.aggregate([
       {
@@ -151,10 +151,9 @@ export default class ConversationRepository
           $expr: { $gt: [{ $size: '$chats' }, 0] },
         },
       },
-      { $count: 'newMessagesCount' },
+      { $project: { _id: 1 } },
     ]);
 
-    const count = result[0]?.newMessagesCount;
-    return count;
+    return result;
   }
 }
