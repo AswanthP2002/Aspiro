@@ -17,6 +17,7 @@ import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AxiosError } from "axios";
 import { newUnreadChatArrived, openedUnreadChat } from "../../../redux/chatSlice";
+import BouncingLoader from "../../../components/common/Bouncing.loader";
 // import { SocketContext } from "../../../context/SocketContext";
 
 interface FetchConversationsResponsePayload {
@@ -39,6 +40,7 @@ interface LoadChatsResponsePayload {
 
 export default function ChatPage() {
     const messageEndRef = useRef<HTMLDivElement | null>(null)
+    const messageBoxRef = useRef<HTMLInputElement | null>(null)
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(5)
@@ -49,6 +51,7 @@ export default function ChatPage() {
     const [chatText, setChatText] = useState('')
     const [chatingPerson, setChatingPerson] = useState<UserType | null>(null)
     const [onlineUsers, setOnlineUsers] = useState<string[]>([])
+    const [typingUsers, setTypingUsers] = useState<string[]>([])
     const location = useLocation()
     const {_id, name, email, profilePicture} = location.state || {} 
 
@@ -88,6 +91,20 @@ export default function ChatPage() {
           const err = error as AxiosError<{message: string}>
           const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
         }
+      }
+    }
+
+    const userTyping = () => {
+      toast.info('Im typing now')
+      if(tempSocket){
+        tempSocket.emit('USER_TYPING', {userId: logedUser._id})
+      }
+    }
+
+    const userStopedTyping = () => {
+      toast.info('I stoped typing')
+      if(tempSocket){
+        tempSocket.emit('USER_SOTOP_TYPING', {userId: logedUser._id})
       }
     }
 
@@ -271,6 +288,9 @@ export default function ChatPage() {
         })
       })
     }, [tempSocket])
+
+    console.log('-- checking typing users --', typingUsers)
+
 
 
     // useEffect(() => {
@@ -679,6 +699,43 @@ export default function ChatPage() {
     
   }
 
+  useEffect(() => {
+    console.log('This component mounted -status checking useeffect')
+      if(!tempSocket) return
+
+      tempSocket.on('USER_STATUS_CHANGED', (data: {userId:string, status: string}) => {
+        console.log(`User ${data.userId} status changed - ${data.status}`, data)
+        if(data.status === 'online' && !onlineUsers.includes(data.userId)){
+          setOnlineUsers((prv) => {
+            return [...prv, data.userId]
+          })
+        }else if(data.status === 'offline'){
+          setOnlineUsers((prv) => prv.filter((uid) => uid !== data.userId))
+        }
+      })
+
+      tempSocket.on('OTHER_PERSON_TYPING', (data: {userId: string}) => {
+        console.log(`${data.userId} started typing...`)
+        if(!onlineUsers.includes(data.userId)){
+          setTypingUsers((prv) => {
+            return [...prv, data.userId]
+          })
+        }
+      })
+
+      tempSocket.on('OTHER_PERSON_STOP_TYPING', (data: {userId: string}) => {
+        console.log(`${data.userId} stop typing!`)
+        setTypingUsers((prv) => prv.filter((uid) => uid !== data.userId))
+      })
+
+      return () => {
+        tempSocket.off('USER_STATUS_CHANGED')
+        tempSocket.off('OTHER_PERSON_TYPING')
+        tempSocket.off('OTHER_PERSON_STOP_TYPING')
+      }
+
+  }, [tempSocket])
+
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
   <div className="w-full grid grid-cols-12 h-[calc(100vh-120px)] min-h-[600px]">
@@ -776,7 +833,7 @@ export default function ChatPage() {
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-800 leading-none">{chatingPerson?.name}</p>
-                <p className="text-[11px] text-green-500 font-medium mt-1">Online</p>
+                <p className="text-[11px] text-green-500 font-medium mt-1">{onlineUsers.includes(chatingPerson?._id as string) ? "Online" : null}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-gray-400">
@@ -815,6 +872,14 @@ export default function ChatPage() {
                 // </div>
               );
             })}
+            {typingUsers.includes(chatingPerson?._id as string)
+              ? <>
+                <div>
+              <BouncingLoader />
+            </div>
+              </>
+              : null
+            }
             <div ref={messageEndRef} />
           </div>
 
@@ -823,6 +888,8 @@ export default function ChatPage() {
             <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-2 pl-4 border border-gray-100 focus-within:border-blue-200 focus-within:bg-white transition-all">
               <button className="text-gray-400 hover:text-blue-600"><HiPaperClip size={20} /></button>
               <input 
+                onFocus={userTyping}
+                onBlur={userStopedTyping}
                 onChange={(e) => setChatText(e.target.value)} 
                 value={chatText} 
                 type="text" 

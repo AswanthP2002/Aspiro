@@ -38,6 +38,7 @@ export const initSocket = (server: HttpServer) => {
     socket.data.userId = userId;
     connectionManager.addConnection(userId, socket.id);
     //message to the client for testing
+    console.log('Going to emit user status changed');
     io.emit('USER_STATUS_CHANGED', { userId, status: 'online' });
 
     socket.emit('message', 'hello from server');
@@ -84,6 +85,16 @@ export const initSocket = (server: HttpServer) => {
       } catch (error: unknown) {
         console.log('Error occured while saving message', error);
       }
+    });
+
+    socket.on('USER_TYPING', (data: { userId: string }) => {
+      console.log('typing user id ', data.userId);
+      io.emit('OTHER_PERSON_TYPING', { userId: data.userId });
+    });
+
+    socket.on('USER_SOTOP_TYPING', (data: { userId: string }) => {
+      console.log('typing stoped user id', data.userId);
+      io.emit('OTHER_PERSON_STOP_TYPING', { userId: data.userId });
     });
 
     socket.on('MARK_MESSAGE_AS_READ', async ({ conversationId, userId }) => {
