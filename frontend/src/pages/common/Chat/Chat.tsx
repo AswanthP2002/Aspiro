@@ -55,7 +55,7 @@ export default function ChatPage() {
     const location = useLocation()
     const {_id, name, email, profilePicture} = location.state || {} 
 
-    const logedUser = useSelector((state: {userAuth: {user:{_id: string, email: string, name: string}}}) => {
+    const logedUser = useSelector((state: {userAuth: {user:{_id: string, email: string, name: string, profilePicture: string}}}) => {
       return state.userAuth.user
     })
 
@@ -69,10 +69,18 @@ export default function ChatPage() {
       const socket = getSocket()
       if(!socket) return
       socket.emit('SEND_PRIVATE_MESSAGE', {
+        message: {
         conversationId: selectedConversation?._id,
         senderId: logedUser._id,
         receiverId: chatingPerson?._id,
         text: chatText
+      },
+      sender: {
+        _id: logedUser._id,
+        name: logedUser.name,
+        email: logedUser.email,
+        profilePicture:{cloudinarySecureUrl: logedUser.profilePicture}
+      } as UserType
       })
       setChatText('')
     }
@@ -95,14 +103,14 @@ export default function ChatPage() {
     }
 
     const userTyping = () => {
-      toast.info('Im typing now')
+      // toast.info('Im typing now')
       if(tempSocket){
         tempSocket.emit('USER_TYPING', {userId: logedUser._id})
       }
     }
 
     const userStopedTyping = () => {
-      toast.info('I stoped typing')
+      // toast.info('I stoped typing')
       if(tempSocket){
         tempSocket.emit('USER_SOTOP_TYPING', {userId: logedUser._id})
       }
@@ -112,7 +120,7 @@ export default function ChatPage() {
       async function fetchConversations(){
         try {
           const conversationsResult: FetchConversationsResponsePayload = await getConversations(search, page, limit)
-          console.log('-- conversations result --', conversationsResult.result)
+          // console.log('-- conversations result --', conversationsResult.result)
           const conversations = conversationsResult.result
           setConversations(conversations)
           
@@ -123,10 +131,10 @@ export default function ChatPage() {
               }
             });
 
-            console.log('-- checking if conversation already exist -- ', convAlreadyExist)
+            // console.log('-- checking if conversation already exist -- ', convAlreadyExist)
 
             if (convAlreadyExist) {
-              console.log('-- conversation already exist -- continuing with it')
+              // console.log('-- conversation already exist -- continuing with it')
               setSelectedConversation(convAlreadyExist);
               
               setChatingPerson({
@@ -136,10 +144,10 @@ export default function ChatPage() {
                 profilePicture: { cloudinarySecureUrl: profilePicture },
               });
             }else{
-              console.log('-- conversation does not exist -- creating new one')
+              // console.log('-- conversation does not exist -- creating new one')
               const newConv: InitializeConversationResponsePayload = await initializeConversation(_id)
-              console.log('-- checking new conversation innitialization result --', newConv)
-              console.log('-- inspecting chating person redirected data before seting it to chating person --', _id, name, email, profilePicture)
+              // console.log('-- checking new conversation innitialization result --', newConv)
+              // console.log('-- inspecting chating person redirected data before seting it to chating person --', _id, name, email, profilePicture)
               setChatingPerson({_id: _id, name: name, email: email, profilePicture:{cloudinarySecureUrl: profilePicture}})
               setSelectedConversation(newConv.result)
             }
@@ -165,7 +173,8 @@ export default function ChatPage() {
         
         tempSocket.on('RECEIVE_PRIVATE_MESSAGE', (message: Chat) => {
           //update conversations last message
-          console.log('-- inspecting message from socket --', message)
+          // toast.info(`New Private message received conversatin id ${message.conversationId}`)
+          // console.log('-- inspecting message from socket --', message)
           setConversations((conv: Conversation[]) => {
             return conv.map((conversation: Conversation) => {
               if(conversation._id === message.conversationId){
@@ -258,38 +267,102 @@ export default function ChatPage() {
 
     //a temporary useeffect for live updating unread message count for each chat
     useEffect(() => {
-      if(!tempSocket){
-        return
+      if (!tempSocket) {
+        return;
       }
 
-      tempSocket.on('NEW_MESSAGE_RECEIVED', (message: Chat) => {
-        let i = 1
-        console.log('checking i value', i++)
-        console.log('-- checking upcoming message from the bakcend', message)
-        toast.info('New message received')
-        // dispatch(newUnreadChatArrived({conversationId: message.conversationId as string}))
+      tempSocket.on('NEW_MESSAGE_RECEIVED', (data: { message: Chat; sender: UserType }) => {
+        console.log('-- checking upcoming data message --', data.message);
         setConversations((conversations: Conversation[]) => {
-          return conversations.map((conv) => {
-            if(conv._id === message.conversationId){
-              return {
-                ...conv,
-                unreadMessage: conv.unreadMessage + 1,
-                lastMessage:{
-                  text: message.text,
-                  senderId: message.senderId,
-                  sendAt: message.createdAt
-                },
-                updatedAt: new Date().toISOString(),
+          const isConversationAlreadyExist = conversations.find(
+            (conv) => conv._id === data.message.conversationId
+          );
+          if (isConversationAlreadyExist) {
+            return conversations.map((conv) => {
+              if (conv._id === data.message.conversationId) {
+                return {
+                  ...conv,
+                  unreadMessage: conv.unreadMessage + 1,
+                  lastMessage: {
+                    text: data.message.text,
+                    senderId: data.message.senderId,
+                    sendAt: data.message.createdAt,
+                  },
+                  updatedAt: new Date().toISOString(),
+                };
+              } else {
+                return conv;
               }
-            }else{
-              return conv
-            }
-          })
-        })
-      })
-    }, [tempSocket])
+            });
+          } else {
+            return [
+              {
+                _id: data.message.conversationId,
+                unreadMessage: 1,
+                lastMessage: {
+                  text: data.message.text,
+                  senderId: data.message.senderId,
+                  sendAt: data.message.createdAt,
+                },
+                // createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                participants: [
+                  { _id: logedUser._id, email: logedUser.email, name: logedUser.name },
+                  {
+                    _id: data.sender._id,
+                    name: data.sender.name,
+                    email: data.sender.email,
+                    profilePicture: data.sender.profilePicture,
+                  },
+                ],
+              },
+              ...conversations,
+            ];
+          }
+        });
+        // const conversationAlreadyExist = conversations.find((conv) => conv._id === data.message.conversationId)
+        // toast.success(`Live chat conversation id ${data.message.conversationId}`)
+        // if(conversationAlreadyExist){
+        //   toast.warn('Conversation already exist -MERGING')
 
-    console.log('-- checking typing users --', typingUsers)
+        // }else {
+        //   toast.error('Conversation does not exist -DUPLICATE')
+        //   setConversations((prvConversations: Conversation[]) => {
+        //     return [
+        //       {
+        //         _id: data.message.conversationId,
+        //         unreadMessage: 1,
+        //         lastMessage:{
+        //           text: data.message.text,
+        //           senderId: data.message.senderId,
+        //           sendAt: data.message.createdAt
+        //         },
+        //         // createdAt: new Date().toISOString(),
+        //         updatedAt: new Date().toISOString(),
+        //         participants:[
+        //           {_id: logedUser._id, email: logedUser.email, name: logedUser.name},
+        //           {_id: data.sender._id, name: data.sender.name, email: data.sender.email, profilePicture: data.sender.profilePicture}
+        //         ]
+        //       },
+        //       ...prvConversations
+        //     ]
+        //   })
+        // }
+      });
+
+      return () => tempSocket.off('NEW_MESSAGE_RECEIVED');
+    }, [tempSocket]);
+
+    useEffect(() => {
+      if(messageEndRef.current){
+        messageEndRef.current.scrollTo({
+          top: messageEndRef.current.scrollHeight,
+          behavior: 'smooth'
+        })
+      }
+    }, [conversations])
+
+    // console.log('-- checking typing users --', typingUsers)
 
 
 
@@ -600,7 +673,7 @@ export default function ChatPage() {
     if(!isConfirmed) return
 
     try {
-      await deleteChat(chatId)
+      await deleteChat(chatId, selectedConversation?._id as string, chatingPerson?._id as string)
       seetMessages((chats: Chat[]) => {
         return chats.filter((chat: Chat) => chatId !== chat._id)
       })
@@ -728,10 +801,18 @@ export default function ChatPage() {
         setTypingUsers((prv) => prv.filter((uid) => uid !== data.userId))
       })
 
+      tempSocket.on('CHAT_DELETE_FOR_ALL', (data: {chatId: string, userId: string, conversationId: string}) => {
+        // toast.info('Other user deleted a chat')
+        seetMessages((prv) => {
+          return prv.filter((chat) => chat._id !== data.chatId)
+        })
+      })
+
       return () => {
         tempSocket.off('USER_STATUS_CHANGED')
         tempSocket.off('OTHER_PERSON_TYPING')
         tempSocket.off('OTHER_PERSON_STOP_TYPING')
+        tempSocket.off('CHAT_DELETED_FOR_ALL')
       }
 
   }, [tempSocket])
@@ -759,6 +840,7 @@ export default function ChatPage() {
             const partner = conv?.participants?.find((p: UserType) => p._id !== logedUser._id)
             const isSelected = selectedConversation?._id === conv._id;
             const isOnline = onlineUsers.includes(partner?._id as string);
+            const isTyping = typingUsers.includes(partner?._id as string);
 
             return (
               <div 
@@ -786,9 +868,12 @@ export default function ChatPage() {
                     <p className={`text-sm font-semibold truncate ${isSelected ? "text-white" : "text-gray-900"}`}>{partner?.name || 'User'}</p>
                     <span className={`text-[10px] ${isSelected ? "text-blue-100" : "text-gray-400"}`}>{timeLineForMessages(conv.updatedAt)}</span>
                   </div>
-                  <p className={`text-xs truncate w-[70%] mt-0.5 ${isSelected ? "text-blue-50" : "text-gray-500"}`}>
+                  {isTyping
+                    ? <p className="text-blue-600 text-xs font-medium transition-all duration-300">typing...</p>
+                    : <p className={`text-xs truncate w-[70%] mt-0.5 ${isSelected ? "text-blue-50" : "text-gray-500"}`}>
                     {conv?.lastMessage?.text || 'Start a conversation'}
                   </p>
+                  }
                   {/* <p>Checking {conv.unreadMessage}</p> */}
                   <div className="flex gap-2 absolute right-0 bottom-0">
                     {(conv.unreadMessage > 0) && (
@@ -844,7 +929,7 @@ export default function ChatPage() {
           </div>
           
           {/* Message Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#f8fafc] custom-scrollbar">
+          <div ref={messageEndRef} className="flex-1 overflow-y-auto max-h-[450px] p-6 space-y-4 bg-[#f8fafc] custom-scrollbar">
             {messages.map((message: Chat, index: number) => {
               const isMe = message.senderId === logedUser._id;
               return (
@@ -880,7 +965,7 @@ export default function ChatPage() {
               </>
               : null
             }
-            <div ref={messageEndRef} />
+            <div />
           </div>
 
           {/* Input Area */}

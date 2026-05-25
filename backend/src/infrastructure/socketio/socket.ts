@@ -8,6 +8,7 @@ import { ChatDAO } from '../database/Schemas/user/chat.schema';
 import { ConversationDAO } from '../database/DAOs/user/conversation.dao';
 import mongoose from 'mongoose';
 import { Server as HttpServer } from 'http';
+import User from '../../domain/entities/user/User.FIX';
 
 export const initSocket = (server: HttpServer) => {
   console.log('socket initialization called');
@@ -53,9 +54,9 @@ export const initSocket = (server: HttpServer) => {
       socket.join(data.targetId); //conversation id == targetId
       console.log('User joined room: ', data.targetId);
     });
-    socket.on('SEND_PRIVATE_MESSAGE', async (data: Chat) => {
+    socket.on('SEND_PRIVATE_MESSAGE', async (data: { message: Chat; sender: User }) => {
       console.log('-- inspecting private message from the client --', data);
-      const { conversationId, senderId, receiverId, text } = data;
+      const { conversationId, senderId, receiverId, text } = data.message;
 
       try {
         const newMessage = await ChatDAO.create({
@@ -77,9 +78,9 @@ export const initSocket = (server: HttpServer) => {
         );
 
         //emitting notification to the receivers socket
-        const reciversSocket = connectionManager.getSockets(data.receiverId as string);
+        const reciversSocket = connectionManager.getSockets(data.message.receiverId as string);
         reciversSocket.forEach((s) => {
-          io.to(s).emit('NEW_MESSAGE_RECEIVED', newMessage);
+          io.to(s).emit('NEW_MESSAGE_RECEIVED', { message: newMessage, sender: data.sender });
         });
         io.to(conversationId as string).emit('RECEIVE_PRIVATE_MESSAGE', newMessage);
       } catch (error: unknown) {

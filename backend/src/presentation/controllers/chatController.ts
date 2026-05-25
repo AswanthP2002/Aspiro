@@ -82,9 +82,15 @@ export default class ChatController {
 
   async deleteChat(req: Request, res: Response, next: NextFunction): Promise<void> {
     const chatId = req.params.chatId;
+    const conversationId = req.query.conversationId;
+    const chatingPersonId = req.query.chattingPersonId;
 
     try {
-      await this._deleteChat.execute(chatId);
+      await this._deleteChat.execute({
+        chatId,
+        conversationId: conversationId as string,
+        chattingPersonId: chatingPersonId as string,
+      });
       res.status(StatusCodes.OK).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Chats'),

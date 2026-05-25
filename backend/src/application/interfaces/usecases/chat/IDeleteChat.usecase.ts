@@ -1,3 +1,5 @@
+import ChatDeleteForAll from '../../../DTOs/chat/deleteChatForAll.dto';
+
 export default interface IDeleteChatUsecase {
-  execute(chatId: string): Promise<void>;
+  execute(dto: ChatDeleteForAll): Promise<void>;
 }

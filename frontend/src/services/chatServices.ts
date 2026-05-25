@@ -32,11 +32,12 @@ export const getChats = async (conversationId: string) => {
     }
 }
 
-export const deleteChat = async (chatId: string) => {
+export const deleteChat = async (chatId: string, conversationId: string, chattingPersonId: string) => {
     try {
         const response = await axiosInstance.delete(ChatEndpoints.DELETE_CHAT_BY_ID(chatId),
             
             {   
+                params:{conversationId, chattingPersonId},
                 sendAuthToken: true
             } as AxiosRequest
         )
