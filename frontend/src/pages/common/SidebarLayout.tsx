@@ -155,9 +155,11 @@ export default function CommonLayout() {
             <Outlet />
           </div>
 
-          <div className="hidden lg:block w-90 px-3">
+          {!window.location.href.includes('chats') && (
+            <div className="hidden lg:block w-90 px-3">
             <SuggessionBar />
           </div>
+          )}
         </div>
       </div>
     </div>

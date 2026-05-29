@@ -1,7 +1,8 @@
-import ConversationDTO, {
+import {
+  ConversationsWithUnreadCountDTO,
   FetchConversationsRequestDTO,
 } from '../../../DTOs/conversation/conversation.dto';
 
 export default interface IGetConversationsUsecase {
-  execute(dto: FetchConversationsRequestDTO): Promise<ConversationDTO[] | null>;
+  execute(dto: FetchConversationsRequestDTO): Promise<ConversationsWithUnreadCountDTO[] | null>;
 }

@@ -5,12 +5,13 @@ import { UserPosts } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
 import { CiImageOn, CiVideoOn } from "react-icons/ci"
 import { Controller, useForm } from "react-hook-form";
-import { FormControl, FormHelperText, Skeleton } from "@mui/material";
+import { FormControl, FormHelperText, Modal, Skeleton } from "@mui/material";
 import { FaCircleXmark } from "react-icons/fa6";
 import { PostContext } from "../../../context/PostContext";
 import Post from "../../../components/common/Post";
 import { toast } from "react-toastify";
 import { GoFileMedia } from "react-icons/go";
+import { LuSearch, LuShare2, LuX } from "react-icons/lu";
 
 interface CreatePostResponsePayload {
     success: boolean
@@ -23,6 +24,7 @@ interface RootState {
         user: {
             _id: string
             profilePicture: string,
+            headline: string,
             name: string
         }
     }
@@ -127,10 +129,13 @@ export default function Feed() {
                         {
                             ...result.result,
                             userDetails:{
+                                _id: currentlyLogedUserDetails._id,
                                 name: currentlyLogedUserDetails.name,
+                                headline: currentlyLogedUserDetails.headline,
                                 profilePicture:{
                                     cloudinarySecureUrl: currentlyLogedUserDetails.profilePicture
-                                }
+                                },
+                                
                             }
                         }, 
                         ...(prev || [])
@@ -306,11 +311,11 @@ export default function Feed() {
                         <p className="text-xs text-gray-500 mt-2">No post available</p>
                     </div>
                 )}
-                
             </div>
             
         </div>
         
+        {/* <ShareModal /> */}
         </>
     )
 }
@@ -320,5 +325,51 @@ export function ProgressBar({progress}: {progress: number}){
         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-400 overflow-hidden">
             <div className="bg-blue-600 h-2.5 transition-all duration-300 ease-out" style={{width: `${progress}%`}}></div>
         </div>
+    )
+}
+
+export const ShareModal = () => {
+    return(
+        <>
+            <Modal open={true} className="flex items-center justify-center">
+                <div className="p-5 bg-white w-md lg:xl shadow-xl rounded-lg">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="font-bold text-xl tracking-wide">Share this post</p>
+                            <p className="text-sm text-gray-700">Choose how you would like to share this post</p>
+                        </div>
+                        <button><LuX size={22} /></button>
+                    </div>
+                    <div className="flex justify-between my-3 ">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                <LuShare2 />
+                            </div>
+                            <p className="font-medium text-sm">Share with aspiro users</p>
+                        </div>
+                        <button className="bg-blue-600 text-sm px-5 font-semibold tracking-wide text-white rounded-lg shadow-[0_0_30px_2px_rgba(100,0,200,0.2)]">Share</button>
+                    </div>
+                    <div className="my-2 relative">
+                        <LuSearch className="absolute left-3 top-4" color="gray" />
+                        <input type="text" className="border w-full py-3 ps-10 rounded-lg bg-gray-50 placeholder:text-xs placeholder:tracking-wide focus:bg-white" placeholder="Search for users" />
+                    </div>
+                    <div className="grid grid-cols-5 gap-3 overflow-x-hidden mt-3">
+                        {["Messi", "Ronaldinio", "Zinadin Zidane", "Nazario", "Iniesta"].map((n: string, index: number) => (
+                            <div className=" flex flex-col items-center">
+                                <div className="w-15 h-15 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-xl shadow-blue-100">{n[0]}</div>
+                                <p className="text-xs tracking-wide max-w-15 truncate text-center">{n}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex mt-5 items-center">
+                        <div className="border-t border-slate-300 w-full"></div>
+                        <div>
+                            <p className="text-xs text-gray-700 w-full !m-0 !p-0">Or share externally</p>
+                        </div>
+                        <div className="border-t border-slate-300 w-full"></div>
+                    </div>
+                </div>
+            </Modal>
+        </>
     )
 }

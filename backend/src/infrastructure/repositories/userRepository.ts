@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { connection } from 'mongoose';
 import User, { AccountAction } from '../../domain/entities/user/User.FIX';
 import IUserRepository from '../../domain/interfaces/IUserRepo';
 import { UserDAO } from '../database/DAOs/user.dao.refactored';
@@ -11,6 +11,7 @@ import LoadUsersForPublicDBQuery from '../../application/queries/user/loadUsersF
 import UserCachedData from '../../domain/entities/user/user.cachedData.entity';
 import MyProfileAggregated from '../../domain/entities/user/myProfileAggregated.entity';
 import UserFullProfileData from '../../domain/entities/user/userFullProfile.entity';
+import { ConnectionWithSenderDetails } from '../../domain/entities/connection/connectionRequest.entity';
 
 @injectable()
 export default class UserRepository extends BaseRepository<User> implements IUserRepository {
@@ -509,6 +510,22 @@ export default class UserRepository extends BaseRepository<User> implements IUse
           as: 'followers',
         },
       },
+      {
+        $lookup: {
+          from: 'jobapplications',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'applicationsCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'favoriteJobs',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'savedJobs',
+        },
+      },
     ]);
 
     return result[0];
@@ -641,5 +658,72 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     ]);
 
     return result[0];
+  }
+
+  async updateProfileView(
+    viewerId: string,
+    profileId: string
+  ): Promise<{ _id: string; views: string[] } | null> {
+    if (!mongoose.isValidObjectId(viewerId)) return null;
+
+    const result = await UserDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(profileId) },
+      { $addToSet: { views: viewerId } },
+      { returnDocument: 'after' }
+    );
+
+    return result as { _id: string; views: string[] };
+  }
+
+  async getConnections(
+    userId: string,
+    page: number,
+    limit: number,
+    search: string
+  ): Promise<ConnectionWithSenderDetails[] | null> {
+    const skip = (page - 1) * limit;
+    const result = await UserDAO.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      {
+        $facet: {
+          connections: [
+            {
+              $unwind: {
+                path: '$connections',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'connections',
+                foreignField: '_id',
+                as: 'connectedUserDetails',
+              },
+            },
+            {
+              $unwind: {
+                path: '$connectedUserDetails',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $project: {
+                'connectedUserDetails._id': 1,
+                'connectedUserDetails.name': 1,
+                'connectedUserDetails.headline': 1,
+                'connectedUserDetails.profilePicture': 1,
+              },
+            },
+            { $match: { 'connectedUserDetails.name': { $regex: new RegExp(search, 'i') } } },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+        },
+      },
+    ]);
+
+    const connections = result[0]?.connections;
+    return connections;
   }
 }

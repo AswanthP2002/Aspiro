@@ -7,8 +7,9 @@ export const initializeSocket = (userId: string) => {
     }
 
     socket = io('http://localhost:5000', {
-        auth: {userId}
+        auth: {userId} 
     })
+    console.log('-- socket is here -- ', socket)
 
     return socket
 }

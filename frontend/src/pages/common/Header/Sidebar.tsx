@@ -18,6 +18,8 @@ export default function Sidebar() {
   const unReadNotificationsCount = useSelector((state: {notification: {unReadNotificationsCount: number}}) => {
     return state.notification.unReadNotificationsCount;
   });
+
+  const unreadChatsCount = useSelector((state: {chat: {newUnreadChatsCount: number}}) => state.chat.newUnreadChatsCount)
   return (
     <div className="p-3">
       <ul className="space-y-3">
@@ -32,12 +34,17 @@ export default function Sidebar() {
         </li>
         
         <li
-          className={`rounded-lg transition-all duration-200 !p-2 text-sm cursor-pointer 
+          className={`rounded-lg transition-all duration-200 !p-2 group text-sm cursor-pointer relative
         ${makeSideBarActive('/chats') ? 'bg-white text-blue-500 shadow-sm' : 'hover:bg-white hover:text-blue-500 text-white'}`}
         >
           <Link to={'/chats'} className="flex items-center gap-3">
             <IoMdChatbubbles size={22} />
             <span className="font-medium tracking-wide">Messages</span>
+            {unreadChatsCount > 0 && (
+              <div className={`absolute top-0 group-hover:text-white text-white transition-color duration-300 !left-5 bg-red-600 w-5 h-5 rounded-full flex items-center justify-center text-[.7rem] font-semibold`}>
+              {unreadChatsCount}
+            </div>
+            )}
           </Link>
         </li>
         

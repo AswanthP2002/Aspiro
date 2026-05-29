@@ -51,7 +51,6 @@ export class ResumeController {
         });
         return;
       }
-      console.log('No file found in request for addResume');
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_CREATION_FAILED('Resume'),
@@ -111,7 +110,6 @@ export class ResumeController {
 
   async analyzeResume(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // console.log('-- checking resume content from the frontend', req.body.data);
       const result = await this._analyzeResume.execute(req.body.data, req.body.targettedRole);
       res.status(StatusCodes.OK).json({ success: true, message: 'checking flow', result });
     } catch (error) {
@@ -121,7 +119,6 @@ export class ResumeController {
 
   async analyzeResumeDetailed(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // console.log('-- checking resume content from the frontend', req.body.data);
       const result = await this._analyzeResumeDetailed.execute(
         req.body.data,
         req.body.targettedRole

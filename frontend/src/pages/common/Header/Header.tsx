@@ -1,188 +1,64 @@
-import { useDispatch, useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
-import {CgProfile} from 'react-icons/cg'
-import {IoMdNotificationsOutline} from 'react-icons/io'
-import {FaCirclePlus} from 'react-icons/fa6'
-import { logout } from "../../../redux/userAuthSlice"
-import Swal from "sweetalert2"
-import { userLogout } from "../../../services/userServices"
-import { useContext, useEffect, useState } from "react"
-import { appContext } from "../../../context/AppContext"
-import { Notify } from "notiflix"
-//import { candidateLogout } from "../../../hooks/Logouts"
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-export default function Header(){
+export default function Header() {
 
-    const {openCreatePostModal} = useContext(appContext)
+  const navigate = useNavigate();
+  const user = useSelector((state: { userAuth: { user: { _id: string; name: string } } }) => {
+    return state.userAuth.user;
+  });
 
-    // const [notifications, setNotifications] = useState<any[]>([])
-    // let notificationstest : any[] = []
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const user = useSelector((state : {userAuth: {user: {_id: string, name: string}}}) => {
-        return state.userAuth.user
-    })
-    const userRole = useSelector((state : {userAuth: {user:{_id: string}, userRole: string}}) => {
-        return state.userAuth.userRole
-    })
-    
-    
+  console.log('This is loged user', user);
 
-    console.log('This is loged user', user)
-
-    async function logoutUser(){
-        Swal.fire({
-            icon:'info',
-            title:'Logout?',
-            text:'Are your sure your want to logout?',
-            showConfirmButton:true,
-            confirmButtonText:'Yes',
-            showCancelButton:true,
-            cancelButtonText:'No'
-        }).then(async (result) => {
-            if(result?.isConfirmed){
-                const logoutResult = await userLogout(dispatch, navigate)
-                dispatch(logout())
-                Swal.fire({
-                    icon:'success',
-                    title:'Logout',
-                    text:'You have successfully logged out',
-                    showConfirmButton:false,
-                    showCancelButton:false,
-                    timer:1500
-                }).then(() => navigate('/'))
-            }else{
-                return
-            }
-        })
-        
-        
-    }
-
-    function goToProfile(){
-        if(userRole === 'user'){
-            navigate('/profile/personal')
-        }else{
-            Notify.failure('Something went wrong', {timeout:1400})
-        }
-
-    }
-
-    // useEffect(() => {
-    //     if(user){
-    //         (async function(){
-    //             const result = await getNotifications()
-    //             console.log('notficiations', result.notifications)
-    //             // notificationstest = result?.notifications
-    //             setNotifications(result.notifications)
-    //         })
-    //     }
-    // }, [user])
-    
-    return(
-        <div className="w-full sticky top-0 left-0 bg-white border-b border-gray-200 z-59">
-            <div className="flex items-center justify-between p-5 w-full md:px-20">
-                <div className="brand">
-                    <p className="text-2xl font-light">Aspiro</p>
-                </div>
-                <div className=" hidden md:block">
-                    <ul className="flex gap-8 text-sm text-gray-700">
-                    <li className="cursor-pointer">Expolore</li>
-                    <li className="cursor-pointer">Find Opportunities</li>
-                    <li className="cursor-pointer">Network</li>
-                    <li className="cursor-pointer">Recruiters</li>
-                </ul>
-                </div>
-                <div>
-                    <button onClick={() => navigate('/login')} className="border border-blue-500 rounded-md text-xs text-blue-500 px-5 py-2">Sign In</button>
-                </div>
-            </div>
-            {/* <div className="w-full px-2 md:px-20 py-5 shadow-sm">
-                <div className="navbar bg-green-200 flex items-center justify-between gap-10">
-                    <div className="brand">
-                        <h3 className="brand-text text-black text-l font-bold">Aspiro</h3>
-                    </div> */}
-                    {/* if user exist then show the authorized navigations */}
-                    
-                    {/* {
-                        user
-                            ? <>
-                                <div className="border border-gray-300 w-100 relative rounded-full !py-2">
-                                    <input type="text" className="w-full !ps-10 !pe-3" placeholder="Search for people" />
-                                    <i className="fa-solid fa-search absolute absolute left-3 bottom-3 !text-gray-400"></i>
-                                </div> */}
-                                {/* <div className="!px-2 relative flex !py-1 search border border-gray-200 w-[500px] rounded-sm bg-gray-200">
-                                    <i className="absolute top-1 fa-solid fa-search !text-sm"></i>
-                                    <input type="text" placeholder="search in community" className="w-full !px-5 text-sm" />
-                                    <button type="button" className="text-xs bg-white w-[20px] rounded">/</button>
-                                </div> */}
-
-                                {/* <div className="flex items-center gap-3">
-                                    <button className="relative"><span className="absolute bg-red-500 !w-[7px] !h-[7px] rounded-full"></span> <IoMdNotificationsOutline size={20} /></button>
-                                    <button onClick={openCreatePostModal}><FaCirclePlus size={30} color="blue" /></button>
-                                    <div className="group relative">
-                                        <button className="profile"><CgProfile style={{ color: 'gray' }} size={30} /></button>
-                                        <div className="action-details hidden group-hover:block absolute bg-white shadow w-[150px] right-0 p-2">
-                                            <div onClick={goToProfile} className="cursor-pointer">
-                                                <p className="text-sm">Profile</p>
-                                            </div>
-                                            <div className="mt-2">
-                                                <span onClick={logoutUser} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                              </> */}
-                            {/* : <>
-                                 <div className="flex items-center gap-10">
-                                 <ul className="nav-links flex gap-10">
-                                    <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
-                                    <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
-                                    <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/candidates'}>Candidates</Link></li>
-                                    <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
-                                    <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
-                                </ul>
-                                <button onClick={() => navigate('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
-                                </div>
-                              </>
-                    } */}
-                {/* </div>
-            </div> */}
+  return (
+    <div className="w-full sticky top-0 left-0 bg-white/80 backdrop-blur-md border-b border-slate-100 z-[100]">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 md:px-12">
+        {/* Brand/Logo */}
+        <div className="brand cursor-pointer group" onClick={() => navigate('/')}>
+          <p className="text-2xl font-black tracking-tighter text-slate-900 transition-colors group-hover:text-blue-600">
+            Aspiro<span className="text-blue-600">.</span>
+          </p>
         </div>
-    )
+
+        {/* Navigation Links */}
+        <div className="hidden md:block">
+          <ul className="flex gap-10 text-sm font-semibold text-slate-600">
+            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
+              Explore
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+            </li>
+            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
+              Find Opportunities
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+            </li>
+            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
+              Network
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+            </li>
+            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
+              For Recruiters
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/login')}
+            className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden sm:block"
+          >
+            Log in
+          </button>
+          <button
+            onClick={() => navigate('/register')}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-2.5 rounded-full transition-all shadow-lg shadow-blue-200 active:scale-95"
+          >
+            Join Aspiro
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-
-{/* <div className="nav-actions flex justify-between w-full items-center">
-                    <ul className="nav-links flex gap-10">
-                        <li className="nav-link text-sm active hover:text-blue-500 cursor-pointer"><Link to={'/'}>Home</Link></li>
-                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/jobs'}>Find Jobs</Link></li>
-                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500"><Link to={'/candidates'}>Candidates</Link></li>
-                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Companies</li>
-                        <li className="nav-link text-sm cursor-pointer hover:text-blue-500">Network</li>
-                    </ul>
-                    
-                    <div className="actions flex gap-5 items-center">
-
-                        {
-                            logedUser
-                            
-                                ? <>
-                                    <NotificationComponent notifications={notifications?.length > 0 ? notifications : []} />
-                                    <div className="relative account-action-wrapper group cursor-pointer">
-                                        <img src={defaultUser} style={{width:'48px', height:'50px'}} alt="" />
-                                        <div className="action-details hidden group-hover:block absolute bg-white shadow w-[150px] right-0 p-2">
-                                            <div>
-                                                <Link to={'/profile/personal'}><p className="text-sm">Profile</p> </Link>
-                                            </div>
-                                            <div className="mt-2">
-                                                <span onClick={() => logoutCandidate()} className="cursor-pointer text-sm">Logout <i className="ms-2 fa-solid fa-arrow-right-from-bracket cursor-pointer"></i></span>
-                                            </div>
-                                        </div>
-                                        {/* <i className="fa-solid fa-arrow-right-from-bracket cursor-pointer" onClick={() => candidateLogout()}></i> */}
-                    //                 </div>
-                    //               </>
-                    //             : <button onClick={() => navigator('/login')} className="border border-blue-500 text-blue px-3 py-1 cursor-pointer text-blue-500">Sign In</button>
-                    //     }
-                    // </div>
-                    // </div> */}

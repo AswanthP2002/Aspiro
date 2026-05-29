@@ -88,3 +88,19 @@ export const getConnections = async (userId: string, search: string, page: numbe
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const removeConnection = async (removeConnectionId: string) => {
+    try {
+        const response = await axiosInstance.delete(ConnectionEndpoints.REMOVE_CONNECTION(removeConnectionId), 
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        console.log('Error occured while removing connection', error)
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}

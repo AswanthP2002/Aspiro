@@ -74,7 +74,11 @@ export const EndPoints = {
     DELETE_USER_BY_ID: (userId: string) => `/v2/user/${userId}`,
     BAN_USER_BY_ID: (userId: string) => `/v2/user/ban/${userId}`,
 
+    USER_PROFILE_VIEWED: (profileId: string) => `/v2/user/profile/${profileId}/viewed`,
+
     LOAD_USER_FULL_PROFILE_DETAILS: '/v2/user/full-profile/details',
     START_AI_INTERVIEW: '/v2/interview/ai',
-    LOAD_DASHBOARD: '/v2/interview/ai/dashboard'
+    LOAD_DASHBOARD: '/v2/interview/ai/dashboard',
+
+    VALIDATE_TOKEN: '/v1/token-verify'
 } as const

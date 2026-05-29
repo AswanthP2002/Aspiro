@@ -110,7 +110,6 @@ export class SkillController {
   }
 
   async adminGetSkills(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('-- load skill controller trigerred --');
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const search = (req.query.search as string) || '';

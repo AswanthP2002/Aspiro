@@ -30,9 +30,15 @@ import IAdminLoadRecruiterDetailsUsecase from '../../application/interfaces/usec
 import IAdminRevokeRecruiterVerification from '../../application/interfaces/usecases/recruiter/IAdminRevokeRecruiterVerification.usecase';
 import IAdminHandlePermissionRevokingUsecase from '../../application/interfaces/usecases/recruiter/IAdminHandlePermissionRevoking.usecase';
 import IAdminChangeRecruiterApplicationStatusToUnderReview from '../../application/interfaces/usecases/recruiter/IAdminChangeRecruiterApplicationStatusToUnderReview.usecase';
+import IVerifyBeforePostingJobUsecase from '../../application/interfaces/usecases/recruiter/IVerifyBeforePostingJob.usecase';
+import ResponseHandler from '../../utilities/response.handler';
+import IManageRecruiterPermissionsUsecase from '../../application/interfaces/usecases/recruiter/IManageRecruiterPermissions.usecase';
+import IVerifyBeforeEditJobUsecase from '../../application/interfaces/usecases/recruiter/IVerifyBeforeEditJob.usecase';
+import IVerifyBeforeManagingApplicationsUsecase from '../../application/interfaces/usecases/recruiter/IVerifyBeforeManagingApplications.usecase';
 
 @injectable()
 export default class RecruiterController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('ICreateRecruiterUsecase') private _createRecruiter: ICreateRecruiterUsecase,
     @inject('ICreateJobUsecase') private _createJob: ICreateJobUseCase,
@@ -68,8 +74,18 @@ export default class RecruiterController {
     @inject('IAdminRevokeRecruiterVerificationUsecase')
     private _handleVerificationUpdate: IAdminRevokeRecruiterVerification,
     @inject('IAdminHandlePermissionRevokingUsecase')
-    private _handlePermissionRevoking: IAdminHandlePermissionRevokingUsecase
-  ) {}
+    private _handlePermissionRevoking: IAdminHandlePermissionRevokingUsecase,
+    @inject('IVerifyBeforePostingJob')
+    private _verifyBeforePostingJob: IVerifyBeforePostingJobUsecase,
+    @inject('IManageRecruiterPermissions')
+    private _manageRecruiterPermissions: IManageRecruiterPermissionsUsecase,
+    @inject('IVerifyBeforeEditJobUsecase')
+    private _verifyBeforeEditJob: IVerifyBeforeEditJobUsecase,
+    @inject('IVerifyBeforeManageApplicationsUsecase')
+    private _verifyBeforeManageApplications: IVerifyBeforeManagingApplicationsUsecase
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async createRecruiter(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req?.user?.id;
@@ -281,8 +297,6 @@ export default class RecruiterController {
   async updateCandidateNotes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const applicationId = req.params.applicationId;
-      console.log('checking params', req.params);
-      console.log('-- checking body from the controller --', req.body);
       const result = await this._updateCandidateNotes.execute({
         _id: applicationId,
         ...req.body,
@@ -495,6 +509,55 @@ export default class RecruiterController {
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Recruiter application status'),
         result,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyBeforePostingJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._verifyBeforePostingJob.execute(userId);
+      this._responseHandler.success(res, 'Verification checked', StatusCodes.OK, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyBeforeEditJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._verifyBeforeEditJob.execute(userId);
+      this._responseHandler.success(res, 'Verification checked', StatusCodes.OK, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyBeforeManageApplications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user.id;
+    try {
+      const result = await this._verifyBeforeManageApplications.execute(userId);
+      this._responseHandler.success(res, 'Verification checked', StatusCodes.OK, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async manageRecruiterPermissions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const recruiterId = req.params.id;
+    try {
+      const result = await this._manageRecruiterPermissions.execute({ recruiterId, ...req.body });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Recruiter'),
+        StatusCodes.OK,
+        result
+      );
     } catch (error) {
       next(error);
     }

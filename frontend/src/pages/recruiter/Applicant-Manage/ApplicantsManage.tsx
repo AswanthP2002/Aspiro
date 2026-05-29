@@ -1,44 +1,37 @@
 import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
-import defaultProfile from '../../../../public/default-img-instagram.png'
-import { getApplicationDetails, getSingleApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus } from "../../../services/recruiterServices"
+import { getApplicationDetails, getSingleApplicationDetails, rejectJobApplication, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus, verifyBeforeManageApplications } from "../../../services/recruiterServices"
 // import ApplicantCard from "../../../components/recruiter/ApplicantCard"
 import Swal from "sweetalert2"
-import Loader from "../../../components/candidate/Loader"
 import { Notify } from "notiflix"
-import { LuCalendar, LuCircleX, LuFileArchive, LuFileUser, LuGraduationCap, LuMapPin, LuMessageCircle, LuPhone, LuSearch, LuSend, LuSparkles, LuUser, LuUserCheck, LuUsers, LuUserX } from "react-icons/lu"
-import { BiBriefcase, BiCalendar, BiChevronDown, BiChevronUp, BiEnvelope, BiSend, BiStar, BiTrash } from "react-icons/bi"
-import { FaRegCircleXmark, FaXmark } from "react-icons/fa6"
-import { CiCircleCheck } from "react-icons/ci"
-import formatDate, { formattedDateMoment } from "../../../services/util/formatDate"
-import { PiSuitcase } from "react-icons/pi"
-import { FaFile, FaGraduationCap, FaUsersSlash } from "react-icons/fa"
-import { Box, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, MenuItem, Modal, TextField } from "@mui/material"
-import { IoCall, IoCloseCircle, IoLocation } from "react-icons/io5"
+import { LuCalendar, LuCircleX, LuFileArchive, LuFileUser, LuGraduationCap, LuMapPin, LuPhone, LuSearch, LuSend, LuSparkles, LuUser, LuUserCheck, LuUserX } from "react-icons/lu"
+import { BiBriefcase, BiCalendar, BiChevronDown, BiChevronUp, BiEnvelope, BiStar } from "react-icons/bi"
+import { FaRegCircleXmark } from "react-icons/fa6"
+import { formattedDateMoment } from "../../../services/util/formatDate"
+import { FaFile, FaUsersSlash } from "react-icons/fa"
+import { Box, Button, Checkbox, FormControlLabel, MenuItem, Modal, TextField } from "@mui/material"
 import dayjs, { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import { ApplicationsAggregated, Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData, Skills } from "../../../types/entityTypes"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
-import { HiPaperClip } from "react-icons/hi2"
-import { BsArrowLeft, BsClock } from "react-icons/bs"
+import { BsArrowLeft } from "react-icons/bs"
 import { toast } from "react-toastify"
 import { AxiosError } from "axios"
 
-interface Application {
-    _id: string;
-    applicantDetails: {
-        _id: string;
-        name: string;
-        headline: string;
-        profilePicture: { cloudinarySecureUrl: string };
-    };
-    // Add other application properties as needed
-}
+// interface Application {
+//     _id: string;
+//     applicantDetails: {
+//         _id: string;
+//         name: string;
+//         headline: string;
+//         profilePicture: { cloudinarySecureUrl: string };
+//     };
+//     // Add other application properties as needed
+// }
 
 
 export default function ApplicantManagePage(){
@@ -50,17 +43,14 @@ export default function ApplicantManagePage(){
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [totalDocs, setTotalDocs] = useState(0)
     const [limit, setLimit] = useState(5)
     const [selectionMode, setSelectionMode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [jobDetails, setJobDetails] = useState<any>(null);
     const params : any = useParams()
     const jobId = params.jobId || location.state.jobId || {}
-    const [controlBarOpen, setControlBarOpen] = useState<boolean>(false)
-    const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState<boolean>(false)
+    const [isAllowedToManageApplications, setIsAllowedToManageApplications] = useState<boolean>(true)
     const navigator = useNavigate()
-    const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
 
     const [isControlBarMenuOpen, setIsControlBarMenuOpen] = useState(false)
 
@@ -490,6 +480,8 @@ const interviewTypes = [
                     //getJobDetails(jobId)
                 ]);
 
+                const permissionForApplicationManageResult = await verifyBeforeManageApplications()
+
                 if (appResult?.success) {
                     console.log('--checking inner value of data--', appResult.result)
                     setApplications(appResult.result.applications)
@@ -501,6 +493,10 @@ const interviewTypes = [
                     setRejected(appResult?.result?.rejected)
                 } else {
                     Notify.failure(appResult?.message || "Could not fetch applications.");
+                }
+
+                if(permissionForApplicationManageResult.success){
+                    setIsAllowedToManageApplications(permissionForApplicationManageResult.result)
                 }
 
                // if (jobResult?.success) {
@@ -696,6 +692,10 @@ const interviewTypes = [
         {isControlBarMenuOpen && (
             <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e: any) => updateCandidateNote(e)} />
         )}
+
+        {!isAllowedToManageApplications && (
+            <CanNotProceedModal open={!isAllowedToManageApplications} />
+        )}
         
         </>
     )
@@ -871,7 +871,7 @@ const interviewTypes = [
         }
     }, [applicationId])
     
-
+    
     const toggleStatusMenu = () => setIsStatusMenuOpened(prv => !prv)
 
     return(
@@ -2068,3 +2068,30 @@ const interviewTypes = [
 //       }
 //         </>
 //     )
+
+
+export const CanNotProceedModal = ({open}: {open: boolean}) => {
+    const navigate = useNavigate()
+
+    const navigateToDashboard = () => {
+        return navigate('/profile/recruiter/overview')
+    }
+
+    return(
+        <>
+            <Modal className="backdrop-blur-md flex flex-col items-center justify-center" open={open}>
+                <div className="bg-white p-5 lg:p-10 rounded-lg w-md max-w-[90%] shadow-xl">
+                    <p className="font-semibold text-lg tracking-wide text-gray-900">Permission Denied</p>
+                    <p className="text-sm font-medium  text-gray-700 mt-1">Your are not allowed to manage applications</p>
+                    <div className="my-5 p-3 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-xs leading-relaxed text-gray-600">Your account permissions are updated by the admin. Currently you are not allowed to manage applications</p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <button onClick={navigateToDashboard} className="bg-blue-600  text-white  shadow-[0_0_30px_2px_rgba(100,0,250,0.2)] transition-color duration-300 hover:bg-blue-700 w-full p-3 text-sm font-semibold rounded-lg">Understood</button>
+                        <button disabled={true} className="border border-slate-400 text-slate-700 transition-color duration-300 hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none hover:shadow-xl w-full p-3 text-sm font-semibold rounded-lg">Help</button>
+                    </div>           
+                </div>
+            </Modal>
+        </>
+    )
+}

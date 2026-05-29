@@ -51,3 +51,18 @@ export interface ConnectionWithSenderDetailsDTO {
     profilePicture?: string;
   };
 }
+
+export interface ConnectionUserDetailsDTO {
+  _id?: string;
+  connectedUserDetails: {
+    _id: string;
+    name: string;
+    headline: string;
+    profilePicture: string;
+  };
+}
+
+export interface RemoveConnectionDTO {
+  myId: string;
+  removingConnectionId: string;
+}

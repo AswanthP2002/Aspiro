@@ -71,6 +71,10 @@ export default function VerificationPage(){
 
     const navigate = useNavigate()
 
+    if(!email || !id){
+        return navigate('/login')
+    }
+
     const startTimer = () => {
         setresendenabled(false);
 
@@ -205,59 +209,110 @@ export default function VerificationPage(){
 
     return(
         <>
-            <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex flex-col items-center justify-center">
-                <div className="shadow-lg w-sm md:w-md bg-white border border-gray-200 rounded-md p-7 md:p-10">
-                    <div className="flex justify-center w-full items-center">
-                        <div className="bg-blue-100 rounded-full w-13 h-13 flex justify-center items-center">
-                            <HiOutlineEnvelope color="blue" size={23} />
-                        </div>
-                    </div>
-                    <div className="!my-5">
-                        <p className="text-center">Email verification</p>
-                        <p className="text-center text-gray-700 font-light text-sm mt-2">We have sent a verification code to your email {email || 'test@gmail.com'}</p>
-                    </div>
-                    <form>
-                        <p className="text-center text-sm text-gray-700">Enter 6 digit code</p>
-                        <div className="flex gap-2 w-full justify-center mt-3">
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit1} onChange={(e) => setDigit1(e.target.value)} ref={digit1Ref} />
-                            </div>
+            <div className="w-full min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6">
+  {/* Branding (Optional but professional) */}
+  <div className="mb-8">
+    <p className='text-2xl font-black tracking-tighter text-slate-900'>Aspiro<span className="text-blue-600">.</span></p>
+  </div>
 
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit2} onChange={(e) => setDigit2(e.target.value)} ref={digit2Ref} />
-                            </div>
+  <div className="w-full max-w-md bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-3xl p-8 md:p-12 border border-slate-100">
+    {/* Icon Header */}
+    <div className="flex justify-center w-full mb-8">
+      <div className="bg-blue-50 text-blue-600 rounded-2xl w-16 h-16 flex justify-center items-center shadow-inner">
+        <HiOutlineEnvelope size={32} strokeWidth={1.5} />
+      </div>
+    </div>
 
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit3} onChange={(e) => setDigit3(e.target.value)} ref={digit3Ref} />
-                            </div>
+    {/* Typography Hierarchy */}
+    <div className="text-center mb-10">
+      <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Check your email</h2>
+      <p className="text-slate-500 text-sm mt-3 leading-relaxed">
+        We've sent a 6-digit verification code to <br />
+        <span className="font-semibold text-slate-900">{email || 'test@gmail.com'}</span>
+      </p>
+    </div>
 
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit4} onChange={(e) => setDigit4(e.target.value)} ref={digit4Ref} />
-                            </div>
-
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit5} onChange={(e) => setDigit5(e.target.value)} ref={digit5Ref} />
-                            </div>
-
-                            <div className="bg-gray-100 rounded-md !p-2 w-8"> 
-                                <input min={1} max={1} className="w-[100%] " type="text" value={digit6} onChange={(e) => setDigit6(e.target.value)} ref={digit6Ref} />
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-center text-xs !my-4 text-red-500">{otpError}</p>
-                        </div>
-                        <div>
-                            <p className="text-center text-sm mt-3 text-gray-500">OTP will expire in <span className="text-blue-500">{getMinute(remainingtime)}:{getSecond(remainingtime)}</span></p>
-                        </div>
-                        <div className="mt-3 w-full">
-                            <Button type="button" variant="contained" loading={loading} onClick={verifyOnSubmit} disabled={!valuesFilled} className={`w-full bg-${valuesFilled ? 'black' : 'gray-400'} text-sm text-white rounded-sm py-2`}>Verify & continue</Button>
-                        </div>
-                        <div className="resend-otp">
-                          <p className="text-center text-sm mt-3">Didn't receive any code? <button type="button" onClick={handleResendOtp} disabled={!resendenabled} className={resendenabled ? "link text-blue-600 resend-otp-button" : "text-gray-400"}>Resend OTP</button></p>
-                        </div>
-                    </form>
-                </div>
+    <form className="space-y-8">
+      <div className="space-y-4">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[2px] text-slate-400">Enter Verification Code</p>
+        
+        {/* OTP Inputs */}
+        <div className="flex gap-2 sm:gap-3 w-full justify-center">
+          {[
+            { val: digit1, set: setDigit1, ref: digit1Ref },
+            { val: digit2, set: setDigit2, ref: digit2Ref },
+            { val: digit3, set: setDigit3, ref: digit3Ref },
+            { val: digit4, set: setDigit4, ref: digit4Ref },
+            { val: digit5, set: setDigit5, ref: digit5Ref },
+            { val: digit6, set: setDigit6, ref: digit6Ref },
+          ].map((digit, idx) => (
+            <div key={idx} className="w-12 h-14 bg-slate-50 border-2 border-slate-100 rounded-xl transition-all focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50"> 
+              <input 
+                maxLength={1} 
+                className="w-full h-full text-center text-xl font-bold text-slate-900 bg-transparent outline-none" 
+                type="text" 
+                value={digit.val} 
+                onChange={(e) => digit.set(e.target.value)} 
+                ref={digit.ref} 
+              />
             </div>
+          ))}
+        </div>
+
+        {/* Error Handling */}
+        {otpError && (
+          <div className="bg-red-50 border border-red-100 py-2 rounded-lg">
+            <p className="text-center text-xs font-bold text-red-500 uppercase tracking-tight">{otpError}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="text-center">
+        <p className="text-sm font-medium text-slate-600">
+          Code expires in <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{getMinute(remainingtime)}:{getSecond(remainingtime)}</span>
+        </p>
+      </div>
+
+      <div className="w-full">
+        <Button 
+          type="button" 
+          variant="contained" 
+          loading={loading} 
+          onClick={verifyOnSubmit} 
+          disabled={!valuesFilled}
+          fullWidth
+          sx={{
+            py: 1.8,
+            borderRadius: '16px',
+            textTransform: 'none',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            bgcolor: valuesFilled ? '#0F172A' : '#E2E8F0',
+            color: valuesFilled ? 'white' : '#94A3B8',
+            '&:hover': { bgcolor: '#000' },
+            boxShadow: valuesFilled ? '0 10px 15px -3px rgba(0,0,0,0.1)' : 'none'
+          }}
+        >
+          Verify & Continue
+        </Button>
+      </div>
+
+      <div className="pt-2">
+        <p className="text-center text-sm text-slate-500">
+          Didn't receive the code?{' '}
+          <button 
+            type="button" 
+            onClick={handleResendOtp} 
+            disabled={!resendenabled} 
+            className={`font-bold transition-colors ${resendenabled ? "text-blue-600 hover:text-blue-700 underline underline-offset-4" : "text-slate-300"}`}
+          >
+            Resend OTP
+          </button>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
         </>
     )
 }

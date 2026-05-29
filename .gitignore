@@ -35,4 +35,6 @@ frontend/.env.development
 backend/.env
 
 rebuild.md
+frontend/refactor.test.md
+testRun.model.js
 

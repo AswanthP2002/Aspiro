@@ -12,11 +12,14 @@ export default interface ConnectionRequest {
 }
 
 export interface ConnectionWithSenderDetails {
-  _id?: string;
-  receiver?: string;
-  sender?: string;
-  status: ConnectionRequestStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  senderDetails?: User;
+  _id: string;
+  connectedUserDetails: {
+    _id: string;
+    name: string;
+    headline: string;
+    profilePicture: {
+      cloudinaryPublicId: string;
+      cloudinarySecureUrl: string;
+    };
+  };
 }

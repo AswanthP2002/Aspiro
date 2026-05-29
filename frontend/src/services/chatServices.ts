@@ -32,11 +32,12 @@ export const getChats = async (conversationId: string) => {
     }
 }
 
-export const deleteChat = async (chatId: string) => {
+export const deleteChat = async (chatId: string, conversationId: string, chattingPersonId: string) => {
     try {
         const response = await axiosInstance.delete(ChatEndpoints.DELETE_CHAT_BY_ID(chatId),
             
             {   
+                params:{conversationId, chattingPersonId},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -52,6 +53,21 @@ export const deleteChatForMe = async (chatId: string) => {
     try {
         const response = await axiosInstance.patch(ChatEndpoints.DELETE_CHAT_FOR_ME(chatId), null,
             {   
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const getNewUnreadConversationsCount = async () => {
+    try {
+        const response = await axiosInstance.get(ChatEndpoints.GET_NEW_UNREAD_CONVERSATIONS_COUNT,
+            {
                 sendAuthToken: true
             } as AxiosRequest
         )

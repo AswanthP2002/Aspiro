@@ -9,4 +9,5 @@ export default interface IRealTimeEventEmitter {
   connectionRequest(notification: Notification): void;
   removeNotification(receipient: string, notificationId: string): void;
   connectionAccepted(notification: Notification): void;
+  deleteChatForAll(chatingPersonId: string, deletedChatId: string, conversationId: string): void;
 }

@@ -582,7 +582,7 @@ export const googleLogin = async (googleToken : string) => {
         const err = error as AxiosError
         console.log('Error occured while google login')
         if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
+            throw err
         }
 
         

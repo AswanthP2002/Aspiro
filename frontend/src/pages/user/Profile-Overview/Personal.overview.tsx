@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Notify } from 'notiflix';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { Button, CircularProgress, Modal, Skeleton } from '@mui/material';
+import { Button, CircularProgress, Modal } from '@mui/material';
 import { logout } from '../../../redux/candidateAuthSlice';
 import {
   addSocialmediaLinks,
@@ -446,16 +446,16 @@ export default function ProfilePersonal() {
 
           <div className="grid grid-cols-3 mt-10 pt-8 border-t border-gray-100">
             <div className="text-center border-r border-gray-100">
-              <p className="text-xl font-bold text-gray-900">12</p>
+              <p className="text-xl font-bold text-gray-900">{user?.applicationsCount?.length}</p>
               <p className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Applications</p>
             </div>
             <div className="text-center border-r border-gray-100">
-              <p className="text-xl font-bold text-gray-900">8</p>
+              <p className="text-xl font-bold text-gray-900">{user?.savedJobs?.length}</p>
               <p className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Saved Jobs</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-gray-900 flex items-center justify-center gap-1">
-                <FaEye size={20} className="text-gray-400" /> 14
+                <FaEye size={20} className="text-gray-400" /> {user?.views?.length}
               </p>
               <p className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Profile Views</p>
             </div>

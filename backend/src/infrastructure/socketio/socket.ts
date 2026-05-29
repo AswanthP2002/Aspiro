@@ -8,6 +8,7 @@ import { ChatDAO } from '../database/Schemas/user/chat.schema';
 import { ConversationDAO } from '../database/DAOs/user/conversation.dao';
 import mongoose from 'mongoose';
 import { Server as HttpServer } from 'http';
+import User from '../../domain/entities/user/User.FIX';
 
 export const initSocket = (server: HttpServer) => {
   console.log('socket initialization called');
@@ -33,11 +34,12 @@ export const initSocket = (server: HttpServer) => {
       console.warn(`Anonymous connection attempt: ${socket.id}`);
       return;
     }
-    //console.log('new user connected', userId, socket.id);
+    console.log('new user connected', userId, socket.id);
 
     socket.data.userId = userId;
     connectionManager.addConnection(userId, socket.id);
     //message to the client for testing
+    console.log('Going to emit user status changed');
     io.emit('USER_STATUS_CHANGED', { userId, status: 'online' });
 
     socket.emit('message', 'hello from server');
@@ -49,11 +51,12 @@ export const initSocket = (server: HttpServer) => {
 
     socket.to('socketcid').emit('message', 'hi');
     socket.on('JOIN_ROOM', (data) => {
-      socket.join(data.targetId);
+      socket.join(data.targetId); //conversation id == targetId
       console.log('User joined room: ', data.targetId);
     });
-    socket.on('SEND_PRIVATE_MESSAGE', async (data: Chat) => {
-      const { conversationId, senderId, receiverId, text } = data;
+    socket.on('SEND_PRIVATE_MESSAGE', async (data: { message: Chat; sender: User }) => {
+      console.log('-- inspecting private message from the client --', data);
+      const { conversationId, senderId, receiverId, text } = data.message;
 
       try {
         const newMessage = await ChatDAO.create({
@@ -74,18 +77,37 @@ export const initSocket = (server: HttpServer) => {
           }
         );
 
+        //emitting notification to the receivers socket
+        const reciversSocket = connectionManager.getSockets(data.message.receiverId as string);
+        reciversSocket.forEach((s) => {
+          io.to(s).emit('NEW_MESSAGE_RECEIVED', { message: newMessage, sender: data.sender });
+        });
         io.to(conversationId as string).emit('RECEIVE_PRIVATE_MESSAGE', newMessage);
       } catch (error: unknown) {
         console.log('Error occured while saving message', error);
       }
     });
 
+    socket.on('USER_TYPING', (data: { userId: string }) => {
+      console.log('typing user id ', data.userId);
+      io.emit('OTHER_PERSON_TYPING', { userId: data.userId });
+    });
+
+    socket.on('USER_SOTOP_TYPING', (data: { userId: string }) => {
+      console.log('typing stoped user id', data.userId);
+      io.emit('OTHER_PERSON_STOP_TYPING', { userId: data.userId });
+    });
+
     socket.on('MARK_MESSAGE_AS_READ', async ({ conversationId, userId }) => {
+      // console.log('Event occured for reading  message')
+      // console.log('Conversation id', conversationId)
+      // console.log('userid')
       await ChatDAO.updateMany(
         { conversationId, receiverId: userId, isRead: false },
         { $set: { isRead: true } }
       );
 
+      console.log('Going to emit message read update event');
       io.to(conversationId).emit('MESSAGES_READ_UPDATE', { conversationId, readerId: userId });
     });
 

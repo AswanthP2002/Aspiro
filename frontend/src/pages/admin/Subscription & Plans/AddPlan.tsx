@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { AiFillRocket } from 'react-icons/ai';
 import { BsArrowLeft } from 'react-icons/bs';
@@ -32,6 +32,10 @@ const PlanConfiguration = () => {
     socialFeed: boolean
     jobRecommendation: boolean
   }
+
+  const [isJobPostingUnlimited, setIsJobPostingUnlimited] = useState(true)
+  const [isJobApplicationUnlimited, setIsJobApplicationUnlimited] = useState(true)
+  const [connectionRequests, setConnectionRequests] = useState(true)
 
   const { register, control, handleSubmit, watch, formState: { errors } } = useForm<AddPlanFormData>({
     defaultValues: {
@@ -156,7 +160,7 @@ const PlanConfiguration = () => {
           <div className="lg:col-span-2 space-y-6">
             
             {/* General Information */}
-            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <section className="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]">
               <h2 className="font-semibold mb-1">General Information</h2>
               <p className="text-xs text-gray-400 mb-6">Basic details about the subscription plan</p>
               
@@ -195,7 +199,7 @@ const PlanConfiguration = () => {
             </section>
 
             {/* Pricing */}
-            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <section className="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]">
               <h2 className="font-semibold mb-1">Pricing</h2>
               <p className="text-xs text-gray-400 mb-6">Set monthly and yearly pricing options</p>
               <div className="grid grid-cols-2 gap-4">
@@ -221,7 +225,7 @@ const PlanConfiguration = () => {
             </section>
 
             {/* Feature Permissions */}
-            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <section className="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]">
               <h2 className="font-semibold mb-1">Feature Permissions</h2>
               <p className="text-xs text-gray-400 mb-6">Select which features are included in this plan</p>
               
@@ -250,7 +254,7 @@ const PlanConfiguration = () => {
             </section>
 
             {/* Status & Settings */}
-            <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <section className="bg-white p-6 rounded-xl border border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]">
               <h2 className="font-semibold mb-1">Status & Settings</h2>
               <div className="mt-4 flex items-center justify-between py-4 border-b border-gray-50">
                 <div>
@@ -323,6 +327,7 @@ const PlanConfiguration = () => {
                         )}
                         <span className={formData[f.key] ? "text-gray-700" : "text-gray-300"}>
                           {f.label} {f.isNumeric && formData[f.key] ? `(${formData[f.key]} per month)` : ''}
+                          {f.isNumeric && formData[f.key] === '' ? "Unlimited" : ""}
                         </span>
                       </div>
                     ))}

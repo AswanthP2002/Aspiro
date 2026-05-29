@@ -45,6 +45,7 @@ export const JobSchema = new Schema<Job>(
     views: { type: Number, default: 0 },
     applicationsCount: { type: Number, default: 0 },
     expiresAt: { type: Date, required: true },
+    isHidden: { type: Boolean, default: false },
   },
   {
     timestamps: true,

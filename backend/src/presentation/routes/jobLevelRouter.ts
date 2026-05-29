@@ -17,7 +17,7 @@ function CreateJobLevelRouter() {
   jobLevelRouter.get(
     JobLevelApiRoutes.LOAD,
     centralizedAuthentication,
-    authorization(['admin']),
+    authorization(['admin', 'user', 'recruiter']),
     jobLevelController.getJobLevels.bind(jobLevelController)
   );
   jobLevelRouter.patch(

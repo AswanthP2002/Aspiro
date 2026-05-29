@@ -33,4 +33,10 @@ export default interface RecruiterProfileOverviewData {
   userProfile: User;
   companyDetails?: Company;
   jobs: Job[];
+  isAllJobsHidden?: boolean;
+  allowPostJobs?: boolean;
+  allowEditJobs?: boolean;
+  allowDeletePosts?: boolean;
+  allowManageApplications?: boolean;
+  allowScheduleInterviews?: boolean;
 }

@@ -24,6 +24,18 @@ function createCompanyRouter() {
     authorization(['user', 'recruiter']),
     companyController.getCompaniesList.bind(companyController)
   );
+  companyRouter.get(
+    CompanyAPIRoutes.COMPANY.ADMIN_LOAD_COMPANIES_DATA,
+    centralizedAuthentication,
+    authorization(['admin']),
+    companyController.adminLoadAllCompaniesData.bind(companyController)
+  );
+  companyRouter.patch(
+    CompanyAPIRoutes.COMPANY.ADMIN_EDIT_COMPANY,
+    centralizedAuthentication,
+    authorization(['admin']),
+    companyController.adminEditCompany.bind(companyController)
+  );
 
   return companyRouter;
 }

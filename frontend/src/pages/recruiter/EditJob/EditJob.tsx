@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
-import { editJob, getPostedJobDetails, postJob, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from "../../../services/recruiterServices"
+import { editJob, getPostedJobDetails, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists, verifyBeforeEditJob } from "../../../services/recruiterServices"
 import dayjs, { Dayjs } from "dayjs"
 import { Controller, useForm } from "react-hook-form"
-import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField } from "@mui/material"
 import { Textarea } from "@mui/joy"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { DateField } from "@mui/x-date-pickers/DateField"
-import { Notify } from "notiflix"
 import { toast } from "react-toastify"
 import { JobLevelData, JobTypesData, WorkModeData } from "../../../types/entityTypes"
 
@@ -41,15 +40,14 @@ export default function EditJobForm(){
     const location = useLocation()
     const jobData = location.state?.jobData || {}
 
-    const [requiredSkills, setRequiredSkills] = useState<string[]>([])
     const requiredSkillRef = useRef<HTMLInputElement | null>(null)
     const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
     const [jobTypeData, setJobTypeData] = useState<JobTypesData[]>([])
     const [workModeData, setWorkModeData] = useState<WorkModeData[]>([])
-    const [optionalSkills, setOptionalSkills] = useState<string[]>([])
     const optionalSkillRef = useRef<HTMLInputElement | null>(null)
     const navigator = useNavigate()
     const [loading, setloading] = useState(false)
+    const [isAllowedToEditJobs, setIsAllowedToEditJobs] = useState<boolean>(true)
 
     const {control, watch, reset, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
         defaultValues: {
@@ -79,6 +77,11 @@ export default function EditJobForm(){
                     workModeDataResult,
                     jobTypeDataResult
                 ] = await Promise.all([recruiterFetchJobLevelLists(), recruiterFetchWorkModeLists(), recruiterFetchJobTypeLists()])
+
+                const eidPermissionResult = await verifyBeforeEditJob()
+                if(eidPermissionResult.success){
+                    setIsAllowedToEditJobs(eidPermissionResult.result)
+                }
                 
                 if(jobDetailsFetchResult.success){
                     reset({
@@ -118,31 +121,6 @@ export default function EditJobForm(){
             toast.warn('Can not edit job now')
             navigator(-1)
         }
-        // if(jobData){
-        //     const jobDetailsResult = await
-        //     console.log('this is job data for editing', jobData)
-        //     reset({
-        //         jobTitle: jobData.jobTitle,
-        //         description: jobData.description,
-        //         requirements: jobData.requirements,
-        //         responsibilities: jobData.responsibilities,
-        //         duration: jobData.duration,
-        //         jobType: jobData.jobType,
-        //         workMode: jobData.workMode,
-        //         location: jobData.location,
-        //         minSalary: jobData.minSalary,
-        //         maxSalary: jobData.maxSalary,
-        //         salaryCurrency: jobData.salaryCurrency,
-        //         salaryPeriod: jobData.salaryPeriod,
-        //         vacancies: jobData.vacancies,
-        //         qualification: jobData.qualification,
-        //         experienceInYears: jobData.experienceInYears,
-        //         jobLevel: jobData.jobLevel,
-        //         requiredSkills: jobData.requiredSkills,
-        //         optionalSkills: jobData.optionalSkills,
-        //         expiresAt: dayjs(jobData.expiresAt)
-        //     })
-        // }
     }, [jobData, reset])
 
     const enteredJobType = watch('jobType')
@@ -230,15 +208,54 @@ export default function EditJobForm(){
     
     }
 
+    const inputStyles = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '10px',
+    backgroundColor: '#fff',
+    '& fieldset': { borderColor: '#e2e8f0' }, // slate-200
+    '&:hover fieldset': { borderColor: '#cbd5e1' }, // slate-300
+    '&.Mui-focused fieldset': { borderColor: '#2563eb' }, // blue-600
+  },
+  '& .MuiInputLabel-root': { color: '#64748b' }, // slate-500
+};
+
+const selectStyles = {
+  // Target the root of the OutlinedInput
+  borderRadius: '10px',
+  backgroundColor: '#fff',
+  
+  // Target the border (notchedOutline)
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#e2e8f0', // slate-200
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#cbd5e1', // slate-300
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#2563eb', // blue-600
+    borderWidth: '2px',
+  },
+  
+  // Icon and Label
+  '& .MuiSvgIcon-root': { color: '#64748b' },
+};
+
+
+
     return(
         <>
         <div className="bg-gray-50 py-20 px-5">
             <form onSubmit={handleSubmit(editJobOnSubmit)} className="border border-slate-200 bg-white shadow-xl max-w-4xl !mx-auto rounded-md !py-5 !px-5">
-                <p className="text-start font-semibold text-2xl">Edit job post</p>
-                <p className="text-sm mt-1 text-gray-600 text-start">Currently editing <span className="text-blue-500 font-semibold">{jobData.jobTitle}</span>.</p>
+                <p className="text-start font-semibold text-gray-900 text-2xl">Edit job post</p>
+                <p className="text-sm mt-1 text-gray-600 font-medium text-start">Currently editing <span className="text-blue-500 font-semibold">{jobData.jobTitle}</span>.</p>
 
-                <div className="form-group border border-gray-200 rounded-md mt-5 !p-5">
-                    <p className="font-bold text-blue-900 text-sm uppercase">Core Job Details</p>
+                <div className="form-group rounded-md mt-5 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-500 font-semibold w-8 h-8 rounded-full flex items-center justify-center">
+                            <p>1</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Core Job Details</p>
+                    </div>
                     <FormControl fullWidth sx={{marginTop:'15px'}}>
                         <Controller
                             name="jobTitle"
@@ -254,7 +271,7 @@ export default function EditJobForm(){
                                     label="Job title"
                                     error={Boolean(errors.jobTitle)}
                                     helperText={errors?.jobTitle?.message}
-                                
+                                    sx={inputStyles}
                                 />
                             )}
                         />
@@ -274,6 +291,7 @@ export default function EditJobForm(){
                                     labelId="job-type-label"
                                     variant="outlined"
                                     error={Boolean(errors.jobType)}
+                                    sx={selectStyles}
                                 >   {jobTypeData.map((jobType: JobTypesData) => (
                                     <MenuItem key={jobType._id} value={jobType.name}>{jobType.name}</MenuItem>
                                 ))}
@@ -304,6 +322,7 @@ export default function EditJobForm(){
                                   label="Duration (Internships & Contracts only)"
                                   error={Boolean(errors.duration)}
                                   helperText={errors?.duration?.message}
+                                  sx={inputStyles}
                                 />
                             )}
                         />
@@ -311,8 +330,13 @@ export default function EditJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                <p className="font-bold text-blue-900 text-sm uppercase">Location & Logistics</p>                    
+                <div className="form-group rounded-md mt-10 !p-5">
+                <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-500 font-semibold w-8 h-8 rounded-full flex items-center justify-center">
+                            <p>2</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Location & Logistics</p>
+                    </div>                    
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
                         
                         <FormControl fullWidth>
@@ -332,6 +356,7 @@ export default function EditJobForm(){
                                         type="number"
                                         error={Boolean(errors.vacancies)}
                                         helperText={errors?.vacancies?.message}
+                                        sx={inputStyles}
                                      />
                                 )}
                             />
@@ -350,6 +375,7 @@ export default function EditJobForm(){
                                     labelId="word-mode-label"
                                     variant="outlined"
                                     error={Boolean(errors.workMode)}
+                                    sx={selectStyles}
                                 >   
                                     {workModeData.map((workMode: WorkModeData) => (
                                         <MenuItem key={workMode._id} value={workMode.name}>{workMode.name}</MenuItem>
@@ -379,6 +405,7 @@ export default function EditJobForm(){
                                     disabled={enteredWorkMode === 'Remote' ? true : false}
                                     error={Boolean(errors.location)}
                                     helperText={errors?.location?.message}
+                                    sx={inputStyles}
                                 />
                             )}
                         />
@@ -386,8 +413,13 @@ export default function EditJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                <p className="font-bold text-blue-900 text-sm uppercase">Compensation</p>                    
+                <div className="form-group rounded-md mt-10 !p-5">
+                <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-500 font-semibold w-8 h-8 rounded-full flex items-center justify-center">
+                            <p>3</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Compensation</p>
+                    </div>                   
                 <div className="grid gird-cols-1 gap-5 lg:grid-cols-2 lg:gap-10 mt-5 w-full">
                         <FormControl fullWidth>
                             <Controller
@@ -406,6 +438,7 @@ export default function EditJobForm(){
                                         type="number"
                                         error={Boolean(errors.minSalary)}
                                         helperText={errors?.minSalary?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -428,6 +461,7 @@ export default function EditJobForm(){
                                         type="number"
                                         error={Boolean(errors.maxSalary)}
                                         helperText={errors?.maxSalary?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -446,6 +480,7 @@ export default function EditJobForm(){
                                         labelId="salary-currency-label"
                                         variant="outlined"
                                         error={Boolean(errors.salaryCurrency)}
+                                        sx={selectStyles}
                                     >
                                         <MenuItem value="INR">INR</MenuItem>
                                         <MenuItem value="USD">USD</MenuItem>
@@ -468,6 +503,7 @@ export default function EditJobForm(){
                                         labelId="salary-period-label"
                                         variant="outlined"
                                         error={Boolean(errors.salaryPeriod)}
+                                        sx={selectStyles}
                                     >
                                         <MenuItem value="annually">Annually</MenuItem>
                                         <MenuItem value="monthly">Monthly</MenuItem>
@@ -481,8 +517,13 @@ export default function EditJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-bold text-blue-900 text-sm uppercase">Candidate Requirements</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-500 font-semibold w-8 h-8 rounded-full flex items-center justify-center">
+                            <p>4</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Candidate Requirements</p>
+                    </div>
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-10 justify-between mt-5 w-full">
                         <FormControl fullWidth error={Boolean(errors.jobLevel)}>
                             <InputLabel id="job-level-id">Job Level</InputLabel>
@@ -497,6 +538,7 @@ export default function EditJobForm(){
                                         labelId="job-level-id"
                                         variant="outlined"
                                         error={Boolean(errors.jobLevel)}
+                                        sx={selectStyles}
                                     >
                                         {jobLevelData.map((jobLevel: JobLevelData) => (
                                             <MenuItem key={jobLevel._id} value={jobLevel.name}>{jobLevel.name}</MenuItem>
@@ -527,6 +569,7 @@ export default function EditJobForm(){
                                         label="Qualification"
                                         error={Boolean(errors.qualification)}
                                         helperText={errors?.qualification?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -549,6 +592,7 @@ export default function EditJobForm(){
                                         type="number"
                                         error={Boolean(errors.experienceInYears)}
                                         helperText={errors?.experienceInYears?.message}
+                                        sx={inputStyles}
                                     />
                                 )}
                             />
@@ -556,8 +600,13 @@ export default function EditJobForm(){
                     </div>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
-                    <p className="font-bold text-blue-900 text-sm uppercase">Job Descriptions & Details</p>
+                <div className="form-group rounded-md mt-10 !p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 text-blue-500 font-semibold w-8 h-8 rounded-full flex items-center justify-center">
+                            <p>5</p>
+                        </div>
+                        <p className="font-semibold text-gray-700 uppercase">Job Description & Details</p>
+                    </div>
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.description)}>
                         <label htmlFor="" className="text-xs uppercase mb-2">description</label>
                         <Controller 
@@ -625,7 +674,7 @@ export default function EditJobForm(){
                     </FormControl>
                 </div>
 
-                <div className="form-group border border-gray-200 rounded-md mt-10 !p-5">
+                <div className="form-group rounded-md mt-10 !p-5">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full">
                         <div className="w-full">
                             <label htmlFor="">Required Skills</label>
@@ -684,12 +733,42 @@ export default function EditJobForm(){
                         </DemoContainer>
                     </LocalizationProvider>
                     <div className="flex gap-2">
-                        <Button type="button" variant="outlined" onClick={() => navigator(-1)}>Cancel</Button>
-                        <Button type="submit" variant="contained" loading={loading}>Edit Job</Button>  </div>    
+                        <button className="text-sm font-semibold text-gray-700 border border-slate-400 transition-color duration-300 hover:bg-slate-100 hover:shadow-xl px-5 py-3 rounded-lg" type="button" onClick={() => navigator(-1)}>Cancel</button>
+                        <button className="border border-transparent bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold text-sm px-5 py-3 shadow-[0_0_30px_2px_rgba(0,0,230,0.2)] transition-color duration-300 rounded-lg" type="submit">{loading ? "Processing..." : "Edit Job"}</button>  </div>    
                 </div>
                 
             </form>
         </div>
+
+        {!isAllowedToEditJobs && (
+            <CanNotProceedModal open={!isAllowedToEditJobs} />
+        )}
+        </>
+    )
+}
+
+export const CanNotProceedModal = ({open}: {open: boolean}) => {
+    const navigate = useNavigate()
+
+    const navigateToDashboard = () => {
+        return navigate('/profile/recruiter/overview')
+    }
+
+    return(
+        <>
+            <Modal className="backdrop-blur-md flex flex-col items-center justify-center" open={open}>
+                <div className="bg-white p-5 lg:p-10 rounded-lg w-md max-w-[90%] shadow-xl">
+                    <p className="font-semibold text-lg tracking-wide text-gray-900">Permission Denied</p>
+                    <p className="text-sm font-medium  text-gray-700 mt-1">Your are not allowed to edit jobs</p>
+                    <div className="my-5 p-3 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-xs leading-relaxed text-gray-600">Your account permissions are updated by the admin. Currently you are not allowed to edit existing jobs</p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        <button onClick={navigateToDashboard} className="bg-blue-600  text-white  shadow-[0_0_30px_2px_rgba(100,0,250,0.2)] transition-color duration-300 hover:bg-blue-700 w-full p-3 text-sm font-semibold rounded-lg">Understood</button>
+                        <button disabled={true} className="border border-slate-400 text-slate-700 transition-color duration-300 hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none hover:shadow-xl w-full p-3 text-sm font-semibold rounded-lg">Help</button>
+                    </div>           
+                </div>
+            </Modal>
         </>
     )
 }

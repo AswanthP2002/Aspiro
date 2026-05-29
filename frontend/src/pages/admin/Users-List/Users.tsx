@@ -389,8 +389,8 @@ export default function Users() {
   return (
     <>
     <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-100">
-      <p className='text-lg font-medium'>User Management</p>
-      <p className='text-xs mt-1 mb-5'>Manaage all users and account security</p>
+      <p className='text-xl font-semibold tracking-wide text-gray-900'>User Management</p>
+      <p className='text-sm font-medium text-gray-700 mt-1 mb-5'>Manaage all users and account security</p>
       <div className="p-3 border border-gray-200 bg-white rounded-md mb-3 relative">
         <div className="grid grid-cols-12 gap-2 items-center">
           <div className="col-span-6 lg:col-span-8">

@@ -1,4 +1,4 @@
-import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
+import Recruiter, { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import { ObjectId } from 'mongodb';
 import BaseRepository from '../baseRepository';
@@ -519,6 +519,13 @@ export default class RecruiterRespository
   //   //return this locally updated data
   //   return locallyUpdated;
   // }
+
+  async findRecruiterByUserId(userId: string): Promise<NewRecruiter | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await RecruiterDAO.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+    return result;
+  }
 }
 
 //stoped at bulk approval implementation testing

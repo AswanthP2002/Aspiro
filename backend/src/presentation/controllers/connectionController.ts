@@ -8,9 +8,12 @@ import IGetConnectionsUsecase from '../../application/interfaces/usecases/connec
 // import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
+import ResponseHandler from '../../utilities/response.handler';
+import IRemoveConnectionUsecase from '../../application/interfaces/usecases/connection/IRemoveConnection.usecase';
 
 @injectable()
 export class ConnectionController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('ISendConnectionRequestUsecase')
     private _sendConnectionRequest: ISendConnectionRequestUsecase,
@@ -20,8 +23,11 @@ export class ConnectionController {
     private _cancelConnectionRequest: ICancelConnectionRequestUsecase,
     @inject('IAcceptConnectionRequestUsecase')
     private _acceptConnectionRequest: IAcceptConnectionRequestUsecase,
-    @inject('IGetConnectionsUsecase') private _getConnections: IGetConnectionsUsecase
-  ) {}
+    @inject('IGetConnectionsUsecase') private _getConnections: IGetConnectionsUsecase,
+    @inject('IRemoveConnectionUsecase') private _removeConnection: IRemoveConnectionUsecase
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async sendConnectionRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sender = req.user?.id as string;
@@ -36,11 +42,18 @@ export class ConnectionController {
         acted_user_avatar,
       });
 
-      res.status(StatusCodes.CREATED).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection request'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection requested'),
+        StatusCodes.CREATED,
+        result
+      );
+
+      // res.status(StatusCodes.CREATED).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection request'),
+      //   result,
+      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -51,11 +64,17 @@ export class ConnectionController {
     const receiver = req.params.receiverId;
     try {
       const result = await this._cancelConnectionRequest.execute({ sender, receiver });
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection request'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection cancelled'),
+        StatusCodes.OK,
+        result
+      );
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection request'),
+      //   result,
+      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -88,11 +107,17 @@ export class ConnectionController {
         myAvatar: acted_user_avatar,
       });
 
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Connection request status'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection'),
+        StatusCodes.OK,
+        result
+      );
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Connection request status'),
+      //   result,
+      // });
     } catch (error) {
       next(error);
     }
@@ -112,11 +137,33 @@ export class ConnectionController {
         limit,
       });
 
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Connections'),
-        result,
-      });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Connections'),
+        StatusCodes.OK,
+        result
+      );
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Connections'),
+      //   result,
+      // });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeConnection(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const myId = req.user.id;
+    const removingConnectionId = req.params.id;
+
+    try {
+      await this._removeConnection.execute({ myId, removingConnectionId });
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection'),
+        StatusCodes.OK
+      );
     } catch (error) {
       next(error);
     }

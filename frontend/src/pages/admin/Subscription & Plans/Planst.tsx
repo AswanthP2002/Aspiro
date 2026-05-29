@@ -126,23 +126,23 @@ export default function Plans(){
 
     return(
         <>
-            <div className="px-5 py-10 lg:p-10">
+            <div className="px-5 w-full min-h-screen bg-gray-50 py-10 lg:p-10">
                 <div className="header flex justify-between items-center">
                     <div>
-                        <p className="font-bold text-xl">Plan Configuration</p>
+                        <p className="font-bold text-xl text-gray-900 tracking-wide">Plan Configuration</p>
                         <p className="text-xs text-slate-500 font-medium">Create and manage subscription tires for your platform</p>
                     </div>
                     <div>
-                        <button onClick={navigateToAddPlanPage} className="text-xs flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md">
+                        <button onClick={navigateToAddPlanPage} className="bg-blue-600 text-white flex px-5 py-3 rounded-lg shadow-[0_0_30px_2px_rgba(0,0,200,0.2)] items-center justify-center gap-2 text-sm font-medium">
                             <FaPlus />
                             <p>Create new plan</p>
                         </button>
                     </div>
                 </div>
                 <div className="body mt-10">
-                    <div className="bg-white w-full border border-slate-200 rounded-lg p-5">
-                        <p className="font-medium text-slate-600">Existing plans</p>
-                        <p className="text-xs mt-2 text-gray-700">Manage your current subscription tires</p>
+                    <div className="bg-white w-full border border-slate-200 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] rounded-lg p-5">
+                        <p className="font-bold uppercase tracking-wide text text-slate-700">Existing plans</p>
+                        <p className="text-sm mt-2 text-gray-700">Manage your current subscription tires</p>
                         {loading
                             ? <>
                                 <div>
@@ -158,33 +158,33 @@ export default function Plans(){
                             <table className="w-full mt-5">
                             <thead>
                                 <tr>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Plan Name</th>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Monthly Price</th>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Yearly Price</th>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Status</th>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Trial Period</th>
-                                    <th className="font-medium text-sm py-3 px-2 text-start text-slate-600">Actions</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Plan Name</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Monthly Price</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Yearly Price</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Status</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Trial Period</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {plans.map((plan: PlanData, index: number) => (
+                                {plans.map((plan: PlanData) => (
                                         <>
                                             <tr key={plan._id} className="border-t border-slate-300">
-                                                <td className="py-4 px-2 text-xs">
+                                                <td className="py-4 px-2 text-sm text-gray-700">
                                                     <div className="flex items-center gap-2">
-                                                        {plan.badgeIcon === 'Lightning' && <BsLightning />}
-                                                        {plan.badgeIcon === 'Rocket' && <BsRocket />}
-                                                        {plan.badgeIcon === 'Star' && <BsStar />}
-                                                        <p>{plan.name}</p>
+                                                        {plan.badgeIcon === 'Lightning' && <BsLightning size={18} />}
+                                                        {plan.badgeIcon === 'Rocket' && <BsRocket size={18} />}
+                                                        {plan.badgeIcon === 'Star' && <BsStar size={18} />}
+                                                        <p className="">{plan.name}</p>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-2 text-xs">
+                                                <td className="py-4 px-2 text-sm text-gray-700">
                                                     <div className="flex items-center gap-center">
                                                         <BiRupee />
                                                         {plan.monthlyPrice}
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-2 text-xs">
+                                                <td className="py-4 px-2 text-sm text-gray-700">
                                                    <div className="flex items-center gap-center">
                                                         <BiRupee />
                                                         {plan.yearlyPrice}
@@ -196,13 +196,13 @@ export default function Plans(){
                                                             ? <button onClick={() => togglePlanListing(plan._id as string, 'UNLIST')} className="text-xs font-medium bg-black text-white rounded-md px-2 py-1">Unlist</button>
                                                             : <button onClick={() => togglePlanListing(plan._id as string, 'LIST')} className="text-xs font-medium bg-black text-white rounded-md px-2 py-1">List</button>
                                                         }
-                                                        <p className={`text-xs ${plan.isListed ? "text-green-600" : "text-red-600"}`}>{plan.isActive ? "Listed" : "Unlisted"}</p>
+                                                        <p className={`text-sm ${plan.isListed ? "text-green-600" : "text-red-600"}`}>{plan.isActive ? "Listed" : "Unlisted"}</p>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-2 text-xs">
+                                                <td className="py-4 px-2 text-sm text-gray-700">
                                                     <p>{plan.trialPeriod}</p>
                                                 </td>
-                                                <td className="py-4 px-2 text-xs">
+                                                <td className="py-4 px-2">
                                                     <div className="flex items-center gap-3">
                                                         <button onClick={() => navigateToEditPlanPage(plan)}><BsPencilSquare /></button>
                                                         <button onClick={() => deletePlan(plan._id as string)}><BsTrash3 color="red" /></button>
@@ -233,8 +233,8 @@ export default function Plans(){
 </div>
                         )}
                     <div className="flex justify-end space-x-2 mt-5">
-                        <button disabled={page <= 1 ? true : false} className="text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded-md px-2 py-1">Prev</button>
-                        <button disabled={page >= totalPages ? true : false} className="text-xs font-medium text-white bg-blue-500 rounded-md px-2 py-1">Next</button>
+                        <button disabled={page <= 1 ? true : false} className="text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-md px-3 py-2">Prev</button>
+                        <button disabled={page >= totalPages ? true : false} className="text-sm font-medium text-white bg-blue-500 rounded-md px-3 py-2">Next</button>
                     </div>
                     </div>
                     

@@ -36,7 +36,12 @@ function createUserRouter() {
   );
   userRouter.post('/logout', userController.userLogout.bind(userController));
   userRouter.get('/v1/token/refresh', userController.reAuthenticate.bind(userController));
-  userRouter.get(UserApiRoutes.USER_PUBLIC.LOAD_JOBS, userController.loadJobs.bind(userController)); //no zod validation for load jobs query
+  userRouter.get(
+    UserApiRoutes.USER_PUBLIC.LOAD_JOBS,
+    centralizedAuthentication,
+    authorization(['user', 'admin', 'recruiter']),
+    userController.loadJobs.bind(userController)
+  ); //no zod validation for load jobs query
 
   userRouter.get(
     UserApiRoutes.USER_PUBLIC.LOAD_JOB_DETAILS_BY_ID,
@@ -86,6 +91,13 @@ function createUserRouter() {
     centralizedAuthentication,
     authorization(['user']),
     userController.checkIsJobApplied.bind(userController)
+  );
+
+  userRouter.patch(
+    UserApiRoutes.USER_PROFILE_MANAGE.PROFILE_VIEW_UPDATE,
+    centralizedAuthentication,
+    authorization(['user']),
+    userController.updateProfileView.bind(userController)
   );
   userRouter.post(
     UserApiRoutes.USER_JOB_MANAGE.SAVE_JOB,
@@ -235,20 +247,25 @@ function createUserRouter() {
     userController.userBan.bind(userController)
   );
 
+  userRouter.post(
+    UserApiRoutes.USER_AUTH_MANAGE.VALIDATE_TOKEN,
+    userController.validateToken.bind(userController)
+  );
+
   userRouter.get(
     '/v1/similar-people',
     (req: Request, res: Response, next: NextFunction) => {
-      console.log('Passed through the api endpoint going to the auth');
+      // console.log('Passed through the api endpoint going to the auth');
       next();
     },
     centralizedAuthentication,
     (req: Request, res: Response, next: NextFunction) => {
-      console.log('Passed through the authentication endpoint going to the authroization');
+      // console.log('Passed through the authentication endpoint going to the authroization');
       next();
     },
     authorization(['user']),
     (req: Request, res: Response, next: NextFunction) => {
-      console.log('Passed through the authorization endpoint going to the controller');
+      // console.log('Passed through the authorization endpoint going to the controller');
       next();
     },
     userController.getSimilarUsers.bind(userController)
@@ -313,7 +330,7 @@ function createUserRouter() {
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
 
   function testMiddleware(req: Request, res: Response, next: NextFunction) {
-    console.log('--inspectng request body', req.body);
+    // console.log('--inspectng request body', req.body);
     next();
     ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }

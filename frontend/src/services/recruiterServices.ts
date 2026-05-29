@@ -512,21 +512,21 @@ export const addCompany = async (name: string, linkedin: string, website: string
     }
 }
 
-export const getCompaniesList = async (search: string) => {
-    try {
-        const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
-            {
-                params:{search},
-                sendAuthToken: true
-            } as AxiosRequest
-        )
+// export const getCompaniesList = async (search: string) => {
+//     try {
+//         const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
+//             {
+//                 params:{search},
+//                 sendAuthToken: true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
+//         return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }
 
 
 export const updateJobApplicationStatus = async (
@@ -636,7 +636,7 @@ export const rejectRecruiterApplication = async (recruiterId: string, reason: st
 
 export const approveRecruiterApplication = async (recruiterId: string) => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_RECRUITER_APPLICATION(recruiterId), {},
+        const response = await axiosInstance.patch(RecruiterEndPoints.APPROVE_APPLICATION_BY_ID(recruiterId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -731,5 +731,78 @@ export const changeStatusToUnderReview = async (applicationId: string) => {
         const err = error as AxiosError
         console.log('--Error occured--', err)
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const verifyBeforePostingJob = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_VERIFICATION_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const verifyBeforeEditJob = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_EDIT_JOB_VERIFICATION_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const verifyBeforeManageApplications = async () => {
+    try {
+        const response = await axiosInstance.get(RecruiterEndPoints.CHECK_MANAGE_APPLICATIONS_VERIFICATIONS_STATUS,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const manageRecruiterPermissions = async (
+  recruiterId: string,
+  isAllJobsHidden: boolean,
+  allowPostJobs: boolean,
+  allowEditJobs: boolean,
+  allowDeletePosts: boolean,
+  allowManageApplications: boolean,
+  allowScheduleInterviews: boolean,
+) => {
+    try {
+        const response = await axiosInstance.patch(RecruiterEndPoints.MANAGE_RECRUITER_PERMISSIONS(recruiterId),
+        {isAllJobsHidden, allowPostJobs, allowEditJobs, allowDeletePosts, allowManageApplications, allowScheduleInterviews},
+        {
+            sendAuthToken: true,
+            headers:{'Content-Type': 'application/json'}
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        console.log('Error occured while managing recruiter permissions', err)
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden){
+            throw err
+        }
     }
 }

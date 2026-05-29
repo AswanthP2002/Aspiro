@@ -18,7 +18,13 @@ interface CommentAddingResponsePayload {
 export const PostContext = createContext<unknown>(null) //changed to unknown from any
 interface RootUser {
     userAuth: {
-        user:{_id: string}
+        user:{
+            _id: string;
+            name: string;
+            profilePicture: string;
+            headline: string;
+            email: string;
+        }
     }
 }
 export default function PostProvider({children}: {children: React.ReactNode}){
@@ -127,15 +133,31 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                     if(post._id === postId){
                         return {
                             ...post,
-                            comments: [...post.comments, {
+                            comments: post.comments ? [...post.comments, {
                                 _id,
-                                userId:logedUser.id,
+                                userId:logedUser._id,
                                 postId,
                                 text,
+                                depth: parentId ? 1 : 0,
                                 userDetails:{
                                     name: logedUser.name,
-                                    headline: logedUser.headline
+                                    headline: logedUser.headline,
+                                    socialLinks: []
                                 },
+                                likes: 0,
+                                createdAt:`${new Date()}`
+                            }] : [{
+                                _id,
+                                userId:logedUser._id,
+                                postId,
+                                text,
+                                depth: parentId ? 1 : 0,
+                                userDetails:{
+                                    name: logedUser.name,
+                                    headline: logedUser.headline,
+                                    socialLinks: []
+                                },
+                                likes: 0,
                                 createdAt:`${new Date()}`
                             }]
                         }
@@ -154,7 +176,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
     const deleteCommentOnPost = async (postId: string, commentId: string) => {
         if(!postId || !commentId) return
         Swal.fire({
-            icon:'warning',
+            icon:'question',
             title:'Delete Comment?',
             width:'300',
             showConfirmButton:true,
@@ -171,7 +193,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                     return
                 }
 
-                //update ui
+                //update ui removing main comment
                 setUserPosts((posts: UserPosts[]) => {
                     return posts.map((post: UserPosts) => {
                         if(post._id === postId){
@@ -184,6 +206,21 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                         }
                     })
                 })
+
+                setUserPosts((posts: UserPosts[]) => {
+                    return posts.map((post: UserPosts) => {
+                        if(post._id === postId){
+                            return {
+                                ...post,
+                                comments: post.comments.filter((comment: Comments) => comment.parentId !== commentId)
+                            }
+                        }else{
+                            return post
+                        }
+                    })
+                })
+
+                
 
                 
             }else{
@@ -201,7 +238,7 @@ export default function PostProvider({children}: {children: React.ReactNode}){
                         if(post._id === postId){
                             return {
                                 ...post,
-                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment?.likes + 1} : comment)
+                                comments: post.comments.map((comment: Comments) => comment._id === commentId ? {...comment, likes: comment.likes ? comment.likes + 1 : 1} : comment)
                             }
                         }else{
                             return post

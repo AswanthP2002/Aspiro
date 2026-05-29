@@ -8,7 +8,7 @@ import { CgClose } from "react-icons/cg"
 import { BiSearch } from "react-icons/bi"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { cancelConnectionRequest, getConnections } from "../../services/connectionServices"
+import { cancelConnectionRequest, getConnections, removeConnection } from "../../services/connectionServices"
 
 type RootUser = {
     userAuth: {
@@ -98,8 +98,8 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
 
   const dSearch = debouncedSearch(searchConnection, 500)
 
-  const removeConnection = async (senderId: string, name: string) => {
-    if(!senderId) return
+  const removeAConnection = async (userId: string, name: string) => {
+    if(!userId) return
 
     const confirm = await Swal.fire({
       icon: 'question',
@@ -120,12 +120,17 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
     if(!confirm.isConfirmed) return
 
     try {
-      await cancelConnectionRequest(senderId)
-      toast.success('Follower removed')
-      setConnections((connection: ConnectionDetails[]) => {
-        return connection.filter((connection: ConnectionDetails) => connection.sender !== senderId)
-      })
-      onRemoveConnection()
+      // await cancelConnectionRequest(senderId)
+      const result = await removeConnection(userId)
+      if(result?.success){
+        toast.info('Connection removed')
+        setConnections((connection: ConnectionDetails[]) => {
+          return connection.filter((connection: ConnectionDetails) => connection._id !== userId)
+        })
+        onRemoveConnection()
+      }
+      
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Something went wrong')
     }
@@ -184,28 +189,28 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
            {loading
             ? <Skeleton width={50} height={50} variant='circular' />
             :  (
-              data.senderDetails?.profilePicture
+              data.connectedUserDetails?.profilePicture
                 ? <div className='shrink-0 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center w-11 h-11 rounded-full shadow-sm font-medium text-sm tracking-tighter'>
-                  <img src={data.senderDetails.profilePicture} className='w-full h-full object-cover rounded-full' alt="" />
+                  <img src={data.connectedUserDetails.profilePicture} className='w-full h-full object-cover rounded-full' alt="" />
             </div>
                : <div className='shrink-0 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center w-11 h-11 rounded-full shadow-sm font-medium text-sm tracking-tighter'>
-              { data.senderDetails?.name && data?.senderDetails?.name.split(' ').map(n => n[0]).join('')}
+              { data.connectedUserDetails?.name && data?.connectedUserDetails?.name.split(' ').map(n => n[0]).join('')}
             </div>
             )
            }
 
             {/* Content */}
-            <div onClick={() => navigateToUserProfile(data.senderDetails?._id as string)} className="flex-1 cursor-pointer min-w-0">
+            <div onClick={() => navigateToUserProfile(data.connectedUserDetails?._id as string)} className="flex-1 cursor-pointer min-w-0">
               {loading
                 ? <Skeleton width={100} />
                 : <p className='text-[14px] font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors'>
-                {data.senderDetails?.name}
+                {data.connectedUserDetails?.name}
               </p>
               }
               {loading
                 ? <Skeleton height={12} />
                 : <p className='text-[12px] text-gray-500 truncate leading-relaxed'>
-                {data.senderDetails?.headline}
+                {data.connectedUserDetails?.headline}
               </p>
               }
             </div>
@@ -213,7 +218,7 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
             {/* Optional Action Button (Follow/Unfollow) */}
             {loading
               ? <Skeleton width={50} />
-              : (logedUser._id === userId ? <button onClick={() => removeConnection(data.senderDetails?._id as string, data.senderDetails?.name as string)} className="text-xs font-medium text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors">
+              : (logedUser._id === userId ? <button onClick={() => removeAConnection(data.connectedUserDetails?._id as string, data.connectedUserDetails?.name as string)} className="text-xs font-medium text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors">
               Remove
             </button> : null)
             }

@@ -9,7 +9,12 @@ function CreateJobRouter() {
 
   const jobController = container.resolve(JobController);
 
-  jobRouter.get(JobApiRoutes.LOAD_JOB_DETAILS, jobController.loadJobDetails.bind(jobController));
+  jobRouter.get(
+    JobApiRoutes.LOAD_JOB_DETAILS,
+    centralizedAuthentication,
+    authorization(['user', 'admin', 'recruiter']),
+    jobController.loadJobDetails.bind(jobController)
+  );
   jobRouter.get(
     JobApiRoutes.LOAD_JOBS_HOMPE_PAGE,
     jobController.searchJobFromHomePage.bind(jobController)

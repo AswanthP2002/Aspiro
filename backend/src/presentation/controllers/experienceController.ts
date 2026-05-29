@@ -19,7 +19,6 @@ export default class ExperienceController {
   ) {}
 
   async addExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('-- correctly executed newly created experience controller--');
     const userId = req.user?.id;
     try {
       const result = await this._addUserExperience.execute({ userId, ...req.body });
@@ -51,7 +50,6 @@ export default class ExperienceController {
 
   async editExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { experienceId } = req.params;
-    console.log('-- checking upcoming experience for editing--', req.body);
     try {
       const result = await this._editUserExperienceUC.execute({ experienceId, ...req.body });
       res

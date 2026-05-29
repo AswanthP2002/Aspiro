@@ -22,22 +22,22 @@ export default class LikePostUsecase implements ILikePostUsecase {
 
     if (result) {
       const postDto = mapToPostDTOFromPost(result);
-      const newNotification = await this._notificationRepo.create({
-        category: 'LIKE',
-        recepientId: ownerId,
-        actorId: actorId,
-        message: `${acted_by} liked your post`,
-        targetId: postId,
-        targetUrl: `/posts/${postId}`,
-        metadata: {
-          acted_by,
-          acted_user_avatar,
-          content: postDto.description,
-        },
-      });
+      // const newNotification = await this._notificationRepo.create({
+      //   category: 'LIKE',
+      //   recepientId: ownerId,
+      //   actorId: actorId,
+      //   message: `${acted_by} liked your post`,
+      //   targetId: postId,
+      //   targetUrl: `/posts/${postId}`,
+      //   metadata: {
+      //     acted_by,
+      //     acted_user_avatar,
+      //     content: postDto.description,
+      //   },
+      // }); commented part of cleanup
 
       //brodcast the like event to all users
-      this._realTimeEventEmitter.postLiked(newNotification as Notification);
+      //this._realTimeEventEmitter.postLiked(newNotification as Notification);
 
       return postDto;
     }

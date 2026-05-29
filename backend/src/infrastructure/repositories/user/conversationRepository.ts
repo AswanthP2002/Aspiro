@@ -1,8 +1,11 @@
 import { injectable } from 'tsyringe';
-import Conversation from '../../../domain/entities/conversation/conversation.entity';
+import Conversation, {
+  ConversationWithUnreadMessageCount,
+} from '../../../domain/entities/conversation/conversation.entity';
 import IConversationRepo from '../../../domain/interfaces/user/IConversationRepo';
 import { ConversationDAO } from '../../database/DAOs/user/conversation.dao';
 import BaseRepository from '../baseRepository';
+import mongoose from 'mongoose';
 
 @injectable()
 export default class ConversationRepository
@@ -18,7 +21,7 @@ export default class ConversationRepository
     search: string,
     page: number,
     limit: number
-  ): Promise<Conversation[] | null> {
+  ): Promise<ConversationWithUnreadMessageCount[] | null> {
     const skip = (page - 1) * limit;
 
     const result = await ConversationDAO.aggregate([
@@ -43,9 +46,26 @@ export default class ConversationRepository
         },
       },
       {
+        $lookup: {
+          from: 'chats',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                isRead: false,
+                receiverId: new mongoose.Types.ObjectId(logedUserId),
+              },
+            },
+          ],
+          as: 'unReadMessage',
+        },
+      },
+      {
         $match: {
           $expr: { $gte: [{ $size: '$participants' }, 2] },
           'participants.name': { $regex: new RegExp(search, 'i') },
+          'participants._id': new mongoose.Types.ObjectId(logedUserId),
         },
       },
       { $sort: { updatedAt: -1 } },
@@ -105,5 +125,35 @@ export default class ConversationRepository
     }
 
     return conversation;
+  }
+
+  async getUnreadConversationsCount(logedUserId: string): Promise<{ _id?: string }[] | null> {
+    if (!mongoose.isValidObjectId(logedUserId)) return null;
+    const result = await ConversationDAO.aggregate([
+      {
+        $lookup: {
+          from: 'chats',
+          localField: '_id',
+          foreignField: 'conversationId',
+          pipeline: [
+            {
+              $match: {
+                isRead: false,
+                receiverId: new mongoose.Types.ObjectId(logedUserId),
+              },
+            },
+          ],
+          as: 'chats',
+        },
+      },
+      {
+        $match: {
+          $expr: { $gt: [{ $size: '$chats' }, 0] },
+        },
+      },
+      { $project: { _id: 1 } },
+    ]);
+
+    return result;
   }
 }

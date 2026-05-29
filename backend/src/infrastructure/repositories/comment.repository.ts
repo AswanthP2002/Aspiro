@@ -35,4 +35,10 @@ export default class CommentRepository
 
     return result;
   }
+
+  async deleteCommentsByParentId(parentId: string): Promise<void> {
+    if (!mongoose.isValidObjectId(parentId)) return;
+
+    await CommentDAO.deleteMany({ parentId: new mongoose.Types.ObjectId(parentId) });
+  }
 }

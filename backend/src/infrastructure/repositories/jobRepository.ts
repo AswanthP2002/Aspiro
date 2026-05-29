@@ -450,6 +450,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
           jobLevel: { $in: jobLevelFilter },
           jobType: { $in: jobTypeFilter },
           location: { $regex: new RegExp(locationSearch, 'i') },
+          isHidden: false,
         },
       },
       {
@@ -500,7 +501,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   }
 
   async getRecommendedJobs(query: string): Promise<JobAggregated[] | null> {
-    console.log('- checking constructed query --', query);
+    // console.log('- checking constructed query --', query);
     const result = await JobDAO.aggregate([
       {
         $match: {
@@ -563,5 +564,37 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     ]);
 
     return result;
+  }
+
+  async hideSingleJob(jobId: string): Promise<Job | null> {
+    // if (!mongoose.isValidObjectId(jobId)) return null;
+    if (!mongoose.isValidObjectId(jobId)) return null;
+    const result = await JobDAO.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(jobId) },
+      { $set: { isHidden: true } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async hideJobsByRecruiterUserId(id: string): Promise<void> {
+    await JobDAO.updateMany(
+      {
+        recruiterId: new mongoose.Types.ObjectId(id),
+        isHidden: false,
+      },
+      { $set: { isHidden: true } }
+    );
+  }
+
+  async unHideJobsByRecruiterUserId(id: string): Promise<void> {
+    await JobDAO.updateMany(
+      {
+        recruiterId: new mongoose.Types.ObjectId(id),
+        isHidden: true,
+      },
+      { $set: { isHidden: false } }
+    );
   }
 }

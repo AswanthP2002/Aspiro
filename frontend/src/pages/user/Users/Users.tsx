@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BiCheck, BiGridAlt, BiListUl, BiSearch, BiUserPlus } from 'react-icons/bi';
-import { Experience, Skills, UserOverviewForPublic, UserType } from '../../../types/entityTypes';
-import { getLocationDetails, getUsersForPublic } from '../../../services/userServices';
+import { BiGridAlt, BiListUl, BiSearch, BiUserCheck, BiUserPlus } from 'react-icons/bi';
+import { ConnectionRequests, Experience, Follow, Skills, UserOverviewForPublic, UserPublicProfileData } from '../../../types/entityTypes';
+import { followUser, getLocationDetails, getUsersForPublic, unfollowUser } from '../../../services/userServices';
 import { Notify } from 'notiflix';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { MdVerified } from 'react-icons/md';
 import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
+import { cancelConnectionRequest, removeConnection, sendConnectionRequest } from '../../../services/connectionServices';
 
 export default function UsersFindingPage() {
   const [view, setView] = useState<'list' | 'grid'>('list');
@@ -15,6 +17,7 @@ export default function UsersFindingPage() {
   const [search, setSearch] = useState<string>('');
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(5)
+  const [sort, setSort] = useState<"recently_joined" | "most_connection" | "suggested">("recently_joined")
   const [hasMore, setHasMore] = useState(true)
   const [roleTypeFilter, setRoleTypeFilter] = useState<'All' | 'Recruiter'>('All');
   const [experienceTypeFilter, setExperienceTypeFilter] = useState<
@@ -26,6 +29,31 @@ export default function UsersFindingPage() {
   const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null)
   // const [selectedLocation, setSelectedLocation] = useState()
+  const [roleTypeFilterOpen, setRoleTypeFilterOpen] = useState(false)
+  const [levelTypeFilterOpen, setLevelTypeFilterOpen] = useState(false)
+  const [sortMenuOpen, setSortMenuOpen] = useState(false)
+
+  const toggleSortMenuOpen = () => {
+    setLevelTypeFilterOpen(false)
+    setRoleTypeFilterOpen(false)
+    setSortMenuOpen((prv) => !prv)
+  }
+
+  const toggleRoleTypeFilter = () => {
+    setLevelTypeFilterOpen(false)
+    setRoleTypeFilterOpen((prv) => {
+      if(prv){
+        return false
+      }else{
+        return true
+      }
+    })
+  }
+
+  const toggleLevelTypeFilter = () => {
+    setRoleTypeFilterOpen(false)
+    setLevelTypeFilterOpen((prv) => !prv)
+  }
 
   const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
     return state.userAuth.user;
@@ -102,6 +130,190 @@ export default function UsersFindingPage() {
 
     return experienceLabel;
   };
+
+  const followAUser = async (userId: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    try {
+      const result = await followUser(userId, logedUser.name, '')
+      if(result?.success){
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                followers:[
+                  ...user.followers as Follow[],
+                  {
+                    _id: result?.result._id,
+                    follower: result?.result.follower,
+                    following: result?.result.following,
+                    createdAt: result?.result.createdAt,
+                    updatedAt: result?.result.updatedAt,
+                    type: 'candidate'
+                  }
+                ]
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('Error occured while following a user')
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
+  const unfollowAUser = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: `Unfollow ${name}?`,
+      showConfirmButton: true, 
+      showCancelButton: true,
+      confirmButtonText:'Unfollow',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirmation.isConfirmed) return
+
+    try {
+      const result = await unfollowUser(userId, logedUser.name, '')
+      if(result.success){
+        toast.info(`Unfollowed ${name}`)
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                followers: user.followers?.filter((follow: Follow) => follow.follower !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('error occured while unfollowing a user', error)
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
+  const sendConnectionRequestToAUser = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirm = await Swal.fire({
+      icon: 'question',
+      title: 'Send connection request?',
+      text: `Your request will be pending until ${name} accepts it`,
+      showConfirmButton: true,
+      confirmButtonText: 'Send',
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirm.isConfirmed) return
+
+    try {
+      const result = await sendConnectionRequest(userId, logedUser.name, "")
+      if(result.success){
+        toast.success('Connection request send')
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connectionRequests: [...user.connectionRequests as ConnectionRequests[], result?.result]
+              }
+            }else {
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      console.log('error occured while sending connection request', error)
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
+
+  const cancelConnectionRequests = async (userId: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: 'Cancel Request',
+      showConfirmButton: true,
+      showCancelButton: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false
+    })
+    if(!confirmation.isConfirmed) return
+    try {
+      const result = await cancelConnectionRequest(userId)
+      if(result.success){
+        toast.info('Connection Request Cancelled')
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connectionRequests: user.connectionRequests?.filter((connection: ConnectionRequests) => connection.sender !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  const removeFromMyConnection = async (userId: string, name: string) => {
+    if(!userId) return toast.error('Something went wrong')
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: 'Break Connection ?',
+      text: `Are you sure to remove ${name} from your connection?.`,
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Remove',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!confirmation.isConfirmed) return
+
+    try {
+      const result = await removeConnection(userId)
+      if(result.success){
+        toast.info(`${name} removed from your connection`)
+        setUsers((users: UserOverviewForPublic[] | null | undefined) => {
+          if(!users) return null
+          return users.map((user: UserOverviewForPublic) => {
+            if(user._id === userId){
+              return {
+                ...user,
+                connections: user.connections?.filter((connection: string) => connection !== logedUser._id)
+              }
+            }else{
+              return user
+            }
+          })
+        })
+      }
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    }
+  }
 
   const navigateToUserPublicProfile = (userId: string) => {
     if (!userId) return;
@@ -191,9 +403,34 @@ export default function UsersFindingPage() {
     }
   };
 
+  const isConnectionRequestSend = (user: UserOverviewForPublic) => {
+    for(let i = 0; i < user?.connectionRequests?.length; i++){
+      if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'PENDING'){
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const isAConnection = (user: UserOverviewForPublic) => {
+    if(user.connections?.includes(logedUser._id)){
+      return true
+    }else{
+      return false
+    }
+    // for(let i = 0; i < user?.connectionRequests?.length; i++){
+    //   if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'ACCEPTED'){
+    //     return true
+    //   }
+    // }
+
+    // return false
+  }
+
   const amIFollowingThisUser = (user: UserOverviewForPublic): boolean => {
     for (let i = 0; i < user?.followers?.length; i++) {
-      if (user.followers[i].follower === logedUser.id) {
+      if (user.followers && user.followers[i].follower === logedUser._id) {
         return true;
       }
     }
@@ -216,11 +453,25 @@ export default function UsersFindingPage() {
 
             <div className="flex items-center gap-3">
               {/* Sort Select */}
-              <select className="bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+              <div onClick={toggleSortMenuOpen} className='border border-slate-200 relative rounded-lg px-5 py-2 text-sm text-gray-600 cursor-pointer min-w-40'>
+                {sort === 'recently_joined' && (<p className='text-center'>Recently Joined</p>)}
+                {sort === 'most_connection' && (<p className='text-center'>Most Connections</p>)}
+                {sort === 'suggested' && (<p className='text-center'>Suggested</p>)}
+                {sortMenuOpen && (
+                  <div className="absolute z-5 bg-white shadow-xl border border-slate-100 transition-all duration-300 w-full left-0 top-10 rounded-lg">
+                  <ul className='p-1'>
+                    <li onClick={() => setSort('recently_joined')} className='text-center text-xs font-medium text-gray-600 py-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Recently Joined</li>
+                    <li onClick={() => setSort('most_connection')} className='text-center text-xs font-medium text-gray-600 py-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Most Connections</li>
+                    <li onClick={() => setSort('suggested')} className='text-center text-xs font-medium text-gray-600 py-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Suggested</li>
+                  </ul>
+                </div>
+                )}
+              </div>
+              {/* <select className="bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                 <option value="recently-joined">Recently Joined</option>
                 <option value="most-connections">Most Connections</option>
                 <option value="suggested">Suggested</option>
-              </select>
+              </select> */}
 
               {/* View Toggles */}
               <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
@@ -261,16 +512,39 @@ export default function UsersFindingPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
               Quick Filters
             </span>
-
-            <select
+            <div onClick={toggleRoleTypeFilter} className='relative border border-slate-200 py-2 px-7 rounded-xl text-gray-600 cursor-pointer'>
+              <p className='text-xs font-medium'>{roleTypeFilter === 'All' ? "All roles" : roleTypeFilter}</p>
+              {roleTypeFilterOpen && (
+                <div className="absolute z-5 transition-all duration-300 bg-white border border-slate-100 top-9 w-full left-0 rounded-lg text-xs shadow-xl">
+                <ul className='w-full p-1'>
+                  <li onClick={() => {setRoleTypeFilter('All');setRoleTypeFilterOpen(false)}} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>All Roles</li>
+                  <li onClick={() => {setRoleTypeFilter('Recruiter');setRoleTypeFilterOpen(false)}} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Recruiter</li>
+                </ul>
+              </div>
+              )}
+            </div>
+            {/* <select
               onChange={(e) => setRoleTypeFilter(e.target.value)}
               className="text-xs font-medium bg-white border border-gray-200 px-4 py-1.5 rounded-full hover:border-gray-300 transition-colors outline-none cursor-pointer"
             >
               <option value="All">All Roles</option>
               <option value="Recruiter">Recruiters</option>
-            </select>
-
-            <select
+            </select> */}
+            <div onClick={toggleLevelTypeFilter} className='relative border border-slate-200 py-2 px-7 rounded-xl text-gray-600 cursor-pointer'>
+              <p className='text-xs font-medium'>{experienceTypeFilter === 'All' ? "All Level" : experienceTypeFilter}</p>
+              {levelTypeFilterOpen && (
+                <div className="absolute z-5 transition-all duration-300 bg-white border border-slate-100 top-9 w-full left-0 rounded-lg text-xs shadow-xl">
+                <ul className='w-full p-1'>
+                  <li onClick={() => setExperienceTypeFilter('All')} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>All Levels</li>
+                  <li onClick={() => setExperienceTypeFilter('Fresher')} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Fresher</li>
+                  <li onClick={() => setExperienceTypeFilter('Entry_Level')} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Entry Level</li>
+                  <li onClick={() => setExperienceTypeFilter('Mid_Level')} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Mid Level</li>
+                  <li onClick={() => setExperienceTypeFilter('High_Level')} className='text-center p-2 hover:bg-blue-500 hover:text-white transition-color duration-300 rounded-md'>Senior Level</li>
+                </ul>
+              </div>
+              )}
+            </div>
+            {/* <select
               onChange={(e) => setExperienceTypeFilter(e.target.value)}
               className="text-xs font-medium bg-white border border-gray-200 px-4 py-1.5 rounded-full hover:border-gray-300 transition-colors outline-none cursor-pointer"
             >
@@ -279,7 +553,7 @@ export default function UsersFindingPage() {
               <option value="Entry_Level">Entry Level</option>
               <option value="Mid_Level">Mid Level</option>
               <option value="High_Level">Senior Level</option>
-            </select>
+            </select> */}
 
             {/* Location Search Group */}
             <div className="relative flex items-center bg-white border border-gray-200 rounded-full pl-4 pr-1 py-1 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
@@ -314,68 +588,6 @@ export default function UsersFindingPage() {
             </div>
           </div>
         </div>
-        {/* <div className="w-full bg-white p-2 sticky top-0 z-18 shadow">
-                    <div className="flex justify-between">
-                        <div>
-                            <p>Discover peoples</p>
-                            <p className="text-xs text-gray-700 mt-1">Connect with people and expand your professional network</p>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <select name="" id="" className="border border-gray-200 rounded-md text-xs p-1 outline-none">
-                                <option value="recently-joined">Recently joined</option>
-                                <option value="most-connections">Most connections </option>
-                                <option value="suggested">Suggested</option>
-                            </select>
-                            <button onClick={() => setView('list')} className={`${view === 'list' ? 'bg-black' : 'bg-white'} border border-gray-200 rounded-md w-7 h-7 flex items-center justify-center`}>
-                                <BiListUl color={`${view === 'list' ? 'white' : 'black'}`} />
-                            </button>
-                            <button onClick={() => setView('grid')} className={`${view === 'grid' ? 'bg-black' : 'bg-whhite'} border border-gray-200 rounded-md w-7 h-7 flex items-center justify-center`}>
-                                <BiGridAlt color={`${view === 'grid' ? 'white' : 'black'}`} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="mt-2 flex items-center bg-gray-200 p-2 rounded-md">
-                        <BiSearch color="gray" />
-                        <input onKeyUp={(e) => db(e)} type="text" className="!text-xs w-full" placeholder="Search by name, headline, skill" />
-                    </div>
-                    <div className="flex items-center gap-3 flex-wrap mt-5">
-                        <p className="text-xs text-gray-500">Quick filters : </p>
-                        <select onChange={(e) => setRoleTypeFilter(e.target.value)} className="text-xs outline-none border border-gray-200 w-fit ps-2 rounded-full py-1">
-                            <option value="All">All Users</option>
-                            <option value="Recruiter">Recruiters</option>
-                        </select>
-                        <select onChange={(e) => setExperienceTypeFilter(e.target.value)} className="text-xs outline-none border border-gray-200 w-fit ps-2 rounded-full py-1">
-                            <option value="All">All Level</option>
-                            <option value="Fresher">Fresher</option>
-                            <option value="Entry_Level">Entry Level</option>
-                            <option value="Mid_Level">Mid Level</option>
-                            <option value="High_Level">High Level</option>
-                        </select>
-                        <div className="text-xs border border-gray-200 w-fit px-5 rounded-full py-1">Near by</div>
-                        <div className="text-xs relative flex gap-2 items-center border border-gray-200 px-5 rounded-md py-1">
-                            <input 
-                                type="text"
-                                className="border !text-xs w-70 border-gray-300 rounded-md px-2 py-1"
-                                placeholder="enter the location"
-                                value={query}
-                                onChange={handleChange}
-                            />
-                            <button onClick={findByLocation} className="bg-blue-500 text-white rounded-md px-2 py-1">Find</button>
-                            {
-                                suggestions?.length > 0 && (
-                                    <ul className="absolute top-9 bg-white z-10 border border-gray-300 rounded-md shadow-xl space-y-2 m-h-[500px] p-3 overflow-y-scroll">
-                                {
-                                    suggestions?.map((place: any) => (
-                                        <li className="text-xs cursor-pointer text-gray-700" onClick={() => handleLocationSelect(place)} key={place.place_id}>{place.display_name}</li>
-                                    ))
-                                }
-                            </ul>
-                                )
-                            }
-                        </div>
-                    </div>
-                </div> */}
-
         <div className="mt-5">
           <div className={`grid gap-5 ${view === 'list' ? 'grid-cols-1' : 'grid-cols-2'}`}>
             {users?.map((user: UserOverviewForPublic, index: number) => (
@@ -461,23 +673,45 @@ export default function UsersFindingPage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div
+                    {user._id !== logedUser._id && (
+                      <div
                       className={`mt-5 flex items-center gap-2 ${view === 'grid' ? 'justify-center w-full' : ''}`}
                     >
-                      <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
-                        <BiUserPlus className="text-lg" /> Connect
-                      </button>
-
-                      <button
-                        className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                          amIFollowingThisUser(user)
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-gray-900 text-white hover:bg-black'
-                        }`}
+                      {
+                        isAConnection(user) ? (
+                          <button onClick={() => removeFromMyConnection(user._id as string, user.name as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            <BiUserCheck className="text-lg" /> Connected
+                          </button>
+                        ) : isConnectionRequestSend(user) ? (
+                          <button onClick={() => cancelConnectionRequests(user._id as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            Pending
+                          </button>
+                        ) : (
+                          <button onClick={() => sendConnectionRequestToAUser(user._id as string, user.name as string)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            <BiUserPlus className="text-lg" /> Connect
+                          </button>
+                        )
+                      }
+                      {
+                        amIFollowingThisUser(user)
+                          ? <button
+                          onClick={() => unfollowAUser(user._id as string, user.name as string)}
+                         className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200`}
                       >
-                        {amIFollowingThisUser(user) ? 'Following' : 'Follow'}
+                        Following
                       </button>
+                      : <button
+                        onClick={() => followAUser(user._id as string)}
+                        className={`flex-1 sm:flex-none px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-gray-900 text-white hover:bg-black`}
+                      >
+                        Follow
+                      </button>
+                      }
+                      
+
+                      
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -506,62 +740,3 @@ export default function UsersFindingPage() {
     </>
   );
 }
-
-
-
-// <div className="bg-white rounded-md p-5">
-              //     <div className={`${view === 'list' ? 'flex flex-row' : 'flex flex-col items-center'} gap-3`}>
-              //         <div>
-              //             <div onClick={() => navigateToUserPublicProfile(user._id)} className="relative cursor-pointer bg-blue-500 w-15 h-15 rounded-full flex items-center justify-center">
-              //                 {
-              //                     user.profilePicture?.cloudinarySecureUrl && (
-              //                         <img style={{objectFit:'cover'}} className="w-[90%] h-[90%] rounded-full" src={user.profilePicture?.cloudinarySecureUrl} alt="" />
-              //                     )
-              //                 }
-              //                 {
-              //                     !user.profilePicture?.cloudinarySecureUrl && (
-              //                         <p className="text-white text-xl">{user?.name[0]}</p>
-              //                     )
-              //                 }
-              //                 <div className="bg-green-400 absolute p-1 rounded-full bottom-0 right-3"></div>
-              //             </div>
-              //         </div>
-              //         <div className={`flex flex-col ${view === 'grid' ? 'items-center' : ''}`}>
-              //             <div className="flex items-center gap-2">
-              //                 <p>{user.name}</p>
-              //                 {user.isRecruiter && user.isVerifiedRecruiter
-              //                     ? <div className="flex items-center gap-2">
-              //                         <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 rounded-md border border-blue-300 py-[3px]">Recruiting</span>
-              //                         <span className="flex items-center text-xs gap-2 bg-green-200 px-2 py-[3px] rounded-md border border-green-300 text-green-700"><MdVerified /> Aspiro Verified</span>
-              //                       </div>
-              //                     : (user.isRecruiter && !user.isVerifiedRecruiter
-              //                         ? <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 rounded-md border border-blue-300 py-[3px]">Recruiting</span>
-              //                         : <span></span>)
-              //                 }
-              //             </div>
-              //             <p className="text-gray-500 text-sm mt-1">{user.headline}</p>
-              //             <p className="mt-1 text-blue-500 text-xs">{0} Mutal connections</p>
-              //             <p className={`mt-1 text-gray-500 text-xs ${view === 'grid' ? 'hidden' : ''}`}>{getClippedText(user?.summary as string, 200)}</p>
-              //             <div className={`mt-3 flex flex-wrap gap-2 ${view === 'grid' ? 'hidden' : ''}`}>
-              //                 {
-              //                     getSkillPhills(user.skills as Skills[]).map((skill: string, index: number) => (
-              //                         <div className="text-xs bg-gray-200 px-2 py-1 rounded-full" key={index}>{skill}</div>
-              //                     ))
-              //                 }
-              //             </div>
-              //             <div className="mt-3 flex items-center gap-3">
-              //                 <button className="border border-gray-200 text-xs text-gray-700 px-5 py-2 rounded-md flex items-center gap-2"><BiUserPlus /> Connect</button>
-              //                 {
-              //                     amIFollowingThisUser(user) && (
-              //                         <button className="bg-black text-white text-xs px-5 py-2 rounded-md flex items-center gap-2">Following <BiCheck /></button>
-              //                     )
-              //                 }
-              //                 {
-              //                     !amIFollowingThisUser(user) && (
-              //                         <button className="bg-black text-white text-xs px-5 py-2 rounded-md">Follow</button>
-              //                     )
-              //                 }
-              //             </div>
-              //         </div>
-              //     </div>
-              // </div>

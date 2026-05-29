@@ -90,6 +90,8 @@ export interface JobListForPublicDTO {
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: string;
+  isFlagged?: boolean;
+  status?: string;
   companyDetails?: {
     _id?: string;
     name?: string;

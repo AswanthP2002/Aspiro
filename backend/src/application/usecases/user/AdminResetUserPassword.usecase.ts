@@ -6,6 +6,7 @@ import { AdminUserPasswordResetDTO } from '../../DTOs/admin/adminUserPasswordRes
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateToken, verifyToken } from '../../../services/jwt';
 import IEmailService from '../../interfaces/services/IEmailService';
+import { WrongCredentialsError } from '../../../domain/errors/AppError';
 
 type DecodedValue = {
   code: string;
@@ -28,7 +29,7 @@ export default class AdminResetUserPasswordUsecase implements IAdminResetUserPas
       console.log('Step (3) Decode success decoded values', decode);
       if (decode.code !== code) {
         console.log('Code does not match');
-        return null;
+        throw new WrongCredentialsError();
       }
 
       console.log('code is matched now generating new token for the user to reset the link');
@@ -55,7 +56,7 @@ export default class AdminResetUserPasswordUsecase implements IAdminResetUserPas
       return userDetails as AdminUserDetailsDTO;
     } catch (error: unknown) {
       console.log('error occured while resting link send from admin side', error);
-      throw new Error('Reset link send failed');
+      throw error;
     }
   }
 }

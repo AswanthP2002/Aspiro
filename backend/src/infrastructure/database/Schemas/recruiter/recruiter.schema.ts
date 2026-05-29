@@ -50,6 +50,12 @@ export const RecruiterSchema = new Schema<NewRecruiter>(
       url: { type: String },
     },
     yearOfExperience: { type: Number },
+    isAllJobsHidden: { type: Boolean, default: false },
+    allowPostJobs: { type: Boolean, default: true },
+    allowEditJobs: { type: Boolean, default: true },
+    allowDeletePosts: { type: Boolean, default: true },
+    allowManageApplications: { type: Boolean, default: true },
+    allowScheduleInterviews: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

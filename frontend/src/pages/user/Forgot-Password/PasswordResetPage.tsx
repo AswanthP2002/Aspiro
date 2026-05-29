@@ -3,9 +3,11 @@ import { Controller, useForm } from 'react-hook-form'
 import {FaArrowLeft} from 'react-icons/fa'
 import {GoLock} from 'react-icons/go'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { resetPassword } from '../../../services/userServices'
+import { resetPassword, validateToken } from '../../../services/userServices'
 import Swal from 'sweetalert2'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import { AxiosError } from 'axios'
 
 export default function PasswordResetPage(){
 
@@ -25,6 +27,7 @@ export default function PasswordResetPage(){
     const typedPassword = watch('password')
 
     async function resetPasswordOnSubmit(data: FormInput){
+        alert('reset button called')
         setLoading(true)
         const {password} = data
         
@@ -33,38 +36,39 @@ export default function PasswordResetPage(){
         if(result?.success){
             navigate('/password-reset/success')
         }else{
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:result?.message,
-                showConfirmButton:true,
-                confirmButtonText:'Ok',
-                allowOutsideClick:false,
-                allowEscapeKey:false,
-                showCancelButton:false
-            }).then(() => {
-                navigate('/login')
-            })
+           toast.error('Something went wrong')
         }
         } catch (error: unknown) {
-            Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:'Something went wrong',
-                showConfirmButton:true,
-                confirmButtonText:'Ok',
-                allowEscapeKey:false,
-                allowOutsideClick:false,
-                showCancelButton:false
-            }).then(() => navigate('/login'))
+            const err = error as AxiosError<{message: string}>
+            const finalErrMessage = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(finalErrMessage)
         } finally {
             setLoading(false)
         }
     }
 
+    useEffect(() => {
+        async function validateSessionToken(){
+            if(!token){
+                return navigate('/login')
+            }
+            try {
+                const result = await validateToken(token)
+                if(!result?.success){
+                    return navigate('/login')
+                }
+            } catch (error: unknown) {
+                console.log('Error occured while validating token', error)
+                toast.error(error instanceof Error ? error.message : 'Something went wrong')
+            }
+        }
+
+        validateSessionToken()
+    }, [])
+
     return(
         <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex justify-center items-center">
-            <div className='bg-white shadow-lg rounded-md border border-gray-200 !p-5 md:!p-10 w-md'>
+            <div className='bg-white shadow-xl rounded-lg border border-slate-100 !p-10 md:!p-10 w-md'>
                 <div className="w-full">
                     <button className='text-gray-500 flex items-center gap-2'>
                         <FaArrowLeft />
@@ -77,12 +81,12 @@ export default function PasswordResetPage(){
                     </div>
                 </div>
                 <div>
-                    <p className="text-center text-gray-700">Reset password</p>
-                    <p className='text-center !my-5 text-sm text-black font-light'>Enter your new password and confirm it</p>
+                    <p className="text-center font-semibold text-lg text-gray-900">Reset password</p>
+                    <p className='text-center mt-3 mb-5 text-sm font-medium text-gray-700'>Enter your new password and confirm it</p>
                 </div>
                 <form onSubmit={handleSubmit(resetPasswordOnSubmit)}>
-                    <FormControl fullWidth>
-                        <label htmlFor="" className='!text-black font-medium text-sm !mb-1'>New Password</label>
+                    <FormControl fullWidth error={Boolean(errors.password)}>
+                        <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>New Password</label>
                         <Controller
                             name='password'
                             control={control}
@@ -91,11 +95,12 @@ export default function PasswordResetPage(){
                                 pattern:{value:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, message:'Password must contain one special character, uppercase, lowercase, digit'}
                             }}
                             render={({field}) => (
-                                <div className="flex gap-2 !px-2 !py-2 bg-gray-100 rounded-md items-center">
-                                    <GoLock color='gray' />
+                                <div className="flex gap-2 relative items-center">
+                                    <GoLock color='gray' className='absolute left-3' />
                                     <input type="password"
                                         {...field}
                                         placeholder='Enter new password'
+                                        className='border border-slate-100 p-3 w-full rounded-lg px-10 bg-gray-50 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-200'
                                     />
                                 </div>
                             )}
@@ -103,8 +108,8 @@ export default function PasswordResetPage(){
                         <FormHelperText>{errors.password?.message || 'Pasword must be atleast 8 characters long'}</FormHelperText>
                     </FormControl>
 
-                    <FormControl fullWidth className='!mt-5'>
-                        <label htmlFor="" className='!text-black font-medium text-sm !mb-1'>Confirm new password</label>
+                    <FormControl fullWidth className='!mt-5' error={Boolean(errors.confirmPassword)}>
+                        <label htmlFor="" className='uppercase font-semibold !text-xs !text-gray-400 !mb-1'>Confirm password</label>
                         <Controller
                             name='confirmPassword'
                             control={control}
@@ -115,11 +120,12 @@ export default function PasswordResetPage(){
                                 required: { value: true, message: 'Confirm your password' },
                             }}
                             render={({field}) => (
-                                <div className="flex gap-2 !px-2 !py-2 bg-gray-100 rounded-md items-center">
-                                    <GoLock color='gray' />
+                                <div className="flex gap-2 relative items-center">
+                                    <GoLock color='gray' className='absolute left-3' />
                                     <input type="password"
                                         {...field}
                                         placeholder='Confirm new password'
+                                        className='border border-slate-100 w-full p-3 rounded-lg px-10 bg-gray-50 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-200'
                                     />
                                 </div>
                             )}
@@ -127,14 +133,14 @@ export default function PasswordResetPage(){
                         <FormHelperText>{errors.confirmPassword?.message}</FormHelperText>
                     </FormControl>
                     <div className="action !mt-5">
-                        <Button
-                            variant='contained'
-                            loading={loading}
-                            fullWidth
-                            sx={{
-                                bgcolor:'black'
-                            }}
-                        >Reset Password</Button>
+                        <button
+                            className='border border-transparent w-full p-3 rounded-lg bg-black text-white font-semibold text-sm shadow-xl transition-color duration-300 hover:bg-gray-500'
+                        >
+                            {loading
+                                ? "Processing..."
+                                : "Reset Password"
+                            }
+                        </button>
                         {/* <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button> */}
                     </div>
                 </form>

@@ -62,6 +62,7 @@ export const UserSchema = new Schema<User>(
     isDeleted: { type: Boolean, default: false },
     lastLogin: { type: Date },
     hiddenPosts: { type: [Schema.Types.ObjectId], ref: 'posts' },
+    views: { type: [String] },
   },
   { timestamps: true }
 );

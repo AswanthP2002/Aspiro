@@ -76,7 +76,7 @@ async function main() {
   await connectToDb();
   //connect redis
   //await connectRedis(); closed right now for testing :
-  await connectRedis();
+  // await connectRedis();
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);

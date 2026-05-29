@@ -9,32 +9,32 @@ export default function Validator(schema: ZodSchema) {
       req.body = validatedData;
       next();
     } catch (error: unknown) {
-      console.error('Wrong while validating', error);
-      res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        title: 'Validation Failed',
-        message: 'One or more input fields are invalid',
-        errors: [
-          {
-            code: 'MISSING_FIELDS',
-            message: 'Incompletion of required fields',
-          },
-          {
-            code: 'INVALID_DATA',
-            message: 'Data entered, can not be processed by server',
-          },
-          {
-            code: 'TOO_SHORT',
-            message: 'Data entered is too short',
-          },
-          {
-            code: 'TOO_LONG',
-            message: 'Data entered is too long',
-          },
-        ],
-      });
+      // console.error('Wrong while validating', error);
+      // res.status(StatusCodes.BAD_REQUEST).json({
+      //   success: false,
+      //   title: 'Validation Failed',
+      //   message: 'One or more input fields are invalid',
+      //   errors: [
+      //     {
+      //       code: 'MISSING_FIELDS',
+      //       message: 'Incompletion of required fields',
+      //     },
+      //     {
+      //       code: 'INVALID_DATA',
+      //       message: 'Data entered, can not be processed by server',
+      //     },
+      //     {
+      //       code: 'TOO_SHORT',
+      //       message: 'Data entered is too short',
+      //     },
+      //     {
+      //       code: 'TOO_LONG',
+      //       message: 'Data entered is too long',
+      //     },
+      //   ],
+      // });
 
-      return;
+      return next(error);
     }
   };
 }

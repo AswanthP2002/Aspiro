@@ -37,7 +37,7 @@ export const StatusMessage = {
   },
   AUTH_MESSAGE: {
     LOGIN: (auth: string) => `${auth} loged in succesfully`,
-    NO_REFRESH_TOKEN: 'No refresh token provided',
+    NO_REFRESH_TOKEN: 'Your session has expired, please relogin to continue',
     INVALID_TOKEN: 'Invalid token',
     LOGOUT: 'User loged out succesfully',
     PASSWORD_RESET_LINK_SEND: 'Password reset link send succesfully',

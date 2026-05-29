@@ -45,7 +45,6 @@ export default class PlanController {
   ) {}
 
   async createPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('-- inspecing request body --', req.body);
     const payload = {
       name: req.body.planName,
       description: req.body.planDescription,
@@ -187,13 +186,10 @@ export default class PlanController {
   }
 
   async userSubscribeFreePlan(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('request reached inside controller for subscribing');
     const userId = req.user.id;
     const planId = req.params.planId;
-    console.log('-- plan id and user id ', planId, userId);
     try {
       const result = await this._subscribeFreePlan.execute({ userId, planId });
-      console.log('plan created succesfully');
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Free plan'),
@@ -217,13 +213,10 @@ export default class PlanController {
   }
 
   async userSubscribePaidPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('request reached inside controller for subscribing');
     const userId = req.user.id;
     const planId = req.params.planId;
-    console.log('-- plan id and user id ', planId, userId);
     try {
       const result = await this._subscribePaidPlan.execute({ planId, userId });
-      console.log('plan created succesfully');
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Free plan'),
@@ -259,7 +252,6 @@ export default class PlanController {
     const status = (req.query.status as string) || 'all';
     try {
       const result = await this._getAnalytics.execute(search, page, limit, status);
-      console.log('result for the frontend', result);
       res.status(StatusCodes.OK).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Analytics'),

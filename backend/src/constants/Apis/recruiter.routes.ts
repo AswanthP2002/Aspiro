@@ -2,6 +2,10 @@ export const RecruiterApiRoutes = {
   RECRUITER_PROFILE: {
     CREATE: '/v1/recruiter/create',
     LOAD_MY_RECRUITER_PROFILE: '/v1/recruiter/profile/overview',
+    CHECK_VERIFICATION_STATUS: '/v2/recruiter/verification-status',
+    CHECK_EDIT_JOB_VERIFICATION_STATUS: '/v2/recruiter/job-edit/verification-status',
+    CHECK_MANAGE_APPLICATIONS_VERIFICATIONS_STATUS:
+      '/v2/recruiter/manage-applications/verification-status',
   },
   RECRUITER_JOB_CONFIG_LISTS: {
     JOB_LEVEL_LIST_FETCH: '/v1/recruiter/joblevels',
@@ -34,6 +38,7 @@ export const RecruiterApiRoutes = {
     LOAD_RECRUITER_DETAILS_BY_ID: '/v2/recruiters/:recruiterId',
     BLOCK_RECRUITER_BY_ID: '/recruiter/block/:companyId',
     HANDLE_RECRUITER_VERIFICATION: '/v2/recruiter/:recruiterId/verification/action',
-    HANDLE_RECRUITER_PERMISSIONS: '/v2/recruiter/:recruiterId/permissions/update',
+    HANDLE_RECRUITER_PERMISSIONS: '/v2/recruiter/:recruiterId/permissions/update', //legacy
+    MANAGE_RECRUITER_PERMISSIONS: '/v2/recruiter/:id/permissions',
   },
 } as const;

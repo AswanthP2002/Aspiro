@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import store from '../../redux/store';
 import { tokenRefresh, updateUserMetaData } from '../../redux/userAuthSlice';
 import { reAuthenticate } from '../commonServices';
+import { toast } from 'react-toastify';
 
 const baseUrl = import.meta.env.VITE_SERVER_URL
 
@@ -81,9 +82,10 @@ axiosInstance.interceptors.response.use(
                 }
             })
         }
-        else if(response && response.status === 406 && !originalRequest.url.includes('login')){
-           window.location.replace(`/action/termination?message=${response.data.message}`)
-           return
+        else if(response && response.status === 406 && !window.location.href.includes('login')){
+            // alert(originalRequest.url)
+            // toast.warn(originalRequest.url)
+            return window.location.replace(`/action/termination?message=${response.data.message}`)
        }
         else if(response && response.status === 403){
             Swal.fire({
@@ -125,11 +127,13 @@ axiosInstance.interceptors.response.use(
                 // Handle refresh token failure (e.g., redirect to login)
                 return Promise.reject(refreshError);
             }   //given an auth failed flag, which is for wrong password
-        }else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
+        }
+        // else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
             // alert(`This one is still executing ${response.data.errors.code}`)
             // console.log('not executed')
-            window.location.replace('http://localhost:5173/token/expired')
-        }else if(response && response.status === 404 && !window.location.href.includes('/login')){
+            // window.location.replace('http://localhost:5173/token/expired')
+        // }
+        else if(response && response.status === 404 && !window.location.href.includes('/login')){
             console.log('--checking 404 error--', response)
             //window.location.replace('http://localhost:5173/404') //only if it is not in the login page
         }

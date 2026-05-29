@@ -16,6 +16,7 @@ export const UserApiRoutes = {
   USER_AUTH_MANAGE: {
     GOOGLE_LOGIN: '/v1/google/sign-up',
     NORMAL_LOGIN: '/v1/user/login',
+    VALIDATE_TOKEN: '/v1/token-verify',
   },
 
   USER_PROFILE_MANAGE: {
@@ -34,6 +35,7 @@ export const UserApiRoutes = {
       UPLOAD: '/v1/user/me/cover-photo',
       REMOVE: '/v1/user/me/cover-photo/remove',
     },
+    PROFILE_VIEW_UPDATE: '/v2/user/profile/:id/viewed',
   },
 
   USER_DOCUMENTS_MANAGE: {

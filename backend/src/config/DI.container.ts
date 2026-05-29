@@ -472,6 +472,29 @@ import InterviewAIResultRepository from '../infrastructure/repositories/user/int
 import InterviewAIMapper from '../application/mappers/Interview-AI/InterviewAi.mapperClass';
 import ILoadInterviewDashboardUsecase from '../application/interfaces/usecases/AI/ILoadInterviewDashboard.usecase';
 import LoadInterviewDashboard from '../application/usecases/AI/LoadInterviewDashboard.usecase';
+import IUpdateProfileViewUsecase from '../application/interfaces/usecases/user/IUpdateProfileView.usecase';
+import UpdateProfileViewUsecase from '../application/usecases/user/UpdateProfileView.usecase';
+import IRemoveConnectionUsecase from '../application/interfaces/usecases/connection/IRemoveConnection.usecase';
+import RemoveConnectionUsecase from '../application/usecases/connection/RemoveConnection.usecase';
+import IValidateTokenUsecase from '../application/interfaces/usecases/user/IValidateToken.usecase';
+import ValidateTokenUsecase from '../application/usecases/user/ValidateToken.usecase';
+import IVerifyBeforePostingJobUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforePostingJob.usecase';
+import VerifyBeforePostingJobUsecase from '../application/usecases/recruiter/VerifyBeforePostingJob.usecase';
+import IManageRecruiterPermissionsUsecase from '../application/interfaces/usecases/recruiter/IManageRecruiterPermissions.usecase';
+import ManageRecruiterPermissionsUsecase from '../application/usecases/recruiter/ManageRecruiterPermissions.usecase';
+import IVerifyBeforeEditJobUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforeEditJob.usecase';
+import VerifyBeforeEditJobUsecase from '../application/usecases/recruiter/VerifyBeforeEditJob.usecase';
+import IVerifyBeforeManagingApplicationsUsecase from '../application/interfaces/usecases/recruiter/IVerifyBeforeManagingApplications.usecase';
+import VerifyBeforeManagingApplicationsUsecase from '../application/usecases/recruiter/VerifyBeforeManagingApplications.usecase';
+import IAdminLoadAllCompaniesDataUsecase from '../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
+import AdminLoadAllCompaniesDataUsecase from '../application/usecases/company/AdminLoadCompaniesData.usecase';
+import IAdminEditCompanyUsecase from '../application/interfaces/usecases/company/IAdminEditCompany.usecase';
+import AdminEditCompanyUsecase from '../application/usecases/company/AdminEditCompanyUsecase';
+import ConversationMapper from '../application/mappers/conversations/Conversation.mapperClass';
+import IDeleteConversationUsecase from '../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
+import DeleteConversationUsecase from '../application/usecases/conversation/DeleteConversations.usecase';
+import IGetNewUnreadConversationsCount from '../application/interfaces/usecases/conversation/IGetNewUnreadConversationsCount.usecase';
+import GetNewUnreadConversationsCountUsecase from '../application/usecases/conversation/GetNewUnreadConversationsCount.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -566,7 +589,26 @@ container.registerSingleton<IAdminResetUserPasswordUsecase>(
   'IAdminResetUserPasswordUsecase',
   AdminResetUserPasswordUsecase
 );
-
+container.registerSingleton<IManageRecruiterPermissionsUsecase>(
+  'IManageRecruiterPermissions',
+  ManageRecruiterPermissionsUsecase
+);
+container.registerSingleton<IAdminEditCompanyUsecase>(
+  'IAdminEditCompanyUsecase',
+  AdminEditCompanyUsecase
+);
+container.registerSingleton<IAdminLoadAllCompaniesDataUsecase>(
+  'IAdminLoadAllCompaniesDataUsecase',
+  AdminLoadAllCompaniesDataUsecase
+);
+container.registerSingleton<IVerifyBeforeEditJobUsecase>(
+  'IVerifyBeforeEditJobUsecase',
+  VerifyBeforeEditJobUsecase
+);
+container.registerSingleton<IVerifyBeforeManagingApplicationsUsecase>(
+  'IVerifyBeforeManageApplicationsUsecase',
+  VerifyBeforeManagingApplicationsUsecase
+);
 container.registerSingleton<ILoadRecruiterRecentJobs>(
   'ILoadRecruiterRecentJobs',
   LoadRecruiterRecentJobsUsecase
@@ -587,6 +629,19 @@ container.registerSingleton<ILoadMyProfileUsecase>('ILoadMyProfileUsecase', Load
 container.registerSingleton<ISaveUserBasicsUsecase>(
   'ISaveUserBasicsUsecase',
   SaveUserBasicsUsecase
+);
+container.registerSingleton<IUpdateProfileViewUsecase>(
+  'IUpdateProfileViewUsecase',
+  UpdateProfileViewUsecase
+);
+container.registerSingleton<IValidateTokenUsecase>('IValidateTokenUsecase', ValidateTokenUsecase);
+container.registerSingleton<IRemoveConnectionUsecase>(
+  'IRemoveConnectionUsecase',
+  RemoveConnectionUsecase
+);
+container.registerSingleton<IVerifyBeforePostingJobUsecase>(
+  'IVerifyBeforePostingJob',
+  VerifyBeforePostingJobUsecase
 );
 container.registerSingleton<IUploadUserProfilePictureUsecase>(
   'IUploadUserProfilePictureUsecase',
@@ -826,6 +881,14 @@ container.registerSingleton<IGetConversationsUsecase>(
   'IGetConversationsUsecase',
   GetconversationsUsecase
 );
+container.registerSingleton<IDeleteConversationUsecase>(
+  'IDeleteConversationUsecase',
+  DeleteConversationUsecase
+);
+container.registerSingleton<IGetNewUnreadConversationsCount>(
+  'IGetNewUnreadConversationsCountUsecase',
+  GetNewUnreadConversationsCountUsecase
+)
 container.registerSingleton<IInitializeConversation>(
   'IInitializeConversation',
   InitializeConversationUsecase
@@ -1126,5 +1189,6 @@ container.registerSingleton('AlertsMapper', AlertMapper);
 container.registerSingleton('ConnectionRequestMapper', ConnectionRequestMapper);
 container.registerSingleton('PlanMapper', PlanMapper);
 container.registerSingleton('InterviewAIMapper', InterviewAIMapper);
+container.registerSingleton('ConversationMapper', ConversationMapper);
 
 //register socket

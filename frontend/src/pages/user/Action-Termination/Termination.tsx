@@ -3,7 +3,6 @@ import { useState } from "react";
 import { CiWarning } from "react-icons/ci";
 import { useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Notify } from "notiflix";
 import { userLogout } from "../../../services/userServices";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
@@ -16,7 +15,6 @@ export default function TerminationPage(){
     const navigate = useNavigate()
 
     const logoutOnButtonClick = async () => {
-        Notify.info('Logout happening')
         try {
             setLoading(true)
             await toast.promise(

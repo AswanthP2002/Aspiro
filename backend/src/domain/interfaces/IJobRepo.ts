@@ -42,4 +42,7 @@ export default interface IJobRepo extends IBaseRepo<Job> {
     query: LoadJobsAggregatedListForPublicQuery
   ): Promise<{ jobs: JobListAggregatedForPublic[]; totalPages: number } | null>;
   getRecommendedJobs(query: string): Promise<JobAggregated[] | null>;
+  hideSingleJob(jobId: string): Promise<Job | null>;
+  hideJobsByRecruiterUserId(id: string): Promise<void>;
+  unHideJobsByRecruiterUserId(id: string): Promise<void>;
 }

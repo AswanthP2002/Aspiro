@@ -77,8 +77,8 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
 
     return(
         <>
-            <div className={`w-full bg-white rounded-xl border-2 border-blue-500 p-6 mb-4 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.6)] hover:border-blue-500 hover:ring-1 hover:ring-blue-500 hover:bg-gradient-to-br hover:from-blue-500 hover:to-indigo-50 ${
-      data.status === 'active' ? 'border-blue-500 ring-1 ring-blue-500' : ''
+            <div className={`w-full ${data.isFlagged ? "bg-gradient-to-br from-white via-amber-50 to-red-200" : "bg-white"} rounded-xl border border-slate-200 p-6 mb-4 shadow-[0_0_30px_2px_rgba(100,0,250,0.2)] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.6)] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 ${
+      data.isFlagged ? "border-orange-500 ring-1 ring-orange-500" : ""
     }`}>
       {/* Top Header Section */}
       <div className="flex justify-between items-start mb-4">

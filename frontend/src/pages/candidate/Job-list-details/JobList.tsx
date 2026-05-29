@@ -130,7 +130,7 @@ export default function JobListing() {
 
   <div className="p-5 bg-gray-50/50">
     {/* Integrated Search Bar */}
-    <div className="flex flex-col md:flex-row items-stretch gap-0 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+    <div className="flex flex-col md:flex-row items-stretch gap-0 bg-white border border-slate-100 rounded-lg shadow-xl focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-300">
       
       {/* Job Title Search */}
       <div className="flex-1 flex items-center gap-3 px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
@@ -159,7 +159,7 @@ export default function JobListing() {
         <button 
           onClick={setSearchingLocation} 
           disabled={loading}
-          className="h-full px-8 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center min-w-[120px]"
+          className="h-full px-8 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center min-w-[120px] shadow-[0_0_30px_2px_rgba(0,0,200,0.2)]"
         >
           {loading ? 'Searching...' : 'Find Jobs'}
         </button>
@@ -187,7 +187,7 @@ export default function JobListing() {
           </button>
 
           {filter.isOpen && (
-            <div className="absolute top-full mt-2 z-30 bg-white w-48 border border-gray-200 rounded-lg shadow-xl py-1 animate-in fade-in zoom-in duration-100">
+            <div className="absolute top-full mt-2 z-30 bg-white w-48 border border-slate-100 rounded-lg shadow-xl py-1 animate-in fade-in zoom-in transition-all duration-300">
               <button 
                 onClick={() => {filter.set('All'); filter.setOpen(false)}} 
                 className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs"
@@ -210,65 +210,7 @@ export default function JobListing() {
     </div>
   </div>
 </div>
-          {/* <div className="header px-5 py-3 bg-white rounded-md border border-slate-200">
-              <p >Find your opportunities</p>
-              <p className='text-xs text-gray-500'>Discover opportunities that matches your skills</p>
-              <div className="mt-3 grid grid-cols-12 gap-2">
-                <div className="col-span-12 border border-slate-200 rounded-md flex items-center gap-3 p-2">
-                  <BsSearch size={12} color='gray' />
-                  <input onKeyUp={(event) => dSearch(event)} type="text" className='w-full !text-xs' placeholder='Search job tile, skills' />
-                </div>
-                <div className='col-span-12 flex gap-2'>
-                  <div className="border flex-1 border-slate-200 rounded-md flex items-center gap-3 p-2">
-                  <BiMapPin size={12} color='gray' />
-                  <input ref={locationSearchInputField} type="text" className='w-full !text-xs' placeholder='Search location' />
-                </div>
-                <Button type='button' loading={loading} onClick={setSearchingLocation} className='!text-xs' variant='contained' >Search</Button>
-                </div>
-                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
-                  <div className="flex justify-between items-center">
-                    <p className='text-xs font-medium text-center'>{jobTypeFilter}</p>
-                    <button onClick={toggleJobTypeFilterOpen}><BiChevronDown /></button>
-                  </div>
-                  {isJobTypeFilterOpen && (
-                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
-                     <button onClick={() => {setJobTypeFilter('All'); setIsJobTypeFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
-                    {jobTypeOptions.map((option: JobTypesData, index: number) => (
-                      <button onClick={() => {setJobTypeFilter(option.name as string); setIsJobTypeFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
-                    ))}
-                  </div>
-                  )}
-                </div>
-                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
-                  <div className="flex justify-between items-center">
-                    <p className='text-xs font-medium text-center'>{jobLevelFilter}</p>
-                    <button onClick={toggleJobLevelFilterOpen}><BiChevronDown /></button>
-                  </div>
-                  {isJobLevelFilterOpen && (
-                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
-                    <button onClick={() => {setJobLevelFilter('All'); setIsJobLevelFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
-                    {jobLevelOptions.map((option: JobLevelData, index: number) => (
-                      <button onClick={() => {setJobLevelFilter(option.name as string); setIsJobLevelFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
-                    ))}
-                  </div>
-                  )}
-                </div>
-                <div className="col-span-4 border border-slate-200 p-2 rounded-md relative">
-                  <div className="flex justify-between items-center">
-                    <p className='text-xs font-medium text-center'>{workModeFilter}</p>
-                    <button onClick={toggleWorkModeFilter}><BiChevronDown /></button>
-                  </div>
-                  {isWorkModeFilterOpen && (
-                    <div className="absolute bg-white text-xs flex flex-col w-full left-0 border border-slate-200 rounded-md shadow-sm">
-                    <button onClick={() => {setWorkModeFilter('All'); setIsWorkModeFilterOpen(false)}} className='hover:bg-gray-200 py-2'>All</button>
-                    {workModeOptions.map((option: WorkModeData, index: number) => (
-                      <button onClick={() => {setWorkModeFilter(option.name as string); setIsWorkModeFilterOpen(false)}} key={index} className='hover:bg-gray-200 py-2'>{option.name}</button>
-                    ))}
-                  </div>
-                  )}
-                </div>
-              </div>
-          </div> */}
+    
           <div className="mt-5 grid grid-cols-1 gap-3">
             {jobs.length > 0 && (
               jobs.map((job: LoadJobsForPublicData) => (

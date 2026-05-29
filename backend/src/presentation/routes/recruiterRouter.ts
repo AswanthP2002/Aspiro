@@ -122,6 +122,27 @@ function createRecruiterRouter() {
     recruiterController.loadRecruiterApplications.bind(recruiterController)
   );
 
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITER_PROFILE.CHECK_VERIFICATION_STATUS,
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.verifyBeforePostingJob.bind(recruiterController)
+  );
+
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITER_PROFILE.CHECK_EDIT_JOB_VERIFICATION_STATUS,
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.verifyBeforeEditJob.bind(recruiterController)
+  );
+
+  recruiterRouter.get(
+    RecruiterApiRoutes.RECRUITER_PROFILE.CHECK_MANAGE_APPLICATIONS_VERIFICATIONS_STATUS,
+    centralizedAuthentication,
+    authorization(['user', 'recruiter']),
+    recruiterController.verifyBeforeManageApplications.bind(recruiterController)
+  );
+
   recruiterRouter.patch(
     RecruiterApiRoutes.RECRUITERS.REJECT_APPLICATION_BY_ID,
     centralizedAuthentication,
@@ -134,6 +155,13 @@ function createRecruiterRouter() {
     centralizedAuthentication,
     authorization(['admin']),
     recruiterController.approveRecruiterApplication.bind(recruiterController)
+  );
+
+  recruiterRouter.patch(
+    RecruiterApiRoutes.RECRUITERS.MANAGE_RECRUITER_PERMISSIONS,
+    centralizedAuthentication,
+    authorization(['admin']),
+    recruiterController.manageRecruiterPermissions.bind(recruiterController)
   );
 
   recruiterRouter.get(

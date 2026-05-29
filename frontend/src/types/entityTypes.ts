@@ -168,7 +168,7 @@ export interface UserType {
   summary?: string;
   password?: string;
   dateOfBirth?: string;
-  socialLinks: SocialLinks[];
+  socialLinks?: SocialLinks[]; //required to optional
   location?: {
     city?: string;
     district?: string;
@@ -340,16 +340,11 @@ type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 
 export interface ConnectionDetails {
   _id?: string;
-  receiver?: string;
-  sender?: string;
-  status: ConnectionRequestStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  senderDetails?:{
-    _id?: string,
-    name?: string,
-    headline?: string,
-    profilePicture?: string
+  connectedUserDetails: {
+    _id: string;
+    name: string;
+    headline?: string;
+    profilePicture?: string;
   }
 }
 
@@ -437,6 +432,12 @@ export interface AdminRecruiterDetailsData {
   totalJobs?: number;
   activeJobs?: number;
   totalApplications: number;
+  isAllJobsHidden?: boolean;
+  allowPostJobs?: boolean;
+  allowEditJobs?: boolean;
+  allowDeletePosts?: boolean;
+  allowManageApplications?: boolean;
+  allowScheduleInterviews?: boolean;
 }
 
 export interface MyJobData {
@@ -454,6 +455,20 @@ export interface MyJobData {
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: string;
+}
+
+export interface AdminCompanyData {
+  _id?: string;
+  name: string;
+  website?: string;
+  linkedin?: string;
+  description?: string;
+  slogan?: string;
+  industry?: string;
+  location?: string;
+  createdAt?: Date | string;
+  recruiters?: number;
+  jobs?: number;
 }
 
 export interface AdminJobListsData {
@@ -521,6 +536,7 @@ export interface LoadJobsForPublicData {
   requiredSkills: string[];
   createdAt?: Date;
   updatedAt?: Date;
+  isFlagged?: boolean;
   expiresAt?: string;
   companyDetails?: {
     _id?: string;
@@ -1105,6 +1121,7 @@ export interface Conversation {
     userInfo?: UserType
     createdAt?: string
     updatedAt?: string
+    unreadMessage?: number
 }
 
 export interface MessageReadBy {
@@ -1308,7 +1325,10 @@ export interface MyProfileDTO {
   createdAt?: string;
   updatedAt?: string;
   followers?: number;
-  following?: number
+  following?: number;
+  applicationsCount?: JobApplicationStatusData[];
+  savedJobs?: FavoriteJob[];
+  views?: string[];
 }
 
 export interface UserOverviewForPublic {
@@ -1318,6 +1338,7 @@ export interface UserOverviewForPublic {
   summary?: string;
   role?: Role[];
   connections?: string[];
+  connectionRequests?: ConnectionRequests[]
   followers?: Follow[];
   skills?: Skills[]
   profilePicture?: {
