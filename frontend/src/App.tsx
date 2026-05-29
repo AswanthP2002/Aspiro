@@ -134,9 +134,14 @@ interface FetchNotificationsResponsePayload {
 interface RootState {
   userAuth: {
     user: {_id: string, role: string, subscription: {planId: string, name: string}} | null,
-    userToken: any,
-    userRole: any,
+    userToken: string,
+    userRole: string,
     initialLoading: boolean,
+    subscription:{
+      subscriptionId: string,
+      planId: string,
+      name: string
+    }
   }
 }
 
@@ -222,7 +227,14 @@ function App() {
   //   }
   // }, [logedUser, initialLoading, dispatch]) // commented for testing loop
 
+  useEffect(() => {
+    if(logedUser?._id && (!logedUser.subscription.name || !logedUser.subscription.planId) && logedUser.role === 'user'){
+      setShowPlansModal(true)
+    }
+  }, [logedUser?._id])
+
   const location = useLocation()
+
   return (
         <>
         <ToastContainer

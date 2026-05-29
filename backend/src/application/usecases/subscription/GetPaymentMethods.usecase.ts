@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import ISubscriptionPortalUsecase from '../../interfaces/usecases/subscription/ISubscriptionPortal.usecase';
 import ISubscriptionRepo from '../../../domain/interfaces/plan/ISubscriptionRepo';
 import stripe from '../../../infrastructure/services/stripe.service';
 import IGetPaymentMethodsUsecase from '../../interfaces/usecases/subscription/IGetPaymentMethods.usecase';
