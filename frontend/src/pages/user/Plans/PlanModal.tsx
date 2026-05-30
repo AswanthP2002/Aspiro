@@ -8,11 +8,11 @@ import {
   subscribePaidPlan,
 } from '../../../services/planServices';
 import { toast } from 'react-toastify';
-import { BsLightning, BsRocket, BsStar } from 'react-icons/bs';
+import { BsArrowLeft, BsLightning, BsRocket, BsStar } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
-const PricingPage = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
+const PricingPage = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
   const [plansData, setPlansData] = useState<PlanData[]>([]);
 
@@ -81,34 +81,36 @@ const PricingPage = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   }, []);
 
   return (
-    <Modal open={open} onClose={onClose} className="overflow-y-auto">
-      <div className="min-h-screen bg-gray-50 pt-5 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
+    // <Modal open={open} onClose={onClose} className="overflow-y-auto">
+      
+    // </Modal>
+    <div className='w-full min-h-screen'>
+      <div className="bg-gray-50 pt-5 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="flex justify-end">
-            <button onClick={onClose}>
-              <FiX size={30} color="gray" />
+          <div className="flex w-full justify-start">
+            <button onClick={() => navigate(-1)} className='flex items-center gap-2 text-sm text-slate-700 hover:bg-gray-200 p-2 transition-color duration-300 rounded-md'>
+              <BsArrowLeft />
+              <p>Back</p>
             </button>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Choose your perfect plan
-          </h1>
-          <p className="text-gray-500">Get advanced features and make your goals even faster</p>
+          <p className='text-3xl font-bold bg-gradient-to-b from-blue-400 to-indigo-600 bg-clip-text text-transparent my-2'>Choose your perfect plan</p>
+          <p className="text-gray-700 text-sm">Get advanced features and make your goals even faster</p>
 
           {/* Toggle */}
           <div className="mt-8 flex justify-center items-center">
-            <div className="relative flex bg-blue-600 rounded-full p-1 w-48 shadow-inner">
+            <div className="relative flex bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-1 w-48 shadow-inner">
               <button
                 onClick={() => setBillingCycle('monthly')}
                 className={`${billingCycle === 'monthly' ? 'bg-white text-blue-600' : 'text-white'} 
-              flex-1 py-2 text-sm font-medium rounded-full transition-all duration-200`}
+              flex-1 py-1 text-sm font-medium rounded-full transition-all duration-200`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingCycle('annually')}
                 className={`${billingCycle === 'annually' ? 'bg-white text-blue-600' : 'text-white'} 
-              flex-1 py-2 text-sm font-medium rounded-full transition-all duration-200`}
+              flex-1 py-1 text-sm font-medium rounded-full transition-all duration-200`}
               >
                 Annually
               </button>
@@ -117,23 +119,23 @@ const PricingPage = ({ open, onClose }: { open: boolean; onClose: () => void }) 
         </div>
 
         {/* Pricing Cards */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
           {plansData.map((plan: PlanData) => (
             <div
               key={plan._id}
-              className={`relative p-8 rounded-3xl bg-white transition-all duration-300 border-2 
-            ${plan.monthlyPrice > 0 ? 'border-blue-500 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] scale-105' : 'border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]'}`}
+              className={`relative p-8 rounded-3xl ${plan.monthlyPrice > 300 ? "bg-gradient-to-br from-white to-yellow-50" : "bg-white"} transition-all duration-300 border-2 
+            ${plan.monthlyPrice > 0 && plan.monthlyPrice < 300 ? 'border-blue-500 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] scale-105' : (plan.monthlyPrice > 300 ? "border-amber-400 shadow-[0_0_30px_2px_rgba(100,0,0,0.1)]" : 'border-slate-100 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)]')}`}
             >
               {plan.monthlyPrice > 0 && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                  <FiStar size={14} fill="white" /> Most Popular
+                <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 ${plan.monthlyPrice > 200 ? "bg-gradient-to-br from-yellow-300 to-amber-500" : (plan.monthlyPrice > 100 && plan.monthlyPrice < 300 ? "bg-blue-500" : "")} text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1`}>
+                  <FiStar size={14} fill="white" /> {plan.monthlyPrice > 300 ? "Elite" : "Most Popular"}
                 </div>
               )}
 
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div
-                    className={`p-3 rounded-2xl inline-block mb-4 ${plan.monthlyPrice > 0 ? 'bg-blue-600' : 'bg-gray-100'}`}
+                    className={`p-3 rounded-2xl inline-block mb-4 ${plan.monthlyPrice > 0 && plan.monthlyPrice < 300 ? 'bg-blue-600 text-white' : (plan.monthlyPrice > 300 ? "bg-gradient-to-br from-yellow-300 to-amber-400 text-white" : 'bg-gray-100')}`}
                   >
                     {plan.badgeIcon === 'Star' && <BsStar />}
                     {plan.badgeIcon === 'Lightning' && <BsLightning />}
@@ -159,7 +161,7 @@ const PricingPage = ({ open, onClose }: { open: boolean; onClose: () => void }) 
               <button
                 onClick={() => subscribePlan(plan._id as string, plan.monthlyPrice, plan.name)}
                 className={`w-full py-4 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors mb-8
-              ${plan.monthlyPrice > 0 ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+              ${plan.monthlyPrice > 0 && plan.monthlyPrice < 300 ? 'bg-blue-600 text-white hover:bg-blue-700' : (plan.monthlyPrice > 300 ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-[0_0_30px_2px_rgba(100,0,0,0.1)] text-white" : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50')}`}
               >
                 Get started <span className="text-lg">→</span>
               </button>
@@ -205,7 +207,7 @@ const PricingPage = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           ))}
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };
 
