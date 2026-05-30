@@ -11,6 +11,7 @@ export default interface UserSubscription {
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
   paymentStatus?: 'paid' | 'pending' | 'failed';
+  features?: { [key: string]: string | number | boolean };
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
@@ -28,5 +29,6 @@ export interface UserSubscriptionAndPlanDetails {
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  features?: { [key: string]: string | number | boolean };
   planDetails: Plan;
 }

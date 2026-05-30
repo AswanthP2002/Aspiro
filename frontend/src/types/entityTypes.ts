@@ -1242,6 +1242,7 @@ export interface UserSubscriptionAndPlanDetailsData {
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  features?: {[key: string]: string | number | boolean}
   planDetails: PlanData;
 }
 

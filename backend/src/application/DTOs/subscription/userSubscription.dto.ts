@@ -1,4 +1,4 @@
-import { PlanDTO } from "../plan/plan.dto";
+import { PlanDTO } from '../plan/plan.dto';
 
 export default interface UserSubscriptionDTO {
   _id?: string;
@@ -11,10 +11,10 @@ export default interface UserSubscriptionDTO {
   currentPeriodEnd: string | Date;
   isCanceled: boolean;
   paymentStatus: 'paid' | 'pending' | 'failed';
+  features?: { [key: string]: string | number | boolean };
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
-
 
 export interface UserSubscriptionAndPlanDetailsDTO {
   _id?: string;
@@ -29,5 +29,6 @@ export interface UserSubscriptionAndPlanDetailsDTO {
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  features?: { [key: string]: string | number | boolean };
   planDetails: PlanDTO;
 }

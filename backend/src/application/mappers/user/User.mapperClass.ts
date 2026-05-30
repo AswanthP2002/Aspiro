@@ -168,6 +168,7 @@ export default class UserMapper {
         name: data.subscription.name,
         planId: data.subscription.planId,
         subscriptionId: data.subscription.planId,
+        features: data.subscription.features
       },
     };
   }

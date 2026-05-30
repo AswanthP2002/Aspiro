@@ -13,6 +13,7 @@ interface User {
     subscriptionId: string;
     planId: string;
     name: string
+    features: {[key: string]: string | number | boolean}
   }
 }
 

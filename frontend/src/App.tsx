@@ -117,6 +117,11 @@ import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/Inte
 import InterviewDashboardPage from './pages/user/Aspiro-career/AI-Interviews/Dashboard';
 import CompaniesPage from './pages/admin/Companies/Companies';
 import { newUnreadChatArrived, newUnreadConversationsCountFetchThunk } from './redux/chatSlice';
+import PricingTemporaryPage from './pages/user/Plans/Pricing.temp';
+import { RecruiterProfilePlanProtectedRoute } from './components/route-components/RecruiterProfile.plan.protected.route';
+import { InterviewPracticePlanProtectedRoute } from './components/route-components/InterviewPractice.plan.protected.route';
+import { ResumeAnalyzePlanProtectedRoute, ResumeAutoCreatePlanProtectedRoute } from './components/route-components/ResumeTools.plan.protected.route';
+import { JobApplicationPlanProtectedRoute } from './components/route-components/JobApplication.plan.protected.route';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -272,7 +277,9 @@ function App() {
               <Route path={UserRoutes.JOBS} element={<JobListing />} />
               <Route path={UserRoutes.USERS} element={<UsersFindingPage />} />
               <Route path={UserRoutes.JOB_DETAILS} element={<JObDetailsCandidateSide />} />
-              <Route path={UserRoutes.JOB_APPLY} element={<JobApplyPage />} />
+              <Route path={UserRoutes.JOB_APPLY} element={<JobApplicationPlanProtectedRoute />}>
+                <Route index element={<JobApplyPage />} />
+              </Route>
               <Route path={UserRoutes.NOTIFICATIONS} element={<NotificationPage />} />
               <Route path={UserRoutes.USER_DETAILS} element={<UserPublicProfile />} />
               <Route path={UserRoutes.CHATS} element={<ChatPage />} />
@@ -289,7 +296,9 @@ function App() {
               <Route path='recruiter/register' element={<RecruiterRegisterPage />} />
               <Route path='recruiter/post-job' element={<PostAJobForm />} />
               <Route path='recruiter/post-a-job' element={<PostAJobForm />} />
-              <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
+              <Route path='recruiter/overview' element={<RecruiterProfilePlanProtectedRoute />}>
+                <Route element={<RecruiterProfilePage />} />
+              </Route>
               <Route path='recruiter/my-jobs' element={<MyJobs />} />
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
               <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
@@ -300,10 +309,16 @@ function App() {
               <Route path='billings' element={<SubscriptionPage />} />
               <Route path='aspiro-career' element={<AspiroCareer />} />
               <Route path='aspiro-career/resume-tools' element={<ResumeToolsPage />} />
-              <Route path='aspiro-career/resume-tools/auto-create' element={<AutoResumeCreationPage />} />
-              <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzer />} />
+              <Route path='aspiro-career/resume-tools/auto-create' element={<ResumeAutoCreatePlanProtectedRoute />}>
+                <Route index element={<AutoResumeCreationPage />} />
+              </Route>
+              <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzePlanProtectedRoute />}>
+                <Route index element={<ResumeAnalyzer />} />
+              </Route>
               <Route path='aspiro-career/resume-tools/analyze/report' element={<DetailedAnalysisReportPage />} />
-              <Route path='aspiro-career/interview' element={<InterviewOverviewPage />} />
+              <Route path='aspiro-career/interview' element={<InterviewPracticePlanProtectedRoute />}>
+                <Route index element={<InterviewOverviewPage />} />
+              </Route>
               <Route path='aspiro-career/interview/personalization' element={<InterviewPersonalizationPage />} />
               <Route path='aspiro-career/interview/mode-select' element={<InterviewModeSelectionPage />} />
               <Route path='aspiro-career/interview/start' element={<InterviewPage />} />
@@ -357,6 +372,7 @@ function App() {
         <Route path='/payment-success' element={<PaymentSuccessPage />} />
 
         <Route path='/test' element={<ApplicationTrack />} />
+        <Route path='/temp/pricing' element={<PricingPage />} />
 
         <Route path='*' element={<NotFoundPage />} />
 
