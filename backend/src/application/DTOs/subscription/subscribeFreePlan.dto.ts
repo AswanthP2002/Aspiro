@@ -6,4 +6,5 @@ export interface SubscribeFreePlanDTO {
 export interface SubscribePaidPlanDTO {
   userId: string;
   planId: string;
+  billingCycle: 'monthly' | 'annually';
 }

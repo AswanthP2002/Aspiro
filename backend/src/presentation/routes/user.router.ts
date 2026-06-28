@@ -12,11 +12,13 @@ import { CreateUserSchema } from '../schemas/user/createUserRequest.zod.schema.F
 import { verifyUserInputsSchema } from '../schemas/user/userVerifyRequest.zod.schema';
 import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasicsRequest.zod.schema';
 import { UserApiRoutes } from '../../constants/Apis/user.routes';
+import SubscriptionAccess from '../../middlewares/subscription.access.track';
 
 function createUserRouter() {
   const userRouter = express.Router();
 
   const userController = container.resolve(UserController);
+  const subscriptionAccessTrack = container.resolve(SubscriptionAccess);
 
   userRouter.post(
     '/v1/user/register',
@@ -83,7 +85,7 @@ function createUserRouter() {
     UserApiRoutes.USER_JOB_MANAGE.APPLY_BY_JOBID,
     centralizedAuthentication,
     authorization(['user']),
-    testMiddleware,
+    subscriptionAccessTrack.checkAccessStatus('jobApplications'),
     userController.applyJob.bind(userController)
   );
   userRouter.get(

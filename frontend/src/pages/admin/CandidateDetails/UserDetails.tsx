@@ -22,20 +22,20 @@ export default function CandidateDetails(){
 
     const navigate = useNavigate()
 
-    const getSocialPhills = useCallback((domain: string) => {
-        switch(domain){
-            case 'linkedin':
-                return <button className="bg-gray-200 p-1 rounded-md"><FaLinkedin color="gray" /></button>
-            case 'instagram':
-                return <button className="bg-gray-200 p-1 rounded-md"><FaInstagram color="gray" /></button>
-            case 'github':
-                return <button className="bg-gray-200 p-1 rounded-md"><FaGithub color="gray" /></button>
-            case 'twitter':
-                return <button className="bg-gray-200 p-1 rounded-md"><FaTwitter color="gray" /></button>
-            default:
-                return 
-        }
-    }, [])
+    // const getSocialPhills = useCallback((domain: string) => {
+    //     switch(domain){
+    //         case 'linkedin':
+    //             return <button className="bg-gray-200 p-1 rounded-md"><FaLinkedin color="gray" /></button>
+    //         case 'instagram':
+    //             return <button className="bg-gray-200 p-1 rounded-md"><FaInstagram color="gray" /></button>
+    //         case 'github':
+    //             return <button className="bg-gray-200 p-1 rounded-md"><FaGithub color="gray" /></button>
+    //         case 'twitter':
+    //             return <button className="bg-gray-200 p-1 rounded-md"><FaTwitter color="gray" /></button>
+    //         default:
+    //             return 
+    //     }
+    // }, [])
     
     const [userDetails, setUserDetails] = useState<AdminUserDetailsData | null>(null)
     const [experiences, setexperience] = useState<Experience[]>([])

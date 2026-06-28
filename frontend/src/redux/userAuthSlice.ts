@@ -26,9 +26,6 @@ interface UserAuthState {
 
 const loadInitialState = (): UserAuthState => {
   try {
-    const userItem = localStorage.getItem('user');
-    const userRole = localStorage.getItem('userRole'); // Roles are plain strings
-
     return {
       user: null, //currently not geting any data from localstorage
       userToken: null, // Always initialize token as null
@@ -50,8 +47,6 @@ const userAuthSlice = createSlice({
       state.userToken = action.payload.userToken;
       state.userRole = action.payload.userRole;
       state.initialLoading = false
-      // localStorage.setItem('user', JSON.stringify(action.payload.user));
-      // if (action.payload.userRole) localStorage.setItem('userRole', action.payload.userRole);
     },
     logout: (state) => {
       state.user = null;
@@ -87,24 +82,6 @@ const userAuthSlice = createSlice({
         state.userToken = null;
       })
   },
-  // extraReducers(builder) {
-  //   builder
-  //     .addCase(reAuthenticateThunk.pending, (state) => {
-  //       state.initialLoading = true
-  //     })
-  //     .addCase(reAuthenticateThunk.fulfilled, (state, action: any) => {
-  //       state.user = action.payload.userData
-  //       state.userToken = action.payload.accessToken
-  //       state.userRole = action.payload.userData.role
-  //       state.initialLoading = false
-  //     })
-  //     .addCase(reAuthenticateThunk.rejected, (state) => {
-  //       state.initialLoading = false
-  //       state.user = null
-  //       state.userRole = null
-  //       state.userToken = null
-  //     })
-  // },
 })
     
 export const { loginSuccess, logout, tokenRefresh, updateUserMetaData } = userAuthSlice.actions;

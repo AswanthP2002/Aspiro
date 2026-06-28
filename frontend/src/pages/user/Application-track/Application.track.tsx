@@ -14,13 +14,14 @@ import { InterviewData, TrackMyJobApplicationData } from "../../../types/entityT
 import { deleteMyApplication, getMyInterviews, trackMyApplication } from "../../../services/userServices";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { AxiosError } from "axios";
 
 export default function ApplicationTrack(){
 
     const [activeSection, setActiveSection] = useState<'notes' | 'interviews'>('notes')
     const [interviews, setInterviews] = useState<InterviewData[]>([])
     
-    const [status, setStatus] = useState<'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'>('rejected')
+    // const [status, setStatus] = useState<'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'>('rejected')
     const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false)
     const location = useLocation()
     const [applicationTrackDetails, setApplicationTrackDetails] = useState<TrackMyJobApplicationData | null>(null)
@@ -46,7 +47,9 @@ export default function ApplicationTrack(){
             toast.success('Deleted')
             navigate('/profile/my-applications')
         } catch (error) {
-            toast.error('Something went wrong')
+            const err = error as AxiosError<{message: string}>
+            const message = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(message)
         }
     }
 
@@ -206,21 +209,6 @@ export default function ApplicationTrack(){
                                     </p>
                                 </div>
                             </div>
-
-                            {/* <div className="flex gap-3">
-                                <div className="">
-                                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"><LuCheck color="gray" /></div>
-                                    <div className="w-1 bg-gray-300 h-full m-auto"></div>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-sm">Application submitted</p>
-                                    <p className="text-xs text-gray-700">Your application has been send to the recruiter</p>
-                                    <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
-                                        <FaClock />
-                                        <p>{formatRelativeTime(new Date())}</p>
-                                    </p>
-                                </div>
-                            </div> */}
 
                             <div className="flex gap-3">
                                 <div className="">

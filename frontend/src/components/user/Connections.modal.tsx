@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { ConnectionDetails, FollowerData } from "../../types/entityTypes"
-import { getFollowers, removeAFollower } from "../../services/followServices"
+import { ConnectionDetails } from "../../types/entityTypes"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import { Modal, Skeleton } from "@mui/material"
@@ -8,7 +7,7 @@ import { CgClose } from "react-icons/cg"
 import { BiSearch } from "react-icons/bi"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { cancelConnectionRequest, getConnections, removeConnection } from "../../services/connectionServices"
+import { getConnections, removeConnection } from "../../services/connectionServices"
 
 type RootUser = {
     userAuth: {
@@ -34,7 +33,7 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
   console.log('-- checking loged user -- ', logedUser)
 
   const observer = useRef<null | IntersectionObserver>(null)
-  const lastConnectionRef = useCallback((node) => {
+  const lastConnectionRef = useCallback((node: Element) => {
     if(loading) return
     if(observer.current) observer.current.disconnect()
 

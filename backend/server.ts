@@ -36,6 +36,7 @@ import CreateConnectionRouter from './src/presentation/routes/connectionRouter';
 import CreatePlanRouter from './src/presentation/routes/planRouter';
 import PlanController from './src/presentation/controllers/planController';
 import { container } from 'tsyringe';
+import CronSubscriptionReset from './src/infrastructure/cron-schedule/subscription/subscription.monthly.reset';
 // import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
@@ -74,6 +75,8 @@ async function main() {
   );
 
   await connectToDb();
+  const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
+  cronMonthlyResetTest.resetSubscriptionLimit();
   //connect redis
   //await connectRedis(); closed right now for testing :
   // await connectRedis();

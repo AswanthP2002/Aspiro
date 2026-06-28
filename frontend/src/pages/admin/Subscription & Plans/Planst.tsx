@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BiRupee } from "react-icons/bi";
 import { BsLightning, BsPencilSquare, BsRocket, BsStar, BsTrash3 } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa";
-import { TbBusinessplan, TbLayoutCards, TbPackage } from "react-icons/tb";
+import { TbPackage } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { PlanData } from "../../../types/entityTypes";
 import { adminDeletePlan, adminGetPlans, adminTogglePlanListing } from "../../../services/planServices";

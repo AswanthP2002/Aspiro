@@ -246,7 +246,7 @@ export default function StoreDetails(){
                                     />
                                     {suggestions?.length > 0 && (
                                         <ul className="border mt-1 max-h-48 overflow-y-auto bg-white">
-                                            {suggestions.map((place: any) => (
+                                            {suggestions.map((place: {place_id: string, display_name: string}) => (
                                             <li
                                                 key={place.place_id}
                                                 className="p-2 hover:bg-gray-100 text-xs text-gray-500 cursor-pointer"

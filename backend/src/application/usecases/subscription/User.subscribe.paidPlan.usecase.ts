@@ -15,7 +15,7 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
   ) {}
 
   async execute(dto: SubscribePaidPlanDTO): Promise<string> {
-    const { planId, userId } = dto;
+    const { planId, userId, billingCycle } = dto;
     const userDetails = await this._userRepo.findById(userId);
     const planDetails = await this._planRepo.findById(planId);
 
@@ -30,9 +30,14 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
               description: planDetails?.description || 'Access features',
             },
             unit_amount:
-              planDetails && planDetails?.monthlyPrice ? planDetails?.monthlyPrice * 100 : 0,
+              planDetails && billingCycle === 'monthly'
+                ? planDetails?.monthlyPrice * 100
+                : planDetails && billingCycle === 'annually'
+                  ? planDetails?.yearlyPrice * 100
+                  : 0,
+            // planDetails && planDetails?.monthlyPrice ? planDetails?.monthlyPrice * 100 : 0,
             recurring: {
-              interval: 'month',
+              interval: billingCycle === 'monthly' ? 'month' : 'year',
             },
           },
           quantity: 1,
@@ -41,7 +46,7 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
       mode: 'subscription',
       customer_email: userDetails?.email as string,
       success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:5173/feed`,
+      cancel_url: `http://localhost:5173/payment-failed`,
       metadata: {
         userId: userId,
         planId: planId,

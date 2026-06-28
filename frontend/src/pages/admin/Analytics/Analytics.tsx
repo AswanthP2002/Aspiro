@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { SubscriptionAnalyticsData } from '../../../types/entityTypes';
 import { adminGetAnalytics } from '../../../services/planServices';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { BiRupee, BiXCircle } from 'react-icons/bi';
-import { FaChartLine, FaDollarSign, FaUsers } from 'react-icons/fa';
+import { BiRupee } from 'react-icons/bi';
+import { FaChartLine } from 'react-icons/fa';
 import { LuSearch, LuUser } from 'react-icons/lu';
 import { FiFilter } from 'react-icons/fi';
-import { toast } from 'react-toastify';
 
 export const AdminAnalytics = () => {
   const [analytics, setAnalytics] = useState<SubscriptionAnalyticsData | null>(null);

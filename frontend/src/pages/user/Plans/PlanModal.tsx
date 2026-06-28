@@ -1,6 +1,5 @@
-import { Modal } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { FiCheck, FiStar, FiX, FiZap } from 'react-icons/fi';
+import { FiCheck, FiStar, FiX } from 'react-icons/fi';
 import { PlanData } from '../../../types/entityTypes';
 import {
   getPlansForUsers,
@@ -11,10 +10,25 @@ import { toast } from 'react-toastify';
 import { BsArrowLeft, BsLightning, BsRocket, BsStar } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+type RootState = {
+  userAuth: {
+    user: {
+      _id: string,
+      subscription: {
+        subscriptionId: string,
+        planId: string
+      }
+    }
+  }
+}
 
 const PricingPage = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
   const [plansData, setPlansData] = useState<PlanData[]>([]);
+
+  const logedUser = useSelector((state: RootState) => state.userAuth.user)
 
   const navigate = useNavigate();
 
@@ -52,7 +66,7 @@ const PricingPage = () => {
       }
     } else {
       try {
-        const result = await subscribePaidPlan(planId);
+        const result = await subscribePaidPlan(planId, billingCycle);
         if (result.success && result.result) {
           toast.success('Subscribed');
           window.location.href = result.result;
@@ -158,13 +172,15 @@ const PricingPage = () => {
                 </span>
               </div>
 
-              <button
+              {logedUser.subscription.planId !== plan._id && (
+                <button
                 onClick={() => subscribePlan(plan._id as string, plan.monthlyPrice, plan.name)}
                 className={`w-full py-4 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors mb-8
               ${plan.monthlyPrice > 0 && plan.monthlyPrice < 300 ? 'bg-blue-600 text-white hover:bg-blue-700' : (plan.monthlyPrice > 300 ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-[0_0_30px_2px_rgba(100,0,0,0.1)] text-white" : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50')}`}
               >
                 Get started <span className="text-lg">→</span>
               </button>
+              )}
 
               <div className="w-full space-y-3 mb-8 px-2">
                 <p className="text-left text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">

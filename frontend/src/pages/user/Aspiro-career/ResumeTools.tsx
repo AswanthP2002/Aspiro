@@ -1,12 +1,8 @@
-import { Modal } from '@mui/material';
-import React, { useState } from 'react';
-import { BiCheckCircle, BiDownload } from 'react-icons/bi';
+import { BiCheckCircle, BiChevronDown, BiDownload } from 'react-icons/bi';
 import { BsEye } from 'react-icons/bs';
-import { CgMoreVertical } from 'react-icons/cg';
 import { FiEdit3 } from 'react-icons/fi';
 import { LuFileText, LuLayoutDashboard, LuPlus, LuStar } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import BouncingLoader from '../../../components/common/Bouncing.loader';
 
 const ResumeToolsPage = () => {
   const navigate = useNavigate()
@@ -15,8 +11,8 @@ const ResumeToolsPage = () => {
     <div className="min-h-screen bg-[#F8FAFC] p-8 font-sans text-[#1E293B]">
       {/* Header Section */}
       <header className="mb-10">
-        <h1 className="text-2xl font-bold mb-1">Smart Resume Tools</h1>
-        <p className="text-gray-500">Create, analyze, and optimize your resumes with AI-powered tools</p>
+        <h1 className="text-2xl font-bold text-gray-800 tracking-wide mb-1">Smart Resume Tools</h1>
+        <p className="text-gray-500 text-sm">Create, analyze, and optimize your resumes with AI-powered tools</p>
       </header>
 
       {/* Top Action Cards */}
@@ -45,7 +41,7 @@ const ResumeToolsPage = () => {
       </div>
 
       <div className="flex justify-end mb-8">
-        <button onClick={() => navigate('auto-create')} className="bg-[#2563EB] text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-700 transition-colors">
+        <button onClick={() => navigate('auto-create')} className="flex items-center gap-2 bg-blue-600 text-white p-3 rounded-md shadow-xl">
           <LuPlus size={18} /> Create new resume
         </button>
       </div>
@@ -99,10 +95,10 @@ const ResumeToolsPage = () => {
 const ActionCard = ({ icon, iconBg, title, desc, url }) => {
     const navigate = useNavigate()
   return (
-    <div onClick={() => navigate(url)} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 hover:border-blue-300 cursor-pointer transition-all">
+    <div onClick={() => navigate(url)} className="bg-white p-5 rounded-lg border border-slate-200 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] flex items-center gap-4 hover:border-blue-300 cursor-pointer transition-all">
       <div className={`${iconBg} p-3 rounded-lg shadow-inner`}>{icon}</div>
       <div>
-        <h3 className="font-bold text-sm">{title}</h3>
+        <h3 className="font-bold text-sm tracking-wide">{title}</h3>
         <p className="text-xs text-gray-500">{desc}</p>
       </div>
     </div>
@@ -110,7 +106,7 @@ const ActionCard = ({ icon, iconBg, title, desc, url }) => {
 };
 const ResumeSection = ({ title, children }) => (
   <div>
-    <h2 className="text-lg font-bold mb-4 border-b border-gray-200 pb-2">{title}</h2>
+    <p className='font-semibold text-lg my-3 text-gray-800'>{title}</p>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {children}
     </div>
@@ -118,21 +114,21 @@ const ResumeSection = ({ title, children }) => (
 );
 
 const ResumeCard = ({ title, template, date, status, score, scoreText }) => (
-  <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative group">
+  <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] relative group">
     <div className="flex justify-between items-start mb-4">
       <div>
-        <h3 className="font-bold text-lg">{title}</h3>
+        <p className='font-semibold'>{title}</p>
         <p className="text-xs text-gray-400">{template} • {date}</p>
       </div>
       <button className="text-gray-400 hover:text-gray-600">
-        <CgMoreVertical size={20} />
+        <BiChevronDown size={20} />
       </button>
     </div>
 
     <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold mb-6 ${
       status === 'Draft' ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'
     }`}>
-      {status === 'Draft' ? '⚠️ Draft' : '✅ Completed'}
+      {status === 'Draft' ? 'Draft' : 'Completed'}
     </div>
 
     <div className="mb-6">

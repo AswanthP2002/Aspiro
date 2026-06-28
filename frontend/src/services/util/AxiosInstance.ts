@@ -16,7 +16,19 @@ export type AxiosRequest = customeRequest & InternalAxiosRequestConfig
 
 interface ReAuthenticateResult {
     accessToken: string,
-    userData: any
+    userData: {
+        _id: string,
+        email: string,
+        name: string,
+        role: string,
+        profilePicture: string,
+        subscription: {
+            subscriptionId: string,
+            planId: string,
+            name: string,
+            features: string
+        }
+    }
 }
 
 const axiosInstance = axios.create({
@@ -89,20 +101,27 @@ axiosInstance.interceptors.response.use(
        }
         else if(response && response.status === 403){
             Swal.fire({
-                icon:'info',
-                title:'Blocked',
-                text:'Your account has been blocked, you will be logout shortly',
-                showConfirmButton:false,
-                showCancelButton:false,
-                allowOutsideClick:false,
-                timer:4000
-            })//.then(async () => {
-            //     const dispatch = store.dispatch
-            //     await userLogout(dispatch,() => {
-            //         window.location.replace('http://localhost:5173/login')
-            //     })
+                icon: 'question',
+                title: 'Limit Reached',
+                text: response.data.message,
+                showConfirmButton: true,
+            })
+            window.location.href = '/temp/pricing'
+            // Swal.fire({
+            //     icon:'info',
+            //     title:'Blocked',
+            //     text:'Your account has been blocked, you will be logout shortly',
+            //     showConfirmButton:false,
+            //     showCancelButton:false,
+            //     allowOutsideClick:false,
+            //     timer:4000
+            // })//.then(async () => {
+            // //     const dispatch = store.dispatch
+            // //     await userLogout(dispatch,() => {
+            // //         window.location.replace('http://localhost:5173/login')
+            // //     })
 
-            // })
+            // // })
         }else if(
             response && 
             response.status === 401 &&

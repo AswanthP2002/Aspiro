@@ -1,7 +1,6 @@
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { googleLogin } from "../../services/commonServices";
 import InfinitySpinner from "./InfinitySpinner";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { loginSuccess } from "../../redux/userAuthSlice";
@@ -10,7 +9,6 @@ import { AxiosError } from "axios";
 
 export default function GoogleLoginButton(){
     const dispatcher = useDispatch()
-    const navigateTo = useNavigate()
 
     const [loading, setLoading] = useState(false)
 

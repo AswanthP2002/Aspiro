@@ -26,7 +26,7 @@ export default class GetSessionDetailsUsecase implements IGetSessionDetailsUseca
       planName: session.line_items?.data[0].description as string,
       status: session.payment_status as string,
       startingPeriod: new Date().toISOString(),
-      endPeriod: new Date(session.expires_at).toISOString()
+      endPeriod: new Date(session.expires_at).toISOString(),
     };
   }
 }

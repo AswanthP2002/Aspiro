@@ -8,8 +8,12 @@ export default interface UserSubscription {
   stripeCustomerId?: string;
   status: 'active' | 'canceled' | 'incomplete' | 'past_due';
   currentPeriodStart?: string | Date;
+  isTrialPeriodGiven?: boolean;
+  trialPeriodStarts?: Date | string;
+  trialPeriodEnds?: Date | string;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  billingCycle?: 'monthly' | 'annually';
   paymentStatus?: 'paid' | 'pending' | 'failed';
   features?: { [key: string]: string | number | boolean };
   createdAt?: string | Date;
@@ -26,6 +30,10 @@ export interface UserSubscriptionAndPlanDetails {
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isTrialPeriodGiven?: boolean;
+  trialPeriodStarts?: string | Date;
+  trialPeriodEnds?: string | Date;
+  billingCycle?: 'monthly' | 'annually';
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;

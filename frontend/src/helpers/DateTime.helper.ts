@@ -1,10 +1,11 @@
+import moment from "moment";
+
 export default function getReminingDays(expDate : Date | string) : number {
-        const expiryDate = new Date(expDate)
-        const currentDate = new Date()
+        const startDate = moment(new Date())
+        const endDate = moment(new Date(expDate))
 
-        const millSec = expiryDate.getTime() - currentDate.getTime()
+        const reminingDays = endDate.diff(startDate, 'days')
 
-        const days = Math.ceil(millSec / (1000 * 60 * 60 * 24))
+        return reminingDays
 
-        return days
     }

@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LuChartBar, LuFileCheck2, LuFileText, LuTarget, LuTrendingUp, LuUpload, LuX } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import { parsePdf } from '../../../utilities/pdf.parser';
 import { AxiosError } from 'axios';
-import { analyzeResume, analyzeResumeDetailed } from '../../../services/resumeServices';
-import { data, useNavigate } from 'react-router-dom';
+import { analyzeResumeDetailed } from '../../../services/resumeServices';
+import { useNavigate } from 'react-router-dom';
 
 
 const ResumeAnalyzer = () => {
   const [file, setFile] = useState(null);
   const [targettedRole, setTargettedRole] = useState("")
   const [targettedRoleError, setTargettedRoleError] = useState<{isError: boolean, message: string}>({isError: false, message: ''})
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyseResult, setAnalyseResult] = useState<{score: number, feedback: string, strength: string[], improvements: string[]} | null>(null)
 
 

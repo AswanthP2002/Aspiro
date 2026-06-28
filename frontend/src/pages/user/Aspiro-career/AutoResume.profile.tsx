@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { BiAward, BiBriefcase, BiChart, BiCheck, BiCheckCircle, BiChevronDown, BiChevronRight, BiErrorCircle, BiInfoCircle, BiMessageSquare, BiPlus } from 'react-icons/bi';
+import { useEffect, useState } from 'react';
+import { BiAward, BiBriefcase, BiCheckCircle, BiChevronDown, BiInfoCircle, BiPlus } from 'react-icons/bi';
 import { BsInfo } from 'react-icons/bs';
 import { FaGraduationCap } from 'react-icons/fa';
 import { GiLightBulb } from 'react-icons/gi';
@@ -8,15 +8,13 @@ import { loadUserFullProfileDetails } from '../../../services/userServices';
 import { toast } from 'react-toastify';
 import { Certificates, Education, Experience, Skills, UserFullProfileData } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
-import { Box, Checkbox, Divider, FormControl, FormControlLabel, FormHelperText, Modal, Stack, Typography } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, FormHelperText, Modal } from '@mui/material';
 import moment from 'moment';
 import { analyzeResume } from '../../../services/resumeServices';
-import { eachMinuteOfInterval } from 'date-fns';
 import { AxiosError } from 'axios';
-import { FiAlertCircle, FiX } from 'react-icons/fi';
 import { MdAutoAwesome } from 'react-icons/md';
-import { CgClose } from 'react-icons/cg';
 import BouncingLoader from '../../../components/common/Bouncing.loader';
+import { FiX } from 'react-icons/fi';
 
 const GenerateFromProfile = () => {
   const [loading, setLoading] = useState(true)
@@ -38,14 +36,14 @@ const GenerateFromProfile = () => {
   const toggleCertAdding = () => setIsCertificateAdding(prv => !prv)
   const toggleSkilAdding = () => setIsSkillAdding(prv => !prv)
 
-  const [selectedSections, setSelectedSections] = useState({
-    personal: true,
-    experience: true,
-    education: true,
-    skills: true,
-    certificates: true
-  });
-  const [summary, setSummary] = useState('')
+  // const [selectedSections, setSelectedSections] = useState({
+  //   personal: true,
+  //   experience: true,
+  //   education: true,
+  //   skills: true,
+  //   certificates: true
+  // });
+  // const [summary, setSummary] = useState('')
   const [userFullProfileDetails, setUserFullProfileDetails] = useState<UserFullProfileData | null>(null)
   const [analyticsData, setAnalyticsData] = useState<{score: string, feedback: string, strength: string[], improvements: string[]} | null>(null)
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false)
@@ -99,12 +97,12 @@ const GenerateFromProfile = () => {
     endYear: ''
   }})
 
-  const {reset: certReset, handleSubmit: certHandleSubmit, watch: certWatch, control: certControl, formState: {errors: certError}} = useForm<AddNewCertificateFormData>({defaultValues: {
+  const {reset: certReset, handleSubmit: certHandleSubmit, control: certControl, formState: {errors: certError}} = useForm<AddNewCertificateFormData>({defaultValues: {
     certificate: '',
     issuedBy: ''
   }})
 
-  const {reset: skillReset, handleSubmit: skillHandleSubmit, watch: skillWatch, control: skillControl, formState: {errors: skillError}} = useForm<AddNewSkillFormData>({defaultValues: {
+  const {reset: skillReset, handleSubmit: skillHandleSubmit, control: skillControl, formState: {errors: skillError}} = useForm<AddNewSkillFormData>({defaultValues: {
     skill: ''
   }})
 
@@ -892,19 +890,6 @@ const GenerateFromProfile = () => {
                           </p>
                           <span className="text-[10px] text-slate-500 italic">{exp.jobType ? exp.jobType : "In-Office"}</span>
                         </div>
-                        {/* <ul className="list-disc ml-4 text-[10px] text-slate-700 space-y-1">
-                          <li>
-                            Architected a professional job opportunity platform using React,
-                            TypeScript, and Node.js.
-                          </li>
-                          <li>
-                            Integrated Amazon S3 for secure file storage and Socket.io for real-time
-                            user engagement.
-                          </li>
-                          <li>
-                            Designed an ATS-compliant resume builder with AI optimization tools.
-                          </li>
-                        </ul> */}
                       </div>
                     ))}
                 </div>
@@ -950,14 +935,6 @@ const GenerateFromProfile = () => {
                         </>
                     ))
                   )}
-                  {/* <span className="font-bold">Languages:</span> TypeScript, JavaScript (ES6+),
-                  HTML5, CSS3
-                  <br />
-                  <span className="font-bold">Frameworks/Libraries:</span> React.js, Node.js,
-                  Express.js, Tailwind CSS
-                  <br />
-                  <span className="font-bold">Database & Tools:</span> MongoDB, Amazon S3,
-                  Socket.io, Git, Clean Architecture */}
                 </p>
               </section>
               )}
@@ -1049,21 +1026,21 @@ const InclusionRow = ({ label }) => (
 export function AnalysisModal({ open, handleClose, data }) {
   // data: { score: 85, feedback: "...", strength: [], improvements: [] }
 
-  const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  borderRadius: '16px',
-  boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
-  p: 0, // Header has internal padding
-  outline: 'none',
-  overflow: 'hidden',
-  // High-end touch: Top accent border based on score
-  borderTop: (theme) => `8px solid ${theme.palette.success.main}`, 
-};
+//   const style = {
+//   position: 'absolute',
+//   top: '50%',
+//   left: '50%',
+//   transform: 'translate(-50%, -50%)',
+//   width: 600,
+//   bgcolor: 'background.paper',
+//   borderRadius: '16px',
+//   boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
+//   p: 0, // Header has internal padding
+//   outline: 'none',
+//   overflow: 'hidden',
+//   // High-end touch: Top accent border based on score
+//   borderTop: (theme) => `8px solid ${theme.palette.success.main}`, 
+// };
 
   return (
     <Modal open={open} onClose={handleClose} className='flex items-center justify-center'>

@@ -1,6 +1,5 @@
 import React, { useContext, useRef, useState } from "react"
 import {IoMdImages} from 'react-icons/io'
-import CropComponent from "./CropComponent"
 import { createPost } from "../../services/userServices"
 import { Notify } from "notiflix"
 import { appContext } from "../../context/AppContext"
@@ -14,7 +13,7 @@ export default function CreatePost(){
         description: string
     }
 
-    const {control, formState:{errors}, watch, handleSubmit} = useForm<FormInput>({
+    const {control, formState:{errors}, handleSubmit} = useForm<FormInput>({
         defaultValues:{description:''}
     })
 
@@ -22,11 +21,11 @@ export default function CreatePost(){
 
     const [sectionUpload, setSectionUpload] = useState(1)
     const [imagePreview, setImagePrivew] = useState("")
-    const [crop, setCrop] = useState({x : 0, y : 0})
-    const [zoom, setZoom] = useState(1)
-    const [cropPixels, setCropPixels] = useState(null)
+    // const [crop, setCrop] = useState({x : 0, y : 0})
+    // const [zoom, setZoom] = useState(1)
+    // const [cropPixels, setCropPixels] = useState(null)
     // const [cropedImagePreview, setcroppedImagePrevivew] = useState<any>(null)
-    const [description, setDescription] = useState("")
+    // const [description, setDescription] = useState("")
     const [blobImage, setBlobImage] = useState<string | File>("")
 
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -51,47 +50,17 @@ export default function CreatePost(){
     //     setCropPixels(cropPixels)
     // }
 
-    const createImageFromUrl = (url : string) => {
-        return new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(img)
-            img.onerror = (err) => reject(err)
+    // const createImageFromUrl = (url : string) => {
+    //     return new Promise((resolve, reject) => {
+    //         const img = new Image()
+    //         img.onload = () => resolve(img)
+    //         img.onerror = (err) => reject(err)
 
-            img.crossOrigin = 'anonymous'
-            img.src = url
-        })
-    }
-
-    // const getCroppedImage = async (imageSrc : any, cropPixel : any) => {
-    //     const image : any= await createImageFromUrl(imageSrc)
-    //     const canvas = document.createElement('canvas')
-    //     canvas.width = cropPixel.width
-    //     canvas.height = cropPixel.height
-    //     const ctx = canvas.getContext('2d')
-
-    //     ctx?.drawImage(
-    //         image,
-    //         cropPixel?.x,
-    //         cropPixel?.y,
-    //         cropPixel?.width,
-    //         cropPixel?.height,
-    //         0,
-    //         0,
-    //         cropPixel?.width,
-    //         cropPixel?.height
-    //     )
-
-    //     return new Promise((resolve) => {
-    //         canvas.toBlob((blob) => resolve(blob), "image/jpeg")
+    //         img.crossOrigin = 'anonymous'
+    //         img.src = url
     //     })
     // }
 
-    // const cropImage = async () => {
-    //     const imageBlob : any = await getCroppedImage(imagePreview, cropPixels)
-    //     setcroppedImagePrevivew(URL.createObjectURL(imageBlob))
-    //     setBlobImage(imageBlob)
-    //     setSectionUpload(3)
-    // }
 
     const create = async (data : FormInput) => {
         const formData = new FormData()

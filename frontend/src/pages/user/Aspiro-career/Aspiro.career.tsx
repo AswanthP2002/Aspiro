@@ -1,4 +1,3 @@
-import React from 'react';
 import { LuArrowRight, LuFileText, LuMessageSquare } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,10 +5,10 @@ const AspiroCareer = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6 font-sans">
       {/* Header Section */}
       <div className="text-center mb-12 max-w-2xl">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+        <h1 className="text-4xl lg:mt-10 font-bold text-gray-900 mb-4 tracking-tight">
           Aspiro Career
         </h1>
         <p className="text-lg text-gray-600 leading-relaxed">
@@ -22,7 +21,7 @@ const AspiroCareer = () => {
       <div className="grid md:grid-cols-2 gap-8 w-full max-auto max-w-4xl">
         
         {/* Card 1: Resume Tools */}
-        <div className="group relative bg-white border border-gray-200 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer">
+        <div className="group relative bg-white border border-slate-200 p-8 rounded-2xl shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] hover:shadow-xl transition-all duration-300 cursor-pointer">
           <div className="mb-5 inline-block p-3 bg-blue-50 rounded-lg group-hover:bg-blue-600 transition-colors duration-300">
             <LuFileText className="w-8 h-8 text-blue-600 group-hover:text-white" />
           </div>
@@ -36,7 +35,7 @@ const AspiroCareer = () => {
         </div>
 
         {/* Card 2: Practice Interviews */}
-        <div className="group relative bg-white border border-gray-200 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer">
+        <div className="group relative bg-white border border-slate-200 p-8 rounded-2xl shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] hover:shadow-xl transition-all duration-300 cursor-pointer">
           <div className="mb-5 inline-block p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-600 transition-colors duration-300">
             <LuMessageSquare className="w-8 h-8 text-emerald-600 group-hover:text-white" />
           </div>
@@ -49,11 +48,6 @@ const AspiroCareer = () => {
           </div>
         </div>
 
-      </div>
-
-      {/* Simple Footer/Status */}
-      <div className="mt-16 text-gray-400 text-sm">
-        &copy; {new Date().getFullYear()} Aspiro Platform
       </div>
     </div>
   );

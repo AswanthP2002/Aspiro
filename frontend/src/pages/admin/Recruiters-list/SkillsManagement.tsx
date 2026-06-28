@@ -25,66 +25,8 @@ interface SkillData {
 }
 
 export default function AppConfigPage() {
-    // const [skills, setSkills] = useState<SkillData[]>([]);
-    // const [filteredSkills, setFilteredSkills] = useState<SkillData[]>([]);
-    // const [search, setSearch] = useState('');
-    // const [page, setPage] = useState(1)
-    // const [limit, setLimit] = useState(10)
-    // const [pagination, setPagination] = useState<number[]>([])
-    // const [totalPage, setTotalPage] = useState(0)
-    // const [modalOpen, setModalOpen] = useState(false);
-    // const [isEditing, setIsEditing] = useState(false);
-    // const [currentSkill, setCurrentSkill] = useState<SkillData | null>(null);
+    
     const [activeSection, setActiveSection] = useState<'skills' | 'job-level' | 'job-type' | 'work-mode'>('skills')
-
-    // Form state
-    // const [skillName, setSkillName] = useState('');
-
-    // const searchMethod = (e: any) => {
-    //     setSearch(e.target.value)
-    //     //Notify.info(e.target.value, {timeout: 1000})
-    // }
-
-    // const dbounceSearch = (fn: Function, delay: number) => {
-    //     let timer: any
-    //     return function(...args: any){
-    //         clearTimeout(timer)
-    //         timer = setTimeout(() => {
-    //             fn(...args)
-    //         }, delay)
-    //     }
-    // }
-
-    // const dSearch = dbounceSearch(searchMethod, 600)
-
-
-    // useEffect(() => {
-    //     fetchSkills();
-    // }, [search, limit, page]);
-
-    // useEffect(() => {
-    //     if (search) {
-    //         const filtered = skills.filter(s => s.skills.toLowerCase().includes(search.toLowerCase()));
-    //         setFilteredSkills(filtered);
-    //     } else {
-    //         setFilteredSkills(skills);
-    //     }
-    // }, [search, skills]);
-
-    // const fetchSkills = async () => {
-    //     try {
-    //         const result = await adminGetSkills(search, limit, page)
-    //         if (result?.success) {
-    //             const data = result?.result?.skills || []; 
-    //             setSkills(data);
-    //             setTotalPage(result?.result?.totalPages || 0)
-    //             setPagination(new Array(result?.result?.totalPages || 0).fill(0))
-    //             setFilteredSkills(data);
-    //         }
-    //     } catch (error: any) {
-    //         console.log(error);
-    //     }
-    // };
 
     return (
         <div className='p-5 lg:px-20 md:py-10'>

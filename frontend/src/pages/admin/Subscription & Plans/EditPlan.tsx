@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { AiFillRocket } from 'react-icons/ai';
 import { BsArrowLeft } from 'react-icons/bs';
-import { FiZap, FiCheck, FiX, FiChevronRight, FiSave, FiStar } from 'react-icons/fi';
+import { FiZap, FiCheck, FiX, FiSave, FiStar } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { adminEditPlan, createPlan } from '../../../services/planServices';
+import { adminEditPlan } from '../../../services/planServices';
 import Swal from 'sweetalert2';
 import { AxiosError } from 'axios';
 
@@ -165,44 +165,6 @@ const EditPlan = () => {
         })
     }
   }, [editablePlanData])
-
-//   {
-//   "_id": {
-//     "$oid": "69c51ddee955e350e46b7303"
-//   },
-//   "name": "Basic",
-//   "description": "Beginners Choice",
-//   "monthlyPrice": 0,
-//   "yearlyPrice": 0,
-//   "trialPeriod": 0,
-//   "badgeIcon": "Lightning",
-//   "isListed": true,
-//   "currency": "INR",
-//   "billingCycle": "monthly",
-//   "isActive": true,
-//   "features": [
-//     "resumeBuilder",
-//     "socialFeed",
-//     "jobRecommendation"
-//   ],
-//   "featuresListed": {
-//     "jobPosts": "",
-//     "directMessaging": false,
-//     "connectionRequests": "10",
-//     "interviewPractice": false,
-//     "isListed": true,
-//     "jobApplications": "5",
-//     "jobRecommendation": true,
-//     "pushJob": false,
-//     "recruiterProfile": false,
-//     "resumeAnalyzer": false,
-//     "resumeBuilder": true,
-//     "smartFilter": false,
-//     "socialFeed": true
-//   },
-//   "__v": 0,
-//   "isDeleted": false
-// }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans text-slate-900">

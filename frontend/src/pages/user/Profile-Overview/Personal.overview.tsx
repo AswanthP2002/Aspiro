@@ -14,16 +14,15 @@ import {
 import GeneralModal from '../../../components/common/Modal';
 import EditProfilePictureComponent from '../../../components/candidate/EditProfilePhotoComponent';
 import EditCoverphotoComponent from '../../../components/candidate/EditCoverPhotoComponent';
-import { FollowerData, MyProfileDTO, SocialLinks } from '../../../types/entityTypes';
+import { MyProfileDTO, SocialLinks } from '../../../types/entityTypes';
 import { Controller, useForm } from 'react-hook-form';
 import { FaEye, FaGithub, FaGlobe, FaInstagram, FaLinkedin, FaPenSquare, FaPlus } from 'react-icons/fa';
 import { BsEnvelope } from 'react-icons/bs';
 import { FaCircleXmark } from 'react-icons/fa6';
 import { LuPhone, LuUser } from 'react-icons/lu';
-import { BiAlignLeft, BiCheckCircle, BiMapPin, BiSearch } from 'react-icons/bi';
+import { BiAlignLeft, BiCheckCircle, BiMapPin } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { toast } from 'react-toastify';
-import { getFollowers, removeAFollower } from '../../../services/followServices';
 import FollowersModal from '../../../components/user/Followers.modal';
 import FollowingsModal from '../../../components/user/Followings.modal';
 import ConnectionsModal from '../../../components/user/Connections.modal';

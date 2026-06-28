@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
-import { formatRelativeTime, transformDate } from '../../services/util/formatDate'
 import {CiBookmark, CiMonitor} from 'react-icons/ci'
-import {MdBookmarkAdded} from 'react-icons/md'
 import { checkIsJobApplied, checkIsSaved, saveJob, unsaveJob } from '../../services/userServices'
 import { Notify } from 'notiflix'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { JobAggregatedData, LoadJobsForPublicData } from '../../types/entityTypes'
-import { BiBriefcase, BiCalendar, BiChart, BiDollar, BiShare } from 'react-icons/bi'
+import { LoadJobsForPublicData } from '../../types/entityTypes'
+import { BiBriefcase, BiCalendar, BiChart, BiDollar } from 'react-icons/bi'
 import moment from 'moment'
 import { BsClock } from 'react-icons/bs'
-import { BarChart } from 'recharts'
 import { currencyFormatter } from '../../helpers/Currency.helper'
 import { TbBookmarkFilled } from 'react-icons/tb'
 import { toast } from 'react-toastify'
@@ -161,63 +158,3 @@ const InfoItem = ({ icon, label, value, bgColor }: { icon: React.ReactNode, labe
     </div>
   </div>
 );
-
-// /**
-//  * <div className="relative tile border border-gray-300 cursor-pointer rounded-sm p-3">
-//             {/* <div className="absoute text-xs border border-gray-300 w-fit !px-3 !py-1 rounded-sm"><p>{data.jobLevel}</p></div>
-//             <div className="absoute text-xs border border-gray-300 w-fit !px-3 !py-1 rounded-sm "><p>In-office</p></div> */}
-//             <div className='flex gap-3 items-center'>
-//                 <div className='border border-gray-200 w-[40px] h-[40px] flex justify-center items-center rounded-full'>
-//                     <i className="fa-solid fa-briefcase !text-gray-300"></i>
-//                 </div>
-//                 <div className=''>
-//                     <p className="font-semibold text-start">{data?.jobTitle}</p>
-//                     <p className="text-sm text-gray-500">
-//                         {data?.recruiterProfile?.employerType === 'company' ? data.recruiterProfile.organizationDetails?.organizationName : data?.userDetails?.name}
-//                     </p>
-//                 </div>
-//             </div>
-//             {/* skills */}
-//             <div className='flex flex-wrap gap-2 mt-5'>
-//                 {
-//                     data.requiredSkills.map((skill : string, index : number) => {
-//                         return <div key={index} className='bg-gray-200 rounded-full !px-3 !py-1'><p className="text-xs text-gray-500">{skill}</p></div>
-//                     })
-//                 }
-//             </div>
-//             <div className='flex gap-2 mt-5'>
-//             <div className='flex-grow-1 border-r border-gray-300'>
-//                 <p className="text-xs text-gray-500 text-start"><i className="fa-solid fa-wallet !text-xs !text-gray-400"></i> Pay</p>
-//                 <p className="text-start font-semibold text-sm">&#8377; {data.minSalary} - {data.maxSalary}</p>
-//             </div>
-
-//             <div className='flex-grow-1 border-r border-gray-300'>
-//                 <p className="text-xs text-gray-500 text-start"><i className="fa-solid fa-clock !text-xs !text-gray-400"></i> Duration</p>
-//                 <p className="text-start font-semibold text-sm">{data.duration ? data.duration : "NA"}</p>
-//             </div>
-
-//             <div className='flex-grow-1'>
-//                 <p className="text-xs text-gray-500 text-start"><i className="fa-solid fa-laptop !text-xs !text-gray-400"></i> Work Mode</p>
-//                 <p className="text-start font-semibold text-sm">{data.workMode}</p>
-//             </div>
-            
-//             </div>
-//             <div className='mt-5'>
-//                 <p className=" text-start text-xs text-blue-400">Apply by {transformDate(data.expiresAt as string)} | Posted {formatRelativeTime(data.createdAt)}</p>
-//             </div>
-//             <div className='flex justify-between !mt-5'>
-//                 <div className="flex gap-5">
-//                     <button onClick={() => viewJobDetails(data._id as string)} className='text-xs border border-gray-300 rounded-md !px-4 !py-2 text-blue-500'>View Details</button>
-//                     <button onClick={() => goToJobApplyPage(data._id as string)} className='text-xs bg-blue-500 text-white rounded-md !px-4 !py-2'>Apply Now</button>
-//                 </div>
-//                 <div className="flex justify-end gap-5">
-//                     {
-//                         isJobSave
-//                             ? <button onClick={() => unSaveJob(data._id as string)}><MdBookmarkAdded /></button>
-//                             : <button onClick={() => saveTheJob(data._id as string)}><i className="fa-solid fa-bookmark !text-gray-400"></i></button>
-//                     }
-//                     <button><i className="!text-gray-400 fa-solid fa-share-nodes"></i></button>
-//                 </div>
-//             </div>
-//         </div>
-//  */

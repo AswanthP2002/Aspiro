@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 // import store from "./store";
 
 interface AlertPayloadvalues {
-    alerts: AlertsData[] | any[]
+    alerts: AlertsData[]
     unReadAlertsCount: number
 }
 
@@ -42,18 +42,6 @@ const alertSlice = createSlice({
             existAlertIds.forEach((id) => console.log(id))
             const uniqueAlerts = newAlerts.filter((al) => !existAlertIds.has(al._id))
             console.log('-- unique laerts --', uniqueAlerts)
-            // const existingAlerts = store.getState().alert.alerts
-            // console.log('-- exisitng alerts--', state.alerts)
-            // const newAlerts = action.payload.alerts
-            // console.log('-- new alerts --', newAlerts)
-            // Notify.success('Alerts setuped succesfully')
-            // const existingAlerts = new Set(state.alerts.filter((alert) => alert._id))
-            // console.log('--checking existing alerts id--')
-            // existingAlerts.forEach((value) => console.log('value', value))
-            // const uniqueAlerts = newAlerts.filter((alert) => !existingAlerts.has(alert._id))
-            // console.log('-- found unique alerts--', uniqueAlerts)
-            // console.log(action.payload.alerts)
-            // console.log(action.payload.unReadAlertsCount)
             state.alerts.push(...uniqueAlerts)
             console.log('-- checking alerts after filteration --', current(state.alerts))
             // state.unReadAlertsCount = action.payload.unReadAlertsCount
@@ -77,7 +65,7 @@ const alertSlice = createSlice({
                 // toast.info('Fetching unread alerts count')
                 state.unReadAlertsCount = 0
             })
-            .addCase(unreadAlertsCountThunk.fulfilled, (state, action: any) => {
+            .addCase(unreadAlertsCountThunk.fulfilled, (state, action: PayloadAction<{result: number}>) => {
                 // toast.success('Fetched unread alerts count')
                 console.log('action payload count', action.payload.result)
                 state.unReadAlertsCount = action.payload.result

@@ -1,4 +1,3 @@
-import { BiMedal, BiStar, BiTrophy } from "react-icons/bi";
 import { IoMedalSharp, IoSunnyOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
 import {ResponsiveContainer, XAxis, LineChart, Line, YAxis, Tooltip, CartesianGrid} from 'recharts'
@@ -145,25 +144,6 @@ export default function InterviewDashboardPage(){
                             <div>
                                 <img className="w-17 h-17 object-cover grayscale contrast-30" src={scoreNinetyAbove} alt="" />
                             </div>
-                            {/* <div className="border border-slate-200 rounded-md flex flex-col items-center gap-2 p-3">
-                                <BiStar size={25} />
-                                <p className="text-xs font-medium">First Interview</p>
-                            </div>
-
-                            <div className="border border-slate-200 rounded-md flex flex-col items-center gap-2 p-3">
-                                <IoSunnyOutline size={25} />
-                                <p className="text-xs font-medium">5 days streak</p>
-                            </div>
-
-                            <div className="border border-slate-200 rounded-md flex flex-col items-center gap-2 p-3">
-                                <BiMedal size={25} />
-                                <p className="text-xs font-medium">Score 90 above</p>
-                            </div>
-
-                            <div className="border border-slate-200 rounded-md flex flex-col items-center gap-2 p-3">
-                                <BiTrophy size={25} />
-                                <p className="text-xs font-medium">10 Interviews</p>
-                            </div> */}
                         </div>
                     </div>
                 </div>

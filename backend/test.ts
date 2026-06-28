@@ -1,11 +1,21 @@
-// @injectable()
-// export default class CreateUserUseCase implements ICreateUserUseCase {
-//   constructor(
-//     @inject('IUserRepository') private readonly _repo: IUserRepository,
-//     @inject('IEmailService') private _emailService: IEmailService
-//   ) {}
+class Land {
+  walk() {
+    console.log('Walking...');
+  }
+}
 
-//   async execute(createUserDto: CreateUserDto): Promise<UserDto | null> {
-//     //here im confused what about the validation and transformtion plainto instance etc
-//   }
-// }
+class Water {
+  swim() {
+    console.log('Swimming...');
+  }
+}
+
+class Frog {}
+
+Object.assign(Frog.prototype, Land.prototype);
+Object.assign(Frog.prototype, Water.prototype);
+
+const frog = new Frog()
+
+frog.walk()
+frog.swim()

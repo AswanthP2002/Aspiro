@@ -96,20 +96,6 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
         }
 
     const currentWorkingStatus = watch('isPresent')
-    
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width:'auto',
-        minWidth:400,
-        bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 24,
-        overflowY: 'auto',
-        p: 4,
-    };
 
     return(
         <Modal open={experiencemodalopen} className="flex items-center justify-center" onClose={closeModal}>

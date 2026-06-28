@@ -247,64 +247,6 @@ export default function EditCoverphotoComponent({coverPhoto, onSaveCoverPhoto, o
           </div>
         )}
       </div>
-            {/* {
-                openCrop
-                    ? <div className='relative'>
-                        {
-                            loading && (
-                                <div className="absolute inset-0 flex justify-center items-center bg-black/50 z-50">
-                                    <CircularProgress />
-                                </div>
-                            )
-                        }
-                        <div className="cropComponent-wrapper w-[700px] h-[250px]">
-                            <CropComponent 
-                                crop={crop}
-                                zoom={zoom}
-                                aspectRatio={4 / 1}
-                                image={image}
-                                setCrop={setCrop}
-                                setZoom={setZoom}
-                                cropComplete={cropComplete}
-                            />
-                        </div>
-                        <div className="crop-actions flex gap-10 mt-5">
-                            <div className="flex items-center gap-3">
-                                <input value={zoom} onChange={(event) => setZoom(parseFloat(event.target.value))} type="range" min={1} max={3} step={0.01} />
-                                <label htmlFor="" className="block text-sm">Zoom</label>
-                            </div>
-                            <div>
-                                <button onClick={onSave} className='button bg-blue-500 rounded px-2 py-1 text-white text-sm'>Save</button>
-                            </div>
-                        </div>
-                      </div>
-                    : <div>
-                        {
-                            loading && (
-                                <div className="absolute inset-0 flex justify-center items-center bg-black/50 z-50">
-                                    <CircularProgress />
-                                </div>
-                            )
-                        }
-                        <div className="header">
-                            <h4 className="text-center font-semibold">Cover photo</h4>
-                        </div>
-                        <div className="coverphoto mt-5 mb-5 relative">
-                            <img src={coverPhoto?.cloudinarySecureUrl ? coverPhoto?.cloudinarySecureUrl : defaultCoverPhoto} className='w-[600px] h-[150px]' alt="" style={{ objectFit: 'cover' }} />
-                        </div>
-                        <div className="actions flex justify-center gap-10">
-                            <input onChange={(event) => handleFileUpload(event)} ref={fileRef} type="file" accept='image/*' name="" className='hidden' id="" />
-                            <button>
-                                <i className="fa-solid fa-upload"></i>
-                                <span className='text-xs font-semibold ms-2' onClick={openUpload}>Upload photo</span>
-                            </button>
-                            <button disabled={coverPhoto?.cloudinarySecureUrl ? false : true} onClick={() => deleteCoverphoto(coverPhoto?.cloudinaryPublicId)}>
-                                <i className="fa-solid fa-trash"></i>
-                                <span className='text-xs font-semibold ms-2'>Remove photo</span>
-                            </button>
-                        </div>
-                    </div>
-            } */}
         </>
     )
 }

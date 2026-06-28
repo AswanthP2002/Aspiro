@@ -495,6 +495,10 @@ import IDeleteConversationUsecase from '../application/interfaces/usecases/conve
 import DeleteConversationUsecase from '../application/usecases/conversation/DeleteConversations.usecase';
 import IGetNewUnreadConversationsCount from '../application/interfaces/usecases/conversation/IGetNewUnreadConversationsCount.usecase';
 import GetNewUnreadConversationsCountUsecase from '../application/usecases/conversation/GetNewUnreadConversationsCount.usecase';
+import SubscriptionAccess from '../middlewares/subscription.access.track';
+import IMonthlyResetSubscriptionLImits from '../application/interfaces/usecases/subscription/IMonthlyResetSubscriptionLimits';
+import MonthlyResetSubscriptionLimitUsecase from '../application/usecases/subscription/MonthlyResetSubscriptionLimit.usecase';
+import CronSubscriptionReset from '../infrastructure/cron-schedule/subscription/subscription.monthly.reset';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -888,7 +892,7 @@ container.registerSingleton<IDeleteConversationUsecase>(
 container.registerSingleton<IGetNewUnreadConversationsCount>(
   'IGetNewUnreadConversationsCountUsecase',
   GetNewUnreadConversationsCountUsecase
-)
+);
 container.registerSingleton<IInitializeConversation>(
   'IInitializeConversation',
   InitializeConversationUsecase
@@ -1080,6 +1084,10 @@ container.registerSingleton<IAdminChangeJobTypeStatusUsecase>(
   'IAdminChangeJobTypeStatusUsecase',
   AdminChangeJobTypeStatusUsecase
 );
+container.registerSingleton<IMonthlyResetSubscriptionLImits>(
+  'IMonthlySubscriptionLimitReset',
+  MonthlyResetSubscriptionLimitUsecase
+);
 container.registerSingleton<IAdminGetJobTypesUsecase>(
   'IAdminGetJobTypesUsecase',
   AdminGetJobTypesUsecase
@@ -1155,6 +1163,8 @@ container.registerSingleton(JobLevelController);
 container.registerSingleton(JobTypeController);
 container.registerSingleton(AlertsController);
 container.registerSingleton(ConnectionController);
+container.registerSingleton(SubscriptionAccess);
+container.registerSingleton(CronSubscriptionReset);
 
 //register other services
 container.registerSingleton<IEmailService>('IEmailService', EmailService); //email service

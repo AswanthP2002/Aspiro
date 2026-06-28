@@ -17,6 +17,10 @@ export const UserSubscriptionSchema = new Schema<UserSubscription>(
     isCanceled: { type: Boolean, default: false },
     paymentStatus: { type: String, enum: ['paid', 'pending', 'failed'] }, // 'paid', 'pending', 'failed'
     features: { type: Schema.Types.Mixed, default: {} },
+    billingCycle: { type: String, enum: ['monthly', 'annually'] },
+    isTrialPeriodGiven: { type: Boolean, default: false },
+    trialPeriodStarts: { type: Date },
+    trialPeriodEnds: { type: Date },
   },
   { timestamps: true }
 );

@@ -10,7 +10,6 @@ import { BrowserRouter } from 'react-router-dom';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const root = createRoot(document.getElementById('root')!);
-// wrapping app with google auth provider
 
 root.render(
   <ErrorBoundary>

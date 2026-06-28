@@ -17,6 +17,7 @@ export default class SubscriptionAccess {
 
       if (
         mySubscription &&
+        mySubscription.features &&
         mySubscription.features[feature] &&
         !isNaN(parseInt(mySubscription.features[feature] as string))
       ) {
@@ -29,7 +30,7 @@ export default class SubscriptionAccess {
 
           return;
         }
-      } else if (mySubscription && mySubscription.features[feature]) {
+      } else if (mySubscription && mySubscription.features && mySubscription.features[feature]) {
         next();
       } else {
         res.status(StatusCodes.FORBIDEN).json({

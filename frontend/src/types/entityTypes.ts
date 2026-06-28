@@ -755,7 +755,7 @@ export interface RecruiterProfileData {
   };
   isRejected?: boolean;
   applicationResendBufferDate?: Date;
-  verificationHistory?: any;
+  verificationHistory?: {action?: string};
   createdAt?: string;
   updatedAt?: string;
   userProfile: UserType;
@@ -1075,7 +1075,7 @@ export interface ApplicationsAggregated {
     updatedAt: Date;
     job: Job
     applicant: UserType;
-    resume: any;
+    resume: Resumes;
     experiences: Experience[];
     educations: Education[]
     skills: Skills[]
@@ -1134,7 +1134,7 @@ export interface Message {
     senderId?: string
     content?: {
         text?: string,
-        attachments?: any[]
+        // attachments?: {}
     }
     readBy?: MessageReadBy[]
     isDeleted?: boolean

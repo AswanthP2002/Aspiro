@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Notify } from 'notiflix';
 import { Controller, useForm } from 'react-hook-form';
-import { Button, FormControl, FormHelperText,Modal} from '@mui/material';
+import { FormControl, FormHelperText,Modal} from '@mui/material';
 import { addCompany, createRecruiterService } from '../../services/recruiterServices';
 import { getCompaniesList } from '../../services/companyServices';
 import { FaCircleCheck } from 'react-icons/fa6';
@@ -117,7 +117,7 @@ export default function RecruiterRegisterPage() {
             for(const [key, value] of formData.entries()){
                 console.log(`${key}: ${value}`)
             }
-            const result = await createRecruiterService(formData)
+            await createRecruiterService(formData)
 
                Swal.fire({
                     icon:'success',
@@ -137,8 +137,8 @@ export default function RecruiterRegisterPage() {
         }
     };
     
-    const selectedcompanyName = watch('companyName')
-    const selectedcompanyId = watch('companyId')
+    // const selectedcompanyName = watch('companyName')
+    // const selectedcompanyId = watch('companyId')
 
     const [searchResultList, setSearchResultList] = useState<Company[]>([])
     const [isSearching, setIsSearching] = useState(false)
@@ -399,31 +399,6 @@ export default function RecruiterRegisterPage() {
                     )}
                 </div>
                 )}
-                {/* Suggestions Dropdown */}
-                {/* { (searchResultList.length > 0 || isSearching) && (
-                    <div className="absolute z-10 bg-white border border-gray-200 rounded-md shadow-lg w-full mt-1 max-h-[250px] overflow-y-auto">
-                        {isSearching ? (
-                            <p className="p-3 text-xs text-gray-500">Searching...</p>
-                        ) : (
-                            searchResultList.map((company) => (
-                                <div 
-                                    key={company._id} 
-                                    onClick={() => selectCompanyFromList(company)} 
-                                    className='flex items-center gap-3 cursor-pointer hover:bg-blue-50 p-3 border-b border-gray-50 last:border-none'
-                                >
-                                    <div className='bg-gray-100 w-9 h-9 rounded-md flex items-center justify-center shrink-0'>
-                                        <BiBuildings size={18} className="text-gray-500" />
-                                    </div>
-                                    <div className='overflow-hidden'>
-                                        <p className='text-sm font-semibold text-gray-800 truncate'>{company.name}</p>
-                                        <p className='text-[10px] text-gray-500 truncate'>{company.location}</p>
-                                    </div>
-                                    <BiCheckCircle className="ml-auto text-transparent hover:text-blue-500" />
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )} */}
             </div>
             <FormHelperText>{errors.companyName?.message}</FormHelperText>
         </FormControl>

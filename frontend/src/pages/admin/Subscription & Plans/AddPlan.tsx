@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { AiFillRocket } from 'react-icons/ai';
 import { BsArrowLeft } from 'react-icons/bs';
-import { FiZap, FiCheck, FiX, FiChevronRight, FiSave, FiStar } from 'react-icons/fi';
+import { FiZap, FiCheck, FiX, FiSave, FiStar } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { createPlan } from '../../../services/planServices';

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BiGridAlt, BiListUl, BiSearch, BiUserCheck, BiUserPlus } from 'react-icons/bi';
-import { ConnectionRequests, Experience, Follow, Skills, UserOverviewForPublic, UserPublicProfileData } from '../../../types/entityTypes';
+import { ConnectionRequests, Experience, Follow, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
 import { followUser, getLocationDetails, getUsersForPublic, unfollowUser } from '../../../services/userServices';
 import { Notify } from 'notiflix';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { cancelConnectionRequest, removeConnection, sendConnectionRequest } from '../../../services/connectionServices';
+import { AxiosError } from 'axios';
 
 export default function UsersFindingPage() {
   const [view, setView] = useState<'list' | 'grid'>('list');
@@ -102,34 +103,34 @@ export default function UsersFindingPage() {
 
   const db = debouncedSearch(searchUsers, 500);
 
-  const getExperienceLabel = (experiences: Experience[]) => {
-    let experienceInMonths = 0;
-    let experienceLabel;
-    const n = experiences.length;
+  // const getExperienceLabel = (experiences: Experience[]) => {
+  //   let experienceInMonths = 0;
+  //   let experienceLabel;
+  //   const n = experiences.length;
 
-    for (let i = 0; i < n; i++) {
-      const startDate = new Date(experiences[i].startDate);
-      const endDate = experiences[i].isPresent ? new Date() : new Date(experiences[i].endDate);
+  //   for (let i = 0; i < n; i++) {
+  //     const startDate = new Date(experiences[i].startDate);
+  //     const endDate = experiences[i].isPresent ? new Date() : new Date(experiences[i].endDate);
 
-      const yearDif = endDate.getFullYear() - startDate.getFullYear();
-      const monthDif = endDate.getMonth() - startDate.getMonth();
+  //     const yearDif = endDate.getFullYear() - startDate.getFullYear();
+  //     const monthDif = endDate.getMonth() - startDate.getMonth();
 
-      const fullMonthsDif = yearDif * 12 + monthDif;
-      experienceInMonths += fullMonthsDif;
-    }
+  //     const fullMonthsDif = yearDif * 12 + monthDif;
+  //     experienceInMonths += fullMonthsDif;
+  //   }
 
-    if (experienceInMonths >= 12 * 4) {
-      experienceLabel = 'High Level';
-    } else if (experienceInMonths >= 12 * 2 && experienceInMonths < 12 * 4) {
-      experienceLabel = 'Mid Level';
-    } else if (experienceInMonths >= 12 && experienceInMonths < 12 * 2) {
-      experienceLabel = 'Entry Level';
-    } else {
-      experienceLabel = 'Fresher';
-    }
+  //   if (experienceInMonths >= 12 * 4) {
+  //     experienceLabel = 'High Level';
+  //   } else if (experienceInMonths >= 12 * 2 && experienceInMonths < 12 * 4) {
+  //     experienceLabel = 'Mid Level';
+  //   } else if (experienceInMonths >= 12 && experienceInMonths < 12 * 2) {
+  //     experienceLabel = 'Entry Level';
+  //   } else {
+  //     experienceLabel = 'Fresher';
+  //   }
 
-    return experienceLabel;
-  };
+  //   return experienceLabel;
+  // };
 
   const followAUser = async (userId: string) => {
     if(!userId) return toast.error('Something went wrong')
@@ -273,7 +274,9 @@ export default function UsersFindingPage() {
         })
       }
     } catch (error) {
-      
+      const err = error as AxiosError<{message: string}>
+      const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
+      toast.error(finalMessage)
     }
   }
 
@@ -343,7 +346,7 @@ export default function UsersFindingPage() {
     setHasMore(true)
   }, [search, roleTypeFilter, experienceTypeFilter, location])
 
-  const lastUserObserverComponent = useCallback((node) => {
+  const lastUserObserverComponent = useCallback((node: Element) => {
     if(loading) return
     if(observer.current) observer.current.disconnect()
 
@@ -395,13 +398,13 @@ export default function UsersFindingPage() {
 
   console.log('User Type Filter values ', roleTypeFilter);
 
-  const getClippedText = (text: string, buffer: number) => {
-    if (text.length <= buffer) {
-      return text;
-    } else {
-      return `${text.slice(0, buffer)}...`;
-    }
-  };
+  // const getClippedText = (text: string, buffer: number) => {
+  //   if (text.length <= buffer) {
+  //     return text;
+  //   } else {
+  //     return `${text.slice(0, buffer)}...`;
+  //   }
+  // };
 
   const isConnectionRequestSend = (user: UserOverviewForPublic) => {
     for(let i = 0; i < user?.connectionRequests?.length; i++){
@@ -467,11 +470,6 @@ export default function UsersFindingPage() {
                 </div>
                 )}
               </div>
-              {/* <select className="bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <option value="recently-joined">Recently Joined</option>
-                <option value="most-connections">Most Connections</option>
-                <option value="suggested">Suggested</option>
-              </select> */}
 
               {/* View Toggles */}
               <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
@@ -523,13 +521,7 @@ export default function UsersFindingPage() {
               </div>
               )}
             </div>
-            {/* <select
-              onChange={(e) => setRoleTypeFilter(e.target.value)}
-              className="text-xs font-medium bg-white border border-gray-200 px-4 py-1.5 rounded-full hover:border-gray-300 transition-colors outline-none cursor-pointer"
-            >
-              <option value="All">All Roles</option>
-              <option value="Recruiter">Recruiters</option>
-            </select> */}
+          
             <div onClick={toggleLevelTypeFilter} className='relative border border-slate-200 py-2 px-7 rounded-xl text-gray-600 cursor-pointer'>
               <p className='text-xs font-medium'>{experienceTypeFilter === 'All' ? "All Level" : experienceTypeFilter}</p>
               {levelTypeFilterOpen && (
@@ -544,16 +536,6 @@ export default function UsersFindingPage() {
               </div>
               )}
             </div>
-            {/* <select
-              onChange={(e) => setExperienceTypeFilter(e.target.value)}
-              className="text-xs font-medium bg-white border border-gray-200 px-4 py-1.5 rounded-full hover:border-gray-300 transition-colors outline-none cursor-pointer"
-            >
-              <option value="All">All Levels</option>
-              <option value="Fresher">Fresher</option>
-              <option value="Entry_Level">Entry Level</option>
-              <option value="Mid_Level">Mid Level</option>
-              <option value="High_Level">Senior Level</option>
-            </select> */}
 
             {/* Location Search Group */}
             <div className="relative flex items-center bg-white border border-gray-200 rounded-full pl-4 pr-1 py-1 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
@@ -574,7 +556,7 @@ export default function UsersFindingPage() {
 
               {suggestions?.length > 0 && (
                 <ul className="absolute top-10 left-0 w-full bg-white z-50 border border-gray-200 rounded-xl shadow-2xl max-h-60 overflow-y-auto p-2 list-none">
-                  {suggestions.map((place: any) => (
+                  {suggestions.map((place: {place_id: string, display_name: string}) => (
                     <li
                       className="text-xs p-2 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
                       onClick={() => handleLocationSelect(place)}
@@ -602,7 +584,7 @@ export default function UsersFindingPage() {
                   {/* Avatar Section */}
                   <div className="relative flex-shrink-0">
                     <div
-                      onClick={() => navigateToUserPublicProfile(user._id)}
+                      onClick={() => navigateToUserPublicProfile(user._id as string)}
                       className="cursor-pointer w-20 h-20 rounded-full border-2 border-gray-100 flex items-center justify-center overflow-hidden bg-slate-100"
                     >
                       {user.profilePicture?.cloudinarySecureUrl ? (
@@ -613,7 +595,7 @@ export default function UsersFindingPage() {
                         />
                       ) : (
                         <span className="text-2xl font-semibold text-slate-500">
-                          {user?.name[0]}
+                          {user && user.name && user?.name[0]}
                         </span>
                       )}
                     </div>
@@ -707,9 +689,7 @@ export default function UsersFindingPage() {
                         Follow
                       </button>
                       }
-                      
-
-                      
+                                            
                     </div>
                     )}
                   </div>
