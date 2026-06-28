@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JobListTile from '../../../components/common/JobListTile';
 import { getJobs } from '../../../services/userServices';
-import { Notify } from 'notiflix';
 import { JobLevelData, JobTypesData, LoadJobsForPublicData, WorkModeData } from '../../../types/entityTypes';
 import { BsSearch } from 'react-icons/bs';
 import { BiChevronDown, BiMapPin } from 'react-icons/bi';
 import { TbBriefcaseOff } from 'react-icons/tb';
-import { Button } from '@mui/material';
 import { recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists } from '../../../services/recruiterServices';
 import { toast } from 'react-toastify';
 

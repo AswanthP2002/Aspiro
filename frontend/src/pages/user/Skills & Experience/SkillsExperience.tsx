@@ -9,7 +9,6 @@ import EditEducationForm from "../../../components/candidate/Forms/EducationEdit
 import { getUserExperiences, deleteUserExperience } from "../../../services/experienceServices";
 import { getUserEducations, deleteUserEducation } from "../../../services/educationServices";
 import { getUserSkills, deleteUserSkill } from "../../../services/skillService";
-// import { deleteUserSkill } from "../../../services/userServices";
 import { Education, Experience, Skills } from "../../../types/entityTypes";
 import { Notify } from "notiflix";
 import { FaGraduationCap, FaPlus, FaSuitcase, FaTrash } from "react-icons/fa";
@@ -97,7 +96,7 @@ export default function ExperiencePage(){
 
         if (result.isConfirmed) {
             try {
-                const result = await toast.promise(
+                await toast.promise(
                     deleteUserExperience(expId),
                     {
                         pending: 'Deleting experience...',

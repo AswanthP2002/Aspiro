@@ -1,10 +1,6 @@
 import { AxiosError, HttpStatusCode} from "axios";
-import axios from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
-import Swal from "sweetalert2";
-import { Recruiter } from "../types/entityTypes";
 import { RecruiterEndPoints } from "../constants/endPoints/recruiter.endpoints";
-import { toast } from "react-toastify";
 
 //legacy
 export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
@@ -377,81 +373,60 @@ export const refreshRecruiterToken = async () => {
     }
 }
 
-export const rejectJobApplication = async (candidateId : string, applicationId : string, rejectReason : string, message : string = "") => {
-    try {
-        const response = await axiosInstance.put(`/recruiter/reject/application/${applicationId}/${candidateId}`,
-            {reason:rejectReason, message:message},
-            {
-                headers:{'Content-Type':'application/json'},
-                sendAuthTokenRecruiter:true
-            } as AxiosRequest
-        )
-
-        return response.data
-    } catch (error : unknown) {
-        console.log('Error occured while rejecting application', error instanceof Error ? error.message : null)
-        const err = error as AxiosError
-
-        if(err.response && err.response.status < 500 && err.response.status !== 403){
-            return err.response.data
-        }
-
-        console.log('Error occured while rejecting application', err)
-    }
-}
-
-// export const finalizeShortList = async (jobId : string, applications : any) => {
+// export const rejectJobApplication = async (candidateId : string, applicationId : string, rejectReason : string, message : string = "") => {
 //     try {
-//         const response = await axiosInstance.post(`/recruiter/applications/finalize/${jobId}`,
-//             {applications},
+//         const response = await axiosInstance.put(`/recruiter/reject/application/${applicationId}/${candidateId}`,
+//             {reason:rejectReason, message:message},
 //             {
 //                 headers:{'Content-Type':'application/json'},
 //                 sendAuthTokenRecruiter:true
 //             } as AxiosRequest
 //         )
+
 //         return response.data
-//     } catch (error) {
-        
+//     } catch (error : unknown) {
+//         console.log('Error occured while rejecting application', error instanceof Error ? error.message : null)
+//         const err = error as AxiosError
+
+//         if(err.response && err.response.status < 500 && err.response.status !== 403){
+//             return err.response.data
+//         }
+
+//         console.log('Error occured while rejecting application', err)
 //     }
 // }
 
-export const getFinalizedShortlistData = async (jobId : string) => {
-    try {
-        const response = await axiosInstance.get(`/recruiter/applications/finalize/${jobId}`,
-            {
-                sendAuthTokenRecruiter:true
-            } as AxiosRequest
-        )
+// export const getFinalizedShortlistData = async (jobId : string) => {
+//     try {
+//         const response = await axiosInstance.get(`/recruiter/applications/finalize/${jobId}`,
+//             {
+//                 sendAuthTokenRecruiter:true
+//             } as AxiosRequest
+//         )
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
 
-        console.log(err)
-    }
-}
+//         console.log(err)
+//     }
+// }
 
-export const getJobApplicationDetails = async (applicationId : string) => {
-    try {
-        const response = await axiosInstance.get(`/recruiter/application/${applicationId}`, {
-            sendAuthTokenRecruiter:true
-        } as AxiosRequest)
+// export const getJobApplicationDetails = async (applicationId : string) => {
+//     try {
+//         const response = await axiosInstance.get(`/recruiter/application/${applicationId}`, {
+//             sendAuthTokenRecruiter:true
+//         } as AxiosRequest)
 
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while geting spcific job application details', err)
-        if(err.response && err.response.status < 500 && err.response?.status !== 403){
-            return err.response.data
-        }
-    }
-}
-// //title:string
-//     rejector:string
-//     rejectee:string
-//     message:string
-//     relatedId:string
-//     type:string
+//         return response.data
+//     } catch (error : unknown) {
+//         const err = error as AxiosError
+//         console.log('Error occured while geting spcific job application details', err)
+//         if(err.response && err.response.status < 500 && err.response?.status !== 403){
+//             return err.response.data
+//         }
+//     }
+// }
 
 export const rejectCandidateJobApplication = async (title : string, description : string, type : string, relatedId : string, applicationId : string, candidateId : string) => {
     try {
@@ -511,23 +486,6 @@ export const addCompany = async (name: string, linkedin: string, website: string
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
-
-// export const getCompaniesList = async (search: string) => {
-//     try {
-//         const response = await axiosInstance.get(RecruiterEndPoints.FETCH_COMPANY_LIST,
-//             {
-//                 params:{search},
-//                 sendAuthToken: true
-//             } as AxiosRequest
-//         )
-
-//         return response.data
-//     } catch (error: unknown) {
-//         const err = error as AxiosError
-//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-//     }
-// }
-
 
 export const updateJobApplicationStatus = async (
     applicationId: string, status: string, candidateName: string, candidateEmail: string, jobTitle: string

@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { Comments, Notification, UserPosts } from "../types/entityTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { addComment, deleteComment, deletePost, hidePost, likeComment, likeUserPost, unlikeComment, unlikeUserPost } from "../services/userServices";
 import { Notify } from "notiflix";
 import Swal from "sweetalert2";
-import { BsFillArrowDownLeftSquareFill } from "react-icons/bs";
 import { getSocket } from "../socket";
 import { addLiveNotification } from "../redux/notificationSlice";
 

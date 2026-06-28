@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import Illustration from '/not-found.png'
 import notFoundIllustration from '/error-page.png'
 
 export default function NotFoundPage(){

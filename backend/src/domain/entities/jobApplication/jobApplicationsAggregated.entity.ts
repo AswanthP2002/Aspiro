@@ -20,5 +20,5 @@ export default interface ApplicationsAggregated {
   resume: Resume;
   experiences: Experience[];
   educations: Education[];
-  skills: Skills;
+  skills: Skills[];
 }

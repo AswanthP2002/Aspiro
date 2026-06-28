@@ -111,10 +111,13 @@ export const subscribeFreePlan = async (planId: string) => {
     }
 }
 
-export const subscribePaidPlan = async (planId: string) => {
+export const subscribePaidPlan = async (planId: string, billingCycle: string) => {
     try {
-        const response = await axiosInstance.post(PlanApiEndpoints.USER.SUBSCRIBE_PAID_PLAN(planId), null,
+        const response = await axiosInstance.post(PlanApiEndpoints.USER.SUBSCRIBE_PAID_PLAN(planId), {billingCycle},
             {
+                headers:{
+                    'Content-Type': 'application/json'
+                },
                 sendAuthToken: true
             } as AxiosRequest
         )

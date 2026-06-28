@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getNewUnreadConversationsCount } from "../services/chatServices";
-import { toast } from "react-toastify";
 
 
 export const newUnreadConversationsCountFetchThunk = createAsyncThunk(

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { deleteJob, getJobs, getPostedJobDetails } from "../../../services/recruiterServices";
 import { Notify } from "notiflix";
 import Swal from "sweetalert2";
-import { FaPlus } from "react-icons/fa";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import { BiBriefcase, BiMapPin, BiTrash } from "react-icons/bi";
 import { BsClock, BsEye, BsPencilSquare } from "react-icons/bs";
@@ -113,10 +112,12 @@ export default function MyJobs() {
                     setTotalPages(result.result?.totalPages)
                     //setPage(result?.result?.page)
                 } else {
-                    Notify.failure(result?.message || "Could not fetch jobs.");
+                    toast.error('Could not fetch jobs')
                 }
             } catch (error: unknown) {
-                Notify.failure("An error occurred while fetching jobs.");
+              const err = error as AxiosError<{message: string}>
+              const message = err.response?.data.message || err.message || 'Something went wrong'
+              toast.error(message)
             } finally {
                 setLoading(false);
             }

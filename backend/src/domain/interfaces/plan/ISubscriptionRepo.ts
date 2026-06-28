@@ -1,5 +1,7 @@
 import { SubscriptionAnalyticsDTO } from '../../../application/DTOs/subscription/subscriptionAnalytics.dto';
-import UserSubscription, { UserSubscriptionAndPlanDetails } from '../../entities/plan/userSubscription.entity';
+import UserSubscription, {
+  UserSubscriptionAndPlanDetails,
+} from '../../entities/plan/userSubscription.entity';
 import IBaseRepo from '../IBaseRepo';
 
 export default interface ISubscriptionRepo extends IBaseRepo<UserSubscription> {
@@ -10,6 +12,11 @@ export default interface ISubscriptionRepo extends IBaseRepo<UserSubscription> {
     limit: number,
     status: string[]
   ): Promise<{ data: SubscriptionAnalyticsDTO; totalPages: number } | null>;
-  getUserSubscriptionDetails(userId: string): Promise<UserSubscriptionAndPlanDetails | null>
-  findOneWithUserId(userId: string): Promise<UserSubscription | null>
+  getUserSubscriptionDetails(userId: string): Promise<UserSubscriptionAndPlanDetails | null>;
+  findOneWithUserId(userId: string): Promise<UserSubscription | null>;
+  updateFeatureJobApplicationCountByUserId(
+    userId: string,
+    count: string
+  ): Promise<UserSubscription | null>;
+  findSubscriptionsByPlanId(planId: string): Promise<UserSubscription[] | null>
 }

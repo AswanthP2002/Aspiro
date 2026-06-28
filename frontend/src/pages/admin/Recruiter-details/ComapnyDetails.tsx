@@ -104,38 +104,6 @@ export default function RecruiterDetails(){
     setIsRevocationModalOpened(true)
   }
 
-  const handleRevokePermissions = (recruiterId: string, action: "Revoke" | "Un-Revoke") => {
-        if(!recruiterId) return
-
-    Swal.fire({
-        icon: "question",
-        title: "Revoke Permissions?",
-        showConfirmButton: true,
-        confirmButtonText: "Revoke",
-        showCancelButton: true,
-        allowEscapeKey: false,
-        allowOutsideClick: false
-    }).then(async (response) => {
-        if(response.isConfirmed){
-            try {
-                const result = await handleRecruiterPermissions(recruiterId, action)
-                if(result?.success){
-                    toast.success('Permissions Revoked')
-                    setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
-                        if(!prv) return null
-                        return {
-                            ...prv,
-                            isPermissionRevoked: true,
-                        }
-                    })
-                }
-            } catch (error: unknown) {
-                toast.error(error instanceof Error ? error.message : 'somethng went wrong')
-            }
-        }
-    })
-  };
-
   const onManagingPermissions = (updatedRecruiterData: Partial<AdminRecruiterDetailsData>) => {
     setRecruiterDetails((prv: AdminRecruiterDetailsData | null) => {
       if(!prv) return null

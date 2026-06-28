@@ -2,15 +2,12 @@ import { useEffect, useState } from "react";
 import { BiChevronRight } from "react-icons/bi";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { IoMdSend } from "react-icons/io";
-import { MdAutoAwesome, MdKeyboardVoice, MdOutlineKeyboardVoice, MdSlowMotionVideo } from "react-icons/md";
+import { MdAutoAwesome, MdOutlineKeyboardVoice, MdSlowMotionVideo } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getInterviewResponse } from "../../../../services/userServices";
 import { toast } from "react-toastify";
 import {} from 'spinners-react'
 import BouncingLoader from "../../../../components/common/Bouncing.loader";
-import { LuSpeech } from "react-icons/lu";
-import SpeechRecognition, {useSpeechRecognition} from "react-speech-recognition";
-import {useSpeech} from 'react-text-to-speech'
 import Swal from "sweetalert2";
 import { Modal } from "@mui/material";
 
@@ -24,7 +21,7 @@ export default function InterviewPage(){
     const [loading, setLoading] = useState(false)
     const [isAiResponding, setIsAiResponding] = useState(false)
     const [isInterviewStoped, setIsInterviewStoped] = useState(false)
-    const [sepeachableText, setSpeachableText] = useState('')
+    // const [sepeachableText, setSpeachableText] = useState('')
     const [isInterviewResultCalculating, setIsInterviewResultCalculating] = useState(false)
 
 
@@ -58,7 +55,7 @@ export default function InterviewPage(){
     ])
 
     const startInterview = () => setIsStarted(true)
-    const stopInterview = () => setIsStarted(false)
+    // const stopInterview = () => setIsStarted(false)
 
     const start = async () => {
         setLoading(true)
@@ -150,20 +147,6 @@ export default function InterviewPage(){
         toast.error(error instanceof Error ? error.message : 'Something went wrong')
       }
     }
-
-    // useEffect(() => {
-    //   console.log('Checking speechable notification', sepeachableText)
-    //   if(!sepeachableText) return
-    //   if(speechStatus === 'started'){
-    //     stop()
-    //   }
-
-    //   const timer = setTimeout(() => {
-    //     StartSpeeking()
-    //   }, 180);
-
-    //   return () => clearTimeout(timer)
-    // }, [sepeachableText])
 
     return (
       <>
@@ -319,69 +302,3 @@ export default function InterviewPage(){
       </>
     );
 }
-
-// function TextToSpeech(){
-//   const {Text, start, pause, stop, speechStatus} = useSpeech({
-//     text: "Hello, I’m the Aspiro AI Interviewer. I’ll be guiding you through a structured interview for the Business Development Excecutive position to help us understand your technical background and problem-solving approach. I’ll ask one question at a time. Are you ready to begin?",
-//     stableText: true,
-//     voiceURI: 'Google UK English Female',
-//     pitch: 1,
-//     rate: 0.9
-//   })
-
-
-//   // useEffect(() => {
-//   //   const voices = window.speechSynthesis.getVoices()
-//   //   console.log("checking available voices", voices)
-//   //   voices.forEach((voice) => {
-//   //     console.log(voice.voiceURI)
-//   //   })
-//   // }, [])
-
-//   return(
-//     <div>
-//       <Text />
-//       <div>
-//         {speechStatus !== "started"
-//           ? <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={start}>Start</button>
-//           : <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={pause}>Pause</button>
-//         }
-//         <button className="bg-white border border-slate-200 rounded-md p-2 block" onClick={stop}>Stop</button>
-//       </div>
-//     </div>
-//   )
-// }
-
-// function SpeechComponent(){
-//     const [isRecording, setIsRecording] = useState(false)
-//     const [result, setResult] = useState('')
-
-//    const {transcript, listening, resetTranscript, browserSupportsSpeechRecognition} = useSpeechRecognition()
-
-//     if(!browserSupportsSpeechRecognition){
-//         return <div><p>Browser does not support speech recognition</p></div>
-//     }
-
-//     const startListening = () => {
-//         setIsRecording(true)
-//         SpeechRecognition.startListening({continuous: true, language: 'en-US', interimResults: true})
-//     }
-
-//     const stopListening = () => {
-//         setIsRecording(false)
-//         SpeechRecognition.stopListening()
-//     }
-
-//     return(
-//         <>
-//             <div className="p-5">
-//                 <p>Speech</p>
-//                 {isRecording
-//                     ? <button onClick={stopListening} className="bg-white border border-slate-200 rounded-md p-5"><LuSpeech /></button>
-//                     : <button onClick={startListening} className="bg-white border border-slate-200 rounded-md p-5"><MdKeyboardVoice /></button>
-//                 }
-//                 <p>{transcript}</p>
-//             </div>
-//         </>
-//     )
-// }

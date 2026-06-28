@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FollowerData, FollowingsData } from "../../types/entityTypes"
-import { getFollowers, getFollowings, removeAFollower } from "../../services/followServices"
+import { getFollowings } from "../../services/followServices"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import { Modal, Skeleton } from "@mui/material"

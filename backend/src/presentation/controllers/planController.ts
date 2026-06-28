@@ -215,8 +215,9 @@ export default class PlanController {
   async userSubscribePaidPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user.id;
     const planId = req.params.planId;
+    const billingCycle = req.body.billingCycle;
     try {
-      const result = await this._subscribePaidPlan.execute({ planId, userId });
+      const result = await this._subscribePaidPlan.execute({ planId, userId, billingCycle });
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Free plan'),

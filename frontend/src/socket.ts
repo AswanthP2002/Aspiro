@@ -1,6 +1,6 @@
-import {io} from 'socket.io-client'
+import {io, Socket} from 'socket.io-client'
 
-let socket: any = null
+let socket: null | Socket = null
 export const initializeSocket = (userId: string) => {
     if(socket){
         socket.disconnect()

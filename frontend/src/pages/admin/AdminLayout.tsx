@@ -2,7 +2,6 @@
 
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../../components/admin/Sidebar/Sidebar';
-import TopBar from '../../components/admin/TopBar';
 import { useContext } from 'react';
 import { appContext } from '../../context/AppContext';
 

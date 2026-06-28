@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BiCheckCircle, BiCreditCard, BiDownload, BiXCircle } from 'react-icons/bi';
 import { FiAlertCircle } from 'react-icons/fi';
 import { InvoiceData, PaymentMethodsStripeData, PlanData, UserSubscriptionAndPlanDetailsData } from '../../../types/entityTypes';
@@ -14,7 +14,6 @@ const SubscriptionPage = () => {
   const [subscriptionDetails, setSubscriptionDetails] = useState<UserSubscriptionAndPlanDetailsData | null>(null)
   const [invoices, setInvoices] = useState<InvoiceData[]>([])
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodsStripeData | null>(null)
-  const [loading, setLoading] = useState(true)
   const [isPlansListingModalOpen, setIsPlansListingModalOpen] = useState(false)
 
   const handleManagePayment = async () => {
@@ -37,10 +36,13 @@ const SubscriptionPage = () => {
                 console.log('result after subscription details', result)
                 setSubscriptionDetails(result.result)
                 toast.success('Subscription details fetched')
-                //const invoicesResult = await getUserInvoices(result?.result.stripeCustomerId as string)
-                //const paymentMethodResult = await getPaymentMethods()
-                // setInvoices(invoicesResult.result)
-                //setPaymentMethod(paymentMethodResult.result)
+                if(result.result.planDetails.monthlyPrice > 0){
+                  const invoicesResult = await getUserInvoices(result?.result.stripeCustomerId as string)
+                  const paymentMethodResult = await getPaymentMethods()
+                  setInvoices(invoicesResult.result)
+                  setPaymentMethod(paymentMethodResult.result)
+                }
+                
             }
         } catch (error) {
             console.log('error', error)
@@ -181,9 +183,9 @@ const SubscriptionPage = () => {
                                 </td>
                                 <td className='py-2 px-2 text-xs font-medium text-slate-700'>
                                   {
-                                    (value && isNaN(parseInt(value as string)))
+                                    (value && isNaN(parseInt(subscriptionDetails.features[featureName] as string)))
                                       ? "Unlimited"
-                                      : (value && !isNaN(parseInt(value as string)) ? value : "-")
+                                      : (value && !isNaN(parseInt(subscriptionDetails.features[featureName] as string)) ? subscriptionDetails.features[featureName] : "-")
                                   }
                                 </td>
                               </tr>
@@ -394,7 +396,6 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
                     <ul className='space-y-1 mt-2'>
                       {Object.entries(plan.featuresListed).map((feature, i) => {
                         const featureKey = feature[0]
-                        const keyValue = feature[1]
                         return (
                         <li key={i} className='flex items-center text-sm gap-2'>
                           {plan.featuresListed[featureKey]

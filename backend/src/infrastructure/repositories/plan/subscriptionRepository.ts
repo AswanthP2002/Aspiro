@@ -171,6 +171,29 @@ export default class SubscriptionRepository
     return result;
   }
 
+  async updateFeatureJobApplicationCountByUserId(
+    userId: string,
+    count: string
+  ): Promise<UserSubscription | null> {
+    if (!mongoose.isValidObjectId(userId)) return null;
+
+    const result = await UserSubscriptionDAO.findOneAndUpdate(
+      { userId: new mongoose.Types.ObjectId(userId) },
+      { $set: { 'features.jobApplications': count } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async findSubscriptionsByPlanId(planId: string): Promise<UserSubscription[] | null> {
+    const subscriptions = await UserSubscriptionDAO.find({
+      planId: new mongoose.Types.ObjectId(planId),
+    });
+
+    return subscriptions;
+  }
+
   // async getUsersPurchasedCurrentDay(): Promise<{ count: number } | null> {
   //   const today = new Date();
   //   today.setHours(0, 0, 0, 0);

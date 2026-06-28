@@ -1,9 +1,5 @@
 import { createContext, JSX, useState, useEffect } from 'react';
 import { UserMetaData } from '../types/entityTypes';
-import { useSelector } from 'react-redux';
-import { loadUserMetaData } from '../services/userServices';
-import { Notify } from 'notiflix';
-import Swal from 'sweetalert2';
 
 export const appContext = createContext<unknown>(null); //changed to unknown from any
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { RecruiterProfileData } from "../../../types/entityTypes"
 import { useLocation, useNavigate } from "react-router-dom"
-import { FaArrowLeft, FaFile, FaGlobe, FaLinkedin } from "react-icons/fa"
+import { FaArrowLeft, FaGlobe, FaLinkedin } from "react-icons/fa"
 import { BsCheckCircle, BsClock } from "react-icons/bs"
 import formatDate from "../../../services/util/formatDate"
 import { LuUser } from "react-icons/lu"
@@ -50,7 +50,7 @@ export default function RecruiterApplicationDetailsPage(){
         if (isConfirmed && reason) {
             try {
                 // Here you would call your service to reject the application
-                const result = await rejectRecruiterApplication(applicationDetails?._id as string, reason)
+                await rejectRecruiterApplication(applicationDetails?._id as string, reason)
                 console.log('Application rejected with reason:', reason);
                 // You can also show a success message
                 Swal.fire('Rejected!', 'The application has been rejected.', 'success');

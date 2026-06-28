@@ -15,6 +15,7 @@ export const PlanSchema = new Schema<Plan>({
   features: { type: [String] },
   featuresListed: { type: Schema.Types.Mixed, default: {} },
   isDeleted: { type: Boolean, default: false },
+  isTrialPiriodGiven: { type: Boolean, default: false },
 });
 
 export const PlanDAO = model<Plan>('plans', PlanSchema);

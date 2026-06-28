@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BiCalendar, BiCheckCircle, BiDownload, BiEnvelope } from 'react-icons/bi';
 import { BsArrowRight } from 'react-icons/bs';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -78,15 +78,15 @@ const PaymentSuccessPage = () => {
             <span>Rs. {paymentDetails?.amount}</span>
           </div>
           <div className="flex justify-between text-gray-500">
-            <span>GST (18%)</span>
-            <span>Rs. {paymentDetails && paymentDetails.amount ? (paymentDetails.amount * 18) / 100 : 0}</span>
+            <span>Processing Fee (0%)</span>
+            <span>Rs. 0.00</span>
           </div>
         </div>
 
         {/* Total */}
         <div className="flex justify-between items-center mb-8">
           <span className="text-lg text-gray-400 uppercase tracking-wider font-medium">Grand Total</span>
-          <span className="text-2xl font-black text-gray-900 font-mono italic">Rs. {paymentDetails && paymentDetails.amount ? ((paymentDetails.amount * 18) / 100) + paymentDetails.amount : 0}</span>
+          <span className="text-2xl font-black text-gray-900 font-mono italic">Rs. {paymentDetails && paymentDetails.amount}</span>
         </div>
 
         {/* Status Alerts */}

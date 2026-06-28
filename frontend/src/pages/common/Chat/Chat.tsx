@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react"
 import React, { useState } from "react";
-import { Notify } from "notiflix";
 import { BiBlock, BiCheck, BiCheckDouble, BiChevronDown, BiSearch, BiSend, BiTrash } from "react-icons/bi";
 import { IoCallOutline } from "react-icons/io5";
-import { BsCameraVideo, BsEmojiSmile, BsThreeDotsVertical, BsTrash2, BsWechat } from "react-icons/bs";
+import { BsCameraVideo, BsEmojiSmile, BsThreeDotsVertical, BsWechat } from "react-icons/bs";
 import { HiPaperClip } from "react-icons/hi2";
-import { Chat, Conversation, User, UserType } from "../../../types/entityTypes";
+import { Chat, Conversation, UserType } from "../../../types/entityTypes";
 import { useLocation } from "react-router-dom";
 import { getSocket } from "../../../socket";
 import { getConversations, getChats, deleteChat, deleteChatForMe } from "../../../services/chatServices";
@@ -16,7 +15,7 @@ import moment from "moment";
 import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AxiosError } from "axios";
-import { newUnreadChatArrived, openedUnreadChat } from "../../../redux/chatSlice";
+import { openedUnreadChat } from "../../../redux/chatSlice";
 import BouncingLoader from "../../../components/common/Bouncing.loader";
 // import { SocketContext } from "../../../context/SocketContext";
 
@@ -98,6 +97,7 @@ export default function ChatPage() {
           console.log('Error occured while loading chats', error)
           const err = error as AxiosError<{message: string}>
           const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
+          toast.error(finalMessage)
         }
       }
     }
@@ -320,34 +320,7 @@ export default function ChatPage() {
             ];
           }
         });
-        // const conversationAlreadyExist = conversations.find((conv) => conv._id === data.message.conversationId)
-        // toast.success(`Live chat conversation id ${data.message.conversationId}`)
-        // if(conversationAlreadyExist){
-        //   toast.warn('Conversation already exist -MERGING')
-
-        // }else {
-        //   toast.error('Conversation does not exist -DUPLICATE')
-        //   setConversations((prvConversations: Conversation[]) => {
-        //     return [
-        //       {
-        //         _id: data.message.conversationId,
-        //         unreadMessage: 1,
-        //         lastMessage:{
-        //           text: data.message.text,
-        //           senderId: data.message.senderId,
-        //           sendAt: data.message.createdAt
-        //         },
-        //         // createdAt: new Date().toISOString(),
-        //         updatedAt: new Date().toISOString(),
-        //         participants:[
-        //           {_id: logedUser._id, email: logedUser.email, name: logedUser.name},
-        //           {_id: data.sender._id, name: data.sender.name, email: data.sender.email, profilePicture: data.sender.profilePicture}
-        //         ]
-        //       },
-        //       ...prvConversations
-        //     ]
-        //   })
-        // }
+        
       });
 
       return () => tempSocket.off('NEW_MESSAGE_RECEIVED');
@@ -361,295 +334,6 @@ export default function ChatPage() {
         })
       }
     }, [conversations])
-
-    // console.log('-- checking typing users --', typingUsers)
-
-
-
-    // useEffect(() => {
-    //   console.log('This useeffect will run when selected conversation OR chating person changed')
-    //   console.log('selected conversation', selectedConversation)
-    //   console.log('chating person', chatingPerson)
-    // }, [selectedConversation, chatingPerson])
-    
-    // useEffect(() => {
-    //   console.log('Some event occured in temp socket')
-    //   if(tempSocket){
-    //     tempSocket.on('RECEIVE_PRIVATE_MESSAGE', (message: Chat) => {
-    //       console.log('Private message received ---> ', message)
-    //       seetMessages((prv: Chat[]) => ([...prv, message]))
-    //       setConversations((prv: Conversation[]) => {
-    //         return prv.map((conv: Conversation) => {
-    //           if(conv._id === message.conversationId){
-    //             return {
-    //               ...conv,
-    //               lastMessage:{
-    //                 text: message.text,
-    //                 senderId: message.senderId,
-    //                 sendAt: message.createdAt
-    //               }
-    //             }
-    //           }else{
-    //             return conv
-    //           }
-    //         })
-    //       })
-    //     })
-    //   }
-    // }, [tempSocket])
-
-    // console.log('-- selected conversation --', selectedConversation)
-    // console.log('-- chatting person -- ', chatingPerson)
-
-  //   const searchConvo = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const value = e.target.value
-  //     // toast.info(`search : ${value}`)
-  //     setSearch(value)
-      
-  //   }
-
-  //   const debouncedSearch = <T extends (...args: never[]) => void>(fn: T, delay: number) => {
-  //     let timer: ReturnType<typeof setTimeout>
-  //     return function(...args: Parameters<T>){
-  //       clearTimeout(timer)
-  //       timer = setTimeout(() => {
-  //         fn(...args)
-  //       }, delay);
-  //     }
-  //   }
-
-  //   const dSearch = debouncedSearch(searchConvo, 500)
-  //   //accessing specific user deteails when the chat is opened through a user profile
-  //   const {_id, name, email} = location.state || {}
-
-  //   const inputRef = useRef<HTMLInputElement | null>(null)
-
-  //   const send = (event : React.ChangeEvent<HTMLInputElement>) => {
-  //       event.preventDefault()
-  //       if(!chatText.trim() || !selectedConversation || !chatingPerson) return
-
-  //       const socket = getSocket()
-  //       if(!socket) return toast.error('Socket not connected');
-
-  //       const messageData: Chat = {
-  //           conversationId: selectedConversation._id,
-  //           senderId: logedUser._id,
-  //           receiverId: chatingPerson._id,
-  //           text: chatText,
-  //           createdAt: new Date().toString(),
-
-  //       }
-
-  //       socket.emit('SEND_PRIVATE_MESSAGE', messageData)
-  //       // seetMessages((prv: Chat[]) => [...prv, messageData])
-  //       Notify.success('send', {timeout:1000})
-  //       if(inputRef?.current){
-  //           inputRef.current.value = ""
-  //       }
-  //       setChatText('')
-        
-  //   }
-
-
-  //   const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
-  //       return state.userAuth.user
-  //   })
-
-  //   const markAsRead = () => {
-  //       const socket = getSocket()
-  //       if(socket && selectedConversation?._id) {
-  //           socket.emit('MARK_MESSAGE_AS_READ', {conversationId: selectedConversation._id, userId: logedUser._id})
-  //       }
-  //   }
-
-  //   useEffect(() => {
-  //       const socket = getSocket()
-  //       if(socket){
-  //         socket.on('USER_STATUS_CHANGED', ({userId, status}) => {
-  //           setOnlineUsers(prev => 
-  //           status === 'online' ? [...new Set([...prev, userId])] : prev.filter(id => id !== userId)
-  //       );
-  //       })
-  //       }
-        
-  //   }, [])
-
-
-  //   useEffect(() => {
-
-  //       const socket = getSocket()
-  //       if(!socket || !selectedConversation?._id) return
-
-  //       console.log('joining room: ', selectedConversation._id)
-  //       socket.emit('JOIN_ROOM', {targetId: selectedConversation._id})
-
-  //       socket.off('RECEIVE_PRIVATE_MESSAGE')
-        
-  //       socket.on('RECEIVE_PRIVATE_MESSAGE', (newMessage: any) => {
-  //           console.log('new message received via socket', newMessage)
-  //           toast.info('Received a private message')
-  //           toast.success(`new message text -- ${newMessage.text}`)
-  //           if(newMessage.conversationId === selectedConversation._id){
-  //               seetMessages((prv: Chat[]) => {
-  //                   const exists = prv.find(m => m._id === newMessage._id || (m.text === newMessage.text && m.createdAt === newMessage.createdAt))
-  //                   if(exists) return prv;
-  //                   return [...prv, newMessage]
-  //               })
-  //               //updating conversation preview
-                
-  //               setConversations((conversations: Conversation[]) => {
-  //                 return conversations.map((conversation: Conversation) => {
-  //                   if(newMessage.conversationId === conversation._id){
-  //                     return {
-  //                       ...conversation,
-  //                       lastMessage: {
-  //                         ...conversation.lastMessage,
-  //                         text: newMessage.text
-  //                       }
-  //                     }
-  //                   }else{
-  //                     return conversation
-  //                   }
-  //                 })
-  //               })
-  //           }
-  //       })
-
-  //       socket.on('MESSAGES_READ_UPDATE', ({readerId}) => {
-  //           if(readerId === logedUser._id){
-  //               seetMessages((prv: Chat[]) => {
-  //                   return prv.map((m) => ({...m, isRead: true}))
-  //               })
-  //           }
-  //       })
-
-
-  //       return () => {
-  //           socket.off('RECEIVE_PRIVATE_MESSAGE')
-  //       }
-  //   }, [selectedConversation?._id])
-
-  //   //  useeffect for fetching conversations
-  //   useEffect(() => {
-  //       async function fetchConversationOnStart(){
-  //         setLoading(true)
-  //           try {
-  //               const result: FetchConversationsResponsePayload = await getConversations(search, page, limit)
-  //               if(result.success){
-  //                 console.log('-- checking result from the backend as conversations', result)
-  //                   toast.success(result.message)
-  //                   setConversations(result.result)
-  //               }
-  //           } catch (error: unknown) {
-  //               Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
-  //           } finally {
-  //             setLoading(false)
-  //           }
-  //       }
-
-  //       if(logedUser._id){
-  //           fetchConversationOnStart()
-  //       }
-  //   }, [logedUser._id, search, page])
-
-
-  //   //fetching chats based on selected conversaations
-  //   useEffect(() => {
-  //       const loadChatHistory = async () => {
-  //           if(selectedConversation?._id){
-  //               try {
-  //                   const result: LoadChatsResponsePayload = await getChats(selectedConversation._id)
-  //                   if(result.success){
-  //                     console.log('-- printing fetched chats--', result)
-  //                       seetMessages(result.result)
-  //                       toast.success(result.message)
-  //                   }
-                    
-  //               } catch (error) {
-  //                   toast.error(error instanceof Error ? error.message : 'Something broke')
-  //               }
-  //           }
-  //       }
-
-  //       loadChatHistory()
-  //   }, [selectedConversation?._id])
-
-  //   useEffect(() => {
-  //       //condition for checking how the component opened : directly or from a users profile
-  //       if(_id && name && email){
-  //           //check first if the id is present anywhere in the conversation
-  //           // const userFoundInConversation = conversations.find((conv: Conversation) => {
-  //           //     if(conv.userInfo?._id === _id){
-  //           //         return conv
-  //           //     }
-  //           // })
-  //           const startChat = async () => {
-  //               try {
-  //                   const result: InitializeConversationResponsePayload = await initializeConversation(_id)
-  //                   setSelectedConversation(result.result)
-  //                   console.log('conversation ready', result.result)
-  //                   Notify.success('Conversation started')
-  //               } catch (error: unknown) {
-  //                   Notify.failure(error instanceof Error ? error.message : 'something went wrong')
-  //               }
-  //           }
-  //           startChat()
-  //       }
-  //   }, [_id])
-
-
-  //   //specifying who am i chating with
-  //   //identifying chating person from the participantss
-  //   //seting identified person as chatting person
-  //   useEffect(() => {
-  //       if(selectedConversation){
-  //           const recipient = selectedConversation.participants?.find((p: UserType) => p._id !== logedUser._id)
-  //           if(recipient){
-  //               setChatingPerson(recipient)
-  //           }
-  //       }
-  //   }, [selectedConversation, logedUser._id])
-
-  //   useEffect(() => {
-  //       if(selectedConversation?._id) {
-  //           markAsRead()
-  //       }
-  //   }, [selectedConversation?._id, messages.length])
-
-  //   function getConversationDate(date: string){
-  //       const convDate = new Date(date)
-  //       const now = new Date()
-
-  //       const startOfToday = new Date(now.setHours(0, 0, 0, 0))
-  //       const startOfConvDay = new Date(convDate.setHours(0, 0, 0, 0))
-
-  //       const difInMs = startOfToday - startOfConvDay
-  //       const difInDays = difInMs / (1000 * 60 * 60 * 24)
-
-  //       if(difInDays === 0) return moment(date).format("hh:mm a")
-  //       if(difInDays === 1) return 'yesterday'
-  //       if(difInDays > 1){
-  //         const getDay = convDate.getDay() + 1
-  //         switch(getDay){
-  //           case 1:
-  //             return 'Monday'
-  //           case 2:
-  //             return 'Tuesday'
-  //           case 3:
-  //             return 'Wednesday'
-  //           case 4:
-  //             return 'Thursday'
-  //           case 5:
-  //             return 'Friday'
-  //           case 6:
-  //             return 'Saturday'
-  //           case 7:
-  //             return 'Sunday'
-  //           default:
-  //             return moment(convDate).format("DD:MM:YYYY")
-  //         }
-  //       }
-  //   }
 
     const unsendMessage = async (chatId: string) => {
       if(!chatId) return
@@ -935,7 +619,6 @@ export default function ChatPage() {
               return (
                 <>
                 <MessageBubble key={message._id || index} message={message} onUnsend={() => unsendMessage(message._id as string)} onDeleteForMe={() => deleteForMe(message._id as string)} />
-                {/* <p>{JSON.stringify(messages)}</p> */}
                 </>
                 // <div key={message._id || index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                 //   <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-sm text-sm ${

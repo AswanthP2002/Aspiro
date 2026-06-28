@@ -1,108 +1,25 @@
 import { useEffect, useState } from 'react';
 import { getNotifications, changeNotificationStatus, deleteNotification, markAllNotificationRead } from '../../../services/notificationServices';
 import { acceptConnectionRequest, rejectConnectionRequest } from '../../../services/connectionServices';
-import { updateNOtificationReadStatus } from '../../../services/userServices';
 import { formatRelativeTime } from '../../../services/util/formatDate';
-import claraImage from '/klara.jpg';
-import leschulerImage from '/schuller.jpg';
-import { PiSuitcase } from 'react-icons/pi';
-import { BiCheckDouble, BiFilter, BiHeart, BiMedal, BiTrash, BiUserCheck, BiUserPlus } from 'react-icons/bi';
+import { BiCheckDouble, BiFilter, BiHeart, BiTrash, BiUserPlus } from 'react-icons/bi';
 import { BiBell } from 'react-icons/bi';
-import { BsBell, BsClock, BsThreeDotsVertical } from 'react-icons/bs';
+import { BsClock, BsThreeDotsVertical } from 'react-icons/bs';
 import { Notification } from '../../../types/entityTypes';
-import { FaTrash } from 'react-icons/fa';
-import { MdChatBubble, MdOutlineNotifications } from 'react-icons/md';
-import { FaShareNodes } from 'react-icons/fa6';
+import { MdChatBubble } from 'react-icons/md';
 import { IoChatboxOutline, IoNotificationsOffOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAllNotificationsFromStore, deleteNotificationFromStore, markAllNotificationAsRead, markAsRead, setNotifications, setNotificationsCount } from '../../../redux/notificationSlice';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import Loader from '../../../components/admin/Loader';
-import InfinitySpinner from '../../../components/common/InfinitySpinner';
 import { toast } from 'react-toastify';
 
-const notifications = [
-  {
-    _id: 'notif_001',
-    type: 'POST_LIKE',
-    message: 'Rahul liked your post',
-    isRead: false,
-    createdAt: '2026-01-21T08:30:00Z',
-    metadata: {
-      acted_by: 'Rahul Sharma',
-      acted_user_avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      target_content: {
-        type: 'post',
-        preview: 'Just launched my new portfolio website today!',
-      },
-    },
-  },
-  {
-    _id: 'notif_002',
-    type: 'COMMENT',
-    message: 'Ananya commented on your post',
-    isRead: false,
-    createdAt: '2026-01-21T08:40:00Z',
-    metadata: {
-      acted_by: 'Ananya Verma',
-      acted_user_avatar: 'https://randomuser.me/api/portraits/women/45.jpg',
-      target_content: {
-        type: 'comment',
-        preview: 'This looks amazing! Great work 👏',
-      },
-    },
-  },
-  {
-    _id: 'notif_003',
-    type: 'FOLLOW',
-    message: 'Karthik started following you',
-    isRead: true,
-    createdAt: '2026-01-20T18:10:00Z',
-    metadata: {
-      acted_by: 'Karthik Reddy',
-      acted_user_avatar: 'https://randomuser.me/api/portraits/men/61.jpg',
-      target_content: null,
-    },
-  },
-  {
-    _id: 'notif_004',
-    type: 'POST_MENTION',
-    message: 'Meera mentioned you in a post',
-    isRead: false,
-    createdAt: '2026-01-20T20:15:00Z',
-    metadata: {
-      acted_by: 'Meera Iyer',
-      acted_user_avatar: 'https://randomuser.me/api/portraits/women/18.jpg',
-      target_content: {
-        type: 'post',
-        preview: 'Shoutout to @aswanth for helping me debug my Node.js app!',
-      },
-    },
-  },
-  {
-    _id: 'notif_005',
-    type: 'COMMENT_REPLY',
-    message: 'Suresh replied to your comment',
-    isRead: false,
-    createdAt: '2026-01-21T07:55:00Z',
-    metadata: {
-      acted_by: 'Suresh Kumar',
-      acted_user_avatar: 'https://randomuser.me/api/portraits/men/74.jpg',
-      target_content: {
-        type: 'comment',
-        preview: 'Thanks! That explanation really helped.',
-      },
-    },
-  },
-];
 
+  // const getClippedText = (text: string, buffer: number) => {
+  //   if (text?.length <= buffer) return text;
 
-  const getClippedText = (text: string, buffer: number) => {
-    if (text?.length <= buffer) return text;
-
-    return `"${text?.slice(0, buffer)}..."`;
-  };
+  //   return `"${text?.slice(0, buffer)}..."`;
+  // };
 
   
 interface NotificationRootState {

@@ -15,6 +15,7 @@ export interface ReAuthenticateResultPayload {
             name: string;
             planId: string;
             subscriptionId: string;
+            features: {[key: string]: string | number | boolean}
         }
     }
 }

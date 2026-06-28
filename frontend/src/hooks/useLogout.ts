@@ -1,10 +1,10 @@
-import { useDispatch } from "react-redux"
-import { candidateLogout } from "../services/userServices"
-import { useNavigate } from "react-router-dom"
-export default function useCandidateLogout(){
+// import { useDispatch } from "react-redux"
+// import { candidateLogout } from "../services/userServices"
+// import { useNavigate } from "react-router-dom"
+// export default function useCandidateLogout(){
 
-    const dispatcher = useDispatch()
-    const navigate = useNavigate()
+//     const dispatcher = useDispatch()
+//     const navigate = useNavigate()
 
-    return () => candidateLogout(dispatcher, navigate)
-}
+//     return () => candidateLogout(dispatcher, navigate)
+// }

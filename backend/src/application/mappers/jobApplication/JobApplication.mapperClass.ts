@@ -39,7 +39,7 @@ export default class JobApplicationMapper {
   }
 
   public jobApplicationAggregatedToJobApplicationListForRecruiterDTO(
-    data: ApplicationsAggregated
+    data: ApplicationsAggregated & { matchScore: number }
   ): JobApplicationsListForRecruiterDTO {
     return {
       _id: data._id,
@@ -53,7 +53,7 @@ export default class JobApplicationMapper {
         email: data.applicant.email,
         headline: data.applicant.headline,
         location: `${data.applicant.location?.city},${data.applicant.location?.district},${data.applicant.location?.state}`,
-        match: 0,
+        match: data.matchScore,
       },
     };
   }

@@ -163,18 +163,5 @@ export default function CommonLayout() {
         </div>
       </div>
     </div>
-    // <div className="relative">
-    //     <aside className="bg-gradient-to-br flex flex-col justify-between !pb-10 from-blue-500 to-indigo-600 fixed h-screen w-70 ">
-    //         <div>
-    //             <div className="brand !ms-12 !mt-10">
-    //                 <p className="text-white font-semibold text-3xl">Aspiro</p>
-    //             </div>
-    //             <Sidebar />
-    //         </div>
-
-    //     </aside>
-    //     {/* This will be content part from */}
-
-    // </div>
   );
 }

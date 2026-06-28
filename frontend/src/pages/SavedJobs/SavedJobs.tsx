@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import JobVerticalCard from "../../components/common/JobVerticalCard";
 import { getSavedJobs, unsaveJob } from "../../services/userServices";
-import { FavoriteJob, JobDetails, MySavedJobData } from "../../types/entityTypes";
+import { MySavedJobData } from "../../types/entityTypes";
 import { Notify } from "notiflix";
 import { BsArrowLeft, BsBookmarkFill, BsBriefcase } from "react-icons/bs";
 import { LuCalendar, LuSearch, LuUsers } from "react-icons/lu";
-import { BiBriefcase, BiChevronDown, BiDollar, BiRupee } from "react-icons/bi";
+import { BiChevronDown, BiDollar, BiRupee } from "react-icons/bi";
 import { TbBriefcaseOff } from "react-icons/tb";
 import { formattedDateMoment } from "../../services/util/formatDate";
 import getReminingDays from "../../helpers/DateTime.helper";
@@ -18,7 +17,7 @@ export default function SavedJobs(){
     const [search, setSearch] = useState('')
     const [sort, setSort] = useState<'recently-saved' | 'expiry-order' | 'highest-salary'>('recently-saved')
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(5)
+    // const [limit, setLimit] = useState(5)
     const [totalPages, setTotalPages] = useState(1)
 
     const navigate = useNavigate()
@@ -54,7 +53,7 @@ export default function SavedJobs(){
             confirmButtonText: 'Unsave'
         }).then(async (response) => {
             if(response.isConfirmed){
-                const result = await unsaveJob(savedId)
+                await unsaveJob(savedId)
                 setSavedJobs((prv: MySavedJobData[] | null | undefined) => {
                     if(!prv) return null
                      return prv.filter((savedJob: MySavedJobData) => savedJob._id !== savedId)

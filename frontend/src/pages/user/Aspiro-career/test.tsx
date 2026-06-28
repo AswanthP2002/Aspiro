@@ -1,16 +1,4 @@
-import React from 'react';
-import { 
-  ArrowLeft, 
-  Download, 
-  Save, 
-  CheckCircle, 
-  AlertCircle,
-  Mail,
-  Phone,
-  Linkedin,
-  Globe,
-  MapPin
-} from 'lucide-react';
+import { LuArrowLeft, LuCircleAlert, LuCircleCheck, LuDownload, LuGlobe, LuLinkedin, LuMail, LuMapPin, LuPhone, LuSave } from 'react-icons/lu';
 
 const ATSPreviewPage = () => {
   return (
@@ -19,22 +7,22 @@ const ATSPreviewPage = () => {
       <nav className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
           <button className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500">
-            <ArrowLeft size={20} />
+            <LuArrowLeft size={20} />
           </button>
           <div>
             <h1 className="text-base font-bold text-slate-900">Resume Preview</h1>
             <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 uppercase tracking-wider">
-              <CheckCircle size={12} /> Optimized for ATS
+              <LuCircleCheck size={12} /> Optimized for ATS
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button className="text-slate-600 text-sm font-semibold px-4 py-2 hover:bg-slate-50 rounded-lg flex items-center gap-2 border border-slate-200">
-            <Save size={16} /> Save as Draft
+            <LuSave size={16} /> Save as Draft
           </button>
           <button className="bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow-md flex items-center gap-2 transition-all">
-            <Download size={16} /> Download PDF
+            <LuDownload size={16} /> Download PDF
           </button>
         </div>
       </nav>
@@ -59,11 +47,11 @@ const ATSPreviewPage = () => {
           <header className="text-center mb-8">
             <h1 className="text-2xl font-bold uppercase tracking-tight mb-2">Aswanth P</h1>
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-slate-700">
-              <span className="flex items-center gap-1"><Mail size={10}/> aswanth@example.com</span>
-              <span className="flex items-center gap-1"><Phone size={10}/> +91 9876543210</span>
-              <span className="flex items-center gap-1"><MapPin size={10}/> Valanchery, Kerala</span>
-              <span className="flex items-center gap-1"><Linkedin size={10}/> linkedin.com/in/aswanth</span>
-              <span className="flex items-center gap-1"><Globe size={10}/> aswanth.dev</span>
+              <span className="flex items-center gap-1"><LuMail size={10}/> aswanth@example.com</span>
+              <span className="flex items-center gap-1"><LuPhone size={10}/> +91 9876543210</span>
+              <span className="flex items-center gap-1"><LuMapPin size={10}/> Valanchery, Kerala</span>
+              <span className="flex items-center gap-1"><LuLinkedin size={10}/> linkedin.com/in/aswanth</span>
+              <span className="flex items-center gap-1"><LuGlobe size={10}/> aswanth.dev</span>
             </div>
           </header>
 
@@ -133,7 +121,7 @@ const ATSPreviewPage = () => {
 
         {/* Bottom Feedback */}
         <div className="w-[210mm] mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-4 items-start">
-          <AlertCircle className="text-blue-500 shrink-0" size={18} />
+          <LuCircleAlert className="text-blue-500 shrink-0" size={18} />
           <div>
             <h4 className="text-xs font-bold text-blue-900 mb-1">Why this layout?</h4>
             <p className="text-[10px] text-blue-700 leading-relaxed">

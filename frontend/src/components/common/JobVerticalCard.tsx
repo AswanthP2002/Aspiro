@@ -1,26 +1,21 @@
-import Swal from 'sweetalert2'
 import { unsaveJob } from '../../services/userServices'
-import { isDateExpired } from '../../services/util/checkExpiry'
 import getDaysLeftFromToday from '../../services/util/getDays'
-import defaultProfile from '/default-img-instagram.png'
-import {Document, Page, pdfjs} from 'react-pdf'
+import {pdfjs} from 'react-pdf'
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min?url'
 import { Link } from 'react-router-dom'
 import { PiSuitcase } from 'react-icons/pi'
 import { CiBookmark, CiBookmarkCheck } from 'react-icons/ci'
-import { IoInformation } from 'react-icons/io5'
-import { BsClock, BsInfo } from 'react-icons/bs'
-import { CgInfo, CgLock } from 'react-icons/cg'
-import { FavoriteJob, JobDetails } from '../../types/entityTypes'
-import formatDate, { formatRelativeTime, transformDate } from '../../services/util/formatDate'
+import { BsClock } from 'react-icons/bs'
+import { FavoriteJob } from '../../types/entityTypes'
+import { formatRelativeTime, transformDate } from '../../services/util/formatDate'
 import { Notify } from 'notiflix'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
 
 export default function JobVerticalCard({jobData, onUnsaveJob} : {jobData: FavoriteJob, onUnsaveJob: Function}){
     console.log('job data fetched from the backend', jobData)
-    const [jobDetails, setJobDetails] = useState<FavoriteJob | null | undefined>(null)
+    // const [jobDetails, setJobDetails] = useState<FavoriteJob | null | undefined>(null)
     const [isJobSaved, setIsJobSaved] = useState<boolean>(true)
 
     const jobUnsave = async (jobId: string) => {
@@ -110,40 +105,6 @@ export default function JobVerticalCard({jobData, onUnsaveJob} : {jobData: Favor
                 </div>
             </div>
         </div>
-        {/* <div className="p-2 flex bg-white justify-between items-center border-b border-gray-300">
-            <div className="job flex gap-4">
-                <div className='logo'>
-                    <img src={defaultProfile} style={{width:'50px',height:'50px'}} alt="" />
-                </div>
-
-                <div className="details">
-                    <p className="text-sm">{jobData?.jobDetails?.jobTitle || 'Job title'} <span className='bg-blue-200 rounded-full text-xs px-2'>{jobData?.jobDetails?.locationType || 'Remote'}</span></p>
-                    <div className="flex gap-5">
-                        <p><span className='text-xs text-gray-400'>{jobData?.jobDetails?.location || 'Kannur, Kerala, India'}</span> <span className='text-xs text-gray-400'>Rs. {jobData?.jobDetails?.minSalary || '500'} - Rs. {jobData?.jobDetails?.maxSalary || '1000'}</span></p>
-                    <p>
-                        
-                        {
-                            
-                            jobData?.jobDetails?.expiresAt < new Date() 
-                                ? <>
-                                   <i className="fa-solid fa-circle-xmark"></i> 
-                                   <span className='text-xs text-red-500 ms-2'>Expired</span>
-                                 </>
-                                : <span className='text-xs text-green-500'>{getDaysLeftFromToday(jobData?.jobDetails?.expiresAt || new Date())} Days left</span>
-                            
-                        }
-                        
-                        
-                    </p>
-                    </div>
-                </div>
-            </div>
-            <div className="actions">
-                <i className="fa-solid fa-bookmark !text-black" onClick={() => jobUnsave(jobData?.jobId, jobData?._id)}></i>
-            </div>
-            <p>Pdf viewer</p>
-            
-        </div> */}
         
         </>
         

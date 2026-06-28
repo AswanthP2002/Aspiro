@@ -1,7 +1,7 @@
 import { MdOutlineNotificationAdd, MdOutlineNotifications } from 'react-icons/md';
 import { IoMdChatbubbles } from 'react-icons/io';
 import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { appContext } from '../../../context/AppContext';
 import { BiBriefcase, BiHomeAlt2 } from 'react-icons/bi';
 import { LuUsers } from 'react-icons/lu';
@@ -83,26 +83,6 @@ export default function Sidebar() {
             <span className="absolute text-[12px] bg-red-500 font-medium rounded-full w-[22px] h-[22px] flex items-center justify-center -top-2 left-5">{unReadNotificationsCount}</span>
           )}
         </li>
-        {/* <li
-          className={`relative nav-link hover:bg-blue-500 hover:shadow-lg rounded-md ${makeSideBarActive('/notifications') ? 'bg-blue-500' : ''} transition-all ease-in-out !p-2 text-sm text-white font-semibold cursor-pointer relative"`}
-        >
-          {unReadNotificationsCount > 0 && (
-            <span className="absolute right-1 flex h-5 w-5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-white text-xs items-center justify-center">
-                {unReadNotificationsCount}
-              </span>
-            </span>
-          )}
-          <Link to={'/notifications'} className="flex items-center gap-2">
-            {unReadNotificationsCount > 0 ? (
-              <MdOutlineNotificationAdd size={25} />
-            ) : (
-              <MdOutlineNotifications size={25} />
-            )}{' '}
-            <span className="font-normal">Notifications</span>
-          </Link>
-        </li> */}
         
       </ul>
     </div>

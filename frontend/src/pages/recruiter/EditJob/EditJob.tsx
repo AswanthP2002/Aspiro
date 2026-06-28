@@ -126,22 +126,22 @@ export default function EditJobForm(){
     const enteredJobType = watch('jobType')
     const enteredWorkMode = watch('workMode')
 
-    const addRequiredSkill = (event : any) => {
-        event.preventDefault()
+    const addRequiredSkill = () => {
+        // event.preventDefault()
         const skill = requiredSkillRef.current?.value
         if(!skill) return
         setValue('requiredSkills', [...getValues('requiredSkills'), skill]);
         if(requiredSkillRef.current) requiredSkillRef.current.value = ""
     }
     
-    const removeRequiredSkill = (event : any, skill : string) => {
-        event.preventDefault()
+    const removeRequiredSkill = (skill : string) => {
+        // event.preventDefault()
         const updatedSkills = getValues('requiredSkills').filter((s: string) => skill.toLocaleLowerCase() !== s.toLocaleLowerCase());
         setValue('requiredSkills', updatedSkills);
     }
 
-    const addOptionalSkill = (event : any) => {
-        event.preventDefault()
+    const addOptionalSkill = () => {
+        // event.preventDefault()
         const skill = optionalSkillRef.current?.value
         if(!skill) return
         setValue('optionalSkills', [...getValues('optionalSkills'), skill]);
@@ -149,8 +149,8 @@ export default function EditJobForm(){
         
     }
 
-    const removeOptionalSkill = (event : any, skill : string) => {
-        event.preventDefault()
+    const removeOptionalSkill = (skill : string) => {
+        // event.preventDefault()
         const updatedSkills = getValues('optionalSkills').filter((s: string) => skill.toLowerCase() !== s.toLocaleLowerCase());
         setValue('optionalSkills', updatedSkills);
     }

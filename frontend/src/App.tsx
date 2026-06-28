@@ -8,51 +8,30 @@ import VerificationPage from './pages/user/Verification/Verification';
 import ProfileLayout from './pages/candidate/Profile-Layout';
 import ProfilePersonal from './pages/user/Profile-Overview/Personal.overview';
 import StoreDetails from './pages/user/User-Intro Details/StoreDetails';
-import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form';
+// import IntroDetailsPageForm from './pages/recruiter/IntroDetailsPage/Form';
 import MyJobs from './pages/recruiter/Profile-Personal/MyJobs';
 import PostAJobForm from './pages/recruiter/Profile-PostAJob/PostAJob';
 import AdminLayout from './pages/admin/AdminLayout';
 import Dashboard from './pages/admin/Dashboard/Dashboard';
-// import Companies from './pages/admin/Company-list/Companies';
 import Users from './pages/admin/Users-List/Users';
 import CandidateDetails from './pages/admin/CandidateDetails/UserDetails';
-// import CompanyDetails from './pages/admin/company-details/ComapnyDetails';
 import Jobs from './pages/admin/Job-list/JobList';
-// import JobDetails from './pages/admin/JobDetails/JobDetails';
 import ExperiencePage from './pages/user/Skills & Experience/SkillsExperience';
 import JobListing from './pages/candidate/Job-list-details/JobList';
-// import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
 import DocumentsPage from './pages/user/Documents Page/Documents';
-// import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import ApplicantManagePage from './pages/recruiter/Applicant-Manage/ApplicantsManage';
 import AdminProtectedRoutes from './components/admin/AdminProtectedRoutes';
-// import AdminLogedIn from './components/admin/AdminLogedInRoute';
-// import RecruiterLogedInRoutes from './components/recruiter/RecruiterLogedIn';
-//import CandidateProtectedRoute from './components/candidate/CandidateProtectedRoutes';
 import SavedJobs from './pages/SavedJobs/SavedJobs';
-// import FinalizedList from './pages/recruiter/FinalizedList/FinalizedList';
-// import CandidatePublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
-// import CandidatesList from './pages/candidate/Candidate-List-Details/CandidateList';
-// import MyApplications from './pages/candidate/My-applications/Applications';
-// import ViewApplicationDetailsPage from './pages/recruiter/View-application/ViewApplication';
 import NotificationPage from './pages/candidate/Notification-Page/Notifications';
 import Feed from './pages/common/Feed/Feed';
 import CommonLayout from './pages/common/SidebarLayout';
-// import Chat from './pages/common/Chat/Chat';
-// import ArcLoader from './components/candidate/Loader';
-// import CircularSpinner from './components/common/CircularSpinner';
-// import InfinitySpinner from './components/common/InfinitySpinner';
 import PublicRoute from './components/route-components/PublicRoute';
-// import CandidateProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
 import NotFoundPage from './pages/shared/NotFound';
 import AdminLoginPage from './pages/admin/Login/Login';
 import UserProtectedRoute from './components/route-components/Candidate-ProtectedRoute';
-import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
 import TokenExpiredLogoutPage from './pages/TokenExpiredLogout.page';
 import RecruiterProfilePage from './pages/candidate/Recruiter/RecruiterProfile.page';
 import EditJobForm from './pages/recruiter/EditJob/EditJob';
-
-// import SocketProvider from './context/SocketContext';
 import ForgotPasswordPage from './pages/user/Forgot-Password/ForgotPassword';
 import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
 import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
@@ -66,8 +45,6 @@ import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetai
 import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import MyApplications from './pages/user/My-applications/Applications';
 import ChatPage from './pages/common/Chat/Chat';
-// import Companies from './pages/admin/Company-list/Companies';
-// import AdminSkillManagementPage from './pages/admin/Company-list/SkillsManagement';
 import NoAuthRoutes from './components/route-components/NoAuthRoute';
 import UserRegister from './pages/user/Register/Register';
 import UserLogin from './pages/user/Login-FIX/Login';
@@ -76,23 +53,16 @@ import { AnimatePresence } from 'motion/react';
 import AlertsPage from './pages/user/Alerts/Alerts';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alerts, Chat, Notification } from './types/entityTypes';
-// import { setAlerts, unreadAlertsCountThunk } from './redux/alertSlice';
-// import { fetchUserAlerts } from './services/alertsServices';
-// import { getNotifications } from './services/userServices';
 import { disconnectSocket, initializeSocket } from './socket';
-import { addLiveNotification, deleteNotificationFromStore, notificationThunk } from './redux/notificationSlice';
+import { addLiveNotification, deleteNotificationFromStore } from './redux/notificationSlice';
 import { UserRoutes } from './constants/routs/user.routes';
 import { reAuthenticateThunk } from './redux/reAuthenticateSlice';
 import store from './redux/store';
-// import { Modal } from '@mui/material';
-// import Loader from './components/admin/Loader';
 import { AdminRoutes } from './constants/routs/admin.routes';
 import TerminationPage from './pages/user/Action-Termination/Termination';
 import { SocketEvents } from './socket/socket.events';
-// import Recruiters from './pages/admin/Recruiters/Companies';
-import Recruiters from './pages/admin/Recruiters-list/Companies';
+import Recruiters from './pages/admin/Recruiters-list/Recruiters';
 import RecruiterDetails from './pages/admin/Recruiter-details/ComapnyDetails';
-// import AppConfigPage from './pages/admin/Recruiters/SkillsManagement';
 import AppConfigPage from './pages/admin/Recruiters-list/SkillsManagement';
 import JobDetails from './pages/admin/JobDetails/JobDetails';
 import ApplySuccessPage from './pages/candidate/Job-apply/Apply-Success';
@@ -117,6 +87,13 @@ import InterviewCompletePage from './pages/user/Aspiro-career/AI-Interviews/Inte
 import InterviewDashboardPage from './pages/user/Aspiro-career/AI-Interviews/Dashboard';
 import CompaniesPage from './pages/admin/Companies/Companies';
 import { newUnreadChatArrived, newUnreadConversationsCountFetchThunk } from './redux/chatSlice';
+import { RecruiterProfilePlanProtectedRoute } from './components/route-components/RecruiterProfile.plan.protected.route';
+import { InterviewPracticePlanProtectedRoute } from './components/route-components/InterviewPractice.plan.protected.route';
+import { ResumeAnalyzePlanProtectedRoute, ResumeAutoCreatePlanProtectedRoute } from './components/route-components/ResumeTools.plan.protected.route';
+import { JobApplicationPlanProtectedRoute } from './components/route-components/JobApplication.plan.protected.route';
+import PaymentFailedPage from './pages/user/Plans/PaymentFailedPage';
+import BillingsProtectedRoute from './components/route-components/Billings.protected.route';
+import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -227,11 +204,11 @@ function App() {
   //   }
   // }, [logedUser, initialLoading, dispatch]) // commented for testing loop
 
-  useEffect(() => {
-    if(logedUser?._id && (!logedUser.subscription.name || !logedUser.subscription.planId) && logedUser.role === 'user'){
-      setShowPlansModal(true)
-    }
-  }, [logedUser?._id])
+  // useEffect(() => {
+  //   if(logedUser?._id && logedUser.role === 'user' && (!logedUser.subscription.name || !logedUser.subscription.planId)){
+  //     window.location.href = '/temp/pricing'
+  //   }
+  // }, [logedUser?._id])
 
   const location = useLocation()
 
@@ -251,9 +228,9 @@ function App() {
           transition={Bounce}
         />
 
-        {showPlansModal && (
+        {/* {showPlansModal && (
           <PricingPage open={showPlansModal} onClose={() => setShowPlansModal(false)} />
-        )}
+        )} */}
 
         <PostProvider>
       <AnimatePresence mode='wait'>
@@ -272,7 +249,9 @@ function App() {
               <Route path={UserRoutes.JOBS} element={<JobListing />} />
               <Route path={UserRoutes.USERS} element={<UsersFindingPage />} />
               <Route path={UserRoutes.JOB_DETAILS} element={<JObDetailsCandidateSide />} />
-              <Route path={UserRoutes.JOB_APPLY} element={<JobApplyPage />} />
+              <Route path={UserRoutes.JOB_APPLY} element={<JobApplicationPlanProtectedRoute />}>
+                <Route index element={<JobApplyPage />} />
+              </Route>
               <Route path={UserRoutes.NOTIFICATIONS} element={<NotificationPage />} />
               <Route path={UserRoutes.USER_DETAILS} element={<UserPublicProfile />} />
               <Route path={UserRoutes.CHATS} element={<ChatPage />} />
@@ -286,10 +265,14 @@ function App() {
               <Route path={UserRoutes.MY_PROFILE_PERSONAL} index element={<ProfilePersonal />} />
               <Route path={UserRoutes.MY_PROFILE_DOCUMENTS} element={<DocumentsPage />} />
               <Route path={UserRoutes.MY_EXPERIENCES_EDUCATIONS_SKILLS} element={<ExperiencePage />} />
-              <Route path='recruiter/register' element={<RecruiterRegisterPage />} />
+              <Route path='recruiter/register' element={<RecruiterProfilePlanProtectedRoute />}>
+                <Route index element={<RecruiterRegisterPage />} />
+              </Route>
               <Route path='recruiter/post-job' element={<PostAJobForm />} />
               <Route path='recruiter/post-a-job' element={<PostAJobForm />} />
-              <Route path='recruiter/overview' element={<RecruiterProfilePage />} />
+              <Route path='recruiter/overview' element={<RecruiterProfilePlanProtectedRoute />}>
+                <Route index element={<RecruiterProfilePage />} />
+              </Route>
               <Route path='recruiter/my-jobs' element={<MyJobs />} />
               <Route path='recruiter/edit-job' element={<EditJobForm />} />
               <Route path='recruiter/applications/:jobId' element={<ApplicantManagePage />} />
@@ -297,13 +280,21 @@ function App() {
               <Route path={UserRoutes.MY_APPLICATIONS} element={<MyApplications />} />
               <Route path={UserRoutes.MY_APPLICATION_TRACK} element={<ApplicationTrack />} />
               <Route path='alerts' element={<AlertsPage />} />
-              <Route path='billings' element={<SubscriptionPage />} />
+              <Route path='billings' element={<BillingsProtectedRoute />}>
+                <Route index element={<SubscriptionPage />} />
+              </Route>
               <Route path='aspiro-career' element={<AspiroCareer />} />
               <Route path='aspiro-career/resume-tools' element={<ResumeToolsPage />} />
-              <Route path='aspiro-career/resume-tools/auto-create' element={<AutoResumeCreationPage />} />
-              <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzer />} />
+              <Route path='aspiro-career/resume-tools/auto-create' element={<ResumeAutoCreatePlanProtectedRoute />}>
+                <Route index element={<AutoResumeCreationPage />} />
+              </Route>
+              <Route path='aspiro-career/resume-tools/analyze' element={<ResumeAnalyzePlanProtectedRoute />}>
+                <Route index element={<ResumeAnalyzer />} />
+              </Route>
               <Route path='aspiro-career/resume-tools/analyze/report' element={<DetailedAnalysisReportPage />} />
-              <Route path='aspiro-career/interview' element={<InterviewOverviewPage />} />
+              <Route path='aspiro-career/interview' element={<InterviewPracticePlanProtectedRoute />}>
+                <Route index element={<InterviewOverviewPage />} />
+              </Route>
               <Route path='aspiro-career/interview/personalization' element={<InterviewPersonalizationPage />} />
               <Route path='aspiro-career/interview/mode-select' element={<InterviewModeSelectionPage />} />
               <Route path='aspiro-career/interview/start' element={<InterviewPage />} />
@@ -351,12 +342,14 @@ function App() {
           </Route>
         </Route>
 
-        <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} />
+        {/* <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} /> */}
         <Route path='/token/expired' element={<TokenExpiredLogoutPage />} />
         <Route path='/action/termination' element={<TerminationPage />} />
         <Route path='/payment-success' element={<PaymentSuccessPage />} />
+        <Route path='/payment-failed' element={<PaymentFailedPage />} />
 
         <Route path='/test' element={<ApplicationTrack />} />
+        <Route path='/temp/pricing' element={<PricingPage />} />
 
         <Route path='*' element={<NotFoundPage />} />
 

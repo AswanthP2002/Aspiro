@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { FaLocationPin } from "react-icons/fa6";
 import { MdLocationOn } from "react-icons/md";
 import { AdminCompanyData } from "../../../types/entityTypes";
 import { adminEditCompany, adminLoadCompaniesData } from "../../../services/companyServices";
