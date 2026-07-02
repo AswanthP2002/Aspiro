@@ -247,14 +247,18 @@ export class UserController {
 
   async reAuthenticate(req: Request, res: Response): Promise<void> {
     try {
+      console.log('==== Refreshing ===')
+      console.log(req.method, req.originalUrl)
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
+        console.log('-- No RefreshToken provied --')
         res
           .status(StatusCodes.NOT_ACCEPTABLE)
           .json({ success: false, message: StatusMessage.AUTH_MESSAGE.NO_REFRESH_TOKEN });
         return;
       }
 
+      console.log('-- Refreshtoken exist decoding....')
       const decoded = (await verifyToken(refreshToken)) as JWTTokenVerifyResult; //chance for error
       const result = await this._loadUserMetaData.execute(decoded.id);
       const accessToken = await generateToken({
@@ -262,6 +266,7 @@ export class UserController {
         email: decoded?.email as string,
         role: decoded?.role as string,
       });
+      console.log('Issued new access token')
       res.status(StatusCodes.OK).json({
         success: true,
         message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('New Accestoken'),

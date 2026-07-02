@@ -1,3 +1,4 @@
+import User from '../user/User.FIX';
 import { Plan } from './plan.entity';
 
 export default interface UserSubscription {
@@ -39,4 +40,5 @@ export interface UserSubscriptionAndPlanDetails {
   updatedAt?: string | Date;
   features?: { [key: string]: string | number | boolean };
   planDetails: Plan;
+  userDetails?: User;
 }

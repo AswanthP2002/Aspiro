@@ -3,12 +3,16 @@ export interface SubscriptionAnalyticsDTO {
     totalMRR: number;
     activeRecruiters: number;
     churnRate: number;
+    subscriptionCategoryData: { label: string; value: number; color: string }[];
+    recruiterTypeData: { label: string; value: number; color: string }[];
+    userTypeData: { label: string; value: number; color: string }[];
   };
   revenueGrowth: { month: string; amount: number }[];
-  subscribers: SubscriberDetails[]
+  subscribers: SubscriberDetailsDTO[];
 }
 
-export interface SubscriberDetails {
+export interface SubscriberDetailsDTO {
+  userId: string;
   userName: string;
   userEmail: string;
   planName: string;

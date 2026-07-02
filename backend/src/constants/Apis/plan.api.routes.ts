@@ -6,6 +6,7 @@ export const PlanApiRoutes = {
     EDIT_PLAN_BY_ID: '/v2/subscription/plans/:planId/edit',
     TOGGLE_PLAN_LISTING_STATUS: '/v2/subscription/plans/status-toggle/:planId',
     LOAD_ANAYTICS: '/v2/analytics/admin',
+    LOAD_USER_SUBSCRIPTION_DETAILS: '/v2/subscription/details/:userId',
   },
   USER: {
     GET_PLANST: '/v2/plans/load',
@@ -15,6 +16,6 @@ export const PlanApiRoutes = {
     LOAD_MY_SUBSCRIPTION_DETAILS: '/v2/my-subscription',
     GET_USER_INVOICES: '/v2/subscription/invoices/:stripeCustomerId',
     MANAGE_BILLING_PORTAL: '/v2/subscription/portal/create-session',
-    GET_PAYMENT_METHODS: '/v2/subscriptions/payment-methods'
+    GET_PAYMENT_METHODS: '/v2/subscriptions/payment-methods',
   },
 } as const;

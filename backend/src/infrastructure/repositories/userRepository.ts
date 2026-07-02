@@ -468,6 +468,7 @@ export default class UserRepository extends BaseRepository<User> implements IUse
         subscriptionId: user?.subscriptionDetails?._id || '',
         name: user?.planDetails?.name,
         features: user?.subscriptionDetails?.features || {},
+        price: user?.planDetails?.monthlyPrice,
       },
     };
 

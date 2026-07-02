@@ -7,6 +7,11 @@ export const SocialLinksSchema = new Schema<SocialLinks>({
   url: { type: String },
 });
 
+export const SubscriptionMetaDataSchema = new Schema<{ action: string; date?: string | Date }>({
+  action: { type: String },
+  date: { type: Date },
+});
+
 export const AccountActionSchema = new Schema<AccountAction>(
   {
     action: { type: String },
@@ -63,6 +68,7 @@ export const UserSchema = new Schema<User>(
     lastLogin: { type: Date },
     hiddenPosts: { type: [Schema.Types.ObjectId], ref: 'posts' },
     views: { type: [String] },
+    subscriptionMetaData: { type: [SubscriptionMetaDataSchema] },
   },
   { timestamps: true }
 );

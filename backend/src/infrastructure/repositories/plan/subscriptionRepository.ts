@@ -72,6 +72,7 @@ export default class SubscriptionRepository
             { $limit: limit },
             {
               $project: {
+                userId: '$userDetails._id',
                 userName: '$userDetails.name',
                 userEmail: '$userDetails.email',
                 planName: '$planDetails.name',
@@ -103,6 +104,102 @@ export default class SubscriptionRepository
             },
             { $sort: { _id: 1 } },
           ],
+          free: [
+            {
+              $lookup: {
+                from: 'plans',
+                localField: 'planId',
+                foreignField: '_id',
+                as: 'planDetails',
+              },
+            },
+            {
+              $match: {
+                'planDetails.monthlyPrice': 0,
+              },
+            },
+            { $count: 'docs' },
+          ],
+          premium: [
+            {
+              $lookup: {
+                from: 'plans',
+                localField: 'planId',
+                foreignField: '_id',
+                as: 'planDetails',
+              },
+            },
+            {
+              $match: {
+                'planDetails.monthlyPrice': { $gt: 0 },
+              },
+            },
+            { $count: 'docs' },
+          ],
+          recruiters: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            {
+              $match: {
+                'userDetails.role': { $in: ['recruiter'] },
+              },
+            },
+            { $count: 'docs' },
+          ],
+          nonRecruiters: [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails',
+              },
+            },
+            {
+              $match: {
+                'userDetails.role': { $nin: ['recruiter'] },
+              },
+            },
+            { $count: 'docs' },
+          ],
+          freelancers: [
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: 'userId',
+                foreignField: 'userId',
+                as: 'recruiterDetails',
+              },
+            },
+            {
+              $match: {
+                'recruiterDetails.recruiterType': 'freelance',
+              },
+            },
+            { $count: 'docs' },
+          ],
+          corporate: [
+            {
+              $lookup: {
+                from: 'recruiters',
+                localField: 'userId',
+                foreignField: 'userId',
+                as: 'recruiterDetails',
+              },
+            },
+            {
+              $match: {
+                'recruiterDetails.recruiterType': 'corporate',
+              },
+            },
+            { $count: 'docs' },
+          ],
         },
       },
     ]);
@@ -131,6 +228,18 @@ export default class SubscriptionRepository
           totalMRR: data.stats[0]?.totalMRR || 0,
           activeRecruiters: data.stats[0]?.activeRecruiters || 0,
           churnRate: 0,
+          subscriptionCategoryData: [
+            { label: 'Free Users', value: data.free[0]?.docs || 0, color: '#0088fe' },
+            { label: 'Premium Users', value: data.premium[0]?.docs || 0, color: '#00e49f' },
+          ],
+          recruiterTypeData: [
+            { label: 'Freelancers', value: data.freelancers[0]?.docs || 0, color: '#ffbb28' },
+            { label: 'Corporate', value: data.corporate[0]?.docs || 0, color: '#52ecd7' },
+          ],
+          userTypeData: [
+            { label: 'Recruiters', value: data.recruiters[0]?.docs || 0, color: '#d5f968' },
+            { label: 'Non-Recruiters', value: data.nonRecruiters[0]?.docs || 0, color: '#22de32' },
+          ],
         },
         revenueGrowth: data.revenueGrowth.map((item: any) => ({
           month: months[item._id - 1],
@@ -158,6 +267,20 @@ export default class SubscriptionRepository
         },
       },
       { $unwind: { path: '$planDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
     ]);
 
     return result[0];

@@ -94,6 +94,8 @@ import { JobApplicationPlanProtectedRoute } from './components/route-components/
 import PaymentFailedPage from './pages/user/Plans/PaymentFailedPage';
 import BillingsProtectedRoute from './components/route-components/Billings.protected.route';
 import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
+import UserSubscriptionManage from './pages/admin/Analytics/User.subscription.manage';
+import PricingPageProtectedRoute from './components/route-components/PricingPage.protected.route';
 
 interface FetchAlertsPayloadResponse {
   success: boolean
@@ -144,7 +146,7 @@ function App() {
 
   useEffect(() => {
     if(logedUser?._id && logedUser.role === 'user'){
-      toast.info('dispatching unread chat thunk')
+      // toast.info('dispatching unread chat thunk')
       store.dispatch(newUnreadConversationsCountFetchThunk())
     }
   }, [logedUser?._id])
@@ -338,7 +340,8 @@ function App() {
           <Route path='subscription/plans/create' element={<PlanConfiguration />} />
           <Route path='subscription/plans' element={<Plans />} />
           <Route path='subscription/plans/edit/:id' element={<EditPlan />} />
-          <Route path='analytics' element={<AdminAnalytics />} />
+          <Route path='analytics/overview' element={<AdminAnalytics />} />
+          <Route path='analytics/overview/subscription/details' element={<UserSubscriptionManage />} />
           </Route>
         </Route>
 
@@ -349,7 +352,9 @@ function App() {
         <Route path='/payment-failed' element={<PaymentFailedPage />} />
 
         <Route path='/test' element={<ApplicationTrack />} />
-        <Route path='/temp/pricing' element={<PricingPage />} />
+        <Route path='/temp/pricing' element={<PricingPageProtectedRoute />}>
+          <Route index element={<PricingPage />} />
+        </Route>
 
         <Route path='*' element={<NotFoundPage />} />
 

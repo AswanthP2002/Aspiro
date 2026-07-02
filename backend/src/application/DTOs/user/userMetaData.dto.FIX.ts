@@ -33,6 +33,7 @@ export default interface UserMetaDataDTO {
     subscriptionId: string;
     planId: string;
     name: string;
+    price: number;
     features?: { [key: string]: string | number | boolean };
   };
 }

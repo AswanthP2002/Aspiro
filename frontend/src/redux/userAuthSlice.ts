@@ -12,8 +12,9 @@ interface User {
   subscription?: {
     subscriptionId: string;
     planId: string;
-    name: string
-    features: {[key: string]: string | number | boolean}
+    name: string;
+    price: number;
+    features: {[key: string]: string | number | boolean};
   }
 }
 

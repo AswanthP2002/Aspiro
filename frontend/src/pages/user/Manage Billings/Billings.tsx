@@ -9,6 +9,7 @@ import { Modal } from '@mui/material';
 import { CgClose } from 'react-icons/cg';
 import { LuCheck, LuCloudLightning, LuIndianRupee, LuRocket, LuStar } from 'react-icons/lu';
 import BouncingLoader from '../../../components/common/Bouncing.loader';
+import { useSelector } from 'react-redux';
 
 const SubscriptionPage = () => {
   const [subscriptionDetails, setSubscriptionDetails] = useState<UserSubscriptionAndPlanDetailsData | null>(null)
@@ -329,6 +330,7 @@ const SubscriptionPage = () => {
 const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void}) => {
   const [loading, setLoading] = useState(false)
   const [plansData, setPlansData] = useState<PlanData[]>([])
+  const logedUser = useSelector((state: {userAuth: {user: {subscription: {subscriptionId: string, planId: string, price: number}}}}) => state.userAuth.user)
 
   useEffect(() => {
     async function fetchPlans(){
@@ -389,7 +391,16 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
                     <p className='text-xs text-slate-500'>/month</p>
                   </div>
                   <div className="my-5">
-                    <button className='p-3 rounded-lg border border-transparent bg-gradient-to-br from-blue-500 to-indigo-600 text-sm text-white tracking-wide w-full shadow-[0_0_30px_2px_rgba(100,0,200,0.2)]'>Upgrade</button>
+                    <button disabled={plan._id === logedUser.subscription.planId} className='p-3 rounded-lg disabled:!bg-white disabled:text-slate-400 disabled:border-slate-100 border border-transparent bg-gradient-to-br from-blue-500 to-indigo-600 text-sm text-white tracking-wide w-full shadow-[0_0_30px_2px_rgba(100,0,200,0.2)]'>
+                      {plan._id === logedUser.subscription.planId
+                        ? "Current Plan"
+                        : (
+                          plan.monthlyPrice > logedUser.subscription.price
+                          ? "Upgrade"
+                          : "Downgrade"
+                        )
+                      }
+                    </button>
                   </div>
                   <div className="mt-5">
                     <p className='text-sm tracking-wide font-medium text-slate-700'>Whats included:</p>

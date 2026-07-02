@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PieChart } from '@mui/x-charts/PieChart'
 import { SubscriptionAnalyticsData } from '../../../types/entityTypes';
 import { adminGetAnalytics } from '../../../services/planServices';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -6,8 +7,27 @@ import { BiRupee } from 'react-icons/bi';
 import { FaChartLine } from 'react-icons/fa';
 import { LuSearch, LuUser } from 'react-icons/lu';
 import { FiFilter } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+
+const dummyData = [
+    {label: 'Free Users', value: 7000, color: '#0088FE'},
+    {label: 'Premium Users', value: 1242, color: '#00e49F'}
+]
+
+const recruiterDummy = [
+  {label: 'Recruiters', value: 494, color: '#ffbb28'},
+  {label: 'Non Recruiters', value: 6599, color: '#52ecd7'}
+]
+
+const dummyThree = [
+  {label: 'Freelance Recruiters', value: 3000, color: '#d5f968'},
+  {label: 'Corporate Recruiters', value: 3599, color: '#22de32'}
+]
 
 export const AdminAnalytics = () => {
+
+  const navigate = useNavigate()
+
   const [analytics, setAnalytics] = useState<SubscriptionAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('')
@@ -32,6 +52,12 @@ export const AdminAnalytics = () => {
   }
 
   const dSearch = debouncedSearch(searchData, 500)
+
+  const navigateToUserSubscriptionManagePage = (userId: string) => {
+    if(!userId) return
+
+    return navigate('subscription/details', {state: {userId}})
+  }
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -82,9 +108,15 @@ export const AdminAnalytics = () => {
           isNegative 
         />
       </div>
+      
+      <div className="my-5 w-full flex gap-5 flex-wrap justify-start">
+        <DonutChart data={analytics?.stats?.subscriptionCategoryData} />
+        <DonutChart data={analytics?.stats?.userTypeData} />
+        <DonutChart data={analytics?.stats?.recruiterTypeData} />
+      </div>
 
       {/* 2. Revenue Chart - Injecting analytics.revenueGrowth */}
-      <div className="bg-white p-6 rounded-xl border mb-8">
+      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
         <h3 className="font-bold mb-6 text-gray-700">Revenue Growth (Last 6 Months)</h3>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -133,7 +165,7 @@ export const AdminAnalytics = () => {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {analytics.subscribers.map((sub, index) => (
+            {analytics.subscribers?.map((sub, index) => (
               <tr key={index} className="hover:bg-gray-50 border-t border-slate-300">
                 <td className="p-4">
                   <div className="font-medium text-gray-900">{sub.userName}</div>
@@ -155,7 +187,7 @@ export const AdminAnalytics = () => {
                   </span>
                 </td>
                 <td className="p-4 text-blue-600 text-sm font-semibold cursor-pointer text-center">
-                  Manage
+                  <button onClick={() => navigateToUserSubscriptionManagePage(sub.userId)}>Manage</button>
                 </td>
               </tr>
             ))}
@@ -187,3 +219,20 @@ const StatCard = ({ title, value, growth, icon, isNegative }) => (
     </div>
   </div>
 );
+
+const DonutChart = ({data}: {data: {label: string, value: number, color: string}[]}) => {
+  const settings = {
+    height: 200,
+    width: 200,
+    margin: {right: 5}
+  }
+
+  return(
+    <>
+      <PieChart
+        series={[{innerRadius: 50, outerRadius: 100, data, arcLabel: 'value'}]}
+        {...settings}
+      />
+    </>
+  )
+}

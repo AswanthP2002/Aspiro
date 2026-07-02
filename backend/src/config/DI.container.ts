@@ -499,6 +499,9 @@ import SubscriptionAccess from '../middlewares/subscription.access.track';
 import IMonthlyResetSubscriptionLImits from '../application/interfaces/usecases/subscription/IMonthlyResetSubscriptionLimits';
 import MonthlyResetSubscriptionLimitUsecase from '../application/usecases/subscription/MonthlyResetSubscriptionLimit.usecase';
 import CronSubscriptionReset from '../infrastructure/cron-schedule/subscription/subscription.monthly.reset';
+import SubscriptionMapper from '../application/mappers/subscription/Subscription.mapperClass';
+import ILoadUserSubscriptionDetailsUsecase from '../application/interfaces/usecases/subscription/ILoadUserSubscriptionDetails.usecase';
+import LoadUserSubscriptionDetailsUsecase from '../application/usecases/subscription/LoadUserSubscriptionDetails.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -1088,6 +1091,10 @@ container.registerSingleton<IMonthlyResetSubscriptionLImits>(
   'IMonthlySubscriptionLimitReset',
   MonthlyResetSubscriptionLimitUsecase
 );
+container.registerSingleton<ILoadUserSubscriptionDetailsUsecase>(
+  'ILoadUserSubscriptionDetailsUsecase',
+  LoadUserSubscriptionDetailsUsecase
+);
 container.registerSingleton<IAdminGetJobTypesUsecase>(
   'IAdminGetJobTypesUsecase',
   AdminGetJobTypesUsecase
@@ -1200,5 +1207,6 @@ container.registerSingleton('ConnectionRequestMapper', ConnectionRequestMapper);
 container.registerSingleton('PlanMapper', PlanMapper);
 container.registerSingleton('InterviewAIMapper', InterviewAIMapper);
 container.registerSingleton('ConversationMapper', ConversationMapper);
+container.registerSingleton('SubscriptionMapper', SubscriptionMapper);
 
 //register socket

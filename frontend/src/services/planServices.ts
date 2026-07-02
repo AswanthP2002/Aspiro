@@ -175,6 +175,21 @@ export const loadMySubscriptionDetails = async () => {
     }
 }
 
+export const getUserSubscriptionDetails = async (userId: string) => {
+    try {
+        const response = await axiosInstance.get(PlanApiEndpoints.ADMIN.LOAD_USER_SUBSCRIPTION_DETAILS(userId), 
+        {
+            sendAuthToken: true
+        } as AxiosRequest
+    )
+
+    return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
 export const getUserInvoices = async (stripeCustomerId: string) => {
     try {
         const response = await axiosInstance.get(PlanApiEndpoints.USER.GET_USER_INVOICES(stripeCustomerId),
@@ -186,7 +201,9 @@ export const getUserInvoices = async (stripeCustomerId: string) => {
         return response.data
     } catch (error) {
         const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+        if(err.response && err.response.status === 503){
+            throw err
+        }else if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 

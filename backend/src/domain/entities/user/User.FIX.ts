@@ -57,4 +57,5 @@ export default interface User {
   hiddenPosts?: string[];
   lastLogin?: Date;
   views?: string[];
+  subscriptionMetaData?: { action: string; date?: string | Date }[];
 }
