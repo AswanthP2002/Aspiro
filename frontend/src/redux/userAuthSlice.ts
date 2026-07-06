@@ -8,12 +8,14 @@ interface User {
   name?: string;
   headline?: string;
   profilePicture?: string
-  role?: string
+  role?: string;
+  isTrialUsed?: boolean;
   subscription?: {
     subscriptionId: string;
     planId: string;
-    name: string
-    features: {[key: string]: string | number | boolean}
+    name: string;
+    price: number;
+    features: {[key: string]: string | number | boolean};
   }
 }
 

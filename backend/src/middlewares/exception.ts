@@ -3,7 +3,10 @@ import AppError from '../domain/errors/AppError';
 import { StatusCodes } from '../presentation/statusCodes';
 import { StatusMessage } from '../constants/Messages/statusMessages';
 import { ZodError } from 'zod';
+import stripe from '../infrastructure/services/stripe.service';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+
+const { StripeConnectionError } = stripe.errors;
 
 export default function exceptionhandle(
   err: unknown,
@@ -97,6 +100,14 @@ export default function exceptionhandle(
       code: 'INVALID_ACCESS_TOKEN',
       message: 'Invalid toke or jwt token malformed',
     };
+  } else if (err instanceof StripeConnectionError) {
+    console.log('Stripe connection error happening in narrowing', err.message);
+    responseMessage = err.message.split('.')[0];
+    code = StatusCodes.SERVICE_UNAVAILABLE;
+    errors = {
+      code: 'STRIPE_CONNECTION_ERROR',
+      message: err.message,
+    };
   }
 
   if (res.headersSent) {
@@ -104,11 +115,14 @@ export default function exceptionhandle(
     return next(err);
   }
 
+  console.log('-- response message before sending --', responseMessage);
+  console.log('-- response code before sending --', code);
+
   res.status(code).json({
     success: false,
     message: responseMessage,
     errors,
-  });
+  }); //commented this code for testing ..
 
   // switch (err.name) {
   //   case 'DUPLICATE_MOBILE':

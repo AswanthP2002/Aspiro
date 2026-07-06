@@ -6,7 +6,7 @@ export default interface UserSubscriptionDTO {
   planId?: string;
   stripeSubscriptionId?: string;
   stripeCustomerId?: string;
-  status: 'active' | 'canceled' | 'incomplete' | 'past_due';
+  status: string;
   currentPeriodStart: string | Date;
   currentPeriodEnd: string | Date;
   isCanceled: boolean;
@@ -22,7 +22,7 @@ export interface UserSubscriptionAndPlanDetailsDTO {
   planId?: string;
   stripeSubscriptionId?: string;
   stripeCustomerId?: string;
-  status: 'active' | 'canceled' | 'incomplete' | 'past_due';
+  status: string;
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;

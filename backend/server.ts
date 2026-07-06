@@ -75,8 +75,8 @@ async function main() {
   );
 
   await connectToDb();
-  const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
-  cronMonthlyResetTest.resetSubscriptionLimit();
+  // const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
+  // cronMonthlyResetTest.resetSubscriptionLimit();
   //connect redis
   //await connectRedis(); closed right now for testing :
   // await connectRedis();
@@ -107,10 +107,10 @@ async function main() {
   const planRouter = CreatePlanRouter();
 
   const port = process.env.PORT || 5000;
-  app.use('/', (req: Request, res: Response, next: NextFunction) => {
-    logger.info(`${req.method} ${req.url} - User:${req.user ? req.user : 'Guest'}`);
-    next();
-  });
+  // app.use('/', (req: Request, res: Response, next: NextFunction) => {
+  //   logger.info(`${req.method} ${req.url} - User:${req.user ? req.user : 'Guest'}`);
+  //   next();
+  // });
 
   //to automatically log all apis
   //app.use(pinoHttp({ logger }));

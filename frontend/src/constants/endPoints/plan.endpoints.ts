@@ -6,6 +6,7 @@ export const PlanApiEndpoints = {
     EDIT_PLAN_BY_ID: (planId: string) => `/v2/subscription/plans/${planId}/edit`,
     TOGGLE_PLAN_LISTING_STATUS: (planId: string) => `/v2/subscription/plans/status-toggle/${planId}`,
     LOAD_ANAYTICS: '/v2/analytics/admin',
+    LOAD_USER_SUBSCRIPTION_DETAILS: (userId: string) => `/v2/subscription/details/${userId}`
   },
   USER: {
     GET_PLANST: '/v2/plans/load',

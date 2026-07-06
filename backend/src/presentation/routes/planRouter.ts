@@ -88,7 +88,7 @@ function CreatePlanRouter() {
   planRouter.get(
     PlanApiRoutes.USER.GET_USER_INVOICES,
     centralizedAuthentication,
-    authorization(['user']),
+    authorization(['user', 'admin']),
     planController.getUserInvoices.bind(planController)
   );
 
@@ -97,14 +97,21 @@ function CreatePlanRouter() {
     centralizedAuthentication,
     authorization(['user']),
     planController.subscriptionPortal.bind(planController)
-  )
+  );
 
   planRouter.get(
     PlanApiRoutes.USER.GET_PAYMENT_METHODS,
     centralizedAuthentication,
     authorization(['user']),
     planController.getPaymentMethods.bind(planController)
-  )
+  );
+
+  planRouter.get(
+    PlanApiRoutes.ADMIN.LOAD_USER_SUBSCRIPTION_DETAILS,
+    centralizedAuthentication,
+    authorization(['user', 'admin']),
+    planController.loadUserSubscriptionDetails.bind(planController)
+  );
 
   return planRouter;
 }

@@ -55,4 +55,8 @@ export default interface IUserRepository extends IBaseRepo<User> {
     limit: number,
     search: string
   ): Promise<ConnectionWithSenderDetails[] | null>;
+  // getActiveUsersWithGrowth(): Promise<{
+  //   users: number;
+  //   growth: { thisMonth: number; lastMonth: number };
+  // } | null>;
 }

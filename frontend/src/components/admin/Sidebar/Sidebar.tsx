@@ -67,7 +67,7 @@ export default function Sidebar(){
             <li className={`group ${checkPresentPath('dashboard') ? 'bg-blue-100 font-medium text-blue-500' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
               <Link to="/admin/dashboard" className='flex items-center gap-2 text-orange-500'>
                 <BiGridAlt size={23} color='blue' className='group-hover:!text-blue-500' />
-                <p className='text-blue-400 group-hover:text-blue-500 group-hover:font-medium'>Overview</p>
+                <p className='text-blue-400 group-hover:text-blue-500 group-hover:font-medium'>Dashboard</p>
               </Link>
             </li>
             <li className={`group ${checkPresentPath('users') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
@@ -94,12 +94,12 @@ export default function Sidebar(){
               <p className='text-blue-700 group-hover:text-blue-400'>Jobs</p>
               </Link>
             </li>
-            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
+            {/* <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
               <Link to="admin/dashboard" className='flex items-center gap-2'>
                 <BsEye size={23} color='gray' className='cursor-not-allowed' />
                 <p className='text-gray-300 cursor-not-allowed'>Contents Moderation</p>
               </Link>
-            </li>
+            </li> */}
             <li className={`group ${checkPresentPath('subscriptions') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
               <Link to="/admin/subscription/plans" className='flex items-center gap-2'>
               <BiWallet size={21} color='blue' className='group-hover:!text-blue-400'/>
@@ -112,12 +112,28 @@ export default function Sidebar(){
               <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>App Config</p>
               </Link>
             </li>
-            <li className={`group ${checkPresentPath('analytics') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
-              <Link to="/admin/analytics" className='flex items-center gap-2'>
+            <div>
+              <li className={`group ${checkPresentPath('analytics') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
+              <Link to="/admin/analytics/overview" className='flex items-center gap-2'>
               <GiReceiveMoney size={21} color='blue' className='group-hover:!text-blue-400'/>
               <p className='text-blue-700 group-hover:text-blue-400 group-hover:font-medium'>Analytics & Revenue</p>
               </Link>
             </li>
+
+            {checkPresentPath('analytics') && (
+                <ul className='space-y-1 ms-10 my-2 transition-all duration-300 list-disc'>
+                  <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/overview') ? "bg-blue-100" : "bg-white"}`}>
+                    <Link to={'analytics/overview'}>Overview</Link>
+                  </li>
+                  <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/failed-payments') ? "bg-blue-100" : "bg-white"}`}>
+                    <Link to={'analytics/failed-payments'}>Failed Payments</Link>
+                  </li>
+                  <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/refunds') ? "bg-blue-100" : "bg-white"}`}>
+                    <Link to={'analytics/refunds'}>Refunds</Link>
+                  </li>
+                </ul>
+              )}
+            </div>
             {/* <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md cursor-not-allowed`}>
               <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
               <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>

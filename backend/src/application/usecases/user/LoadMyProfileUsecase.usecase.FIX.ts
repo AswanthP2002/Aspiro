@@ -13,10 +13,10 @@ export class LoadMyProfileUsecase implements ILoadMyProfileUsecase {
 
   async execute(id: string): Promise<MyProfileDTO | null> {
     const userDetails = await this._userRepo.findByUserId(id);
-    console.log('-- what i got from the database--', userDetails);
+    // console.log('-- what i got from the database--', userDetails);
     if (userDetails) {
       const userDto = this._mapper.myProfileAggregatedToDTO(userDetails);
-      console.log('-- what im going to send the frontend--', userDto);
+      // console.log('-- what im going to send the frontend--', userDto);
       return userDto;
     }
 

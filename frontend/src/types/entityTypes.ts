@@ -1161,6 +1161,7 @@ export interface PlanData {
   monthlyPrice: number;
   yearlyPrice: number;
   trialPeriod: number;
+  isTrialPiriodGiven?: boolean;
   badgeIcon: string;
   isListed: boolean;
   currency: 'INR' | 'USD';
@@ -1177,12 +1178,40 @@ export interface SubscriptionAnalyticsData {
     totalMRR: number;
     activeRecruiters: number;
     churnRate: number;
+    subscriptionCategoryData: {label: string, value: number, color: string}[],
+    recruiterTypeData: {label: string, value: number, color: string}[],
+    userTypeData: {label: string, value: number, color: string}[]
   };
   revenueGrowth: { month: string; amount: number }[];
   subscribers: SubscriberDetailsData[]
 }
 
+export interface UserSubscriptionDetailsData {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  joinedAt: string | Date;
+  subscriptionMetaData: { action: string; date: string | Date }[];
+  subscriptionDetails: {
+    _id: string;
+    planId: string;
+    stripeCustomerId: string;
+    stripeSubscriptionId: string;
+    currentPeriodEnds: string | Date;
+    features: { [key: string]: string | number | boolean };
+  };
+  planDetails: {
+    _id: string;
+    name: string;
+    monthlyPrice: number;
+  };
+}
+
+
 export interface SubscriberDetailsData {
+  userId: string;
   userName: string;
   userEmail: string;
   planName: string;

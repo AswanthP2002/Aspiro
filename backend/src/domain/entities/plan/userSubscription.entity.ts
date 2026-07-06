@@ -1,3 +1,4 @@
+import User from '../user/User.FIX';
 import { Plan } from './plan.entity';
 
 export default interface UserSubscription {
@@ -6,11 +7,11 @@ export default interface UserSubscription {
   planId?: string;
   stripeSubscriptionId?: string;
   stripeCustomerId?: string;
-  status: 'active' | 'canceled' | 'incomplete' | 'past_due';
+  status: string;
   currentPeriodStart?: string | Date;
   isTrialPeriodGiven?: boolean;
-  trialPeriodStarts?: Date | string;
-  trialPeriodEnds?: Date | string;
+  trialPeriodStarts?: Date | string | null;
+  trialPeriodEnds?: Date | string | null;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
   billingCycle?: 'monthly' | 'annually';
@@ -26,7 +27,7 @@ export interface UserSubscriptionAndPlanDetails {
   planId?: string;
   stripeSubscriptionId?: string;
   stripeCustomerId?: string;
-  status: 'active' | 'canceled' | 'incomplete' | 'past_due';
+  status: string;
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
@@ -39,4 +40,5 @@ export interface UserSubscriptionAndPlanDetails {
   updatedAt?: string | Date;
   features?: { [key: string]: string | number | boolean };
   planDetails: Plan;
+  userDetails?: User;
 }

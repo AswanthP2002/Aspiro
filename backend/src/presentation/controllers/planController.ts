@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import ICreatePlanUsecase from '../../application/interfaces/usecases/plan/ICreatePlan.usecase';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, response, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import { CreatePlanDTO, EditPlanDTO } from '../../application/DTOs/plan/plan.dto';
@@ -18,10 +18,13 @@ import ILoadMySubscriptionDetailsUsecase from '../../application/interfaces/usec
 import IGetUserInvoicesUsecase from '../../application/interfaces/usecases/subscription/IGetUserInvoices.usecase';
 import ISubscriptionPortalUsecase from '../../application/interfaces/usecases/subscription/ISubscriptionPortal.usecase';
 import IGetPaymentMethodsUsecase from '../../application/interfaces/usecases/subscription/IGetPaymentMethods.usecase';
-import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
+import ILoadUserSubscriptionDetailsUsecase from '../../application/interfaces/usecases/subscription/ILoadUserSubscriptionDetails.usecase';
+import ResponseHandler from '../../utilities/response.handler';
+// import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 
 @injectable()
 export default class PlanController {
+  private _response: ResponseHandler;
   constructor(
     @inject('ICreatePlanUsecase') private _createPlan: ICreatePlanUsecase,
     @inject('IAdminGetPlanUsecase') private _adminGetPlans: IAdminGetPlansUsecase,
@@ -41,8 +44,12 @@ export default class PlanController {
     private _loadMySubscriptionDetails: ILoadMySubscriptionDetailsUsecase,
     @inject('IGetUserInvoicesUsecase') private _getUserInvoices: IGetUserInvoicesUsecase,
     @inject('ISubscriptionPortalUsecase') private _subscriptionPortal: ISubscriptionPortalUsecase,
-    @inject('IGetPaymentMethodsUsecase') private _getPaymentMethods: IGetPaymentMethodsUsecase
-  ) {}
+    @inject('IGetPaymentMethodsUsecase') private _getPaymentMethods: IGetPaymentMethodsUsecase,
+    @inject('ILoadUserSubscriptionDetailsUsecase')
+    private _loadUserSubscriptionDetails: ILoadUserSubscriptionDetailsUsecase
+  ) {
+    this._response = new ResponseHandler();
+  }
 
   async createPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
     const payload = {
@@ -325,6 +332,20 @@ export default class PlanController {
       });
       return;
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async loadUserSubscriptionDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.params.userId;
+    try {
+      const result = await this._loadUserSubscriptionDetails.execute(userId);
+      this._response.success(res, 'Loaded', StatusCodes.OK, result);
+    } catch (error: unknown) {
       next(error);
     }
   }

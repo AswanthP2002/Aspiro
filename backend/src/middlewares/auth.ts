@@ -92,6 +92,9 @@ export const centralizedAuthentication = async (
 ): Promise<void> => {
   const auth = req.headers.authorization;
   // console.info('-- AUTH --> ', auth);
+  console.log('=================');
+  console.log(req.method, req.originalUrl);
+  console.log('Authorization --', auth?.split(' ')[1].slice(0, 5));
   if (!auth) {
     console.log('NO authorization provided - response - No authorization : 401 - Auth :: ', auth);
     res.status(StatusCodes.UNAUTHORIZED).json({
@@ -102,6 +105,8 @@ export const centralizedAuthentication = async (
   }
 
   try {
+    console.log('Authorization exist decoding...');
+    // console.log('before decoding ', auth.split(' '))
     const decoded = (await verifyToken(auth.split(' ')[1])) as JWTVerificationResultPayload;
     const userData = await UserDAO.findById(new mongoose.Types.ObjectId(decoded.id));
     if (userData?.isBlocked) {
@@ -126,7 +131,7 @@ export const authorization = (roles: string[]) => {
   // console.log('Entered inside the authorization;;;')
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (!roles.includes(req.user.role as string)) {
-      // console.log('- inside authorization :: failed');
+      console.log('- inside authorization :: failed -- FORBIDEN REQUEST');
       res.status(StatusCodes.FORBIDEN).json({ success: false, message: 'Forbidden request' });
       return;
     }

@@ -47,8 +47,16 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
         const token = store.getState().userAuth.userToken
         if (token) {
             customeRequest.headers.Authorization = `Bearer ${token}`
+            console.log('Token existing before sending --', token)
+            // if(customeRequest.url?.includes('plans/load')){
+            //     alert('Token existing...')
+            // }
         }else{
             customeRequest.headers.Authorization = `Bearer ${token}`
+            console.log('Token not existing before sending --', token)
+            // if(customeRequest.url?.includes('plans/load')){
+            //     alert('Token not existing...')
+            // }
         }
     }
     
@@ -88,6 +96,7 @@ axiosInstance.interceptors.response.use(
                     if(role === 'user'){
                         window.location.replace('http://localhost:5173')
                     }else{
+                        alert('Internal server error occured, redirecting to dashboard')
                         window.location.replace('http://localhost:5173/admin/dashboard')
                     }
                     
@@ -100,6 +109,7 @@ axiosInstance.interceptors.response.use(
             return window.location.replace(`/action/termination?message=${response.data.message}`)
        }
         else if(response && response.status === 403){
+            alert('403 response received from this...')
             Swal.fire({
                 icon: 'question',
                 title: 'Limit Reached',

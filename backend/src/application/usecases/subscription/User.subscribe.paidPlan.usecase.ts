@@ -19,6 +19,9 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
     const userDetails = await this._userRepo.findById(userId);
     const planDetails = await this._planRepo.findById(planId);
 
+    const isTrialing = planDetails?.isTrialPiriodGiven;
+    const isEligible = !userDetails?.isTrialUsed;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'upi'],
       line_items: [
@@ -44,6 +47,9 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
         },
       ],
       mode: 'subscription',
+      subscription_data: {
+        trial_period_days: planDetails?.trialPeriod,
+      },
       customer_email: userDetails?.email as string,
       success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `http://localhost:5173/payment-failed`,
@@ -53,6 +59,6 @@ export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidP
       },
     });
 
-    return session.url as string;
+    return session.url as string; 
   }
 }

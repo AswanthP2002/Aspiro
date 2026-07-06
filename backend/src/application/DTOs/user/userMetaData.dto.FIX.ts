@@ -28,11 +28,13 @@ export default interface UserMetaDataDTO {
   headline?: string;
   email?: string;
   role?: string;
+  isTrialUsed?: boolean;
   profilePicture?: string;
   subscription?: {
     subscriptionId: string;
     planId: string;
     name: string;
+    price: number;
     features?: { [key: string]: string | number | boolean };
   };
 }

@@ -37,7 +37,11 @@ function createUserRouter() {
     userController.userLogin.bind(userController)
   );
   userRouter.post('/logout', userController.userLogout.bind(userController));
-  userRouter.get('/v1/token/refresh', userController.reAuthenticate.bind(userController));
+  userRouter.get(
+    '/v1/token/refresh',
+    testMiddleware,
+    userController.reAuthenticate.bind(userController)
+  );
   userRouter.get(
     UserApiRoutes.USER_PUBLIC.LOAD_JOBS,
     centralizedAuthentication,
@@ -332,7 +336,8 @@ function createUserRouter() {
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
 
   function testMiddleware(req: Request, res: Response, next: NextFunction) {
-    // console.log('--inspectng request body', req.body);
+    console.log('--- Refreshed / reloaded ---')
+    console.log(req.method, req.originalUrl)
     next();
     ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }

@@ -54,7 +54,7 @@ const Dashboard = () => {
     {id:1, title:'Total Acive Users', value:24590, hike:12.5, icon:<LuUsers size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'},
     {id:2, title:'New Job Posting', value:174, hike:7, icon:<FaBriefcase size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'},
     {id:3, title:'Pending Verification', value:23, hike:null, icon:<MdVerified size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'},
-    {id:4, title:'Reported Content', value:15, hike:null, icon:<MdOutlineReport size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'}
+    // {id:4, title:'Reported Content', value:15, hike:null, icon:<MdOutlineReport size={22} className='hover:scale-110 transition' color='blue' />, iconTilecolor:'blue'}
   ]
 
   const [options, setOptions] = useState({
@@ -85,7 +85,7 @@ const Dashboard = () => {
       <section className='mt-5'>
         <div className="grid grid-cols-12 w-full gap-5">
           <div className="col-span-12">
-            <div className="grid w-full grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-3">
+            <div className="grid w-full grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
         {
           demoTileData.map((data, index : number) => {
             return <div className='bg-white border border-gray-200 rounded-md !p-5' key={index}>

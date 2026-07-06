@@ -1,6 +1,6 @@
-import SocialLinks from "../user/SocialLinks";
-import { Role, AccountAction } from "../user/User.FIX";
-import { Plan } from "./plan.entity";
+import SocialLinks from '../user/SocialLinks';
+import { Role, AccountAction } from '../user/User.FIX';
+import { Plan } from './plan.entity';
 
 export default interface SubscriptionAnalytics {
   _id?: string;
@@ -51,5 +51,28 @@ export default interface SubscriptionAnalytics {
   hiddenPosts?: string[];
   lastLogin?: Date;
   planDetails: Plan;
-  
+}
+
+export interface SubscriptionAnalyticsData {
+  stats: {
+    totalMRR: number;
+    activeRecruiters: number;
+    churnRate: number;
+    subscriptionCategoryData: { label: string; value: number; color: string }[];
+    recruiterTypeData: { label: string; value: number; color: string }[];
+    userTypeData: { label: string; value: number; color: string }[];
+  };
+  revenueGrowth: { month: string; amount: number }[];
+  subscribers: SubscriberDetails[];
+}
+
+export interface SubscriberDetails {
+  userName: string;
+  userEmail: string;
+  planName: string;
+  billingCycle: string;
+  nextRenewal: Date | string;
+  amount: number;
+  paymentStatus: string;
+  status: string;
 }

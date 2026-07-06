@@ -463,11 +463,13 @@ export default class UserRepository extends BaseRepository<User> implements IUse
         `${user.profilePicture?.cloudinarySecureUrl ? user.profilePicture.cloudinarySecureUrl : ''}` ||
         '',
       role: `${user.role ? user.role[0] : 'user'}`,
+      isTrialUsed: user.isTrialUsed,
       subscription: {
         planId: user?.planDetails?._id || '',
         subscriptionId: user?.subscriptionDetails?._id || '',
         name: user?.planDetails?.name,
         features: user?.subscriptionDetails?.features || {},
+        price: user?.planDetails?.monthlyPrice,
       },
     };
 
@@ -727,4 +729,69 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     const connections = result[0]?.connections;
     return connections;
   }
+
+  // async getActiveUsers(): Promise<{
+  //   users: number;
+  //   growth: { thisMonth: number; lastMonth: number };
+  // } | null> {
+  //   const result = await UserDAO.aggregate([
+  //     {
+  //       $match: {
+  //         isDeleted: false,
+  //         isBanned: false,
+  //         isBlocked: false,
+  //       },
+  //     },
+  //     { $count: 'totalActiveUsers' },
+  //   ]);
+
+  //   const growthData = await UserDAO.aggregate([
+  //     {
+  //       $match: {
+  //         isDeleted: false,
+  //         createdAt: { $exists: true },
+  //       },
+  //     },
+  //     {
+  //       $facet: {
+  //         thisMonth: [
+  //           {
+  //             $match: {
+  //               createdAt: {
+  //                 $gte: new Date(new Date().setDate(1)),
+  //               },
+  //             },
+  //           },
+  //           { $count: 'count' },
+  //         ],
+
+  //         lastMonth: [
+  //           {
+  //             $match: {
+  //               createdAt: {
+  //                 $gte: new Date(
+  //                   new Date(new Date().setMonth(new Date().getMonth() - 1)).setDate(1)
+  //                 ),
+  //                 $lt: new Date(new Date().setDate(1)),
+  //               },
+  //             },
+  //           },
+  //           { $count: 'count' },
+  //         ],
+  //       },
+  //     },
+  //     {
+  //       $project: {
+  //         thisMonth: { $ifNull: [{ $arrayElemAt: ['$thisMonth.count', 0] }, 0] },
+  //         lastMonth: { $ifNull: [{ $arrayElemAt: ['$lastMonth.count', 0] }, 0] },
+  //       },
+  //     },
+  //   ]);
+
+  //   const count = result[0]?.count;
+  //   const thisMonth = growthData[0]?.thisMonth;
+  //   const lastMonth = growthData[0]?.lastMonth;
+
+  //   return { users: count, growth: { thisMonth, lastMonth } };
+  // }
 }

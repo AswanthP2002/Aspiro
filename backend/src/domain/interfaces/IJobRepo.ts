@@ -45,4 +45,8 @@ export default interface IJobRepo extends IBaseRepo<Job> {
   hideSingleJob(jobId: string): Promise<Job | null>;
   hideJobsByRecruiterUserId(id: string): Promise<void>;
   unHideJobsByRecruiterUserId(id: string): Promise<void>;
+  getNewJobPostingWithGrowth(): Promise<{
+    jobs: number;
+    growth: { thisMonth: number; lastMonth: number };
+  } | null>;
 }
