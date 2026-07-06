@@ -5,6 +5,7 @@ export default interface UserCachedData {
   email?: string;
   role?: string;
   profilePicture?: string;
+  isTrialUsed?: boolean;
   subscription: {
     subscriptionId: string;
     planId: string;

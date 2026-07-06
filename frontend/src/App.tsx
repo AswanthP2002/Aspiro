@@ -54,7 +54,7 @@ import AlertsPage from './pages/user/Alerts/Alerts';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alerts, Chat, Notification } from './types/entityTypes';
 import { disconnectSocket, initializeSocket } from './socket';
-import { addLiveNotification, deleteNotificationFromStore } from './redux/notificationSlice';
+import { addLiveNotification, deleteNotificationFromStore, notificationThunk } from './redux/notificationSlice';
 import { UserRoutes } from './constants/routs/user.routes';
 import { reAuthenticateThunk } from './redux/reAuthenticateSlice';
 import store from './redux/store';
@@ -199,12 +199,12 @@ function App() {
     }
   }, [logedUser, dispatch])
 
-  // useEffect(() => {
-  //   //Notify.info('Useeffect for Notification is running')
-  //   if(logedUser){
-  //     store.dispatch(notificationThunk())
-  //   }
-  // }, [logedUser, initialLoading, dispatch]) // commented for testing loop
+  useEffect(() => {
+    //Notify.info('Useeffect for Notification is running')
+    if(logedUser){
+      store.dispatch(notificationThunk())
+    }
+  }, [logedUser, initialLoading, dispatch]) // commented for testing loop
 
   // useEffect(() => {
   //   if(logedUser?._id && logedUser.role === 'user' && (!logedUser.subscription.name || !logedUser.subscription.planId)){

@@ -597,4 +597,58 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
       { $set: { isHidden: false } }
     );
   }
+
+  async getNewJobPostingWithGrowth(): Promise<{
+    jobs: number;
+    growth: { thisMonth: number; lastMonth: number };
+  } | null> {
+    const result = await JobDAO.aggregate([
+      {
+        $facet: {
+          total: [{ $match: { status: 'active' } }, { $count: 'count' }],
+
+          thisMonth: [
+            {
+              $match: {
+                createdAt: {
+                  $gte: new Date(new Date().setDate(1)),
+                },
+              },
+            },
+            { $count: 'count' },
+          ],
+
+          lastMonth: [
+            {
+              $match: {
+                createdAt: {
+                  $gte: new Date(
+                    new Date(new Date().setMonth(new Date().getMonth() - 1)).setDate(1)
+                  ),
+                  $lt: new Date(new Date().setDate(1)),
+                },
+              },
+            },
+            { $count: 'count' },
+          ],
+        },
+      },
+      {
+        $project: {
+          total: { $ifNull: [{ $arrayElemAt: ['$total.count', 0] }, 0] },
+          thisMonth: { $ifNull: [{ $arrayElemAt: ['$thisMonth.count', 0] }, 0] },
+          lastMonth: { $ifNull: [{ $arrayElemAt: ['$lastMonth.count', 0] }, 0] },
+        },
+      },
+    ]);
+
+    const jobsCount = result[0]?.count || 0;
+    const thisMonth = result[0]?.thisMonth || 0;
+    const lastMonth = result[0]?.lastMOnth || 0;
+
+    return {
+      jobs: jobsCount,
+      growth: { thisMonth, lastMonth },
+    };
+  }
 }

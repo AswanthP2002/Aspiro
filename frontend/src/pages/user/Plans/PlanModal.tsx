@@ -16,6 +16,7 @@ type RootState = {
   userAuth: {
     user: {
       _id: string,
+      isTrialUsed: boolean;
       subscription: {
         subscriptionId: string,
         planId: string
@@ -85,6 +86,7 @@ const PricingPage = () => {
         if (result.success) {
           toast.success(result?.message);
           setPlansData(result?.result);
+          console.log('-- plans data from the server ---', result.result)
         }
       } catch (error) {
         console.log('errror', error);
@@ -178,7 +180,14 @@ const PricingPage = () => {
                 className={`w-full py-4 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors mb-8
               ${plan.monthlyPrice > 0 && plan.monthlyPrice < 300 ? 'bg-blue-600 text-white hover:bg-blue-700' : (plan.monthlyPrice > 300 ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-[0_0_30px_2px_rgba(100,0,0,0.1)] text-white" : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50')}`}
               >
-                Get started <span className="text-lg">→</span>
+                {plan.trialPeriod > 0 && !logedUser.isTrialUsed
+                  ? <>
+                    Try {plan.trialPeriod} days trial <span className="text-lg">→</span>
+                    </>
+                  : <>
+                    Get started <span className="text-lg">→</span>
+                    </>
+                }
               </button>
               )}
 

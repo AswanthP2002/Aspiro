@@ -94,12 +94,12 @@ export default function Sidebar(){
               <p className='text-blue-700 group-hover:text-blue-400'>Jobs</p>
               </Link>
             </li>
-            <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
+            {/* <li className={`group cursor-not-allowed text-gray-200 text-sm !p-2 rounded-md`}>
               <Link to="admin/dashboard" className='flex items-center gap-2'>
                 <BsEye size={23} color='gray' className='cursor-not-allowed' />
                 <p className='text-gray-300 cursor-not-allowed'>Contents Moderation</p>
               </Link>
-            </li>
+            </li> */}
             <li className={`group ${checkPresentPath('subscriptions') ? 'bg-blue-100' : null} text-sm hover:bg-blue-100 !p-2 rounded-md`}>
               <Link to="/admin/subscription/plans" className='flex items-center gap-2'>
               <BiWallet size={21} color='blue' className='group-hover:!text-blue-400'/>

@@ -9,7 +9,6 @@ export const UserSubscriptionSchema = new Schema<UserSubscription>(
     stripeCustomerId: { type: String, required: false }, // cus_123...
     status: {
       type: String,
-      enum: ['active', 'canceled', 'incomplete', 'past_due'],
       default: 'active',
     },
     currentPeriodStart: { type: Date },

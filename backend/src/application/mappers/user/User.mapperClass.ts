@@ -162,6 +162,7 @@ export default class UserMapper {
       name: data.name,
       email: data.email,
       headline: data.headline,
+      isTrialUsed: data.isTrialUsed,
       role: data.role,
       profilePicture: data.profilePicture,
       subscription: {

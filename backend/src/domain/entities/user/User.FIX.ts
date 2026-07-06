@@ -58,4 +58,5 @@ export default interface User {
   lastLogin?: Date;
   views?: string[];
   subscriptionMetaData?: { action: string; date?: string | Date }[];
+  isTrialUsed?: boolean;
 }

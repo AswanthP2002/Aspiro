@@ -17,6 +17,7 @@ export class PlanMapper {
       isListed: data.isListed,
       monthlyPrice: data.monthlyPrice,
       trialPeriod: data.trialPeriod,
+      isTrialPiriodGiven: data.trialPeriod > 0,
       yearlyPrice: data.yearlyPrice,
     };
   }

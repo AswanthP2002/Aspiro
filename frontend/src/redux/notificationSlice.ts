@@ -25,7 +25,7 @@ export const notificationThunk = createAsyncThunk(
             console.log('Going to call the api inside thunk')
             const result: UnReadNotificationsCountResponsePayload = await getUnReadNotificationsCount()
             console.log('API called inside the thunk, ', result)
-            Notify.success(`Notification fetched - count ${result}`)
+            // Notify.success(`Notification fetched - count ${result}`)
             return result
         } catch (error: unknown) {
             const err = error as AxiosError

@@ -1161,6 +1161,7 @@ export interface PlanData {
   monthlyPrice: number;
   yearlyPrice: number;
   trialPeriod: number;
+  isTrialPiriodGiven?: boolean;
   badgeIcon: string;
   isListed: boolean;
   currency: 'INR' | 'USD';

@@ -69,6 +69,7 @@ export const UserSchema = new Schema<User>(
     hiddenPosts: { type: [Schema.Types.ObjectId], ref: 'posts' },
     views: { type: [String] },
     subscriptionMetaData: { type: [SubscriptionMetaDataSchema] },
+    isTrialUsed: { type: Boolean },
   },
   { timestamps: true }
 );

@@ -317,6 +317,19 @@ export default class SubscriptionRepository
     return subscriptions;
   }
 
+  async updateByStripeSubscriptionId(
+    stripeSubscriptionId: string,
+    data: Partial<UserSubscription>
+  ): Promise<UserSubscription | null> {
+    const result = await UserSubscriptionDAO.findOneAndUpdate(
+      { stripeSubscriptionId: stripeSubscriptionId },
+      { $set: data },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
   // async getUsersPurchasedCurrentDay(): Promise<{ count: number } | null> {
   //   const today = new Date();
   //   today.setHours(0, 0, 0, 0);

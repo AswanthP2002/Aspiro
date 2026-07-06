@@ -242,10 +242,10 @@ export default function Post({ postData }: { postData: UserPosts }) {
                 <p className='text-[13px] font-medium group-hover:text-red-600'>Delete post</p>
               </li>
             )}
-            <li className='flex cursor-pointer items-center gap-2 p-2 hover:bg-red-50 rounded-md group border-t border-gray-100 pt-2'>
+            {/* <li className='flex cursor-pointer items-center gap-2 p-2 hover:bg-red-50 rounded-md group border-t border-gray-100 pt-2'>
               <GoReport className="text-red-400" size={14} />
               <p className='text-[13px] font-medium text-red-500'>Report post</p>
-            </li>
+            </li> */}
           </ul>
         </div>
       )}

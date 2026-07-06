@@ -19,5 +19,9 @@ export default interface ISubscriptionRepo extends IBaseRepo<UserSubscription> {
     userId: string,
     count: string
   ): Promise<UserSubscription | null>;
-  findSubscriptionsByPlanId(planId: string): Promise<UserSubscription[] | null>
+  findSubscriptionsByPlanId(planId: string): Promise<UserSubscription[] | null>;
+  updateByStripeSubscriptionId(
+    stripeSubscriptionId: string,
+    data: Partial<UserSubscription>
+  ): Promise<UserSubscription | null>;
 }
