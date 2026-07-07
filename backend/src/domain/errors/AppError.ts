@@ -23,6 +23,15 @@ export class DuplicateEmailError extends AppError {
   }
 }
 
+export class VerificationPendingError extends AppError {
+  constructor() {
+    super(
+      'VERIFICATION_PENDING',
+      "An account with this email already exists but hasn't been verified. If this is your account, please verify your email to continue."
+    );
+  }
+}
+
 export class InvalidUserError extends AppError {
   constructor() {
     super('INVALID_USER', 'Invalid user : No user data available o');

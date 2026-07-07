@@ -1,5 +1,9 @@
 import { inject, injectable } from 'tsyringe';
-import { DuplicateEmailError, DuplicateMobileError } from '../../../domain/errors/AppError';
+import {
+  DuplicateEmailError,
+  DuplicateMobileError,
+  VerificationPendingError,
+} from '../../../domain/errors/AppError';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateCode } from '../../../utilities/generateCode';
 import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
@@ -23,7 +27,11 @@ export default class CreateUserUseCase implements ICreateUserUseCase {
     //check if the email is already linked with another user
     const isExistingEmail = await this._repo.findByEmail(newUser.email);
     if (isExistingEmail) {
-      throw new DuplicateEmailError();
+      if (!isExistingEmail.isVerified) {
+        throw new VerificationPendingError();
+      } else {
+        throw new DuplicateEmailError();
+      }
     }
 
     //check if the mobile number is already linked

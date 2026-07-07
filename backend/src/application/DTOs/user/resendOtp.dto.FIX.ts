@@ -1,11 +1,11 @@
-import { IsDefined, IsEmail, IsString } from 'class-validator';
+import { IsDefined, IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class ResendOtpDto {
   @IsDefined({ message: 'Email can not be emtpy' })
   @IsEmail({}, { message: 'Must be a valid email' })
   email!: string;
 
-  @IsDefined({ message: 'Id can not be empty' })
+  @IsOptional()
   @IsString({ message: 'Id must be a string' })
   id!: string;
 }

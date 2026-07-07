@@ -21,15 +21,15 @@ export const registerUser = async (name: string, email: string, phone: string, p
     } catch (error : unknown) {
         console.log('--User Register Eerror--', error instanceof Error ? error.message : error)
         const err = error as AxiosError
-
+        console.log('Error occured while register', err)
         if(err.response && err.response.status < 500) return err.response.data
     }
 }
 
-export const verify = async (id : string, otp : string) => {
+export const verify = async (id : string, otp : string, email: string) => {
     try {
         const response = await axiosInstance.post(EndPoints.VERIFY,
-            {id, otp},
+            {id, otp, email},
             {
                 headers:{'Content-Type':'application/json'}
             } as AxiosRequest

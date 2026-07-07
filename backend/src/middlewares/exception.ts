@@ -33,6 +33,15 @@ export default function exceptionhandle(
         responseMessage = 'This email is already linked with another account';
         code = StatusCodes.CONFLICT;
         break;
+      case 'VERIFICATION_PENDING':
+        responseMessage =
+          "An account with this email already exists but hasn't been verified. If this is your account, please verify your email to continue.";
+        code = StatusCodes.CONFLICT;
+        errors = {
+          code: 'VERIFICATION_PENDING',
+          message: 'Email exist with pending verification',
+        };
+        break;
       case 'OTP_EXPIRED':
         responseMessage = 'otp expired';
         code = StatusCodes.BAD_REQUEST;
