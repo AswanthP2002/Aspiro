@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodSchema } from 'zod';
-import { StatusCodes } from '../presentation/statusCodes';
+// import { StatusCodes } from '../presentation/statusCodes';
 
 export default function Validator(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {

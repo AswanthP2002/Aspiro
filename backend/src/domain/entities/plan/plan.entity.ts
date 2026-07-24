@@ -1,9 +1,10 @@
 export interface Plan {
   _id?: string;
+  stripeProductId?: string;
   name: string;
   description: string;
   monthlyPrice: number;
-  yearlyPrice: number;
+  stripePriceId?: string;
   trialPeriod: number;
   isTrialPiriodGiven?: boolean;
   badgeIcon: string;
@@ -18,25 +19,6 @@ export interface Plan {
   isDeleted?: boolean;
 }
 
-// {
-//   "planName": "Basic",
-//   "planDescription": "Basic Plan",
-//   "monthlyPrice": 0,
-//   "yearlyPrice": 0,
-//   "trialPeriod": 0,
-//   "badgeIcon": "Lightning",
-//   "isListed": true,
-//   "connectionRequests": 10,
-//   "jobApplications": 5,
-//   "features": [
-//     "resumeBuilder",
-//     "socialFeed",
-//     "jobRecommendation"
-//   ],
-//   "directMessaging": false,
-//   "interviewPractice": false,
-//   "pushJob": false,
-//   "recruiterProfile": false,
-//   "resumeAnalyzer": false,
-//   "smartFilter": false
-// }
+export interface PlanWithActiveUsersCount extends Plan {
+  activeUsers?: number;
+}

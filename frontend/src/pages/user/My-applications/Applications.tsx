@@ -14,13 +14,15 @@ import { toast } from 'react-toastify';
 export default function MyApplications() {
   const [applications, setApplications] = useState<MyApplicationsListData[]>([]);
   const [totalDocs, setTotalDocs] = useState(0)
-  const [loading, setLoading] = useState(true);
+  console.log(totalDocs)
+  // const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [limit, setLimit] = useState(5)
+  console.log(setLimit)
   const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<'all' | 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'>('all')
-  const [sort, setSotr] = useState<'recently-applied' | 'oldest-applied'>('recently-applied')
+  const [status, setStatus] = useState<'all' | 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | string>('all')
+  const [sort, setSotr] = useState<'recently-applied' | 'oldest-applied' | string>('recently-applied')
   const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
   const [isSortMenuOpened, setIsSortMenuOpened] = useState(false)
 
@@ -87,7 +89,7 @@ export default function MyApplications() {
         });
         setApplications([]);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     })()
   }, [search, page, status, sort, limit]);
@@ -175,7 +177,7 @@ export default function MyApplications() {
                     <div className="flex-1">
                       <p className='font-semibold'>{application.jobDetails?.jobTitle}</p>
                       <p className='text-xs text-gray-700'>{application.companyDetails?.name} | Posted by {application.recruiterDetails?.name}</p>
-                      <p className='mt-2 font-semibold'>{currencyFormatter(application.jobDetails?.minSalary, "INR")}</p>
+                      <p className='mt-2 font-semibold'>{currencyFormatter(application?.jobDetails?.minSalary, "INR")}</p>
                       <p className='mt-3 text-xs text-gray-500 flex items-center gap-1'><FaClock /> Applied on {formattedDateMoment(application.createdAt, "MMM DD YYYY")}</p>
                       <div className="flex justify-between items-center mt-3">
                         <div>

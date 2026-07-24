@@ -7,6 +7,6 @@ export default interface AdminDashboardData {
     pendingVerification: number;
   };
   charts: {
-    userEngangement: any[];
+    userEngangement: { [key: string]: string | number | boolean }[];
   };
 }

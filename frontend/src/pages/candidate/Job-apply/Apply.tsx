@@ -13,14 +13,16 @@ export default function JobApplyPage() {
     
     const [resume, setResume] = useState<File | null>(null)
     const [myResumesList, setMyResumesList] = useState<Resumes[]>([])
-    const [resumeLoader, setResumeLoader] = useState(false)
+    // const [resumeLoader, setResumeLoader] = useState(false)
     const [savedResumeId, setSavedResumeId] = useState("")
     const [filename, setFilename] = useState('')
     const [resumeNillError, setResumeNillError] = useState('') 
+    console.log(resumeNillError)
     const [jobDetails, setJobDetails] = useState<JobDetailsForPublicData | null | undefined>()
     const [coverLetterContent, setCoverLetterContent] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [coverLetterContentNillError, setResumeCoverLetterContentNillError] = useState('')
+    console.log(coverLetterContentNillError)
     const resumeFieldRef = useRef<HTMLInputElement | null>(null)
 
     const params = useParams()
@@ -44,11 +46,14 @@ export default function JobApplyPage() {
     console.log('job details through location obj', data)
 
     function clickResumeField(){
-        resumeFieldRef.current.click()
+        if(resumeFieldRef.current){
+          resumeFieldRef.current.click()
+        }
+        
     }
 
     function selectResume(event : React.ChangeEvent<HTMLInputElement>){
-        const file = event.target.files[0]
+        const file = event?.target?.files[0]
         console.log('checking the file', file)
         if(file){
             setResume(file)
@@ -173,7 +178,7 @@ export default function JobApplyPage() {
 
         async function fetchMyExistingResumes(){
             try {
-                setResumeLoader(true)
+                // setResumeLoader(true)
                 const resumeResult = await loadUserResumes()
                 console.log('--checking my resume list from backend--', resumeResult)
                 Notify.success('Resume fetched succesfully')
@@ -181,7 +186,7 @@ export default function JobApplyPage() {
             } catch (error: unknown) {
                 Notify.failure(error instanceof Error ? error.message : 'Failed to load resumes')
             } finally {
-                setResumeLoader(false)
+                // setResumeLoader(false)
             }
         }
         fetchMyExistingResumes()

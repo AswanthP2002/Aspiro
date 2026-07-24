@@ -3,4 +3,3 @@ import { SubscribePaidPlanDTO } from '../../../DTOs/subscription/subscribeFreePl
 export default interface IUserSubscribePaidPlanUsecase {
   execute(dto: SubscribePaidPlanDTO): Promise<string>;
 }
-

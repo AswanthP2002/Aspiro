@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BiGridAlt, BiListUl, BiSearch, BiUserCheck, BiUserPlus } from 'react-icons/bi';
-import { ConnectionRequests, Experience, Follow, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
+import { ConnectionRequests, Follow, Skills, UserOverviewForPublic } from '../../../types/entityTypes';
 import { followUser, getLocationDetails, getUsersForPublic, unfollowUser } from '../../../services/userServices';
 import { Notify } from 'notiflix';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,7 @@ export default function UsersFindingPage() {
   const [search, setSearch] = useState<string>('');
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(5)
+  console.log(setLimit)
   const [sort, setSort] = useState<"recently_joined" | "most_connection" | "suggested">("recently_joined")
   const [hasMore, setHasMore] = useState(true)
   const [roleTypeFilter, setRoleTypeFilter] = useState<'All' | 'Recruiter'>('All');
@@ -102,35 +103,6 @@ export default function UsersFindingPage() {
   };
 
   const db = debouncedSearch(searchUsers, 500);
-
-  // const getExperienceLabel = (experiences: Experience[]) => {
-  //   let experienceInMonths = 0;
-  //   let experienceLabel;
-  //   const n = experiences.length;
-
-  //   for (let i = 0; i < n; i++) {
-  //     const startDate = new Date(experiences[i].startDate);
-  //     const endDate = experiences[i].isPresent ? new Date() : new Date(experiences[i].endDate);
-
-  //     const yearDif = endDate.getFullYear() - startDate.getFullYear();
-  //     const monthDif = endDate.getMonth() - startDate.getMonth();
-
-  //     const fullMonthsDif = yearDif * 12 + monthDif;
-  //     experienceInMonths += fullMonthsDif;
-  //   }
-
-  //   if (experienceInMonths >= 12 * 4) {
-  //     experienceLabel = 'High Level';
-  //   } else if (experienceInMonths >= 12 * 2 && experienceInMonths < 12 * 4) {
-  //     experienceLabel = 'Mid Level';
-  //   } else if (experienceInMonths >= 12 && experienceInMonths < 12 * 2) {
-  //     experienceLabel = 'Entry Level';
-  //   } else {
-  //     experienceLabel = 'Fresher';
-  //   }
-
-  //   return experienceLabel;
-  // };
 
   const followAUser = async (userId: string) => {
     if(!userId) return toast.error('Something went wrong')
@@ -222,7 +194,7 @@ export default function UsersFindingPage() {
 
     try {
       const result = await sendConnectionRequest(userId, logedUser.name, "")
-      if(result.success){
+      if(result?.success){
         toast.success('Connection request send')
         setUsers((users: UserOverviewForPublic[] | null | undefined) => {
           if(!users) return null
@@ -422,13 +394,6 @@ export default function UsersFindingPage() {
     }else{
       return false
     }
-    // for(let i = 0; i < user?.connectionRequests?.length; i++){
-    //   if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'ACCEPTED'){
-    //     return true
-    //   }
-    // }
-
-    // return false
   }
 
   const amIFollowingThisUser = (user: UserOverviewForPublic): boolean => {

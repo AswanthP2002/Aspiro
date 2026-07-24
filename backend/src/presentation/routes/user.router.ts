@@ -21,22 +21,22 @@ function createUserRouter() {
   const subscriptionAccessTrack = container.resolve(SubscriptionAccess);
 
   userRouter.post(
-    '/v1/user/register',
+    UserApiRoutes.USERS.REGISTER,
     Validator(CreateUserSchema),
     userController.registerUser.bind(userController)
   );
   userRouter.post(
-    '/v1/user/verify',
+    UserApiRoutes.USERS.VERIFY,
     Validator(verifyUserInputsSchema),
     userController.verifyUser.bind(userController)
   );
-  userRouter.post('/v1/user/otp/resend', userController.resendOTP.bind(userController)); //removed resend otp sending limit currently for testing :allowresendotp
+  userRouter.post(UserApiRoutes.USERS.OTP_RESEND, userController.resendOTP.bind(userController)); //removed resend otp sending limit currently for testing :allowresendotp
   userRouter.post(
     UserApiRoutes.USER_AUTH_MANAGE.NORMAL_LOGIN,
     Validator(loginSchema),
     userController.userLogin.bind(userController)
   );
-  userRouter.post('/logout', userController.userLogout.bind(userController));
+  userRouter.post(UserApiRoutes.USERS.LOGOUT, userController.userLogout.bind(userController));
   userRouter.get(
     '/v1/token/refresh',
     testMiddleware,
@@ -336,8 +336,8 @@ function createUserRouter() {
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
 
   function testMiddleware(req: Request, res: Response, next: NextFunction) {
-    console.log('--- Refreshed / reloaded ---')
-    console.log(req.method, req.originalUrl)
+    console.log('--- Refreshed / reloaded ---');
+    console.log(req.method, req.originalUrl);
     next();
     ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }

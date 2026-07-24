@@ -14,13 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
-
-  // const getClippedText = (text: string, buffer: number) => {
-  //   if (text?.length <= buffer) return text;
-
-  //   return `"${text?.slice(0, buffer)}..."`;
-  // };
-
   
 interface NotificationRootState {
   notification:{
@@ -47,7 +40,10 @@ export default function NotificationPage() {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(7)
+  console.log(setPage, setLimit)
+  console.log(notificationsData)
   const [hasMore, setHasMore] = useState<boolean>(true)
+  console.log(hasMore)
   const [notificationType, setNotificationType] = 
     useState<
     'LIKE' | 
@@ -57,9 +53,10 @@ export default function NotificationPage() {
     'CONNECTION_ACCEPTED' | 
     'COMMENT_REPLY' | 
     'SHARE' | 
-    'ALL'>('ALL')
+    'ALL' | string>('ALL')
   const [notificationStatus, setNotificationStatus] = useState<'ALL' | 'READ' | 'UNREAD'>('UNREAD')
   const [offSet, setOffSet] = useState(0)
+  console.log(setOffSet)
 
   const toggleNotificationsActionMenu = () => {
     setIsNotificationActionMenuOpen((prv) => !prv);
@@ -321,7 +318,7 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
     
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string, profilePicture: string}}}) => {
       return state.userAuth.user
     })
 
@@ -461,7 +458,7 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center border border-gray-200 shadow-sm">
-            <p className="text-gray-600 font-medium text-lg uppercase">{notification?.actorDetails?.name[0]}</p>
+            <p className="text-gray-600 font-medium text-lg uppercase">{notification.actorDetails && notification?.actorDetails?.name && notification?.actorDetails?.name[0]}</p>
           </div>
         )}
         {/* Category Icon Badge (Optional: helps visual parsing) */}
@@ -478,7 +475,7 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
           {/* Main Message */}
           <p className={`text-[14px] leading-snug ${notification.isRead ? 'text-gray-600 font-normal' : 'text-gray-900 font-semibold'}`}>
             { (notification.category === 'CONNECTION_REQUEST' && notification.isRead) 
-              ? <span className="text-blue-600 font-bold">{notification.metadata?.acted_by}</span> 
+              ? <span className="text-blue-600 font-bold">{notification.metadata?.acted_by as string}</span> 
               : notification.message 
             }
             {notification.category === 'CONNECTION_REQUEST' && notification.isRead && " is your new connection"}
@@ -522,7 +519,7 @@ function NotificationCard({ notification, onNotificationDelete, onSingleNotifica
       {['COMMENT', 'LIKE', 'COMMENT_REPLY'].includes(notification.category as string) && (
         <div className="mt-2 pl-3 border-l-2 border-gray-100 italic">
           <p className="text-[13px] text-gray-500 leading-relaxed">
-            "{notification.metadata.content}"
+            "{notification && notification.metadata && notification.metadata.content as string}"
           </p>
         </div>
       )}

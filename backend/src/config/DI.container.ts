@@ -502,6 +502,14 @@ import CronSubscriptionReset from '../infrastructure/cron-schedule/subscription/
 import SubscriptionMapper from '../application/mappers/subscription/Subscription.mapperClass';
 import ILoadUserSubscriptionDetailsUsecase from '../application/interfaces/usecases/subscription/ILoadUserSubscriptionDetails.usecase';
 import LoadUserSubscriptionDetailsUsecase from '../application/usecases/subscription/LoadUserSubscriptionDetails.usecase';
+import IUserCancelSubscriptionUsecase from '../application/interfaces/usecases/subscription/ICancelSubscription.usecase';
+import UserCancelSubscriptionUsecase from '../application/usecases/subscription/UserCancelSubscription.usecase';
+import IUpgradeSubscriptionUsecase from '../application/interfaces/usecases/subscription/IUpgradeSubscription.usecase';
+import UpgradeSubscriptionUsecase from '../application/usecases/subscription/UpgradeSubscription.usecase';
+import IPaymentServices, {
+  ISubscriptionService,
+} from '../application/interfaces/services/IPayment.services';
+import StripePaymentGateway from '../infrastructure/services/Stripe.payment.service';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -1091,6 +1099,14 @@ container.registerSingleton<IMonthlyResetSubscriptionLImits>(
   'IMonthlySubscriptionLimitReset',
   MonthlyResetSubscriptionLimitUsecase
 );
+container.registerSingleton<IUserCancelSubscriptionUsecase>(
+  'IUserCancelSubscriptionUsecase',
+  UserCancelSubscriptionUsecase
+);
+container.registerSingleton<IUpgradeSubscriptionUsecase>(
+  'IUpgradeSubscriptionUsecase',
+  UpgradeSubscriptionUsecase
+);
 container.registerSingleton<ILoadUserSubscriptionDetailsUsecase>(
   'ILoadUserSubscriptionDetailsUsecase',
   LoadUserSubscriptionDetailsUsecase
@@ -1183,6 +1199,8 @@ container.registerSingleton<IRealTimeEventEmitter>(
   RealTimeEventEmitterService
 );
 container.registerSingleton<IAiServices>('IAiServices', AiServices);
+container.registerSingleton<IPaymentServices>('StripePaymentGateway', StripePaymentGateway);
+container.registerSingleton<ISubscriptionService>('ISubscriptionService', StripePaymentGateway);
 
 //register mappers
 container.registerSingleton('UserMapper', UserMapper);

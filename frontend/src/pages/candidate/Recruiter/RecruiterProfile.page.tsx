@@ -16,13 +16,15 @@ import { BiBuildings, BiEnvelope, BiPhone, BiShieldQuarter } from "react-icons/b
 import { FiAlertCircle, FiArrowRightCircle } from "react-icons/fi";
 import moment, { Moment } from "moment";
 import { TbBrandDaysCounter } from "react-icons/tb";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 export default function RecruiterProfilePage(){
     const navigateTo = useNavigate();
     const [profileData, setProfileData] = useState<RecruiterProfileData | null>(null)
-    const [isRecruiterProfileExist, setIsRecruiterProfileExist] = useState<boolean>(false)
+    // const [isRecruiterProfileExist, setIsRecruiterProfileExist] = useState<boolean>(false)
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<boolean>(false)
+    // const [error, setError] = useState<boolean>(false)
 
     const getStatusPill = (status: Job['status']) => {
         switch (status) {
@@ -54,16 +56,19 @@ export default function RecruiterProfilePage(){
                     if(!result?.result){
                         return navigateTo('/profile/recruiter/register')
                     }
-                    setIsRecruiterProfileExist(true)
+                    // setIsRecruiterProfileExist(true)
                    setProfileData(result?.result)
                 }else{
-                    setIsRecruiterProfileExist(false)
+                    // setIsRecruiterProfileExist(false)
                     setProfileData(null)
                     Notify.failure(result?.message, {timeout:2000})
                 }
             } catch (error: unknown) {
-                setError(true)
-                Notify.failure('Something went wrong', {timeout:2000})
+                // setError(true)
+                // Notify.failure('Something went wrong', {timeout:2000})
+                const err = error as AxiosError<{message: string}>
+                const msg = err.response?.data.message || err.message || 'Something went wrong'
+                toast.error(msg)
             } finally {
                 setLoading(false)
             }
@@ -108,7 +113,7 @@ export default function RecruiterProfilePage(){
       
       <div className={`z-10 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
         profileData.profileStatus === 'under-review' ? 'bg-blue-600 ring-4 ring-blue-50' : 
-        profileData.profileStatus === 'verified' ? 'bg-green-500' : 'bg-gray-100'
+        (profileData.profileStatus === 'verified' ? 'bg-green-500' : 'bg-gray-100')
       }`}>
         <BiShieldQuarter className={profileData.profileStatus === 'pending' ? 'text-gray-400' : 'text-white'} size={24} />
       </div>
@@ -362,7 +367,7 @@ export default function RecruiterProfilePage(){
                                                     <p className="font-semibold tracking-wide text-gray-900">{job?.jobTitle}</p>
                                                     <div className="flex gap-3 items-center">
                                                         <span className="flex text-sm font-medium mt-1 text-gray-500 gap-1 items-center"><IoLocation /> {job.workMode}</span>
-                                                        <span className="flex text-sm font-medium mt-1 text-gray-500 gap-1 items-center"><PiClock /> {getReminingDays(job.expiresAt)} Day left</span>
+                                                        <span className="flex text-sm font-medium mt-1 text-gray-500 gap-1 items-center"><PiClock /> {getReminingDays(job.expiresAt as string)} Day left</span>
                                                     </div>
                                                     <div className="flex gap-2 items-center mt-5">
                                                         {getStatusPill(job?.status as Job['status'])}
@@ -448,14 +453,6 @@ const CooldownScreen = ({recruiterData}: {recruiterData: RecruiterProfileData}) 
           </p>
         </div>
       </div>
-
-      {/* Progress Line Visual */}
-      {/* <div className="relative h-2 w-full bg-gray-100 rounded-full mb-10 overflow-hidden">
-        <div 
-          className="absolute top-0 left-0 h-full bg-amber-500 transition-all duration-700"
-          style={{ width: `${(1 - (bufferDate?.diff(currentDate, "days") / 30)) * 100}%` }} 
-        />
-      </div> */}
 
       {/* Next Steps Section */}
       <div className="bg-blue-50/50 rounded-xl p-6 border border-blue-100">

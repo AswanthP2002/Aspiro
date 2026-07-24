@@ -54,6 +54,10 @@ export default function exceptionhandle(
         responseMessage = 'User not found';
         code = StatusCodes.NOT_FOUND;
         break;
+      case 'RESOURCE_ALREADY_EXIST':
+        responseMessage = err.message;
+        code = StatusCodes.CONFLICT;
+        break;
       case 'WRONG_PASSWORD':
         responseMessage = 'Wrong password';
         code = StatusCodes.UNAUTHORIZED;

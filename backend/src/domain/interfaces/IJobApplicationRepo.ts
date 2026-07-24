@@ -1,3 +1,4 @@
+import Job from '../entities/job/job.entity';
 import JobApplication, {
   JobApplicationCompanyRecruiterAggregated,
 } from '../entities/jobApplication/jobApplication.entity';
@@ -47,4 +48,7 @@ export default interface IJobApplicationRepo extends IBaseRepo<JobApplication> {
   getJobApplicationDetailsCompanyRecruiterCombined(
     applicationId: string
   ): Promise<JobApplicationCompanyRecruiterAggregated | null>;
+  //temp
+  // getAppliedJobByCandidateId(candidateId: string): Promise<JobApplicationAggregated[] | null>
+  // getApplicationByJobIdTemp(id: string): Promise<JobApplicationAggregated | null>
 }

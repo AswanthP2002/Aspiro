@@ -121,7 +121,7 @@ export default function UserSubscriptionManage(){
                   </p>
                   <p className="text-[.7rem] text-slate-300">Next billing: {moment(userSubscriptionData?.subscriptionDetails.currentPeriodEnds).format("DD MMM YYYY")}</p>
                 </div>
-                <div className="mt-5 space-y-2">
+                {/* <div className="mt-5 space-y-2">
                   <button className="flex w-full items-center justify-center gap-2 border border-slate-200 text-xs p-3 bg-gradient-to-br from-blue-400 shadow-sm shadow-blue-100 to-indigo-500 rounded-lg text-white font-semibold tracking-wide">
                     <BsArrowUp />
                     <p>Upgrade Plan</p>
@@ -133,7 +133,7 @@ export default function UserSubscriptionManage(){
                   <button className="flex w-full items-center justify-center gap-2 border border-slate-200 text-xs p-3 rounded-lg text-slate-400">
                     <p>Cancel Subscription</p>
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">

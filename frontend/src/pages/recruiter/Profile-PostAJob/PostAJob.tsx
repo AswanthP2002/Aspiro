@@ -49,7 +49,7 @@ export default function PostAJobForm(){
     const [workModeOptions, setWorkModeOptions] = useState<WorkModeData[]>([])
     const [isVerified, setIsVerified] = useState<boolean>(true)
 
-    const {control, watch, handleSubmit, formState:{errors}, setValue, getValues} = useForm<JobDetails>({
+    const {control, watch, handleSubmit, formState:{errors}} = useForm<JobDetails>({
         defaultValues: {
             jobTitle: "",
             description: "",
@@ -57,16 +57,16 @@ export default function PostAJobForm(){
             responsibilities: "",
             duration: "",
             jobType: "",
-            workMode: "On-site",
+            workMode: "",
             location: "",
             minSalary: "",
             maxSalary: "",
-            salaryCurrency: "INR",
-            salaryPeriod: "annually",
+            salaryCurrency: "",
+            salaryPeriod: "",
             vacancies: "",
             qualification: "",
             experienceInYears: "",
-            jobLevel: "Entry-level",
+            jobLevel: "",
             requiredSkills: [],
             optionalSkills: [],
             expiresAt: null
@@ -580,7 +580,7 @@ const selectStyles = {
                         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100">
                             <p className="text-sm font-semibold text-blue-500 !p-0">5</p>
                         </div>
-                        <p className="font-semibold text-gray-700 uppercase">Location & Logistics</p>
+                        <p className="font-semibold text-gray-700 uppercase">Job Description</p>
                     </div>
                     <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.description)}>
                         <Controller 

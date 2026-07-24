@@ -16,6 +16,7 @@ import ResumeAddForm from "../../../components/candidate/Forms/ResumeAddForm"
 import { toast } from "react-toastify"
 import { AxiosError } from "axios"
 import { useNavigate } from "react-router-dom"
+import { Dispatch, SetStateAction } from "react"
 
 interface CertificateCardProps {
     certificate: Certificates,
@@ -94,7 +95,7 @@ interface EditResumeResponsePayload {
 
 interface ResumeCardProps {
     resume: Resumes,
-    setResumes: Function
+    setResumes: Dispatch<SetStateAction<Resumes[]>> // Removed Generic Function type
 }
 
 const ResumeCard = ({resume, setResumes}: ResumeCardProps) => {

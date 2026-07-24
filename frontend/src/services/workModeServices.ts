@@ -6,9 +6,6 @@ export const adminAddWorkMode = async (name: string, isActive: boolean) => {
     try {
         const response = await axiosInstance.post(WorkModeEndpoints.ADD, {name, isActive},
             {   
-                headers:{
-                    "Content-Type": 'application/json'
-                },
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -45,7 +42,6 @@ export const adminChangeWorkmodeStatus = async (id: string, status: 'active' | '
     try {
         const response = await axiosInstance.patch(WorkModeEndpoints.CHANGE_STATUS_BY_ID(id), {status},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )

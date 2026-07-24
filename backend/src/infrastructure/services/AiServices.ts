@@ -253,7 +253,7 @@ ${JSON.stringify(persona.slice(1), null, 2)}`;
       finalMessage = persona;
     }
 
-    console.log('-checking final message for the ai before calling', finalMessage)
+    console.log('-checking final message for the ai before calling', finalMessage);
     // console.log('-- checking persona before sending to the ai --', persona);
     for (const model of this._models) {
       console.log(`Is interview stoped ${isStoped}`);

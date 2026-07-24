@@ -109,3 +109,9 @@ export class ServiceBusyError extends AppError {
     super('SERVICE_BUISY', `All of the ${service} are busy now, please try after some time`);
   }
 }
+
+export class ResourceNotFound extends AppError {
+  constructor(resource: string) {
+    super('RESOURCE_NOT_FOUND', `${resource} not found`);
+  }
+}

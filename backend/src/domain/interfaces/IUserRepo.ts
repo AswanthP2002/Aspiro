@@ -1,6 +1,6 @@
 import { FindUsersQuery } from '../../application/queries/user/users.query';
 import UserProfileAggregatedAdmin from '../entities/user/userProfileAggregated';
-import User, { AccountAction } from '../entities/user/User.FIX';
+import User, { AccountAction, SubscriptionMetaData } from '../entities/user/User.FIX';
 import IBaseRepo from './IBaseRepo';
 import LoadUsersForPublicDBQuery from '../../application/queries/user/loadUsersForPublicDB.query';
 import UserProfileAggregated from '../entities/user/userProfileAggregated';
@@ -55,6 +55,7 @@ export default interface IUserRepository extends IBaseRepo<User> {
     limit: number,
     search: string
   ): Promise<ConnectionWithSenderDetails[] | null>;
+  updateUserSubscriptionData(userId: string, data: SubscriptionMetaData): Promise<User | null>;
   // getActiveUsersWithGrowth(): Promise<{
   //   users: number;
   //   growth: { thisMonth: number; lastMonth: number };

@@ -1,5 +1,6 @@
 export const AdminEndPoints = {
     ADMIN_LOGIN: '/admin/v1/login',
+    ADMIN_LOGOUT: '/admin/logout',
     LOAD_USERS: '/admin/v1/users',
     LOAD_USER_DETAILS: (userId: string) => `/admin/v1/users/details/${userId}`,
     BLOCK_USER: (userId: string) => `/admin/v1/user/block/${userId}`,
@@ -18,6 +19,8 @@ export const AdminEndPoints = {
     ADMIN_REVOKE_RECRUITER_VERIFICATION: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}/verification/action`,
     ADMIN_REVOKE_RECRUITER_PERMISSIONS: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}/permissions/update`,
     ADMIN_DELETE_RECRUITER: (recruiterId: string) => `/admin/v1/recruiter/${recruiterId}`,
+
+    ADMIN_DELETE_COMPANY: (companyId: string) => `/admin/recruiter/close/${companyId}`,
 
     //Configs - Work Mode
     ADMIN_ADD_WORKMODE: `/admin/v1/workmode`,

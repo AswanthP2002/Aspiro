@@ -23,7 +23,7 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
     const navigateTo = useNavigate()
     const [isJobSave, setIsJobSaved] = useState<boolean>(false)
     const [isJobApplied, setIsJobApplied] = useState(false)
-
+    console.log(isJobApplied)
     const logedUser = useSelector((state : RootUser) => {
         return state.userAuth
     })

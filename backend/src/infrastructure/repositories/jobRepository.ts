@@ -651,4 +651,9 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
       growth: { thisMonth, lastMonth },
     };
   }
+
+  // async getRecruiterJobsByRecruiterIdTemp(recruiterId: string): Promise<Job[] | null> {
+  //   const result = await JobDAO.find({ recruiterId: new mongoose.Types.ObjectId(recruiterId) });
+  //   return result;
+  // }
 }

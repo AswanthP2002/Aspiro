@@ -16,10 +16,12 @@ export default class AdminGetPlansUsecase implements IAdminGetPlansUsecase {
     dto: AdminGetPlanRequestDTO
   ): Promise<{ plans: PlanDTO[]; totalPages: number } | null> {
     const { page, limit } = dto;
-    const result = await this._repo.findPlans(page, limit);
+    const result = await this._repo.findPlansWithActiveUsers(page, limit);
     if (result) {
       const dto: PlanDTO[] = [];
-      result.plans.forEach((data: Plan) => dto.push(this._mapper.planEntityToPlanDTO(data)));
+      result.plans.forEach((data: Plan) =>
+        dto.push(this._mapper.planWithActiveUsersCountToDtO(data))
+      );
 
       return { plans: dto, totalPages: result.totalPages };
     }

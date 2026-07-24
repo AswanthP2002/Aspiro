@@ -1,6 +1,6 @@
 
 import { Route, Routes, useLocation } from 'react-router-dom';
-import {ToastContainer, Bounce, toast} from 'react-toastify'
+import {ToastContainer, Bounce} from 'react-toastify'
 import './App.css';
 import Home from './pages/common/Home/Home';
 import Layouts from './pages/common/Layouts';
@@ -40,7 +40,7 @@ import UserPublicProfile from './pages/candidate/Candidate-List-Details/Candidat
 import PostProvider from './context/PostContext';
 import RecruiterApplications from './pages/admin/Recruiter-applications/RecruiterApplications';
 import RecruiterApplicationDetailsPage from './pages/admin/Recruiter-applications/RecruiterApplicationDetailsPage';
-import { useEffect, useState } from 'react';
+import { useEffect} from 'react';
 import JObDetailsCandidateSide from './pages/candidate/Job-list-details/JobDetails';
 import JobApplyPage from './pages/candidate/Job-apply/Apply';
 import MyApplications from './pages/user/My-applications/Applications';
@@ -52,7 +52,7 @@ import UsersFindingPage from './pages/user/Users/Users';
 import { AnimatePresence } from 'motion/react';
 import AlertsPage from './pages/user/Alerts/Alerts';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alerts, Chat, Notification } from './types/entityTypes';
+import { Chat, Notification } from './types/entityTypes';
 import { disconnectSocket, initializeSocket } from './socket';
 import { addLiveNotification, deleteNotificationFromStore, notificationThunk } from './redux/notificationSlice';
 import { UserRoutes } from './constants/routs/user.routes';
@@ -96,19 +96,21 @@ import BillingsProtectedRoute from './components/route-components/Billings.prote
 import RecruiterRegisterPage from './pages/candidate/RecruiterRegister';
 import UserSubscriptionManage from './pages/admin/Analytics/User.subscription.manage';
 import PricingPageProtectedRoute from './components/route-components/PricingPage.protected.route';
+import PageLoader from './components/common/PageLoader';
+import SubscriptionProtectedRoute from './components/route-components/Subscription.protected.route';
 
-interface FetchAlertsPayloadResponse {
-  success: boolean
-  message: string
-  result: Alerts[]
-}
+// interface FetchAlertsPayloadResponse {
+//   success: boolean
+//   message: string
+//   result: Alerts[]
+// }
 
-interface FetchNotificationsResponsePayload {
-  success: boolean
-  message: string
-  notifications: Notification[]
-  unRead: number
-}
+// interface FetchNotificationsResponsePayload {
+//   success: boolean
+//   message: string
+//   notifications: Notification[]
+//   unRead: number
+// }
 
 interface RootState {
   userAuth: {
@@ -125,7 +127,8 @@ interface RootState {
 }
 
 function App() {
-  const [showPlansModal, setShowPlansModal] = useState(false)
+  //To dynamically show pricing page - commented for testing purpose
+  // const [showPlansModal, setShowPlansModal] = useState(false)
   const logedUser = useSelector((state: RootState) => {
     return state.userAuth.user
   })
@@ -245,7 +248,8 @@ function App() {
           } />
 
           <Route element={<UserProtectedRoute />}>
-            
+          {/* Added subscription protected route, for subscribtion intimation */}
+            <Route element={<SubscriptionProtectedRoute />}> 
             <Route element={<CommonLayout />}>
               <Route path={UserRoutes.SOCIAL_FEED} element={<Feed />} />
               <Route path={UserRoutes.JOBS} element={<JobListing />} />
@@ -257,6 +261,7 @@ function App() {
               <Route path={UserRoutes.NOTIFICATIONS} element={<NotificationPage />} />
               <Route path={UserRoutes.USER_DETAILS} element={<UserPublicProfile />} />
               <Route path={UserRoutes.CHATS} element={<ChatPage />} />
+            </Route>
             </Route>
           </Route>
 
@@ -351,7 +356,7 @@ function App() {
         <Route path='/payment-success' element={<PaymentSuccessPage />} />
         <Route path='/payment-failed' element={<PaymentFailedPage />} />
 
-        <Route path='/test' element={<ApplicationTrack />} />
+        <Route path='/test' element={<PageLoader />} />
         <Route path='/temp/pricing' element={<PricingPageProtectedRoute />}>
           <Route index element={<PricingPage />} />
         </Route>

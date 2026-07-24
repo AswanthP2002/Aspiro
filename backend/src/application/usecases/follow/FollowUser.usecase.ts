@@ -18,7 +18,7 @@ export default class FollowUseruseCse implements IFollowUserUseCase {
   ) {}
 
   async execute(followUserDto: FollowUserDTO): Promise<FollowUserResDTO | null> {
-    const { follower, following, acted_by, acted_user_avatar } = followUserDto;
+    const { follower, following } = followUserDto;
     console.info('-- checking follower and following before saving --', followUserDto);
     if (follower === following) {
       throw new Error('Duplicate : You cant follow yourself');

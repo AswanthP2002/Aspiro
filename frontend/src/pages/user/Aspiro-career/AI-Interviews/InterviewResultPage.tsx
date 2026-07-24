@@ -22,30 +22,6 @@ export default function InterviewCompletePage(){
 
     console.log('Checking result from the interview ', result)
     
-
-    // const [questionFeedback, setQuestionFeedback] = useState<{q: String, f: string, s: number}[]>([
-    //     {
-    //         q: 'Tell me about yourself',
-    //         f: 'Strong self awareness and presentation skills',
-    //         s: 80
-    //     },
-    //     {
-    //         q: 'Why did you leaved your previous job',
-    //         f: 'Lack of clarity and phillar words',
-    //         s: 60
-    //     },
-    //     {
-    //         q: 'Tell me about your strength and weekness',
-    //         f: 'Strong self awareness and presentation skills',
-    //         s: 90
-    //     },
-    //     {
-    //         q: 'How do you manage time?',
-    //         f: 'Lack of clarity and phillar words',
-    //         s: 60
-    //     }
-    // ])
-    
     useEffect(() => {
         if(result) {
             setResultData(result?.result)

@@ -8,6 +8,7 @@ import {
 } from '../../DTOs/connection/connectionRequest.dto';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
 import IRealTimeEventEmitter from '../../interfaces/services/IRealTimeEventEmitter';
+import ISubscriptionRepo from '../../../domain/interfaces/plan/ISubscriptionRepo';
 
 @injectable()
 export class SendConnectionRequestUsecase implements ISendConnectionRequestUsecase {
@@ -16,7 +17,8 @@ export class SendConnectionRequestUsecase implements ISendConnectionRequestUseca
   constructor(
     @inject('IConnectionRequestRepository') private _repo: IConnectionRequestRepository,
     @inject('INotificationRepository') private _notificationRepo: INotificationRepo,
-    @inject('IRealTimeEventEmitter') private _realTimeEventEmitter: IRealTimeEventEmitter
+    @inject('IRealTimeEventEmitter') private _realTimeEventEmitter: IRealTimeEventEmitter,
+    @inject('ISubscriptionRepository') private subscriptionRepo: ISubscriptionRepo
   ) {
     this._mapper = new ConnectionRequestMapper();
   }
@@ -34,9 +36,21 @@ export class SendConnectionRequestUsecase implements ISendConnectionRequestUseca
       status: 'PENDING',
     });
 
+    const userSubscriptionData = await this.subscriptionRepo.getUserSubscriptionDetails(sender);
+    if (userSubscriptionData && userSubscriptionData.features) {
+      const existingCount = userSubscriptionData?.features['connectionRequests'];
+      if (parseInt(existingCount.toString()) > 0) {
+        const reminingCount = parseInt(existingCount.toString()) - 1;
+        await this.subscriptionRepo.updateFeaturesConnectionRequestCountByUserId(
+          sender,
+          reminingCount.toString()
+        );
+      }
+    }
+
     if (newConnectionRequest) {
       //notificaton
-      const notify = await this._notificationRepo.create({
+      await this._notificationRepo.create({
         category: 'CONNECTION_REQUEST',
         actorId: sender,
         recepientId: receiver,

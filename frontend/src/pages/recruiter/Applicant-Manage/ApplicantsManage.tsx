@@ -28,14 +28,15 @@ export default function ApplicantManagePage(){
     // const [selectedCards, setSelectedCards] = useState<any[]>([])
     const [selectedApplication, setSelectedApplication] = useState<string | null>(null)
     const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
-    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer'>('all')
+    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer' | string>('all')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(5)
+    // const [limit, setLimit] = useState(5)
     // const [selectionMode, setSelectionMode] = useState(false)
-    const [loading, setLoading] = useState(false);
-    const [jobDetails, setJobDetails] = useState<any>(null);
+    // const [loading, setLoading] = useState(false);
+    // const [jobDetails, setJobDetails] = useState<any>(null);
+    console.log(setPage, setTotalPages)
     const params = useParams()
     const jobId = params.jobId || location.state.jobId || {}
     const [isAllowedToManageApplications, setIsAllowedToManageApplications] = useState<boolean>(true)
@@ -67,15 +68,15 @@ export default function ApplicantManagePage(){
         body: string
     }
     // const [emailAttachment, setEmailAttachment] = useState(null)
-    const [emailModalOpen, setEmailModalOpen] = useState(false)
-    const {
-        control: EmailContentsControl,
-        formState:{errors: EmailContentsErrors},
-        handleSubmit: handleEmailContentsSubmit,
-        watch: EmailWatch
-    } = useForm<EmailContents>({
-        defaultValues:{to: '', body: ''}
-    })
+    // const [emailModalOpen, setEmailModalOpen] = useState(false)
+    // const {
+    //     control: EmailContentsControl,
+    //     formState:{errors: EmailContentsErrors},
+    //     handleSubmit: handleEmailContentsSubmit,
+    //     watch: EmailWatch
+    // } = useForm<EmailContents>({
+    //     defaultValues:{to: '', body: ''}
+    // })
 
 // const interviewTypes = [
 //   "Technical",
@@ -84,22 +85,22 @@ export default function ApplicantManagePage(){
 //   "General"
 // ];
 
-    const {
-    control,
-    handleSubmit,
-    reset,
-    formState:{errors}
-  } = useForm<InterviewFormData>({
-    defaultValues: {
-      date: null,
-      time: null,
-      interviewType: "",
-      gmeetUrl: "",
-      interviewerName: "",
-      note: "",
-      sendEmail: false
-    }
-  });
+//     const {
+//     control,
+//     handleSubmit,
+//     reset,
+//     formState:{errors}
+//   } = useForm<InterviewFormData>({
+//     defaultValues: {
+//       date: null,
+//       time: null,
+//       interviewType: "",
+//       gmeetUrl: "",
+//       interviewerName: "",
+//       note: "",
+//       sendEmail: false
+//     }
+//   });
 
   
 
@@ -213,7 +214,7 @@ export default function ApplicantManagePage(){
     //     return filteredApplications
     // }
 
-    const [job, setJob] = useState<string>('')
+    // const [job, setJob] = useState<string>('')
     const [applications, setApplications] = useState<JobApplicationsListForRecruiter[]>([])
     
     // const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
@@ -224,7 +225,7 @@ export default function ApplicantManagePage(){
     const [hired, setHired] = useState(0)
     const [rejected, setRejected] = useState(0)
 
-    const [selectedCandidateForManaging, setSelectedCandidateForManaging] = useState<ApplicationsAggregated | null | undefined>(null)
+    // const [selectedCandidateForManaging, setSelectedCandidateForManaging] = useState<ApplicationsAggregated | null | undefined>(null)
 
     // const [shortList, setShortList] = useState<any[]>([])
     // const [apppCount, setAppCount] = useState(0)
@@ -239,7 +240,7 @@ export default function ApplicantManagePage(){
         setSearch(value)
     }
 
-    const updateNoteStateLocally = (e: any) => {
+    const updateNoteStateLocally = (e: React.ChangeEvent<HTMLInputElement>) => {
         //toast.info(e.target.value)
         setNotes(e.target.value)
         //console.log('--testing data--', e.target.value)
@@ -259,193 +260,6 @@ export default function ApplicantManagePage(){
     const updateCandidateNote = debounced(updateNoteStateLocally, 2000)
     const dSearch = debounced(searchApplicant, 500)
 
-    // const selectOneFromApplied = (id: string) => {
-    //     const candidate = applied.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromScreening = (id: string) => {
-    //     const candidate = screening.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromInterview = (id: string) => {
-    //     const candidate = interview.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromOffer = (id: string) => {
-    //     const candidate = offer.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromHired = (id: string) => {
-    //     const candidate = hired.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromRejected = (id: string) => {
-    //     const candidate = rejected.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const updateStatus = async (e: any) => {
-    //     const existingStatus = selectedCandidateForManaging?.status
-    //     const status = e.target.value
-    //     Notify.info(`Checking new Status ${status}`, {timeout:2000})
-    //     try {
-    //         const result = await updateJobApplicationStatus(
-    //             selectedCandidateForManaging?._id as string, status,
-    //             selectedCandidateForManaging?.applicant.name as string, selectedCandidateForManaging?.applicant.email as string,
-    //             job
-    //         )
-    //         Notify.success(result?.message, {timeout:2000})
-    //         setSelectedCandidateForManaging((prv: ApplicationsAggregated | null | undefined) => {
-    //             if(!prv) return null
-
-    //             return {
-    //                 ...prv,
-    //                 status:status
-    //             }
-    //         })
-
-    //         //update status based arrays to add selected application  status based array
-    //         // switch(status){
-    //         //     case 'applied' :
-    //         //         setApplied((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, selectedCandidateForManaging as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'screening' :
-    //         //         setScreening((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'interview' :
-    //         //         setInterview((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'offer' :
-    //         //         setOffer((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'hired' :
-    //         //         setHired((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'rejected' :
-    //         //         setRejected((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     default :
-    //         //         return
-                
-    //         // }
-
-    //         //update current status based arrays to removed selected application from current status based array
-    //         // switch(existingStatus){
-    //         //     case 'applied':
-    //         //         setApplied((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'screening':
-    //         //         setScreening((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'interview':
-    //         //         setInterview((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'offer':
-    //         //         setOffer((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'hired':
-    //         //         setHired((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'rejected':
-    //         //         setRejected((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         // }
-    //     } catch (error: unknown) {
-    //         Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:3000})
-    //     }
-    // }
-
-    // async function finalizeShortlistMethod(){
-    //     const shortlistedIds = shortList.map((app) => {
-    //         return app._id
-    //     })
-
-    //     const result = await finalizeShortList(jobId, shortlistedIds)
-    //     if(result?.success){
-    //         Swal.fire({
-    //             icon:'success',
-    //             title:'Finalized',
-    //             text:'You will redirected to the details page',
-    //             showConfirmButton:false,
-    //             showCancelButton:false,
-    //             timer:2400
-    //         }).then(() => {
-    //             navigator('finalized', {state:{jobId}})
-    //         })
-    //     }else{
-    //         Swal.fire({
-    //             icon:'error',
-    //             title:'Oops',
-    //             text:result?.message
-    //         })
-    //     }
-    // }
-
     
     const onApplicationStatusUpdate = (applicationId: string, status: string) => {
         setApplications((prv: JobApplicationsListForRecruiter[]) => {
@@ -462,10 +276,10 @@ export default function ApplicantManagePage(){
 
     useEffect(() => {
         (async () => {
-            setLoading(true);
+            // setLoading(true);
             try {
                 const [appResult] = await Promise.all([
-                    getApplicationDetails(jobId, search, page, limit, filter)
+                    getApplicationDetails(jobId, search, page, 5, filter)
                     //getJobDetails(jobId)
                 ]);
 
@@ -489,7 +303,7 @@ export default function ApplicantManagePage(){
                 }
 
                // if (jobResult?.success) {
-                    setJobDetails([]);
+                    // setJobDetails([]);
                // } else {
                //     Notify.failure(jobResult?.message || "Could not fetch job details.");
                 //}
@@ -497,11 +311,10 @@ export default function ApplicantManagePage(){
                 console.log('Checking error while fetching data --', error)
                 Notify.failure("An error occurred while fetching data.");
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         })()
     }, [search, page, filter])
-    //checking problem here..............
     
     useEffect(() => {
         if(selectedApplication){
@@ -609,7 +422,7 @@ export default function ApplicantManagePage(){
                     {isFilterMenuOpened && (
                         <div className="absolute border w-full border border-slate-200 rounded-md bg-white">
                             {Array.from(['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected']).map((item, index) => (
-                                <button onClick={() => {setFilter(item); setIsFilterMenuOpened(false)}} className="w-full text-xs font-medium p-2 hover:bg-gray-100">{item}</button>
+                                <button key={index} onClick={() => {setFilter(item); setIsFilterMenuOpened(false)}} className="w-full text-xs font-medium p-2 hover:bg-gray-100">{item}</button>
                             ))}
                         </div>
                     )}
@@ -648,7 +461,7 @@ export default function ApplicantManagePage(){
                                         </div>
                                         <span className="!mt-5 flex items-center gap-2 block">
                                             <LuCalendar size={13} color="gray" />
-                                            <p className="text-xs text-gray-500">Applied on {formattedDateMoment(application.createdAt, "MMM DD YYYY")}</p>
+                                            <p className="text-xs text-gray-500">Applied on {formattedDateMoment(application.createdAt as string, "MMM DD YYYY")}</p>
                                         </span>
                                     </div>
                                     <div>
@@ -679,7 +492,7 @@ export default function ApplicantManagePage(){
             </div>
         </div>
         {isControlBarMenuOpen && (
-            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e: any) => updateCandidateNote(e)} />
+            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e) => updateCandidateNote(e)} />
         )}
 
         {!isAllowedToManageApplications && (
@@ -709,7 +522,7 @@ export function StatusPhills({status}: {status: string}){
   }
 }
 
-export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e: any) => void}){
+export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e) => void}){
     
     type InterviewFormData = {
   date: Dayjs | null;
@@ -728,9 +541,11 @@ const interviewTypes = [
   "General"
 ];
 
+    const [isEmailModalOpen, setEmailModalOpen] = useState<boolean>(false)
+    console.log(isEmailModalOpen)
     const [isStatusMenuOpened, setIsStatusMenuOpened] = useState(false)
     const [applicationDetails, setApplicationDetails] = useState<SingleJobApplicationDetailsData | null>(null)
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
     const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState(false)
 
@@ -840,7 +655,7 @@ const interviewTypes = [
 
     useEffect(() => {
         async function fetchSingleApplicationDetails(){
-            setLoading(true)
+            // setLoading(true)
             try {
                 const result = await getSingleApplicationDetails(applicationId)
                 if(result.success){
@@ -851,7 +666,7 @@ const interviewTypes = [
             } catch (error) {
                 toast.error(error instanceof Error ? error.message : 'Something went wrong')
             } finally {
-                setLoading(false)
+                // setLoading(false)
             }
         }
 
@@ -898,32 +713,32 @@ const interviewTypes = [
                                             <button className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">{status}</button>
                                         ))} */}
                                         {applicationDetails.status === 'applied' && (
-                                            <button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'applied', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">applied</button>
+                                            <button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'applied', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">applied</button>
                                         )}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'screening', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">screening</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'screening', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">screening</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'interview', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">interview</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'interview', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">interview</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'offer', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">offer</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'offer', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">offer</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer' || 
                                             applicationDetails.status === 'hired'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'hired', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'hired', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer' || 
                                             applicationDetails.status === 'rejected'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'rejected', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'rejected', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
                                     </div>
                                 )}
                             </div>

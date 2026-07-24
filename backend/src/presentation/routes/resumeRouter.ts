@@ -45,14 +45,14 @@ function CreateResumeRouter() {
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     resumeController.analyzeResume.bind(resumeController)
-  )
+  );
 
   resumeRouter.post(
     ResumeApiRoutes.RESUMES.ANALYZE_RESUME_DETAILED,
     centralizedAuthentication,
     authorization(['user', 'recruiter']),
     resumeController.analyzeResumeDetailed.bind(resumeController)
-  )
+  );
 
   return resumeRouter;
 }

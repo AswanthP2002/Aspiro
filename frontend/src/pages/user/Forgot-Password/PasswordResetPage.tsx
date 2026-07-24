@@ -12,6 +12,7 @@ export default function PasswordResetPage(){
 
     //access token from the url
     const [searchParams, setSearchParams] = useSearchParams()
+    console.log(setSearchParams)
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
     const token = searchParams.get('token')
@@ -140,7 +141,6 @@ export default function PasswordResetPage(){
                                 : "Reset Password"
                             }
                         </button>
-                        {/* <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button> */}
                     </div>
                 </form>
                 

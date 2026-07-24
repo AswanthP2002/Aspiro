@@ -64,6 +64,7 @@ export default function EditExperienceForm({
   } = useForm<Inputs>();
 
   const [editableIsPresent, setEditableIsPresent] = useState(false);
+  console.log(setEditableIsPresent)
   const [loading, setLoading] = useState<boolean>(false)
 
 

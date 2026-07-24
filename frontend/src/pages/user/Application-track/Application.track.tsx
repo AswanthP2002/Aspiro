@@ -262,7 +262,7 @@ export default function ApplicationTrack(){
                                         <p className="text-xs font-medium">{interview.interviewType}</p>
                                         <span className="text-xs text-gray-800 flex items-center gap-2 mt-2">
                                             <LuCalendar color="gray" />
-                                            <p>{formattedDateMoment(interview.interviewDate, "MMM DD YYYY")}</p>
+                                            <p>{formattedDateMoment(interview.interviewDate as string, "MMM DD YYYY")}</p>
                                         </span>
                                         <span className="text-xs text-gray-800 flex items-center gap-2 mt-2">
                                             {/* <FaClock color="gray" /> */}
@@ -288,7 +288,7 @@ export default function ApplicationTrack(){
                             <Switch onChange={() => setIsMoreOptionsOpen(prv => !prv)} checked={isMoreOptionsOpen} />
                         </div>
                         {isMoreOptionsOpen && (
-                            <button onClick={() => deleteOneApplication(applicationTrackDetails?._id)} className="bg-red-500 mt-2 text-white text-xs font-medium p-2 w-full rounded-md hover:bg-red-600">Withdraw application ?</button>
+                            <button onClick={() => deleteOneApplication(applicationTrackDetails?._id as string)} className="bg-red-500 mt-2 text-white text-xs font-medium p-2 w-full rounded-md hover:bg-red-600">Withdraw application ?</button>
                         )}
                     </div>
                 </div>

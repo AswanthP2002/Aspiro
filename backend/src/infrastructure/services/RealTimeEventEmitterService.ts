@@ -66,7 +66,7 @@ export class RealTimeEventEmitterService implements IRealTimeEventEmitter {
 
   deleteChatForAll(chatingPersonId: string, deletedChatId: string, conversationId: string): void {
     const sockets = this._connectionManager.getSockets(chatingPersonId);
-    console.warn('-- checking if i got the socket for sending delete for all event --', sockets)
+    console.warn('-- checking if i got the socket for sending delete for all event --', sockets);
     sockets.forEach((socketId: string) => {
       console.log('--> going to emit to this' + `${socketId} -->`);
       this._io.to(socketId).emit('CHAT_DELETE_FOR_ALL', {

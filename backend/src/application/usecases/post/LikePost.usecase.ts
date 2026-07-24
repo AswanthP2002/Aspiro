@@ -6,7 +6,7 @@ import mapToPostDTOFromPost from '../../mappers/post/mapToPostDTOFromPost.mapper
 import IRealTimeEventEmitter from '../../interfaces/services/IRealTimeEventEmitter';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
 import LikePostDTO from '../../DTOs/post/likePost.dto';
-import Notification from '../../../domain/entities/notification/notification.entity';
+// import Notification from '../../../domain/entities/notification/notification.entity';
 
 @injectable()
 export default class LikePostUsecase implements ILikePostUsecase {
@@ -17,7 +17,7 @@ export default class LikePostUsecase implements ILikePostUsecase {
   ) {}
 
   async execute(dto: LikePostDTO): Promise<PostDTO | null> {
-    const { postId, acted_by, acted_user_avatar, actorId, ownerId } = dto;
+    const { postId, actorId } = dto;
     const result = await this._postRepo.likePost(postId, actorId);
 
     if (result) {

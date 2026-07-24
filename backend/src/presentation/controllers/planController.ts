@@ -20,6 +20,8 @@ import ISubscriptionPortalUsecase from '../../application/interfaces/usecases/su
 import IGetPaymentMethodsUsecase from '../../application/interfaces/usecases/subscription/IGetPaymentMethods.usecase';
 import ILoadUserSubscriptionDetailsUsecase from '../../application/interfaces/usecases/subscription/ILoadUserSubscriptionDetails.usecase';
 import ResponseHandler from '../../utilities/response.handler';
+import IUserCancelSubscriptionUsecase from '../../application/interfaces/usecases/subscription/ICancelSubscription.usecase';
+import IUpgradeSubscriptionUsecase from '../../application/interfaces/usecases/subscription/IUpgradeSubscription.usecase';
 // import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 
 @injectable()
@@ -46,7 +48,11 @@ export default class PlanController {
     @inject('ISubscriptionPortalUsecase') private _subscriptionPortal: ISubscriptionPortalUsecase,
     @inject('IGetPaymentMethodsUsecase') private _getPaymentMethods: IGetPaymentMethodsUsecase,
     @inject('ILoadUserSubscriptionDetailsUsecase')
-    private _loadUserSubscriptionDetails: ILoadUserSubscriptionDetailsUsecase
+    private _loadUserSubscriptionDetails: ILoadUserSubscriptionDetailsUsecase,
+    @inject('IUserCancelSubscriptionUsecase')
+    private _cancelSubscription: IUserCancelSubscriptionUsecase,
+    @inject('IUpgradeSubscriptionUsecase')
+    private _upgradeSubscriptionUsecase: IUpgradeSubscriptionUsecase
   ) {
     this._response = new ResponseHandler();
   }
@@ -210,7 +216,7 @@ export default class PlanController {
   async handleWebhook(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sig = req.headers['stripe-signature'] as string;
     const rawBody = req.body;
-
+    console.log('-- Webhook Event triggered from the controller --')
     try {
       await this._handleWebhook.execute(sig, rawBody);
       res.status(StatusCodes.OK).json({ received: true });
@@ -345,6 +351,33 @@ export default class PlanController {
     try {
       const result = await this._loadUserSubscriptionDetails.execute(userId);
       this._response.success(res, 'Loaded', StatusCodes.OK, result);
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async cancelSubscription(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    const { planId, subscriptionId } = req.params;
+
+    try {
+      const result = await this._cancelSubscription.execute({ userId, subscriptionId, planId });
+      this._response.success(res, 'Subscription Cancelled', StatusCodes.OK, result);
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async upgradeSubscription(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.user.id;
+    const { currentSubscriptionId, upgradingPlanId } = req.params;
+    try {
+      const result = await this._upgradeSubscriptionUsecase.execute({
+        userId,
+        currentSubscriptionId,
+        upgradingPlanId,
+      });
+      this._response.success(res, 'Subscription Upgraded', StatusCodes.OK, result);
     } catch (error: unknown) {
       next(error);
     }

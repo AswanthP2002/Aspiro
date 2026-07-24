@@ -1,64 +1,37 @@
 import { inject, injectable } from 'tsyringe';
 import { SubscribePaidPlanDTO } from '../../DTOs/subscription/subscribeFreePlan.dto';
-import ISubscriptionRepo from '../../../domain/interfaces/plan/ISubscriptionRepo';
 import IUserSubscribePaidPlanUsecase from '../../interfaces/usecases/subscription/IUser.subscribe.paidePlan.usecase';
 import { IPlanRepository } from '../../../domain/interfaces/plan/IPlanRepository';
-import stripe from '../../../infrastructure/services/stripe.service';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
+import IPaymentServices from '../../interfaces/services/IPayment.services';
 
 @injectable()
 export default class UserSubscribePaidPlanUsecase implements IUserSubscribePaidPlanUsecase {
   constructor(
-    @inject('ISubscriptionRepository') private _repo: ISubscriptionRepo,
     @inject('IPlanRepository') private _planRepo: IPlanRepository,
-    @inject('IUserRepository') private _userRepo: IUserRepository
+    @inject('IUserRepository') private _userRepo: IUserRepository,
+    @inject('StripePaymentGateway') private _paymentGateway: IPaymentServices
   ) {}
 
   async execute(dto: SubscribePaidPlanDTO): Promise<string> {
-    const { planId, userId, billingCycle } = dto;
+    const { planId, userId } = dto;
     const userDetails = await this._userRepo.findById(userId);
     const planDetails = await this._planRepo.findById(planId);
 
-    const isTrialing = planDetails?.isTrialPiriodGiven;
-    const isEligible = !userDetails?.isTrialUsed;
+    if (!planDetails?.monthlyPrice) {
+      throw new Error('No price provided ');
+    }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'upi'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'inr',
-            product_data: {
-              name: planDetails?.name || 'Subscription plan',
-              description: planDetails?.description || 'Access features',
-            },
-            unit_amount:
-              planDetails && billingCycle === 'monthly'
-                ? planDetails?.monthlyPrice * 100
-                : planDetails && billingCycle === 'annually'
-                  ? planDetails?.yearlyPrice * 100
-                  : 0,
-            // planDetails && planDetails?.monthlyPrice ? planDetails?.monthlyPrice * 100 : 0,
-            recurring: {
-              interval: billingCycle === 'monthly' ? 'month' : 'year',
-            },
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      subscription_data: {
-        trial_period_days: planDetails?.trialPeriod,
-      },
-      customer_email: userDetails?.email as string,
-      success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:5173/payment-failed`,
-      metadata: {
-        userId: userId,
-        planId: planId,
-      },
+    const sessionUrl = await this._paymentGateway.createSession({
+      priceId: planDetails.stripePriceId as string,
+      trialPeriod: planDetails?.trialPeriod || 0,
+      customeerEmail: userDetails?.email as string,
+      userId,
+      planId,
     });
 
-    return session.url as string; 
+    console.log('Session created in stripe -- Session URL', sessionUrl);
+
+    return sessionUrl;
   }
 }

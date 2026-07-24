@@ -336,7 +336,7 @@ export interface Notification {
   }
 }
 
-type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+// type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 
 export interface ConnectionDetails {
   _id?: string;
@@ -1168,6 +1168,7 @@ export interface PlanData {
   billingCycle: 'monthly' | 'yearly';
   features: string[];
   featuresListed: { [key: string]: string | number };
+  activeUsers?: number;
   isActive: boolean;
   createdAt?: string | Date;
   updatedAt?: string | Date;
@@ -1268,11 +1269,19 @@ export interface UserSubscriptionAndPlanDetailsData {
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isCancelAtPeriodEnds?: boolean;
+  trialPeriodStarts?: string;
+  trialPeriodEnds?: string;
+  planMetaData?: {
+    name: string;
+    price: number;
+  };
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
   features?: {[key: string]: string | number | boolean}
   planDetails: PlanData;
+
 }
 
 export interface InvoiceData {

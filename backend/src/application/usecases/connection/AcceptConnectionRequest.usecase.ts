@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IAcceptConnectionRequestUsecase from '../../interfaces/usecases/connection/IAcceptConnectionRequest.usecase';
 import IConnectionRequestRepository from '../../../domain/interfaces/IConnectionRequest.repo';
 import INotificationRepo from '../../../domain/interfaces/INotificationRepo';
-import IRealTimeEventEmitter from '../../interfaces/services/IRealTimeEventEmitter';
+// import IRealTimeEventEmitter from '../../interfaces/services/IRealTimeEventEmitter';
 import {
   // UpdateConnectionRequestDTO,
   ConnectionRequestDTO,
@@ -17,7 +17,7 @@ export default class AcceptConnectionRequestUsecase implements IAcceptConnection
   constructor(
     @inject('IConnectionRequestRepository') private _repo: IConnectionRequestRepository,
     @inject('INotificationRepository') private _notificationRepo: INotificationRepo,
-    @inject('IRealTimeEventEmitter') private _realTimeEventEmitter: IRealTimeEventEmitter,
+    // @inject('IRealTimeEventEmitter') private _realTimeEventEmitter: IRealTimeEventEmitter,
     @inject('IUserRepository') private _userRepo: IUserRepository
   ) {
     this._mapper = new ConnectionRequestMapper();
@@ -50,7 +50,7 @@ export default class AcceptConnectionRequestUsecase implements IAcceptConnection
       await this._userRepo.addToConnection(senderId as string, myId as string);
 
       //create notifification for the other user as accptance
-      const newNotification = await this._notificationRepo.create({
+      await this._notificationRepo.create({
         category: 'CONNECTION_ACCEPTED',
         actorId: myId, // since the user who recived the request is trigering accept
         message: `${myName} accepted your connection request`,

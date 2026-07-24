@@ -195,7 +195,7 @@ export default function JobListing() {
               {filter.options.map((option, i) => (
                 <button 
                   key={i} 
-                  onClick={() => {filter.set(option.name); filter.setOpen(false)}} 
+                  onClick={() => {filter.set(option.name as string); filter.setOpen(false)}} 
                   className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs text-gray-700"
                 >
                   {option.name}

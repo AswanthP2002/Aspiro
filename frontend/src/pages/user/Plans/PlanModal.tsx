@@ -182,7 +182,7 @@ const PricingPage = () => {
               >
                 {plan.trialPeriod > 0 && !logedUser.isTrialUsed
                   ? <>
-                    Try {plan.trialPeriod} days trial <span className="text-lg">→</span>
+                    Try {plan.trialPeriod} days free trial <span className="text-lg">→</span>
                     </>
                   : <>
                     Get started <span className="text-lg">→</span>

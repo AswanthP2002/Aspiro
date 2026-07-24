@@ -1,6 +1,6 @@
 export default interface IAnalyzeResumeUsecase {
   execute(
-    resumeData: any,
+    resumeData: string | Buffer<ArrayBuffer> | Buffer,
     targetedRole: string
   ): Promise<{
     score: number;

@@ -111,19 +111,19 @@ export default class GetJobApplicationsUseCase implements IGetJobApplicationsUse
     //candidate side
     const skills = application.skills;
     const experiences = application.experiences;
-    const educations = application.educations;
-    const candidateHeadline = application.applicant.headline;
-    const candidateDescription = application.applicant.summary;
+    // const educations = application.educations;
+    // const candidateHeadline = application.applicant.headline;
+    // const candidateDescription = application.applicant.summary;
     //resume matching also should done for more accuracy
 
     //job side
     const jobRequiredSkills = application.job.requiredSkills;
     const jobOptionalSkills = application.job.optionalSkills;
-    const jobDetails = [
-      ...application.job.description.split(' '),
-      ...application.job.requirements.split(' '),
-      ...application.job.responsibilities.split(' '),
-    ];
+    // const jobDetails = [
+    //   ...application.job.description.split(' '),
+    //   ...application.job.requirements.split(' '),
+    //   ...application.job.responsibilities.split(' '),
+    // ];
 
     const skillMatchingScore = this.skillMatchingScore(
       skills.map((s) => s.skill),
@@ -136,10 +136,10 @@ export default class GetJobApplicationsUseCase implements IGetJobApplicationsUse
       application.job.experienceInYears
     );
 
-    const educationMatchingScore = this.educationMatchingScore(
-      educations,
-      application.job.qualification
-    );
+    // const educationMatchingScore = this.educationMatchingScore(
+    //   educations,
+    //   application.job.qualification
+    // );
     console.log('Skill match score -- ', skillMatchingScore);
     console.log('Experience match score -- ', experienceMatchingScre);
     const totalMatchScore = ((skillMatchingScore + experienceMatchingScre) * 100) / 200;

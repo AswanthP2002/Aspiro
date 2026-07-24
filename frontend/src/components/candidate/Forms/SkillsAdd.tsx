@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { addUserSkill } from "../../../services/skillService";

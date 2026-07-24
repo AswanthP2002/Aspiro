@@ -19,12 +19,13 @@ type AlertFetchingResponsePayload = {
 export default function AlertsPage() {
   const [isNotificationMenuOpen, setIsNotificationMenuOpen] = useState<boolean>(false);
   const [alertsData, setAlertsData] = useState<AlertsData[]>([])
-  const [loading, setLoading] = useState(false)
+  // const [loading, setLoading] = useState(false)
   // const [hasMore, setHasMore] = useState(true)
   const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'RESOLVED'>('ALL')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(4)
   const toggleNotificationMenu = () => setIsNotificationMenuOpen((prv) => !prv);
+  console.log(setStatus, setPage, setLimit)
 
   const dipsatch = useDispatch()
 
@@ -37,7 +38,7 @@ export default function AlertsPage() {
 
   useEffect(() => {
     async function fetchAlerts(){
-      setLoading(true)
+      // setLoading(true)
       try {
         const result: AlertFetchingResponsePayload = await fetchUserAlerts(status, page, limit)
         if(result?.success){
@@ -51,7 +52,7 @@ export default function AlertsPage() {
       } catch (error: unknown) {
         toast.error(error instanceof Error ? error.message : 'Something went wrong')
       } finally {
-        setLoading(false)
+        // setLoading(false)
       }
     }
     fetchAlerts()
@@ -153,7 +154,7 @@ function AlertsCard({ alert }: { alert: Alerts }) {
               </div>
               <div className="mt-5">
                 <p className="flex items-center text-xs text-gray-500 gap-2">
-                  <BsClock size={10} color="gray" /> {formatRelativeTime(alert.createdAt)}
+                  <BsClock size={10} color="gray" /> {formatRelativeTime(alert.createdAt as string)}
                 </p>
               </div>
             </div>

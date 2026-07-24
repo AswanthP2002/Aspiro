@@ -67,7 +67,7 @@ export const adminEditPlan = async (planId: string, data: {[key: string]: string
 export const adminTogglePlanListing = async (planId: string, status: 'LIST' | 'UNLIST') => {
     try {
         const response = await axiosInstance.patch(PlanApiEndpoints.ADMIN.TOGGLE_PLAN_LISTING_STATUS(planId),
-            null,
+            {},
             {
                 params: {status},
                 sendAuthToken: true
@@ -98,7 +98,7 @@ export const getPlansForUsers = async () => {
 
 export const subscribeFreePlan = async (planId: string) => {
     try {
-        const response = await axiosInstance.post(PlanApiEndpoints.USER.SUBSCRIBE_FREE_PLAN(planId), null,
+        const response = await axiosInstance.post(PlanApiEndpoints.USER.SUBSCRIBE_FREE_PLAN(planId), {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -115,9 +115,6 @@ export const subscribePaidPlan = async (planId: string, billingCycle: string) =>
     try {
         const response = await axiosInstance.post(PlanApiEndpoints.USER.SUBSCRIBE_PAID_PLAN(planId), {billingCycle},
             {
-                headers:{
-                    'Content-Type': 'application/json'
-                },
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -172,6 +169,19 @@ export const loadMySubscriptionDetails = async () => {
     } catch (error) {
         const err = error as AxiosError
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const cancelSubscription = async (planId: string, subscriptionId: string) => {
+    try {
+        const response = await axiosInstance.patch(PlanApiEndpoints.USER.CANCEL_SUBSCRIPTION(planId, subscriptionId), {}, {
+            sendAuthToken: true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }
 
@@ -238,3 +248,32 @@ export const getPaymentMethods = async () => {
     }
 }
 
+export const upgradeSubscription = async (currentSubscriptionId: string, upgradingPlanId: string) => {
+    try {
+        const response = await axiosInstance.patch(PlanApiEndpoints.USER.UPGRADE_SUBSCRIPTION(currentSubscriptionId, upgradingPlanId), {}, {
+            sendAuthToken: true
+        } as AxiosRequest)
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+    }
+}
+
+
+// export const cancelSubscription = async (planId: string, subscriptionId: string) => {
+//     try {
+//         const response = await axiosInstance.patch(PlanApiEndpoints.USER.CANCEL_SUBSCRIPTION(planId, subscriptionId),
+//         {},
+//         {
+//             sendAuthToken: true
+//         } as AxiosRequest
+//     )
+
+//     return response.data
+//     } catch (error: unknown) {
+//         const err = error as AxiosError
+//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
+//     }
+// }

@@ -7,7 +7,6 @@ export const addUserEducation = async (educationLevel : string, educationStream 
         const response = await axiosInstance.post(EducationEndpoints.ADD_EDUCATION,
             {educationLevel, educationStream, institution, isPresent, startYear, endYear, location},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -42,7 +41,6 @@ export const editUserEducation = async (educationId : string, educationLevel : s
         const response = await axiosInstance.put(EducationEndpoints.UPDATE_EDUCATION_BY_EDUCATIONID(educationId),
             {educationLevel, educationStream, institution, isPresent, startYear:startYear, endYear, location},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )

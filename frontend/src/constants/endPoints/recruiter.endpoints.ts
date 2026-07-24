@@ -30,4 +30,5 @@ export const RecruiterEndPoints = {
     MANAGE_RECRUITER_PERMISSIONS: (id: string) => `/v2/recruiter/${id}/permissions`,
     CHECK_MANAGE_APPLICATIONS_VERIFICATIONS_STATUS:
       '/v2/recruiter/manage-applications/verification-status',
+    REJECT_CANDIDATE_APPLICATION: (applicationId: string) => `/recruiter/reject/application/${applicationId}`,
 } as const

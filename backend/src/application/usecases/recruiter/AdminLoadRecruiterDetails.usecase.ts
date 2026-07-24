@@ -22,5 +22,3 @@ export default class AdminLoadRecruiterDetailsUsecase implements IAdminLoadRecru
     return null;
   }
 }
-
-

@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { Notify } from 'notiflix';
 import { BiBookmark } from 'react-icons/bi';
 import { FiEyeOff } from 'react-icons/fi';
-import { GoReport } from 'react-icons/go';
+// import { GoReport } from 'react-icons/go';
 import { togglePostSave } from '../../services/userServices';
 import Swal from 'sweetalert2';
 import { RiBookMarkedFill } from 'react-icons/ri';
@@ -38,13 +38,13 @@ export default function Post({ postData }: { postData: UserPosts }) {
         showDescription,
         unlikePost,
         likePost,
-        setComment,
+        // setComment,
         deleteCommentOnPost,
         addCommentOnPost,
         likeACommentOnAPost,
         unlikeACommentOnAPost,
         deleteMyPost,
-        transoformCloudinaryUrl,
+        // transoformCloudinaryUrl,
         hideAPost
     } = useContext(PostContext)
 
@@ -57,6 +57,7 @@ export default function Post({ postData }: { postData: UserPosts }) {
     const [replyTo, setReplyTo] = useState<{commentId: string, name: string} | null>(null)
     const [postIsSaved, setPostIsSaved] = useState(false)
 
+    console.log(commentLiked)
     const togglePostOptionMenuVisibility = () => setIsPostOptionMenuOPened(prv => !prv)
     const toggleCommentBoxOpen = () => setIsCommentBoxOpen(prv => !prv)
 

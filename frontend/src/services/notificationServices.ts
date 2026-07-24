@@ -41,7 +41,7 @@ export const getNotifications = async (page: number, limit: number, type: string
 
 export const changeNotificationStatus = async (notificationId: string) => {
     try {
-        const response = await axiosInstance.patch(NotificationEndpoints.CHANGE_NOTIFICATION_STATUS_BY_NOTIFICATION_ID(notificationId), null,
+        const response = await axiosInstance.patch(NotificationEndpoints.CHANGE_NOTIFICATION_STATUS_BY_NOTIFICATION_ID(notificationId), {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -57,7 +57,7 @@ export const changeNotificationStatus = async (notificationId: string) => {
 
 export const markAllNotificationRead = async () => {
     try {
-        const response = await axiosInstance.put(NotificationEndpoints.MARK_ALL_NOTIFICATION_READ, null,
+        const response = await axiosInstance.put(NotificationEndpoints.MARK_ALL_NOTIFICATION_READ, {},
             {
                 sendAuthToken: true
             } as AxiosRequest

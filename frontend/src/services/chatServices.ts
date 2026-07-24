@@ -51,7 +51,7 @@ export const deleteChat = async (chatId: string, conversationId: string, chattin
 
 export const deleteChatForMe = async (chatId: string) => {
     try {
-        const response = await axiosInstance.patch(ChatEndpoints.DELETE_CHAT_FOR_ME(chatId), null,
+        const response = await axiosInstance.patch(ChatEndpoints.DELETE_CHAT_FOR_ME(chatId), {},
             {   
                 sendAuthToken: true
             } as AxiosRequest

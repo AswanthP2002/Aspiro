@@ -1,4 +1,4 @@
-import Recruiter, { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
+import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import { ObjectId } from 'mongodb';
 import BaseRepository from '../baseRepository';

@@ -17,6 +17,7 @@ export default class ResendOTPUseCase implements IResendOTPUseCase {
 
   async execute(resendOtpDto: ResendOtpDto): Promise<UserDTO | null> {
     const { email, id } = resendOtpDto;
+    console.log(id);
     //find user
     const user = await this._userRepo.findByEmail(email);
 

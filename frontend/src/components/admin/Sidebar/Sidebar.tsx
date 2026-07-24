@@ -10,7 +10,7 @@ import { appContext } from '../../../context/AppContext';
 import { logoutAdmin } from '../../../services/adminServices';
 import { Notify } from 'notiflix';
 import { BiBriefcase, BiGridAlt, BiWallet } from 'react-icons/bi';
-import { BsDatabaseGear, BsEye } from 'react-icons/bs';
+import { BsDatabaseGear } from 'react-icons/bs';
 import {GiReceiveMoney} from 'react-icons/gi'
 
 const checkPresentPath = (path: string) => {
@@ -125,53 +125,15 @@ export default function Sidebar(){
                   <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/overview') ? "bg-blue-100" : "bg-white"}`}>
                     <Link to={'analytics/overview'}>Overview</Link>
                   </li>
-                  <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/failed-payments') ? "bg-blue-100" : "bg-white"}`}>
+                  {/* <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/failed-payments') ? "bg-blue-100" : "bg-white"}`}>
                     <Link to={'analytics/failed-payments'}>Failed Payments</Link>
                   </li>
                   <li className={`text-sm text-blue-700 hover:bg-blue-100 ps-2 py-1 ${checkPresentPath('analytics/refunds') ? "bg-blue-100" : "bg-white"}`}>
                     <Link to={'analytics/refunds'}>Refunds</Link>
-                  </li>
+                  </li> */}
                 </ul>
               )}
             </div>
-            {/* <li className={`group ${checkPresentPath('applications') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md cursor-not-allowed`}>
-              <Link to="/admin/recruiter/applications" className='flex items-center gap-2'>
-              <LuUserSearch size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiter Applications</p>
-              </Link>
-            </li> */}
-            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/jobs" className='flex items-center gap-2'>
-                <FaBriefcase size={21} color='gray' className='group-hover:!text-orange-500' />
-                <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Job Posts</p>
-              </Link>
-            </li> */}
-            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/recruiters" className='flex items-center gap-2'>
-                <FaUserTie size={21} color='gray' className='group-hover:!text-orange-500' />
-                <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Recruiters</p>
-              </Link>
-            </li> */}
-            
-            {/* <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/users" className='flex items-center gap-2'>
-              <FaRegChartBar size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Analyitcs</p>
-              </Link>
-            </li>
-            <li className='group text-sm hover:bg-orange-100 !p-2 rounded-md'>
-              <Link to="/admin/users" className='flex items-center gap-2'>
-              <CiCreditCard1 size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Billings & Subscriptions</p>
-              </Link>
-            </li>
-            
-            <li className={`group ${checkPresentPath('skills-manage') ? 'bg-orange-100' : null} text-sm hover:bg-orange-100 !p-2 rounded-md`}>
-              <Link to="/admin/skills-manage" className='flex items-center gap-2'>
-              <FaTools size={21} color='gray' className='group-hover:!text-orange-400'/>
-              <p className='text-gray-700 group-hover:text-orange-400 group-hover:font-medium'>Skills</p>
-              </Link>
-            </li> */}
           </ul>
         </div>
         <div className='!p-5 border-t border-gray-300'>
@@ -182,23 +144,5 @@ export default function Sidebar(){
         </div>
       </div>
     </>
-    // <div className="w-64 bg-white p-6 shadow-md flex flex-col justify-between">
-    //   <div>
-    //     <h2 className="text-2xl font-bold mb-6">Aspiro</h2>
-    //     <nav className="space-y-3 mt-15">
-    //         <ul>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/dashboard"><i className="fa-solid fa-house group-hover:!text-orange-400 me-3"></i>Home</Link></li>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/jobs"><i className="fa-solid fa-briefcase group-hover:!text-orange-400 me-3"></i>Job Posts</Link></li>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/companies"><i className="fa-solid fa-building group-hover:!text-orange-400 me-3"></i>Recruiters</Link></li>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/users"><i className="fa-solid fa-users group-hover:!text-orange-400 me-3"></i>Users</Link></li>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/analytics"><i className="fa-solid fa-magnifying-glass-chart group-hover:!text-orange-400 me-3"></i>Analytics</Link></li>
-    //           <li className='mt-7 group hover:text-orange-400 text-sm'><Link to="/admin/courses"><i className="fa-solid fa-money-bill-trend-up group-hover:!text-orange-400 me-3"></i>Bills & Plans</Link></li>
-    //        </ul>
-    //     </nav>
-    //   </div>
-    //   {
-    //     token ? <button onClick={triggerAdminLogout} className="text-red-500 mt-6">Logout</button> : null
-    //   }
-    // </div>
   );
 };

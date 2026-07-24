@@ -1,4 +1,4 @@
-import User from '../user/User.FIX';
+// import User from '../user/User.FIX';
 
 export type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 

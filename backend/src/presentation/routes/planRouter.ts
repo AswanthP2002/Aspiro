@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { container } from 'tsyringe';
 import PlanController from '../controllers/planController';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
@@ -111,6 +111,20 @@ function CreatePlanRouter() {
     centralizedAuthentication,
     authorization(['user', 'admin']),
     planController.loadUserSubscriptionDetails.bind(planController)
+  );
+
+  planRouter.patch(
+    PlanApiRoutes.USER.CANCEL_SUBSCRIPTION,
+    centralizedAuthentication,
+    authorization(['user', 'admin']),
+    planController.cancelSubscription.bind(planController)
+  );
+
+  planRouter.patch(
+    PlanApiRoutes.USER.UPGRADE_SUBSCRIPTION,
+    centralizedAuthentication,
+    authorization(['user', 'admin']),
+    planController.upgradeSubscription.bind(planController)
   );
 
   return planRouter;

@@ -49,4 +49,5 @@ export default interface IJobRepo extends IBaseRepo<Job> {
     jobs: number;
     growth: { thisMonth: number; lastMonth: number };
   } | null>;
+  // getRecruiterJobsByRecruiterIdTemp(recruiterId: string): Promise<Job[] | null>;
 }

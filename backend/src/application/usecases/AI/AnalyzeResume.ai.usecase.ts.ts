@@ -7,7 +7,7 @@ export default class AnalyzeResumeUsecase implements IAnalyzeResumeUsecase {
   constructor(@inject('IAiServices') private _aiService: IAiServices) {}
 
   async execute(
-    resumeData: any,
+    resumeData: string | Buffer<ArrayBuffer> | Buffer,
     targetedRole: string
   ): Promise<{
     score: number;

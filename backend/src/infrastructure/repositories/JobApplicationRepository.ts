@@ -377,4 +377,46 @@ export default class JObApplicationRepository
 
     return result[0];
   }
+
+  // async getAppliedJobByCandidateId(
+  //   candidateId: string
+  // ): Promise<JobApplicationAggregated[] | null> {
+  //   const result = await JobApplicationDAO.aggregate([
+  //     {
+  //       $lookup: {
+  //         from: 'jobs',
+  //         localField: 'jobId',
+  //         foreignField: '_id',
+  //         as: 'jobDetails',
+  //       },
+  //     },
+  //     {
+  //       $unwind: {
+  //         path: '$jobDetails',
+  //         preserveNullAndEmptyArrays: true,
+  //       },
+  //     },
+  //   ]);
+
+  //   return result;
+  // }
+
+  // async getApplicationByJobIdTemp(id: string): Promise<JobApplicationAggregated | null> {
+  //   const result = await JobApplicationDAO.aggregate([
+  //     {
+  //       $match: {
+  //         jobId: new mongoose.Types.ObjectId(),
+  //       },
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: 'jobs',
+  //         localField: 'jobId',
+  //         foreignField: '_id',
+  //         as: 'jobDetails',
+  //       },
+  //     },
+  //     { $unwind: '$jobDetails' },
+  //   ]);
+  // }
 }

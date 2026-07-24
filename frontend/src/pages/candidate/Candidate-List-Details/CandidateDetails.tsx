@@ -43,10 +43,10 @@ interface CancelConnectionRequestResponsePayload {
 }
 
 export default function UserPublicProfile() {
-    const {userMetaData} = useContext(appContext)
+    // const {userMetaData} = useContext(appContext)
 
     const [userDetails, setUserDetails] = useState<UserPublicProfileData | undefined>()
-    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string}}}) => {
+    const logedUser = useSelector((state: {userAuth: {user: {_id: string, name: string, profilePicture: string}}}) => {
         return state?.userAuth?.user
     })
     const [followed, setFollowed] = useState<boolean>(false)
@@ -71,6 +71,7 @@ export default function UserPublicProfile() {
     const location = useLocation()
     const fallbackUserId = useParams<{userId: string}>().userId
     const {userId} = location.state || {}
+    console.log(userId)
     console.log('---checking data for testability---', location)
     //Notify.success(`get userid from the recruiter side page ${userId || fallbackUserId}`)
     
@@ -431,7 +432,7 @@ export default function UserPublicProfile() {
             </p>
           </div>
 
-          {userDetails?.socialLinks?.length > 0 && (
+          {userDetails?.socialLinks && userDetails?.socialLinks?.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Social Presence</h3>
               <div className="space-y-4">
@@ -450,7 +451,7 @@ export default function UserPublicProfile() {
             </div>
           )}
 
-          {userDetails?.skills.length > 0 && (
+          {userDetails?.skills && userDetails?.skills.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Skills</h3>
               <div className="flex flex-wrap gap-2">
@@ -467,7 +468,7 @@ export default function UserPublicProfile() {
         {/* Right Column: Experience, Education & Activity */}
         <div className="lg:col-span-2 space-y-6">
           {/* Experience Section */}
-          {userDetails?.experiences.length > 0 && (
+          {userDetails?.experiences && userDetails?.experiences.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <PiSuitcase size={22} className="text-gray-400" />
@@ -487,7 +488,7 @@ export default function UserPublicProfile() {
                       <p className="text-gray-600 font-medium text-sm">{exp.organization}</p>
                       <div className="flex flex-wrap gap-3 mt-2 text-[12px] text-gray-500 font-medium">
                         <span className="flex items-center gap-1"><IoLocation /> {exp.location}</span>
-                        <span className="flex items-center gap-1"><CiCalendar /> {formatDate(exp.startDate)} - {exp.isPresent ? 'Present' : formatDate(exp.endDate)}</span>
+                        <span className="flex items-center gap-1"><CiCalendar /> {formatDate(exp.startDate as string)} - {exp.isPresent ? 'Present' : formatDate(exp.endDate as string)}</span>
                       </div>
                       <div className="flex gap-2 mt-3">
                         <span className="text-[10px] uppercase font-bold tracking-widest bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md">{exp.workMode}</span>
@@ -504,7 +505,7 @@ export default function UserPublicProfile() {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Recent Activity</h3>
             <div className="space-y-4">
-              {userDetails?.posts.length > 0 ? (
+              {userDetails?.posts && userDetails?.posts.length > 0 ? (
                 userDetails.posts.map((post: any, i: number) => (
                   <Post key={i} postData={post} loading={false} />
                 ))

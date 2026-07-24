@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BiCheckCircle, BiCreditCard, BiDownload, BiXCircle } from 'react-icons/bi';
 import { FiAlertCircle } from 'react-icons/fi';
 import { InvoiceData, PaymentMethodsStripeData, PlanData, UserSubscriptionAndPlanDetailsData } from '../../../types/entityTypes';
-import { getPaymentMethods, getPlansForUsers, getUserInvoices, loadMySubscriptionDetails, manageSubscriptionPortal } from '../../../services/planServices';
+import { cancelSubscription, getPaymentMethods, getPlansForUsers, getUserInvoices, loadMySubscriptionDetails, manageSubscriptionPortal, upgradeSubscription } from '../../../services/planServices';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import { Modal } from '@mui/material';
@@ -10,12 +10,26 @@ import { CgClose } from 'react-icons/cg';
 import { LuCheck, LuCloudLightning, LuIndianRupee, LuRocket, LuStar } from 'react-icons/lu';
 import BouncingLoader from '../../../components/common/Bouncing.loader';
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 const SubscriptionPage = () => {
+
+  const navigateTo = useNavigate()
+
   const [subscriptionDetails, setSubscriptionDetails] = useState<UserSubscriptionAndPlanDetailsData | null>(null)
   const [invoices, setInvoices] = useState<InvoiceData[]>([])
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodsStripeData | null>(null)
   const [isPlansListingModalOpen, setIsPlansListingModalOpen] = useState(false)
+
+  const isTrialPeriodEnded = (trialPeriodEndsDate: string) => {
+    const endsDate = moment(new Date(trialPeriodEndsDate))
+    const today = moment(new Date())
+
+    const diff = endsDate.diff(today, "days")
+    return diff > 0 ? false : true
+  }
 
   const handleManagePayment = async () => {
     try {
@@ -26,6 +40,57 @@ const SubscriptionPage = () => {
     } catch (error) {
         console.log('error  ', error)
         toast.error(error instanceof Error ? error.message : 'Failed to open billing portal')
+    }
+  }
+
+  const cancelCurrentSubscription = async (planId: string, subscriptionId: string) => {
+    if(!planId || !subscriptionId) {
+      toast.error('Can not cancel plan right now')
+      return
+    }
+
+    const conirmresult = await Swal.fire({
+      icon: 'question',
+      title: 'Cancel Subscription?',
+      text: 'Are you sure to cancel the subscription?. You may loss access to all the features included in this plan',
+      showConfirmButton: true,
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    })
+
+    if(!conirmresult.isConfirmed) return
+
+    try {
+      const result = await cancelSubscription(planId, subscriptionId)
+      if(result.success){
+        if(result.result.isCancelAtPeriodEnds){
+          Swal.fire({
+            icon: 'info',
+            title: 'Cancelled',
+            text: 'Your subscription has been cancelled and wont charge you. You can enjoy the paid features until the period ends',
+            allowOutsideClick: false, 
+            allowEscapeKey: false
+          })
+        }else{
+          Swal.fire({
+            icon: 'info',
+            title: 'Cancelled',
+            text: 'Your subscription has been cancelled. Please Go with the free tier or subscribe to other paid plans',
+            showConfirmButton: true,
+            confirmButtonText: 'Go to plans',
+            showCancelButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          }).then(() => {
+            return navigateTo('/temp/pricing')
+          })
+        }
+      }
+    } catch (error: unknown) {
+      const err = error as AxiosError<{message: string}>
+      const msg = err.response?.data.message || err.message || 'Something went wrong'
+      toast.error(msg)
     }
   }
 
@@ -70,14 +135,14 @@ const SubscriptionPage = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="text-xl font-bold text-slate-800">
-                    {subscriptionDetails?.planDetails.name}
+                    {subscriptionDetails?.planMetaData?.name}
                   </h2>
                   <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
                     {subscriptionDetails?.status}
                   </span>
                 </div>
                 <p className="text-lg font-semibold text-slate-700">
-                  Rs. {subscriptionDetails?.planDetails.monthlyPrice}
+                  Rs. {subscriptionDetails?.planMetaData?.price}
                   <span className="text-sm font-normal text-slate-500">/month</span>
                 </p>
 
@@ -92,7 +157,20 @@ const SubscriptionPage = () => {
                   </div>
                 )}
 
-                {subscriptionDetails?.planDetails.monthlyPrice > 0 && (
+              {
+                  subscriptionDetails &&
+                  subscriptionDetails?.planDetails &&
+                  subscriptionDetails.planDetails.isTrialPiriodGiven &&
+                  !isTrialPeriodEnded(subscriptionDetails.trialPeriodEnds as string) && (
+                    <div className='mt-5 border border-green-300 p-3 rounded-md bg-green-100'>
+                      <p className='text-lg text-green-600'><span className='font-semibold text-lg'>{moment(new Date(subscriptionDetails.trialPeriodEnds as string)).diff(moment(new Date()), "days")}</span> days remining</p>
+                      <p className='text-xs text-slate-500 mt-2'>Your free trial ends on {moment(new Date(subscriptionDetails.trialPeriodEnds as string)).format("DD-MM-YYYY hh:mm a")}. You can cancel your subscription at any time before the date.</p>
+                      <p className="mt-2 italic text-xs text-amber-600">You will be charged the subscription amount if you didnt cancel the subscription</p>
+                    </div>
+                  )
+                }
+
+                {subscriptionDetails?.planDetails && subscriptionDetails?.planDetails.monthlyPrice > 0 && (
                   <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg p-4 flex gap-3">
                     <FiAlertCircle className="text-blue-500 shrink-0" size={20} />
                     <p className="text-sm text-blue-700">
@@ -199,6 +277,7 @@ const SubscriptionPage = () => {
                 </div>
 
                 <button
+                onClick={() => cancelCurrentSubscription(subscriptionDetails?.planDetails._id as string, subscriptionDetails?._id as string)}
                   disabled={subscriptionDetails?.planDetails.monthlyPrice === 0}
                   className="mt-10 text-red-500 font-bold text-sm hover:underline disabled:text-gray-300"
                 >
@@ -208,7 +287,7 @@ const SubscriptionPage = () => {
             </div>
 
             {/* Payment Method Section */}
-            {subscriptionDetails?.planDetails.monthlyPrice > 0 && (
+            {subscriptionDetails?.planDetails && subscriptionDetails?.planDetails.monthlyPrice > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-bold text-slate-800">Payment Method</h2>
@@ -254,7 +333,7 @@ const SubscriptionPage = () => {
                   >
                     <div>
                       <p className="font-bold text-slate-800 text-sm">{inv.id}</p>
-                      <p className="text-[11px] text-slate-500">{inv.date}</p>
+                      <p className="text-[11px] text-slate-500">{inv.date?.toString()}</p>
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="bg-green-100 text-green-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
@@ -332,6 +411,64 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
   const [plansData, setPlansData] = useState<PlanData[]>([])
   const logedUser = useSelector((state: {userAuth: {user: {subscription: {subscriptionId: string, planId: string, price: number}}}}) => state.userAuth.user)
 
+  //upgrading plan
+
+  const upgradeMyPlan = async (currentSubscriptionId: string, upgradingPlanId: string) => {
+    if(!currentSubscriptionId || !upgradingPlanId){
+      return toast.error('Can not upgrade plan now')
+    }
+
+    const confirmationResult = await Swal.fire({
+      icon: 'question',
+      title: 'Upgrade?',
+      text: 'Are you sure to upgrade your existing plan to this',
+      showConfirmButton: true,
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        const container = Swal.getContainer()
+        if(container){
+          container.style.zIndex = '999999'
+        }
+      }
+    })
+
+    if(!confirmationResult.isConfirmed) return
+
+    try {
+      const reuslt = await upgradeSubscription(currentSubscriptionId, upgradingPlanId)
+      if(reuslt.success && reuslt?.result.id){
+        Swal.fire({
+          icon: 'success',
+          title: 'Plan Upgraded',
+          text: 'Your current plan has been upgraded. You will be chareged the new plan amount from the next billing date',
+          showCancelButton: false,
+          showConfirmButton: true,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            const container = Swal.getContainer()
+            if(container){
+              container.style.zIndex = '999999999'
+            }
+          }
+        }).then((result) => {
+          if(result.isConfirmed){
+            window.location.reload()
+          }
+        })
+      }else{
+        const successUrl = reuslt.result
+        window.location.href = successUrl
+      }
+    } catch (error: unknown) {
+      const err = error as AxiosError<{message: string}>
+      const msg = err.response?.data.message || err.message || 'Something went wrong'
+      toast.error(msg)
+    }
+  }
+
   useEffect(() => {
     async function fetchPlans(){
       setLoading(true)
@@ -391,7 +528,7 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
                     <p className='text-xs text-slate-500'>/month</p>
                   </div>
                   <div className="my-5">
-                    <button disabled={plan._id === logedUser.subscription.planId} className='p-3 rounded-lg disabled:!bg-white disabled:text-slate-400 disabled:border-slate-100 border border-transparent bg-gradient-to-br from-blue-500 to-indigo-600 text-sm text-white tracking-wide w-full shadow-[0_0_30px_2px_rgba(100,0,200,0.2)]'>
+                    <button onClick={() => upgradeMyPlan(logedUser.subscription.subscriptionId, plan._id as string)} disabled={plan._id === logedUser.subscription.planId} className='p-3 rounded-lg disabled:!bg-white disabled:text-slate-400 disabled:border-slate-100 border border-transparent bg-gradient-to-br from-blue-500 to-indigo-600 text-sm text-white tracking-wide w-full shadow-[0_0_30px_2px_rgba(100,0,200,0.2)]'>
                       {plan._id === logedUser.subscription.planId
                         ? "Current Plan"
                         : (

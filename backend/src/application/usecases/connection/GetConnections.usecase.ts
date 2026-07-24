@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IGetConnectionsUsecase from '../../interfaces/usecases/connection/IGetConnections.usecase';
-import IConnectionRequestRepository from '../../../domain/interfaces/IConnectionRequest.repo';
+// import IConnectionRequestRepository from '../../../domain/interfaces/IConnectionRequest.repo';
 import {
   GetConnectionsRequestDTO,
   ConnectionUserDetailsDTO,

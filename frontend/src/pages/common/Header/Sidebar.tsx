@@ -1,8 +1,8 @@
 import { MdOutlineNotificationAdd, MdOutlineNotifications } from 'react-icons/md';
 import { IoMdChatbubbles } from 'react-icons/io';
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import { appContext } from '../../../context/AppContext';
+// import { useContext } from 'react';
+// import { appContext } from '../../../context/AppContext';
 import { BiBriefcase, BiHomeAlt2 } from 'react-icons/bi';
 import { LuUsers } from 'react-icons/lu';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ const makeSideBarActive = (path: string) => {
 };
 
 export default function Sidebar() {
-  const { openCreatePostModal } = useContext(appContext);
+  // const { openCreatePostModal } = useContext(appContext);
   // const { socket } = useContext(SocketContext)
 
   const unReadNotificationsCount = useSelector((state: {notification: {unReadNotificationsCount: number}}) => {

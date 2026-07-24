@@ -53,7 +53,7 @@ export default function ProfilePersonal() {
   const openFollowersModal = () => setIsFollowersModalOpen(true)
   const closeFollowerModal = () => setIsFollowersModalOpen(false)
 
-  const openFollowingModal = () => setIsFollowingModalOpen(true)
+  // const openFollowingModal = () => setIsFollowingModalOpen(true)
   const closeFollowingModal = () => setIsFollowingModalOpen(false)
 
   const openConnectionsModal = () => setIsConnectionsModalOpen(true)

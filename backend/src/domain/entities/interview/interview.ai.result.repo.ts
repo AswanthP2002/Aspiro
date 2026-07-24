@@ -3,5 +3,5 @@ import { InterviewAIEntity, InterviewDashboardEntity } from './interview.ai.enti
 
 export default interface IInterviewAiResultRepo extends IBaseRepo<InterviewAIEntity> {
   _placeholder?: never;
-  getUserInterviewDashboard(userId: string): Promise<InterviewDashboardEntity | null>
+  getUserInterviewDashboard(userId: string): Promise<InterviewDashboardEntity | null>;
 }

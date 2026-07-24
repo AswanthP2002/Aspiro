@@ -7,7 +7,6 @@ export const addUserExperience = async (jobRole: string, jobType: string, locati
         const response = await axiosInstance.post(ExperienceEndPoints.ADD_EXPERIENCE,
             {jobRole, jobType, location, workMode, organization, isPresent, startDate, endDate, description},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -42,7 +41,6 @@ export const editUserExperience = async (experienceId: string, jobRole: string, 
         const response = await axiosInstance.put(ExperienceEndPoints.UPDATE_EXPERIENCE_BY_EXPERIENCEID(experienceId),
             {jobRole, jobType, organization, isPresent, startDate, endDate, location, workMode},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )

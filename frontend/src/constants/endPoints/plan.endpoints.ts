@@ -16,6 +16,8 @@ export const PlanApiEndpoints = {
     LOAD_MY_SUBSCRIPTION_DETAILS: '/v2/my-subscription',
     GET_USER_INVOICES: (stripeCustomerId: string) => `/v2/subscription/invoices/${stripeCustomerId}`,
     MANAGE_BILLING_PORTAL: '/v2/subscription/portal/create-session',
-    GET_PAYMENT_METHODS: '/v2/subscriptions/payment-methods'
+    GET_PAYMENT_METHODS: '/v2/subscriptions/payment-methods',
+    CANCEL_SUBSCRIPTION: (planId: string, subscriptionId: string) => `/v2/subscriptions/${subscriptionId}/cancel/${planId},`,
+    UPGRADE_SUBSCRIPTION: (currentSubscriptionId: string, upgradingPlanId: string) => `/v2/subscription/${currentSubscriptionId}/upgrade/${upgradingPlanId}`
   },
 } as const;

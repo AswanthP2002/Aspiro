@@ -8,6 +8,11 @@ export interface AccountAction {
   date?: string | Date;
 }
 
+export interface SubscriptionMetaData {
+  action: string;
+  date?: string | Date;
+}
+
 export default interface User {
   _id?: string;
   name?: string;

@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 import store from '../../redux/store';
 import { tokenRefresh, updateUserMetaData } from '../../redux/userAuthSlice';
 import { reAuthenticate } from '../commonServices';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 const baseUrl = import.meta.env.VITE_SERVER_URL
 
@@ -33,14 +33,23 @@ interface ReAuthenticateResult {
 
 const axiosInstance = axios.create({
     baseURL:baseUrl,
-    withCredentials:true
+    withCredentials:true,
+    headers: {
+        "Content-Type": "application/json"
+    } //Added a common heder for optimization: Individual headers are removable now
 });
 
-axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<any> => {
+axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<unknown> => {
     const customeRequest = request as AxiosRequest
 
     if(customeRequest?.sendCookie){
         customeRequest.withCredentials = true
+    }
+
+    if(customeRequest.data instanceof FormData){
+        delete customeRequest.headers['Content-Type']
+    }else{
+        customeRequest.headers['Content-Type'] = 'application/json'
     }
 
     if(customeRequest.sendAuthToken){
@@ -109,14 +118,20 @@ axiosInstance.interceptors.response.use(
             return window.location.replace(`/action/termination?message=${response.data.message}`)
        }
         else if(response && response.status === 403){
-            alert('403 response received from this...')
+            // alert('403 response received from this...')
             Swal.fire({
                 icon: 'question',
                 title: 'Limit Reached',
                 text: response.data.message,
                 showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Pricing',
+            }).then((result) => {
+                if(result.isConfirmed){
+                    window.location.href = '/temp/pricing'
+                }
             })
-            window.location.href = '/temp/pricing'
+            // window.location.href = '/temp/pricing'
             // Swal.fire({
             //     icon:'info',
             //     title:'Blocked',

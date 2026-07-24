@@ -12,9 +12,7 @@ export default class LoadUserMetaDataUsecase implements ILoadUserMetaDataUsecase
   ) {}
 
   async execute(userId: string): Promise<UserMetaDataDTO | null> {
-    //console.log('--checking userId inside usecase--', userId);
     const user = await this._userRepo.getUserMetaData(userId);
-    console.log('--Checking user metadata before mapping--', user);
 
     if (user) {
       const dto = this._mapper.userToUserMetaDataDTO(user);

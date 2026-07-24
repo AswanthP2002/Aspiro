@@ -6,6 +6,8 @@ import { appContext } from "../../context/AppContext"
 import { Controller, useForm } from "react-hook-form"
 import { FormControl, FormHelperText } from "@mui/material"
 import { Textarea } from "@mui/joy"
+import { AxiosError } from "axios"
+import { toast } from "react-toastify"
 
 export default function CreatePost(){
     
@@ -73,21 +75,23 @@ export default function CreatePost(){
         console.log('Testing formdata before sending to the service', formData)
 
         try {
-            alert('going to call the service')
+            // alert('going to call the service')
             const result = await createPost(formData)
             if(result?.success){
                 Notify.success('Post created successfully', {timeout:1200})
                 setTimeout(() => {
                     closeCreatePostModal()
                     window.location.reload()
-    
                 , 1200})
             }else{
                 Notify.failure(result?.message)
                 //setTimeout(() => window.location.reload(), 1200)
             }
         } catch (error : unknown) {
-            Notify.failure('Something went wrong', {timeout:1200})
+           const err = error as AxiosError<{message: string}>
+           const msg = err?.response?.data.message || err.message || 'Something went wrong'
+           toast.error(msg)
+
         }
         
     }

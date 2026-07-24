@@ -1,26 +1,9 @@
 import { AxiosError, HttpStatusCode} from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import { RecruiterEndPoints } from "../constants/endPoints/recruiter.endpoints";
+import { JobsEndpoints } from "../constants/endPoints/jobs.endpoints";
+import { Dayjs } from "dayjs";
 
-//legacy
-export const recruiterRegister = async (fullName : string, email : string, phone : string, password : string) => {
-    try {
-        const response = await axiosInstance.post('/recruiter/register',
-            {fullName, email, phone, password},
-            {
-                headers:{'Content-Type' : 'application/json'}
-            } as AxiosRequest
-        )
-
-        return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response?.status < 500) return err.response.data
-
-        console.log('Error occured while recruiter registering', err)
-    }
-}
 
 export const createRecruiterService = async (
    formData: FormData
@@ -28,7 +11,8 @@ export const createRecruiterService = async (
     try {
         const response = await axiosInstance.post(RecruiterEndPoints.REGISTER_RECRUITER, formData,
             {
-                sendAuthToken: true
+                sendAuthToken: true,
+                headers: {}
             } as AxiosRequest
         )
 
@@ -47,7 +31,6 @@ export const recruiterLogin = async (email : string, password : string) => {
         const response = await axiosInstance.post('recruiter/login', 
             {email, password},
             {
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
 
@@ -60,92 +43,6 @@ export const recruiterLogin = async (email : string, password : string) => {
         console.log('Error occured while recruiter login', err)
     }
 }
-
-// export const saveIntroDetails = async (recruiterDetails : Recruiter) => {
-//     try {
-//         const response = await axiosInstance.post('/recruiter/intro/details',
-//             recruiterDetails,
-//             {
-//                 headers:{'Content-Type' : 'application/json'},
-//                 sendAuthToken:true
-//             } as AxiosRequest
-//         )
-
-//         return response.data
-//     } catch (error : unknown) {
-//         const err = error as AxiosError
-
-//         if(err.response && err.response.data){
-//             const {message} : any = err.response.data
-
-//             Swal.fire({
-//                 icon:'error',
-//                 title:'Error',
-//                 text:message
-//             })
-//         }
-
-//         console.log('Error occured while saving basic details', err)
-//     }
-// }
-
-// export const addLogoCloudinary = async (logoFormData : any) => {
-//     try {
-//         const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', logoFormData)
-//         return response.data
-//     } catch (error : unknown) {
-//         if(error instanceof Error){
-//             Swal.fire({
-//                 icon:'error',
-//                 title:'Error',
-//                 text:error.message
-//             })
-//         }
-
-//         console.log('Error occured while saving logo into cloudinary', error)
-
-//     }
-// }
-
-// export const addCoverPhotoCloudinary = async (coverFormData : any) => {
-//     try {
-//         const response = await axios.post('https://api.cloudinary.com/v1_1/dfb0unqh6/image/upload', coverFormData)
-//         return response.data
-//     } catch (error : unknown) {
-//         if(error instanceof Error){
-//             Swal.fire({
-//                 icon:'error',
-//                 title:'Error',
-//                 text:error.message
-//             })
-//         }
-
-//         console.log('Error occured while saving coverphoto into cloudinary', error)
-//     }
-// }
-
-// export const logoutRecruiter = async () => {
-//     try {
-//         const response = await axiosInstance.post('/recruiter/logout', null, {
-//             sendAuthTokenRecruiter:true
-//         } as AxiosRequest)
-
-//         return response.data
-//     } catch (error : unknown) {
-//         const err = error as AxiosError
-
-//         if(err.response && err.response.data){
-//             const {message} : any = err.response.data
-//             Swal.fire({
-//                 icon:'error',
-//                 title:'Error',
-//                 text:message
-//             })
-//         }
-
-//         console.log('Error occured while recruiter logout', err)
-//     }
-// }
 
 export const getProfileOverview = async () => {
     try {
@@ -180,7 +77,6 @@ export const scheduleInterview = async (
             },
             {
                 sendAuthToken:true,
-                headers:{"Content-Type":'application/json'}
             } as AxiosRequest
         )
 
@@ -200,14 +96,34 @@ export const postJob = async (
     {
         jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency, 
         salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
-    }: any,
+    }: {
+        jobTitle: string,
+        description: string,
+        requirements: string,
+        responsibilities: string,
+        duration: string,
+        jobType: 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Temporary' | '',
+        workMode: 'On-site' | 'Remote' | 'Hybrid' | '',
+        location: string,
+        minSalary: number | '',
+        maxSalary: number | '',
+        salaryCurrency: string,
+        salaryPeriod: 'annually' | 'monthly' | 'weekly' | 'hourly' | '',
+        vacancies: number | '',
+        qualification: string,
+        experienceInYears: number | '',
+        jobLevel: 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Lead' | 'Manager' | '',
+        requiredSkills: string[],
+        optionalSkills: string[],
+        expiresAt: Dayjs | Date | string | null;
+    },
 ) => {
     try {
         const response = await axiosInstance.post(RecruiterEndPoints.POST_A_JOB, {
             jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency,
             salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
         },
-        {   headers:{"Content-Type":'application/json'},
+        {   
             sendAuthToken:true
         } as AxiosRequest
     )
@@ -228,17 +144,38 @@ export const editJob = async (
     {
         _id, recruiterId, jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location, minSalary, maxSalary, salaryCurrency, 
         salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt
-    }: any,
+    }: {
+        _id: string,
+        recruiterId: string,
+        jobTitle: string,
+        description: string,
+        requirements: string, 
+        responsibilities: string,
+        duration: string, 
+        jobType: string, 
+        workMode: string,
+        location: string, 
+        minSalary: string | number,
+        maxSalary: string | number,
+        salaryCurrency: string,
+        salaryPeriod: string,
+        vacancies: string | number,
+        qualification: string, 
+        experienceInYears: number, 
+        jobLevel: string,
+        requiredSkills: string[],
+        optionalSkills: string[],
+        expiresAt: string | Date
+    },
 ) => {
     try {
-        const response = await axiosInstance.put('/recruiter/job/edit', 
+        const response = await axiosInstance.put(JobsEndpoints.RECRUITER.EDIT_JOB, 
             {
                 _id, recruiterId, jobTitle, description, requirements, responsibilities, duration, jobType, workMode, location,
                 salaryPeriod, vacancies, qualification, experienceInYears, jobLevel, requiredSkills, optionalSkills, expiresAt,
                 minSalary, maxSalary, salaryCurrency
             },
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -312,7 +249,7 @@ export const getPostedJobDetails = async (jobId: string) => {
 
 export const getRecentJobs = async () => {
     try {
-        const response = await axiosInstance.get('/recruiter/recent/jobs',
+        const response = await axiosInstance.get(JobsEndpoints.RECRUITER.GET_RECENT_JOBS,
             {
                 sendAuthToken:true,
             } as AxiosRequest
@@ -364,76 +301,11 @@ export const getSingleApplicationDetails = async (applicationId: string) => {
     }
 }
 
-export const refreshRecruiterToken = async () => {
-    try {
-        const response = await axiosInstance.get('/recruiter/token/refresh')
-        return response.data?.accessToken
-    } catch (error : unknown) {
-        console.log('Error occured while refreshig tokene', error)
-    }
-}
-
-// export const rejectJobApplication = async (candidateId : string, applicationId : string, rejectReason : string, message : string = "") => {
-//     try {
-//         const response = await axiosInstance.put(`/recruiter/reject/application/${applicationId}/${candidateId}`,
-//             {reason:rejectReason, message:message},
-//             {
-//                 headers:{'Content-Type':'application/json'},
-//                 sendAuthTokenRecruiter:true
-//             } as AxiosRequest
-//         )
-
-//         return response.data
-//     } catch (error : unknown) {
-//         console.log('Error occured while rejecting application', error instanceof Error ? error.message : null)
-//         const err = error as AxiosError
-
-//         if(err.response && err.response.status < 500 && err.response.status !== 403){
-//             return err.response.data
-//         }
-
-//         console.log('Error occured while rejecting application', err)
-//     }
-// }
-
-// export const getFinalizedShortlistData = async (jobId : string) => {
-//     try {
-//         const response = await axiosInstance.get(`/recruiter/applications/finalize/${jobId}`,
-//             {
-//                 sendAuthTokenRecruiter:true
-//             } as AxiosRequest
-//         )
-
-//         return response.data
-//     } catch (error : unknown) {
-//         const err = error as AxiosError
-
-//         console.log(err)
-//     }
-// }
-
-// export const getJobApplicationDetails = async (applicationId : string) => {
-//     try {
-//         const response = await axiosInstance.get(`/recruiter/application/${applicationId}`, {
-//             sendAuthTokenRecruiter:true
-//         } as AxiosRequest)
-
-//         return response.data
-//     } catch (error : unknown) {
-//         const err = error as AxiosError
-//         console.log('Error occured while geting spcific job application details', err)
-//         if(err.response && err.response.status < 500 && err.response?.status !== 403){
-//             return err.response.data
-//         }
-//     }
-// }
-
 export const rejectCandidateJobApplication = async (title : string, description : string, type : string, relatedId : string, applicationId : string, candidateId : string) => {
     try {
-        const response = await axiosInstance.patch(`/recruiter/reject/application/${applicationId}`,
+        const response = await axiosInstance.patch(RecruiterEndPoints.REJECT_CANDIDATE_APPLICATION(applicationId),
             {title, description, type, candidateId, relatedId},
             {   
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -447,14 +319,12 @@ export const rejectCandidateJobApplication = async (title : string, description 
 }
 
 export const updateCandidateNotes = async (applicationId: string, notes: string) => {
-    // toast.info(`inside the service application id ${applicationId}`)
     try {
         const response = await axiosInstance.patch(RecruiterEndPoints.UPDATE_CANDIDATE_NOTE(applicationId), {
             notes
         },
         {
             sendAuthToken:true,
-            headers:{"Content-Type":'application/json'}
         } as AxiosRequest
     )
 
@@ -474,7 +344,6 @@ export const addCompany = async (name: string, linkedin: string, website: string
             name, linkedin, website,industry, slogan, description, location 
         },
         {
-            headers: {'Content-Type': 'application/json'},
             sendAuthToken: true
         } as AxiosRequest
     )
@@ -495,7 +364,6 @@ export const updateJobApplicationStatus = async (
             {status, candidateName, candidateEmail, jobTitle},
             {
                 sendAuthToken:true,
-                headers:{"Content-Type":'application/json'}
             } as AxiosRequest
         )
 
@@ -647,7 +515,7 @@ export const getRecruiterDetails = async (recruiterId: string) => {
 
 export const handleRecruiterVerification = async (recrutierId: string, action: "Verified" | "Revoked") => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_VERIFICATION(recrutierId), null, {
+        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_VERIFICATION(recrutierId), {}, {
             params:{action},
             sendAuthToken:true
         } as AxiosRequest)
@@ -664,7 +532,7 @@ export const handleRecruiterVerification = async (recrutierId: string, action: "
 
 export const handleRecruiterPermissions = async (recrutierId: string, action: "Revoke" | "Un-Revoke") => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_PERMISSIONS(recrutierId), null, {
+        const response = await axiosInstance.patch(RecruiterEndPoints.HANDLE_RECRUITER_PERMISSIONS(recrutierId), {}, {
             params:{action},
             sendAuthToken:true
         } as AxiosRequest)
@@ -679,7 +547,7 @@ export const handleRecruiterPermissions = async (recrutierId: string, action: "R
 
 export const changeStatusToUnderReview = async (applicationId: string) => {
     try {
-        const response = await axiosInstance.patch(RecruiterEndPoints.CHANGE_STATUS_UNDER_REVIEW(applicationId), null,
+        const response = await axiosInstance.patch(RecruiterEndPoints.CHANGE_STATUS_UNDER_REVIEW(applicationId), {},
         {
             sendAuthToken: true
         } as AxiosRequest
@@ -751,7 +619,6 @@ export const manageRecruiterPermissions = async (
         {isAllJobsHidden, allowPostJobs, allowEditJobs, allowDeletePosts, allowManageApplications, allowScheduleInterviews},
         {
             sendAuthToken: true,
-            headers:{'Content-Type': 'application/json'}
         } as AxiosRequest
     )
 

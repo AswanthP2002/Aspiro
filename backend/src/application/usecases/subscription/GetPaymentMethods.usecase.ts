@@ -12,18 +12,27 @@ export default class GetPaymentMethodsUsecase implements IGetPaymentMethodsUseca
     const subscription = await this._subscriptionRepo.findOneWithUserId(userId);
     if (subscription) {
       const customerStripeId = subscription.stripeCustomerId;
-      const customer = (await stripe.customers.retrieve(customerStripeId as string, {
+      const customer = await stripe.customers.retrieve(customerStripeId as string, {
         expand: ['invoice_settings.default_payment_method'],
-      })) as any;
+      });
+
+      if (customer.deleted) {
+        return null;
+      }
 
       const defaultMethod = customer.invoice_settings.default_payment_method;
-      if (!defaultMethod) return null;
+      if (
+        !defaultMethod ||
+        typeof defaultMethod === 'string' ||
+        defaultMethod.object !== 'payment_method'
+      )
+        return null;
 
       return {
-        brand: defaultMethod.card.brand,
-        last4: defaultMethod.card.last4,
-        expMonth: defaultMethod.card.exp_month,
-        expYear: defaultMethod.card.exp_year,
+        brand: defaultMethod?.card?.brand as string,
+        last4: defaultMethod?.card?.last4 as string,
+        expMonth: defaultMethod?.card?.exp_month,
+        expYear: defaultMethod?.card?.exp_year,
       };
     }
 

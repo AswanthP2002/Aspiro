@@ -22,6 +22,7 @@ export default function Home(){
     const [jobvacancies, setjobvacancies] = useState(jobVacancies)
     const [tileguideData, settileguideData] = useState(guideData)
 
+    console.log(setjobvacancies, settileguideData)
     const cardData = [
         {
         id:1,
@@ -43,7 +44,7 @@ export default function Home(){
     },
     {
         id:4,
-        title:"Internships",
+        title:"Recruiters",
         count:8500,
         icon:<FaConnectdevelop size={25} color='white' />
     }
@@ -118,7 +119,7 @@ export default function Home(){
         </p>
 
         {/* Professional Search Bar */}
-        <div className="mt-10 bg-white p-2 rounded-2xl shadow-xl border border-slate-100 flex flex-col lg:flex-row gap-2 transition-all focus-within:ring-4 focus-within:ring-blue-500/10">
+        <div className="relative mt-10 bg-white p-2 rounded-2xl shadow-xl border border-slate-100 flex flex-col lg:flex-row gap-2 transition-all focus-within:ring-4 focus-within:ring-blue-500/10">
           <div className="flex-1 flex gap-3 items-center px-4 py-3 border-b lg:border-b-0 lg:border-r border-slate-100">
             <IoSearch className="text-blue-600" size={20} />
             <input 
@@ -140,6 +141,8 @@ export default function Home(){
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg shadow-blue-200">
             Find Jobs
           </button>
+
+          <div className="absolute"></div>
         </div>
 
         <p className="text-slate-500 text-xs mt-4 flex gap-2">

@@ -686,7 +686,7 @@ const selectStyles = {
                             <div className="skills !mt-2 flex flex-wrap gap-2">
                                 {
                                     watch('requiredSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeRequiredSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeRequiredSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
                                     })
                                 }
                             </div>
@@ -701,7 +701,7 @@ const selectStyles = {
                             <div className="skills !mt-2 flex flex-wrap gap-2">
                                 {
                                     watch('optionalSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeOptionalSkill(e, skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeOptionalSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
                                     })
                                 }
                             </div>

@@ -23,6 +23,7 @@ export default function ApplySuccessPage(){
             description: 'We will notifi'
         }
     ])
+    console.log(setInfo)
     const {jobTitle, recruiterName, companyName, workMode, minSalary, maxSalary} = location.state ||  {}
     if(!jobTitle){
         navigateTo('/')

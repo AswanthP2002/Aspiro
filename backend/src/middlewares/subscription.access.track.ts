@@ -24,7 +24,7 @@ export default class SubscriptionAccess {
         if (parseInt(mySubscription.features[feature] as string) > 0) {
           next();
         } else {
-          console.log('Current feature limit is over now -- request forbiden')
+          console.log('Current feature limit is over now -- request forbiden');
           res
             .status(StatusCodes.FORBIDEN)
             .json({ success: false, message: 'You have reached your limit for this month' });
@@ -34,7 +34,7 @@ export default class SubscriptionAccess {
       } else if (mySubscription && mySubscription.features && mySubscription.features[feature]) {
         next();
       } else {
-        console.log('Current plan does not have access to this plan -- request forbiden')
+        console.log('Current plan does not have access to this plan -- request forbiden');
         res.status(StatusCodes.FORBIDEN).json({
           success: false,
           message: 'Your current plan does not access to this feature. Upgrade your plan',

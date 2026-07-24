@@ -10,10 +10,15 @@ export default interface UserSubscriptionDTO {
   currentPeriodStart: string | Date;
   currentPeriodEnd: string | Date;
   isCanceled: boolean;
+  isCancelAtPeriodEnds?: boolean;
   paymentStatus: 'paid' | 'pending' | 'failed';
   features?: { [key: string]: string | number | boolean };
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  planMetadata?: {
+    name: string;
+    price: number;
+  };
 }
 
 export interface UserSubscriptionAndPlanDetailsDTO {
@@ -26,9 +31,14 @@ export interface UserSubscriptionAndPlanDetailsDTO {
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isCancelAtPeriodEnds?: boolean;
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
   features?: { [key: string]: string | number | boolean };
+  planMetadata?: {
+    name: string;
+    price: number;
+  }
   planDetails: PlanDTO;
 }

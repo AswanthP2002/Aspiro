@@ -11,7 +11,7 @@ export const adminLogin = async (email : string, password : string) => {
         const result = await axiosInstance.post(AdminEndPoints.ADMIN_LOGIN, 
             {email, password},
             { 
-                headers:{'Content-Type':'application/json'}
+                // headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
         return result.data
@@ -28,7 +28,7 @@ export const adminLogin = async (email : string, password : string) => {
 
 export const logoutAdmin = async (dispatch: Dispatch, navigate: (path: string) => void) => {
     try {
-        const result = await axiosInstance.post('/admin/logout', null, {
+        const result = await axiosInstance.post(AdminEndPoints.ADMIN_LOGOUT, {}, {
             sendCookie:true,
             sendAuthToken:true
         } as AxiosRequest)
@@ -86,7 +86,7 @@ export const blockCompanyUnblockCompany = async (companyId : string, operation :
         : `/admin/recruiter/unblock/${companyId}`
 
     try {
-        const response = await axiosInstance.patch(url, null, {
+        const response = await axiosInstance.patch(url, {}, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -101,7 +101,7 @@ export const blockCompanyUnblockCompany = async (companyId : string, operation :
 
 export const deleteCompany = async (companyId : string) => { //delete / close company should also delete company jobs
     try {
-        const response = await axiosInstance.delete(`/admin/recruiter/close/${companyId}`, {
+        const response = await axiosInstance.delete(AdminEndPoints.ADMIN_DELETE_COMPANY(companyId), {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -132,7 +132,6 @@ export const requestReset = async (email: string) => {
         const response = await axiosInstance.post(AdminEndPoints.REQUEST_PASSWORD_RESET, 
             {email},
             {
-                headers:{"Content-Type": "application/json"},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -151,7 +150,6 @@ export const resetUserPassword = async (code: string, token: string, userId: str
         const response = await axiosInstance.patch(AdminEndPoints.RESET_USER_PASSWORD, 
             {code,token, userId, userEmail},
             {
-                headers:{"Content-Type": "application/json"},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -162,15 +160,6 @@ export const resetUserPassword = async (code: string, token: string, userId: str
         console.log('Error occured while ereseting user password', err)
 
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-    }
-}
-
-export const refreshAdminToken = async () => {
-    try {
-        const response = await axiosInstance.get('/admin/token/refresh')
-        return response.data?.accessToken
-    } catch (error : unknown) {
-        console.log('Error occured while refreshing admin access token', error)
     }
 }
 
@@ -210,7 +199,7 @@ export const adminDeleteJob = async (id: string) => {
 
 export const adminBlockJob = async (id: string) => {
     try {
-        const response = await axiosInstance.patch(AdminEndPoints.ADMIN_BLOCK_JOB(id), null,
+        const response = await axiosInstance.patch(AdminEndPoints.ADMIN_BLOCK_JOB(id), {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -227,7 +216,7 @@ export const adminBlockJob = async (id: string) => {
 
 export const adminUnblockJob = async (id: string) => {
     try {
-        const response = await axiosInstance.patch(AdminEndPoints.ADMIN_UNBLOCK_JOB(id), null,
+        const response = await axiosInstance.patch(AdminEndPoints.ADMIN_UNBLOCK_JOB(id), {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -248,7 +237,6 @@ export const adminToggleFlagJob = async (id: string, action: 'flag' | 'un-flag')
         const response = await axiosInstance.patch(AdminEndPoints.ADMIN_FLAG_JOB(id),
             {action},
             {   
-                headers:{'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )

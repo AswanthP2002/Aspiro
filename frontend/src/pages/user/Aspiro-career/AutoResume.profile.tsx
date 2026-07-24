@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { BiAward, BiBriefcase, BiCheckCircle, BiChevronDown, BiInfoCircle, BiPlus } from 'react-icons/bi';
 import { BsInfo } from 'react-icons/bs';
 import { FaGraduationCap } from 'react-icons/fa';
@@ -15,8 +15,13 @@ import { AxiosError } from 'axios';
 import { MdAutoAwesome } from 'react-icons/md';
 import BouncingLoader from '../../../components/common/Bouncing.loader';
 import { FiX } from 'react-icons/fi';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const GenerateFromProfile = () => {
+
+  const resumeRef = useRef<HTMLDivElement | null>(null)
+
   const [loading, setLoading] = useState(true)
   // Example state to manage selections
   const [isExperienceAdding, setIsExperienceAdding] = useState(false)
@@ -36,14 +41,6 @@ const GenerateFromProfile = () => {
   const toggleCertAdding = () => setIsCertificateAdding(prv => !prv)
   const toggleSkilAdding = () => setIsSkillAdding(prv => !prv)
 
-  // const [selectedSections, setSelectedSections] = useState({
-  //   personal: true,
-  //   experience: true,
-  //   education: true,
-  //   skills: true,
-  //   certificates: true
-  // });
-  // const [summary, setSummary] = useState('')
   const [userFullProfileDetails, setUserFullProfileDetails] = useState<UserFullProfileData | null>(null)
   const [analyticsData, setAnalyticsData] = useState<{score: string, feedback: string, strength: string[], improvements: string[]} | null>(null)
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false)
@@ -51,6 +48,39 @@ const GenerateFromProfile = () => {
   const openAnalysisModal = () => setIsAnalysisModalOpen(true)
   const closeAnalysisModal = () => setIsAnalysisModalOpen(false)
 
+  const downloadPDF = async () => {
+    if(!resumeRef.current) return;
+
+    const canvas = await html2canvas(resumeRef.current, {
+      scale: 2,
+      useCORS: true
+    })
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    })
+
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    // const pdfHeight = pdf.internal.pageSize.getHeight()
+
+    const imgWidth = pdfWidth
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(
+      imgData,
+      "PNG",
+      0,
+      0,
+      imgWidth,
+      imgHeight
+    )
+
+    pdf.save("resume.pdf")
+  }
 
 
   type AddNewExperienceFormData = {
@@ -286,7 +316,7 @@ const GenerateFromProfile = () => {
         </div>
         <div className='space-x-2'>
           <button onClick={resumeAnalyze} className='px-2 py-1 bg-white text-slate-500 rounded-md text-xs'>Analyze</button>
-          <button className="bg-blue-500 text-white px-3 py-2 text-xs font-medium rounded-md">
+          <button onClick={downloadPDF} className="bg-blue-500 text-white px-3 py-2 text-xs font-medium rounded-md">
             Generate Resume
         </button>
         </div>
@@ -825,7 +855,7 @@ const GenerateFromProfile = () => {
             </ul>
           </WidgetBox>
 
-          <div className="bg-white shadow-[0_0_50px_rgba(0,0,0,0.1)] p-[20mm] text-[#111] leading-relaxed select-none pointer-events-none">
+          <div ref={resumeRef} style={{width: "210mm", minHeight: "297mm"}} className="bg-white shadow-[0_0_50px_rgba(0,0,0,0.1)] p-[20mm] text-[#111] leading-relaxed select-none pointer-events-none">
             {/* Header: Centered & Clean */}
             {personalInfoSectionIncluded && (
                 <header className="text-center mb-8">
@@ -861,11 +891,12 @@ const GenerateFromProfile = () => {
                   Professional Summary
                 </h2>
                 <p className="text-[11px] text-justify">
-                  Full-Stack Developer specializing in the MERN stack with a strong focus on Clean
+                  {userFullProfileDetails?.summary}
+                  {/* Full-Stack Developer specializing in the MERN stack with a strong focus on Clean
                   Architecture and SOLID principles. Proven track record in building scalable web
                   applications and implementing complex features like real-time notifications and
                   AI-driven modules. Dedicated to high-performance code and professional software
-                  patterns.
+                  patterns. */}
                 </p>
               </section>
               )}
@@ -877,7 +908,7 @@ const GenerateFromProfile = () => {
                   Experience
                 </h2>
                 <div className="space-y-4">
-                  {userFullProfileDetails?.experiences?.length > 0 &&
+                  {userFullProfileDetails?.experiences && userFullProfileDetails?.experiences?.length > 0 &&
                     userFullProfileDetails?.experiences.map((exp: Experience) => (
                       <div>
                         <div className="flex justify-between items-baseline">
@@ -903,7 +934,7 @@ const GenerateFromProfile = () => {
                   Education
                 </h2>
                 <div className="space-y-2">
-                    {userFullProfileDetails?.educations.length > 0 && (
+                    {userFullProfileDetails?.educations && userFullProfileDetails?.educations.length > 0 && (
                     userFullProfileDetails?.educations.map((edu: Education) => (
                         <>
                         <div>
@@ -928,7 +959,7 @@ const GenerateFromProfile = () => {
                   Skills
                 </h2>
                 <p className="text-[10px] text-slate-700">
-                  {userFullProfileDetails?.skills.length > 0 && (
+                  {userFullProfileDetails?.skills && userFullProfileDetails?.skills.length > 0 && (
                     userFullProfileDetails?.skills.map((skill: Skills) => (
                         <>
                         {`${skill.skill}, `}
@@ -946,7 +977,7 @@ const GenerateFromProfile = () => {
                   Certifications
                 </h2>
                 <ul className="text-[10px] text-slate-700 space-y-0.5">
-                  {userFullProfileDetails?.certificates.length > 0 && (
+                  {userFullProfileDetails?.certificates && userFullProfileDetails?.certificates.length > 0 && (
                     userFullProfileDetails?.certificates.map((certificate: Certificates) => (
                         <li>• {certificate.name} - {certificate.issuedOrganization}</li>
                     ))
@@ -972,9 +1003,42 @@ const GenerateFromProfile = () => {
   );
 };
 
-// --- Sub-Components ---
+interface SectionWrapperProps {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  isChecked: boolean;
+  toggleCheck: () => void;
+  sectionValueAddingStatus: boolean
+  onToggleSectionValueAdd: () => void
+}
 
-const SectionWrapper = ({ title, icon, children, isChecked, toggleCheck, sectionValueAddingStatus, onToggleSectionValueAdd }) => (
+interface ItemCardProps {
+  title: string;
+  subtitle: string;
+  date: string;
+  description?: string
+}
+
+interface WidgetBoxProps {
+  title: string;
+  icon: string;
+  children: React.ReactNode;
+  color: string
+}
+
+interface AnalysisModalProps {
+    open: boolean;
+    handleClose: () => void;
+    data: {
+        score: string;
+        feedback: string;
+        strength: string[];
+        improvements: string[];
+    } | null
+}
+
+const SectionWrapper = ({ title, icon, children, isChecked, toggleCheck, sectionValueAddingStatus, onToggleSectionValueAdd }: SectionWrapperProps) => (
   <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative">
     <div className="flex justify-between items-center mb-4">
       <div className="flex items-center gap-2 text-slate-700">
@@ -991,7 +1055,7 @@ const SectionWrapper = ({ title, icon, children, isChecked, toggleCheck, section
   </div>
 );
 
-const ItemCard = ({ title, subtitle, date, description = '' }) => (
+const ItemCard = ({ title, subtitle, date, description = '' }: ItemCardProps) => (
   <div className="bg-slate-50 p-4 rounded-lg flex gap-4 items-start border border-slate-100">
     <input type="checkbox" defaultChecked className="mt-1 rounded border-slate-300 accent-black w-4 h-4" />
     <div>
@@ -1005,7 +1069,7 @@ const ItemCard = ({ title, subtitle, date, description = '' }) => (
   </div>
 );
 
-const WidgetBox = ({ title, icon, children, color }) => (
+const WidgetBox = ({ title, icon, children, color }: WidgetBoxProps) => (
   <div className={`${color} border rounded-xl p-5 shadow-sm`}>
     <div className="flex items-center gap-2 mb-3">
       {icon}
@@ -1015,7 +1079,7 @@ const WidgetBox = ({ title, icon, children, color }) => (
   </div>
 );
 
-const InclusionRow = ({ label }) => (
+const InclusionRow = ({ label }: {label: string}) => (
   <div className="flex justify-between items-center text-[11px]">
     <span className="text-slate-500 font-medium">{label}</span>
     <span className="bg-black text-white px-3 py-1 rounded-md font-bold uppercase scale-90">Included</span>
@@ -1023,24 +1087,7 @@ const InclusionRow = ({ label }) => (
 );
 
 
-export function AnalysisModal({ open, handleClose, data }) {
-  // data: { score: 85, feedback: "...", strength: [], improvements: [] }
-
-//   const style = {
-//   position: 'absolute',
-//   top: '50%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   width: 600,
-//   bgcolor: 'background.paper',
-//   borderRadius: '16px',
-//   boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
-//   p: 0, // Header has internal padding
-//   outline: 'none',
-//   overflow: 'hidden',
-//   // High-end touch: Top accent border based on score
-//   borderTop: (theme) => `8px solid ${theme.palette.success.main}`, 
-// };
+export function AnalysisModal({ open, handleClose, data }: AnalysisModalProps) {
 
   return (
     <Modal open={open} onClose={handleClose} className='flex items-center justify-center'>
@@ -1064,7 +1111,7 @@ export function AnalysisModal({ open, handleClose, data }) {
               <p className='text-sm text-gray-500'>ATS Score</p>
               <p className='font-bold text-2xl text-orange-500'>{data?.score} %</p>
               <div className='w-full h-3 rounded-full bg-gray-100'>
-                <div className={`w-[${data?.score}%] bg-orange-500 h-full rounded-full`}></div>
+                <div style={{width: `${data?.score}%`}} className={`w-[${data?.score}%] bg-orange-500 h-full rounded-full`}></div>
               </div>
             </div>
 
@@ -1083,7 +1130,7 @@ export function AnalysisModal({ open, handleClose, data }) {
               <div className="mt-3">
                 <ul className='list-disc space-y-2'>
                   {data?.strength?.map((s: string, i: number) => (
-                    <div className='p-3 bg-green-50 ring-1 ring-green-500 rounded-md'>
+                    <div key={i} className='p-3 bg-green-50 ring-1 ring-green-500 rounded-md'>
                       <li className='ms-5 text-xs text-gray-700'>{s}</li>
                     </div>
                   ))}
@@ -1101,7 +1148,7 @@ export function AnalysisModal({ open, handleClose, data }) {
               <div className="mt-3">
                 <ul className='list-disc space-y-2'>
                   {data?.improvements?.map((s: string, i: number) => (
-                    <div className='p-3 bg-orange-50 ring-1 ring-orange-500 rounded-md'>
+                    <div key={i} className='p-3 bg-orange-50 ring-1 ring-orange-500 rounded-md'>
                       <li className='ms-5 text-xs text-gray-700'>{s}</li>
                     </div>
                   ))}

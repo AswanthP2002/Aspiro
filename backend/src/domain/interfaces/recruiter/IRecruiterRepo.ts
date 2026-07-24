@@ -1,6 +1,6 @@
 import FindRecruitersDBQuery from '../../../application/queries/recruiter/recruiter.query';
 import { AppliedRecruitersQuery } from '../../../application/queries/recruiter/recruiter.query';
-import Recruiter, { NewRecruiter } from '../../entities/recruiter/recruiter.entity';
+import { NewRecruiter } from '../../entities/recruiter/recruiter.entity';
 import RecruiterProfileOverviewData from '../../entities/recruiter/recruiterProfilveOverviewData';
 import IBaseRepo from '../IBaseRepo';
 
