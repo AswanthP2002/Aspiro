@@ -9,7 +9,7 @@ import { Notification } from '../../../types/entityTypes';
 import { MdChatBubble } from 'react-icons/md';
 import { IoChatboxOutline, IoNotificationsOffOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteAllNotificationsFromStore, deleteNotificationFromStore, markAllNotificationAsRead, markAsRead, setNotifications, setNotificationsCount } from '../../../redux/notificationSlice';
+import { deleteAllNotificationsFromStore, deleteNotificationFromStore, markAllNotificationAsRead, markAsRead, setNotifications } from '../../../redux/notificationSlice';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';

@@ -70,7 +70,7 @@ export default function JobListTile({data} : {data : LoadJobsForPublicData}){
             })()
             return
         }
-    }, [])
+    }, [data._id, logedUser]) //Updated dependancy due to lint error previously empty
 
     return(
         <>

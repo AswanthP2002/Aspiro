@@ -37,7 +37,7 @@ export default function CommonLayout() {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [setWindowSize]); //previously empty
 
   const logedUser = useSelector((state: RootState) => {
     return state.userAuth.user;

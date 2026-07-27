@@ -9,20 +9,6 @@ import { LuSearch, LuUser } from 'react-icons/lu';
 import { FiFilter } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
-const dummyData = [
-    {label: 'Free Users', value: 7000, color: '#0088FE'},
-    {label: 'Premium Users', value: 1242, color: '#00e49F'}
-]
-
-const recruiterDummy = [
-  {label: 'Recruiters', value: 494, color: '#ffbb28'},
-  {label: 'Non Recruiters', value: 6599, color: '#52ecd7'}
-]
-
-const dummyThree = [
-  {label: 'Freelance Recruiters', value: 3000, color: '#d5f968'},
-  {label: 'Corporate Recruiters', value: 3599, color: '#22de32'}
-]
 
 export const AdminAnalytics = () => {
 
@@ -31,7 +17,6 @@ export const AdminAnalytics = () => {
   const [analytics, setAnalytics] = useState<SubscriptionAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('')
-  const [limit, setLimit] = useState(7)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [status, setStatus] = useState('all')
@@ -63,7 +48,7 @@ export const AdminAnalytics = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await adminGetAnalytics(search, page, limit, status)
+        const response = await adminGetAnalytics(search, page, 7, status)
         console.log('chekcing', response)
         if (response.success) {
           setAnalytics(response.result.data);
@@ -88,17 +73,19 @@ export const AdminAnalytics = () => {
 
       {/* 1. Stats Grid - Injecting data from state */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard 
+        <StatCard
           title="Total MRR" 
           value={analytics.stats.totalMRR} 
           growth={11.8} 
-          icon={<BiRupee />} 
+          icon={<BiRupee />}
+          isNegative={false}
         />
         <StatCard 
           title="Active Premium Recruiters" 
           value={analytics.stats.activeRecruiters} 
           growth={23} 
-          icon={<LuUser />} 
+          icon={<LuUser />}
+          isNegative={false}
         />
         <StatCard 
           title="Churn Rate" 
@@ -139,7 +126,7 @@ export const AdminAnalytics = () => {
         <div className='grid grid-cols-12 mt-5'>
           <div className='flex col-span-6 items-center bg-gray-100 px-2 py-1 rounded-md gap-2 border border-slate-200 w-'>
             <LuSearch size={15} />
-            <input onKeyUp={(e) => dSearch(e)} type="text" placeholder='Search by name, email, transaction Id' className='!text-xs w-full' />
+            <input onChange={(e) => dSearch(e)} type="text" placeholder='Search by name, email, transaction Id' className='!text-xs w-full' />
           </div>
           <div className='flex col-span-6 items-center justify-end gap-2'>
             <FiFilter />
@@ -202,7 +189,7 @@ export const AdminAnalytics = () => {
   );
 };
 
-const StatCard = ({ title, value, growth, icon, isNegative }) => (
+const StatCard = ({ title, value, growth, icon, isNegative }: {title: string, value: string | number | boolean, growth: string | number | boolean, icon: React.ReactNode, isNegative: boolean}) => (
   <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
     <div className="flex justify-between items-start">
       <div>

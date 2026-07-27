@@ -1,5 +1,5 @@
-import JobAggregatedDTO from '../../DTOs/job/jobDetails.dto.FIX';
+import JobsForHompePageDTO from '../../DTOs/job/jobsForHomePage.dto';
 
 export default interface ISearchJobsFromHomeUseCase {
-  execute(search: string): Promise<JobAggregatedDTO[] | null>;
+  execute(search: string): Promise<JobsForHompePageDTO[] | null>;
 }

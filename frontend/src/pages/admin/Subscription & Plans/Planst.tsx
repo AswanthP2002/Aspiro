@@ -16,7 +16,6 @@ export default function Plans(){
     const [loading, setLoading] = useState(false)
     const [plans, setPlans] = useState<PlanData[]>([])
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(5)
     const [totalPages, setTotalPages] = useState(1)
 
     const navigate = useNavigate()
@@ -28,7 +27,7 @@ export default function Plans(){
     const navigateToEditPlanPage = (data: PlanData) => {
         return navigate(`/admin/subscription/plans/edit/${data._id}`, {state: {editablePlanData: data}})
     }
-
+    console.log(typeof setPage)
     const togglePlanListing = async (planId: string, status: 'LIST' | 'UNLIST') => {
         if(!planId) return
 
@@ -109,7 +108,7 @@ export default function Plans(){
         async function loadSubscriptionPlans(){
             setLoading(true)
             try {
-                const result = await adminGetPlans(page, limit)
+                const result = await adminGetPlans(page, 5)
                 if(result?.success){
                     console.log('Admin get plans ')
                     setPlans(result.result.plans)
@@ -124,7 +123,7 @@ export default function Plans(){
         }
 
         loadSubscriptionPlans()
-    }, [page, limit])
+    }, [page])
 
     return(
         <>

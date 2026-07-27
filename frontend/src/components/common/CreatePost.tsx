@@ -48,21 +48,6 @@ export default function CreatePost(){
         }
     }
 
-    // const cropComplete = (cropArea : any, cropPixels : any) => {
-    //     setCropPixels(cropPixels)
-    // }
-
-    // const createImageFromUrl = (url : string) => {
-    //     return new Promise((resolve, reject) => {
-    //         const img = new Image()
-    //         img.onload = () => resolve(img)
-    //         img.onerror = (err) => reject(err)
-
-    //         img.crossOrigin = 'anonymous'
-    //         img.src = url
-    //     })
-    // }
-
 
     const create = async (data : FormInput) => {
         const formData = new FormData()
@@ -82,7 +67,7 @@ export default function CreatePost(){
                 setTimeout(() => {
                     closeCreatePostModal()
                     window.location.reload()
-                , 1200})
+                }, 1200)
             }else{
                 Notify.failure(result?.message)
                 //setTimeout(() => window.location.reload(), 1200)
@@ -112,28 +97,7 @@ export default function CreatePost(){
                         </section>
                     )
                 }
-                {/* crop, aspectRatio, zoom, image = cropTestImage, setCrop, setZoom, cropComplete */}
-                {/* {
-                    sectionUpload === 2 && (
-                        <section id="section-crop">
-                            <h5 className="text-center">Crop</h5>
-                            <div className="relative w-[400px] h-[400px]">
-                                <CropComponent
-                                    crop={crop}
-                                    aspectRatio={undefined}
-                                    zoom={zoom}
-                                    image={imagePreview}
-                                    setCrop={setCrop}
-                                    setZoom={setZoom}
-                                    cropComplete={cropComplete}
-                                />
-                            </div>
-                            <div className="w-full flex justify-end mt-2">
-                                <button onClick={cropImage} className="text-sm bg-blue-500 text-white rounded !px-3 !py-1">Next</button>
-                            </div>
-                        </section>
-                    )
-                } */}
+        
                 {
                     sectionUpload === 2 && (
                         <section id="content-section">

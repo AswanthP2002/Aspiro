@@ -39,6 +39,6 @@ export interface UserSubscriptionAndPlanDetailsDTO {
   planMetadata?: {
     name: string;
     price: number;
-  }
+  };
   planDetails: PlanDTO;
 }

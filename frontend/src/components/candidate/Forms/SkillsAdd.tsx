@@ -3,7 +3,6 @@ import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { addUserSkill } from "../../../services/skillService";
 import { getSkillsSuggesion } from "../../../services/skillService";
-// import { getSkillsSuggesion } from "../../../services/userServices";
 import { Notify } from "notiflix";
 import { Skills } from "../../../types/entityTypes";
 import { toast } from "react-toastify";
@@ -52,7 +51,6 @@ export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddS
             console.log('-- checking upcoming skills from the backend -- suggestion --', result)
             if(result?.success){
                 const fetchedSkills = result?.result?.skills || [];
-                // Map correctly based on API response structure (handling objects or strings)
                 const mappedSkills = fetchedSkills.map((s: {skill: string}) => {
                     return typeof s === 'string' ? s : s.skill // (s?.skill || s?.skills || s?.name);
                 }).filter((s: string) => s && typeof s === 'string');
@@ -100,9 +98,7 @@ export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddS
                     }
                 }
             )
-           // closeSkillsModal()
             if(result.success){
-                // console.log('--checking skill return --', result.result)
                 onAddSkill(result.result)
             }else{
                 toast.error(result.message)

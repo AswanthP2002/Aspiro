@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getMyApplications } from '../../../services/userServices';
 import Swal from 'sweetalert2';
-import { MyApplications as Application, MyApplicationsListData } from '../../../types/entityTypes';
+import { MyApplications as MyApplicationsListData } from '../../../types/entityTypes';
 import { useNavigate } from 'react-router-dom';
 import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
 import { BsArrowLeft } from 'react-icons/bs';
@@ -176,9 +176,9 @@ export default function MyApplications() {
                     </div>
                     <div className="flex-1">
                       <p className='font-semibold'>{application.jobDetails?.jobTitle}</p>
-                      <p className='text-xs text-gray-700'>{application.companyDetails?.name} | Posted by {application.recruiterDetails?.name}</p>
-                      <p className='mt-2 font-semibold'>{currencyFormatter(application?.jobDetails?.minSalary, "INR")}</p>
-                      <p className='mt-3 text-xs text-gray-500 flex items-center gap-1'><FaClock /> Applied on {formattedDateMoment(application.createdAt, "MMM DD YYYY")}</p>
+                      <p className='text-xs text-gray-700'>{application.recruiterProfile?.name} | Posted by {application.recruiterProfile?.name}</p>
+                      <p className='mt-2 font-semibold'>{currencyFormatter(application?.jobDetails?.minSalary ? application.jobDetails.minSalary.toString() : '100', "INR")}</p>
+                      <p className='mt-3 text-xs text-gray-500 flex items-center gap-1'><FaClock /> Applied on {formattedDateMoment(application.createdAt.toISOString(), "MMM DD YYYY")}</p>
                       <div className="flex justify-between items-center mt-3">
                         <div>
                           {getStatusPhills(application.status as string)}

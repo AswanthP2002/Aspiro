@@ -34,13 +34,27 @@ export default function VerificationPage(){
     const [otpError, setOtpError] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
 
+    const location = useLocation()
+    const {email, id} = location.state || {}
+    
+    const navigate = useNavigate()
+    // useEffect(() => {
+    //     if(!email){
+    //         navigate('/login')
+    //     }else if(!id){
+    //         toast.info('No otp request found. Please request for an OTP', {autoClose: false})
+    //     }
+    // }, [])
+
     useEffect(() => {
-        if(!email){
-            navigate('/login')
-        }else if(!id){
-            toast.info('No otp request found. Please request for an OTP', {autoClose: false})
-        }
-    }, [])
+    if (!email) {
+        navigate('/login')
+    } else if (!id) {
+        toast.info('No otp request found. Please request for an OTP', {
+            autoClose: false
+        })
+    }
+}, [email, id, navigate])
 
     useEffect(() => {
         if(digit1){
@@ -76,14 +90,15 @@ export default function VerificationPage(){
     const [remainingtime, setreminingtime] = useState(OTP_EXPIRY_SECONDS)
     const [resendenabled, setresendenabled] = useState(false)
 
-    const location = useLocation()
-    const {email, id} = location.state || {}
+    useEffect(() => {
+        if(!email){
+            navigate('/login')
+        }
+    }, [email, navigate])
 
-    const navigate = useNavigate()
-
-    if(!email){
-        return navigate('/login')
-    }
+    // if(!email){
+    //     return navigate('/login')
+    // }
 
     const startTimer = () => {
         setresendenabled(false);

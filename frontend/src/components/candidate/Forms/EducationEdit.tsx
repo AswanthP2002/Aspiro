@@ -1,7 +1,6 @@
 import { Box, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { bachelorsDegree, diploma, higherSecondaryEducation, mastersDegree } from "../../../assets/data/educationalStreamsData";
-// import { editUserEducation } from "../../../services/userServices";
 import { editUserEducation } from "../../../services/educationServices";
 import { Controller, useForm } from "react-hook-form";
 import { Education } from "../../../types/entityTypes";
@@ -70,21 +69,23 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
         })
         return () => console.log('Component unmounted')
 
-    }, [])
+    }, [
+        reset,
+        selectedEducation.educationLevel,
+        selectedEducation.educationStream,
+        selectedEducation.endYear,
+        selectedEducation.isPresent,
+        selectedEducation.location,
+        selectedEducation.institution,
+        selectedEducation.startYear
+    ]) //Added these dependencies due to lint error, previously the array was empty
 
     const currentEducationStatus = watch("isPresent")
-
-    // const toggleIsPresent = () => {
-    //     setIspresent(prev => !prev)
-    // }
-
 
     async function editEducation(data : Inputs) {
         setLoading(true)
         const {educationLevel, stream, institution, location, startDate, endDate} = data
-        
-        //closeEditEducationModal()
-
+    
             try {
                 const result: EditEducationResponsePayload = await toast.promise(
                     editUserEducation(selectedEducation._id as string, educationLevel, stream, institution, isPresent, startDate, endDate, location),
@@ -175,7 +176,7 @@ export default function EditEducationForm({selectedEducation, onEditEducation, e
                             required:{value:true, message:'Education stream can not be empty'},
                             minLength:{value:3, message:'Minimum 3 charecters'},
                             maxLength:{value:50, message:'Maximum 50 charecters'},
-                            pattern:{value:/^[a-zA-Z0-9\s-&()\/]+$/, message:'Please enter valid education'}
+                            pattern:{value:/^[a-zA-Z0-9\s&()/-]+$/, message:'Please enter valid education'}
                         }}
                       />
                     : <>

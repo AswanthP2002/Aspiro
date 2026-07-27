@@ -22,7 +22,6 @@ import { toast } from "react-toastify";
 export default function RecruiterProfilePage(){
     const navigateTo = useNavigate();
     const [profileData, setProfileData] = useState<RecruiterProfileData | null>(null)
-    // const [isRecruiterProfileExist, setIsRecruiterProfileExist] = useState<boolean>(false)
     const [loading, setLoading] = useState(false)
     // const [error, setError] = useState<boolean>(false)
 
@@ -73,7 +72,7 @@ export default function RecruiterProfilePage(){
                 setLoading(false)
             }
         })()
-    }, [])
+    }, [navigateTo]) //previously empty
     return(
         <>
         {loading && (<ThreeDotLoading />)}
@@ -408,8 +407,12 @@ const CooldownScreen = ({recruiterData}: {recruiterData: RecruiterProfileData}) 
     
     useEffect(() => {
         setCurrentDate(moment(new Date()))
-        setBufferDate(moment(new Date(recruiterData.applicationResendBufferDate)))
-    }, [])
+        setBufferDate(moment(new Date(
+            recruiterData.applicationResendBufferDate
+                ? recruiterData.applicationResendBufferDate
+                : new Date()
+        )))
+    }, [recruiterData.applicationResendBufferDate]) //previously empty
     
     return(
         <div className="max-w-2xl mx-auto py-12 px-4">

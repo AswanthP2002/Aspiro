@@ -55,6 +55,7 @@ import IUpdateProfileViewUsecase from '../../application/interfaces/usecases/use
 import ResponseHandler from '../../utilities/response.handler';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import ValidateTokenUsecase from '../../application/usecases/user/ValidateToken.usecase';
+import IUserLoadHomePageDatasUsecase from '../../application/interfaces/usecases/user/IUserLoadHomePageData';
 
 const MockData = [
   { name: 'Alex Carter', headline: 'Building meaningful digital experiences' },
@@ -159,7 +160,8 @@ export class UserController {
     @inject('ILoadInterviewDashboardUsecase')
     private _loadInterviewDashboard: ILoadInterviewDashboardUsecase,
     @inject('IUpdateProfileViewUsecase') private _updateProfileView: IUpdateProfileViewUsecase,
-    @inject('IValidateTokenUsecase') private _validateToken: ValidateTokenUsecase
+    @inject('IValidateTokenUsecase') private _validateToken: ValidateTokenUsecase,
+    @inject('IUserLoadHomePageDataUsecase') private _UserLoadHomePage: IUserLoadHomePageDatasUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -296,32 +298,6 @@ export class UserController {
         });
       } else if (error instanceof Error) {
         console.log('Error occured while refreshing accessToken', error);
-        // switch (error.name) {
-        //   case 'TokenExpiredError':
-        //     console.log('inside the reauthenticate controller token expired');
-        //     res.status(StatusCodes.UNAUTHORIZED).json({
-        //       success: false,
-        //       message: StatusMessage.COMMON_MESSAGE.SESSION_EXPIRED,
-        //       errors: {
-        //         code: 'REFRESH_TOKEN_EXPIRED',
-        //         message: 'Refresh token expired, please login again',
-        //       },
-        //     });
-        //     break;
-
-        //   case 'JsonWebTokenError':
-        //     console.log('inside the reauthenticate controller toke error');
-        //     res.status(StatusCodes.UNAUTHORIZED).json({
-        //       success: false,
-        //       message: StatusMessage.AUTH_MESSAGE.INVALID_TOKEN,
-        //       errors: {
-        //         code: 'INVALID_TOKEN',
-        //         message: 'Invalid token, please login again',
-        //       },
-        //     });
-        //     break;
-
-        //   default:
         console.log('Refresh token verification failed');
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
@@ -1005,11 +981,6 @@ export class UserController {
         StatusCodes.OK,
         result
       );
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Profile view'),
-      //   result,
-      // });
     } catch (error) {
       next(error);
     }
@@ -1021,6 +992,15 @@ export class UserController {
       const result = await this._validateToken.execute(token);
       this._responseHandler.success(res, 'Validated', StatusCodes.OK, result);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async userLoadHomePageData(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._UserLoadHomePage.execute();
+      this._responseHandler.success(res, 'Datas fetched', StatusCodes.OK, result);
+    } catch (error: unknown) {
       next(error);
     }
   }

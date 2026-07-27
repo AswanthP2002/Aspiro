@@ -73,7 +73,7 @@ export default function JObDetailsCandidateSide() {
 
         fetchJobDetails()
         
-    }, [])
+    }, [jobDetails, jobId]) //updating dependancy array due to lint error, previously empty
 
     function goToApplyPage(jobId : string) {
         navigator(`/jobs/${jobId}/apply`, {state:{jobDetails}})
@@ -228,7 +228,7 @@ export default function JObDetailsCandidateSide() {
                         onClick={() => goToApplyPage(jobDetails?._id as string)}
                         className="border border-slate-300 text-green-500 text-sm font-semibold px-3 py-2 rounded-md"
                       >
-                        Applied on {formattedDateMoment(jobDetails?.createdAt, 'MMM DD YYYY')}
+                        Applied on {formattedDateMoment(jobDetails?.createdAt ? jobDetails.createdAt.toISOString() : new Date().toISOString(), 'MMM DD YYYY')}
                       </button>
                     </>
                   ) : (

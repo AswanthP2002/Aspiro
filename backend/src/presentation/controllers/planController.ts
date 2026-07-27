@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import ICreatePlanUsecase from '../../application/interfaces/usecases/plan/ICreatePlan.usecase';
-import { NextFunction, Request, response, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import { CreatePlanDTO, EditPlanDTO } from '../../application/DTOs/plan/plan.dto';
@@ -216,7 +216,7 @@ export default class PlanController {
   async handleWebhook(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sig = req.headers['stripe-signature'] as string;
     const rawBody = req.body;
-    console.log('-- Webhook Event triggered from the controller --')
+    console.log('-- Webhook Event triggered from the controller --');
     try {
       await this._handleWebhook.execute(sig, rawBody);
       res.status(StatusCodes.OK).json({ received: true });

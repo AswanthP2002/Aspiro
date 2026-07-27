@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { BiCheckCircle, BiInfoCircle, BiRefresh, BiShareAlt, BiTrendingUp } from "react-icons/bi"
 import { BsArrowRight } from "react-icons/bs"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -16,7 +16,9 @@ type InterviewResultType = {
 export default function InterviewCompletePage(){
 
     const location = useLocation()
-    const result = location.state || {}
+    const result = useMemo(() => {
+        return location.state || {}
+    }, [location.state]) //created its own usememo to prevent change in every rerender
     const [resultData, setResultData] = useState<InterviewResultType | null>(null)
     const navigate = useNavigate()
 
@@ -26,7 +28,7 @@ export default function InterviewCompletePage(){
         if(result) {
             setResultData(result?.result)
         }
-    }, [])
+    }, [result]) //previously empty
 
     return(
         <>

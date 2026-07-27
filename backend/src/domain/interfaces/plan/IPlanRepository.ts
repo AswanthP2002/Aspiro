@@ -11,5 +11,5 @@ export interface IPlanRepository extends IBaseRepo<Plan> {
     page: number,
     limit: number
   ): Promise<{ plans: PlanWithActiveUsersCount[]; totalPages: number } | null>;
-  findPlanByStripePriceId(stripePriceId: string): Promise<Plan | null>
+  findPlanByStripePriceId(stripePriceId: string): Promise<Plan | null>;
 }

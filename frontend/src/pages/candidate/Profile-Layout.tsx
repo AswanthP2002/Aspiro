@@ -38,7 +38,7 @@ export default function ProfileLayout() {
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setWindowSize]); //previously empty
 
   return (
     <>

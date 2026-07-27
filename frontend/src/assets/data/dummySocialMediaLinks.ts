@@ -1,4 +1,4 @@
-const socialMediaLinks : any[] = [
+const socialMediaLinks : {id: number, domain: string, url: string}[] = [
     {
         id:1,
         domain:'linkedin',

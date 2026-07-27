@@ -274,6 +274,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
   }
 
   async searchJobsFromHome(search: string = ''): Promise<JobAggregated[] | null> {
+    console.log('Checking search query', search);
     const result = await JobDAO.aggregate([
       {
         $lookup: {
@@ -283,7 +284,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
           as: 'companyDetails',
         },
       },
-      { $unwind: '$companyDetails' },
+      { $unwind: { path: '$companyDetails', preserveNullAndEmptyArrays: true } },
       { $match: { jobTitle: { $regex: new RegExp(search, 'i') } } },
     ]);
     return result;
@@ -652,8 +653,31 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
     };
   }
 
-  // async getRecruiterJobsByRecruiterIdTemp(recruiterId: string): Promise<Job[] | null> {
-  //   const result = await JobDAO.find({ recruiterId: new mongoose.Types.ObjectId(recruiterId) });
-  //   return result;
-  // }
+  async getActiveJobsCount(): Promise<{ count: number } | null> {
+    const result = await JobDAO.find({
+      isHidden: false,
+    }).countDocuments();
+
+    return { count: result };
+  }
+
+  async getJobsByTitleAndOpenings(): Promise<{ jobTitle: string; openings: number }[] | null> {
+    const result = await JobDAO.aggregate([
+      {
+        $group: {
+          _id: '$jobTitle',
+          openings: { $sum: '$vacancies' },
+        },
+      },
+    ]);
+
+    const mappedResult = result.map((data) => {
+      return {
+        jobTitle: data._id,
+        openings: data.openings,
+      };
+    });
+
+    return mappedResult;
+  }
 }

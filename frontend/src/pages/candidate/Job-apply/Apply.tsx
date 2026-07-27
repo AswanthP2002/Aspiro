@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
@@ -40,7 +40,9 @@ export default function JobApplyPage() {
     const jobId = params.id
 
     const location = useLocation()
-    const data = location.state?.jobDetails || {}
+    const data = useMemo(() => {
+      return location.state?.jobDetails || {}
+    }, [location.state?.jobDetails])
     const navigatTo = useNavigate()
     console.log('--checking what is coming from the backend--', location.state)
     console.log('job details through location obj', data)
@@ -53,7 +55,7 @@ export default function JobApplyPage() {
     }
 
     function selectResume(event : React.ChangeEvent<HTMLInputElement>){
-        const file = event?.target?.files[0]
+        const file = event.target.files ? event?.target?.files[0] : null
         console.log('checking the file', file)
         if(file){
             setResume(file)
@@ -80,8 +82,19 @@ export default function JobApplyPage() {
         
         const coverletternillerror = !coverLetterContent || !/^[a-zA-Z0-9\s.,!?;:'"@#$%&*()\-_/+=\r\n]{50,2000}$/.test(coverLetterContent) || false
 
-        resumenillerror ? setResumeNillError('Please select file first') : setResumeNillError('')
-        coverletternillerror ? setResumeCoverLetterContentNillError('Write your cover letter') : setResumeCoverLetterContentNillError('')
+        if(resumenillerror){
+          setResumeNillError('Please select file first')
+        }else {
+          setResumeNillError('')
+        }
+
+        if(coverletternillerror){
+          setResumeCoverLetterContentNillError('Write your cover letter')
+        }else{
+          setResumeCoverLetterContentNillError('')
+        }
+        // resumenillerror ? setResumeNillError('Please select file first') : setResumeNillError('')
+        // coverletternillerror ? setResumeCoverLetterContentNillError('Write your cover letter') : setResumeCoverLetterContentNillError('')
 
         if(resumenillerror || coverletternillerror) return false
 
@@ -132,7 +145,7 @@ export default function JobApplyPage() {
             }
             // toast.info('Testing done')
 
-            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, savedResumeId || resumeResult?.result?._id);
+            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id as string, coverLetterContent, savedResumeId || resumeResult?.result?._id);
 
             if (!applicationResult?.success) {
                 throw new Error(applicationResult?.message || 'Failed to submit application.');

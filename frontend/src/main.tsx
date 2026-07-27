@@ -4,7 +4,8 @@ import App from './App.tsx';
 import { Provider } from 'react-redux';
 import store from './redux/store.ts';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import AppContextProvider from './context/AppContext.tsx';
+// import AppContextProvider from './context/AppContext.tsx';
+import AppContextProvider from './context/AppContextProvider.tsx';
 import ErrorBoundary from './components/ErrorBoundary.tsx';
 import { BrowserRouter } from 'react-router-dom';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import { getApplicationDetails, getSingleApplicationDetails, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus, verifyBeforeManageApplications } from "../../../services/recruiterServices"
@@ -16,7 +16,7 @@ import { Controller, useForm } from "react-hook-form"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DateField } from "@mui/x-date-pickers/DateField"
-import { ApplicationsAggregated, Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData, Skills } from "../../../types/entityTypes"
+import { Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData } from "../../../types/entityTypes"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { BsArrowLeft } from "react-icons/bs"
 import { toast } from "react-toastify"
@@ -25,20 +25,18 @@ import { AxiosError } from "axios"
 
 export default function ApplicantManagePage(){
     const location = useLocation()
-    // const [selectedCards, setSelectedCards] = useState<any[]>([])
     const [selectedApplication, setSelectedApplication] = useState<string | null>(null)
     const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
     const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer' | string>('all')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    // const [limit, setLimit] = useState(5)
-    // const [selectionMode, setSelectionMode] = useState(false)
-    // const [loading, setLoading] = useState(false);
-    // const [jobDetails, setJobDetails] = useState<any>(null);
+   
     console.log(setPage, setTotalPages)
     const params = useParams()
-    const jobId = params.jobId || location.state.jobId || {}
+    const jobId = useMemo(() => {
+        return params.jobId || location.state.jobId || {}
+    }, [location.state.jobId, params.jobId])
     const [isAllowedToManageApplications, setIsAllowedToManageApplications] = useState<boolean>(true)
     // const navigator = useNavigate()
 
@@ -52,21 +50,21 @@ export default function ApplicantManagePage(){
 
     // const toggleFilterMenuOpen = () => setIsFilterMenuOpened(prv => !prv)
 
-    type InterviewFormData = {
-  date: Dayjs | null;
-  time: Dayjs | null;
-  interviewType: string;
-  gmeetUrl: string;
-  interviewerName: string;
-  note: string;
-  sendEmail: boolean;
-};
+//     type InterviewFormData = {
+//   date: Dayjs | null;
+//   time: Dayjs | null;
+//   interviewType: string;
+//   gmeetUrl: string;
+//   interviewerName: string;
+//   note: string;
+//   sendEmail: boolean;
+// };
 
-    type EmailContents = {
-        to: string,
-        subject: string,
-        body: string
-    }
+    // type EmailContents = {
+    //     to: string,
+    //     subject: string,
+    //     body: string
+    // }
     // const [emailAttachment, setEmailAttachment] = useState(null)
     // const [emailModalOpen, setEmailModalOpen] = useState(false)
     // const {
@@ -102,117 +100,6 @@ export default function ApplicantManagePage(){
 //     }
 //   });
 
-  
-
-    // function rejectIndividualCandidate(candidateId : string, applicationId : string){
-    //     Swal.fire({
-    //         title: 'Reject Candidate',
-    //         html: ` 
-    //   <label class="text-sm">Reason</label>
-    //   <select id="reasonSelect" class="">
-    //     <option value="">-- Select reason --</option>
-    //     <option value="Does not meet basic qualification">Does not meet basic qualification</option>
-    //     <option value="Insufficient experience">Insufficient experience</option>
-    //     <option value="Skill mismatch">Skill mismatch</option>
-    //     <option value="Education criteria not met">Education criteria not met</option>
-      
-    //     </select>
-    //   <textarea id="rejectionMessage" class="w-full swal2-textarea" placeholder="Write rejection message"></textarea>
-    // `,
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Confirm',
-    //         cancelButtonText: 'Cancel',
-    //         preConfirm: () => {
-    //             const reason = (document.getElementById('reasonSelect') as HTMLSelectElement).value;
-    //             const message = (document.getElementById('rejectionMessage') as HTMLTextAreaElement).value;
-
-    //             if (!reason) {
-    //                 Swal.showValidationMessage('Please select a reason');
-    //             }
-    //             return { reason, message };
-    //         }
-    //     }).then(async (result) => {
-    //         if (result.isConfirmed) {
-    //             const { reason, message } = result.value as { reason: string; message: string };
-
-    //             rejectJobApplication(candidateId, applicationId, reason, message)
-    //                 .then((res) => {
-    //                     if (!res?.success) return Notify.failure(res?.message);
-    //                     Swal.fire({
-    //                         icon:'success',
-    //                         title:'Rejected',
-    //                         text:'Application rejected successfully',
-    //                         showConfirmButton:false,
-    //                         showCancelButton:false,
-    //                         timer:1500
-    //                     });
-    //                     setApplications(prev => prev.filter(app => app._id !== applicationId));
-    //                 })
-                
-    //         }
-    //     });
-    // }
-
-    // const toggleCardSelection = (id : string) => { //toggle individual cards
-    //     if(selectedCards.includes(id)){
-    //         setSelectedCards(prev => prev.filter(x => x !== id))
-    //     }else{
-    //         setSelectedCards(prev => [...prev, id])
-    //     }
-    // }
-
-    // const handleShortlistSingle = (id : string) => {
-    //     const foundedApplication = applications.find((app) => app._id === id);
-
-    //     setShortList((prev) => {
-    //         if (prev.some((p) => p._id === id)) return prev;
-    //         return [...prev, foundedApplication];
-    //     })
-
-    //     setApplications((prev) => {
-    //         return prev.filter((app) => app._id !== id)
-    //     })
-
-    // }
-
-    // const handleRemoveFromShortList = (id : string) => {
-    //     const foundApplication = shortList.find((app) => app._id === id);
-
-    //     setApplications((prev) => [...prev, foundApplication])
-    //     setShortList((prev) => prev.filter((app) => app._id !== id))
-    // }
-
-    // const handleShortlistAll = () => {
-    //     if (selectedCards.length === 0) return Notify.info('Please select candidates to shortlist.');
-    //     const allSelectedApplications = applications.filter((item) => selectedCards.includes(item._id))
-    //     setShortList(allSelectedApplications);
-
-    //     setApplications(prev => prev.filter(app => !selectedCards.includes(app._id)));
-    // }
-
-    // const selectFromOption = (id : string) => {
-    //     setSelectionMode(true)
-    //     setSelectedCards([id])
-    // }
-
-    // const selectAllCard = () => {
-    //     setSelectionMode(true)
-    //     setSelectedCards(applications.map((application : any) => application?._id))
-    // }
-
-    // const unselectAllCard = () => {
-    //     setSelectionMode(false)
-    //     setSelectedCards([])
-    // }
-
-    //reusable code for filtering applications
-    // const filterApplications = (
-    //     applications: ApplicationsAggregated[],
-    //     status: 'applied' | 'screening' | 'interview' | 'rejected' | 'hired' | 'offer'
-    // ) => {
-    //     const filteredApplications = applications.filter((application: ApplicationsAggregated) => application.status === status)
-    //     return filteredApplications
-    // }
 
     // const [job, setJob] = useState<string>('')
     const [applications, setApplications] = useState<JobApplicationsListForRecruiter[]>([])
@@ -314,7 +201,7 @@ export default function ApplicantManagePage(){
                 // setLoading(false);
             }
         })()
-    }, [search, page, filter])
+    }, [search, page, filter, jobId]) //newly added jobid
     
     useEffect(() => {
         if(selectedApplication){
@@ -329,7 +216,7 @@ export default function ApplicantManagePage(){
             }
         })()
         }
-    }, [notes])
+    }, [notes, selectedApplication]) //previoulsy notes only
     
     return (
         <>
@@ -522,7 +409,7 @@ export function StatusPhills({status}: {status: string}){
   }
 }
 
-export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e) => void}){
+export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e: React.ChangeEvent<HTMLInputElement>) => void}){
     
     type InterviewFormData = {
   date: Dayjs | null;
@@ -838,7 +725,7 @@ const interviewTypes = [
 
                         <div className="mt-5">
                      <p className="font-light">Notes</p>
-                     <textarea value={applicationDetails.notes} onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+                     <textarea value={applicationDetails.notes} onChange={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
                  </div>
                  <div className="mt-5 space-y-2">
                      <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>

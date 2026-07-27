@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { BiStar, BiUpload } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { IoCloseCircle } from 'react-icons/io5';
-// import { addUserResume } from '../../../services/userServices';
 import { addUserResume } from '../../../services/resumeServices'; 
 import { Resumes } from '../../../types/entityTypes';
 import { toast } from 'react-toastify';

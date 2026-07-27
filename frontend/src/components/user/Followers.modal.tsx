@@ -23,7 +23,6 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [hasMore, setHasMore] = useState(true)
-  const [limit, setLimit] = useState(5)
   const navigate = useNavigate()
   
   const logedUser = useSelector((state: RootUser) => {
@@ -33,7 +32,7 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
   console.log('-- checking loged user -- ', logedUser)
 
   const observer = useRef<null | IntersectionObserver>(null)
-  const lastFollowerRef = useCallback((node) => {
+  const lastFollowerRef = useCallback((node: HTMLDivElement) => {
     if(loading) return
     if(observer.current) observer.current.disconnect()
 
@@ -49,10 +48,11 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
 
   }, [loading])
 
-  async function fetchFollowers(){
+  const fetchFollowers = useCallback(() => {
+    return async function (){
       setLoading(true)
       try {
-        const result = await getFollowers(userId, search, page, limit)
+        const result = await getFollowers(userId, search, page, 5)
         if(result?.success){
           // toast.success('Followers fetched')
           console.log('-- follow fetching reuslt ==', result)
@@ -69,6 +69,7 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
         }, 2000);
       }
   }
+  }, [page, search, userId])
 
   const navigateToUserProfile = (userId: string) => {
     if(!userId) return
@@ -141,7 +142,7 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
     if(hasMore){
       fetchFollowers()
     }
-  }, [page, search, limit])
+  }, [page, search, fetchFollowers, hasMore])
   return(
     <>
     <Modal open={isOpen} className='flex items-center justify-center p-4 backdrop-blur-sm bg-black/20'>

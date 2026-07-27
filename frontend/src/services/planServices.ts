@@ -2,7 +2,7 @@ import { AxiosError, HttpStatusCode } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { PlanApiEndpoints } from "../constants/endPoints/plan.endpoints"
 
-export const createPlan = async (data: {[key: string]: string | number | boolean}) => {
+export const createPlan = async (data: {[key: string]: string | number | boolean | string[]}) => {
     try {
         const response = await axiosInstance.post(PlanApiEndpoints.ADMIN.CREATE_PLAN, data,
             {
@@ -48,7 +48,7 @@ export const adminDeletePlan = async (planId: string) => {
     }
 }
 
-export const adminEditPlan = async (planId: string, data: {[key: string]: string | number | boolean}) => {
+export const adminEditPlan = async (planId: string, data: {[key: string]: string | number | string[] | boolean}) => {
     try {
         const response = await axiosInstance.put(PlanApiEndpoints.ADMIN.EDIT_PLAN_BY_ID(planId),
             data,

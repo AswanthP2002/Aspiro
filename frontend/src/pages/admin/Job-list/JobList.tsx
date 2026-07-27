@@ -21,14 +21,13 @@ export default function Jobs() {
   
   const [jobs, setjobs] = useState<AdminJobListsData[]>([])
   const [search, setsearch] = useState("")
-  const [limit, setlimit] = useState(5)
   const [page, setpage] = useState(1)
   const [totalPages, settotalpages] = useState(1)
   const [reportsCount, setReportsCount] = useState(0)
   const [statusFilter, setStatusFilter] = useState<'all' | 'expired' | 'active'>('all')
   
   // const [sort, setsort] = useState('job-latest')
-  const [sortVisibility, setSortVisibility] = useState(false)
+  // const [sortVisibility, setSortVisibility] = useState(false)
   // const [currentSort, setCurrentSort] = useState('job-latest')
   
   const [filter, setFilter] = useState<filterType>({
@@ -38,6 +37,8 @@ export default function Jobs() {
     minSalary:'',
     maxSalary:''
   })
+
+  console.log(typeof setFilter)
 
   const jobsTableColumn: TableColumn<AdminJobListsData>[] = [
     {
@@ -75,7 +76,7 @@ export default function Jobs() {
       header: 'DATE POSTED',
       key: 'createdAt',
       render: (row: AdminJobListsData) => (
-        <div><p className='text-xs'>{formatRelativeTime(row.createdAt)}</p></div>
+        <div><p className='text-xs'>{formatRelativeTime(row.createdAt ?? new Date())}</p></div>
       )
     },
     {
@@ -111,12 +112,12 @@ export default function Jobs() {
       header: 'ACTIONS',
       key: 'actions',
       render: (row: AdminJobListsData) => (
-        <button onClick={() => viewJobDetails(row._id)} className='text-blue-500 font-medium'>View Details</button>
+        <button onClick={() => viewJobDetails(row._id as string)} className='text-blue-500 font-medium'>View Details</button>
       )
     }
   ]
 
-  const [filterVisibility, setFilterVisibility] = useState(false)
+  // const [filterVisibility, setFilterVisibility] = useState(false)
 
   // const openFilter = () => setFilterVisibility(true)
   // const closeFilter = () => setFilterVisibility(false)
@@ -134,7 +135,7 @@ export default function Jobs() {
 
     async function fetchJobDetails(){
       
-        const result = await getJobs(search, page, limit, statusFilter, '', reportsCount)
+        const result = await getJobs(search, page, 5, statusFilter, '', reportsCount)
         console.log('--checking job list from the backend--', result)
         setjobs(result?.result?.jobs)
         settotalpages(result?.result.totalPages)
@@ -142,17 +143,7 @@ export default function Jobs() {
     }
 
     fetchJobDetails()
-  }, [search, page, reportsCount, limit, statusFilter])
-
-  // function formatDate(createdAt : Date | string) : string {
-  //   const joined = new Date(createdAt)
-  //   return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
-  // }
-
-  // function selectjob(job : any){
-  //   setselectedjob(job)
-  //   console.log('Selected company ', selectedjob)
-  // }
+  }, [search, page, reportsCount, statusFilter])
 
   function viewJobDetails(jobId : string){
     navigator(`/admin/job/details/${jobId}`)
@@ -184,14 +175,6 @@ export default function Jobs() {
     })
   }
 
-  // const changePage = (pagenumber : number) => {
-  //   setpage(pagenumber)
-  // }
-
-  // const nextPage = () => setpage(prev => prev + 1)
-  // const previousPage = () => setpage(prev => prev - 1)
-
-
   return (
     <>
       <div className="w-full min-h-screen p-5 lg:p-10 bg-gray-100">
@@ -207,7 +190,7 @@ export default function Jobs() {
               <div className="border border-gray-200 rounded-md px-3 py-1.5 flex items-center gap-2 bg-white">
                 <IoSearchOutline className="text-gray-400" />
                 <input 
-                  onKeyUp={(event) => dSearch(event)} 
+                  onChange={(event) => dSearch(event)} 
                   type="text" 
                   className="text-xs w-full outline-none bg-transparent" 
                   placeholder="Search jobs" 

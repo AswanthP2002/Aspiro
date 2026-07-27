@@ -1,8 +1,4 @@
-// import dummyCompany from '/company.jpg'
-// import shculler from '/schuller.jpg'
-// import klara from '/klara.jpg'
-// import hektor from '/hektor.jpg'
-// import lucas from '/lucas.jpg'
+
 import { useEffect, useState } from 'react'
 import { LuUserPlus } from 'react-icons/lu'
 import { PiSuitcase } from 'react-icons/pi'
@@ -13,25 +9,10 @@ import { toast } from 'react-toastify'
 import { BiSearch } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom'
 
-// const suggestedUsers = [
-//     {name:"Le Schuller", role:"Project Manager",image:shculler},
-//     {name:"Hektor Fort", role:"Graphic Desginer",image:hektor},
-//     {name:'Klara', role:'Prompt Engineer', image:klara},
-//     {name:'Lucas Bergvel', role:'HR Manager', image:lucas}
-// ]
-
-// const suggestedJobs = [
-//     {name:"Node Js Developer", company:"Konami",image:dummyCompany},
-//     {name:"Sales Executive", company:"Nabraz",image:dummyCompany},
-//     {name:"English Tutor", company:"Pragathi",image:dummyCompany},
-//     {name:"Python Intern", company:"Mosch",image:dummyCompany}
-// ]
-
 export default function SuggessionBar(){
     const [familiarUsers, setFamiliarUsers] = useState<SimilarSkillUserData[]>([])
     const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJobsData[]>([])
-    // const [suitableJobs, setSuitableJobs] = useState<any>(suggestedJobs)
-    const [loading, setLoading] = useState(true)
+    // const [loading, setLoading] = useState(true)
     // const [loadingFamiliarUsers, setLodingFamiliarUsers] = useState(true)
     // const [loadingSuitableJobs, setLoadingSuitableJobs] = useState(true)
     const navigate = useNavigate()
@@ -58,7 +39,7 @@ export default function SuggessionBar(){
 
     useEffect(() => {
         (async function(){
-          setLoading(true)
+          // setLoading(true)
           try {
             const [
               similarUserResult,
@@ -70,14 +51,12 @@ export default function SuggessionBar(){
 
             setRecommendedJobs(recommendedJobsResult.result)
             setFamiliarUsers(similarUserResult.result)
-          // if(result?.success){
-          //   setFamiliarUsers(result?.result)
-          // }
+          
           } catch (error) {
             console.log(error)
             toast.error(error instanceof Error ? error.message : 'Can not fetch suggestions')
           } finally {
-            setLoading(false)
+            // setLoading(false)
           }
         })()
 

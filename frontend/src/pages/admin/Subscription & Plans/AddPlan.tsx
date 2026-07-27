@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { AiFillRocket } from 'react-icons/ai';
 import { BsArrowLeft } from 'react-icons/bs';
@@ -32,10 +31,6 @@ const PlanConfiguration = () => {
     socialFeed: boolean
     jobRecommendation: boolean
   }
-
-  // const [isJobPostingUnlimited, setIsJobPostingUnlimited] = useState(true)
-  // const [isJobApplicationUnlimited, setIsJobApplicationUnlimited] = useState(true)
-  // const [connectionRequests, setConnectionRequests] = useState(true)
 
   const { register, control, handleSubmit, watch, formState: { errors } } = useForm<AddPlanFormData>({
     defaultValues: {
@@ -87,7 +82,7 @@ const PlanConfiguration = () => {
 
   const selectedIcon = watch('badgeIcon')
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: AddPlanFormData) => {
     
     const booleaFeaturesKey = featuresList
       .filter(f => !f.isNumeric)
@@ -212,15 +207,7 @@ const PlanConfiguration = () => {
                   />
                   <label htmlFor="" className='!text-xs !text-red-500'>{errors.monthlyPrice?.message}</label>
                 </div>
-                {/* <div>
-                  <label className="block text-xs font-bold mb-1.5">Yearly Price</label>
-                  <input 
-                    type="number"
-                    {...register('yearlyPrice', {required: {value: true, message: 'Yearly price can not be empty'}, min: {value: 0, message: 'Enter a valid amount'}})}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <label htmlFor="" className='!text-xs !text-red-500'>{errors.yearlyPrice?.message}</label>
-                </div> */}
+                
               </div>
             </section>
 

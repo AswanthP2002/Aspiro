@@ -9,12 +9,6 @@ import { Certificates } from "../../../types/entityTypes";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 
-// interface AddCertificateResponsePayload {
-//     success: boolean
-//     message: string
-//     result: Certificates
-// }
-
 interface AddCertificateModalProps {
     certificateModalOpen: boolean
     closeCertificateModal: () => void

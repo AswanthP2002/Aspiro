@@ -457,6 +457,25 @@ export interface MyJobData {
   expiresAt?: string;
 }
 
+export interface HomePageData {
+  overview: {
+    jobs: number;
+    companies: number;
+    recruiters: number;
+    users: number;
+  };
+  jobVacancies: { jobTitle: string; openings: number }[];
+}
+
+
+export interface HomePageJobSearchData {
+  _id?: string;
+  jobTitle: string;
+  company?: string;
+  location: string;
+  workMode?: string;
+}
+
 export interface AdminCompanyData {
   _id?: string;
   name: string;
@@ -882,7 +901,9 @@ export interface UserPublicProfileData {
 
   skills: Skills[];
 
-  posts: Post[];
+  // posts: Post[];
+
+  posts: UserPosts[]
 
   recruiterProfile: Recruiter;
 

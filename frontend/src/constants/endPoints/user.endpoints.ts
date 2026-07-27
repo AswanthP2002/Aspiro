@@ -91,5 +91,6 @@ export const EndPoints = {
     START_AI_INTERVIEW: '/v2/interview/ai',
     LOAD_DASHBOARD: '/v2/interview/ai/dashboard',
 
-    VALIDATE_TOKEN: '/v1/token-verify'
+    VALIDATE_TOKEN: '/v1/token-verify',
+    LOAD_HOME_PAGE_DATA: '/v1/home/datas',
 } as const

@@ -46,9 +46,6 @@ export default function Sidebar(){
   })
  }
 
-  // const token = useSelector((state : any) => {
-  //   return state.userAuth.userToken
-  // })
   return (
     <>
       <div className='w-64 flex !opacity-100 flex-col border-r border-gray-200 !bg-white h-screen'>

@@ -4,11 +4,11 @@ import { formatRelativeTime, formattedDateMoment } from "../../../services/util/
 import { FaClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { BiVideo } from "react-icons/bi";
-import { Button, FormControl, FormHelperText, Modal, Skeleton, Switch } from "@mui/material";
-import { CiWarning } from "react-icons/ci";
-import { FaXmark } from "react-icons/fa6";
-import { Controller, useForm } from "react-hook-form";
-import { Notify } from "notiflix";
+import { Skeleton, Switch } from "@mui/material";
+// import { CiWarning } from "react-icons/ci";
+// import { FaXmark } from "react-icons/fa6";
+// import { Controller, useForm } from "react-hook-form";
+// import { Notify } from "notiflix";
 import { useLocation, useNavigate } from "react-router-dom";
 import { InterviewData, TrackMyJobApplicationData } from "../../../types/entityTypes";
 import { deleteMyApplication, getMyInterviews, trackMyApplication } from "../../../services/userServices";
@@ -299,78 +299,78 @@ export default function ApplicationTrack(){
     )
 }
 
-function WithdrawApplicationModal(){
+// function WithdrawApplicationModal(){
     
-    type WithdrawFormInput = {
-        captcha: string
-    }
+//     type WithdrawFormInput = {
+//         captcha: string
+//     }
 
-    const {watch, handleSubmit, formState: {errors}, control} = useForm<WithdrawFormInput>({defaultValues: {captcha: ''}})
+//     const {watch, handleSubmit, formState: {errors}, control} = useForm<WithdrawFormInput>({defaultValues: {captcha: ''}})
 
-    const submitApplicationWithdrawal = async (data: WithdrawFormInput) => {
-        Notify.success(data.captcha)
-    }
+//     const submitApplicationWithdrawal = async (data: WithdrawFormInput) => {
+//         Notify.success(data.captcha)
+//     }
 
-    return(
-        <Modal open className="flex flex-col items-center justify-center">
-            <div className="bg-white p-5 rounded-md w-md lg:w-lg">
-                <div className="header flex justify-between">
-                    <div className="flex items-start gap-2">
-                        <CiWarning color="orange" size={30} />
-                        <div>
-                            <p className="font-semibold">Withdraw application</p>
-                            <p className="text-xs text-gray-500">This action can not be undone</p>
-                        </div>
-                    </div>
-                    <div>
-                        <button className="p-2 hover:bg-gray-200 rounded-md"><FaXmark /></button>
-                    </div>
-                </div>
-                <div className="mt-5">
-                    <div className="bg-orange-50 p-3 rounded-md ring-1 ring-orange-300">
-                        <p className="text-sm text-gray-700">You are about to withdraw your application for</p>
-                        <p className="font-semibold text-sm mt-3">React Native Developer</p>
-                        <p className="text-xs text-gray-500">Aquila | Posted by Unai Emery</p>
-                    </div>
-                    <div className="mt-5">
-                        <p className="text-sm font-medium">What happens when you withdraw?</p>
-                        <ul className="mt-3 list-disc space-y-2">
-                            <li className="ms-4 text-xs text-gray-500">Your application will be permanently removed</li>
-                            <li className="ms-4 text-xs text-gray-500">You will need to re apply if you changed your mind</li>
-                        </ul>
-                    </div>
-                    <div className="mt-5">
-                        <p className="text-sm">Type <span className="text-red-500 font-medium uppercase">withdraw</span> to continue</p>
-                        <form onSubmit={handleSubmit(submitApplicationWithdrawal)}>
-                            <FormControl fullWidth error={Boolean(errors.captcha)}>
-                                <Controller
-                                    control={control}
-                                    name="captcha"
-                                    rules={{
-                                        required: {value: true, message: 'This is a mandatory field'},
-                                        validate: (data) => {
-                                            return data !== 'WITHDRAW' || "Please enter the correct word to continue"
-                                        }
-                                    }}
-                                    render={({field}) => (
-                                        <input
-                                            {...field}
-                                            type="text"
-                                            placeholder="Enter the word"
-                                            className="bg-gray-200 p-2 rounded-md border border-slate-300 mt-1"
-                                        />
-                                    )}
-                                />
-                                <FormHelperText>{errors.captcha?.message}</FormHelperText>
-                            </FormControl>
-                            <div className="w-full mt-3 flex justify-end gap-2">
-                                <button type="button" className="text-xs font-medium px-2 py-2 border border-slate-300 rounded-md">Cancel</button>
-                                <Button type="submit" variant="contained" className="!text-xs !font-medium">Withdraw</Button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </Modal>
-    )
-}
+//     return(
+//         <Modal open className="flex flex-col items-center justify-center">
+//             <div className="bg-white p-5 rounded-md w-md lg:w-lg">
+//                 <div className="header flex justify-between">
+//                     <div className="flex items-start gap-2">
+//                         <CiWarning color="orange" size={30} />
+//                         <div>
+//                             <p className="font-semibold">Withdraw application</p>
+//                             <p className="text-xs text-gray-500">This action can not be undone</p>
+//                         </div>
+//                     </div>
+//                     <div>
+//                         <button className="p-2 hover:bg-gray-200 rounded-md"><FaXmark /></button>
+//                     </div>
+//                 </div>
+//                 <div className="mt-5">
+//                     <div className="bg-orange-50 p-3 rounded-md ring-1 ring-orange-300">
+//                         <p className="text-sm text-gray-700">You are about to withdraw your application for</p>
+//                         <p className="font-semibold text-sm mt-3">React Native Developer</p>
+//                         <p className="text-xs text-gray-500">Aquila | Posted by Unai Emery</p>
+//                     </div>
+//                     <div className="mt-5">
+//                         <p className="text-sm font-medium">What happens when you withdraw?</p>
+//                         <ul className="mt-3 list-disc space-y-2">
+//                             <li className="ms-4 text-xs text-gray-500">Your application will be permanently removed</li>
+//                             <li className="ms-4 text-xs text-gray-500">You will need to re apply if you changed your mind</li>
+//                         </ul>
+//                     </div>
+//                     <div className="mt-5">
+//                         <p className="text-sm">Type <span className="text-red-500 font-medium uppercase">withdraw</span> to continue</p>
+//                         <form onSubmit={handleSubmit(submitApplicationWithdrawal)}>
+//                             <FormControl fullWidth error={Boolean(errors.captcha)}>
+//                                 <Controller
+//                                     control={control}
+//                                     name="captcha"
+//                                     rules={{
+//                                         required: {value: true, message: 'This is a mandatory field'},
+//                                         validate: (data) => {
+//                                             return data !== 'WITHDRAW' || "Please enter the correct word to continue"
+//                                         }
+//                                     }}
+//                                     render={({field}) => (
+//                                         <input
+//                                             {...field}
+//                                             type="text"
+//                                             placeholder="Enter the word"
+//                                             className="bg-gray-200 p-2 rounded-md border border-slate-300 mt-1"
+//                                         />
+//                                     )}
+//                                 />
+//                                 <FormHelperText>{errors.captcha?.message}</FormHelperText>
+//                             </FormControl>
+//                             <div className="w-full mt-3 flex justify-end gap-2">
+//                                 <button type="button" className="text-xs font-medium px-2 py-2 border border-slate-300 rounded-md">Cancel</button>
+//                                 <Button type="submit" variant="contained" className="!text-xs !font-medium">Withdraw</Button>
+//                             </div>
+//                         </form>
+//                     </div>
+//                 </div>
+//             </div>
+//         </Modal>
+//     )
+// }

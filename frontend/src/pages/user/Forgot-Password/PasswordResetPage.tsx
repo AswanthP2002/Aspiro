@@ -64,7 +64,7 @@ export default function PasswordResetPage(){
         }
 
         validateSessionToken()
-    }, [])
+    }, [navigate, token]) //previosly empty
 
     return(
         <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex justify-center items-center">

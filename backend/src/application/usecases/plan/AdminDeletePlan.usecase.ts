@@ -4,7 +4,6 @@ import { IPlanRepository } from '../../../domain/interfaces/plan/IPlanRepository
 import { PlanDTO } from '../../DTOs/plan/plan.dto';
 import { PlanMapper } from '../../mappers/plan/plan.mapperClass';
 import { ISubscriptionService } from '../../interfaces/services/IPayment.services';
-import { ResourceAlreadyExistError, ResourceNotFound } from '../../../domain/errors/AppError';
 
 @injectable()
 export default class AdminDeletePlanUsecase implements IAdminDeletePlanUsecase {

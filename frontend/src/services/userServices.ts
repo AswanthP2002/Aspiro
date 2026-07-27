@@ -888,7 +888,7 @@ export const getUsersForPublic = async (search: string, roleTypeFilter: string, 
     }
 }
 
-export const getUsers = async (search: string, page: number, sort : string, filter : any) => {
+export const getUsers = async (search: string, page: number, sort : string, filter : {status: boolean[], roles: string[], verification: boolean[]}) => {
     try {
         const response = await axiosInstance.get(EndPoints.LOAD_ALL_USERS, {
             params:{search, page, sort, filter:JSON.stringify(filter)},
@@ -1043,5 +1043,15 @@ export const loadInterviewDashboard = async () => {
     } catch (error) {
         const err = error as AxiosError
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const loadHomePageData = async () => {
+    try {
+        const response = await axiosInstance.get(EndPoints.LOAD_HOME_PAGE_DATA)
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }

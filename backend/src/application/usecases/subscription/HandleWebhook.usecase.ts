@@ -120,8 +120,8 @@ export default class HandleWebhookUsecase implements IHandleWebhookUsecase {
           updatedAt: new Date(),
           planMetaData: {
             name: planDetails.name,
-            price: planDetails.monthlyPrice
-          }
+            price: planDetails.monthlyPrice,
+          },
         });
       }
     }

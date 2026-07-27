@@ -78,17 +78,14 @@ export default function InterviewPage(){
     }
 
     useEffect(() => {
-        let interval: ReturnType<typeof setInterval>
-        if(!isStarted){
-            return () => clearTimeout(interval)
-        }
-        
-        interval = setInterval(() => {
-            setSeconds((prv) => prv <= 0 ? 0 : prv - 1)
-        }, 1000)
+      if (!isStarted) return;
 
-        return () => clearInterval(interval)
-    }, [isStarted])
+      const interval = setInterval(() => {
+        setSeconds((prev) => (prev <= 0 ? 0 : prev - 1));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [isStarted]);
 
     const sendMessage = async () => {
         if(!message) return

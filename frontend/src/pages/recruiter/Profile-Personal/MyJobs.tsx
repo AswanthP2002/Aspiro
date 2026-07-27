@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteJob, getJobs, getPostedJobDetails } from "../../../services/recruiterServices";
 import Swal from "sweetalert2";
@@ -48,14 +48,14 @@ export default function MyJobs() {
       setSelectedJobId('')
     }
 
-    const searchByJobTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchByJobTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         console.log('the value being entered', e.target.value)
         setSearch(e.target.value)
-    }
+    }, [])
 
     const navigate = useNavigate()
 
-    const searchWhileTyping = useCallback(debouncedSearch(searchByJobTitle, 500), []);
+    const searchWhileTyping = useMemo(() => debouncedSearch(searchByJobTitle, 500), [searchByJobTitle]);
 
     async function deleteJobByRecruiter(jobId: string){
         Swal.fire({
@@ -144,7 +144,7 @@ export default function MyJobs() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Search by Title</label>
-            <input onKeyUp={(e) => searchWhileTyping(e)} type="text" placeholder="e.g. Software Engineer" className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500" />
+            <input onChange={(e) => searchWhileTyping(e)} type="text" placeholder="e.g. Software Engineer" className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -262,7 +262,7 @@ function TestJobModal({open, onClose, jobId}: {open: boolean, onClose: () => voi
     }
 
     fetchJobDetails()
-  }, [])
+  }, [jobId]) //previously empty
   return(
     <Modal open={open} onClose={onClose} className="flex items-center justify-center p-4">
       <Box className="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl outline-none overflow-hidden flex flex-col">

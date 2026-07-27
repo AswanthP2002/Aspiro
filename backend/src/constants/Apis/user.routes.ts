@@ -76,6 +76,7 @@ export const UserApiRoutes = {
     LOAD_USERS: '/v1/users',
     LOAD_JOBS: '/v1/jobs',
     LOAD_JOB_DETAILS_BY_ID: '/v1/jobs/details/:jobId',
+    LOAD_HOME_PAGE_DATA: '/v1/home/datas',
   },
 
   USERS: {

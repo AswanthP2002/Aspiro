@@ -56,6 +56,7 @@ export default interface IUserRepository extends IBaseRepo<User> {
     search: string
   ): Promise<ConnectionWithSenderDetails[] | null>;
   updateUserSubscriptionData(userId: string, data: SubscriptionMetaData): Promise<User | null>;
+  getActiveUsersCount(): Promise<{ count: number } | null>;
   // getActiveUsersWithGrowth(): Promise<{
   //   users: number;
   //   growth: { thisMonth: number; lastMonth: number };

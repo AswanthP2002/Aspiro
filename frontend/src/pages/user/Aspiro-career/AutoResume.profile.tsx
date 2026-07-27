@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BiAward, BiBriefcase, BiCheckCircle, BiChevronDown, BiInfoCircle, BiPlus } from 'react-icons/bi';
 import { BsInfo } from 'react-icons/bs';
 import { FaGraduationCap } from 'react-icons/fa';
@@ -1022,7 +1022,7 @@ interface ItemCardProps {
 
 interface WidgetBoxProps {
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   children: React.ReactNode;
   color: string
 }

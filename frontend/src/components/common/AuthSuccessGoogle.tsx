@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginSucess } from "../../redux/candidateAuthSlice";
@@ -6,10 +6,11 @@ import Loader from "../candidate/Loader";
 
 export default function AuthSuccess(){
     const navigator = useNavigate()
-    const params = new URLSearchParams(window.location.search)
+    const params = useMemo(() => {
+        return new URLSearchParams(window.location.search)
+    }, [])
     const dispatcher = useDispatch()
 
-    // const [userData, setuserdata] = useState()
     const [loading, setloading] = useState(false)
 
     useEffect(() => {
@@ -28,7 +29,7 @@ export default function AuthSuccess(){
        dispatcher(loginSucess({token:token, user:user}))
        navigator('/')
 
-    }, [])
+    }, [dispatcher, navigator, params]) //Updated dependancy due to lint error. Previously empty
 
     return(
         <>

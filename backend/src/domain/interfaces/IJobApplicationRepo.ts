@@ -1,4 +1,3 @@
-import Job from '../entities/job/job.entity';
 import JobApplication, {
   JobApplicationCompanyRecruiterAggregated,
 } from '../entities/jobApplication/jobApplication.entity';

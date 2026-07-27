@@ -2,7 +2,7 @@ import {FaBriefcase} from 'react-icons/fa'
 import ApexCharts from 'apexcharts'
 import { useEffect, useState } from 'react'
 import { LuUsers } from 'react-icons/lu';
-import { MdOutlineReport, MdVerified } from 'react-icons/md'
+import { MdVerified } from 'react-icons/md'
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts'
 import { formatRelativeTime } from '../../../services/util/formatDate'
 
@@ -72,6 +72,8 @@ const Dashboard = () => {
       categories:['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
     }
   })
+
+  console.log(typeof setOptions)
 
   useEffect(() => {
   const chart = new ApexCharts(document.getElementById('chart'), options)

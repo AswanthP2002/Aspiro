@@ -152,7 +152,7 @@ function App() {
       // toast.info('dispatching unread chat thunk')
       store.dispatch(newUnreadConversationsCountFetchThunk())
     }
-  }, [logedUser?._id])
+  }, [logedUser?._id, logedUser?.role]) //previously logeduser._id
 
   useEffect(() => {
     console.log('--This is from app.tsx useeffect for socket')

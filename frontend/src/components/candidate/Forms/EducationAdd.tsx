@@ -20,7 +20,6 @@ import {
   diploma,
 } from '../../../assets/data/educationalStreamsData';
 import { addUserEducation } from '../../../services/educationServices';
-// import { addUserEducation } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { Education } from '../../../types/entityTypes';
 import { toast } from 'react-toastify';
@@ -128,13 +127,6 @@ export default function AddEducationForm({
   const currentEducationStatus = watch('isPresent')
 
   const [loading, setLoading] = useState(false);
-  // const [isPresent, setIspresent] = useState(false);
-
-  //seting vales from watch
-
-  // const toggleIsPresent = () => {
-  //   setIspresent((prev) => !prev);
-  // };
 
   const style = {
     position: 'absolute',
@@ -203,7 +195,7 @@ export default function AddEducationForm({
                   minLength: { value: 2, message: 'Minimum 2 charecters' },
                   maxLength: { value: 30, message: 'Maximum 30 charecters' },
                   pattern: {
-                    value: /^[a-zA-Z0-9\s-&()\/]+$/,
+                    value: /^[a-zA-Z0-9\s&()/-]+$/,
                     message: 'Enter a valid education',
                   },
                 })}

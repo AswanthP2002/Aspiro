@@ -18,4 +18,5 @@ export default interface IRecruiterRepo extends IBaseRepo<NewRecruiter> {
     action: 'Verified' | 'Revoked'
   ): Promise<NewRecruiter | null>;
   findRecruiterByUserId(userId: string): Promise<NewRecruiter | null>;
+  getRecruiterCount(): Promise<{ count: number } | null>;
 }

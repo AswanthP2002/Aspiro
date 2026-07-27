@@ -366,7 +366,7 @@ export default function UsersFindingPage() {
     if(hasMore){
       fetchUsers();
     }
-  }, [search, roleTypeFilter, experienceTypeFilter, location, page, limit]);
+  }, [search, roleTypeFilter, experienceTypeFilter, location, page, limit, hasMore]); //hasmore empty
 
   console.log('User Type Filter values ', roleTypeFilter);
 
@@ -379,7 +379,7 @@ export default function UsersFindingPage() {
   // };
 
   const isConnectionRequestSend = (user: UserOverviewForPublic) => {
-    for(let i = 0; i < user?.connectionRequests?.length; i++){
+    for(let i = 0; i < (user?.connectionRequests?.length ?? 0); i++){
       if(user.connectionRequests && user.connectionRequests[i].sender === logedUser._id && user.connectionRequests[i].status === 'PENDING'){
         return true
       }
@@ -397,7 +397,7 @@ export default function UsersFindingPage() {
   }
 
   const amIFollowingThisUser = (user: UserOverviewForPublic): boolean => {
-    for (let i = 0; i < user?.followers?.length; i++) {
+    for (let i = 0; i < (user?.followers?.length ?? 0); i++) {
       if (user.followers && user.followers[i].follower === logedUser._id) {
         return true;
       }
@@ -463,7 +463,7 @@ export default function UsersFindingPage() {
               />
             </div>
             <input
-              onKeyUp={(e) => db(e)}
+              onChange={(e) => db(e)}
               type="text"
               className="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Search by name, headline, or skill..."

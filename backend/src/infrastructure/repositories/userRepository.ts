@@ -251,63 +251,6 @@ export default class UserRepository extends BaseRepository<User> implements IUse
       };
     }
 
-    // const aggPipeline: any[] = [
-    //   {
-    //     $match: matchQuery,
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'experiences',
-    //       localField: '_id',
-    //       foreignField: 'userId',
-    //       as: 'experiences',
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'skills',
-    //       localField: '_id',
-    //       foreignField: 'userId',
-    //       as: 'skills',
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'follows',
-    //       localField: '_id',
-    //       foreignField: 'following',
-    //       as: 'followers',
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'connectionrequests',
-    //       localField: '_id',
-    //       foreignField: 'receiver',
-    //       as: 'connectionRequests',
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'recruiters',
-    //       localField: '_id',
-    //       foreignField: 'userId',
-    //       as: 'recruiterProfile',
-    //     },
-    //   },
-    //   { $unwind: { path: '$recruiterProfile', preserveNullAndEmptyArrays: true } },
-    // ];
-
-    // const searchQuery = {
-    //   $match: {
-    //     $or: [
-    //       { name: { $regex: new RegExp(search, 'i') } },
-    //       { headline: { $regex: new RegExp(search, 'i') } },
-    //     ],
-    //   },
-    // };
-
-    //rebuidling proper aggregation pipeline with facet
     const result = await UserDAO.aggregate([
       {
         $match: {
@@ -375,17 +318,6 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     const totalDocs = result[0]?.metaData[0]?.totalDocs;
     const totalPages = Math.ceil(totalDocs / limit);
 
-    // aggPipeline.push(searchQuery, { $skip: skip }, { $limit: limit });
-
-    // const users = await UserDAO.aggregate(aggPipeline);
-    // const totalDocs = await UserDAO.aggregate([
-    //   ...aggPipeline,
-    //   searchQuery,
-    //   { $count: 'totalDocs' },
-    // ]);
-
-    // const totalPages = (totalDocs[0]?.totalDocs || 0) / limit || 0;
-
     return { users, page, totalPages };
   }
 
@@ -415,21 +347,7 @@ export default class UserRepository extends BaseRepository<User> implements IUse
 
   async getUserMetaData(userId: string): Promise<UserCachedData | null> {
     if (!mongoose.isValidObjectId(userId)) return null;
-    //get cached data
-    //const cachedData: UserCachedData | undefined = await redisClient.hGetAll(`${userId}`);
-    //cached data if abailable?
-    // if (cachedData && cachedData._id) {
-    //   return {
-    //     _id: cachedData._id,
-    //     name: cachedData.name,
-    //     email: cachedData.email,
-    //     headline: cachedData.headline,
-    //     profilePicture: cachedData.profilePicture,
-    //     role: cachedData.role,
-    //   };
-    // }
-    //if cached data is not available, then fetch data from mongodatabase -> store into redis for next use -> return data
-    // const userData = await UserDAO.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+
     const userData = await UserDAO.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
@@ -743,68 +661,15 @@ export default class UserRepository extends BaseRepository<User> implements IUse
     return result;
   }
 
-  // async getActiveUsers(): Promise<{
-  //   users: number;
-  //   growth: { thisMonth: number; lastMonth: number };
-  // } | null> {
-  //   const result = await UserDAO.aggregate([
-  //     {
-  //       $match: {
-  //         isDeleted: false,
-  //         isBanned: false,
-  //         isBlocked: false,
-  //       },
-  //     },
-  //     { $count: 'totalActiveUsers' },
-  //   ]);
+  async getActiveUsersCount(): Promise<{ count: number } | null> {
+    const result = await UserDAO.find({
+      isBanned: false,
+      isDeleted: false,
+      isAdmin: false,
+      isBlocked: false,
+      isVerified: true,
+    }).countDocuments();
 
-  //   const growthData = await UserDAO.aggregate([
-  //     {
-  //       $match: {
-  //         isDeleted: false,
-  //         createdAt: { $exists: true },
-  //       },
-  //     },
-  //     {
-  //       $facet: {
-  //         thisMonth: [
-  //           {
-  //             $match: {
-  //               createdAt: {
-  //                 $gte: new Date(new Date().setDate(1)),
-  //               },
-  //             },
-  //           },
-  //           { $count: 'count' },
-  //         ],
-
-  //         lastMonth: [
-  //           {
-  //             $match: {
-  //               createdAt: {
-  //                 $gte: new Date(
-  //                   new Date(new Date().setMonth(new Date().getMonth() - 1)).setDate(1)
-  //                 ),
-  //                 $lt: new Date(new Date().setDate(1)),
-  //               },
-  //             },
-  //           },
-  //           { $count: 'count' },
-  //         ],
-  //       },
-  //     },
-  //     {
-  //       $project: {
-  //         thisMonth: { $ifNull: [{ $arrayElemAt: ['$thisMonth.count', 0] }, 0] },
-  //         lastMonth: { $ifNull: [{ $arrayElemAt: ['$lastMonth.count', 0] }, 0] },
-  //       },
-  //     },
-  //   ]);
-
-  //   const count = result[0]?.count;
-  //   const thisMonth = growthData[0]?.thisMonth;
-  //   const lastMonth = growthData[0]?.lastMonth;
-
-  //   return { users: count, growth: { thisMonth, lastMonth } };
-  // }
+    return { count: result };
+  }
 }

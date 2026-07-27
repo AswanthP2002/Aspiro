@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { getRecruiters } from '../../../services/adminServices';
 import { getRecruiters } from '../../../services/recruiterServices';
 import { Notify } from 'notiflix';
-import { AdminRecruiterListData, RecruiterProfileData } from '../../../types/entityTypes';
+import { AdminRecruiterListData } from '../../../types/entityTypes';
 import { IoSearchOutline } from 'react-icons/io5';
 import ReusableTable, { TableColumn } from '../../../components/admin/reusable/Table';
 import { FaUsersSlash } from 'react-icons/fa';
@@ -32,7 +31,7 @@ export default function Recruiters() {
       key: 'fullName',
       render: (row: AdminRecruiterListData) => (
         <div className='flex gap-2'>
-          <div className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-400 rounded-full">{row.name ? row.name[0] : 'U'}</div>
+          <div className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-400 rounded-full">{row.fullName ? row.fullName[0] : 'U'}</div>
           <div>
             <p className='font-medium'>{row.fullName}</p>
             <p className='text-xs'>{row.email}</p>
@@ -144,7 +143,7 @@ export default function Recruiters() {
         <div className="border border-gray-200 rounded-md px-3 py-1.5 flex items-center gap-2 bg-white">
           <IoSearchOutline className="text-gray-400" />
           <input 
-            onKeyUp={(event) => dSearch(event)} 
+            onChange={(event) => dSearch(event)} 
             type="text" 
             className="text-xs w-full outline-none bg-transparent" 
             placeholder="Search users" 
@@ -200,7 +199,8 @@ export default function Recruiters() {
   {recruiters.length > 0 && (
     <ReusableTable 
     columns={recruiterTableColumn}
-    data={recruiters as RecruiterProfileData[]}
+    // data={recruiters as RecruiterProfileData[]}
+    data={recruiters}
     currentPage={page}
     totalPages={totalPage}
     onPageChange={(page: number) => setPage(page)}

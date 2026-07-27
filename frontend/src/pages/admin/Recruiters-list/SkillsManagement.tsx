@@ -202,14 +202,13 @@ const SkillsLibrary = () => {
 
     const [skills, setSkills] = useState<SkillData[]>([])
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(8)
     const [search, setSearch] = useState('')
     const [totalPages, setTotalPages] = useState(1)
 
     useEffect(() => {
         async function fetchSkills(){
             try {
-                const result: FetchSkillsResponsePayload = await adminGetSkills(search, limit, page)
+                const result: FetchSkillsResponsePayload = await adminGetSkills(search, 8, page)
                 if(result.success){
                     setSkills(result.result.skills)
                     // Notify.info(result.result.totalPages.toString())
@@ -222,7 +221,7 @@ const SkillsLibrary = () => {
         }
 
         fetchSkills()
-    }, [search, limit, page])
+    }, [search, page])
 
     return(
         <div>
@@ -231,7 +230,7 @@ const SkillsLibrary = () => {
                             <div className='flex-1 flex items-center border border-gray-300 px-2 rounded-md'>
                                 <BsSearch />
                                 <input
-                        onKeyUp={(e) => dSearch(e)}
+                        onChange={(e) => dSearch(e)}
                         type="text"
                         placeholder='Search skills...'
                         className='p-2 text-sm font-light w-full outline-none'
@@ -332,7 +331,7 @@ const WorkModes = () => {
             header: 'USAGE COUNT',
             key: 'usageCount',
             render: (row: WorkModeData) => (
-                <span>0</span>
+                <span>{row?.usageCount ? row.usageCount : 0}</span>
             )
         },
         {
@@ -364,7 +363,6 @@ const WorkModes = () => {
     const [currentWorkMode, setCurrentWorkMode] = useState<WorkModeData | null>(null)
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(5)
     const [totalPages, setTotalPages] = useState(1)
     const [isAddWorkModeModalOpen, setIsAddWorkModeModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -372,6 +370,7 @@ const WorkModes = () => {
 
     // const openModal = () => setIsAddWorkModeModalOpen(true)
     const closeModal = () => setIsAddWorkModeModalOpen(false)
+    console.log(typeof setSearch)
 
     const toggleStatus = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
         const isChecked = e.target.checked
@@ -566,7 +565,7 @@ const WorkModes = () => {
     useEffect(() => {
         async function fetchWorkModes() {
             try {
-                const result: FetchWorkModesResponsePayload = await adminGetWorkModes(search, page, limit)
+                const result: FetchWorkModesResponsePayload = await adminGetWorkModes(search, page, 5)
                 if(result.success){
                     console.log('data from backend w-mode', result)
                     setWorkModes(result.result.workModes)
@@ -577,7 +576,7 @@ const WorkModes = () => {
             }
         }
         fetchWorkModes()
-    }, [search, page, limit])
+    }, [search, page])
     return(
         <>
             <div>
@@ -657,9 +656,8 @@ const JobLevel = () => {
     const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(5)
     const [search, setSearch] = useState('')
-   
+    console.log(typeof setSearch)
     const JobLevelTableColumn: TableColumn<JobLevelData>[] = [
         {
             header: "NAME",
@@ -676,7 +674,7 @@ const JobLevel = () => {
             header: 'USAGE COUNT',
             key: 'usageCount',
             render: (row: JobLevelData) => (
-                <span>0</span>
+                <span>{row.usageCount ? row.usageCount : 0}</span>
             )
         },
         {
@@ -925,7 +923,7 @@ const JobLevel = () => {
     useEffect(() => {
         async function fetchJobLevels() {
             try {
-                const result: FetchJobLevelResultPayload = await adminGetJobLevels(search, page, limit)
+                const result: FetchJobLevelResultPayload = await adminGetJobLevels(search, page, 5)
                 if(result.success){
                     console.log('data from backend j-level', result)
                     setJobLevelData(result.result.jobLevels)
@@ -937,7 +935,7 @@ const JobLevel = () => {
         }
 
         fetchJobLevels()
-    }, [search, page, limit])
+    }, [search, page])
 
 
    return(
@@ -1024,8 +1022,9 @@ const JobTypes = () => {
     const [jobTypesData, setJobTypesData] = useState<JobTypesData[]>([])
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(5)
     const [search, setSearch] = useState('')
+
+    console.log(typeof setSearch)
    
     const jobTypesTableColumn: TableColumn<JobTypesData>[] = [
         {
@@ -1043,7 +1042,7 @@ const JobTypes = () => {
             header: 'USAGE COUNT',
             key: 'usageCount',
             render: (row: JobTypesData) => (
-                <span>0</span>
+                <span>{row.usageCount ? row.usageCount : 0}</span>
             )
         },
         {
@@ -1292,7 +1291,7 @@ const JobTypes = () => {
     useEffect(() => {
         async function fetchJobTypes() {
             try {
-                const result: FetchJobTypesResultPayload = await adminGetJobTypes(search, page, limit)
+                const result: FetchJobTypesResultPayload = await adminGetJobTypes(search, page, 5)
                 if(result.success){
                     console.log('data from backend j-type', result)
                     setJobTypesData(result.result.jobTypes)
@@ -1304,7 +1303,7 @@ const JobTypes = () => {
         }
         fetchJobTypes()
 
-    }, [search, page, limit])
+    }, [search, page])
 
 
    return(

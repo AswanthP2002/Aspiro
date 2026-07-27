@@ -57,11 +57,11 @@ export default function AlertsPage() {
     }
     fetchAlerts()
     
-  }, [status, page])
+  }, [status, page, dipsatch, limit])
 
   useEffect(() => {
     if(alerts){
-      setAlertsData(alerts)
+      setAlertsData(alerts as AlertsData[])
     }
   }, [alerts])
 

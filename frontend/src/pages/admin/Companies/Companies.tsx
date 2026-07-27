@@ -16,6 +16,8 @@ export default function CompaniesPage(){
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [isEditing, setIsEditing] = useState(false)
+
+    console.log(typeof setPage)
     
     const closeEditing = () => setIsEditing(false)
 
@@ -221,7 +223,7 @@ const CompanyEditModal = ({data, open, closeModal, onCompanyEdit}: {data: AdminC
         location: string;
     }
 
-    const {formState: {errors}, control, reset, setValue, handleSubmit} = useForm<CompanyEditFormData>({
+    const {formState: {errors}, control, setValue, handleSubmit} = useForm<CompanyEditFormData>({
         defaultValues: {
             name:'',
             description: '',
@@ -279,7 +281,7 @@ const CompanyEditModal = ({data, open, closeModal, onCompanyEdit}: {data: AdminC
             setValue('industry', data.industry as string)
             setValue('location', data.location as string)
         }
-    }, [data])
+    }, [data, setValue]) //updated dependancy due to lint error, previously data
 
     return(
         <>

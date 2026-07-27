@@ -98,7 +98,7 @@ export default function SavedJobs(){
             <div className="mt-5 bg-white p-2 border border-slate-300 rounded-md grid grid-cols-12 gap-3">
                 <div className="flex col-span-6 lg:col-span-8 items-center gap-2 text-xs bg-gray-100 p-2 rounded-md">
                     <LuSearch color="gray" />
-                    <input onKeyUp={(e) => dSearch(e)} type="text" className="!text-xs w-full" placeholder="Search job title" />
+                    <input onChange={(e) => dSearch(e)} type="text" className="!text-xs w-full" placeholder="Search job title" />
                 </div>
                 <div className="flex col-span-6 relative lg:col-span-4 items-center gap-2 text-xs bg-gray-100 p-2 rounded-md">
                     <div className="flex w-full justify-between items-center">
@@ -126,7 +126,7 @@ export default function SavedJobs(){
                                         </div>
                                     </div>
                                     <div className="flex-1 cursor-pointer" onClick={() => navigateToJobDetailsPage(savedJob.jobDetails._id as string)}>
-                                        <p className="font-semibold text-sm">{savedJob.jobDetails.jobTitle} <span className={`text-xs font-normal ms-5 ${getReminingDays(savedJob.jobDetails.expiresAt as string) <= 5 ? "text-red-500" : "text-gray-500"}`}>Expires in {getReminingDays(savedJob.jobDetails.expiresAt)} Days</span></p>
+                                        <p className="font-semibold text-sm">{savedJob.jobDetails.jobTitle} <span className={`text-xs font-normal ms-5 ${getReminingDays(savedJob.jobDetails.expiresAt as string) <= 5 ? "text-red-500" : "text-gray-500"}`}>Expires in {getReminingDays(savedJob.jobDetails.expiresAt as string)} Days</span></p>
                                         <p className="text-xs text-gray-500 mt-2">{savedJob.companyDetails.name} | Posted by {savedJob.recruiterDetails.name}</p>
                                         <div className="flex gap-2 mt-3">
                                             <span className="bg-blue-500 text-white text-xs px-3 rounded-md">{savedJob.jobDetails.jobType}</span>

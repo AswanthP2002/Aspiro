@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import JobController from '../controllers/jobController';
 import { container } from 'tsyringe';
 import { JobApiRoutes } from '../../constants/Apis/job.routes';
@@ -17,6 +17,7 @@ function CreateJobRouter() {
   );
   jobRouter.get(
     JobApiRoutes.LOAD_JOBS_HOMPE_PAGE,
+    testMiddleware,
     jobController.searchJobFromHomePage.bind(jobController)
   );
   jobRouter.get(
@@ -27,6 +28,12 @@ function CreateJobRouter() {
   );
 
   return jobRouter;
+}
+
+function testMiddleware(req: Request, res: Response, next: NextFunction) {
+  console.log('Request is called');
+  console.log(req.url);
+  next();
 }
 
 export default CreateJobRouter;

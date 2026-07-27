@@ -262,9 +262,9 @@ const SubscriptionPage = () => {
                                 </td>
                                 <td className='py-2 px-2 text-xs font-medium text-slate-700'>
                                   {
-                                    (value && isNaN(parseInt(subscriptionDetails.features[featureName] as string)))
+                                    (value && isNaN(parseInt(subscriptionDetails.features ?  subscriptionDetails.features[featureName] as string : '')))
                                       ? "Unlimited"
-                                      : (value && !isNaN(parseInt(subscriptionDetails.features[featureName] as string)) ? subscriptionDetails.features[featureName] : "-")
+                                      : (value && !isNaN(parseInt(subscriptionDetails.features ? subscriptionDetails.features[featureName] as string: '')) ? (subscriptionDetails.features ? subscriptionDetails.features[featureName] : "-"): '')
                                   }
                                 </td>
                               </tr>

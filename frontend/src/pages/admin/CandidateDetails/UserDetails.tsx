@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { getUserDetails } from "../../../services/userServices"
@@ -6,7 +6,7 @@ import { userBlock, userUnblock, deleteUser, banUser } from "../../../services/u
 import { resetUserPassword, requestReset,  } from "../../../services/adminServices"
 import { AdminUserDetailsData, Education, Experience, Skills } from "../../../types/entityTypes"
 import { Notify } from "notiflix"
-import { FaArrowLeft, FaLinkedin, FaInstagram, FaTwitter, FaGithub} from "react-icons/fa"
+import { FaArrowLeft} from "react-icons/fa"
 import { LuUser } from "react-icons/lu"
 import { CgClose} from "react-icons/cg"
 import { formattedDateMoment } from "../../../services/util/formatDate"
@@ -21,27 +21,14 @@ import { AxiosError } from "axios"
 export default function CandidateDetails(){
 
     const navigate = useNavigate()
-
-    // const getSocialPhills = useCallback((domain: string) => {
-    //     switch(domain){
-    //         case 'linkedin':
-    //             return <button className="bg-gray-200 p-1 rounded-md"><FaLinkedin color="gray" /></button>
-    //         case 'instagram':
-    //             return <button className="bg-gray-200 p-1 rounded-md"><FaInstagram color="gray" /></button>
-    //         case 'github':
-    //             return <button className="bg-gray-200 p-1 rounded-md"><FaGithub color="gray" /></button>
-    //         case 'twitter':
-    //             return <button className="bg-gray-200 p-1 rounded-md"><FaTwitter color="gray" /></button>
-    //         default:
-    //             return 
-    //     }
-    // }, [])
     
     const [userDetails, setUserDetails] = useState<AdminUserDetailsData | null>(null)
     const [experiences, setexperience] = useState<Experience[]>([])
     const [education, setEducation] = useState<Education[]>([])
     const [skills, setskills] = useState<Skills[]>([])
     const [isPasswordResetModalOpen, setIsPasswordResetModalOpen] = useState<boolean>(false)
+
+    console.log(typeof experiences, typeof education, typeof skills)
 
     const openPasswordResetModal = () => setIsPasswordResetModalOpen(true)
     const closePasswordResetModal = () => setIsPasswordResetModalOpen(false)
@@ -52,7 +39,7 @@ export default function CandidateDetails(){
         async function fetchCandidateDetails(){
             
                 try {
-                    const result = await getUserDetails(id)
+                    const result = await getUserDetails(id as string)
                     console.log('result from the backend', result)
                     
                         setUserDetails(result.result)
@@ -66,7 +53,7 @@ export default function CandidateDetails(){
                 }
         }
        fetchCandidateDetails()
-    }, [])
+    }, [id]) //updated dependancy due to lint error, previously empty
 
     async function deleteSingleUser(userId: string){
         Swal.fire({
@@ -243,12 +230,12 @@ export default function CandidateDetails(){
                                             <p className="text-sm text-gray-700">{userDetails?.email}</p>
                                             <div className="flex items-center mt-2 gap-2">
                                                 <span className="uppercase text-xs bg-gray-50 rounded-md px-[5px] text-gray-500 border border-gray-200">id: {userDetails?._id.slice(userDetails._id.length - 5)}</span>
-                                                <p className="text-xs font-light">Joined {formattedDateMoment(userDetails?.createdAt, "MMM DD YYYY")}</p>
+                                                <p className="text-xs font-light">Joined {formattedDateMoment(userDetails?.createdAt as string, "MMM DD YYYY")}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-start justify-start md:justify-end gap-2">
-                                        <span className="text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role[0]}</span>
+                                        <span className="text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role ? userDetails?.role[0] : 'User'}</span>
                                         {userDetails?.role && userDetails.role.length > 1 && (
                                             <span className="block text-xs bg-blue-200 text-blue-500 px-2 py-1 rounded-md border border-blue-300">{userDetails?.role[1]}</span>
                                         )}
@@ -359,7 +346,7 @@ export default function CandidateDetails(){
                                     ? <>
                                         <div className="grid grid-cols-1 gap-2 mt-5">
                                             {userDetails.accountActions.map((history: {action: string, actor: string, date: string}, index: number) => (
-                                                <div className={`${history.action === 'Blocked' ? "bg-red-500" : (history.action === 'Un blocked' ? "bg-green-500" : "bg-blue-500")} ps-1 rounded-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}>
+                                                <div key={index} className={`${history.action === 'Blocked' ? "bg-red-500" : (history.action === 'Un blocked' ? "bg-green-500" : "bg-blue-500")} ps-1 rounded-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}>
                                                     <div className={`flex gap-2 p-3 rounded-md ${history.action === 'Blocked' ? "bg-red-100" : (history.action === 'Un blocked' ? "bg-green-100" : "bg-blue-100")}`}>
                                                     <div className="flex-1">
                                                         <p className="text-sm font-semibold uppercase text-gray-700">{history.action}</p>
@@ -385,7 +372,7 @@ export default function CandidateDetails(){
         </div>
 
         {/* Password reset modal */}
-        {isPasswordResetModalOpen && (<PasswordResetModal data={userDetails} openModal={isPasswordResetModalOpen} closeModal={closePasswordResetModal} />)}
+        {isPasswordResetModalOpen && (<PasswordResetModal data={userDetails as AdminUserDetailsData} openModal={isPasswordResetModalOpen} closeModal={closePasswordResetModal} />)}
         </>
     )
 }
@@ -396,7 +383,7 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
         confirmPasswor: string
     }
     console.log('--data from the child component--', data)
-    const {watch, handleSubmit, formState:{errors}, control} = useForm<PasswordResetFormInputs>({defaultValues: {newPassword: "", confirmPasswor: ""}})
+    useForm<PasswordResetFormInputs>({defaultValues: {newPassword: "", confirmPasswor: ""}})
     
     const [userDetails, setUserDetails] = useState<AdminUserDetailsData | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
@@ -405,6 +392,7 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
     const [isCodeSend, setIsCodeSend] = useState<boolean>(false)
 
     const handleModalClose: ModalProps['onClose'] = (event, reason) => {
+        console.log(typeof event)
         if(reason === 'backdropClick' || reason === 'escapeKeyDown'){
             return
         }
@@ -478,7 +466,7 @@ export const PasswordResetModal = ({data, openModal, closeModal}: {data: AdminUs
         }
     }, [data])
 
-    const logedAdmin = useSelector((state: {userAuth: {user: {_id: string}}}) => {
+    const logedAdmin = useSelector((state: {userAuth: {user: {_id: string, email: string}}}) => {
         return state.userAuth.user
     })
     

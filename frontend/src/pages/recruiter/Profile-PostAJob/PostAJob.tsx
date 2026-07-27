@@ -536,7 +536,7 @@ const selectStyles = {
                                 control={control}
                                 rules={{
                                     required:{value:true, message:'Enter Qualifications, if nothing enter any'},
-                                    pattern: { value: /^(?!\d+$)(?!.*\d$)[A-Za-z.,()\-]+(?:\s[A-Za-z.,()\-]+)*$/, message: 'Enter valid qualifications' }
+                                    pattern: { value: /^(?!\d+$)(?!.*\d$)[A-Za-z.,()-]+(?:\s[A-Za-z.,()-]+)*$/, message: 'Enter valid qualifications' }
                                 }}
                                 render={({field}) => (
                                     <TextField 

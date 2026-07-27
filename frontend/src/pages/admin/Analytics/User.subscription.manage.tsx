@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BiArrowBack, BiCalendar, BiEnvelope, BiRecycle } from "react-icons/bi";
-import { BsArrowDown, BsArrowUp, BsLightning } from "react-icons/bs";
+import { BsLightning } from "react-icons/bs";
 import { CgCreditCard } from "react-icons/cg";
 import { FaLocationDot } from "react-icons/fa6";
 import { LuCheck, LuCircleCheck, LuPhone, LuUser, LuX } from "react-icons/lu";
@@ -48,25 +48,7 @@ export default function UserSubscriptionManage(){
     if(userId){
       loadUserSubscriptionDetails()
     }
-  }, [])
-
-  // useEffect(() => {
-
-  //   async function fetchUserPaymentHistory(){
-  //     try {
-  //       const result = await getUserInvoices(userSubscriptionData?.subscriptionDetails.stripeCustomerId as string) as {success: boolean, message: string, result: InvoiceData[]}
-  //       setPaymentHistory(result.result)
-  //       toast.success('Payment history loaded')
-  //     } catch (error: unknown) {
-  //       const err = error as AxiosError<{message: string}>
-  //       const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
-  //       toast.error(finalMessage)
-  //     }
-  //   }
-
-  //   fetchUserPaymentHistory()
-
-  // }, [userSubscriptionData?.subscriptionDetails.stripeCustomerId])
+  }, [userId]) //Updated dependancy due to lint error, previously empty
   
 
     return (
@@ -140,7 +122,7 @@ export default function UserSubscriptionManage(){
                 <p className="uppercase text-slate-500 text-sm tracking-wide">plan features</p>
                 <p>stripe customer id: {userSubscriptionData?.subscriptionDetails.stripeCustomerId}</p>
                 <div className="mt-3 space-y-1">
-                    {userSubscriptionData?.subscriptionDetails && userSubscriptionData.subscriptionDetails.features && Object.entries(userSubscriptionData?.subscriptionDetails?.features).map(([key, value]) => {
+                    {userSubscriptionData?.subscriptionDetails && userSubscriptionData.subscriptionDetails.features && Object.entries(userSubscriptionData?.subscriptionDetails?.features).map(([key]) => {
                       return(
                         <p className="flex items-center gap-2 text-slate-500 text-xs">
                                 {userSubscriptionData.subscriptionDetails.features[key]

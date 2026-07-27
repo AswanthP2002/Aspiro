@@ -200,7 +200,7 @@ export default function Feed() {
 
         //update post like real time using socket
     
-    }, [page])
+    }, [page, hasMore, setUserPosts]) //previously page only
     
 
     return (

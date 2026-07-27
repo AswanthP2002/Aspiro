@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import formatDate from '../../../services/util/formatDate'
 import { cancelConnectionRequest, removeConnection, sendConnectionRequest } from '../../../services/connectionServices'
 import { followUser, loadUserPublicProfile, unfollowUser, updateUserProfileView } from '../../../services/userServices'
@@ -13,8 +13,7 @@ import { FaLinkedin } from 'react-icons/fa'
 import { PiSuitcase } from 'react-icons/pi'
 import { CiCalendar } from 'react-icons/ci'
 import Post from '../../../components/common/Post'
-import { ConnectionRequests, Experience, Follow, UserPublicProfileData } from '../../../types/entityTypes'
-import { appContext } from '../../../context/AppContext'
+import { ConnectionRequests, Experience, Follow, UserPosts, UserPublicProfileData } from '../../../types/entityTypes'
 import { FaShareNodes } from 'react-icons/fa6'
 import { BiBlock, BiCopy } from 'react-icons/bi'
 import { useParams } from 'react-router-dom'
@@ -237,7 +236,7 @@ export default function UserPublicProfile() {
                 
                 return {
                     ...details,
-                    followers: details.followers.filter((followers: Follow) => followers._id === logedUser.id)
+                    followers: details.followers.filter((followers: Follow) => followers._id === logedUser._id)
                 }
             })
         } catch (error: unknown) {
@@ -251,7 +250,7 @@ export default function UserPublicProfile() {
     }
 
     const isMeFollowsThisUser = (myId: string): boolean => {
-        for(let i = 0; i < userDetails?.followers.length; i++){
+        for(let i = 0; i < (userDetails?.followers ? userDetails.followers.length : 0); i++){
             if(userDetails?.followers[i].follower === myId) return true
         }
         return false
@@ -266,7 +265,7 @@ export default function UserPublicProfile() {
     }
 
     const isConnectionIsPending = (myId: string) => {
-        for(let i = 0; i < userDetails?.connectionRequests.length; i++){
+        for(let i = 0; i < (userDetails?.connectionRequests ? userDetails?.connectionRequests.length : 0); i++){
             if(userDetails?.connectionRequests[i].sender === myId && userDetails.connectionRequests[i].status === 'PENDING'){
                 return true
             }
@@ -294,7 +293,7 @@ export default function UserPublicProfile() {
                 toast.error(error instanceof Error ? error.message : 'Something went wrong')
             }
         })()
-    }, [])
+    }, [fallbackUserId]) //updating dependancy array due to lint error. previously empty
 
     useEffect(() => {
         async function userProfileViewd(){
@@ -310,7 +309,7 @@ export default function UserPublicProfile() {
         if(userDetails?._id && logedUser._id !== userDetails?._id){
             userProfileViewd()
         }
-    }, [userDetails])
+    }, [userDetails, logedUser._id]) //updating dependancy due to lint error. previous userDetails,
 
     return (
         <>
@@ -506,8 +505,8 @@ export default function UserPublicProfile() {
             <h3 className="text-lg font-bold text-gray-900 mb-6">Recent Activity</h3>
             <div className="space-y-4">
               {userDetails?.posts && userDetails?.posts.length > 0 ? (
-                userDetails.posts.map((post: any, i: number) => (
-                  <Post key={i} postData={post} loading={false} />
+                userDetails.posts.map((post: UserPosts) => (
+                  <Post key={post._id} postData={post} />
                 ))
               ) : (
                 <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-xl">
@@ -523,7 +522,7 @@ export default function UserPublicProfile() {
 </div>
 
         {isProfilePhotoClicked && (
-            <ProfilePictureViewModal open={isProfilePhotoClicked} url={userDetails?.profilePicture?.cloudinarySecureUrl} onClose={closeProfilePhoto} />
+            <ProfilePictureViewModal open={isProfilePhotoClicked} url={userDetails?.profilePicture?.cloudinarySecureUrl as string} onClose={closeProfilePhoto} />
         )}
 
         {isFollowersModalOpen && (

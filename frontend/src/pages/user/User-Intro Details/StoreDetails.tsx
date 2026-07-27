@@ -157,7 +157,7 @@ export default function StoreDetails(){
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Required user information is missing.' });
             navigateTo(-1)
         }
-      }, [])
+      }, [navigateTo, userId, userName]) //previosly empty
       
     return(
         <div className="w-full min-h-screen bg-white">

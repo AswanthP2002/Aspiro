@@ -195,7 +195,7 @@ const PricingPage = () => {
                 <p className="text-left text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                   Features included:
                 </p>
-
+              
                 {Object.keys(plan.featuresListed).map((f) => {
                   const rawValue = plan.featuresListed[f];
 

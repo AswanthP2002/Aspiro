@@ -224,7 +224,7 @@ export default function RecruiterDetails(){
         }        
         fetchCompanyDetails()
 
-    }, [])
+    }, [recruiterId]) //updated dependancy due to lint error, earlier emtpy
 
   return (
     <>
@@ -400,8 +400,8 @@ export default function RecruiterDetails(){
 
             <div className="space-y-4">
               <h3 className="text-xs font-bold text-slate-900">Account Info</h3>
-              <InfoRow label="Joined" value={moment(recruiterDetails?.createdAt).format("MMM DD YYYY")} />
-              <InfoRow label="Type" value={recruiterDetails?.recruiterType} />
+              <InfoRow label="Joined" value={moment(recruiterDetails?.createdAt).format("MMM DD YYYY")} color='text-slate-900' />
+              <InfoRow label="Type" value={recruiterDetails?.recruiterType} color='text-slate-900' />
               {
                 recruiterDetails?.isVerified
                     ? <InfoRow label="Status" value={'Verified'} color="text-green-600" />
@@ -606,13 +606,6 @@ const RevokeRecruiterPermissionsModal = ({recruiterData, revocationModalOpen, cl
           allowScheduleInterviews: result.result.allowScheduleInterviews
         })
       }
-      
-  //     isAllJobsHidden?: boolean;
-  // allowPostJobs?: boolean;
-  // allowEditJobs?: boolean;
-  // allowDeletePosts?: boolean;
-  // allowManageApplications?: boolean;
-  // allowScheduleInterviews?: boolean;
       
     } catch (error: unknown) {
       const err = error as AxiosError<{message: string}>

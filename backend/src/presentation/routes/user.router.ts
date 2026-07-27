@@ -186,24 +186,13 @@ function createUserRouter() {
     authorization(['user']),
     userController.trackMyApplication.bind(userController)
   );
-  // userRouter.get(
-  //   '/v1/user/me/alerts',
-  //   centralizedAuthentication,
-  //   authorization(['user', 'recruiter', 'admin']),
-  //   userController.getMyAlerts.bind(userController)
-  // );
   userRouter.get(
     '/v1/users/:userId',
     centralizedAuthentication,
     authorization(['user']),
     userController.loadUsersPublicProfile.bind(userController)
   );
-  // userRouter.get(
-  //   '/v1/user/me/metadata', //route flaged due to authenticated user related issues
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   userController.loadUserMetaData.bind(userController)
-  // );
+
   userRouter.get(
     UserApiRoutes.USER_PUBLIC.LOAD_USERS,
     centralizedAuthentication,
@@ -260,20 +249,8 @@ function createUserRouter() {
 
   userRouter.get(
     '/v1/similar-people',
-    (req: Request, res: Response, next: NextFunction) => {
-      // console.log('Passed through the api endpoint going to the auth');
-      next();
-    },
     centralizedAuthentication,
-    (req: Request, res: Response, next: NextFunction) => {
-      // console.log('Passed through the authentication endpoint going to the authroization');
-      next();
-    },
     authorization(['user']),
-    (req: Request, res: Response, next: NextFunction) => {
-      // console.log('Passed through the authorization endpoint going to the controller');
-      next();
-    },
     userController.getSimilarUsers.bind(userController)
   );
 
@@ -291,10 +268,6 @@ function createUserRouter() {
     userController.loadInterviewDashboard.bind(userController)
   );
 
-  // candidateRouter.get(
-  //   '/candidates/:candidateId',
-  //   candidateController.getCandidateDetails.bind(candidateController)
-  // );
   userRouter.get(
     UserApiRoutes.USER_JOB_MANAGE.LOAD_MY_APPLICATIONS,
     centralizedAuthentication,
@@ -308,30 +281,11 @@ function createUserRouter() {
     authorization(['user']),
     userController.loadUserFullProfileForResumeBuidling.bind(userController)
   );
-  // userRouter.post(
-  //   '/v1/user/connect-request/:receiverId',
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   userController.sendConnectionRequest.bind(userController)
-  // );
-  // userRouter.patch(
-  //   '/v1/user/connection-request-cancel/:receiverId',
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   userController.cancelConnectionRequest.bind(userController)
-  // );
-  // userRouter.patch(
-  //   '/v1/user/connection-request-reject',
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   userController.rejectConnectionRequest.bind(userController)
-  // );
-  // userRouter.patch(
-  //   '/v1/user/connection-request-accept/',
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   userController.acceptConnectionRequest.bind(userController)
-  // );
+
+  userRouter.get(
+    UserApiRoutes.USER_PUBLIC.LOAD_HOME_PAGE_DATA,
+    userController.userLoadHomePageData.bind(userController)
+  );
 
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
 
@@ -339,10 +293,7 @@ function createUserRouter() {
     console.log('--- Refreshed / reloaded ---');
     console.log(req.method, req.originalUrl);
     next();
-    ///res.status(StatusCodes.OK).json({success:true, message:'Testing flow'})
   }
-
-  // // candidateRouter.get('/get/user/:id', getAuthUserData)
 
   return userRouter;
 }

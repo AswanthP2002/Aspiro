@@ -510,6 +510,8 @@ import IPaymentServices, {
   ISubscriptionService,
 } from '../application/interfaces/services/IPayment.services';
 import StripePaymentGateway from '../infrastructure/services/Stripe.payment.service';
+import IUserLoadHomePageDatasUsecase from '../application/interfaces/usecases/user/IUserLoadHomePageData';
+import UserLoadHomePageDataUsecase from '../application/usecases/user/UserLoadHomePageData.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -1157,6 +1159,10 @@ container.registerSingleton<IUserSubscribeFreePlanUsecase>(
 container.registerSingleton<IUserSubscribePaidPlanUsecase>(
   'IUserSubscribePaidPlanUsecase',
   UserSubscribePaidPlanUsecase
+);
+container.registerSingleton<IUserLoadHomePageDatasUsecase>(
+  'IUserLoadHomePageDataUsecase',
+  UserLoadHomePageDataUsecase
 );
 container.registerSingleton<IGetSessionDetailsUsecase>(
   'IGetSessionDetailsUsecase',

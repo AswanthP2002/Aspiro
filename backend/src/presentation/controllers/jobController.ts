@@ -5,14 +5,18 @@ import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/IS
 import { inject, injectable } from 'tsyringe';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IGetRecommendedJobsUsecase from '../../application/interfaces/usecases/job/IGetRecommendedJobs.usecase';
+import ResponseHandler from '../../utilities/response.handler';
 
 @injectable()
 export default class JobController {
+  private _responseHandler: ResponseHandler;
   constructor(
     @inject('IGetJobDetailsUsecase') private _getJobDetails: IGetJobDetailsUseCase,
     @inject('SearchJobsFromHomeUsecase') private _SearchJobsFromHome: ISearchJobsFromHomeUseCase,
     @inject('IRecommendedJobsUsecase') private _recommendedJobs: IGetRecommendedJobsUsecase
-  ) {}
+  ) {
+    this._responseHandler = new ResponseHandler();
+  }
 
   async loadJobDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { jobId } = req.params;
@@ -36,12 +40,19 @@ export default class JobController {
 
     try {
       const jobs = await this._SearchJobsFromHome.execute(search);
+      console.log('Job fetched result count of the jobs', jobs?.length ?? null);
+      this._responseHandler.success(
+        res,
+        StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Jobs'),
+        StatusCodes.OK,
+        jobs
+      );
 
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job'),
-        jobs,
-      });
+      // res.status(StatusCodes.OK).json({
+      //   success: true,
+      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job'),
+      //   result: jobs,
+      // });
 
       return;
     } catch (error: unknown) {

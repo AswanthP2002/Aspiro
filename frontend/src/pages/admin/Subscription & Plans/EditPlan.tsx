@@ -86,7 +86,7 @@ const EditPlan = () => {
 
   const selectedIcon = watch('badgeIcon')
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: AddPlanFormData) => {
     
     const booleaFeaturesKey = featuresList
       .filter(f => !f.isNumeric)
@@ -164,7 +164,7 @@ const EditPlan = () => {
             trialPeriod: editablePlanData.trialPeriod
         })
     }
-  }, [editablePlanData])
+  }, [editablePlanData, reset]) //updating dependancy array due to lint error. previously editableplandata
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans text-slate-900">

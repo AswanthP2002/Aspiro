@@ -504,7 +504,7 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                     name='website'
                                     rules={{
                                         required: false,
-                                        pattern:{value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, message: 'Enter a valid url'}
+                                        pattern:{value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, message: 'Enter a valid url'}
                                     }}
                                     render={({field}) => (
                                         <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='https://www.company.com' />
@@ -520,7 +520,7 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                     name='linkedin'
                                     rules={{
                                         required: false,
-                                        pattern:{value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, message: 'Enter a valid url'}
+                                        pattern:{value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, message: 'Enter a valid url'}
                                     }}
                                     render={({field}) => (
                                         <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='https://www.linkedin.com/company...' />
@@ -566,7 +566,7 @@ function AddCompanyModal({open, onClose}: {open: boolean, onClose: () => void}){
                                     name='industry'
                                     rules={{
                                         required: {value: true, message: 'Industry can not be empty'},
-                                        pattern:{value: /^[A-Z][A-Za-z\s\&\-\/]{2,49}$/, message: 'Enter a name'}
+                                        pattern:{value: /^[A-Z][A-Za-z\s&/-]{2,49}$/, message: 'Enter a name'}
                                     }}
                                     render={({field}) => (
                                         <input {...field} className='border !border-slate-100 p-3 rounded-md bg-gray-50 placeholder:text-xs placeholder:text-slate-400 focus:bg-white focus:!border-blue-300 focus:ring-2 focus:ring-blue-100' placeholder='Information Technology' />

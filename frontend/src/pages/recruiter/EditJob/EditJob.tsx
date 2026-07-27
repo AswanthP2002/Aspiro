@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { editJob, getPostedJobDetails, recruiterFetchJobLevelLists, recruiterFetchJobTypeLists, recruiterFetchWorkModeLists, verifyBeforeEditJob } from "../../../services/recruiterServices"
@@ -38,7 +38,9 @@ interface JobDetails {
 export default function EditJobForm(){
 
     const location = useLocation()
-    const jobData = location.state?.jobData || {}
+    const jobData = useMemo(() => {
+        return location.state?.jobData || {}
+    }, [location.state?.jobData])
 
     const requiredSkillRef = useRef<HTMLInputElement | null>(null)
     const [jobLevelData, setJobLevelData] = useState<JobLevelData[]>([])
@@ -121,7 +123,7 @@ export default function EditJobForm(){
             toast.warn('Can not edit job now')
             navigator(-1)
         }
-    }, [jobData, reset])
+    }, [jobData, reset, navigator]) //previously jobdata, reset
 
     const enteredJobType = watch('jobType')
     const enteredWorkMode = watch('workMode')
@@ -560,7 +562,7 @@ const selectStyles = {
                                 control={control}
                                 rules={{
                                     required:{value:true, message:'Enter Qualifications, if nothing enter any'},
-                                    pattern: { value: /^(?!\d+$)(?!.*\d$)[A-Za-z.,()\-]+(?:\s[A-Za-z.,()\-]+)*$/, message: 'Enter valid qualifications' }
+                                    pattern: { value: /^(?!\d+$)(?!.*\d$)[A-Za-z.,()-]+(?:\s[A-Za-z.,()-]+)*$/, message: 'Enter valid qualifications' }
                                 }}
                                 render={({field}) => (
                                     <TextField 
@@ -686,7 +688,7 @@ const selectStyles = {
                             <div className="skills !mt-2 flex flex-wrap gap-2">
                                 {
                                     watch('requiredSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeRequiredSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={() => removeRequiredSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
                                     })
                                 }
                             </div>
@@ -701,7 +703,7 @@ const selectStyles = {
                             <div className="skills !mt-2 flex flex-wrap gap-2">
                                 {
                                     watch('optionalSkills').map((skill: string, index: number) => {
-                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={(e) => removeOptionalSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
+                                        return <span key={index} className="text-xs text-gray-500 bg-gray-200 !px-3 rounded-full !py-2">{skill} <i onClick={() => removeOptionalSkill(skill)} className="fa-solid fa-circle-xmark ms-1 cursor-pointer"></i></span>
                                     })
                                 }
                             </div>
