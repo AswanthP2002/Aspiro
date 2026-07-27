@@ -27,7 +27,7 @@ export default function ApplicantManagePage(){
     const location = useLocation()
     const [selectedApplication, setSelectedApplication] = useState<string | null>(null)
     const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
-    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer' | string>('all')
+    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer' | 'withdrawn' | string>('all')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
@@ -291,6 +291,7 @@ export default function ApplicantManagePage(){
                         <p className="text-sm text-gray-500">Rejected</p>
                     </div>
                 </div>
+                
             </div>
 
             <div className="mt-5 bg-white border border-slate-200 rounded-md p-2 grid grid-cols-12 gap-2">
@@ -314,12 +315,12 @@ export default function ApplicantManagePage(){
                         </div>
                     )}
                 </div>
-                <div className="col-span-12 lg:col-span-3">
+                {/* <div className="col-span-12 lg:col-span-3">
                     <button disabled className="flex w-full justify-center p-2 border border-slate-300 rounded-md hover:bg-blue-100 items-center gap-2 text-xs font-medium">
                         <LuSparkles color="blue" size={18} />
                         <p className="text-indigo-500">Smart Filter</p>
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <div className="mt-5">
@@ -404,7 +405,13 @@ export function StatusPhills({status}: {status: string}){
       return <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-0.5 rounded-full">Hired</span>;
     case 'rejected':
       return <span className="bg-red-100 text-red-700 text-xs font-medium px-3 py-0.5 rounded-full">Rejected</span>;
-    default:
+    case 'withdrawn': 
+    return (
+  <span className="bg-slate-100 text-slate-700 text-xs font-medium px-3 py-0.5 rounded-full">
+    Withdrawn
+  </span>
+);
+      default:
       return <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-0.5 rounded-full">{status || 'Unknown'}</span>;
   }
 }
@@ -435,7 +442,7 @@ const interviewTypes = [
     // const [loading, setLoading] = useState(false)
     const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
     const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState(false)
-
+    const [candidateNotes, setCandidateNotes] = useState<string>('')
     // const openInterviewScheduleModal = () => setScheduleInterviewModalOpen(true)
     // const closeInterviewScheduleModal = () => setScheduleInterviewModalOpen(false)
 
@@ -548,6 +555,7 @@ const interviewTypes = [
                 if(result.success){
                     toast.success('Application details loaded')
                     setApplicationDetails(result.result)
+                    setCandidateNotes(applicationDetails?.notes as string)
                 }
 
             } catch (error) {
@@ -560,7 +568,7 @@ const interviewTypes = [
         if(applicationId){
             fetchSingleApplicationDetails()
         }
-    }, [applicationId])
+    }, [applicationId, applicationDetails?.notes])
     
     
     // const toggleStatusMenu = () => setIsStatusMenuOpened(prv => !prv)
@@ -626,11 +634,14 @@ const interviewTypes = [
                                             applicationDetails.status === 'offer' || 
                                             applicationDetails.status === 'rejected'
                                         ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'rejected', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        {applicationDetails.status === 'withdrawn' && (
+                                            <button disabled className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">withdrawn</button>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <div className="mt-5 bg-orange-100 p-5 rounded-md ring-1 ring-orange-500">
+                        {/* <div className="mt-5 bg-orange-100 p-5 rounded-md ring-1 ring-orange-500">
                             <div className="flex justify-between items-center text-xs font-medium w-full">
                                 <p>Profile Match</p>
                                 <p>86%</p>
@@ -638,7 +649,7 @@ const interviewTypes = [
                             <div className="border border-slate-200 rounded-md w-full h-3 mt-1 bg-white">
                                 <div className="h-full bg-orange-500 rounded-md w-[86%]"></div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="mt-5">
                             <p className="text-sm font-semibold">Contact Information</p>
                             <div className="mt-1 space-y-2">
@@ -725,13 +736,13 @@ const interviewTypes = [
 
                         <div className="mt-5">
                      <p className="font-light">Notes</p>
-                     <textarea value={applicationDetails.notes} onChange={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+                     <textarea value={candidateNotes} onChange={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
                  </div>
                  <div className="mt-5 space-y-2">
-                     <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
-                     <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button>
-                     <div onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</div>
-                     <div onClick={() => navigateToUserPublicProfile(applicationDetails.candidateDetails?._id as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</div>
+                     <button disabled={applicationDetails.status === 'withdrawn'} onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</button>
+                     {/* <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button> */}
+                     <button onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</button>
+                     <button onClick={() => navigateToUserPublicProfile(applicationDetails.candidateDetails?._id as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</button>
                  </div>
                     </div>
                     )}
@@ -907,7 +918,7 @@ const interviewTypes = [
       />
 
       {/* Checkbox */}
-      <Controller
+      {/* <Controller
         name="sendEmail"
         control={control}
         render={({ field }) => (
@@ -917,7 +928,7 @@ const interviewTypes = [
             label={<span className="text-sm">Send email invitation</span>}
           />
         )}
-      />
+      /> */}
 
       {/* Submit Button */}
       <Button 

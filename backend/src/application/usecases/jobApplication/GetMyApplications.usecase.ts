@@ -30,6 +30,7 @@ export default class GetMyApplicationsUsecase implements IGetMyApplicationsUseca
       'offer',
       'hired',
       'rejected',
+      'withdrawn',
     ];
 
     switch (sort) {

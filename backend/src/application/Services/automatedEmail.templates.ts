@@ -52,7 +52,15 @@ const baseEmailWrapper = (content: string): string => {
 export default function generatedAutomatedEmailContent(
   job: string,
   candidateName: string,
-  status: 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | 'opened'
+  status:
+    | 'applied'
+    | 'screening'
+    | 'interview'
+    | 'offer'
+    | 'hired'
+    | 'rejected'
+    | 'opened'
+    | 'withdrawn'
 ): { subject: string; body: string } {
   let subject: string = '';
   let body: string = '';

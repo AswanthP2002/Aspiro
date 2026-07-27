@@ -17,6 +17,7 @@ export interface JobApplicationDTO {
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
+  withdrawReason?: string;
 }
 
 export interface JobApplicationTrackingDTO {
@@ -24,6 +25,7 @@ export interface JobApplicationTrackingDTO {
   status?: JobApplicationStatus;
   notes?: string;
   createdAt?: string;
+  withdrawReason?: string;
   updatedAt?: string;
   jobDetails?: {
     _id: string;
@@ -37,4 +39,5 @@ export interface JobApplicationTrackingDTO {
     _id: string;
     name: string;
   };
+
 }

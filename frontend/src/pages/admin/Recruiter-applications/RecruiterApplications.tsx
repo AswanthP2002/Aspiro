@@ -274,7 +274,7 @@ export default function RecruiterApplications(){
                 }`}
             >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shrink-0 bg-blue-500`}>
-                {app?.fullName?.split(' ')[0][0]}{app?.fullName?.split(' ')[1][0]}
+                {app?.fullName?.split(' ')[0][0]}
                 </div>
                 <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm truncate">{app?.fullName}</h3>

@@ -168,7 +168,7 @@ function createUserRouter() {
     authorization(['user']),
     userController.removeCoverphoto.bind(userController)
   );
-  userRouter.delete(
+  userRouter.patch(
     UserApiRoutes.USER_JOB_MANAGE.WITHDRAW_APPLICATION,
     centralizedAuthentication,
     authorization(['user']),

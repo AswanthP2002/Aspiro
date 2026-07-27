@@ -48,14 +48,10 @@ export default function JObDetailsCandidateSide() {
                 ] = await Promise.all([loadJobDetails(jobId), checkIsSaved(jobId), checkIsJobApplied(jobId)])
                                
                 if(jobDetailsResult.success){
-                    console.log('job details fetched', jobDetailsResult)
-                    console.log('job saved result', jobSavedResult)
-                    console.log('job applied result', jobAppliedResult)
                     setjobDetails(jobDetailsResult?.jobDetails)
                     setIsJobApplied(jobAppliedResult.result ? jobAppliedResult.result : null)
                     setIsJobSaved(jobSavedResult ? true : false)
-                    console.log('job details from the state', jobDetails)
-
+          
                     if(jobDetailsResult?.jobDetails?.isFlagged){
                         openAwarenessModal()
                     }else{
@@ -73,7 +69,7 @@ export default function JObDetailsCandidateSide() {
 
         fetchJobDetails()
         
-    }, [jobDetails, jobId]) //updating dependancy array due to lint error, previously empty
+    }, [jobId]) //updating dependancy array due to lint error, previously empty
 
     function goToApplyPage(jobId : string) {
         navigator(`/jobs/${jobId}/apply`, {state:{jobDetails}})

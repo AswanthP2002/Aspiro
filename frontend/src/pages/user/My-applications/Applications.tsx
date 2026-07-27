@@ -9,7 +9,6 @@ import { formattedDateMoment } from '../../../services/util/formatDate';
 import { LuFileUser, LuSearch } from 'react-icons/lu';
 import { currencyFormatter } from '../../../helpers/Currency.helper';
 import { FaClock } from 'react-icons/fa';
-import { toast } from 'react-toastify';
 
 export default function MyApplications() {
   const [applications, setApplications] = useState<MyApplicationsListData[]>([]);
@@ -55,13 +54,10 @@ export default function MyApplications() {
   const dSearch = dbouncedSearch(searchJobApplication, 500)
 
   const navigateToApplicationDetailsPage = (applicationId: string) => {
-    toast.info('redirecting to application tracking page')
     if(!applicationId) return
     navigate(`/profile/my-application/${applicationId}`, {state:{applicationId: applicationId}})
   }
-  // function formatLocalDateTime(date?: string) {
-  //   return moment(date).format('DD MMM YYYY, h:mm a');
-  // }
+ 
 
   useEffect(() => {
     (async function () {
@@ -108,6 +104,12 @@ export default function MyApplications() {
         return <span className='bg-green-200 rounded-full text-xs text-green-600 px-2'>{status}</span>
       case 'rejected':
         return <span className='bg-red-200 rounded-full text-xs text-red-600 px-2'>{status}</span>
+      case 'withdrawn':
+        return (
+  <span className="bg-slate-100 text-slate-700 rounded-full px-2 py-1 text-xs font-medium">
+    {status}
+  </span>
+);
       default:
         return
     }
@@ -141,7 +143,7 @@ export default function MyApplications() {
                 </div>
                 {isFilterMenuOpened && (
                   <div className="absolute w-full bg-white left-0 rounded-md border border-slate-200 rounded shadow">
-                      {Array.from(['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected']).map((status) => (
+                      {Array.from(['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected', 'withdrawn']).map((status) => (
                         <button onClick={() => {setStatus(status); setIsFilterMenuOpened(false)}} className='w-full p-2 text-xs font-medium hover:bg-gray-100'>{status}</button>
                       ))}
                   </div>
@@ -168,24 +170,24 @@ export default function MyApplications() {
           <div className="mt-5 grid grid-cols-1 gap-2">
               {applications && applications.length > 0 && (
                 applications.map((application: MyApplicationsListData) => (
-                  <div key={application._id} className='bg-white p-5 flex gap-2 rounded-md border border-slate-200 hover:ring-1 hover:ring-blue-500'>
+                  <div key={application._id} className={`bg-white p-5 flex gap-2 ${application.status === 'withdrawn' ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-md border border-slate-200 hover:ring-1 hover:ring-blue-500`}>
                     <div>
                       <div className="bg-blue-500 w-13 h-13 rounded-md flex items-center justify-center">
                         <LuFileUser color='white' size={25} />
                       </div>
                     </div>
                     <div className="flex-1">
-                      <p className='font-semibold'>{application.jobDetails?.jobTitle}</p>
-                      <p className='text-xs text-gray-700'>{application.recruiterProfile?.name} | Posted by {application.recruiterProfile?.name}</p>
-                      <p className='mt-2 font-semibold'>{currencyFormatter(application?.jobDetails?.minSalary ? application.jobDetails.minSalary.toString() : '100', "INR")}</p>
-                      <p className='mt-3 text-xs text-gray-500 flex items-center gap-1'><FaClock /> Applied on {formattedDateMoment(application.createdAt.toISOString(), "MMM DD YYYY")}</p>
+                      <p className={`${application.status === 'withdraws' ? "text-slate-400" : 'font-semibold'}`}>{application.jobDetails?.jobTitle}</p>
+                      <p className={`${application.status === 'withdrawn' ? "text-slate-400" : 'text-xs text-gray-700'}`}>{application.recruiterProfile?.name} | Posted by {application.recruiterProfile?.name}</p>
+                      <p className={`${application.status === 'withdrawn' ? "text-slate-400" : 'mt-2 font-semibold'}`}>{currencyFormatter(application?.jobDetails?.minSalary ? application.jobDetails.minSalary.toString() : '100', "INR")}</p>
+                      <p className='mt-3 text-xs text-gray-500 flex items-center gap-1'><FaClock /> Applied on {formattedDateMoment(application.createdAt.toLocaleString(), "MMM DD YYYY")}</p>
                       <div className="flex justify-between items-center mt-3">
                         <div>
                           {getStatusPhills(application.status as string)}
                         </div>
                         <div className='space-x-2'>
                           <button onClick={() => navigatetoJobDetailsPage(application.jobDetails?._id as string)} className='px-3 py-2 text-xs font-medium rounded-md border border-slate-300'>View Job</button>
-                          <button onClick={() => navigateToApplicationDetailsPage(application._id as string)} className='px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-md'>View Application</button>
+                          <button disabled={application.status === 'withdrawn'} onClick={() => navigateToApplicationDetailsPage(application._id as string)} className='px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-md'>View Application</button>
                         </div>
                       </div>
                     </div>

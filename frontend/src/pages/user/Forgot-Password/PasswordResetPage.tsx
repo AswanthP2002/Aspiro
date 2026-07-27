@@ -27,7 +27,6 @@ export default function PasswordResetPage(){
     const typedPassword = watch('password')
 
     async function resetPasswordOnSubmit(data: FormInput){
-        alert('reset button called')
         setLoading(true)
         const {password} = data
         

@@ -21,7 +21,7 @@ import createUserRouter from './src/presentation/routes/user.router';
 import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
-// import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
+import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
 import createCompanyRouter from './src/presentation/routes/companyRouter';
 import CreateExperienceRouter from './src/presentation/routes/experienceRouter';
 import CreateEducationRouter from './src/presentation/routes/educationRouter';
@@ -78,7 +78,7 @@ async function main() {
   // const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
   // cronMonthlyResetTest.resetSubscriptionLimit();
   //connect redis
-  //await connectRedis(); commented since there is no network connection
+  await connectRedis();
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);

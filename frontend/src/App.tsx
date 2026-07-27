@@ -37,7 +37,7 @@ import ResetLinkSendPage from './pages/user/Forgot-Password/ResetLinkSendPage';
 import PasswordResetPage from './pages/user/Forgot-Password/PasswordResetPage';
 import PasswordResetSuccessPage from './pages/user/Forgot-Password/PasswordResetSuccessPage';
 import UserPublicProfile from './pages/candidate/Candidate-List-Details/CandidateDetails';
-import PostProvider from './context/PostContext';
+import PostProvider from './context/PostContextProvider';
 import RecruiterApplications from './pages/admin/Recruiter-applications/RecruiterApplications';
 import RecruiterApplicationDetailsPage from './pages/admin/Recruiter-applications/RecruiterApplicationDetailsPage';
 import { useEffect} from 'react';

@@ -373,9 +373,10 @@ export class UserController {
 
   async withdrawApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
     const applicationId = req.params.applicationId;
+    const reason = req.body.reason;
 
     try {
-      await this._withdrawApplication.execute(applicationId);
+      await this._withdrawApplication.execute(applicationId, reason);
 
       res.status(StatusCodes.OK).json({ success: true, message: 'application deleted' });
     } catch (error: unknown) {

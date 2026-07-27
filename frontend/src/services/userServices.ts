@@ -509,9 +509,10 @@ export const getMyInterviews = async () => {
     }
 }
 
-export const deleteMyApplication = async (applicationId: string) => {
+export const deleteMyApplication = async (applicationId: string, reason: string) => {
     try {
-        const response = await axiosInstance.delete(EndPoints.WITHDRAW_APPLICATION(applicationId),
+        const response = await axiosInstance.patch(EndPoints.WITHDRAW_APPLICATION(applicationId),
+            {reason},
             {
                 sendAuthToken:true
             } as AxiosRequest
