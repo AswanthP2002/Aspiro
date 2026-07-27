@@ -14,6 +14,7 @@ import {
 import { JobDTO } from '../../DTOs/job/createJob.dto';
 import { JobAggregatedDTO } from '../../DTOs/job/jobAggregated.dto';
 import RecommendedJobDTO from '../../DTOs/job/recommendedJob.dto';
+import JobsForHompePageDTO from '../../DTOs/job/jobsForHomePage.dto';
 
 export default class JobMapper {
   public jobAggregatedDataToJobAggregatedDTO(data: JobAggregatedData): JobAggregatedDTO {
@@ -270,6 +271,15 @@ export default class JobMapper {
         _id: data.companyProfileDetails?._id as string,
         name: data.companyProfileDetails?.name as string,
       },
+    };
+  }
+
+  public jobAggregatedToJobsHomePageSearchDTO(data: JobAggregated): JobsForHompePageDTO {
+    return {
+      _id: data._id,
+      jobTitle: data.jobTitle,
+      company: data.companyProfileDetails?.name as string,
+      location: data.location,
     };
   }
 }

@@ -14,10 +14,15 @@ import {
 } from 'react-icons/hi2';
 import { BsEye } from 'react-icons/bs';
 import { FiEyeOff } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 type registerResultPayload = {
   success: boolean;
   message: string;
+  errors?: {
+    code: string,
+    message: string
+  }
   userId: string;
   userEmail: string;
 };
@@ -63,6 +68,24 @@ export default function UserRegister(): React.ReactNode {
       if (result.success) {
         navigate(`/verify`, { state: { email: result.userEmail, id: result.userId } });
       } else {
+        console.log('Checking verification pending error --', result)
+        if(result.errors?.code === 'VERIFICATION_PENDING'){
+          Swal.fire({
+            icon: 'info',
+            title: 'Verification Pending',
+            text: result.message,
+            showConfirmButton: true,
+            confirmButtonText: 'Verifiy',
+            cancelButtonText: 'Home',
+            showCancelButton: true,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+          }).then((result) => {
+            if(result.isConfirmed){
+              navigate('/verify', {state: {email: email}})
+            }
+          })
+        }
         setvalidationerrortext(result.message);
       }
     } catch (error: unknown) {

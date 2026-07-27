@@ -4,7 +4,7 @@ import ConnectionRequest, {
 import {
   ConnectionRequestDTO,
   ConnectionUserDetailsDTO,
-  ConnectionWithSenderDetailsDTO,
+  // ConnectionWithSenderDetailsDTO,
 } from '../../DTOs/connection/connectionRequest.dto';
 
 export default class ConnectionRequestMapper {

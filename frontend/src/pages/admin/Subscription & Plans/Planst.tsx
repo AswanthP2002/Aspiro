@@ -10,12 +10,12 @@ import { toast } from "react-toastify";
 import { Skeleton } from "@mui/material";
 import Swal from "sweetalert2";
 import { AxiosError } from "axios";
+import { LuUsers } from "react-icons/lu";
 
 export default function Plans(){
     const [loading, setLoading] = useState(false)
     const [plans, setPlans] = useState<PlanData[]>([])
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(5)
     const [totalPages, setTotalPages] = useState(1)
 
     const navigate = useNavigate()
@@ -27,7 +27,7 @@ export default function Plans(){
     const navigateToEditPlanPage = (data: PlanData) => {
         return navigate(`/admin/subscription/plans/edit/${data._id}`, {state: {editablePlanData: data}})
     }
-
+    console.log(typeof setPage)
     const togglePlanListing = async (planId: string, status: 'LIST' | 'UNLIST') => {
         if(!planId) return
 
@@ -108,8 +108,9 @@ export default function Plans(){
         async function loadSubscriptionPlans(){
             setLoading(true)
             try {
-                const result = await adminGetPlans(page, limit)
+                const result = await adminGetPlans(page, 5)
                 if(result?.success){
+                    console.log('Admin get plans ')
                     setPlans(result.result.plans)
                     setTotalPages(result.result.totalPages)
                 }
@@ -122,7 +123,7 @@ export default function Plans(){
         }
 
         loadSubscriptionPlans()
-    }, [page, limit])
+    }, [page])
 
     return(
         <>
@@ -160,7 +161,7 @@ export default function Plans(){
                                 <tr>
                                     <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Plan Name</th>
                                     <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Monthly Price</th>
-                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Yearly Price</th>
+                                    <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Active Users</th>
                                     <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Status</th>
                                     <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Trial Period</th>
                                     <th className="font-semibold text-sm py-3 px-2 text-start text-slate-600">Actions</th>
@@ -185,9 +186,9 @@ export default function Plans(){
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-2 text-sm text-gray-700">
-                                                   <div className="flex items-center gap-center">
-                                                        <BiRupee />
-                                                        {plan.yearlyPrice}
+                                                   <div className="flex items-center gap-1">
+                                                        <LuUsers />
+                                                        {plan.activeUsers || 0}
                                                     </div> 
                                                 </td>
                                                 <td className="py-4 px-2 text-xs">

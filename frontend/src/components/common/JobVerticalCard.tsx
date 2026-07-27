@@ -13,7 +13,7 @@ import { useState } from 'react'
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
 
-export default function JobVerticalCard({jobData, onUnsaveJob} : {jobData: FavoriteJob, onUnsaveJob: Function}){
+export default function JobVerticalCard({jobData, onUnsaveJob} : {jobData: FavoriteJob, onUnsaveJob: (id: string) => void}){
     console.log('job data fetched from the backend', jobData)
     // const [jobDetails, setJobDetails] = useState<FavoriteJob | null | undefined>(null)
     const [isJobSaved, setIsJobSaved] = useState<boolean>(true)
@@ -72,7 +72,7 @@ export default function JobVerticalCard({jobData, onUnsaveJob} : {jobData: Favor
                             </span>
                             <span className='flex items-center gap-2'>
                                 <BsClock size={12} />
-                                <p className='text-xs text-gray-500'>Posted {formatRelativeTime(jobData.jobDetails.createdAt)}</p>
+                                <p className='text-xs text-gray-500'>Posted {formatRelativeTime(jobData?.jobDetails?.createdAt ?? new Date())}</p>
                             </span>
                             {/* {
                             

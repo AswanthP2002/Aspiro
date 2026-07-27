@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BiArrowBack, BiCalendar, BiEnvelope, BiRecycle } from "react-icons/bi";
-import { BsArrowDown, BsArrowUp, BsLightning } from "react-icons/bs";
+import { BsLightning } from "react-icons/bs";
 import { CgCreditCard } from "react-icons/cg";
 import { FaLocationDot } from "react-icons/fa6";
 import { LuCheck, LuCircleCheck, LuPhone, LuUser, LuX } from "react-icons/lu";
@@ -48,25 +48,7 @@ export default function UserSubscriptionManage(){
     if(userId){
       loadUserSubscriptionDetails()
     }
-  }, [])
-
-  // useEffect(() => {
-
-  //   async function fetchUserPaymentHistory(){
-  //     try {
-  //       const result = await getUserInvoices(userSubscriptionData?.subscriptionDetails.stripeCustomerId as string) as {success: boolean, message: string, result: InvoiceData[]}
-  //       setPaymentHistory(result.result)
-  //       toast.success('Payment history loaded')
-  //     } catch (error: unknown) {
-  //       const err = error as AxiosError<{message: string}>
-  //       const finalMessage = err.response?.data.message || err.message || 'Something went wrong'
-  //       toast.error(finalMessage)
-  //     }
-  //   }
-
-  //   fetchUserPaymentHistory()
-
-  // }, [userSubscriptionData?.subscriptionDetails.stripeCustomerId])
+  }, [userId]) //Updated dependancy due to lint error, previously empty
   
 
     return (
@@ -121,7 +103,7 @@ export default function UserSubscriptionManage(){
                   </p>
                   <p className="text-[.7rem] text-slate-300">Next billing: {moment(userSubscriptionData?.subscriptionDetails.currentPeriodEnds).format("DD MMM YYYY")}</p>
                 </div>
-                <div className="mt-5 space-y-2">
+                {/* <div className="mt-5 space-y-2">
                   <button className="flex w-full items-center justify-center gap-2 border border-slate-200 text-xs p-3 bg-gradient-to-br from-blue-400 shadow-sm shadow-blue-100 to-indigo-500 rounded-lg text-white font-semibold tracking-wide">
                     <BsArrowUp />
                     <p>Upgrade Plan</p>
@@ -133,14 +115,14 @@ export default function UserSubscriptionManage(){
                   <button className="flex w-full items-center justify-center gap-2 border border-slate-200 text-xs p-3 rounded-lg text-slate-400">
                     <p>Cancel Subscription</p>
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
                 <p className="uppercase text-slate-500 text-sm tracking-wide">plan features</p>
                 <p>stripe customer id: {userSubscriptionData?.subscriptionDetails.stripeCustomerId}</p>
                 <div className="mt-3 space-y-1">
-                    {userSubscriptionData?.subscriptionDetails && userSubscriptionData.subscriptionDetails.features && Object.entries(userSubscriptionData?.subscriptionDetails?.features).map(([key, value]) => {
+                    {userSubscriptionData?.subscriptionDetails && userSubscriptionData.subscriptionDetails.features && Object.entries(userSubscriptionData?.subscriptionDetails?.features).map(([key]) => {
                       return(
                         <p className="flex items-center gap-2 text-slate-500 text-xs">
                                 {userSubscriptionData.subscriptionDetails.features[key]

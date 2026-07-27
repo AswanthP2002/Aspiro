@@ -13,14 +13,6 @@ export default class CompanyRepository extends BaseRepository<Company> implement
   }
 
   async findAll(filter?: { industry?: string; location?: string }): Promise<Company[] | null> {
-    // const query: any = {};
-    // if (filter?.industry) {
-    //   query.industry = { $regex: new RegExp(filter.industry, 'i') };
-    // }
-    // if (filter?.location) {
-    //   query.location = { $regex: new RegExp(filter.location, 'i') };
-    // }
-
     console.log(filter);
     const result = await CompanyDAO.find();
     return result;
@@ -76,5 +68,10 @@ export default class CompanyRepository extends BaseRepository<Company> implement
     const totalDocs = result[0]?.metaData[0]?.count;
     const totalPages = Math.floor(totalDocs / limit);
     return { companyData: data, totalPages };
+  }
+
+  async getActiveCompanyCount(): Promise<{ count: number } | null> {
+    const result = await CompanyDAO.find().countDocuments();
+    return { count: result };
   }
 }

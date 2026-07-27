@@ -23,7 +23,6 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [hasMore, setHasMore] = useState(true)
-  const [limit, setLimit] = useState(5)
   const navigate = useNavigate()
   
   const logedUser = useSelector((state: RootUser) => {
@@ -33,7 +32,7 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
   console.log('-- checking loged user -- ', logedUser)
 
   const observer = useRef<null | IntersectionObserver>(null)
-  const lastConnectionRef = useCallback((node: Element) => {
+  const lastConnectionRef = useCallback((node: HTMLDivElement) => {
     if(loading) return
     if(observer.current) observer.current.disconnect()
 
@@ -49,10 +48,11 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
 
   }, [loading])
   
-  async function fetchConnections(){ //middle
+  const fetchConnections = useCallback(() => {
+    return async function (){ //middle
       setLoading(true)
       try {
-        const result = await getConnections(userId, search, page, limit)
+        const result = await getConnections(userId, search, page, 5)
         if(result?.success){
           // toast.success('Followers fetched')
           console.log('-- connection fetching reuslt ==', result)
@@ -69,6 +69,27 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
         }, 2000);
       }
   }
+  }, [page, search, userId]) //moved to usecallback now
+  // async function fetchConnections(){ //middle
+  //     setLoading(true)
+  //     try {
+  //       const result = await getConnections(userId, search, page, 5)
+  //       if(result?.success){
+  //         // toast.success('Followers fetched')
+  //         console.log('-- connection fetching reuslt ==', result)
+  //         setConnections((prv: ConnectionDetails[]) => [...prv, ...result.result])
+  //         setHasMore(result?.result?.length > 0)
+  //       }else{
+  //         setConnections([])
+  //       }
+  //     } catch (error: unknown) {
+  //       toast.error(error instanceof Error ? error.message : 'Something went wrong')
+  //     } finally {
+  //       setTimeout(() => {
+  //         setLoading(false)
+  //       }, 2000);
+  //     }
+  // }
 
   const navigateToUserProfile = (userId: string) => {
     if(!userId) return
@@ -146,7 +167,7 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
     if(hasMore){
       fetchConnections()
     }
-  }, [page, search, limit])
+  }, [page, search, fetchConnections, hasMore])
   return(
     <>
     <Modal open={isOpen} className='flex items-center justify-center p-4 backdrop-blur-sm bg-black/20'>

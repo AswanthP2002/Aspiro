@@ -5,7 +5,7 @@ import { checkIsJobApplied, checkIsSaved, saveJob, unsaveJob } from "../../../se
 import { formattedDateMoment } from "../../../services/util/formatDate"
 import { BiBriefcase, BiChat } from "react-icons/bi"
 import { BsThreeDots } from "react-icons/bs"
-import { LuBan, LuBookmark, LuBookmarkCheck, LuBriefcase, LuBuilding2, LuFileText, LuGraduationCap, LuListChecks, LuShare, LuShare2, LuShieldCheck } from "react-icons/lu"
+import { LuBan, LuBookmark, LuBookmarkCheck, LuBriefcase, LuBuilding2, LuFileText, LuGraduationCap, LuListChecks, LuShare2, LuShieldCheck } from "react-icons/lu"
 import { JobDetailsForPublicData } from "../../../types/entityTypes"
 import { FaHeart } from "react-icons/fa"
 import { CgArrowLeft } from "react-icons/cg"
@@ -21,7 +21,7 @@ export default function JObDetailsCandidateSide() {
     const [jobDetails, setjobDetails] = useState<JobDetailsForPublicData | null >(null)
     const [isJobApplid, setIsJobApplied] = useState(false)
     const [isJobSaved, setIsJobSaved] = useState(false)
-    const [loading, setIsLoading] = useState(false)
+    // const [loading, setIsLoading] = useState(false)
     const [isJobOptionsMenuOpened, setIsJobOptionsMenuOpened] = useState(false)
     const [isAwarnessModalOpene, setIsAwarnessModalOpen] = useState(false)
 
@@ -48,14 +48,10 @@ export default function JObDetailsCandidateSide() {
                 ] = await Promise.all([loadJobDetails(jobId), checkIsSaved(jobId), checkIsJobApplied(jobId)])
                                
                 if(jobDetailsResult.success){
-                    console.log('job details fetched', jobDetailsResult)
-                    console.log('job saved result', jobSavedResult)
-                    console.log('job applied result', jobAppliedResult)
                     setjobDetails(jobDetailsResult?.jobDetails)
                     setIsJobApplied(jobAppliedResult.result ? jobAppliedResult.result : null)
                     setIsJobSaved(jobSavedResult ? true : false)
-                    console.log('job details from the state', jobDetails)
-
+          
                     if(jobDetailsResult?.jobDetails?.isFlagged){
                         openAwarenessModal()
                     }else{
@@ -73,7 +69,7 @@ export default function JObDetailsCandidateSide() {
 
         fetchJobDetails()
         
-    }, [])
+    }, [jobId]) //updating dependancy array due to lint error, previously empty
 
     function goToApplyPage(jobId : string) {
         navigator(`/jobs/${jobId}/apply`, {state:{jobDetails}})
@@ -81,7 +77,7 @@ export default function JObDetailsCandidateSide() {
     async function saveAJob(jobId : string) {
         if(!jobId) return
         try {
-            setIsLoading(true)
+            // setIsLoading(true)
             const result = await saveJob(jobId)
     
             if(result?.success){
@@ -95,14 +91,14 @@ export default function JObDetailsCandidateSide() {
             const finalErrorMessage = err.response?.data.message || err.message || 'Something went wrong'
             toast.error(finalErrorMessage)
         } finally {
-            setIsLoading(false)
+            // setIsLoading(false)
         }
     }
 
     async function unsaveAJob(jobId : string) {
         if(!jobId) return 
         try {
-            setIsLoading(true)
+            // setIsLoading(true)
             const result = await unsaveJob(jobId)
             if(result?.success){
                 toast.success('Unsaved')
@@ -115,7 +111,7 @@ export default function JObDetailsCandidateSide() {
             const finalErrorMessage = err.response?.data.message || err.message || 'Something went wrong'
             toast.error(finalErrorMessage)
         } finally {
-            setIsLoading(false)
+            // setIsLoading(false)
         }
     }
 
@@ -228,7 +224,7 @@ export default function JObDetailsCandidateSide() {
                         onClick={() => goToApplyPage(jobDetails?._id as string)}
                         className="border border-slate-300 text-green-500 text-sm font-semibold px-3 py-2 rounded-md"
                       >
-                        Applied on {formattedDateMoment(isJobSaved.createdAt, 'MMM DD YYYY')}
+                        Applied on {formattedDateMoment(jobDetails?.createdAt ? jobDetails.createdAt.toISOString() : new Date().toISOString(), 'MMM DD YYYY')}
                       </button>
                     </>
                   ) : (

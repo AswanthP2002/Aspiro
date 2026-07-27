@@ -7,7 +7,6 @@ export const addUserSkill = async (skillType : string, skill : string, skillLeve
         const response = await axiosInstance.post(SkillEndpoint.USER.ADD, 
             {skillType, skill, skillLevel},
             {
-                headers:{"Content-Type":'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -60,7 +59,6 @@ export const adminAddSkill = async (skills: string) => {
         const response = await axiosInstance.post(SkillEndpoint.ADMIN.ADD,
             {skills},
             {
-                headers:{"Content-Type":'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -80,7 +78,6 @@ export const adminUpdateSkill = async (skillId: string, skills: string, isVerifi
         const response = await axiosInstance.patch(SkillEndpoint.ADMIN.EDIT_BY_ID(skillId),
             {skills, isVerified},
             {
-                headers:{"Content-Type":'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -118,7 +115,6 @@ export const adminGetSkills = async (search: string, limit?: number, page?: numb
         const response = await axiosInstance.get(SkillEndpoint.ADMIN.LOAD,
             {
                 params:{search, limit, page},
-                headers:{"Content-Type":'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )

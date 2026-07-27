@@ -7,7 +7,6 @@ export const adminAddJobLevel = async (name: string, isActive: boolean) => {
         const response = await axiosInstance.post(JobLevelEndpoints.ADD, 
             {name, isActive},
             {
-                headers: {'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -44,7 +43,6 @@ export const adminEditJobLevel = async (id: string, name: string) => {
         const response = await axiosInstance.patch(JobLevelEndpoints.EDIT_BY_ID(id),
             {name},
             {
-                headers:{'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -63,7 +61,6 @@ export const adminChangeJobLevelStatus = async (id: string, isActive: boolean) =
         const response = await axiosInstance.patch(JobLevelEndpoints.CHANGE_STATU_BY_ID(id),
             {isActive},
             {
-                headers:{'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -81,7 +78,6 @@ export const adminDeleteJobLevel = async (id: string) => {
     try {
         const response = await axiosInstance.delete(JobLevelEndpoints.DELETE_BY_ID(id),
             {
-                headers:{'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )

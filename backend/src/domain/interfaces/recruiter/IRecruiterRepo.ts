@@ -1,6 +1,6 @@
 import FindRecruitersDBQuery from '../../../application/queries/recruiter/recruiter.query';
 import { AppliedRecruitersQuery } from '../../../application/queries/recruiter/recruiter.query';
-import Recruiter, { NewRecruiter } from '../../entities/recruiter/recruiter.entity';
+import { NewRecruiter } from '../../entities/recruiter/recruiter.entity';
 import RecruiterProfileOverviewData from '../../entities/recruiter/recruiterProfilveOverviewData';
 import IBaseRepo from '../IBaseRepo';
 
@@ -18,4 +18,5 @@ export default interface IRecruiterRepo extends IBaseRepo<NewRecruiter> {
     action: 'Verified' | 'Revoked'
   ): Promise<NewRecruiter | null>;
   findRecruiterByUserId(userId: string): Promise<NewRecruiter | null>;
+  getRecruiterCount(): Promise<{ count: number } | null>;
 }

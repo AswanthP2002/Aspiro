@@ -21,7 +21,7 @@ export default class VerifyUserUseCase implements IVerifyUserUseCase {
 
   async execute(verifyUser: VerifyUserDTO): Promise<UserDTO | null> {
     //find user
-    const user = await this._userRepo.findById(verifyUser.id);
+    const user = await this._userRepo.findByEmail(verifyUser.email);
     if (!user || !user.otpExpiresAt || !user.verificationToken) {
       throw new InvalidUserError(); // User not found or no pending verification
     }

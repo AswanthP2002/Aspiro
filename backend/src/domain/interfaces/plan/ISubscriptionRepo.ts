@@ -14,6 +14,9 @@ export default interface ISubscriptionRepo extends IBaseRepo<UserSubscription> {
     status: string[]
   ): Promise<{ data: SubscriptionAnalyticsData; totalPages: number } | null>;
   getUserSubscriptionDetails(userId: string): Promise<UserSubscriptionAndPlanDetails | null>;
+  getSubscriptionAndPlanDetailsBySubscriptionId(
+    subscriptionId: string
+  ): Promise<UserSubscriptionAndPlanDetails | null>;
   findOneWithUserId(userId: string): Promise<UserSubscription | null>;
   updateFeatureJobApplicationCountByUserId(
     userId: string,
@@ -23,5 +26,17 @@ export default interface ISubscriptionRepo extends IBaseRepo<UserSubscription> {
   updateByStripeSubscriptionId(
     stripeSubscriptionId: string,
     data: Partial<UserSubscription>
+  ): Promise<UserSubscription | null>;
+  findSubscriptionByPlanIdAndUserId(
+    userId: string,
+    planId: string
+  ): Promise<UserSubscription | null>;
+  updateFeaturesConnectionRequestCountByUserId(
+    userId: string,
+    count: string
+  ): Promise<UserSubscription | null>;
+  updateFeaturesJobCreationCountByUserId(
+    userId: string,
+    count: string
   ): Promise<UserSubscription | null>;
 }

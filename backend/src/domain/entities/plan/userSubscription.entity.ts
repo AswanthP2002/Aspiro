@@ -14,9 +14,14 @@ export default interface UserSubscription {
   trialPeriodEnds?: Date | string | null;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isCancelAtPeriodEnds?: boolean;
   billingCycle?: 'monthly' | 'annually';
   paymentStatus?: 'paid' | 'pending' | 'failed';
   features?: { [key: string]: string | number | boolean };
+  planMetaData?: {
+    name: string;
+    price: number;
+  };
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
@@ -31,6 +36,7 @@ export interface UserSubscriptionAndPlanDetails {
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isCancelAtPeriodEnds?: boolean;
   isTrialPeriodGiven?: boolean;
   trialPeriodStarts?: string | Date;
   trialPeriodEnds?: string | Date;

@@ -7,7 +7,6 @@ export const sendConnectionRequest = async (receiverId: string, acted_by: string
         const response = await axiosInstance.post(ConnectionEndpoints.SEND_CONNECTION_REQUEST(receiverId),
             {acted_by, acted_user_avatar},
             {
-                headers:{'Content-Type': 'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -23,7 +22,7 @@ export const sendConnectionRequest = async (receiverId: string, acted_by: string
 export const cancelConnectionRequest = async (receiverId: string) => {
     try {
         const response = await axiosInstance.patch(ConnectionEndpoints.CANCEL_CONNECTION_REQUEST(receiverId),
-            null,
+            {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -41,7 +40,6 @@ export const rejectConnectionRequest = async (sender: string) => {
         const response = await axiosInstance.patch(ConnectionEndpoints.REJECT_CONNECTION_REQUEST,
             {sender},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -59,7 +57,6 @@ export const acceptConnectionRequest = async (sender: string, acted_by: string, 
         const response = await axiosInstance.patch(ConnectionEndpoints.ACCEPT_CONNECTION_REQUEST,
             {sender, acted_by, acted_user_avatar},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )

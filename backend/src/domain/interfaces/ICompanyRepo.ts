@@ -8,4 +8,5 @@ export default interface ICompanyRepo extends IBaseRepo<Company> {
     page: number,
     limit: number
   ): Promise<{ companyData: CompanyWithRecruitersAndJobs[]; totalPages: number } | null>;
+  getActiveCompanyCount(): Promise<{ count: number } | null>;
 }

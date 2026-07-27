@@ -5,19 +5,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getSessionDetails } from '../../../services/planServices';
 import { toast } from 'react-toastify';
 import moment from 'moment';
-// import { CheckCircle, Calendar, Mail, ArrowRight, Download } from 'lucide-react';
 
-// amount: session.amount_total as number,
-//       currency: session.currency as string,
-//       email: session.customer_email as string,
-//       planName: session.line_items?.data[0].description as string,
-//       status: session.payment_status as string
 const PaymentSuccessPage = () => {
   const [paymentDetails, setPaymentDetails] = useState<{amount: number, currency: string, email: string, planName: string, status: string, startingPeriod: string, endPeriod: string} | null>(null)
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  // This grabs the {CHECKOUT_SESSION_ID} Stripe sent back in the URL
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {

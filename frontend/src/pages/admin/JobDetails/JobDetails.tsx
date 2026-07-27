@@ -25,7 +25,7 @@ export default function JobDetails(){
         async function fetchJobDetails(){
 
             
-                const result = await getJobDetails(jobId)
+                const result = await getJobDetails(jobId as string)
                 
                     setjobdetails(result?.result)
                     console.log('job details from the server', result)
@@ -35,28 +35,7 @@ export default function JobDetails(){
         
         fetchJobDetails()
 
-    }, [])
-
-    // function formatDate(createdAt : Date | string) : string {
-    //     const joined = new Date(createdAt)
-    //     return `${joined.getDate()}-${joined.getMonth() + 1}-${joined.getFullYear()}`
-    // }
-
-    // async function blockUnblockJob(jobId : string, operation : string){
-        
-        
-    //         const result = await blockJobUnblockJob(jobId, operation)
-            
-    //             Swal.fire({
-    //                 icon:'success',
-    //                 title:'Success',
-    //                 text:result.message,
-    //                 showConfirmButton:false,
-    //                 showCancelButton:false,
-    //                 timer:2000
-    //             }).then(() => window.location.reload())
-           
-    // }
+    }, [jobId]) //updated dependancy due to lint error. previously empty
 
     const deleteJob = async (jobId: string) => {
         if(!jobId) return jobId
@@ -247,7 +226,7 @@ export default function JobDetails(){
               <h3 className="font-bold mb-2">Requirements</h3>
               <ul className='list-disc ps-5'>
                 {jobdetails?.requirements.split(".").map((req: string, index: number) => (
-                  <li className='text-sm leading-relaxed'>{req}</li>
+                  <li key={index} className='text-sm leading-relaxed'>{req}</li>
                 ))}
               </ul>
             </section>
@@ -256,7 +235,7 @@ export default function JobDetails(){
               <h3 className="font-bold mb-3">Responsibilities</h3>
               <ul className='list-disc ps-5'>
                 {jobdetails?.responsibilities.split(".").map((req: string, index: number) => (
-                  <li className='text-sm leading-relaxed'>{req}</li>
+                  <li key={index} className='text-sm leading-relaxed'>{req}</li>
                 ))}
               </ul>
             </section>

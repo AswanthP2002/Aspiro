@@ -16,7 +16,7 @@ const UserProtectedRoute = () => {
     return state.userAuth;
   });
 
-  const { user, userRole, initialLoading, userToken} = userAuth;
+  const { user, userRole, initialLoading} = userAuth;
 
   if(initialLoading){
     return (

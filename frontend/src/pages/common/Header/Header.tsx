@@ -22,24 +22,7 @@ export default function Header() {
 
         {/* Navigation Links */}
         <div className="hidden md:block">
-          <ul className="flex gap-10 text-sm font-semibold text-slate-600">
-            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
-              Explore
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-            </li>
-            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
-              Find Opportunities
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-            </li>
-            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
-              Network
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-            </li>
-            <li className="cursor-pointer hover:text-blue-600 transition-colors relative group">
-              For Recruiters
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-            </li>
-          </ul>
+          
         </div>
 
         {/* Action Buttons */}

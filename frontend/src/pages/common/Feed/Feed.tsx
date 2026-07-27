@@ -53,8 +53,8 @@ export default function Feed() {
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(4)
-
+    // const [limit, setLimit] = useState(4)
+    console.log(progress)
     const observer = useRef<IntersectionObserver | null>(null)
     
     const mediaFileRef = useRef<HTMLInputElement | null>(null)
@@ -97,7 +97,8 @@ export default function Feed() {
 
     const {control, handleSubmit, reset, formState:{errors}} = useForm<PostInput>({defaultValues:{description:''}})
 
-    const [postsLoading, setPostsLoading] = useState(true)
+    // const [postsLoading, setPostsLoading] = useState(true)
+    
 
     console.log('loged user', logedUser, typeof logedUser)
 
@@ -156,7 +157,7 @@ export default function Feed() {
        // Notify.success('done', {timeout:2000})
     }
 
-    const lastPostObservComponentRef = useCallback((node) => {
+    const lastPostObservComponentRef = useCallback((node: HTMLDivElement) => {
         if(loading) return
         if(observer.current) observer.current.disconnect()
 
@@ -176,12 +177,12 @@ export default function Feed() {
             (async function(){
             setLoading(true)
             try {
-                const result = await getPosts(page, limit)
+                const result = await getPosts(page, 4)
                 console.log('pposts from backend', result)
                 if(result.success){
-                    setPostsLoading(false)
+                    // setPostsLoading(false)
                     //setPosts(result.result)
-                    setUserPosts((prv) => [...prv, ...result.result])
+                    setUserPosts((prv: UserPosts[]) => [...prv, ...result.result])
                     setHasMore(result?.result.length > 0)
                     //setLoading(false)
                 }else{
@@ -199,7 +200,7 @@ export default function Feed() {
 
         //update post like real time using socket
     
-    }, [page])
+    }, [page, hasMore, setUserPosts]) //previously page only
     
 
     return (
@@ -355,7 +356,7 @@ export const ShareModal = () => {
                     </div>
                     <div className="grid grid-cols-5 gap-3 overflow-x-hidden mt-3">
                         {["Messi", "Ronaldinio", "Zinadin Zidane", "Nazario", "Iniesta"].map((n: string, index: number) => (
-                            <div className=" flex flex-col items-center">
+                            <div key={index} className=" flex flex-col items-center">
                                 <div className="w-15 h-15 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-xl shadow-blue-100">{n[0]}</div>
                                 <p className="text-xs tracking-wide max-w-15 truncate text-center">{n}</p>
                             </div>

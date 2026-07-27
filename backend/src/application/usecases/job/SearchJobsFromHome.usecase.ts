@@ -1,24 +1,23 @@
 import { inject, injectable } from 'tsyringe';
-// import JobAggregated from '../../domain/entities/jobAggregated.entity';
-// import IJobRepo from '../../domain/interfaces/IJobRepo';
-// import mapJobAggregatedToJobDetailsDTO from '../../domain/mappers/mapJobAggToJobDetailsDTO';
-// import JobAggregatedDTO from '../DTOs/job/jobDetails.dto.FIX';
 import ISearchJobsFromHomeUseCase from '../interfaces/ISearchJobsFromHome.usecase';
-import JobAggregatedDTO from '../../DTOs/job/jobDetails.dto.FIX';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import JobAggregated from '../../../domain/entities/job/jobAggregated.entity';
-// import ISearchJobsFromHomeUseCase from './interfaces/ISearchJobsFromHome.usecase';
+import JobMapper from '../../mappers/job/Job.mapperClass';
+import JobsForHompePageDTO from '../../DTOs/job/jobsForHomePage.dto';
 
 @injectable()
 export default class SearchJobsFromHomeUseCase implements ISearchJobsFromHomeUseCase {
-  constructor(@inject('IJobRepository') private _iJobRepo: IJobRepo) {}
+  constructor(
+    @inject('IJobRepository') private _iJobRepo: IJobRepo,
+    @inject('JobMapper') private _mapper: JobMapper
+  ) {}
 
-  async execute(search: string): Promise<JobAggregatedDTO[] | null> {
+  async execute(search: string): Promise<JobsForHompePageDTO[] | null> {
     const result = await this._iJobRepo.searchJobsFromHome(search);
     if (result) {
-      const dto: JobAggregatedDTO[] = [];
+      const dto: JobsForHompePageDTO[] = [];
       result.forEach((data: JobAggregated) => {
-        dto.push(data as JobAggregatedDTO);
+        dto.push(this._mapper.jobAggregatedToJobsHomePageSearchDTO(data));
       });
       return dto;
     }

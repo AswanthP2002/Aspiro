@@ -39,11 +39,12 @@ interface LoadChatsResponsePayload {
 
 export default function ChatPage() {
     const messageEndRef = useRef<HTMLDivElement | null>(null)
-    const messageBoxRef = useRef<HTMLInputElement | null>(null)
+    // const messageBoxRef = useRef<HTMLInputElement | null>(null)
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(5)
     const [loading, setLoading] = useState(false)
+    console.log(setSearch, setPage, setLimit, setLoading)
     const [conversations, setConversations] = useState<Conversation[]>([])
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null >(null)
     const [messages, seetMessages] = useState<Chat[]>([])
@@ -57,6 +58,23 @@ export default function ChatPage() {
     const logedUser = useSelector((state: {userAuth: {user:{_id: string, email: string, name: string, profilePicture: string}}}) => {
       return state.userAuth.user
     })
+
+    const searchConvo = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const text = e.target.value
+      setSearch(text)
+    }
+
+    const debouncedSearch = <T extends(...args: never[]) => void>(fn: T, delay: number) => {
+      let timer: ReturnType<typeof setTimeout>
+      return function(...args: Parameters<T>){
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          fn(...args)
+        }, delay)
+      }
+    }
+
+    const dSearch = debouncedSearch(searchConvo, 500)
 
     const dispatch = useDispatch()
 
@@ -234,7 +252,7 @@ export default function ChatPage() {
         })
 
       return () => tempSocket.off('JOIN_ROOM')
-    }, [selectedConversation?._id])
+    }, [selectedConversation?._id, selectedConversation?.unreadMessage, tempSocket]) //previously _id only
 
     
     useEffect(() => {
@@ -263,7 +281,7 @@ export default function ChatPage() {
 
       return () => tempSocket.off('MARK_MESSAGE_AS_READ')
 
-    }, [selectedConversation?._id])
+    }, [selectedConversation?._id, dispatch, logedUser._id, selectedConversation, tempSocket])
 
     //a temporary useeffect for live updating unread message count for each chat
     useEffect(() => {
@@ -282,7 +300,7 @@ export default function ChatPage() {
               if (conv._id === data.message.conversationId) {
                 return {
                   ...conv,
-                  unreadMessage: conv.unreadMessage + 1,
+                  unreadMessage: conv.unreadMessage ? conv.unreadMessage + 1 : 0,
                   lastMessage: {
                     text: data.message.text,
                     senderId: data.message.senderId,
@@ -324,7 +342,7 @@ export default function ChatPage() {
       });
 
       return () => tempSocket.off('NEW_MESSAGE_RECEIVED');
-    }, [tempSocket]);
+    }, [tempSocket, logedUser._id, logedUser.email, logedUser.name]);
 
     useEffect(() => {
       if(messageEndRef.current){
@@ -499,7 +517,7 @@ export default function ChatPage() {
         tempSocket.off('CHAT_DELETED_FOR_ALL')
       }
 
-  }, [tempSocket])
+  }, [tempSocket, onlineUsers]) //previously tempsocket only
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
@@ -511,7 +529,7 @@ export default function ChatPage() {
         <h2 className="text-lg font-bold text-gray-800 mb-3">Messages</h2>
         <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 transition-focus-within ring-2 ring-transparent focus-within:ring-blue-100 focus-within:bg-white border border-transparent focus-within:border-blue-200">
           <BiSearch className="text-gray-400" size={18} />
-          <input onKeyUp={(e) => dSearch(e)} className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-400" type="text" placeholder="Search conversations..." />
+          <input onChange={(e) => dSearch(e)} className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-400" type="text" placeholder="Search conversations..." />
         </div>
       </div>
 
@@ -550,7 +568,7 @@ export default function ChatPage() {
                 <div className="flex-1 min-w-0 relative">
                   <div className="flex justify-between items-baseline">
                     <p className={`text-sm font-semibold truncate ${isSelected ? "text-white" : "text-gray-900"}`}>{partner?.name || 'User'}</p>
-                    <span className={`text-[10px] ${isSelected ? "text-blue-100" : "text-gray-400"}`}>{timeLineForMessages(conv.updatedAt)}</span>
+                    <span className={`text-[10px] ${isSelected ? "text-blue-100" : "text-gray-400"}`}>{timeLineForMessages(conv.updatedAt as string)}</span>
                   </div>
                   {isTyping
                     ? <p className="text-blue-600 text-xs font-medium transition-all duration-300">typing...</p>
@@ -560,7 +578,7 @@ export default function ChatPage() {
                   }
                   {/* <p>Checking {conv.unreadMessage}</p> */}
                   <div className="flex gap-2 absolute right-0 bottom-0">
-                    {(conv.unreadMessage > 0) && (
+                    {(conv.unreadMessage && conv.unreadMessage > 0) && (
                     <div className={`text-[.7rem] flex items-center justify-center font-semibold ${selectedConversation?._id === conv._id ? "bg-white text-blue-500" : "bg-blue-600 text-white"} rounded-full w-5 h-5`}>
                       {conv.unreadMessage}
                     </div>
@@ -615,29 +633,11 @@ export default function ChatPage() {
           {/* Message Area */}
           <div ref={messageEndRef} className="flex-1 overflow-y-auto max-h-[450px] p-6 space-y-4 bg-[#f8fafc] custom-scrollbar">
             {messages.map((message: Chat, index: number) => {
-              const isMe = message.senderId === logedUser._id;
+              // const isMe = message.senderId === logedUser._id;
               return (
                 <>
                 <MessageBubble key={message._id || index} message={message} onUnsend={() => unsendMessage(message._id as string)} onDeleteForMe={() => deleteForMe(message._id as string)} />
                 </>
-                // <div key={message._id || index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                //   <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-sm text-sm ${
-                //     isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
-                //   } relative group`}>
-                //     <p className="leading-relaxed">{message.text}</p>
-                //     <div className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMe ? "text-blue-100 justify-end" : "text-gray-400"}`}>
-                //       {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                //       {isMe && (message.isRead ? <BiCheckDouble size={14} /> : <BiCheck size={14} />)}
-                //     </div>
-                //     <button className="hidden group-hover:block absolute top-1 right-1">
-                //       <BiChevronDown size={18} />
-                //     </button>
-                //     <div className={`absolute bg-white text-black border border-slate-200 rounded-md shadow-lg w-40 ${isMe ? 'right-0' : 'left-0'}`}>
-                //       <button className="w-full flex text-xs text-center gap-2 hover:bg-gray-200 px-4 py-2"><BiTrash /> Delete for me</button>
-                //       <button className="w-full flex text-xs text-center gap-2 hover:bg-gray-200 px-4 py-2"><BsTrash2 />Unsend</button>
-                //     </div>
-                //   </div>
-                // </div>
               );
             })}
             {typingUsers.includes(chatingPerson?._id as string)
@@ -721,7 +721,7 @@ function MessageBubble({message, onUnsend, onDeleteForMe}: {message: Chat, onUns
                   } relative group`}>
                     <p className="leading-relaxed">{message.text}</p>
                     <div className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMe ? "text-blue-100 justify-end" : "text-gray-400"}`}>
-                      {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(message.createdAt as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       {isMe && (message.isRead ? <BiCheckDouble size={14} /> : <BiCheck size={14} />)}
                     </div>
                     <button onClick={toggleChatMenuOpen} className="hidden group-hover:block absolute top-1 right-1">
@@ -730,7 +730,7 @@ function MessageBubble({message, onUnsend, onDeleteForMe}: {message: Chat, onUns
                     {isChatMenuOpened && (
                       <div className={`absolute !z-9999 bg-white text-black border border-slate-100 p-[1px] rounded-lg shadow-xl w-40 ${isMe ? 'right-10' : 'left-10'}`}>
                         <button onClick={() => {onDeleteForMe(); setIsChatMenuOpened(false)}} className="w-full rounded-lg flex !text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 transition-color px-4 py-2"><BiTrash size={17} /> Delete for me</button>
-                        {(isMe && !isTimeOver(message.createdAt)) && (
+                        {(isMe && !isTimeOver(message.createdAt as string)) && (
                           <button onClick={() => {onUnsend(); setIsChatMenuOpened(false)}} className="w-full flex text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 px-4 py-2 rounded-md transition-color duration-300 "><BiBlock size={17} />Unsend</button>
                         )}
                     </div>

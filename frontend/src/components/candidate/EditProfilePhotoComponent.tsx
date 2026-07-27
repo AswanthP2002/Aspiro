@@ -47,7 +47,7 @@ export default function EditProfilePictureComponent({ profilePicture, onSaveProf
         }
     }
 
-    const cropComplete = (_, cropedPixels: {width: number, height: number, x: number, y: number}) => {
+    const cropComplete = (_: unknown, cropedPixels: {width: number, height: number, x: number, y: number}) => {
         setCropPixel(cropedPixels)
     }
 

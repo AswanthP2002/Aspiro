@@ -42,6 +42,15 @@ export const EndPoints = {
     SAVE_POST: (postId: string) => `/v1/posts/${postId}/save`,
     GET_USERS: `/v1/users`,
     GET_NOTIFICATIONS: `/v1/notifications`,
+    RESEND_OTP: '/v1/user/otp/resend',
+    PASSWORD_RESET_LINK_SEND: '/reset-password/link/send',
+    RESET_PASSWORD: '/reset-password',
+    LOGOUT: '/logout',
+    USER_ONBOARDING: '/v1/user/me/store-basics',
+    REMOVE_SOCIAL_LINK: '/v1/user/me/social-links/remove',
+    UPDATE_PROFILE_PICTURE: '/v1/user/me/profile-picture',
+    REMOVE_PROFILE_PICTURE: `/v1/user/me/profile-picture/remove`,
+    GET_LOCATION_DETAILS_LOCATION_IQ: `https://us1.locationiq.com/v1/search.php`,
     MARK_ALL_NOTIFICATIONS_READ: '/v1/notifications/mark-all-read',
     GET_UNREAD_NOTIFICATIONS_COUNT: '/v1/notifications/unread-count',
     DELETE_NOTIFICATION: `/v1/notifications/delete`,
@@ -62,7 +71,7 @@ export const EndPoints = {
     LOAD_MY_APPLICATIONS: '/v1/applications',
     TRACK_MY_APPLICATION: (applicationId: string) => `/v1/application/${applicationId}/track`,
     UPLOAD_PROFILE_PICTURE: '/v1/user/me/profile-picture',
-    REMOVE_PROFILE_PICTURE: `/v1/user/me/profile-picture/remove`,
+    // REMOVE_PROFILE_PICTURE: `/v1/user/me/profile-picture/remove`,
     UPLOAD_COVER_PHOTO: '/v1/user/me/cover-photo',
     REMOVE_COVER_PHOTO: '/v1/user/me/cover-photo/remove',
     WITHDRAW_APPLICATION: (applicationId: string) => `/v1/application/${applicationId}`,
@@ -73,6 +82,8 @@ export const EndPoints = {
     UNBLOCK_USER_BY_ID: (userId: string) => `/v2/user/unblock/${userId}`,
     DELETE_USER_BY_ID: (userId: string) => `/v2/user/${userId}`,
     BAN_USER_BY_ID: (userId: string) => `/v2/user/ban/${userId}`,
+    LOAD_USER_PUBLIC_PROFILE:(userId: string) => `/v1/users/${userId}`,
+    GET_SIMILAR_USERS: '/v1/similar-people',
 
     USER_PROFILE_VIEWED: (profileId: string) => `/v2/user/profile/${profileId}/viewed`,
 
@@ -80,5 +91,6 @@ export const EndPoints = {
     START_AI_INTERVIEW: '/v2/interview/ai',
     LOAD_DASHBOARD: '/v2/interview/ai/dashboard',
 
-    VALIDATE_TOKEN: '/v1/token-verify'
+    VALIDATE_TOKEN: '/v1/token-verify',
+    LOAD_HOME_PAGE_DATA: '/v1/home/datas',
 } as const

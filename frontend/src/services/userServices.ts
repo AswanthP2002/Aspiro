@@ -4,6 +4,8 @@ import { logout } from "../redux/userAuthSlice";
 import { EndPoints } from "../constants/endPoints/user.endpoints";
 import { JobsEndpoints } from "../constants/endPoints/jobs.endpoints";
 import { Dispatch } from "redux";
+import { NotificationEndpoints } from "../constants/endPoints/notifications.endpoints";
+import { ChatEndpoints } from "../constants/endPoints/chat.endpoints";
 
 const geocodeLocationAccessToken = import.meta.env.VITE_LOCATION_IQ_GEOCODE_REVERSE_API_ACCESSTOKEN
 console.log('Access token for geocode api', import.meta.env)
@@ -13,7 +15,6 @@ export const registerUser = async (name: string, email: string, phone: string, p
         const response = await axiosInstance.post(EndPoints.REGISTER,
             {name, email, phone, password},
             {
-                headers:{'Content-Type' : 'application/json'}
             } as AxiosRequest
         )
         return response.data
@@ -21,17 +22,16 @@ export const registerUser = async (name: string, email: string, phone: string, p
     } catch (error : unknown) {
         console.log('--User Register Eerror--', error instanceof Error ? error.message : error)
         const err = error as AxiosError
-
+        console.log('Error occured while register', err)
         if(err.response && err.response.status < 500) return err.response.data
     }
 }
 
-export const verify = async (id : string, otp : string) => {
+export const verify = async (id : string, otp : string, email: string) => {
     try {
         const response = await axiosInstance.post(EndPoints.VERIFY,
-            {id, otp},
+            {id, otp, email},
             {
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
 
@@ -46,10 +46,9 @@ export const verify = async (id : string, otp : string) => {
 
 export const resendOtp = async (email : string, id : string) => {
     try {
-        const response = await axiosInstance.post('/v1/user/otp/resend',
+        const response = await axiosInstance.post(EndPoints.RESEND_OTP,
             {email, id},
             {
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
         return response.data
@@ -65,10 +64,9 @@ export const resendOtp = async (email : string, id : string) => {
 
 export const passwordResetLinkSend = async (email: string) => {
     try {
-        const response = await axiosInstance.post('/reset-password/link/send', 
+        const response = await axiosInstance.post(EndPoints.PASSWORD_RESET_LINK_SEND, 
             {email},
             {
-                headers:{'Content-Type':'application/json'}
             }
         )
         return response.data
@@ -83,10 +81,9 @@ export const passwordResetLinkSend = async (email: string) => {
 
 export const resetPassword = async (token: string, password: string) => {
     try {
-        const response = await axiosInstance.post('/reset-password', 
+        const response = await axiosInstance.post(EndPoints.RESET_PASSWORD, 
             {token, password},
             {
-                headers:{'Content-Type':'application/json'}
             }
         )
 
@@ -104,7 +101,6 @@ export const userLogin = async (email : string, password : string) => {
         const response = await axiosInstance.post(EndPoints.LOGIN, 
             {email, password},
             {
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
     
@@ -119,7 +115,7 @@ export const userLogin = async (email : string, password : string) => {
 
 export const userLogout = async (dispatch : Dispatch, navigate : (path: string) => void) => {
     try {
-        const response = await axiosInstance.post('/logout', null,
+        const response = await axiosInstance.post(EndPoints.LOGOUT, {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -149,10 +145,9 @@ export const saveBasicDetails = async (
 ) => {
     try {
         console.log('--checking lat and lon in the user services itserlf', lat, long)
-        const response = await axiosInstance.patch('/v1/user/me/store-basics',
+        const response = await axiosInstance.patch(EndPoints.USER_ONBOARDING,
             {headline, city, district, state, country, pincode, summary, long, lat},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -191,7 +186,6 @@ export const editUserProfile = async (name?: string, headline?: string, city?: s
         const response = await axiosInstance.patch(EndPoints.EDIT_PROFILE_DETAILS,
             {name, headline, city, district, state, country, summary, pincode, phone},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -208,15 +202,6 @@ export const editUserProfile = async (name?: string, headline?: string, city?: s
     }
 }
 
-export const refreshCandidateToken = async () => {
-    try {
-        const response = await axiosInstance.get('/token/refresh')
-        return response.data?.accessToken
-    } catch (error : unknown) {
-        console.log('Error occured while refreshing the token', error)
-    }
-}
-
 export const candidateApplyJob = async (jobId : string, coverLetterContent : string, resumeId : string) => {
     try {
 
@@ -224,7 +209,6 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
             {coverLetterContent, resumeId}, 
             {
                 sendAuthToken:true,
-                headers:{"Content-Type":'application/json'}
             } as AxiosRequest
         )
 
@@ -241,7 +225,7 @@ export const candidateApplyJob = async (jobId : string, coverLetterContent : str
 
 export const saveJob = async (jobId : string) => {
     try {
-        const response = await axiosInstance.post(EndPoints.SAVE_JOB(jobId), null,
+        const response = await axiosInstance.post(EndPoints.SAVE_JOB(jobId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -339,7 +323,6 @@ export const addSocialmediaLinks = async (url : string) => {
         const response = await axiosInstance.patch(EndPoints.ADD_SOCIAL_MEDIA_LINKS,
             {url},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -356,10 +339,9 @@ export const addSocialmediaLinks = async (url : string) => {
 
 export const removeSocialLink = async (domain : string) => {
     try {
-        const response = await axiosInstance.patch('/v1/user/me/social-links/remove',
+        const response = await axiosInstance.patch(EndPoints.REMOVE_SOCIAL_LINK,
             {domain},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -378,7 +360,7 @@ export const removeSocialLink = async (domain : string) => {
 
 export const updateProfilePicture = async (formData : FormData, publicId : string = "") => {
     try {
-        const response = await axiosInstance.patch('/v1/user/me/profile-picture', formData,
+        const response = await axiosInstance.patch(EndPoints.UPDATE_PROFILE_PICTURE, formData,
             {
                 params:{publicId},
                 sendAuthToken:true
@@ -396,10 +378,9 @@ export const updateProfilePicture = async (formData : FormData, publicId : strin
 
 export const removeProfilePicture = async (cloudinaryPublicId : string) => {
     try {
-        const response = await axiosInstance.patch(`/v1/user/me/profile-picture/remove`,
+        const response = await axiosInstance.patch(EndPoints.REMOVE_PROFILE_PICTURE,
             {cloudinaryPublicId},
             {
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -431,7 +412,7 @@ export const updateCoverPhoto = async (formData : FormData, publicId : string = 
 
 export const removeCoverphoto = async (publicId : string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.REMOVE_COVER_PHOTO, null,
+        const response = await axiosInstance.patch(EndPoints.REMOVE_COVER_PHOTO, {},
             {
                 params:{publicId},
                 sendAuthToken:true
@@ -447,7 +428,7 @@ export const removeCoverphoto = async (publicId : string) => {
 
 export const getLocationDetails = async (query: string) => {
     try {
-        const response = await axios.get(`https://us1.locationiq.com/v1/search.php`,
+        const response = await axios.get(EndPoints.GET_LOCATION_DETAILS_LOCATION_IQ,
             {
                 params:{
                     key:geocodeLocationAccessToken,
@@ -528,9 +509,10 @@ export const getMyInterviews = async () => {
     }
 }
 
-export const deleteMyApplication = async (applicationId: string) => {
+export const deleteMyApplication = async (applicationId: string, reason: string) => {
     try {
-        const response = await axiosInstance.delete(EndPoints.WITHDRAW_APPLICATION(applicationId),
+        const response = await axiosInstance.patch(EndPoints.WITHDRAW_APPLICATION(applicationId),
+            {reason},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -566,7 +548,7 @@ export const trackMyApplication = async (applicationId: string) => {
 
 export const updateNOtificationReadStatus = async (id : string) => {
     try {
-        const response = await axiosInstance.patch(`/candidate/notification/${id}`, {}, {sendAuthToken:true} as AxiosRequest)
+        const response = await axiosInstance.patch(NotificationEndpoints.UPDATE_NOTIFICATION_READ_STATUS(id), {}, {sendAuthToken:true} as AxiosRequest)
         return response.data
     } catch (error : unknown) {
         const err = error as AxiosError
@@ -614,7 +596,7 @@ export const deletePost = async (postId: string) => {
 
 export const hidePost = async (postId: string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.HIDE_POST(postId), null,
+        const response = await axiosInstance.patch(EndPoints.HIDE_POST(postId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -629,7 +611,7 @@ export const hidePost = async (postId: string) => {
 
 export const unhidePost = async (postId: string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.UNHIDE_POST(postId), null,
+        const response = await axiosInstance.patch(EndPoints.UNHIDE_POST(postId), {},
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -644,7 +626,7 @@ export const unhidePost = async (postId: string) => {
 
 export const togglePostSave = async (postId: string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.SAVE_POST(postId), null,
+        const response = await axiosInstance.patch(EndPoints.SAVE_POST(postId), {},
     {sendAuthToken: true} as AxiosRequest)
 
     return response.data
@@ -676,7 +658,7 @@ export const likeUserPost = async (postId : string, ownerId: string, acted_by: s
             acted_by,
             acted_user_avatar
         },
-            {headers:{'Content-Type':'application/json'},
+            {
             sendAuthToken:true} as AxiosRequest
         )
 
@@ -712,7 +694,6 @@ export const addComment = async (postId: string, text: string, parentId?: string
             {text, parentId},
             {
                 sendAuthToken:true,
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
 
@@ -747,7 +728,6 @@ export const likeComment = async (postId: string, commentId: string, postOwnerId
         const response = await axiosInstance.patch(EndPoints.LIKE_COMMENT(commentId),
             {postId, postOwnerId},
             {
-                headers:{"Content-Type": "application/json"},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -765,7 +745,6 @@ export const unlikeComment = async (postId: string, commentId: string, postOwner
         const response = await axiosInstance.patch(EndPoints.UNLIKE_COMMENT(commentId),
             {postId, postOwnerId},
             {
-                headers:{"Content-Type": "application/json"},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -785,7 +764,6 @@ export const followUser = async (userId : string, acted_by: string, acted_user_a
             acted_user_avatar
         },
             {   
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -810,10 +788,9 @@ export const validateToken = async (token: string) => {
 
 export const initializeConversation = async (receiver: string) => {
     try {
-        const response = await axiosInstance.post('/v1/conversation/initialize',
+        const response = await axiosInstance.post(ChatEndpoints.INITIALIZE_CONVERSATION,
             {receiver},
             {   
-                headers:{'Content-Type':'application/json'},
                 sendAuthToken: true
             } as AxiosRequest
         )
@@ -827,7 +804,7 @@ export const initializeConversation = async (receiver: string) => {
 
 export const updateUserProfileView = async (profileId: string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.USER_PROFILE_VIEWED(profileId), null, 
+        const response = await axiosInstance.patch(EndPoints.USER_PROFILE_VIEWED(profileId), {}, 
         {
             sendAuthToken: true
         } as AxiosRequest
@@ -838,21 +815,6 @@ export const updateUserProfileView = async (profileId: string) => {
         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err;
     }
 }
-// export const getChats = async (conversationId: string) => {
-//     try {
-//         const response = await axiosInstance.get(`/v1/chats/${conversationId}`,
-            
-//             {   
-//                 sendAuthToken: true
-//             } as AxiosRequest
-//         )
-
-//         return response.data
-//     } catch (error: unknown) {
-//         const err = error as AxiosError
-//         if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
-//     }
-// }
 
 export const unfollowUser = async (userId : string, acted_by: string, acted_user_avatar: string) => {
     try {
@@ -861,7 +823,6 @@ export const unfollowUser = async (userId : string, acted_by: string, acted_user
             acted_user_avatar
         },
             {
-                headers:{"Content-Type":'application/json'},
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -872,21 +833,9 @@ export const unfollowUser = async (userId : string, acted_by: string, acted_user
     }
 }
 
-// export const getUserPosts = async () => {
-//     try {
-//         const response = await axiosInstance.get('/post/user',
-//             {sendAuthTokenCandidate:true} as AxiosRequest
-//         )
-//         return response.data
-//     } catch (error : unknown) {
-//         const err = error as AxiosError
-//         if(err.response && err.response.status < 500 && err.response.status !== 403) return err.response.data
-//     }
-// }
-
 export const loadUserPublicProfile = async (userId: string) => {
     try {
-        const response = await axiosInstance.get(`/v1/users/${userId}`,
+        const response = await axiosInstance.get(EndPoints.LOAD_USER_PUBLIC_PROFILE(userId),
             {
                 sendAuthToken:true
             } as AxiosRequest
@@ -940,7 +889,7 @@ export const getUsersForPublic = async (search: string, roleTypeFilter: string, 
     }
 }
 
-export const getUsers = async (search: string, page: number, sort : string, filter : any) => {
+export const getUsers = async (search: string, page: number, sort : string, filter : {status: boolean[], roles: string[], verification: boolean[]}) => {
     try {
         const response = await axiosInstance.get(EndPoints.LOAD_ALL_USERS, {
             params:{search, page, sort, filter:JSON.stringify(filter)},
@@ -975,7 +924,7 @@ export const getUserDetails = async (userId : string) => {
 
 export const userBlock = async (userId : string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.BLOCK_USER_BY_ID(userId), null, {
+        const response = await axiosInstance.patch(EndPoints.BLOCK_USER_BY_ID(userId), {}, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -991,7 +940,7 @@ export const userBlock = async (userId : string) => {
 
 export const userUnblock = async (userId : string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.UNBLOCK_USER_BY_ID(userId), null, {
+        const response = await axiosInstance.patch(EndPoints.UNBLOCK_USER_BY_ID(userId), {}, {
             sendAuthToken:true
         } as AxiosRequest)
 
@@ -1027,7 +976,7 @@ export const deleteUser = async (userId: string) => {
 
 export const banUser = async (userId: string) => {
     try {
-        const response = await axiosInstance.patch(EndPoints.BAN_USER_BY_ID(userId), null,
+        const response = await axiosInstance.patch(EndPoints.BAN_USER_BY_ID(userId), {},
     {
         sendAuthToken: true
     } as AxiosRequest)
@@ -1045,7 +994,7 @@ export const banUser = async (userId: string) => {
 
 export const similarUseers = async () => {
     try {
-        const response = await axiosInstance.get('/v1/similar-people', {
+        const response = await axiosInstance.get(EndPoints.GET_SIMILAR_USERS, {
             sendAuthToken: true
         } as AxiosRequest)
 
@@ -1095,5 +1044,15 @@ export const loadInterviewDashboard = async () => {
     } catch (error) {
         const err = error as AxiosError
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}
+
+export const loadHomePageData = async () => {
+    try {
+        const response = await axiosInstance.get(EndPoints.LOAD_HOME_PAGE_DATA)
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < 500 && err.response.status !== 403) throw err
     }
 }

@@ -4,11 +4,7 @@ import { formatRelativeTime, formattedDateMoment } from "../../../services/util/
 import { FaClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { BiVideo } from "react-icons/bi";
-import { Button, FormControl, FormHelperText, Modal, Skeleton, Switch } from "@mui/material";
-import { CiWarning } from "react-icons/ci";
-import { FaXmark } from "react-icons/fa6";
-import { Controller, useForm } from "react-hook-form";
-import { Notify } from "notiflix";
+import { Box, Button, Divider, FormControl, FormControlLabel, Modal, Radio, RadioGroup, Skeleton, Switch, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { InterviewData, TrackMyJobApplicationData } from "../../../types/entityTypes";
 import { deleteMyApplication, getMyInterviews, trackMyApplication } from "../../../services/userServices";
@@ -20,7 +16,15 @@ export default function ApplicationTrack(){
 
     const [activeSection, setActiveSection] = useState<'notes' | 'interviews'>('notes')
     const [interviews, setInterviews] = useState<InterviewData[]>([])
+    const [isWithdrawApplicationModalOpen, setIsWithdrawApplicationModalOpen] = useState(false)
+
+    const openWithdrawApplicationModal = () => setIsWithdrawApplicationModalOpen(true)
+    const closeWithdrawApplicationModal = () => setIsWithdrawApplicationModalOpen(false)
     
+    const onWithdrawal = () => {
+        navigate(-1)
+        return
+    }
     // const [status, setStatus] = useState<'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'>('rejected')
     const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false)
     const location = useLocation()
@@ -30,27 +34,8 @@ export default function ApplicationTrack(){
     const {applicationId} = location.state || {}
     console.log('-- checking if application id exist', applicationId)
     const navigate = useNavigate()
-    const  deleteOneApplication = async (applicationId: string) => {
-        const result = await Swal.fire({
-            icon:'question',
-            title: 'Withdraw application',
-            showCancelButton: true,
-            showConfirmButton: true,
-            allowOutsideClick: false,
-            allowEscapeKey: false
-        })
-
-        if(!result.isConfirmed) return
-
-        try {
-            await deleteMyApplication(applicationId)
-            toast.success('Deleted')
-            navigate('/profile/my-applications')
-        } catch (error) {
-            const err = error as AxiosError<{message: string}>
-            const message = err.response?.data.message || err.message || 'Something went wrong'
-            toast.error(message)
-        }
+    const  withdrawApplication = async () => {
+       openWithdrawApplicationModal()
     }
 
     useEffect(() => {
@@ -262,7 +247,7 @@ export default function ApplicationTrack(){
                                         <p className="text-xs font-medium">{interview.interviewType}</p>
                                         <span className="text-xs text-gray-800 flex items-center gap-2 mt-2">
                                             <LuCalendar color="gray" />
-                                            <p>{formattedDateMoment(interview.interviewDate, "MMM DD YYYY")}</p>
+                                            <p>{formattedDateMoment(interview.interviewDate as string, "MMM DD YYYY")}</p>
                                         </span>
                                         <span className="text-xs text-gray-800 flex items-center gap-2 mt-2">
                                             {/* <FaClock color="gray" /> */}
@@ -288,89 +273,159 @@ export default function ApplicationTrack(){
                             <Switch onChange={() => setIsMoreOptionsOpen(prv => !prv)} checked={isMoreOptionsOpen} />
                         </div>
                         {isMoreOptionsOpen && (
-                            <button onClick={() => deleteOneApplication(applicationTrackDetails?._id)} className="bg-red-500 mt-2 text-white text-xs font-medium p-2 w-full rounded-md hover:bg-red-600">Withdraw application ?</button>
+                            <button onClick={withdrawApplication} className="bg-red-500 mt-2 text-white text-xs font-medium p-2 w-full rounded-md hover:bg-red-600">Withdraw application ?</button>
                         )}
                     </div>
                 </div>
             </div>
         </div>
-        {/* <WithdrawApplicationModal /> */}
+        {isWithdrawApplicationModalOpen && (
+            <WithdrawApplicationModal
+                open={isWithdrawApplicationModalOpen}
+                onClose={closeWithdrawApplicationModal}
+                jobTitle={applicationTrackDetails?.jobDetails?.jobTitle as string}
+                companyName=""
+                applicationId={applicationTrackDetails?._id as string}
+                onWithdrawal={onWithdrawal}
+            />
+        )}
         </>
     )
 }
 
-function WithdrawApplicationModal(){
-    
-    type WithdrawFormInput = {
-        captcha: string
-    }
-
-    const {watch, handleSubmit, formState: {errors}, control} = useForm<WithdrawFormInput>({defaultValues: {captcha: ''}})
-
-    const submitApplicationWithdrawal = async (data: WithdrawFormInput) => {
-        Notify.success(data.captcha)
-    }
-
-    return(
-        <Modal open className="flex flex-col items-center justify-center">
-            <div className="bg-white p-5 rounded-md w-md lg:w-lg">
-                <div className="header flex justify-between">
-                    <div className="flex items-start gap-2">
-                        <CiWarning color="orange" size={30} />
-                        <div>
-                            <p className="font-semibold">Withdraw application</p>
-                            <p className="text-xs text-gray-500">This action can not be undone</p>
-                        </div>
-                    </div>
-                    <div>
-                        <button className="p-2 hover:bg-gray-200 rounded-md"><FaXmark /></button>
-                    </div>
-                </div>
-                <div className="mt-5">
-                    <div className="bg-orange-50 p-3 rounded-md ring-1 ring-orange-300">
-                        <p className="text-sm text-gray-700">You are about to withdraw your application for</p>
-                        <p className="font-semibold text-sm mt-3">React Native Developer</p>
-                        <p className="text-xs text-gray-500">Aquila | Posted by Unai Emery</p>
-                    </div>
-                    <div className="mt-5">
-                        <p className="text-sm font-medium">What happens when you withdraw?</p>
-                        <ul className="mt-3 list-disc space-y-2">
-                            <li className="ms-4 text-xs text-gray-500">Your application will be permanently removed</li>
-                            <li className="ms-4 text-xs text-gray-500">You will need to re apply if you changed your mind</li>
-                        </ul>
-                    </div>
-                    <div className="mt-5">
-                        <p className="text-sm">Type <span className="text-red-500 font-medium uppercase">withdraw</span> to continue</p>
-                        <form onSubmit={handleSubmit(submitApplicationWithdrawal)}>
-                            <FormControl fullWidth error={Boolean(errors.captcha)}>
-                                <Controller
-                                    control={control}
-                                    name="captcha"
-                                    rules={{
-                                        required: {value: true, message: 'This is a mandatory field'},
-                                        validate: (data) => {
-                                            return data !== 'WITHDRAW' || "Please enter the correct word to continue"
-                                        }
-                                    }}
-                                    render={({field}) => (
-                                        <input
-                                            {...field}
-                                            type="text"
-                                            placeholder="Enter the word"
-                                            className="bg-gray-200 p-2 rounded-md border border-slate-300 mt-1"
-                                        />
-                                    )}
-                                />
-                                <FormHelperText>{errors.captcha?.message}</FormHelperText>
-                            </FormControl>
-                            <div className="w-full mt-3 flex justify-end gap-2">
-                                <button type="button" className="text-xs font-medium px-2 py-2 border border-slate-300 rounded-md">Cancel</button>
-                                <Button type="submit" variant="contained" className="!text-xs !font-medium">Withdraw</Button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </Modal>
-    )
+interface WithdrawApplicationModalProps {
+  open: boolean;
+  onClose: () => void;
+  jobTitle: string;
+  onWithdrawal: () => void;
+  applicationId: string;
+  companyName: string;
 }
+
+const reasons = [
+  "Haven't heard back from the employer",
+  "Indeed helped me get a job",
+  "Found a job another way",
+  "This job isn't a good match",
+  "Suspicious content from the employer",
+  "Something else",
+];
+
+function WithdrawApplicationModal({
+  open,
+  onClose,
+  applicationId,
+  jobTitle,
+  companyName,
+  onWithdrawal,
+}: WithdrawApplicationModalProps) {
+  const [reason, setReason] = useState("");
+
+  const handleWithdraw = async () => {
+    if (!reason){
+        toast.warn('Plase select a reason')
+        return
+    }
+
+    try {
+        const result = await deleteMyApplication(applicationId, reason)
+        if(result.success){
+            toast.success('Your application withdrawned')
+        }
+    } catch (error: unknown) {
+        const err = error as AxiosError<{message: string}>
+        const msg = err.response?.data.message || err.message || 'Something went wrong'
+        toast.error(msg)
+    } finally {
+        setReason('')
+        onClose()
+        onWithdrawal()
+    }
+    
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} className="flex flex-col items-center justify-center">
+      <div className="bg-white rounded-md p-5"
+      >
+        <Typography variant="h6" fontWeight={700}>
+          Withdraw your application
+        </Typography>
+
+        <Typography fontWeight={600} mt={3}>
+          {jobTitle}
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          {companyName}
+        </Typography>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Typography fontWeight={600} mb={1}>
+          Review before proceeding
+        </Typography>
+
+        <ul
+          className=""
+          style={{
+            paddingLeft: "20px",
+            marginTop: 0,
+            color: "#555",
+          }}
+        >
+          <li>You will not be able to reapply for this job.</li>
+          <li>The employer may still contact you.</li>
+          <li>
+            To update or correct your application, try messaging the employer
+            instead.
+          </li>
+        </ul>
+
+        <Typography fontWeight={600} mt={3}>
+          Why are you no longer interested in this job?
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 2 }}
+        >
+          Your feedback helps us improve the platform.
+        </Typography>
+
+        <FormControl fullWidth>
+          <RadioGroup
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          >
+            {reasons.map((item) => (
+              <FormControlLabel
+                key={item}
+                value={item}
+                control={<Radio />}
+                label={item}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+
+        <div
+          className="flex justify-end gap-2"
+        >
+          <Button onClick={onClose}>Cancel</Button>
+
+          <Button
+            variant="contained"
+            color="error"
+            disabled={!reason}
+            onClick={handleWithdraw}
+          >
+            Withdraw Application
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+

@@ -18,7 +18,7 @@ export default function InterviewPage(){
     const [conversations, setConversations] = useState<{role: 'ai' | 'user', message: string}[]>([])
     const [message, setMessage] = useState('')
     const {role, experienceLevel} = location.state || {}
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     const [isAiResponding, setIsAiResponding] = useState(false)
     const [isInterviewStoped, setIsInterviewStoped] = useState(false)
     // const [sepeachableText, setSpeachableText] = useState('')
@@ -58,7 +58,7 @@ export default function InterviewPage(){
     // const stopInterview = () => setIsStarted(false)
 
     const start = async () => {
-        setLoading(true)
+        // setLoading(true)
         setIsAiResponding(true)
         startInterview()
         try {
@@ -72,23 +72,20 @@ export default function InterviewPage(){
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Something went wrong')
         } finally {
-            setLoading(false)
+            // setLoading(false)
             setIsAiResponding(false)
         }
     }
 
     useEffect(() => {
-        let interval: ReturnType<typeof setInterval>
-        if(!isStarted){
-            return () => clearTimeout(interval)
-        }
-        
-        interval = setInterval(() => {
-            setSeconds((prv) => prv <= 0 ? 0 : prv - 1)
-        }, 1000)
+      if (!isStarted) return;
 
-        return () => clearInterval(interval)
-    }, [isStarted])
+      const interval = setInterval(() => {
+        setSeconds((prev) => (prev <= 0 ? 0 : prev - 1));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [isStarted]);
 
     const sendMessage = async () => {
         if(!message) return
@@ -130,7 +127,7 @@ export default function InterviewPage(){
       if(!confirmResult.isConfirmed) return
       setIsInterviewResultCalculating(true) 
       setIsInterviewStoped(true)
-      setLoading(true)
+      // setLoading(true)
       setIsAiResponding(true)
       
       try {
@@ -220,7 +217,7 @@ export default function InterviewPage(){
                   {conversations.map(
                     (conv: { role: 'ai' | 'user'; message: string }, index: number) =>
                       conv.role === 'ai' ? (
-                          <div className="flex justify-start gap-2">
+                          <div key={index} className="flex justify-start gap-2">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-full flex items-center justify-center">
                               <MdAutoAwesome color="white" />
                             </div>

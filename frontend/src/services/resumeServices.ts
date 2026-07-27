@@ -6,7 +6,6 @@ export const addUserResume = async (formData : FormData) => {
     try {
         const response = await axiosInstance.post(ResumeEndpoint.RESUMES.ADD,formData,
             {
-                headers: { 'Content-Type': undefined }, 
                 sendAuthToken:true
             } as AxiosRequest
         )
@@ -40,7 +39,7 @@ export const loadUserResumes = async () => {
 
 export const setUserResumePrimary = async (resumeId: string) => {
     try {
-        const response = await axiosInstance.patch(ResumeEndpoint.RESUMES.SET_RESUME_AS_PRIMARY(resumeId), null,
+        const response = await axiosInstance.patch(ResumeEndpoint.RESUMES.SET_RESUME_AS_PRIMARY(resumeId), {},
             {
                 sendAuthToken: true
             } as AxiosRequest
@@ -74,7 +73,10 @@ export const deleteUserResume = async (resumeId : string, cloudinaryPublicId : s
     }
 }
 
-export const analyzeResume = async (resumeData: any, targettedRole: string) => {
+export const analyzeResume = async (
+    resumeData: {[key: string]: string | string[] | number | number[] | null | object | boolean | undefined}, 
+    targettedRole: string
+) => {
     try {
         const response = await axiosInstance.post(ResumeEndpoint.RESUMES.ANALYZE_RESUME,
             {data:resumeData, targettedRole},
@@ -89,7 +91,7 @@ export const analyzeResume = async (resumeData: any, targettedRole: string) => {
     }
 }
 
-export const analyzeResumeDetailed = async (resumeData: any, targettedRole: string) => {
+export const analyzeResumeDetailed = async (resumeData: string, targettedRole: string) => {
     try {
         const response = await axiosInstance.post(ResumeEndpoint.RESUMES.ANALYZE_RESUME_DETAILED,
             {data:resumeData, targettedRole},

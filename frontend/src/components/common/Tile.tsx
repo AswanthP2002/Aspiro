@@ -7,7 +7,8 @@ export default function Tile({tileData} : {tileData: {title: string, count: numb
     {/* Icon Container with Glassmorphism feel */}
     <div className="flex-shrink-0 w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
         {/* We can force the icon size here to keep it consistent */}
-        {React.cloneElement(tileData.icon as React.ReactElement, { size: 26 })}
+        {/* {React.cloneElement(tileData.icon as React.ReactElement, { size: 26 })} */}
+        {tileData.icon}
     </div>
 
     {/* Text Content */}

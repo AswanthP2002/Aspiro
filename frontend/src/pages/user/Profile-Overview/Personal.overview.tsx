@@ -53,7 +53,7 @@ export default function ProfilePersonal() {
   const openFollowersModal = () => setIsFollowersModalOpen(true)
   const closeFollowerModal = () => setIsFollowersModalOpen(false)
 
-  const openFollowingModal = () => setIsFollowingModalOpen(true)
+  // const openFollowingModal = () => setIsFollowingModalOpen(true)
   const closeFollowingModal = () => setIsFollowingModalOpen(false)
 
   const openConnectionsModal = () => setIsConnectionsModalOpen(true)
@@ -288,7 +288,7 @@ export default function ProfilePersonal() {
     };
 
     fetchCandidateData();
-  }, []);
+  }, [dispatcher, navigateTo]); //previously empty
 
   useEffect(() => {
     if (user && openprofileedit) {
@@ -304,12 +304,12 @@ export default function ProfilePersonal() {
         phone: user.phone
       });
     }
-  }, [user, openprofileedit]);
+  }, [user, openprofileedit, reset]); //reset newly added
 
   async function addSocialMedialink() {
     setloading(true)
     if (
-      !/https?:\/\/(www\.)?(linkedin\.com|twitter\.com|facebook\.com|instagram\.com|github\.com|t\.me|youtube\.com|behance\.net|dribbble\.com)\/[a-zA-Z0-9._\-\/]+/.test(
+      !/^https?:\/\/(www\.)?(linkedin\.com|twitter\.com|facebook\.com|instagram\.com|github\.com|t\.me|youtube\.com|behance\.net|dribbble\.com)\/[a-zA-Z0-9._/-]+$/.test(
         socialmediaurl
       )
     ) {
@@ -342,7 +342,7 @@ export default function ProfilePersonal() {
           if (!prv) return null;
           return {
             ...prv,
-            socialLinks: [...prv.socialLinks, { domain: url.hostname, url: socialmediaurl }],
+            socialLinks: [...prv.socialLinks ?? [], { domain: url.hostname, url: socialmediaurl }],
           };
         });
         setsocialmediaurl('');
@@ -376,7 +376,7 @@ export default function ProfilePersonal() {
           if (!prv) return null;
           return {
             ...prv,
-            socialLinks: prv?.socialLinks.filter((link: SocialLinks) => link.domain !== domain),
+            socialLinks: (prv?.socialLinks as []).filter((link: SocialLinks) => link.domain !== domain),
           };
         });
       } else {

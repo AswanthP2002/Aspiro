@@ -8,6 +8,7 @@ export default function GeneralModal({openModal, closeModal, children, size = 'm
         borderRadius:'12px',
         outline:'none'
     }
+    console.log(size)
 
     return(
         <>

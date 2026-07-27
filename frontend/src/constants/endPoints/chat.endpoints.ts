@@ -4,4 +4,5 @@ export const ChatEndpoints = {
     DELETE_CHAT_BY_ID: (chatId: string) => `/v2/chats/${chatId}/delete`,
     DELETE_CHAT_FOR_ME: (chatId: string) => `/v2/chats/${chatId}/delete-for-me`,
     GET_NEW_UNREAD_CONVERSATIONS_COUNT: '/v2/conversations/unread/count',
+    INITIALIZE_CONVERSATION: '/v1/conversation/initialize'
 } as const;

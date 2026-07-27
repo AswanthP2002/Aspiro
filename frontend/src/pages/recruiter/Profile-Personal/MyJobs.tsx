@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteJob, getJobs, getPostedJobDetails } from "../../../services/recruiterServices";
-import { Notify } from "notiflix";
 import Swal from "sweetalert2";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import { BiBriefcase, BiMapPin, BiTrash } from "react-icons/bi";
@@ -30,9 +29,9 @@ function debouncedSearch <T extends (...args: never[]) => void>(fn: T, delay: nu
 export default function MyJobs() {
 
     const [myJobs, setMyJobs] = useState<MyJobData[]>([])
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState('')
-    const [limit, setLimit] = useState(5)
+    // const [limit, setLimit] = useState(5)
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [statusFilter, setStatusFilter] = useState<'all' | 'expired' | 'active'>('all')
@@ -49,14 +48,14 @@ export default function MyJobs() {
       setSelectedJobId('')
     }
 
-    const searchByJobTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchByJobTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         console.log('the value being entered', e.target.value)
         setSearch(e.target.value)
-    }
+    }, [])
 
     const navigate = useNavigate()
 
-    const searchWhileTyping = useCallback(debouncedSearch(searchByJobTitle, 500), []);
+    const searchWhileTyping = useMemo(() => debouncedSearch(searchByJobTitle, 500), [searchByJobTitle]);
 
     async function deleteJobByRecruiter(jobId: string){
         Swal.fire({
@@ -103,9 +102,9 @@ export default function MyJobs() {
       
   useEffect(() => {
     async function fetchRecruiterJobs() {
-            setLoading(true);
+            // setLoading(true);
             try {
-                const result = await getJobs(search, page, limit, '', statusFilter, workModeFilter)
+                const result = await getJobs(search, page, 5, '', statusFilter, workModeFilter)
                 if (result?.success) {
                     console.log('jobs paginated', result.result)
                     setMyJobs(result.result?.jobs);
@@ -119,7 +118,7 @@ export default function MyJobs() {
               const message = err.response?.data.message || err.message || 'Something went wrong'
               toast.error(message)
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         }
 
@@ -145,11 +144,11 @@ export default function MyJobs() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Search by Title</label>
-            <input onKeyUp={(e) => searchWhileTyping(e)} type="text" placeholder="e.g. Software Engineer" className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500" />
+            <input onChange={(e) => searchWhileTyping(e)} type="text" placeholder="e.g. Software Engineer" className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "expired")} className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500">
               <option value={'all'}>All Statuses</option>
               <option value={'active'}>Active</option>
               <option value={'expired'}>Expired</option>
@@ -157,7 +156,7 @@ export default function MyJobs() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Work mode</label>
-            <select onChange={(e) => setWorkModeFilter(e.target.value)} className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500">
+            <select onChange={(e) => setWorkModeFilter(e.target.value as "all" | "On-site" | "Remote" | "Hybrid")} className="w-full bg-gray-100 border-none rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500">
               <option value={'all'}>All Modes</option>
               <option value={'Remote'}>Remote</option>
               <option value={'On-site'}>On-site</option>
@@ -224,7 +223,7 @@ const JobCard = ({ job, deleteJob, viewJob, editJob }: {job: MyJobData, deleteJo
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-400">
             <span className="flex items-center gap-1"><BiMapPin size={14} /> {job.location ? job.location : job.workMode}</span>
-            <span className="flex items-center gap-1"><BsClock size={14} /> {getReminingDays(job.expiresAt)} days left</span>
+            <span className="flex items-center gap-1"><BsClock size={14} /> {getReminingDays(job.expiresAt as string)} days left</span>
           </div>
           <div className="mt-4 flex items-center gap-2">
             <button onClick={() => navigateToApplicantsManagePage(job._id as string)} className="border text-sm font-medium bg-gradient-to-br from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-lg shadow-[0_0_30px_2px_rgba(0,0,230,0.1)] transition-colors duration-300">
@@ -263,7 +262,7 @@ function TestJobModal({open, onClose, jobId}: {open: boolean, onClose: () => voi
     }
 
     fetchJobDetails()
-  }, [])
+  }, [jobId]) //previously empty
   return(
     <Modal open={open} onClose={onClose} className="flex items-center justify-center p-4">
       <Box className="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl outline-none overflow-hidden flex flex-col">

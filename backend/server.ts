@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import '../backend/src/config/DI.container';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import session from 'express-session';
@@ -21,7 +21,7 @@ import createUserRouter from './src/presentation/routes/user.router';
 import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
-import { connectRedis } from './src/infrastructure/redis/redisClient';
+import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
 import createCompanyRouter from './src/presentation/routes/companyRouter';
 import CreateExperienceRouter from './src/presentation/routes/experienceRouter';
 import CreateEducationRouter from './src/presentation/routes/educationRouter';
@@ -36,7 +36,7 @@ import CreateConnectionRouter from './src/presentation/routes/connectionRouter';
 import CreatePlanRouter from './src/presentation/routes/planRouter';
 import PlanController from './src/presentation/controllers/planController';
 import { container } from 'tsyringe';
-import CronSubscriptionReset from './src/infrastructure/cron-schedule/subscription/subscription.monthly.reset';
+// import CronSubscriptionReset from './src/infrastructure/cron-schedule/subscription/subscription.monthly.reset'; crone for reseting valus
 // import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
@@ -78,8 +78,7 @@ async function main() {
   // const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
   // cronMonthlyResetTest.resetSubscriptionLimit();
   //connect redis
-  //await connectRedis(); closed right now for testing :
-  // await connectRedis();
+  await connectRedis();
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);

@@ -39,23 +39,6 @@ const reasons = [
   "Other"
 ];
 
-
-// function ProfileStatusTileCard({data}: {data: {title: string, icon: any, count: number, customClass: string, customTitleClass: string}}){
-//     return (
-//         <div className={`border border-gray-200 rounded-md p-5 ${data.customClass}`}>
-//             <div className="flex justify-between">
-//                 <div>
-//                    <p className={`font-light text-sm ${data.customTitleClass}`}>{data.title}</p>
-//                     <p className="text-lg mt-2">{data.count}</p>
-//                 </div>
-//                 <div>
-//                     {data.icon}
-//                 </div>
-//             </div>
-//         </div>
-//     )
-// }
-
 function ApplicationStatusPills({status}: {status: string}){
     switch(status){
         case 'under-review' :
@@ -101,7 +84,6 @@ export default function RecruiterApplications(){
 
     const [recruiterApplications, setRecruiterApplications] = useState<AdminRecruiterApplicationsData[] | null>(null)
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(7)
     const [totalPages, setTotalPages] = useState(0)
     const [isVerificationDocumentOpened, setIsVerificationDocuemtnOpened] = useState(false)
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
@@ -257,18 +239,12 @@ export default function RecruiterApplications(){
         (async () => {
             //Notify.failure(search, {timeout:1000})
             try {
-                const result: RecruiterApplicationsFetchResponsePayload = await loadRecruiterApplications(page, limit)
+                const result: RecruiterApplicationsFetchResponsePayload = await loadRecruiterApplications(page, 7)
 
                 if(result?.success){
                   console.log('applications list', result.result.applications)
                     setRecruiterApplications(result?.result.applications)
                     setTotalPages(result.result.totalPages)
-                    //setSelectedApp(result.result.applications[0]); // Default to Hana
-
-                    // setTotalApplications(result?.result?.length)
-                    // setPendingApplications(result?.result?.filter((application: RecruiterProfileData) => application.profileStatus === 'pending').length)
-                    // setApprovedApplications(result?.result?.filter((application: RecruiterProfileData) => application.profileStatus === 'approved').length)
-                    // setRejectedApplications(result?.result?.filter((application: RecruiterProfileData) => application.profileStatus === 'rejected').length)
                 }
             } catch (error: unknown) {
                 Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:3000})
@@ -298,7 +274,7 @@ export default function RecruiterApplications(){
                 }`}
             >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shrink-0 bg-blue-500`}>
-                {app?.fullName?.split(' ')[0][0]}{app?.fullName?.split(' ')[1][0]}
+                {app?.fullName?.split(' ')[0][0]}
                 </div>
                 <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm truncate">{app?.fullName}</h3>
@@ -366,7 +342,7 @@ export default function RecruiterApplications(){
               <div className="flex items-center gap-4 p-3 bg-purple-50 rounded-lg border border-purple-100">
                 <div className={`p-2 rounded text-white ${'blue'}`}><FaUserTie size={20} color="blue" /></div>
                 <div className="overflow-hidden">
-                  <button onClick={() => navigate(`/admin/users/details/${selectedApp.userProfile?._id}`)} className="text-xs font-bold">Inspect full profile</button>
+                  <button onClick={() => navigate(`/admin/users/details/${selectedApp?.userProfile?._id}`)} className="text-xs font-bold">Inspect full profile</button>
                 </div>
               </div>
             </div>
@@ -518,7 +494,7 @@ export default function RecruiterApplications(){
 
 
 function DeclineApplicationModal({ isOpen, onClose, applicantData, onConfirmDecline }: Props) {
-  const { control, handleSubmit, watch, setValue, formState: { isValid } } = useForm<DeclineFormInputs>({
+  const { control, handleSubmit, watch, setValue } = useForm<DeclineFormInputs>({
     defaultValues: {
       reason: '',
       feedback: ''

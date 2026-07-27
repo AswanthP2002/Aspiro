@@ -17,16 +17,7 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
   })
   console.log('Checking - user Auth ---', user)
   return !user ? children : <Navigate to={UserRoutes.SOCIAL_FEED} replace />
-  // const user = useSelector((state: RootState) => {
-  //   return state.userAuth.user;
-  // });
-
-  // return !user ? children : <Navigate to={'/feed'} replace />;
 };
 
 export default PublicRoute;
 
-/**
- * Testin :: commented actual logic
- * currently just showing actual route without user login check
- */

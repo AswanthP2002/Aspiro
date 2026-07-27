@@ -23,7 +23,7 @@ export default function RecruiterApplicationDetailsPage(){
 
     useEffect(() => {
         setApplicationDetails(location.state.applicationDetails || {})
-    }, [])
+    }, [location.state.applicationDetails]) //updating dependancy due to lint error, previously emtpy
 
     const handleRejectApplication = async () => {
         const { value: reason, isConfirmed } = await Swal.fire({
@@ -137,7 +137,7 @@ export default function RecruiterApplicationDetailsPage(){
                             </span>
                                 )
                             }
-                            <p className="text-xs text-gray-500">Submitted on {formatDate(applicationDetails?.createdAt)}</p>
+                            <p className="text-xs text-gray-500">Submitted on {formatDate(applicationDetails?.createdAt as string)}</p>
                         </div>
                         <div className="mt-3">
                             <div className="flex items-center gap-2">
@@ -166,41 +166,41 @@ export default function RecruiterApplicationDetailsPage(){
                                 <p className="text-sm font-light">Professional Information</p>
                             </div>
                             {
-                                applicationDetails?.employerType === 'selft' && (
+                                applicationDetails?.recruiterType === 'freelance' && (
                                     <div className="mt-3 bg-gray-100 rounded-md p-3 grid grid-cols-2 gap-5">
                                 <div>
                                     <p className="text-xs text-gray-500">Employer Type</p>
-                                    <p className="text-sm mt-1">{applicationDetails?.employerType}</p>
+                                    <p className="text-sm mt-1">{applicationDetails?.recruiterType}</p>
                                 </div>
                             </div>
                                 )
                             }
                             {
-                                applicationDetails?.employerType === 'company' && (
+                                applicationDetails?.recruiterType === 'corporate' && (
                                     <div className="mt-3 bg-gray-100 rounded-md p-3 grid grid-cols-2 gap-5">
                                 <div>
                                     <p className="text-xs text-gray-500">Employer Type</p>
-                                    <p className="text-sm mt-1">{applicationDetails?.employerType}</p>
+                                    <p className="text-sm mt-1">{applicationDetails?.recruiterType}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500">Business Name</p>
-                                    <p className="text-sm mt-1">{applicationDetails?.organizationDetails?.organizationName}</p>
+                                    <p className="text-sm mt-1">{applicationDetails?.companyDetails?.name}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500">Industry</p>
-                                    <p className="text-sm mt-1">{applicationDetails?.organizationDetails?.industry}</p>
+                                    <p className="text-sm mt-1">{applicationDetails?.companyDetails?.industry}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500">Recruting Experience</p>
-                                    <p className="text-sm mt-1">{applicationDetails?.recruitingExperience}</p>
+                                    <p className="text-sm mt-1">{applicationDetails?.yearOfExperience}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 flex items-center gap-2"><FaLinkedin /> Linkedin</p>
-                                    <a className="text-blue-500 text-sm" href={applicationDetails?.organizationDetails?.linkedinUrl}>View Profile</a>
+                                    <a className="text-blue-500 text-sm" href={applicationDetails?.companyDetails?.linkedin}>View Profile</a>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 flex items-center gap-2"><FaGlobe /> Website</p>
-                                    <a className="text-blue-500 text-sm" href={applicationDetails?.organizationDetails?.website}>Go to Website</a>
+                                    <a className="text-blue-500 text-sm" href={applicationDetails?.companyDetails?.website}>Go to Website</a>
                                 </div>
                             </div>
                                 )
@@ -213,21 +213,10 @@ export default function RecruiterApplicationDetailsPage(){
                                 <p className="text-sm font-light">Summary</p>
                             </div>
                             <div className="mt-3 bg-gray-100 rounded-md p-3 ">
-                                <p className="text-xs leading-relaxed">{applicationDetails?.summary}</p>
+                                <p className="text-xs leading-relaxed">{applicationDetails?.userProfile.summary}</p>
                             </div>
                         </div>
 
-                        <div className="mt-5">
-                            <p className="text-sm font-light">Industry Focus</p>
-                            <div className="flex gap-1 flex-wrap mt-3">
-                                {
-                                    applicationDetails?.focusingIndustries?.map((industry: string, index: number) => (
-                                        <span key={index} className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-md">{industry}</span>
-
-                                    ))
-                                }
-                            </div>
-                        </div>
                     </div>
                     <div className="footer p-3 border-t border-gray-200">
                         <div className="p-3 flex items-center">

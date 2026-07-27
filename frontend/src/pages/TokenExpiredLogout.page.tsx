@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { userLogout } from "../services/userServices";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -7,20 +7,21 @@ import { BiArrowFromLeft } from "react-icons/bi";
 import { toast } from "react-toastify";
 
 export default function TokenExpiredLogoutPage(){
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
+    // const [isModalOpen, setIsModalOpen] = useState(false)
+    // const [loading, setLoading] = useState(false)
     const dispatcher = useDispatch()
     const navigate = useNavigate()
+    
     
     const logedUser = useSelector((state: {userAuth: {user: {_id: string}}}) => {
         return state.userAuth.user
     })
 
-    useEffect(() => {
-        setIsModalOpen(true)
+    // useEffect(() => {
+    //     setIsModalOpen(true)
 
-        return () => setIsModalOpen(false)
-    }, [])
+    //     return () => setIsModalOpen(false)
+    // }, [])
 
     
 
@@ -28,13 +29,13 @@ export default function TokenExpiredLogoutPage(){
         if(!logedUser._id){
             return navigate('/login')
         }
-        setLoading(true)
+        // setLoading(true)
         try {
             await userLogout(dispatcher, navigate)
-            setLoading(false)
+            // setLoading(false)
             
         } catch (error: unknown) {
-            setLoading(false)
+            // setLoading(false)
             toast.error(error instanceof Error ? error.message : 'Something went wrong')
         }
     }

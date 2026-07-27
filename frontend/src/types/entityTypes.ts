@@ -336,7 +336,7 @@ export interface Notification {
   }
 }
 
-type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+// type ConnectionRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
 
 export interface ConnectionDetails {
   _id?: string;
@@ -455,6 +455,25 @@ export interface MyJobData {
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt?: string;
+}
+
+export interface HomePageData {
+  overview: {
+    jobs: number;
+    companies: number;
+    recruiters: number;
+    users: number;
+  };
+  jobVacancies: { jobTitle: string; openings: number }[];
+}
+
+
+export interface HomePageJobSearchData {
+  _id?: string;
+  jobTitle: string;
+  company?: string;
+  location: string;
+  workMode?: string;
 }
 
 export interface AdminCompanyData {
@@ -882,7 +901,9 @@ export interface UserPublicProfileData {
 
   skills: Skills[];
 
-  posts: Post[];
+  // posts: Post[];
+
+  posts: UserPosts[]
 
   recruiterProfile: Recruiter;
 
@@ -1168,6 +1189,7 @@ export interface PlanData {
   billingCycle: 'monthly' | 'yearly';
   features: string[];
   featuresListed: { [key: string]: string | number };
+  activeUsers?: number;
   isActive: boolean;
   createdAt?: string | Date;
   updatedAt?: string | Date;
@@ -1268,11 +1290,19 @@ export interface UserSubscriptionAndPlanDetailsData {
   currentPeriodStart?: string | Date;
   currentPeriodEnd?: string | Date;
   isCanceled?: boolean;
+  isCancelAtPeriodEnds?: boolean;
+  trialPeriodStarts?: string;
+  trialPeriodEnds?: string;
+  planMetaData?: {
+    name: string;
+    price: number;
+  };
   paymentStatus?: 'paid' | 'pending' | 'failed';
   createdAt?: string | Date;
   updatedAt?: string | Date;
   features?: {[key: string]: string | number | boolean}
   planDetails: PlanData;
+
 }
 
 export interface InvoiceData {

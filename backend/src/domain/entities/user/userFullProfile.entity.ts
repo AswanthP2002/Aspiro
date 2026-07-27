@@ -1,9 +1,9 @@
-import Certificates from "../certificate/certificates.entity";
-import Education from "../education/educations.entity";
-import Experience from "../experience/experience.entity";
-import Skills from "../skill.user/skills.entity";
-import SocialLinks from "./SocialLinks";
-import { Role, AccountAction } from "./User.FIX";
+import Certificates from '../certificate/certificates.entity';
+import Education from '../education/educations.entity';
+import Experience from '../experience/experience.entity';
+import Skills from '../skill.user/skills.entity';
+import SocialLinks from './SocialLinks';
+import { Role, AccountAction } from './User.FIX';
 
 export default interface UserFullProfileData {
   _id?: string;
@@ -53,8 +53,8 @@ export default interface UserFullProfileData {
   otpExpiresAt?: Date;
   hiddenPosts?: string[];
   lastLogin?: Date;
-  experiences: Experience[],
-  educations: Education[],
-  skills: Skills[],
-  certificates: Certificates[]
+  experiences: Experience[];
+  educations: Education[];
+  skills: Skills[];
+  certificates: Certificates[];
 }

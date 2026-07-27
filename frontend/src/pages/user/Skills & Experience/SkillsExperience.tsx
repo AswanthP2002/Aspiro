@@ -39,9 +39,11 @@ export default function ExperiencePage(){
         educationEdit: false,
     });
  
-    const toggleModal = (modal: keyof typeof modals, isOpen: boolean) => {
+    const toggleModal = useCallback(() => {
+        return (modal: keyof typeof modals, isOpen: boolean) => {
         setModals(prev => ({ ...prev, [modal]: isOpen }));
     };
+    }, [])
 
     const onAddSkill = useCallback((skill: Skills) => {
         setskills((prv : Skills[]) => {
@@ -185,7 +187,7 @@ export default function ExperiencePage(){
     const onAddExperience = useCallback((experience: Experience) => {
         setexperiences(prv => [...prv, {...experience}]);
         toggleModal('experienceAdd', false);
-    }, []);
+    }, [toggleModal]); //previosly emtpy
 
     const onEditExperience = useCallback((updatedExperience: Experience) => {
         setexperiences(prv => 
@@ -315,7 +317,7 @@ export default function ExperiencePage(){
                 </span>
                 <span className="flex items-center gap-1.5">
                     <CiCalendar className="text-gray-400" size={16} />
-                    {formatDate(exp.startDate)} — {exp.endDate && exp.endDate.length > 5 ? formatDate(exp.endDate) : 'Present'}
+                    {formatDate(exp.startDate as string)} — {exp.endDate && exp.endDate.length > 5 ? formatDate(exp.endDate) : 'Present'}
                 </span>
             </div>
 

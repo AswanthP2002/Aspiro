@@ -1,3 +1,3 @@
 export default interface IWithdrawApplicationUsecase {
-  execute(applicationId: string): Promise<void>;
+  execute(applicationId: string, reason: string): Promise<void>;
 }

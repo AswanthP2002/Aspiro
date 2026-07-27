@@ -17,13 +17,7 @@ const ResumeToolsPage = () => {
 
       {/* Top Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* <ActionCard
-          url={""}
-          icon={<LuPlus className="text-white w-6 h-6" />} 
-          iconBg="bg-blue-500"
-          title="Create a new Resume" 
-          desc="Build a professional resume from scratch" 
-        /> */}
+  
         <ActionCard
           url={"auto-create"}
           icon={<LuStar className="text-white w-6 h-6" />} 
@@ -92,7 +86,7 @@ const ResumeToolsPage = () => {
 };
 
 // Sub-Components
-const ActionCard = ({ icon, iconBg, title, desc, url }) => {
+const ActionCard = ({ icon, iconBg, title, desc, url }: {icon: React.ReactNode, iconBg: string, title: string, desc: string, url: string}) => {
     const navigate = useNavigate()
   return (
     <div onClick={() => navigate(url)} className="bg-white p-5 rounded-lg border border-slate-200 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] flex items-center gap-4 hover:border-blue-300 cursor-pointer transition-all">
@@ -104,7 +98,7 @@ const ActionCard = ({ icon, iconBg, title, desc, url }) => {
     </div>
   );
 };
-const ResumeSection = ({ title, children }) => (
+const ResumeSection = ({ title, children }: {title: string, children: React.ReactNode}) => (
   <div>
     <p className='font-semibold text-lg my-3 text-gray-800'>{title}</p>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,7 +107,7 @@ const ResumeSection = ({ title, children }) => (
   </div>
 );
 
-const ResumeCard = ({ title, template, date, status, score, scoreText }) => (
+const ResumeCard = ({ title, template, date, status, score, scoreText }: {title: string, template: string, date: string, status: string, score: string | number, scoreText: string}) => (
   <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-[0_0_30px_2px_rgba(100,0,200,0.1)] relative group">
     <div className="flex justify-between items-start mb-4">
       <div>

@@ -12,6 +12,7 @@ export default function PasswordResetPage(){
 
     //access token from the url
     const [searchParams, setSearchParams] = useSearchParams()
+    console.log(setSearchParams)
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
     const token = searchParams.get('token')
@@ -26,7 +27,6 @@ export default function PasswordResetPage(){
     const typedPassword = watch('password')
 
     async function resetPasswordOnSubmit(data: FormInput){
-        alert('reset button called')
         setLoading(true)
         const {password} = data
         
@@ -63,7 +63,7 @@ export default function PasswordResetPage(){
         }
 
         validateSessionToken()
-    }, [])
+    }, [navigate, token]) //previosly empty
 
     return(
         <div className="w-full min-h-screen bg-gradient-to-br from-white to-indigo-100 flex justify-center items-center">
@@ -140,7 +140,6 @@ export default function PasswordResetPage(){
                                 : "Reset Password"
                             }
                         </button>
-                        {/* <button type='submit' className='bg-black text-white text-sm font-medium w-full !py-2 rounded-md'>Reset password</button> */}
                     </div>
                 </form>
                 

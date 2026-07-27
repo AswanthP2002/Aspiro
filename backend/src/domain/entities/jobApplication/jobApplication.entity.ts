@@ -9,18 +9,22 @@ export type JobApplicationStatus =
   | 'interview'
   | 'offer'
   | 'hired'
-  | 'rejected';
+  | 'rejected'
+  | 'withdrawn';
 
 export default interface JobApplication {
   _id?: string;
   candidateId?: string;
   jobId?: string;
+  recruiterId?: string;
+  companyId?: string;
   resumeId?: string;
   coverLetterContent: string;
   status?: JobApplicationStatus;
   notes?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  withdrawReason?: string;
 }
 
 export interface JobApplicationCompanyRecruiterAggregated {

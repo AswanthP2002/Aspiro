@@ -95,7 +95,7 @@ export default function InterviewOverviewPage(){
                 <div className="bg-gradient-to-br from-blue-500 to-indigo-600 mt-5 p-10 rounded-md flex flex-col items-center text-center">
                     <p className="text-white font-semibold text-lg">"Train smarte. Interview smarter. Get Placed fast!"</p>
                     <p className="text-xs text-slate-200 mt-3">Join thousands of candidate who prepared with asprio</p>
-                    <button className="mt-3 text-indigo-500 px-3 py-2 rounded text-sm font-medium bg-white flex items-center">
+                    <button onClick={() => navigate('personalization')} className="mt-3 text-indigo-500 px-3 py-2 rounded text-sm font-medium bg-white flex items-center">
                         <p>Get started</p>
                         <BsArrowRight />
                     </button>

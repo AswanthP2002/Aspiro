@@ -5,6 +5,8 @@ import { resendOtp, verify } from "../../../services/userServices";
 import { Notify } from "notiflix";
 import { HiOutlineEnvelope } from "react-icons/hi2";
 import { Button } from "@mui/material";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 type ResultPayload = {
     success: boolean,
@@ -31,6 +33,28 @@ export default function VerificationPage(){
     const [valuesFilled, setValuesFilled] = useState<boolean>(false)
     const [otpError, setOtpError] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
+
+    const location = useLocation()
+    const {email, id} = location.state || {}
+    
+    const navigate = useNavigate()
+    // useEffect(() => {
+    //     if(!email){
+    //         navigate('/login')
+    //     }else if(!id){
+    //         toast.info('No otp request found. Please request for an OTP', {autoClose: false})
+    //     }
+    // }, [])
+
+    useEffect(() => {
+    if (!email) {
+        navigate('/login')
+    } else if (!id) {
+        toast.info('No otp request found. Please request for an OTP', {
+            autoClose: false
+        })
+    }
+}, [email, id, navigate])
 
     useEffect(() => {
         if(digit1){
@@ -66,14 +90,15 @@ export default function VerificationPage(){
     const [remainingtime, setreminingtime] = useState(OTP_EXPIRY_SECONDS)
     const [resendenabled, setresendenabled] = useState(false)
 
-    const location = useLocation()
-    const {email, id} = location.state || {}
+    useEffect(() => {
+        if(!email){
+            navigate('/login')
+        }
+    }, [email, navigate])
 
-    const navigate = useNavigate()
-
-    if(!email || !id){
-        return navigate('/login')
-    }
+    // if(!email){
+    //     return navigate('/login')
+    // }
 
     const startTimer = () => {
         setresendenabled(false);
@@ -146,14 +171,14 @@ export default function VerificationPage(){
             return
         }
 
-        if(!id){
+        if(!email){
             Notify.failure('Something went wrong', {timeout:1400})
             return
         }
 
         try {
             setLoading(true)
-            const result: ResultPayload = await verify(id, otp)
+            const result: ResultPayload = await verify(id, otp, email)
     
             if(result.success){
                 Swal.fire({
@@ -182,30 +207,33 @@ export default function VerificationPage(){
     }
 
     async function handleResendOtp() {
-        alert('Handle resend clicked')
+        // alert('Handle resend clicked')
         Notify.info(`Emai ${email}`)
         Notify.info(`Id ${id}`)
         if (!email) {
-            alert('No Email present')
-            Notify.failure('Email not found. Cannot resend OTP.', {timeout: 2000});
+            // alert('No Email present')
+            toast.error('Email not present can not resend otp')
             return;
         }
-        alert('Email is available')
+        // alert('Email is available')
         try {
-            alert('going to call api')
+            // alert('going to call api')
             const result = await resendOtp(email, id)
     
             if (result.success) {
-                alert('a')
-                Notify.success('A new OTP has been sent to your email.', {timeout: 2000});
+                toast.success('A new OTP has been send to your email')
                 startTimer();
             } else {
-                Notify.failure('Failed to resend OTP. Please try again later.', {timeout: 2000});
+                toast.error('Failed to resend otp please retry')
             }
         } catch (error: unknown) {
-            Notify.failure(error instanceof Error ? error.message : 'Something went wrong')
+            console.log('Error occured while verifying -- ', error)
+            const err = error as AxiosError<{message: string}>
+            const message = err.response?.data.message || err.message || 'Something went wrong';
+            toast.error(message)
         }
     }
+    
 
     return(
         <>

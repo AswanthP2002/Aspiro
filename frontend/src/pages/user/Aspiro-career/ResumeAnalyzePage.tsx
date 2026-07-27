@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { LuChartBar, LuFileCheck2, LuFileText, LuTarget, LuTrendingUp, LuUpload, LuX } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import { parsePdf } from '../../../utilities/pdf.parser';
@@ -8,19 +8,21 @@ import { useNavigate } from 'react-router-dom';
 
 
 const ResumeAnalyzer = () => {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const [targettedRole, setTargettedRole] = useState("")
   const [targettedRoleError, setTargettedRoleError] = useState<{isError: boolean, message: string}>({isError: false, message: ''})
   // const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyseResult, setAnalyseResult] = useState<{score: number, feedback: string, strength: string[], improvements: string[]} | null>(null)
-
+  console.log(analyseResult)
 
   const navigate = useNavigate()
 
   // Mock function to handle file selection
-  const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e?.target?.files
+
+    if (files) {
+      setFile(files[0]);
     }
   };
 

@@ -23,6 +23,15 @@ export class DuplicateEmailError extends AppError {
   }
 }
 
+export class VerificationPendingError extends AppError {
+  constructor() {
+    super(
+      'VERIFICATION_PENDING',
+      "An account with this email already exists but hasn't been verified. If this is your account, please verify your email to continue."
+    );
+  }
+}
+
 export class InvalidUserError extends AppError {
   constructor() {
     super('INVALID_USER', 'Invalid user : No user data available o');
@@ -98,5 +107,11 @@ export class UserBannedError extends AppError {
 export class ServiceBusyError extends AppError {
   constructor(service: string) {
     super('SERVICE_BUISY', `All of the ${service} are busy now, please try after some time`);
+  }
+}
+
+export class ResourceNotFound extends AppError {
+  constructor(resource: string) {
+    super('RESOURCE_NOT_FOUND', `${resource} not found`);
   }
 }

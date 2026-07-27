@@ -39,9 +39,6 @@ export const adminEditCompany = async (companyId: string, name: string, slogan: 
         const response = await axiosInstance.patch(CompanyEndpoinds.ADMIN_EDIT_COMPANY(companyId),
             {name, slogan, description, website, linkedin, industry, location},
             {
-                headers:{
-                    "Content-Type": 'application/json'
-                },
                 sendAuthToken: true,
             } as AxiosRequest
         )

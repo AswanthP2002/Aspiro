@@ -3,9 +3,10 @@ import { Plan } from '../../../../domain/entities/plan/plan.entity';
 
 export const PlanSchema = new Schema<Plan>({
   name: { type: String },
+  stripeProductId: { type: String, required: false },
+  stripePriceId: { type: String, required: false },
   description: { type: String },
   monthlyPrice: { type: Number },
-  yearlyPrice: { type: Number },
   trialPeriod: { type: Number },
   badgeIcon: { type: String },
   isListed: { type: Boolean, default: true },

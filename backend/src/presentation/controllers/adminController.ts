@@ -15,8 +15,8 @@ import IAdminDeleteJobUsecase from '../../application/interfaces/usecases/job/IA
 import IGetIndividualRecruiterApplicationDetailsUsecase from '../../application/interfaces/usecases/recruiter/IGetIndividualRecruiterApplicationDetails.usecase';
 import { IAdminDeleteRecruiterDataUsecase } from '../../application/interfaces/usecases/recruiter/IAdminDeleteRecruiterData.usecase';
 import IAdminToggleFlagJobUsecase from '../../application/interfaces/usecases/job/IAdminToggleFlagJob.usecase';
-import { BlockJobUseCase } from '../../application/usecases/job/BlockJob.usecase';
-import { UnblockJobUseCase } from '../../application/usecases/job/UnblockJob.usecase';
+// import { BlockJobUseCase } from '../../application/usecases/job/BlockJob.usecase';
+// import { UnblockJobUseCase } from '../../application/usecases/job/UnblockJob.usecase';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IBlockJobUseCase from '../../application/interfaces/usecases/job/IBlockJob.usecase';
 import IUnblockJobUseCase from '../../application/interfaces/usecases/job/IUnblockJob.usecase';

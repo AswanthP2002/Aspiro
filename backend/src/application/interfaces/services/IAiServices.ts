@@ -1,3 +1,4 @@
+import AiInterviewResultDTO from '../../DTOs/interview/interview.ai.dto';
 import DetailedResumeAnalysisAiDTO from '../../DTOs/resume/DetailedResumeAnalysis.ai.dto';
 
 export default interface IAiServices {
@@ -17,5 +18,5 @@ export default interface IAiServices {
   aiInterview(
     persona: { role: 'system' | 'user' | 'assistant'; content: string }[],
     isStoped: boolean
-  ): Promise<any>;
+  ): Promise<string | AiInterviewResultDTO>;
 }

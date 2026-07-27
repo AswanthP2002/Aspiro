@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { editUserExperience } from '../../../services/experienceServices';
-// import { editUserExperience } from '../../../services/userServices';
 import { Controller, useForm } from 'react-hook-form';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -64,6 +63,7 @@ export default function EditExperienceForm({
   } = useForm<Inputs>();
 
   const [editableIsPresent, setEditableIsPresent] = useState(false);
+  console.log(setEditableIsPresent)
   const [loading, setLoading] = useState<boolean>(false)
 
 
@@ -81,7 +81,7 @@ export default function EditExperienceForm({
         workMode: experience.workMode,
       });
     }
-  }, [experience]);
+  }, [experience, reset]); //Added reset inside dependancy due to lint error, previously only experience added.
 
   const style = {
     position: 'absolute',

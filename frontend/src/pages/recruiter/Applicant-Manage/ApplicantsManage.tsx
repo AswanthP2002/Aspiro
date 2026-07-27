@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import { getApplicationDetails, getSingleApplicationDetails, scheduleInterview, updateCandidateNotes, updateJobApplicationStatus, verifyBeforeManageApplications } from "../../../services/recruiterServices"
@@ -16,7 +16,7 @@ import { Controller, useForm } from "react-hook-form"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DateField } from "@mui/x-date-pickers/DateField"
-import { ApplicationsAggregated, Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData, Skills } from "../../../types/entityTypes"
+import { Education, Experience, JobApplicationsListForRecruiter, SingleJobApplicationDetailsData } from "../../../types/entityTypes"
 import ViewPDFDocument from "../../../components/common/PdfViewer"
 import { BsArrowLeft } from "react-icons/bs"
 import { toast } from "react-toastify"
@@ -25,19 +25,18 @@ import { AxiosError } from "axios"
 
 export default function ApplicantManagePage(){
     const location = useLocation()
-    // const [selectedCards, setSelectedCards] = useState<any[]>([])
     const [selectedApplication, setSelectedApplication] = useState<string | null>(null)
     const [isFilterMenuOpened, setIsFilterMenuOpened] = useState(false)
-    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer'>('all')
+    const [filter, setFilter] = useState<'all' | 'applied' | 'screening' | 'rejected' | 'hired' | 'offer' | 'withdrawn' | string>('all')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [limit, setLimit] = useState(5)
-    // const [selectionMode, setSelectionMode] = useState(false)
-    const [loading, setLoading] = useState(false);
-    const [jobDetails, setJobDetails] = useState<any>(null);
+   
+    console.log(setPage, setTotalPages)
     const params = useParams()
-    const jobId = params.jobId || location.state.jobId || {}
+    const jobId = useMemo(() => {
+        return params.jobId || location.state.jobId || {}
+    }, [location.state.jobId, params.jobId])
     const [isAllowedToManageApplications, setIsAllowedToManageApplications] = useState<boolean>(true)
     // const navigator = useNavigate()
 
@@ -51,31 +50,31 @@ export default function ApplicantManagePage(){
 
     // const toggleFilterMenuOpen = () => setIsFilterMenuOpened(prv => !prv)
 
-    type InterviewFormData = {
-  date: Dayjs | null;
-  time: Dayjs | null;
-  interviewType: string;
-  gmeetUrl: string;
-  interviewerName: string;
-  note: string;
-  sendEmail: boolean;
-};
+//     type InterviewFormData = {
+//   date: Dayjs | null;
+//   time: Dayjs | null;
+//   interviewType: string;
+//   gmeetUrl: string;
+//   interviewerName: string;
+//   note: string;
+//   sendEmail: boolean;
+// };
 
-    type EmailContents = {
-        to: string,
-        subject: string,
-        body: string
-    }
+    // type EmailContents = {
+    //     to: string,
+    //     subject: string,
+    //     body: string
+    // }
     // const [emailAttachment, setEmailAttachment] = useState(null)
-    const [emailModalOpen, setEmailModalOpen] = useState(false)
-    const {
-        control: EmailContentsControl,
-        formState:{errors: EmailContentsErrors},
-        handleSubmit: handleEmailContentsSubmit,
-        watch: EmailWatch
-    } = useForm<EmailContents>({
-        defaultValues:{to: '', body: ''}
-    })
+    // const [emailModalOpen, setEmailModalOpen] = useState(false)
+    // const {
+    //     control: EmailContentsControl,
+    //     formState:{errors: EmailContentsErrors},
+    //     handleSubmit: handleEmailContentsSubmit,
+    //     watch: EmailWatch
+    // } = useForm<EmailContents>({
+    //     defaultValues:{to: '', body: ''}
+    // })
 
 // const interviewTypes = [
 //   "Technical",
@@ -84,136 +83,25 @@ export default function ApplicantManagePage(){
 //   "General"
 // ];
 
-    const {
-    control,
-    handleSubmit,
-    reset,
-    formState:{errors}
-  } = useForm<InterviewFormData>({
-    defaultValues: {
-      date: null,
-      time: null,
-      interviewType: "",
-      gmeetUrl: "",
-      interviewerName: "",
-      note: "",
-      sendEmail: false
-    }
-  });
+//     const {
+//     control,
+//     handleSubmit,
+//     reset,
+//     formState:{errors}
+//   } = useForm<InterviewFormData>({
+//     defaultValues: {
+//       date: null,
+//       time: null,
+//       interviewType: "",
+//       gmeetUrl: "",
+//       interviewerName: "",
+//       note: "",
+//       sendEmail: false
+//     }
+//   });
 
-  
 
-    // function rejectIndividualCandidate(candidateId : string, applicationId : string){
-    //     Swal.fire({
-    //         title: 'Reject Candidate',
-    //         html: ` 
-    //   <label class="text-sm">Reason</label>
-    //   <select id="reasonSelect" class="">
-    //     <option value="">-- Select reason --</option>
-    //     <option value="Does not meet basic qualification">Does not meet basic qualification</option>
-    //     <option value="Insufficient experience">Insufficient experience</option>
-    //     <option value="Skill mismatch">Skill mismatch</option>
-    //     <option value="Education criteria not met">Education criteria not met</option>
-      
-    //     </select>
-    //   <textarea id="rejectionMessage" class="w-full swal2-textarea" placeholder="Write rejection message"></textarea>
-    // `,
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Confirm',
-    //         cancelButtonText: 'Cancel',
-    //         preConfirm: () => {
-    //             const reason = (document.getElementById('reasonSelect') as HTMLSelectElement).value;
-    //             const message = (document.getElementById('rejectionMessage') as HTMLTextAreaElement).value;
-
-    //             if (!reason) {
-    //                 Swal.showValidationMessage('Please select a reason');
-    //             }
-    //             return { reason, message };
-    //         }
-    //     }).then(async (result) => {
-    //         if (result.isConfirmed) {
-    //             const { reason, message } = result.value as { reason: string; message: string };
-
-    //             rejectJobApplication(candidateId, applicationId, reason, message)
-    //                 .then((res) => {
-    //                     if (!res?.success) return Notify.failure(res?.message);
-    //                     Swal.fire({
-    //                         icon:'success',
-    //                         title:'Rejected',
-    //                         text:'Application rejected successfully',
-    //                         showConfirmButton:false,
-    //                         showCancelButton:false,
-    //                         timer:1500
-    //                     });
-    //                     setApplications(prev => prev.filter(app => app._id !== applicationId));
-    //                 })
-                
-    //         }
-    //     });
-    // }
-
-    // const toggleCardSelection = (id : string) => { //toggle individual cards
-    //     if(selectedCards.includes(id)){
-    //         setSelectedCards(prev => prev.filter(x => x !== id))
-    //     }else{
-    //         setSelectedCards(prev => [...prev, id])
-    //     }
-    // }
-
-    // const handleShortlistSingle = (id : string) => {
-    //     const foundedApplication = applications.find((app) => app._id === id);
-
-    //     setShortList((prev) => {
-    //         if (prev.some((p) => p._id === id)) return prev;
-    //         return [...prev, foundedApplication];
-    //     })
-
-    //     setApplications((prev) => {
-    //         return prev.filter((app) => app._id !== id)
-    //     })
-
-    // }
-
-    // const handleRemoveFromShortList = (id : string) => {
-    //     const foundApplication = shortList.find((app) => app._id === id);
-
-    //     setApplications((prev) => [...prev, foundApplication])
-    //     setShortList((prev) => prev.filter((app) => app._id !== id))
-    // }
-
-    // const handleShortlistAll = () => {
-    //     if (selectedCards.length === 0) return Notify.info('Please select candidates to shortlist.');
-    //     const allSelectedApplications = applications.filter((item) => selectedCards.includes(item._id))
-    //     setShortList(allSelectedApplications);
-
-    //     setApplications(prev => prev.filter(app => !selectedCards.includes(app._id)));
-    // }
-
-    // const selectFromOption = (id : string) => {
-    //     setSelectionMode(true)
-    //     setSelectedCards([id])
-    // }
-
-    // const selectAllCard = () => {
-    //     setSelectionMode(true)
-    //     setSelectedCards(applications.map((application : any) => application?._id))
-    // }
-
-    // const unselectAllCard = () => {
-    //     setSelectionMode(false)
-    //     setSelectedCards([])
-    // }
-
-    //reusable code for filtering applications
-    // const filterApplications = (
-    //     applications: ApplicationsAggregated[],
-    //     status: 'applied' | 'screening' | 'interview' | 'rejected' | 'hired' | 'offer'
-    // ) => {
-    //     const filteredApplications = applications.filter((application: ApplicationsAggregated) => application.status === status)
-    //     return filteredApplications
-    // }
-
-    const [job, setJob] = useState<string>('')
+    // const [job, setJob] = useState<string>('')
     const [applications, setApplications] = useState<JobApplicationsListForRecruiter[]>([])
     
     // const [applied, setApplied] = useState<ApplicationsAggregated[]>([])
@@ -224,7 +112,7 @@ export default function ApplicantManagePage(){
     const [hired, setHired] = useState(0)
     const [rejected, setRejected] = useState(0)
 
-    const [selectedCandidateForManaging, setSelectedCandidateForManaging] = useState<ApplicationsAggregated | null | undefined>(null)
+    // const [selectedCandidateForManaging, setSelectedCandidateForManaging] = useState<ApplicationsAggregated | null | undefined>(null)
 
     // const [shortList, setShortList] = useState<any[]>([])
     // const [apppCount, setAppCount] = useState(0)
@@ -239,7 +127,7 @@ export default function ApplicantManagePage(){
         setSearch(value)
     }
 
-    const updateNoteStateLocally = (e: any) => {
+    const updateNoteStateLocally = (e: React.ChangeEvent<HTMLInputElement>) => {
         //toast.info(e.target.value)
         setNotes(e.target.value)
         //console.log('--testing data--', e.target.value)
@@ -259,193 +147,6 @@ export default function ApplicantManagePage(){
     const updateCandidateNote = debounced(updateNoteStateLocally, 2000)
     const dSearch = debounced(searchApplicant, 500)
 
-    // const selectOneFromApplied = (id: string) => {
-    //     const candidate = applied.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromScreening = (id: string) => {
-    //     const candidate = screening.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromInterview = (id: string) => {
-    //     const candidate = interview.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromOffer = (id: string) => {
-    //     const candidate = offer.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromHired = (id: string) => {
-    //     const candidate = hired.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const selectOneFromRejected = (id: string) => {
-    //     const candidate = rejected.find((app: ApplicationsAggregated) => {
-    //         if(app._id === id){
-    //             return app
-    //         }
-    //     })
-    //     //seting selected candidate
-    //     setSelectedCandidateForManaging(candidate)
-    //     setControlBarOpen(true)
-    // }
-
-    // const updateStatus = async (e: any) => {
-    //     const existingStatus = selectedCandidateForManaging?.status
-    //     const status = e.target.value
-    //     Notify.info(`Checking new Status ${status}`, {timeout:2000})
-    //     try {
-    //         const result = await updateJobApplicationStatus(
-    //             selectedCandidateForManaging?._id as string, status,
-    //             selectedCandidateForManaging?.applicant.name as string, selectedCandidateForManaging?.applicant.email as string,
-    //             job
-    //         )
-    //         Notify.success(result?.message, {timeout:2000})
-    //         setSelectedCandidateForManaging((prv: ApplicationsAggregated | null | undefined) => {
-    //             if(!prv) return null
-
-    //             return {
-    //                 ...prv,
-    //                 status:status
-    //             }
-    //         })
-
-    //         //update status based arrays to add selected application  status based array
-    //         // switch(status){
-    //         //     case 'applied' :
-    //         //         setApplied((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, selectedCandidateForManaging as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'screening' :
-    //         //         setScreening((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'interview' :
-    //         //         setInterview((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'offer' :
-    //         //         setOffer((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'hired' :
-    //         //         setHired((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     case 'rejected' :
-    //         //         setRejected((prv: ApplicationsAggregated[]) => {
-    //         //             return [...prv, {...selectedCandidateForManaging, status:status} as ApplicationsAggregated]
-    //         //         })
-    //         //         break
-    //         //     default :
-    //         //         return
-                
-    //         // }
-
-    //         //update current status based arrays to removed selected application from current status based array
-    //         // switch(existingStatus){
-    //         //     case 'applied':
-    //         //         setApplied((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'screening':
-    //         //         setScreening((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'interview':
-    //         //         setInterview((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'offer':
-    //         //         setOffer((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'hired':
-    //         //         setHired((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         //     case 'rejected':
-    //         //         setRejected((prv: ApplicationsAggregated[]) => {
-    //         //             return prv.filter((app: ApplicationsAggregated) => app._id !== selectedCandidateForManaging?._id)
-    //         //         })
-    //         //         break
-    //         // }
-    //     } catch (error: unknown) {
-    //         Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:3000})
-    //     }
-    // }
-
-    // async function finalizeShortlistMethod(){
-    //     const shortlistedIds = shortList.map((app) => {
-    //         return app._id
-    //     })
-
-    //     const result = await finalizeShortList(jobId, shortlistedIds)
-    //     if(result?.success){
-    //         Swal.fire({
-    //             icon:'success',
-    //             title:'Finalized',
-    //             text:'You will redirected to the details page',
-    //             showConfirmButton:false,
-    //             showCancelButton:false,
-    //             timer:2400
-    //         }).then(() => {
-    //             navigator('finalized', {state:{jobId}})
-    //         })
-    //     }else{
-    //         Swal.fire({
-    //             icon:'error',
-    //             title:'Oops',
-    //             text:result?.message
-    //         })
-    //     }
-    // }
-
     
     const onApplicationStatusUpdate = (applicationId: string, status: string) => {
         setApplications((prv: JobApplicationsListForRecruiter[]) => {
@@ -462,10 +163,10 @@ export default function ApplicantManagePage(){
 
     useEffect(() => {
         (async () => {
-            setLoading(true);
+            // setLoading(true);
             try {
                 const [appResult] = await Promise.all([
-                    getApplicationDetails(jobId, search, page, limit, filter)
+                    getApplicationDetails(jobId, search, page, 5, filter)
                     //getJobDetails(jobId)
                 ]);
 
@@ -489,7 +190,7 @@ export default function ApplicantManagePage(){
                 }
 
                // if (jobResult?.success) {
-                    setJobDetails([]);
+                    // setJobDetails([]);
                // } else {
                //     Notify.failure(jobResult?.message || "Could not fetch job details.");
                 //}
@@ -497,11 +198,10 @@ export default function ApplicantManagePage(){
                 console.log('Checking error while fetching data --', error)
                 Notify.failure("An error occurred while fetching data.");
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         })()
-    }, [search, page, filter])
-    //checking problem here..............
+    }, [search, page, filter, jobId]) //newly added jobid
     
     useEffect(() => {
         if(selectedApplication){
@@ -516,7 +216,7 @@ export default function ApplicantManagePage(){
             }
         })()
         }
-    }, [notes])
+    }, [notes, selectedApplication]) //previoulsy notes only
     
     return (
         <>
@@ -591,6 +291,7 @@ export default function ApplicantManagePage(){
                         <p className="text-sm text-gray-500">Rejected</p>
                     </div>
                 </div>
+                
             </div>
 
             <div className="mt-5 bg-white border border-slate-200 rounded-md p-2 grid grid-cols-12 gap-2">
@@ -609,17 +310,17 @@ export default function ApplicantManagePage(){
                     {isFilterMenuOpened && (
                         <div className="absolute border w-full border border-slate-200 rounded-md bg-white">
                             {Array.from(['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected']).map((item, index) => (
-                                <button onClick={() => {setFilter(item); setIsFilterMenuOpened(false)}} className="w-full text-xs font-medium p-2 hover:bg-gray-100">{item}</button>
+                                <button key={index} onClick={() => {setFilter(item); setIsFilterMenuOpened(false)}} className="w-full text-xs font-medium p-2 hover:bg-gray-100">{item}</button>
                             ))}
                         </div>
                     )}
                 </div>
-                <div className="col-span-12 lg:col-span-3">
+                {/* <div className="col-span-12 lg:col-span-3">
                     <button disabled className="flex w-full justify-center p-2 border border-slate-300 rounded-md hover:bg-blue-100 items-center gap-2 text-xs font-medium">
                         <LuSparkles color="blue" size={18} />
                         <p className="text-indigo-500">Smart Filter</p>
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <div className="mt-5">
@@ -648,7 +349,7 @@ export default function ApplicantManagePage(){
                                         </div>
                                         <span className="!mt-5 flex items-center gap-2 block">
                                             <LuCalendar size={13} color="gray" />
-                                            <p className="text-xs text-gray-500">Applied on {formattedDateMoment(application.createdAt, "MMM DD YYYY")}</p>
+                                            <p className="text-xs text-gray-500">Applied on {formattedDateMoment(application.createdAt as string, "MMM DD YYYY")}</p>
                                         </span>
                                     </div>
                                     <div>
@@ -679,7 +380,7 @@ export default function ApplicantManagePage(){
             </div>
         </div>
         {isControlBarMenuOpen && (
-            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e: any) => updateCandidateNote(e)} />
+            <ControlBarModal open={isControlBarMenuOpen} applicationId={selectedApplication as string} onClose={closeControlBarMenu} onApplicationStatusUpdate={(id: string, status: string) => onApplicationStatusUpdate(id, status)} updateCandidateNote={(e) => updateCandidateNote(e)} />
         )}
 
         {!isAllowedToManageApplications && (
@@ -704,12 +405,18 @@ export function StatusPhills({status}: {status: string}){
       return <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-0.5 rounded-full">Hired</span>;
     case 'rejected':
       return <span className="bg-red-100 text-red-700 text-xs font-medium px-3 py-0.5 rounded-full">Rejected</span>;
-    default:
+    case 'withdrawn': 
+    return (
+  <span className="bg-slate-100 text-slate-700 text-xs font-medium px-3 py-0.5 rounded-full">
+    Withdrawn
+  </span>
+);
+      default:
       return <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-0.5 rounded-full">{status || 'Unknown'}</span>;
   }
 }
 
-export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e: any) => void}){
+export function ControlBarModal({open, applicationId, onClose, onApplicationStatusUpdate, updateCandidateNote}: {open: boolean, applicationId: string, onClose: () => void, onApplicationStatusUpdate: (id: string, status: string) => void, updateCandidateNote: (e: React.ChangeEvent<HTMLInputElement>) => void}){
     
     type InterviewFormData = {
   date: Dayjs | null;
@@ -728,12 +435,14 @@ const interviewTypes = [
   "General"
 ];
 
+    const [isEmailModalOpen, setEmailModalOpen] = useState<boolean>(false)
+    console.log(isEmailModalOpen)
     const [isStatusMenuOpened, setIsStatusMenuOpened] = useState(false)
     const [applicationDetails, setApplicationDetails] = useState<SingleJobApplicationDetailsData | null>(null)
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     const [pdfViewerOpened, SetPdfViewerOpen] = useState(false)
     const [scheduleInterviewModalOpen, setScheduleInterviewModalOpen] = useState(false)
-
+    const [candidateNotes, setCandidateNotes] = useState<string>('')
     // const openInterviewScheduleModal = () => setScheduleInterviewModalOpen(true)
     // const closeInterviewScheduleModal = () => setScheduleInterviewModalOpen(false)
 
@@ -840,25 +549,26 @@ const interviewTypes = [
 
     useEffect(() => {
         async function fetchSingleApplicationDetails(){
-            setLoading(true)
+            // setLoading(true)
             try {
                 const result = await getSingleApplicationDetails(applicationId)
                 if(result.success){
                     toast.success('Application details loaded')
                     setApplicationDetails(result.result)
+                    setCandidateNotes(applicationDetails?.notes as string)
                 }
 
             } catch (error) {
                 toast.error(error instanceof Error ? error.message : 'Something went wrong')
             } finally {
-                setLoading(false)
+                // setLoading(false)
             }
         }
 
         if(applicationId){
             fetchSingleApplicationDetails()
         }
-    }, [applicationId])
+    }, [applicationId, applicationDetails?.notes])
     
     
     // const toggleStatusMenu = () => setIsStatusMenuOpened(prv => !prv)
@@ -898,37 +608,40 @@ const interviewTypes = [
                                             <button className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">{status}</button>
                                         ))} */}
                                         {applicationDetails.status === 'applied' && (
-                                            <button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'applied', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">applied</button>
+                                            <button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'applied', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">applied</button>
                                         )}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'screening', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">screening</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'screening', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">screening</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'interview', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">interview</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'interview', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">interview</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'offer', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">offer</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'offer', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">offer</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer' || 
                                             applicationDetails.status === 'hired'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'hired', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'hired', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
                                         {(applicationDetails.status === 'applied' ||
                                             applicationDetails.status === 'screening' ||
                                             applicationDetails.status === 'interview' || 
                                             applicationDetails.status === 'offer' || 
                                             applicationDetails.status === 'rejected'
-                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id, 'rejected', applicationDetails.candidateDetails?.name, applicationDetails.candidateDetails?.email, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        ) && (<button onClick={() => {updateACandidateApplicationStatus(applicationDetails._id as string, 'rejected', applicationDetails.candidateDetails?.name as string, applicationDetails.candidateDetails?.email as string, ''); setIsStatusMenuOpened(false) }} className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">hired</button>)}
+                                        {applicationDetails.status === 'withdrawn' && (
+                                            <button disabled className="w-full py-2 hover:bg-blue-100 text-xs font-medium text-gray-700">withdrawn</button>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <div className="mt-5 bg-orange-100 p-5 rounded-md ring-1 ring-orange-500">
+                        {/* <div className="mt-5 bg-orange-100 p-5 rounded-md ring-1 ring-orange-500">
                             <div className="flex justify-between items-center text-xs font-medium w-full">
                                 <p>Profile Match</p>
                                 <p>86%</p>
@@ -936,7 +649,7 @@ const interviewTypes = [
                             <div className="border border-slate-200 rounded-md w-full h-3 mt-1 bg-white">
                                 <div className="h-full bg-orange-500 rounded-md w-[86%]"></div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="mt-5">
                             <p className="text-sm font-semibold">Contact Information</p>
                             <div className="mt-1 space-y-2">
@@ -1023,13 +736,13 @@ const interviewTypes = [
 
                         <div className="mt-5">
                      <p className="font-light">Notes</p>
-                     <textarea value={applicationDetails.notes} onKeyUp={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
+                     <textarea value={candidateNotes} onChange={(e) => updateCandidateNote(e)} placeholder="Write notes about this candidate" className="text-xs mt-2  p-3 border border-gray-300 rounded-md w-full outline-none" rows={5} ></textarea>
                  </div>
                  <div className="mt-5 space-y-2">
-                     <div onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</div>
-                     <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button>
-                     <div onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</div>
-                     <div onClick={() => navigateToUserPublicProfile(applicationDetails.candidateDetails?._id as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</div>
+                     <button disabled={applicationDetails.status === 'withdrawn'} onClick={() => setScheduleInterviewModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center bg-blue-500 text-white"><BiCalendar /> Schedule Interview</button>
+                     {/* <button onClick={() => setEmailModalOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><BiEnvelope /> Send Email</button> */}
+                     <button onClick={() => SetPdfViewerOpen(true)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><FaFile /> View Resume</button>
+                     <button onClick={() => navigateToUserPublicProfile(applicationDetails.candidateDetails?._id as string)} className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md text-xs justify-center border border-gray-300"><LuUser /> Inspect Profile</button>
                  </div>
                     </div>
                     )}
@@ -1205,7 +918,7 @@ const interviewTypes = [
       />
 
       {/* Checkbox */}
-      <Controller
+      {/* <Controller
         name="sendEmail"
         control={control}
         render={({ field }) => (
@@ -1215,7 +928,7 @@ const interviewTypes = [
             label={<span className="text-sm">Send email invitation</span>}
           />
         )}
-      />
+      /> */}
 
       {/* Submit Button */}
       <Button 

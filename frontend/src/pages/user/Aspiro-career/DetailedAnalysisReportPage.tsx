@@ -26,7 +26,7 @@ export default function DetailedAnalysisReportPage(){
                         <div className="bg-blue-50 flex flex-col items-center p-5 lg:p-10 gap-2 rounded-md">
                             <p className={`text-3xl font-bold text-green-500`}>{detailedAnalysisReportData?.overallScore}</p>
                             <p className="text-sm text-slate-500">Overall Score</p>
-                            <div className={`bg-green-500 text-white text-xs px-3 rounded-full`}>{detailedAnalysisReportData?.overallScore > 70 ? "Good" : "Ok"}</div>
+                            <div className={`bg-green-500 text-white text-xs px-3 rounded-full`}>{detailedAnalysisReportData?.overallScore && detailedAnalysisReportData?.overallScore > 70 ? "Good" : "Ok"}</div>
                         </div>
                         <div>
                             <div className="flex flex-col items-end">

@@ -1,29 +1,7 @@
-//candidate services :: recruiter services :: adminservices ::
 import { JobsEndpoints } from "../constants/endPoints/jobs.endpoints"
 import { EndPoints } from "../constants/endPoints/user.endpoints"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { AxiosError } from "axios"
-
-export const adminLogin = async (email : string, password : string) => {
-    try {
-        const result = await axiosInstance.post('/admin/login', 
-            {email, password},
-            { 
-                headers:{'Content-Type':'application/json'},
-                sendCookie:false
-            } as AxiosRequest
-        )
-        return result.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response.status < 500){
-            return err.response.data
-        }
-
-        console.log(error)
-    }
-}
 
 export const reAuthenticate = async () => {
     try {
@@ -53,29 +31,12 @@ export const loadJobDetails = async (jobId : string) => {
     }
 }
 
-export const getCandidateDetails = async (candidateId : string) => {
-    try {
-        const response = await axiosInstance.get(`/candidates/${candidateId}`)
-        return response.data
-    } catch (error : unknown) {
-        console.log('Error occured', error)
-    }
-}
-
-export const commonService = {
-    homePageSearch: async function (searchValue : string) {
-        return fetch(`http://localhost:5000/home/jobs?search=${searchValue}`, {
-            method:'GET'
-        })
-    }
-}
 
 export const googleLogin = async (googleToken : string) => {
     try {
         const response = await axiosInstance.post(EndPoints.GOOGLE_LOGIN,
             {googleToken},
             {
-                headers:{'Content-Type':'application/json'}
             } as AxiosRequest
         )
 

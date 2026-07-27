@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import User, { AccountAction } from '../../../domain/entities/user/User.FIX';
+import User, { AccountAction, SubscriptionMetaData } from '../../../domain/entities/user/User.FIX';
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
 
 export const SocialLinksSchema = new Schema<SocialLinks>({
@@ -7,7 +7,7 @@ export const SocialLinksSchema = new Schema<SocialLinks>({
   url: { type: String },
 });
 
-export const SubscriptionMetaDataSchema = new Schema<{ action: string; date?: string | Date }>({
+export const SubscriptionMetaDataSchema = new Schema<SubscriptionMetaData>({
   action: { type: String },
   date: { type: Date },
 });

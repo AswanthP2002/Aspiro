@@ -49,4 +49,7 @@ export default interface IJobRepo extends IBaseRepo<Job> {
     jobs: number;
     growth: { thisMonth: number; lastMonth: number };
   } | null>;
+  getActiveJobsCount(): Promise<{ count: number } | null>;
+  getJobsByTitleAndOpenings(): Promise<{ jobTitle: string; openings: number }[] | null>;
+  // getRecruiterJobsByRecruiterIdTemp(recruiterId: string): Promise<Job[] | null>;
 }

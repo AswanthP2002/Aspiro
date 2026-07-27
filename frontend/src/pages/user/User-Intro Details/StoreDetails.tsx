@@ -5,9 +5,9 @@ import { getLocationDetails, saveBasicDetails } from "../../../services/userServ
 import { Controller, useForm } from "react-hook-form";
 import { Button, FormControl, FormHelperText } from "@mui/material";
 import { Notify } from "notiflix";
-import { BiBriefcase } from "react-icons/bi";
-import { IoLocation } from "react-icons/io5";
-import { CgCheck } from "react-icons/cg";
+// import { BiBriefcase } from "react-icons/bi";
+// import { IoLocation } from "react-icons/io5";
+// import { CgCheck } from "react-icons/cg";
 
 interface FormState {
     headline: string;
@@ -19,10 +19,38 @@ interface FormState {
     summary: string;
 }
 
+interface LocationPlace {
+    display_name: string;
+    address?: {
+        city: string,
+        town: string,
+        village: string,
+        state_district: string,
+        county: string,
+        country: string,
+        district: string,
+        state: string,
+        postcode: string
+    };
+    lat?: string;
+    lon?: string;
+}
+
+type SelectedLocationType = {
+    formattedAddress: string;
+    city: string;
+    district: string;
+    state: string;
+    country: string;
+    pinCode: string;
+    lon: number;
+    lat: number;
+}
+
 
 export default function StoreDetails(){
 
-    const {formState:{errors}, control, watch, handleSubmit} = useForm<FormState>({
+    const {formState:{errors}, control, handleSubmit} = useForm<FormState>({
         defaultValues:{
             headline:"",
             city:"",
@@ -36,7 +64,7 @@ export default function StoreDetails(){
 
     const [query, setQuery] = useState("")
     const [suggestions, setSuggestion] = useState([])
-    const [selectedLocation, setSelectedLocation] = useState<any>(null)
+    const [selectedLocation, setSelectedLocation] = useState<SelectedLocationType | null>(null)
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -57,56 +85,39 @@ export default function StoreDetails(){
         }
     }
 
-    const handleLocationSelect = (place: any) => {
+    const handleLocationSelect = (place: LocationPlace) => {
         const components = place.address
         setSelectedLocation({
             formattedAddress: place.display_name,
-            city: components.city || components.town || components.village || "",
-            district: components.state_district || components.county || components.district || "",
-            state: components.state || "",
-            country: components.country || "",
-            pinCode: components.postcode || "",
-            lat: parseFloat(place.lat),
-            lon: parseFloat(place.lon)
+            city: components?.city || components?.town || components?.village || "",
+            district: components?.state_district || components?.county || components?.district || "",
+            state: components?.state || "",
+            country: components?.country || "",
+            pinCode: components?.postcode || "",
+            lat: parseFloat(place?.lat as string),
+            lon: parseFloat(place?.lon as string)
         })
         setQuery(place.display_name)
         setSuggestion([])
     } 
 
     const [loading, setLoading] = useState<boolean>(false)
-    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false)
-    
-    
-    const [isSummaryFieldFocused, setIsSummaryFieldFocused] = useState<boolean>(false)
-    const [isHeadlineFieldFocused, setIsHeadlineFieldFocused] = useState<boolean>(false)
-    const [isLocationFieldFocused, setIsLocationFieldFocused] = useState<boolean>(false)
-    
-    const onSummaryFieldFocus = () =>  setIsSummaryFieldFocused(true)
-    const onSummaryFieldBlur = () => setIsSummaryFieldFocused(false)
-
-    const onHeadlineFieldFocus = () => setIsHeadlineFieldFocused(true)
-    const onHeadlineFieldBlur = () => setIsHeadlineFieldFocused(false)
-
-    const onLocationFieldFocus = () => setIsLocationFieldFocused(true)
-    const onLocationFieldBlur = () => setIsLocationFieldFocused(false)
 
     async function onSubmit(data : FormState){
         setLoading(true)
         const {headline, summary} = data
         try {
-            // console.log('--printing longtitude and latitude before calling api', selectedLocation.lon, selectedLocation.lat)
-            // console.log('--printing selected location credentials for fallback', selectedLocation)
             
             const result = await saveBasicDetails(
                 headline,
-                selectedLocation.city,
-                selectedLocation.district,
-                selectedLocation.state,
-                selectedLocation.country,
-                selectedLocation.pinCode,
+                selectedLocation?.city as string,
+                selectedLocation?.district as string,
+                selectedLocation?.state as string,
+                selectedLocation?.country as string,
+                selectedLocation?.pinCode as string,
                 summary,
-                selectedLocation.lon,
-                selectedLocation.lat
+                selectedLocation?.lon ?? 0,
+                selectedLocation?.lat ?? 0
             )
 
             if(result?.success){
@@ -135,9 +146,6 @@ export default function StoreDetails(){
 
           
     }
-
-    const typedHeadline = watch('headline')
-    const typedSummary = watch('summary')
     
     const location = useLocation()
     const { userName, userId } = location.state || {};
@@ -149,53 +157,19 @@ export default function StoreDetails(){
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Required user information is missing.' });
             navigateTo(-1)
         }
-      }, [])
+      }, [navigateTo, userId, userName]) //previosly empty
       
     return(
-        <div className="w-full min-h-screen bg-gradient-to-br from-blue-200 to-indogo-200">
-            <div className="w-full h-full flex flex-col items-center">
-                <p className="mt-10 font-semibold text-2xl">Welcome {userName}! 👋</p>
-                <p className="text-xs text-gray-500 mt-2">Let's set up your profile to help you connect with the right opportunities</p>
-                <div className="flex gap-1 mt-10">
-                    <div className="flex items-center gap-1">
-                        <div className={`${isHeadlineFieldFocused ? 'bg-gradient-to-br from-blue-400 to-indigo-500 shadow shadow-xl shadow-blue-300' : (typedHeadline ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-xl' : 'bg-gray-300')} w-10 h-10 rounded-full flex items-center justify-center text-white`}>
-                            {
-                                typedHeadline
-                                    ? <CgCheck size={25} />
-                                    : 1
-                            }
-                        </div>
-                        <div className={`${typedHeadline ? 'bg-gradient-to-br from-green-400 to-green-500' : 'bg-gray-300'} w-20 h-1 rounded-md`}></div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <div className={`${isLocationFieldFocused ? 'bg-gradient-to-br from-blue-400 to-indigo-500 shadow shadow-xl shadow-blue-300' : (selectedLocation ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-xl' : 'bg-gray-300')} w-10 h-10 rounded-full flex items-center justify-center text-white`}>
-                            {
-                                selectedLocation
-                                    ? <CgCheck size={25} />
-                                    : 2
-                            }
-                        </div>
-                        <div className={`${selectedLocation ? 'bg-gradient-to-br from-green-400 to-green-500' : 'bg-gray-300'} w-20 h-1 rounded-md`}></div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <div className={`${isSummaryFieldFocused ? 'bg-gradient-to-br from-blue-400 to-indigo-500 shadow shadow-xl shadow-blue-300' : (typedSummary ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-xl' : 'bg-gray-300')} w-10 h-10 rounded-full flex items-center justify-center text-white`}>
-                            {
-                                typedSummary
-                                    ? <CgCheck size={25} />
-                                    : 3
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div className="mt-10 bg-white rounded-md w-lg md:w-2xl">
+        <div className="w-full min-h-screen bg-white">
+            <div className="w-full h-full flex flex-col items-start ps-10 pe-10 lg:ps-100 py-10 lg:py-20">
+                <p className="font-bold text-5xl tracking-wide w-100 lg:w-full text-gray-900">Let's start with you</p>
+                <div className="mt-10 text-sm font-medium text-slate-400">Lets set up your profile to help you connect with the right people and right opportunities</div>
+                
+                <div className="mt-10 w-full md:w-155">
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <div id="one" className={`px-5 py-8 border-b border-gray-200 ${isHeadlineFieldFocused ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}`}>
+                        <div id="one" className={``}>
                             <div className="flex gap-2 ">
-                                <div className="bg-blue-500 rounded-md w-10 h-10 flex items-center justify-center"><BiBriefcase color="white" /></div>
-                                <div className="flex-1">
-                                    <p className="font-medium">What's your professional headline?</p>
-                                    <p className="text-xs text-gray-500 mt-2">Describe your current role or the position you are seeking. This helps recruiters find you easily</p>
-                                </div>
+                                
                             </div>
                             <FormControl fullWidth sx={{marginTop:'15px'}} error={Boolean(errors.headline)}>
                                         <Controller
@@ -209,14 +183,12 @@ export default function StoreDetails(){
                                             }}
                                             render={({field}) => {
                                                 return <div className="w-full">
-                                                    <label htmlFor="" className="!text-xs !text-black !mb-1">Professional Headline <span className="text-red-500">*</span></label>
+                                                    <label htmlFor="" className="!text-[.7rem] !text-slate-400 tracking-wide font-medium !mb-1 uppercase">Professional Headline <span className="text-red-500">*</span></label>
                                                     <input
                                                             {...field}
-                                                            onFocus={onHeadlineFieldFocus}
-                                                            onBlur={onHeadlineFieldBlur}
                                                             type="text"
                                                             placeholder="e.g; Senior Software Engineer | Fullstack Developer"
-                                                            className="!text-xs border border-gray-300 p-3 w-full rounded-md"
+                                                            className="!text-[.9rem] pt-3 py-2 mt-2 border-b focus:!border-blue-400 transition-all duration-300 w-full placeholder:font-medium placeholder:text-slate-300 placeholder:text-[.9rem] focus:placeholder:text-slate-200"
                                                         />
                                                 </div>
                                             }}
@@ -225,23 +197,15 @@ export default function StoreDetails(){
                             </FormControl>
                         </div>
 
-                        <div id="two" className={`px-5 py-8 border-b border-gray-200 ${isLocationFieldFocused ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}`}>
-                            <div className="flex gap-2 ">
-                                <div className="bg-violet-500 rounded-md w-10 h-10 flex items-center justify-center"><IoLocation color="white" /></div>
-                                <div className="flex-1">
-                                    <p className="font-medium">Where are you located at?</p>
-                                    <p className="text-xs text-gray-500 mt-2">This helps us personalize job recommendations near you and show relevant opportunities.</p>
-                                </div>
-                            </div>
-                            <div className="mt-5">
-                                    <label htmlFor="" className="!mb-1 !text-xs !text-black">Enter your location <span className="text-red-500">*</span></label>
+                        <div id="two" className={`mt-6`}>
+                        
+                            <div className="">
+                                    <label htmlFor="" className="!text-[.7rem] !text-slate-400 tracking-wide font-medium !mb-1 uppercase">Enter your location <span className="text-red-500">*</span></label>
                                     <input 
                                         type="text"
-                                        className="border border w-full p-3 rounded-md !text-xs"
+                                        className="!text-[.9rem] pt-3 py-2 mt-2 border-b focus:!border-blue-400 transition-all duration-300 w-full placeholder:font-medium placeholder:text-slate-300 placeholder:text-[.9rem] focus:placeholder:text-slate-200"
                                         placeholder="Start typing your city, district, state format"
                                         value={query}
-                                        onFocus={onLocationFieldFocus}
-                                        onBlur={onLocationFieldBlur}
                                         onChange={handleChange}
                                     />
                                     {suggestions?.length > 0 && (
@@ -260,14 +224,8 @@ export default function StoreDetails(){
                             </div>
                         </div>
 
-                        <div id="three" className={`px-5 py-8 border-b border-gray-200 ${isSummaryFieldFocused ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}`}>
-                            <div className="flex gap-2 ">
-                                <div className="bg-blue-500 rounded-md w-10 h-10 flex items-center justify-center"><BiBriefcase color="white" /></div>
-                                <div className="flex-1">
-                                    <p className="font-medium">Tell me about yourself</p>
-                                    <p className="text-xs text-gray-500 mt-2">Give a brief summary of your experience, skills, and what makes you unique.</p>
-                                </div>
-                            </div>
+                        <div id="three" className={`mt-6`}>
+                            
                             <FormControl fullWidth sx={{marginTop:'10px'}} error={Boolean(errors.summary)}>
                                     <Controller
                                         name="summary"
@@ -278,13 +236,11 @@ export default function StoreDetails(){
                                         }}
                                         render={({field}) => {
                                             return <div>
-                                                <label htmlFor="" className="!text-black !text-xs">Professional summary <span className="text-red-500">*</span></label>
+                                                <label htmlFor="" className="!text-[.7rem] !text-slate-400 tracking-wide font-medium !mb-1 uppercase">Professional summary <span className="text-red-500">*</span></label>
                                                 <textarea 
                                                     {...field}
-                                                    onFocus={onSummaryFieldFocus}
-                                                    onBlur={onSummaryFieldBlur}
                                                     name="" id=""
-                                                    className="border border-gray-200 rounded-md w-full p-3 outline-none text-xs"
+                                                    className="!text-[.9rem] pt-3 py-2 mt-2 border-b border-slate-300 focus:!border-blue-400 transition-all duration-300 w-full placeholder:font-medium placeholder:text-slate-300 placeholder:text-[.9rem] outline-none focus:placeholder:text-slate-200"
                                                     placeholder="Share abobout who you are your experience, skills and achivements"
                                                     rows={6}
                                                 >
@@ -297,11 +253,16 @@ export default function StoreDetails(){
                                     <FormHelperText>{errors.summary?.message}</FormHelperText>
                                 </FormControl>
                         </div>
-                        <div className="p-5 flex items-center justify-between">
+                        <div className="">
                             <p className="text-xs text-gray-500">All fields are required to continue</p>
-                            <Button type="submit" disabled={isButtonDisabled} variant="contained" loading={loading}>Save and continue</Button>
+                            <div className="flex justify-end mt-5">
+                                <Button type="submit" variant="contained" loading={loading}>Save and continue</Button>
+                            </div>
                         </div>
                     </form>
+                </div>
+                
+                <div className="flex gap-1 mt-10">
                 </div>
             </div>
         </div>

@@ -58,7 +58,7 @@ export default class GetUsersForPublicUsecase implements IGetUsersForPublicUseca
     });
 
     if (result) {
-      console.log('- checking data for inspecing user recruiter profile --', result.users[0]);
+      // console.log('- checking data for inspecing user recruiter profile --', result.users[0]);
       const usersDto: UserOverviewForPublicDTO[] = [];
       result.users.forEach((user: UserProfileAggregated) =>
         usersDto.push(this._mapper.userProfileAggregatedDataToUserOverviewToPublicDTO(user))

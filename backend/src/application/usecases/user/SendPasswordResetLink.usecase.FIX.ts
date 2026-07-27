@@ -18,7 +18,7 @@ export default class SendResetPassworLinkUsecase implements ISendResetPassworLin
     const user = await this._userRepository.findByEmail(email);
 
     if (!user) {
-      throw new InvalidUserError(); 
+      throw new InvalidUserError();
     }
 
     //generate token for password reset to identify particular user who intending the reset request

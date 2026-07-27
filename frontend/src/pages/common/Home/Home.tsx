@@ -1,53 +1,91 @@
 import landingPageImage from '/Illustration.png'
 import './Home.css'
-import jobVacancies from '../../../assets/data/dummyjobvacancies'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Tile from '../../../components/common/Tile'
 import TileGuide from '../../../components/common/TileGuide'
 import { guideData } from '../../../assets/data/guideData'
-import {FaConnectdevelop} from 'react-icons/fa'
+import {FaUserTie} from 'react-icons/fa'
 import {PiBuildingOfficeFill, PiRocket, PiSuitcase} from 'react-icons/pi'
 import arrowupdown from '/Arrows-up-down.png'
 import arrowdownup from '/Arrows-down-up.png'
 import { useNavigate } from 'react-router-dom'
 import { IoChatbubble, IoLocation, IoSearch } from 'react-icons/io5'
-import { LuUsers } from 'react-icons/lu'
+import { LuBriefcase, LuUsers } from 'react-icons/lu'
 import { FaShareNodes } from 'react-icons/fa6'
 import { BiLineChart, BiMedal } from 'react-icons/bi'
 import { BsArrowRight } from 'react-icons/bs'
 import { FiFacebook, FiInstagram, FiLinkedin, FiTwitter } from 'react-icons/fi'
+import {autoUpdate, flip, offset, shift, size, useFloating} from '@floating-ui/react'
+import { toast } from 'react-toastify'
+import { HomePageData, HomePageJobSearchData } from '../../../types/entityTypes'
+import { fetchJobsForHomePage } from '../../../services/jobServices'
+import { AxiosError } from 'axios'
+import { loadHomePageData } from '../../../services/userServices'
 
 
 export default function Home(){
-    const [jobvacancies, setjobvacancies] = useState(jobVacancies)
+    // const [jobvacancies, setjobvacancies] = useState(jobVacancies)
     const [tileguideData, settileguideData] = useState(guideData)
+    const [jobSearchText, setJobSearchText] = useState<string>('')
+    const [jobSearchResult, setJobSearchResult] = useState<HomePageJobSearchData[]>([])
+    const [homePageData, setHomePageData] = useState<HomePageData | null>(null)
 
-    const cardData = [
-        {
-        id:1,
-        title:"Jobs",
-        count:10000,
-        icon:<PiSuitcase size={25} color='white' />
-    },
-    {
-        id:2,
-        title:"Companies",
-        count:5000,
-        icon:<PiBuildingOfficeFill size={25} color='white' />
-    },
-    {
-        id:3,
-        title:"Candidates",
-        count:7000,
-        icon:<LuUsers size={25} color='white' />
-    },
-    {
-        id:4,
-        title:"Internships",
-        count:8500,
-        icon:<FaConnectdevelop size={25} color='white' />
+    const searchJob = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const ext = e.target.value
+      setJobSearchText(ext)
     }
-    ]
+
+    const debouncedSearch = <T extends(...args: never[]) => void>(fn: T, delay: number) => {
+      let timer: ReturnType<typeof setTimeout>
+      return function(...args: Parameters<T>){
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          fn(...args)
+        }, delay);
+      }
+    }
+
+    const dSearch = debouncedSearch(searchJob, 500)
+
+    const {refs, floatingStyles} = useFloating({
+      placement: 'bottom-start',
+      whileElementsMounted: autoUpdate,
+      middleware: [
+        offset({mainAxis: 30, crossAxis: -53}),
+        flip(),
+        shift({padding: 8}),
+        size({
+          apply({availableHeight, elements}){
+            Object.assign(elements.floating.style, {
+              maxHeight: `${availableHeight}px`,
+              overflowY: "auto"
+            })
+          }
+        })
+      ]
+    })
+
+    useEffect(() => {
+      async function searchJob(){
+        // toast.info('Search functiong is calling')
+        try {
+          const result = await fetchJobsForHomePage(jobSearchText)
+          if(result?.success){
+            setJobSearchResult(result.result)
+          }
+        } catch (error: unknown) {
+          const err = error as AxiosError<{message: string}>
+          const message = err.response?.data.message || err.message || 'Something went wrong'
+          toast.error(message)
+        }
+      }
+
+      if(jobSearchText){
+        searchJob()
+      }
+    }, [jobSearchText])
+
+    console.log(settileguideData)
 
     const cardDataTwo = [
         {
@@ -90,6 +128,25 @@ export default function Home(){
 
     const navigator = useNavigate()
 
+    useEffect(() => {
+      //geting home page data
+      async function fetchHomePageData(){
+        try {
+          const result = await loadHomePageData()
+          if(result.success){
+            setHomePageData(result.result)
+          }
+        } catch (error: unknown) {
+            const err = error as AxiosError<{message: string}>
+            const message = err.response?.data.message || err.message || 'Something went wrong'
+            toast.error(message)
+        }
+      }
+
+      fetchHomePageData()
+    }, [])
+
+
     return(
         <>
         <section className="w-full bg-slate-50 pt-16 pb-24 md:pt-24 md:pb-32 relative overflow-hidden">
@@ -118,10 +175,12 @@ export default function Home(){
         </p>
 
         {/* Professional Search Bar */}
-        <div className="mt-10 bg-white p-2 rounded-2xl shadow-xl border border-slate-100 flex flex-col lg:flex-row gap-2 transition-all focus-within:ring-4 focus-within:ring-blue-500/10">
+        <div className="relative mt-10 bg-white p-2 rounded-2xl shadow-xl border border-slate-100 flex flex-col lg:flex-row gap-2 transition-all focus-within:ring-4 focus-within:ring-blue-500/10">
           <div className="flex-1 flex gap-3 items-center px-4 py-3 border-b lg:border-b-0 lg:border-r border-slate-100">
             <IoSearch className="text-blue-600" size={20} />
-            <input 
+            <input
+              onChange={(e) => dSearch(e)}
+              ref={refs.setReference}
               type="text" 
               placeholder="Job title or keyword" 
               className="w-full bg-transparent outline-none text-slate-700 placeholder:text-slate-400 text-sm" 
@@ -140,6 +199,34 @@ export default function Home(){
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg shadow-blue-200">
             Find Jobs
           </button>
+
+          {jobSearchText && (
+            <div 
+          className="p-3 bg-white left-0 border border-slate-200 rounded-md shadow-xl w-full"
+          ref={refs.setFloating}
+          style={floatingStyles}
+          >
+            {jobSearchResult?.length > 0 
+              ? <>
+                  {jobSearchResult?.map((job) => (
+                    <div key={job._id} className='flex gap-2 p-2 cursor-pointer hover:bg-slate-100 rounded-md'>
+                <div className='bg-slate-50 w-12 h-12 flex items-center justify-center rounded-md'>
+                  <LuBriefcase color='gray' size={20} />
+                </div>
+                <div>
+                  <p className='font-semibold text-sm text-slate-700'>{job.jobTitle}</p>
+                  <p className='text-xs text-slate-700 font-medium mt-0'>{job.company}</p>
+                  <p className='text-[.7rem] text-slate-500 mt-1'>{job.location}</p>
+                </div>
+              </div>
+                  ))}
+                </>
+              : <div className='p-5'>
+                <p className='text-xs text-slate-400 text-center'>No jobs found</p>
+              </div>
+            }
+          </div>
+          )}
         </div>
 
         <p className="text-slate-500 text-xs mt-4 flex gap-2">
@@ -173,9 +260,10 @@ export default function Home(){
 
     {/* Featured Tiles Section */}
     <div className="mt-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {cardData?.map((data, index) => (
-        <Tile key={index} tileData={data} />
-      ))}
+      <Tile tileData={{title: "Jobs", count: homePageData?.overview.jobs ?? 0, icon: <PiSuitcase />}} />
+      <Tile tileData={{title: "Companies", count: homePageData?.overview.companies ?? 0, icon: <PiBuildingOfficeFill />}} />
+      <Tile tileData={{title: "Users", count: homePageData?.overview.users ?? 0, icon: <LuUsers />}} />
+      <Tile tileData={{title: "Recruiters", count: homePageData?.overview.recruiters ?? 0, icon: <FaUserTie />}} />
     </div>
   </div>
         </section>
@@ -199,7 +287,7 @@ export default function Home(){
 
     {/* Job Cards Grid */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {jobvacancies.map((job, index) => (
+      {homePageData?.jobVacancies?.map((job: {jobTitle: string, openings: number}, index) => (
         <div 
           key={index} 
           className="group bg-white flex gap-4 items-center border border-slate-100 p-5 rounded-2xl hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
@@ -211,12 +299,12 @@ export default function Home(){
           
           <div className="overflow-hidden">
             <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
-              {job.jobRole}
+              {job.jobTitle}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
               <p className="text-xs font-medium text-slate-500">
-                {job.vacancies} New Openings
+                {job.openings} New Openings
               </p>
             </div>
           </div>
@@ -315,7 +403,8 @@ export default function Home(){
             >
               {/* Icon Container with Soft Glow */}
               <div className="bg-blue-50 text-blue-600 w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                {React.cloneElement(data.icon as React.ReactElement, { size: 24 })}
+                {/* {React.cloneElement(data.icon as React.ReactElement, { size: 24 })} */}
+                {data.icon}
               </div>
 
               <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-600 transition-colors">

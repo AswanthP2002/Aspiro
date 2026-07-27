@@ -241,7 +241,7 @@ export default class SubscriptionRepository
             { label: 'Non-Recruiters', value: data.nonRecruiters[0]?.docs || 0, color: '#22de32' },
           ],
         },
-        revenueGrowth: data.revenueGrowth.map((item: any) => ({
+        revenueGrowth: data.revenueGrowth.map((item: { _id: number; amount: number }) => ({
           month: months[item._id - 1],
           amount: item.amount,
         })),
@@ -330,18 +330,69 @@ export default class SubscriptionRepository
     return result;
   }
 
-  // async getUsersPurchasedCurrentDay(): Promise<{ count: number } | null> {
-  //   const today = new Date();
-  //   today.setHours(0, 0, 0, 0);
-  //   const countOfUsersPurchaseToday = await UserSubscriptionDAO.aggregate([
-  //     {
-  //       $match: {
-  //         createdAt: { $gte: today },
-  //       },
-  //     },
-  //     { $count: 'count' },
-  //   ]);
+  async findSubscriptionByPlanIdAndUserId(
+    userId: string,
+    planId: string
+  ): Promise<UserSubscription | null> {
+    const result = await UserSubscriptionDAO.findOne({
+      planId: new mongoose.Types.ObjectId(planId),
+      userId: new mongoose.Types.ObjectId(userId),
+    });
 
-  //   const count = countOfUsersPurchaseToday[0];
-  // }
+    return result;
+  }
+
+  async updateFeaturesConnectionRequestCountByUserId(
+    userId: string,
+    count: string
+  ): Promise<UserSubscription | null> {
+    const result = await UserSubscriptionDAO.findOneAndUpdate(
+      { userId: new mongoose.Types.ObjectId(userId) },
+      { $set: { 'features.connectionRequests': count } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async updateFeaturesJobCreationCountByUserId(
+    userId: string,
+    count: string
+  ): Promise<UserSubscription | null> {
+    const result = await UserSubscriptionDAO.findOneAndUpdate(
+      { userId: new mongoose.Types.ObjectId(userId) },
+      { $set: { 'features.jobApplications': count } },
+      { returnDocument: 'after' }
+    );
+
+    return result;
+  }
+
+  async getSubscriptionAndPlanDetailsBySubscriptionId(
+    subscriptionId: string
+  ): Promise<UserSubscriptionAndPlanDetails | null> {
+    const result = await UserSubscriptionDAO.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(subscriptionId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'plans',
+          localField: 'planId',
+          foreignField: '_id',
+          as: 'planDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$planDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
+    return result[0];
+  }
 }

@@ -1,14 +1,16 @@
 export interface PlanDTO {
   _id?: string;
+  stripeProductId?: string;
   name: string;
   description: string;
   monthlyPrice: number;
-  yearlyPrice: number;
+  stripePriceId?: string;
   trialPeriod: number;
   badgeIcon: string;
   isListed: boolean;
   currency: 'INR' | 'USD';
   billingCycle: 'monthly' | 'yearly';
+  activeUsers?: number;
   features: string[];
   featuresListed: { [key: string]: string | number };
   isActive: boolean;

@@ -6,6 +6,8 @@ import { appContext } from "../../context/AppContext"
 import { Controller, useForm } from "react-hook-form"
 import { FormControl, FormHelperText } from "@mui/material"
 import { Textarea } from "@mui/joy"
+import { AxiosError } from "axios"
+import { toast } from "react-toastify"
 
 export default function CreatePost(){
     
@@ -46,21 +48,6 @@ export default function CreatePost(){
         }
     }
 
-    // const cropComplete = (cropArea : any, cropPixels : any) => {
-    //     setCropPixels(cropPixels)
-    // }
-
-    // const createImageFromUrl = (url : string) => {
-    //     return new Promise((resolve, reject) => {
-    //         const img = new Image()
-    //         img.onload = () => resolve(img)
-    //         img.onerror = (err) => reject(err)
-
-    //         img.crossOrigin = 'anonymous'
-    //         img.src = url
-    //     })
-    // }
-
 
     const create = async (data : FormInput) => {
         const formData = new FormData()
@@ -73,21 +60,23 @@ export default function CreatePost(){
         console.log('Testing formdata before sending to the service', formData)
 
         try {
-            alert('going to call the service')
+            // alert('going to call the service')
             const result = await createPost(formData)
             if(result?.success){
                 Notify.success('Post created successfully', {timeout:1200})
                 setTimeout(() => {
                     closeCreatePostModal()
                     window.location.reload()
-    
-                , 1200})
+                }, 1200)
             }else{
                 Notify.failure(result?.message)
                 //setTimeout(() => window.location.reload(), 1200)
             }
         } catch (error : unknown) {
-            Notify.failure('Something went wrong', {timeout:1200})
+           const err = error as AxiosError<{message: string}>
+           const msg = err?.response?.data.message || err.message || 'Something went wrong'
+           toast.error(msg)
+
         }
         
     }
@@ -108,28 +97,7 @@ export default function CreatePost(){
                         </section>
                     )
                 }
-                {/* crop, aspectRatio, zoom, image = cropTestImage, setCrop, setZoom, cropComplete */}
-                {/* {
-                    sectionUpload === 2 && (
-                        <section id="section-crop">
-                            <h5 className="text-center">Crop</h5>
-                            <div className="relative w-[400px] h-[400px]">
-                                <CropComponent
-                                    crop={crop}
-                                    aspectRatio={undefined}
-                                    zoom={zoom}
-                                    image={imagePreview}
-                                    setCrop={setCrop}
-                                    setZoom={setZoom}
-                                    cropComplete={cropComplete}
-                                />
-                            </div>
-                            <div className="w-full flex justify-end mt-2">
-                                <button onClick={cropImage} className="text-sm bg-blue-500 text-white rounded !px-3 !py-1">Next</button>
-                            </div>
-                        </section>
-                    )
-                } */}
+        
                 {
                     sectionUpload === 2 && (
                         <section id="content-section">

@@ -90,7 +90,7 @@ export default function InterviewDashboardPage(){
                     </div>
                 </div>
                 <div className="mt-5">
-                    {dashboardData?.performance.length > 0
+                    {dashboardData?.performance && dashboardData?.performance.length > 0
                         ? <div className="bg-white border border-slate-200 rounded-md p-3">
                         <p className="font-semibold text-sm">Performance Overtime</p>
                         <ResponsiveContainer width="100%" height={350}>

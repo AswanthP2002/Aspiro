@@ -1,4 +1,4 @@
-import Recruiter, { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
+import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import { ObjectId } from 'mongodb';
 import BaseRepository from '../baseRepository';
@@ -62,250 +62,7 @@ export default class RecruiterRespository
     console.log('-- inspecitn total pages --', totalPages);
 
     return { recruiters: allRecruiters, totalPages: totalPages };
-
-    // 1. Build a Dynamic Match Object
-    // const matchConditions: any = {
-    //   profileStatus: { $ne: 'pending' }, // Move global filters here
-    //   isDeleted: { $ne: true }, // Usual safety check
-    // };
-
-    // // 2. Add Search only if it exists
-    // if (search) {
-    //   matchConditions.$or = [
-    //     { 'userProfile.name': { $regex: new RegExp(search, 'i') } },
-    //     { 'userProfile.email': { $regex: new RegExp(search, 'i') } },
-    //     { organizationDetails: { $regex: new RegExp(search, 'i') } },
-    //   ];
-    // }
-
-    // // 3. Add Filter only if array has values
-    // if (employer_type_filter && employer_type_filter.length > 0) {
-    //   matchConditions.employerType = { $in: employer_type_filter };
-    // }
-
-    // const aggPipeline: any[] = [
-    //   {
-    //     $lookup: {
-    //       from: 'users',
-    //       localField: 'userId',
-    //       foreignField: '_id',
-    //       as: 'userProfile',
-    //     },
-    //   },
-    //   { $unwind: '$userProfile' },
-    //   { $match: { iverified: true } }, // Match EARLY for performance
-    //   {
-    //     $lookup: {
-    //       from: 'jobs',
-    //       localField: 'userId',
-    //       foreignField: 'recruiterId',
-    //       as: 'jobs',
-    //     },
-    //   },
-    //   {
-    //     $addFields: {
-    //       isSuspended: { $ifNull: ['$isSuspended', false] },
-    //       isDeleted: { $ifNull: ['$isDeleted', false] },
-    //     },
-    //   },
-    // ];
-
-    // // Get total count using the same matchConditions
-    // const totalDocs = await RecruiterDAO.aggregate([
-    //   {
-    //     $match: {
-    //       $or: [
-    //         { fullName: { $regex: new RegExp(search, 'i') } },
-    //         { email: { $regex: new RegExp(search, 'i') } },
-    //       ],
-    //       profileStatus: 'approved',
-    //       recruiterType: { $in: employer_type_filter },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'users',
-    //       localField: 'userId',
-    //       foreignField: '_id',
-    //       as: 'userProfile',
-    //     },
-    //   },
-    //   { $unwind: '$userProfile' },
-    //   {
-    //     $lookup: {
-    //       from: 'companies',
-    //       localField: 'companyId',
-    //       foreignField: '_id',
-    //       as: 'companyDetails',
-    //     },
-    //   },
-    //   { $unwind: { path: '$companyDetails', preserveNullAndEmptyArrays: true } },
-    //   { $sort: { createdAt: -1 } },
-    //   { $count: 'totalRecruiters' },
-    // ]);
-
-    // // Add Pagination to the main pipeline
-    // aggPipeline.push(
-    //   { $sort: { createdAt: -1 } }, // Always good to have a default sort
-    //   { $skip: skip },
-    //   { $limit: limit }
-    // );
-
-    // const docs = await RecruiterDAO.aggregate([
-    //   {
-    //     $match: {
-    //       $or: [
-    //         { fullName: { $regex: new RegExp(search, 'i') } },
-    //         { email: { $regex: new RegExp(search, 'i') } },
-    //       ],
-    //       profileStatus: 'approved',
-    //       recruiterType: { $in: employer_type_filter },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'users',
-    //       localField: 'userId',
-    //       foreignField: '_id',
-    //       as: 'userProfile',
-    //     },
-    //   },
-    //   { $unwind: '$userProfile' },
-    //   {
-    //     $lookup: {
-    //       from: 'companies',
-    //       localField: 'companyId',
-    //       foreignField: '_id',
-    //       as: 'companyDetails',
-    //     },
-    //   },
-    //   { $unwind: { path: '$companyDetails', preserveNullAndEmptyArrays: true } },
-    //   { $sort: { createdAt: -1 } },
-    //   { $limit: limit },
-    //   { $skip: skip },
-    // ]);
-    // const totalPages = Math.ceil((totalDocs[0]?.totalRecruiters ?? 0) / limit) || 0;
-    // console.log('--total pages--', totalPages);
-    // return { recruiters: docs, totalPages };
   }
-
-  // async findRecruiters(query: FindRecruitersDBQuery): Promise<Recruiter[] | null> {
-  //   const { search, sortOption, limit, page, employer_type_filter } = query;
-  //   const skip = (page - 1) * limit;
-  //   const searchQuery = search ? { companyName: { $regex: new RegExp(search, 'i') } } : {};
-  //   const filterQuery = { employerType: { $in: employer_type_filter } };
-  //   const currentSort = sortOption;
-  //   const pipeLine: any = [];
-
-  //   pipeLine.push({ $match: searchQuery });
-  //   pipeLine.push({ $match: filterQuery });
-  //   pipeLine.push({ $sort: sortOption });
-  //   pipeLine.push({ $skip: skip });
-  //   pipeLine.push({ $limit: limit });
-
-  //   const recruiters = await RecruiterDAO.aggregate(pipeLine);
-  //   return recruiters;
-  // }
-
-  // async findById(id: string): Promise<Recruiter | null> {
-  //   const result = RecruiterDAO.findOne({ _id: new ObjectId(id) });
-  //   return result;
-  // }
-
-  // async findByUserName(username: string): Promise<Recruiter | null> {
-  //   const result = await RecruiterDAO.findOne({ username: username });
-  //   return result;
-  // }
-
-  // async verifyRecruiter(email: string): Promise<Recruiter | null> {
-  //   const result = await RecruiterDAO.findOneAndUpdate(
-  //     { email: email },
-  //     { $set: { isVerified: true } },
-  //     { returnDocument: 'after' }
-  //   );
-  //   return result;
-  // }
-
-  // async updateIntroDetails(
-  //   id: string,
-  //   companyName: string,
-  //   about: string,
-  //   benefits: string,
-  //   companyType: string,
-  //   industryType: string,
-  //   teamStrength: string,
-  //   yearOfEstablishment: string,
-  //   website: string,
-  //   vision: string,
-  //   country: string,
-  //   state: string,
-  //   city: string,
-  //   mobile: string
-  // ): Promise<Recruiter | null> {
-  //   const result = await RecruiterDAO.findOneAndUpdate(
-  //     { _id: new ObjectId(id) },
-  //     {
-  //       $set: {
-  //         companyName: companyName,
-  //         about: about,
-  //         benefit: benefits,
-  //         companyType: companyType,
-  //         industry: industryType,
-  //         teamStrength: teamStrength,
-  //         foundIn: yearOfEstablishment,
-  //         website: website,
-  //         vision: vision,
-  //         'location.country': country,
-  //         'location.city': city,
-  //         'location.state': state,
-  //         phone: mobile,
-  //       },
-  //     },
-  //     { returnDocument: 'after' }
-  //   );
-
-  //   return result;
-  // }
-
-  // async blockRecruiter(id: string): Promise<boolean> {
-  //   const blockResult = await RecruiterDAO.updateOne(
-  //     { _id: new ObjectId(id) },
-  //     {
-  //       $set: {
-  //         isBlocked: true,
-  //         isSuspended: true,
-  //       },
-  //     }
-  //   );
-
-  //   return blockResult.acknowledged;
-  // }
-
-  // async unblockRecruiter(id: string): Promise<boolean> {
-  //   const unblockResult = await RecruiterDAO.updateOne(
-  //     { _id: new ObjectId(id) },
-  //     {
-  //       $set: {
-  //         isBlocked: false,
-  //         isSuspended: false,
-  //       },
-  //     }
-  //   );
-
-  //   return unblockResult.acknowledged;
-  // }
-
-  // async deleteRecruiter(id: string): Promise<boolean> {
-  //   const deleteResult = await RecruiterDAO.updateOne(
-  //     { _id: new ObjectId(id) },
-  //     {
-  //       $set: {
-  //         isDeleted: true,
-  //       },
-  //     }
-  //   );
-  //   return deleteResult.acknowledged;
-  // }
 
   async getRecruiterProfileOverview(
     recruiterId: string
@@ -332,14 +89,6 @@ export default class RecruiterRespository
         },
       },
       { $unwind: '$userProfile' },
-      // {
-      //   $lookup: {
-      //     from: 'jobs',
-      //     localField: 'recruiterId',
-      //     foreignField: 'userProfile._id',
-      //     as: 'jobs',
-      //   },
-      // },
       {
         $lookup: {
           from: 'jobs',
@@ -369,38 +118,7 @@ export default class RecruiterRespository
   ): Promise<{ applications: RecruiterProfileOverviewData[]; totalPages: number } | null> {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
-    // console.log('-- query inside the repo --', query);
-    // let matchFilter: any = {};
-    //manage search for username or email or organization name
 
-    // if (search) {
-    //   matchFilter = {
-    //     $or: [
-    //       { 'userProfile.name': { $regex: new RegExp(search, 'i') } },
-    //       { 'userProfile.email': { $regex: new RegExp(search, 'i') } },
-    //       { 'organizationDetails.organizationName': { $regex: new RegExp(search, 'i') } },
-    //     ],
-    //     profileStatus: { $in: profileStatus },
-    //   };
-    // } else {
-    //   matchFilter = {
-    //     profileStatus: { $in: profileStatus },
-    //   };
-    // }
-
-    // const piepeLine: any[] = [
-    //   {
-    //     $lookup: {
-    //       from: 'users',
-    //       localField: 'userId',
-    //       foreignField: '_id',
-    //       as: 'userProfile',
-    //     },
-    //   },
-    //   { $unwind: '$userProfile' },
-    //   { $match: matchFilter },
-    //   { $sort: { createdAt: -1 } },
-    // ];
     console.log('expected aggregation line revoked');
     console.log('-- page --', page);
     console.log('-- limit --', limit);
@@ -496,35 +214,21 @@ export default class RecruiterRespository
     return result;
   }
 
-  // //testing bulk aprove method
-  // async bulkbulckUpdate(): Promise<Recruiter[] | null> {
-  //   //find all docs with pending status
-  //   const allPendings = await RecruiterDAO.find({ profileStatus: 'pending' });
-
-  //   //update all pening to approve
-  //   const updateresult = await RecruiterDAO.updateMany(
-  //     { profileStatus: 'pending' },
-  //     { $set: { profileStatus: 'approved' } }
-  //   );
-
-  //   //update the previously stored docuemtns based on the modification acknowledgement
-  //   const locallyUpdated: Recruiter[] = [];
-  //   if (updateresult.modifiedCount === allPendings.length) {
-  //     allPendings.forEach((element) => {
-  //       element.profileStatus = 'approved';
-  //       locallyUpdated.push(element);
-  //     });
-  //   }
-
-  //   //return this locally updated data
-  //   return locallyUpdated;
-  // }
-
   async findRecruiterByUserId(userId: string): Promise<NewRecruiter | null> {
     if (!mongoose.isValidObjectId(userId)) return null;
 
     const result = await RecruiterDAO.findOne({ userId: new mongoose.Types.ObjectId(userId) });
     return result;
+  }
+
+  async getRecruiterCount(): Promise<{ count: number } | null> {
+    const result = await RecruiterDAO.find({
+      isVerified: true,
+      profileStatus: 'approved',
+      isRejected: false,
+    }).countDocuments();
+
+    return { count: result };
   }
 }
 

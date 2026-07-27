@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { BiCheckCircle, BiInfoCircle, BiRefresh, BiShareAlt, BiTrendingUp } from "react-icons/bi"
 import { BsArrowRight } from "react-icons/bs"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -16,41 +16,19 @@ type InterviewResultType = {
 export default function InterviewCompletePage(){
 
     const location = useLocation()
-    const result = location.state || {}
+    const result = useMemo(() => {
+        return location.state || {}
+    }, [location.state]) //created its own usememo to prevent change in every rerender
     const [resultData, setResultData] = useState<InterviewResultType | null>(null)
     const navigate = useNavigate()
 
     console.log('Checking result from the interview ', result)
     
-
-    // const [questionFeedback, setQuestionFeedback] = useState<{q: String, f: string, s: number}[]>([
-    //     {
-    //         q: 'Tell me about yourself',
-    //         f: 'Strong self awareness and presentation skills',
-    //         s: 80
-    //     },
-    //     {
-    //         q: 'Why did you leaved your previous job',
-    //         f: 'Lack of clarity and phillar words',
-    //         s: 60
-    //     },
-    //     {
-    //         q: 'Tell me about your strength and weekness',
-    //         f: 'Strong self awareness and presentation skills',
-    //         s: 90
-    //     },
-    //     {
-    //         q: 'How do you manage time?',
-    //         f: 'Lack of clarity and phillar words',
-    //         s: 60
-    //     }
-    // ])
-    
     useEffect(() => {
         if(result) {
             setResultData(result?.result)
         }
-    }, [])
+    }, [result]) //previously empty
 
     return(
         <>

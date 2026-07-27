@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { loadJobDetails } from "../../../services/commonServices"
@@ -13,14 +13,16 @@ export default function JobApplyPage() {
     
     const [resume, setResume] = useState<File | null>(null)
     const [myResumesList, setMyResumesList] = useState<Resumes[]>([])
-    const [resumeLoader, setResumeLoader] = useState(false)
+    // const [resumeLoader, setResumeLoader] = useState(false)
     const [savedResumeId, setSavedResumeId] = useState("")
     const [filename, setFilename] = useState('')
     const [resumeNillError, setResumeNillError] = useState('') 
+    console.log(resumeNillError)
     const [jobDetails, setJobDetails] = useState<JobDetailsForPublicData | null | undefined>()
     const [coverLetterContent, setCoverLetterContent] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [coverLetterContentNillError, setResumeCoverLetterContentNillError] = useState('')
+    console.log(coverLetterContentNillError)
     const resumeFieldRef = useRef<HTMLInputElement | null>(null)
 
     const params = useParams()
@@ -38,17 +40,22 @@ export default function JobApplyPage() {
     const jobId = params.id
 
     const location = useLocation()
-    const data = location.state?.jobDetails || {}
+    const data = useMemo(() => {
+      return location.state?.jobDetails || {}
+    }, [location.state?.jobDetails])
     const navigatTo = useNavigate()
     console.log('--checking what is coming from the backend--', location.state)
     console.log('job details through location obj', data)
 
     function clickResumeField(){
-        resumeFieldRef.current.click()
+        if(resumeFieldRef.current){
+          resumeFieldRef.current.click()
+        }
+        
     }
 
     function selectResume(event : React.ChangeEvent<HTMLInputElement>){
-        const file = event.target.files[0]
+        const file = event.target.files ? event?.target?.files[0] : null
         console.log('checking the file', file)
         if(file){
             setResume(file)
@@ -75,8 +82,19 @@ export default function JobApplyPage() {
         
         const coverletternillerror = !coverLetterContent || !/^[a-zA-Z0-9\s.,!?;:'"@#$%&*()\-_/+=\r\n]{50,2000}$/.test(coverLetterContent) || false
 
-        resumenillerror ? setResumeNillError('Please select file first') : setResumeNillError('')
-        coverletternillerror ? setResumeCoverLetterContentNillError('Write your cover letter') : setResumeCoverLetterContentNillError('')
+        if(resumenillerror){
+          setResumeNillError('Please select file first')
+        }else {
+          setResumeNillError('')
+        }
+
+        if(coverletternillerror){
+          setResumeCoverLetterContentNillError('Write your cover letter')
+        }else{
+          setResumeCoverLetterContentNillError('')
+        }
+        // resumenillerror ? setResumeNillError('Please select file first') : setResumeNillError('')
+        // coverletternillerror ? setResumeCoverLetterContentNillError('Write your cover letter') : setResumeCoverLetterContentNillError('')
 
         if(resumenillerror || coverletternillerror) return false
 
@@ -127,7 +145,7 @@ export default function JobApplyPage() {
             }
             // toast.info('Testing done')
 
-            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id, coverLetterContent, savedResumeId || resumeResult?.result?._id);
+            const applicationResult = await candidateApplyJob(jobId || jobDetails?._id as string, coverLetterContent, savedResumeId || resumeResult?.result?._id);
 
             if (!applicationResult?.success) {
                 throw new Error(applicationResult?.message || 'Failed to submit application.');
@@ -173,7 +191,7 @@ export default function JobApplyPage() {
 
         async function fetchMyExistingResumes(){
             try {
-                setResumeLoader(true)
+                // setResumeLoader(true)
                 const resumeResult = await loadUserResumes()
                 console.log('--checking my resume list from backend--', resumeResult)
                 Notify.success('Resume fetched succesfully')
@@ -181,7 +199,7 @@ export default function JobApplyPage() {
             } catch (error: unknown) {
                 Notify.failure(error instanceof Error ? error.message : 'Failed to load resumes')
             } finally {
-                setResumeLoader(false)
+                // setResumeLoader(false)
             }
         }
         fetchMyExistingResumes()
