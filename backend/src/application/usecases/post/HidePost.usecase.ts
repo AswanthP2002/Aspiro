@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { IHidePostUsecase } from '../../interfaces/usecases/user/IHidePost.usecase';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 
 @injectable()
 export default class HidePostUsecase implements IHidePostUsecase {

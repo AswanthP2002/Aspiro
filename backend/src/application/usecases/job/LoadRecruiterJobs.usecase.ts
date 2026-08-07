@@ -6,7 +6,7 @@ import { JobsQuery } from '../../queries/job/jobs.query';
 import PaginatedJobsDTO from '../../DTOs/job/paginattedJobsDTO.dto';
 import LoadRecruiterJobsDTO from '../../DTOs/job/loadRecruiterJobs.dto';
 import JobMapper from '../../mappers/job/Job.mapperClass';
-import { MyJobDTO } from '../../DTOs/job/loadJob.dto.FIX';
+import { MyJobDTO } from '../../DTOs/job/loadJob.dto';
 
 @injectable()
 export class LoadRecruiterJobsUsecase implements ILoadRecruiterJobsUsecase {

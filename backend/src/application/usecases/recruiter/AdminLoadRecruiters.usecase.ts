@@ -4,7 +4,7 @@ import RecruiterPaginatedDTO from '../../DTOs/recruiter/recruiterPaginated.dto';
 import IAdminLoadRecruitersUsecase from '../../interfaces/usecases/recruiter/IAdminLoadRecruiters.usecase';
 import LoadRecruitersDTO from '../../DTOs/company/loadCompanies.dto';
 import FindRecruitersDBQuery from '../../queries/recruiter/recruiter.query';
-import { AdminRecruiterListDTO } from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
+import { AdminRecruiterListDTO } from '../../DTOs/recruiter/recruiterProfileOverviewData.dto';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
 

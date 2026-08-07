@@ -8,7 +8,7 @@ import JobApplicationAggregated from '../../../domain/entities/jobApplication/jo
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
   JobApplicationTrackingDTO,
-} from '../../DTOs/jobApplication/jobApplication.dto.FIX';
+} from '../../DTOs/jobApplication/jobApplication.dto';
 import JobApplicationsListForRecruiterDTO, {
   SingleApplicationDetailsForRecruiterDTO,
 } from '../../DTOs/jobApplication/JobApplicationsListForRecruiter.dto';

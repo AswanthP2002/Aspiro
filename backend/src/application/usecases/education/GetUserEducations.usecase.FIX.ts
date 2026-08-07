@@ -1,6 +1,6 @@
 import Education from '../../../domain/entities/education/educations.entity';
 import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
-import { EducationDTO } from '../../DTOs/education/education.dto.FIX';
+import { EducationDTO } from '../../DTOs/education/education.dto';
 import IGetUserEducationsUsecase from '../../interfaces/usecases/education/IGetUserEducations.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import EducationMapper from '../../mappers/education/Education.mapperClass';

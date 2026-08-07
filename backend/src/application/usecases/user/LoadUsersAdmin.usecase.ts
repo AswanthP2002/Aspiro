@@ -1,10 +1,10 @@
 import { inject, injectable } from 'tsyringe';
-import { PaginatedUsersDTO } from '../../DTOs/user/loadUsersAdminside.dto.FIX';
+import { PaginatedUsersDTO } from '../../DTOs/user/loadUsersAdminside.dto';
 import { FindUsersQuery } from '../../queries/user/users.query';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import LoadUsersQueryDTO from '../../DTOs/user/loadUsersAdminside.dto.FIX';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
-import User from '../../../domain/entities/user/User.FIX';
+import LoadUsersQueryDTO from '../../DTOs/user/loadUsersAdminside.dto';
+import UserDTO from '../../DTOs/user/user.dto';
+import User from '../../../domain/entities/user/User';
 import ILoadUsersAdminUseCase from '../../interfaces/usecases/user/ILoadUsersAdmin.usecase.FIX';
 import UserMapper from '../../mappers/user/User.mapperClass';
 

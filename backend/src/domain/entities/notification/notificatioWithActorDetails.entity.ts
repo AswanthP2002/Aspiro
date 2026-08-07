@@ -1,4 +1,4 @@
-import User from '../user/User.FIX';
+import User from '../user/User';
 
 export default interface NotificationWithActorDetails {
   _id?: string;

@@ -1,5 +1,5 @@
 import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
-import { CreateSkillDTO, SkillDTO } from '../../DTOs/skill/skill.dto.FIX';
+import { CreateSkillDTO, SkillDTO } from '../../DTOs/skill/skill.dto';
 import { inject, injectable } from 'tsyringe';
 import IAddUsersSkillUsecase from '../../interfaces/usecases/skill.user/IAddUsersSkill.usecase.FIX';
 import { SkillsMapper } from '../../mappers/skill.user/Skill.mapperClass';

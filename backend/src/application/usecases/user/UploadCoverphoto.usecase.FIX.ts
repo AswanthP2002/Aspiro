@@ -1,6 +1,6 @@
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import imgUploadToCloudinary from '../../../services/uploadToCloudinary';
-import { UploadCoverPhotoDTO } from '../../DTOs/user/uploadCoverPhoto.dto.FIX';
+import { UploadCoverPhotoDTO } from '../../DTOs/user/uploadCoverPhoto.dto';
 import { inject, injectable } from 'tsyringe';
 import IUploadUserCoverPhotoUsecase from '../../interfaces/usecases/user/IUploadUserCoverPhoto.usecase.FIX';
 import UserMapper from '../../mappers/user/User.mapperClass';

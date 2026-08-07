@@ -41,7 +41,6 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<unknown> => {
     const customeRequest = request as AxiosRequest
-
     if(customeRequest?.sendCookie){
         customeRequest.withCredentials = true
     }

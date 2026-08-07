@@ -1,8 +1,8 @@
 import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
-import AddJobFavoriteDTO from '../../DTOs/user/addJobFavorite.dto.FIX';
-import FavoriteJobDTO from '../../DTOs/user/favoriteJob.dto.FIX';
+import AddJobFavoriteDTO from '../../DTOs/user/addJobFavorite.dto';
+import FavoriteJobDTO from '../../DTOs/user/favoriteJob.dto';
 import { inject, injectable } from 'tsyringe';
-import ISaveJobUsecase from '../../interfaces/usecases/savedJobs/ISaveJob.usecase.FIX';
+import ISaveJobUsecase from '../../interfaces/usecases/savedJobs/ISaveJob.usecase';
 import { plainToInstance } from 'class-transformer';
 
 @injectable()

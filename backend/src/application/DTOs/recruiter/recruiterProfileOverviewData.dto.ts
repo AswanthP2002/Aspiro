@@ -1,5 +1,5 @@
 import Job from '../../../domain/entities/job/job.entity';
-import User from '../../../domain/entities/user/User.FIX';
+import User from '../../../domain/entities/user/User';
 import CompanyDTO from '../company/company.dto';
 
 export default interface RecruiterProfilelOverviewDataDTO {

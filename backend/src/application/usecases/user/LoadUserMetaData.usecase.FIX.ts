@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import ILoadUserMetaDataUsecase from '../../interfaces/usecases/user/ILoadUserMetaData.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto.FIX';
+import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()

@@ -1,9 +1,11 @@
 import { AxiosError, HttpStatusCode } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { FollowEndpoints } from "../constants/endPoints/follow.endpoints"
+import { toast } from "react-toastify"
 
 export const getFollowers = async (userId: string, search: string, page: number, limit: number) => {
     try {
+        toast.info('Going to call axios instance')
         const response = await axiosInstance.get(FollowEndpoints.GET_FOLLOWERS(userId), 
             {
                 params:{search, page, limit},

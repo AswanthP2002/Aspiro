@@ -8,6 +8,7 @@ import ResponseHandler from '../../utilities/response.handler';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IAdminLoadAllCompaniesDataUsecase from '../../application/interfaces/usecases/company/IAdminLoadCompanies.usecase';
 import IAdminEditCompanyUsecase from '../../application/interfaces/usecases/company/IAdminEditCompany.usecase';
+import IDeactiveACompanyUsecase from '../../application/interfaces/usecases/company/IDeactiveACompany.usecase';
 
 @injectable()
 export default class CompanyController {
@@ -18,7 +19,8 @@ export default class CompanyController {
     @inject('IGetcompaniesBySuggesion') private _getCompaniesList: IGetcompaniesBySuggesionUsecase,
     @inject('IAdminLoadAllCompaniesDataUsecase')
     private _adminLoadAllCompaniesData: IAdminLoadAllCompaniesDataUsecase,
-    @inject('IAdminEditCompanyUsecase') private _adminEditCompany: IAdminEditCompanyUsecase
+    @inject('IAdminEditCompanyUsecase') private _adminEditCompany: IAdminEditCompanyUsecase,
+    @inject('IDeactivateCompanyUsecase') private _deactivateCompany: IDeactiveACompanyUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -102,6 +104,17 @@ export default class CompanyController {
         result
       );
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async deactivateCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const companyId = req.params.companyId;
+
+    try {
+      const result = await this._deactivateCompany.execute(companyId);
+      this._responseHandler.success(res, 'Comany deactivated', StatusCodes.OK, result);
+    } catch (error: unknown) {
       next(error);
     }
   }

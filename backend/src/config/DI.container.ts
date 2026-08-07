@@ -158,18 +158,18 @@ import IApproveRecruiterApplicationUsecase from '../application/interfaces/useca
 import ApproveRecruiterApplicationUsecase from '../application/usecases/recruiter/ApproveRecruiterApplication.usecase.FIX';
 import IGetJobDetailsUseCase from '../application/usecases/interfaces/IGetJobDetails.usecase.FIX';
 import GetJobDetailsUseCase from '../application/usecases/job/GetJobDetails.usecase.FIX';
-import ISaveJobUsecase from '../application/interfaces/usecases/savedJobs/ISaveJob.usecase.FIX';
-import SaveJobUsecase from '../application/usecases/savedJob/SaveJob.usecase.FIX';
-import ICheckIsJobSavedUseCase from '../application/interfaces/usecases/savedJobs/ICheckIsJobSaved.usecase.FIX';
-import CheckIsJobSavedUseCase from '../application/usecases/savedJob/CheckIsJobSaved.usecase.FIX';
-import IUnsaveJobUseCase from '../application/interfaces/usecases/savedJobs/IUnsaveJob.usecase.FIX';
-import UnsaveJobUseCase from '../application/usecases/savedJob/UnsaveJob.usecase.FIX';
-import IGetSavedJobsUsecase from '../application/interfaces/usecases/savedJobs/IGetSavedJobs.usecase.FIX';
-import GetSavedJobsUsecase from '../application/usecases/savedJob/GetSavedJobs.usecase.FIX';
+import ISaveJobUsecase from '../application/interfaces/usecases/savedJobs/ISaveJob.usecase';
+import SaveJobUsecase from '../application/usecases/savedJob/SaveJob.usecase';
+import ICheckIsJobSavedUseCase from '../application/interfaces/usecases/savedJobs/ICheckIsJobSaved.usecase';
+import CheckIsJobSavedUseCase from '../application/usecases/savedJob/CheckIsJobSaved.usecase';
+import IUnsaveJobUseCase from '../application/interfaces/usecases/savedJobs/IUnsaveJob.usecase';
+import UnsaveJobUseCase from '../application/usecases/savedJob/UnsaveJob.usecase';
+import IGetSavedJobsUsecase from '../application/interfaces/usecases/savedJobs/IGetSavedJobs.usecase';
+import GetSavedJobsUsecase from '../application/usecases/savedJob/GetSavedJobs.usecase';
 import IJobApplicationRepo from '../domain/interfaces/IJobApplicationRepo';
 import JObApplicationRepository from '../infrastructure/repositories/JobApplicationRepository';
 import IApplyJobUsecase from '../application/interfaces/usecases/jobApplication/IApplyJob.usecase.FIX';
-import ApplyJobUsecase from '../application/usecases/jobApplication/ApplyJob.usecase.FIX';
+import ApplyJobUsecase from '../application/usecases/jobApplication/ApplyJob.usecase';
 import IResumeRepo from '../domain/interfaces/user/IResumeRepo';
 import ResumeRepository from '../infrastructure/repositories/user/resumeRepository';
 import IAddResumeUseCase from '../application/interfaces/usecases/resume/IAddResume.usecase.FIX';
@@ -512,6 +512,8 @@ import IPaymentServices, {
 import StripePaymentGateway from '../infrastructure/services/Stripe.payment.service';
 import IUserLoadHomePageDatasUsecase from '../application/interfaces/usecases/user/IUserLoadHomePageData';
 import UserLoadHomePageDataUsecase from '../application/usecases/user/UserLoadHomePageData.usecase';
+import IDeactiveACompanyUsecase from '../application/interfaces/usecases/company/IDeactiveACompany.usecase';
+import DeactiveACompanyUsecase from '../application/usecases/company/DeactiveACompany.usecase';
 
 //register repo
 container.registerSingleton<IUserRepository>('IUserRepository', UserRepository);
@@ -725,6 +727,10 @@ container.registerSingleton<IToggleSavePostUsecase>(
 container.registerSingleton<IGetCompanyListUsecase>(
   'IGetCompanyListUsecase',
   GetCompanyListUsecase
+);
+container.registerSingleton<IDeactiveACompanyUsecase>(
+  'IDeactivateCompanyUsecase',
+  DeactiveACompanyUsecase
 );
 container.registerSingleton<IGetcompaniesBySuggesionUsecase>(
   'IGetcompaniesBySuggesion',

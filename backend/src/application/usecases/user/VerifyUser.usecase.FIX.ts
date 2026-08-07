@@ -1,11 +1,11 @@
 import IVerifyUserUseCase from '../../interfaces/usecases/user/IVerifyUser.usecase.FIX';
-import VerifyUserDTO from '../../DTOs/user/verifyUser.dto.FIX';
+import VerifyUserDTO from '../../DTOs/user/verifyUser.dto';
 import {
   InvalidUserError,
   OtpExpiredError,
   WrongCredentialsError,
 } from '../../../domain/errors/AppError';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { inject, injectable } from 'tsyringe';
 import UserMapper from '../../mappers/user/User.mapperClass';

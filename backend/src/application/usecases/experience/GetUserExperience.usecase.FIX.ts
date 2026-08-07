@@ -1,6 +1,6 @@
 import Experience from '../../../domain/entities/experience/experience.entity';
 import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
-import { ExperienceDTO } from '../../DTOs/experience/experience.dto.FIX';
+import { ExperienceDTO } from '../../DTOs/experience/experience.dto';
 import IGetUserExperiencesUsecase from '../../interfaces/usecases/experience/IGetUserExperiences.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import { ExperienceMapper } from '../../mappers/experience/Experience.mapperClass';

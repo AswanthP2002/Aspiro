@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IApproveRecruiterApplicationUsecase from '../../interfaces/usecases/recruiter/IApproveRecruiterApplication.usecase.FIXED';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import IEmailService from '../../interfaces/services/IEmailService';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 

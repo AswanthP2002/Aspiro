@@ -10,6 +10,7 @@ const CompanySchema = new Schema<Company>(
     industry: { type: String },
     location: { type: String },
     slogan: { type: String },
+    isDeactivated: { type: Boolean },
     logo: {
       cloudinaryPublicId: { type: String },
       cloudinarySecureUrl: { type: String },

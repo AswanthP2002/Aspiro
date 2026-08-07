@@ -1,5 +1,5 @@
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import CreateRecruiterDTO, { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import CreateRecruiterDTO, { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import { injectable, inject } from 'tsyringe';
 import ICreateRecruiterUsecase from '../../interfaces/usecases/recruiter/ICreateRecruiter.usecase.FIX';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';

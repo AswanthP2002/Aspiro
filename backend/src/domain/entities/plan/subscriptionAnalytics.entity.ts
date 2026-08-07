@@ -1,5 +1,5 @@
 import SocialLinks from '../user/SocialLinks';
-import { Role, AccountAction } from '../user/User.FIX';
+import { Role, AccountAction } from '../user/User';
 import { Plan } from './plan.entity';
 
 export default interface SubscriptionAnalytics {

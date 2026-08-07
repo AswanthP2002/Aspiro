@@ -3,7 +3,7 @@ import {
   CreateEducationDTO,
   EducationDTO,
   UpdateEducationDTO,
-} from '../../DTOs/education/education.dto.FIX';
+} from '../../DTOs/education/education.dto';
 
 export default class EducationMapper {
   public createEducationDtoToEducation(dto: CreateEducationDTO): Education {

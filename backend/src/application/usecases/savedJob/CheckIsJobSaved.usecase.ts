@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import FavoriteJobs from '../../../domain/entities/savedJob/favoriteJobs.entity';
 import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
-import ICheckIsJobSavedUseCase from '../../interfaces/usecases/savedJobs/ICheckIsJobSaved.usecase.FIX';
+import ICheckIsJobSavedUseCase from '../../interfaces/usecases/savedJobs/ICheckIsJobSaved.usecase';
 
 @injectable()
 export default class CheckIsJobSavedUseCase implements ICheckIsJobSavedUseCase {

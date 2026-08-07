@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
 import { upload } from '../../utilities/multer';
 import Validator from '../../validation/validator.zod';
-import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto.FIX';
+import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.dto';
 import { loginSchema } from '../schemas/user/userLoginRequest.zod.schema';
 import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';

@@ -39,10 +39,8 @@ export default function ExperiencePage(){
         educationEdit: false,
     });
  
-    const toggleModal = useCallback(() => {
-        return (modal: keyof typeof modals, isOpen: boolean) => {
+    const toggleModal = useCallback((modal: keyof typeof modals, isOpen: boolean) => {
         setModals(prev => ({ ...prev, [modal]: isOpen }));
-    };
     }, [])
 
     const onAddSkill = useCallback((skill: Skills) => {
@@ -77,12 +75,12 @@ export default function ExperiencePage(){
 
     function selecteEditableExperience(expIndex : number){
         setSelectedExperience(experiences[expIndex])
-        toggleModal('experienceEdit', true);
+        toggleModal("experienceEdit", true);
     }
 
     function selecteEditableEducation(eduIndex : number) {
         setSelecteEducation(education[eduIndex])
-        toggleModal('educationEdit', true);
+        toggleModal("educationEdit", true);
     }
 
     const deleteExperience = useCallback(async (expId?: string) => {
@@ -186,7 +184,7 @@ export default function ExperiencePage(){
 
     const onAddExperience = useCallback((experience: Experience) => {
         setexperiences(prv => [...prv, {...experience}]);
-        toggleModal('experienceAdd', false);
+        toggleModal("experienceAdd", false);
     }, [toggleModal]); //previosly emtpy
 
     const onEditExperience = useCallback((updatedExperience: Experience) => {
@@ -242,7 +240,7 @@ export default function ExperiencePage(){
             <section className="">
                 <div className="w-full flex justify-between items-center">
                     <p className="font-light">Experiences</p>
-                    <button onClick={() => toggleModal('experienceAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
+                    <button onClick={() => toggleModal("experienceAdd", true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
                         <FaPlus />
                         Add experience
                     </button>
@@ -353,7 +351,7 @@ export default function ExperiencePage(){
             <section className="">
                 <div className="w-full flex justify-between items-center">
                     <p className="font-light">Educations</p>
-                    <button onClick={() => toggleModal('educationAdd', true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
+                    <button onClick={() => toggleModal("educationAdd", true)} className="text-white bg-black text-xs flex items-center gap-2 py-2 rounded-md px-2">
                         <FaPlus />
                         Add Education
                     </button>
@@ -458,7 +456,7 @@ export default function ExperiencePage(){
             <p className="font-bold text-gray-900 uppercase tracking-wider">Skills</p>
         </div>
         <button 
-            onClick={() => toggleModal('skillsAdd', true)} 
+            onClick={() => toggleModal("skillsAdd", true)} 
             className="text-white bg-blue-600 hover:bg-blue-700 text-[11px] font-bold flex items-center gap-2 py-1.5 px-3 rounded-lg transition-all active:scale-95 shadow-sm"
         >
             <FaPlus size={10} />
@@ -534,17 +532,17 @@ export default function ExperiencePage(){
             
         </div>
 
-        <AddExperienceForm onAddExperience={onAddExperience} experiencemodalopen={modals.experienceAdd} closeModal={() => toggleModal('experienceAdd', false)} />
+        <AddExperienceForm onAddExperience={onAddExperience} experiencemodalopen={modals.experienceAdd} closeModal={() => toggleModal("experienceAdd", false)} />
         {
-            modals.experienceEdit && selectedExperience && (<EditExperienceForm onEditExperience={onEditExperience} experience={selectedExperience} editExperienceModalOpen={modals.experienceEdit} closeExpEditModal={() => toggleModal('experienceEdit', false)} />)
+            modals.experienceEdit && selectedExperience && (<EditExperienceForm onEditExperience={onEditExperience} experience={selectedExperience} editExperienceModalOpen={modals.experienceEdit} closeExpEditModal={() => toggleModal()} />)
         }
         
-        <AddEducationForm onAddEducation={onAddEducation} educationModalOpen={modals.educationAdd} closeEducationModal={() => toggleModal('educationAdd', false)} />
+        <AddEducationForm onAddEducation={onAddEducation} educationModalOpen={modals.educationAdd} closeEducationModal={() => toggleModal("educationAdd", false)} />
         {
-            modals.educationEdit && selectedEducation && (<EditEducationForm selectedEducation={selectedEducation} onEditEducation={onEditEducation} editEducationModalOpen={modals.educationEdit} closeEditEducationModal={() => toggleModal('educationEdit', false)} />)
+            modals.educationEdit && selectedEducation && (<EditEducationForm selectedEducation={selectedEducation} onEditEducation={onEditEducation} editEducationModalOpen={modals.educationEdit} closeEditEducationModal={() => toggleModal()} />)
         }
         
-        <AddSkillsForm onRemoveSkill={onRemoveSkill} onAddSkill={onAddSkill} skillsModalOpen={modals.skillsAdd} closeSkillsModal={() => toggleModal('skillsAdd', false)} />
+        <AddSkillsForm onRemoveSkill={onRemoveSkill} onAddSkill={onAddSkill} skillsModalOpen={modals.skillsAdd} closeSkillsModal={() => toggleModal("skillsAdd", false)} />
         </>
     )
 }

@@ -4,13 +4,13 @@ import RecruiterJobDetailsDTO from '../../../domain/entities/job/recruiterJobDet
 import JobAggregated from '../../../domain/entities/job/jobAggregated.entity';
 import Job from '../../../domain/entities/job/job.entity';
 import JobAggregatedData from '../../../domain/entities/job/jobAggregatedData.entity';
-import { AdminJobDetailsDTO } from '../../DTOs/job/jobDetails.dto.FIX';
+import { AdminJobDetailsDTO } from '../../DTOs/job/jobDetails.dto';
 import {
   AdminJobsListDTO,
   JobListForPublicDTO,
   LoadJobDetailsDTOForPublic,
   MyJobDTO,
-} from '../../DTOs/job/loadJob.dto.FIX';
+} from '../../DTOs/job/loadJob.dto';
 import { JobDTO } from '../../DTOs/job/createJob.dto';
 import { JobAggregatedDTO } from '../../DTOs/job/jobAggregated.dto';
 import RecommendedJobDTO from '../../DTOs/job/recommendedJob.dto';

@@ -5,5 +5,6 @@ export const CompanyAPIRoutes = {
     COMPANY_SUGGESTION_LIST: '/v1/companies/list',
     ADMIN_LOAD_COMPANIES_DATA: '/v1/admin/companies/data',
     ADMIN_EDIT_COMPANY: '/v1/admin/company/:id',
+    ADMIN_DEACTIVATE_COMPANY: '/v1/admin/company/:companyId/deactivate',
   },
 } as const;

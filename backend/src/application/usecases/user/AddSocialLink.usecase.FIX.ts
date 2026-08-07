@@ -1,9 +1,9 @@
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
-import AddSocialLinkDTO from '../../DTOs/user/socialLink.dto.FIX';
+import AddSocialLinkDTO from '../../DTOs/user/socialLink.dto';
 import IAddSocialLinkUsecase from '../../interfaces/usecases/user/IAddSocialLink.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()

@@ -1,7 +1,7 @@
 import Company from '../company/company.entity';
 import { JobStatus, SalaryPeriod } from './job.entity';
 import { NewRecruiter } from '../recruiter/recruiter.entity';
-import User from '../user/User.FIX';
+import User from '../user/User';
 
 export default interface JobListAggregatedForPublic {
   _id?: string;

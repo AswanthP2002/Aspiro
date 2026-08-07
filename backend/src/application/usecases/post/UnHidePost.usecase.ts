@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 import { IUnHidePostUsecase } from '../../interfaces/usecases/user/IUnHidePost.usecase';
 
 @injectable()

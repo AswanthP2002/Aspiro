@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import IEditProfileUseCase from '../../interfaces/usecases/user/IEditProfile.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import { UpdataeUserDto } from '../../DTOs/user/updateUser.dto.FIX';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import { UpdataeUserDto } from '../../DTOs/user/updateUser.dto';
+import UserDTO from '../../DTOs/user/user.dto';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()

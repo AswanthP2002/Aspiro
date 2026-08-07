@@ -1,4 +1,4 @@
-import { MyProfileDTO } from '../../DTOs/user/user.dto.FIX';
+import { MyProfileDTO } from '../../DTOs/user/user.dto';
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import UserMapper from '../../mappers/user/User.mapperClass';

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import '../backend/src/config/DI.container';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
 import session from 'express-session';
@@ -17,11 +17,10 @@ import exceptionhandle from './src/middlewares/exception';
 import CreateOAuthRouter from './src/presentation/routes/oAuthRouter';
 import CreateJobRouter from './src/presentation/routes/jobRouter';
 import createUserRouter from './src/presentation/routes/user.router';
-//import connectRedis from './src/infrastructure/redis/redisClient';
 import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
-import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
+// import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
 import createCompanyRouter from './src/presentation/routes/companyRouter';
 import CreateExperienceRouter from './src/presentation/routes/experienceRouter';
 import CreateEducationRouter from './src/presentation/routes/educationRouter';
@@ -37,7 +36,6 @@ import CreatePlanRouter from './src/presentation/routes/planRouter';
 import PlanController from './src/presentation/controllers/planController';
 import { container } from 'tsyringe';
 // import CronSubscriptionReset from './src/infrastructure/cron-schedule/subscription/subscription.monthly.reset'; crone for reseting valus
-// import { initalizeSocket } from './src/infrastructure/socketio/chatSocket';
 
 async function main() {
   const app = express();
@@ -77,8 +75,9 @@ async function main() {
   await connectToDb();
   // const cronMonthlyResetTest = container.resolve(CronSubscriptionReset);
   // cronMonthlyResetTest.resetSubscriptionLimit();
+
   //connect redis
-  await connectRedis();
+  // await connectRedis();
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);
@@ -106,15 +105,11 @@ async function main() {
   const planRouter = CreatePlanRouter();
 
   const port = process.env.PORT || 5000;
-  // app.use('/', (req: Request, res: Response, next: NextFunction) => {
-  //   logger.info(`${req.method} ${req.url} - User:${req.user ? req.user : 'Guest'}`);
-  //   next();
-  // });
+  app.use('/', (req: Request, res: Response, next: NextFunction) => {
+    logger.info(`${req.method} ${req.url} - User:${req.user ? req.user : 'Guest'}`);
+    next();
+  });
 
-  //to automatically log all apis
-  //app.use(pinoHttp({ logger }));
-
-  // Group all API routes under the /api prefix for better organization
   app.use('/api', userRouter);
   // app.use('/api', authRouter); // Consider moving login/verify routes here
   app.use('/api', recruiterRouter);

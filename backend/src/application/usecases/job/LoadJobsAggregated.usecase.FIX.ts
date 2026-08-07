@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import ILoadJobsAggregatedUsecase from '../../interfaces/usecases/job/IloadJobsAggregated.usecase.FIX';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
-import { JobListForPublicDTO, LoadJobListForPublicDTO } from '../../DTOs/job/loadJob.dto.FIX';
+import { JobListForPublicDTO, LoadJobListForPublicDTO } from '../../DTOs/job/loadJob.dto';
 import JobMapper from '../../mappers/job/Job.mapperClass';
 import IJobLevelRepository from '../../../domain/interfaces/admin/IJobLevel.repository';
 import IWorkModeRepository from '../../../domain/interfaces/admin/IWorkMode.repo';

@@ -3,7 +3,7 @@ import streamifier from 'streamifier';
 import cloudinary from '../../../utilities/cloudinary';
 import { v4 } from 'uuid';
 import IAddCertificateUseCase from '../../interfaces/usecases/certificate/IAddCertificate.usecase.FIX';
-import CertificateDTO, { CreateCertificateDTO } from '../../DTOs/certificate/certificate.dto.FIX';
+import CertificateDTO, { CreateCertificateDTO } from '../../DTOs/certificate/certificate.dto';
 import { UploadApiResponse } from 'cloudinary';
 import { inject, injectable } from 'tsyringe';
 import CertificateMapper from '../../mappers/certificate/Certificate.mapperClass';

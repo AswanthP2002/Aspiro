@@ -11,7 +11,7 @@ import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import comparePassword from '../../Services/comparePassword';
 import { UserLoginRequestDto, UserLoginResponseDto } from '../../DTOs/user/userLogin.dto';
 import { inject, injectable } from 'tsyringe';
-import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto.FIX';
+import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto';
 
 @injectable()
 export class UserLoginUseCase implements IUserLoginUseCase {

@@ -1,5 +1,5 @@
-import { Role } from '../../../domain/entities/user/User.FIX';
-import UserMetaDataDTO from './userMetaData.dto.FIX';
+import { Role } from '../../../domain/entities/user/User';
+import UserMetaDataDTO from './userMetaData.dto';
 
 export interface UserLoginRequestDto {
   email: string;

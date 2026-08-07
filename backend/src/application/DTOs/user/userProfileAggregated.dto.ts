@@ -8,7 +8,7 @@ import Education from '../../../domain/entities/education/educations.entity';
 import Experience from '../../../domain/entities/experience/experience.entity';
 import Post from '../../../domain/entities/post/Post';
 import Skills from '../../../domain/entities/skill.user/skills.entity';
-import { AccountAction, Role } from '../../../domain/entities/user/User.FIX';
+import { AccountAction, Role } from '../../../domain/entities/user/User';
 import ConnectionRequest from '../../../domain/entities/connection/connectionRequest.entity';
 
 @Exclude()

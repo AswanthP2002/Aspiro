@@ -1,7 +1,7 @@
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
-} from '../../DTOs/jobApplication/jobApplication.dto.FIX';
+} from '../../DTOs/jobApplication/jobApplication.dto';
 import IApplyJobUsecase from '../../interfaces/usecases/jobApplication/IApplyJob.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';

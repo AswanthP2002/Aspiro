@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import { UserPublicProfileDTO } from '../../DTOs/user/userProfileAggregated.dto.FIX';
+import { UserPublicProfileDTO } from '../../DTOs/user/userProfileAggregated.dto';
 import ILoadUserPublicProfileUsecase from '../../interfaces/usecases/user/ILoadUserAggregatedProfile.usecase.FIX';
 import UserMapper from '../../mappers/user/User.mapperClass';
 

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IResendOTPUseCase from '../../interfaces/usecases/user/IResendOTP.usecase.FIX';
-import { ResendOtpDto } from '../../DTOs/user/resendOtp.dto.FIX';
-import UserDTO, { UserDto } from '../../DTOs/user/user.dto.FIX';
+import { ResendOtpDto } from '../../DTOs/user/resendOtp.dto';
+import UserDTO, { UserDto } from '../../DTOs/user/user.dto';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import IEmailService from '../../interfaces/services/IEmailService';
 import { generateCode } from '../../../utilities/generateCode';

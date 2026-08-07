@@ -1,5 +1,5 @@
 import IEducationRepo from '../../../domain/interfaces/user/IEducationRepo';
-import { EducationDTO, UpdateEducationDTO } from '../../DTOs/education/education.dto.FIX';
+import { EducationDTO, UpdateEducationDTO } from '../../DTOs/education/education.dto';
 import { inject, injectable } from 'tsyringe';
 import IEditUserEducationUsecase from '../../interfaces/usecases/education/IEditUserEducation.usecase.FIX';
 import EducationMapper from '../../mappers/education/Education.mapperClass';

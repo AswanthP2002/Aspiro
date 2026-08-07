@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import IAdminLoadUserDetailsUsecase from '../../interfaces/usecases/user/IAdminLoadUsersDetails.usecase';
-import { AdminUserDetailsDTO } from '../../DTOs/user/userProfileAggregated.dto.FIX';
+import { AdminUserDetailsDTO } from '../../DTOs/user/userProfileAggregated.dto';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()

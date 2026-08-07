@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import User, { AccountAction, SubscriptionMetaData } from '../../../domain/entities/user/User.FIX';
+import User, { AccountAction, SubscriptionMetaData } from '../../../domain/entities/user/User';
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
 
 export const SocialLinksSchema = new Schema<SocialLinks>({

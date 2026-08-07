@@ -1,8 +1,8 @@
-import { AccountAction, Role } from '../../../domain/entities/user/User.FIX';
+import { AccountAction, Role } from '../../../domain/entities/user/User';
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import { Expose, Exclude } from 'class-transformer';
-import { JobApplicationDTO } from '../jobApplication/jobApplication.dto.FIX';
-import FavoriteJobDTO from './favoriteJob.dto.FIX';
+import { JobApplicationDTO } from '../jobApplication/jobApplication.dto';
+import FavoriteJobDTO from './favoriteJob.dto';
 
 @Exclude()
 export class UserDto {

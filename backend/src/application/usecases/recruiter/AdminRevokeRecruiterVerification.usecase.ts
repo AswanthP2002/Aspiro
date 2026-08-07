@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import IAdminRevokeRecruiterVerification from '../../interfaces/usecases/recruiter/IAdminRevokeRecruiterVerification.usecase';
 
 @injectable()

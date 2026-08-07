@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
-import { AdminJobDetailsDTO } from '../../DTOs/job/jobDetails.dto.FIX';
+import { AdminJobDetailsDTO } from '../../DTOs/job/jobDetails.dto';
 import JobMapper from '../../mappers/job/Job.mapperClass';
 import IAdminLoadJobDetailsUseCase from '../admin/interfaces/ILoadJobDetails.usecase';
 

@@ -2,7 +2,7 @@ import Experience from '../../../domain/entities/experience/experience.entity';
 import CreateExperienceDTO, {
   EditExperienceDTO,
   ExperienceDTO,
-} from '../../DTOs/experience/experience.dto.FIX';
+} from '../../DTOs/experience/experience.dto';
 
 export class ExperienceMapper {
   public dtoToExperience(dto: CreateExperienceDTO): Experience {

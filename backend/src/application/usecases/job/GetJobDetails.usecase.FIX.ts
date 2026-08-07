@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import IGetJobDetailsUseCase from '../interfaces/IGetJobDetails.usecase.FIX';
 import JobMapper from '../../mappers/job/Job.mapperClass';
-import { LoadJobDetailsDTOForPublic } from '../../DTOs/job/loadJob.dto.FIX';
+import { LoadJobDetailsDTOForPublic } from '../../DTOs/job/loadJob.dto';
 
 @injectable()
 export default class GetJobDetailsUseCase implements IGetJobDetailsUseCase {

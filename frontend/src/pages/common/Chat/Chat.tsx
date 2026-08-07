@@ -167,6 +167,7 @@ export default function ChatPage() {
               // console.log('-- checking new conversation innitialization result --', newConv)
               // console.log('-- inspecting chating person redirected data before seting it to chating person --', _id, name, email, profilePicture)
               setChatingPerson({_id: _id, name: name, email: email, profilePicture:{cloudinarySecureUrl: profilePicture}})
+              setConversations((prv) => [newConv.result, ...prv])
               setSelectedConversation(newConv.result)
             }
           }
@@ -177,7 +178,7 @@ export default function ChatPage() {
           toast.error(finalErrMessage)
         }
       }
-
+      
       fetchConversations()
     }, [search, page, _id, email, name, profilePicture, limit])
 
@@ -558,7 +559,7 @@ export default function ChatPage() {
                       <img className="w-full h-full object-cover" src={partner.profilePicture.cloudinarySecureUrl} alt="" />
                     ) : (
                       <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                        {partner?.name}
+                        {partner?.name[0]}
                       </div>
                     )}
                   </div>
@@ -576,9 +577,9 @@ export default function ChatPage() {
                     {conv?.lastMessage?.text || 'Start a conversation'}
                   </p>
                   }
-                  {/* <p>Checking {conv.unreadMessage}</p> */}
+                  {/* <p>Checking unread count {conv.unreadMessage} typeof {typeof conv.unreadMessage}</p> */}
                   <div className="flex gap-2 absolute right-0 bottom-0">
-                    {(conv.unreadMessage && conv.unreadMessage > 0) && (
+                    {(conv?.unreadMessage > 0) && (
                     <div className={`text-[.7rem] flex items-center justify-center font-semibold ${selectedConversation?._id === conv._id ? "bg-white text-blue-500" : "bg-blue-600 text-white"} rounded-full w-5 h-5`}>
                       {conv.unreadMessage}
                     </div>

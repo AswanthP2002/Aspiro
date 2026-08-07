@@ -1,4 +1,4 @@
-import { Role } from '../../../domain/entities/user/User.FIX';
+import { Role } from '../../../domain/entities/user/User';
 import SocialLinks from '../../../domain/entities/user/SocialLinks';
 import { IsDefined, IsOptional, IsString } from 'class-validator';
 

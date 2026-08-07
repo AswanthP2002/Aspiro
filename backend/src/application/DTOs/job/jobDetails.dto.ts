@@ -7,7 +7,7 @@ import {
   JobStatus,
 } from '../../../domain/entities/job/job.entity';
 import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
-import User from '../../../domain/entities/user/User.FIX';
+import User from '../../../domain/entities/user/User';
 
 @Exclude()
 export default class JobAggregatedDTO {

@@ -48,8 +48,7 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
 
   }, [loading])
 
-  const fetchFollowers = useCallback(() => {
-    return async function (){
+  const fetchFollowers = useCallback(async function (){
       setLoading(true)
       try {
         const result = await getFollowers(userId, search, page, 5)
@@ -68,7 +67,6 @@ export default function FollowersModal({isOpen, onClose, onFollowerRemoval, user
           setLoading(false)
         }, 2000);
       }
-  }
   }, [page, search, userId])
 
   const navigateToUserProfile = (userId: string) => {

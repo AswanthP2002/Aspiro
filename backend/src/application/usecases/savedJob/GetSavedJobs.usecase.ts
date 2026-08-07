@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
-import IGetSavedJobsUsecase from '../../interfaces/usecases/savedJobs/IGetSavedJobs.usecase.FIX';
+import IGetSavedJobsUsecase from '../../interfaces/usecases/savedJobs/IGetSavedJobs.usecase';
 import { LoadSavedJobsRequestDTO, MySavedJobsDTO } from '../../DTOs/job/loadSavedJobs.dto';
 import SavedJobsMapper from '../../mappers/job/SavedJob.mapperClass';
 

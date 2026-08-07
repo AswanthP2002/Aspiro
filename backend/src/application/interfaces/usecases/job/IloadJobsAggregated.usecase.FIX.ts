@@ -1,4 +1,4 @@
-import { JobListForPublicDTO, LoadJobListForPublicDTO } from '../../../DTOs/job/loadJob.dto.FIX';
+import { JobListForPublicDTO, LoadJobListForPublicDTO } from '../../../DTOs/job/loadJob.dto';
 
 export default interface ILoadJobsAggregatedUsecase {
   execute(

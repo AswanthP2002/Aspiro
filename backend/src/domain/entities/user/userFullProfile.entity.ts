@@ -3,7 +3,7 @@ import Education from '../education/educations.entity';
 import Experience from '../experience/experience.entity';
 import Skills from '../skill.user/skills.entity';
 import SocialLinks from './SocialLinks';
-import { Role, AccountAction } from './User.FIX';
+import { Role, AccountAction } from './User';
 
 export default interface UserFullProfileData {
   _id?: string;

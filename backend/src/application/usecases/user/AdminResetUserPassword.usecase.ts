@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IAdminResetUserPasswordUsecase from '../../interfaces/usecases/user/IAdminResetUserPassword.usecase';
 import UserMapper from '../../mappers/user/User.mapperClass';
-import { AdminUserDetailsDTO } from '../../DTOs/user/userProfileAggregated.dto.FIX';
+import { AdminUserDetailsDTO } from '../../DTOs/user/userProfileAggregated.dto';
 import { AdminUserPasswordResetDTO } from '../../DTOs/admin/adminUserPasswordRest.dto';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateToken, verifyToken } from '../../../services/jwt';

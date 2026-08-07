@@ -2,7 +2,7 @@ import Follow from '../../../domain/entities/follow/follow.entity';
 import ConnectionRequest from '../../../domain/entities/connection/connectionRequest.entity';
 import Experience from '../../../domain/entities/experience/experience.entity';
 import Skills from '../../../domain/entities/skill.user/skills.entity';
-import { Role } from '../../../domain/entities/user/User.FIX';
+import { Role } from '../../../domain/entities/user/User';
 
 export default interface UserOverviewForPublicDTO {
   _id?: string;

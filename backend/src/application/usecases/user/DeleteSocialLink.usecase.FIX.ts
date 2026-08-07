@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import { RemoveSocialLinkDTO } from '../../DTOs/user/socialLink.dto.FIX';
+import { RemoveSocialLinkDTO } from '../../DTOs/user/socialLink.dto';
 import IDeleteSocialLinkUseCase from '../../interfaces/usecases/user/IDeleteSocialLink.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 import UserMapper from '../../mappers/user/User.mapperClass';
 
 @injectable()

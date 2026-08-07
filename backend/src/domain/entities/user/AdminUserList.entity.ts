@@ -1,4 +1,4 @@
-import { Role } from './User.FIX';
+import { Role } from './User';
 
 export default interface AdminUserListDTO {
   _id?: string;

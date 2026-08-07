@@ -1,5 +1,5 @@
 import Comments from '../../../domain/entities/comment/comments.entity';
-import User from '../../../domain/entities/user/User.FIX';
+import User from '../../../domain/entities/user/User';
 
 export default interface PostsAggregatedDTO {
   _id: string;

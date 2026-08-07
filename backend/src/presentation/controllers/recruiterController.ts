@@ -12,7 +12,7 @@ import IDeleteJobUsecase from '../../application/interfaces/usecases/job/IDelete
 import IScheduleInterviewUsecase from '../../application/interfaces/usecases/interview/IScheduleInterview.usecase';
 import CreateInterviewDTO from '../../application/DTOs/interview/interview.dto';
 import IUpdateCandidateNotes from '../../application/interfaces/usecases/jobApplication/IUpdateCandidateNotes.usecase';
-import { JobApplicationDTO } from '../../application/DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../application/DTOs/jobApplication/jobApplication.dto';
 import IUpdateJobApplicationStatusUsecase from '../../application/interfaces/usecases/jobApplication/IUpdateJobApplicationStatus.usecase';
 import UpdateJobApplicationStatusDTO from '../../application/DTOs/jobApplication/UpdateJobApplicationStatus.dto';
 import ILoadRecruiterRecentJobs from '../../application/interfaces/usecases/job/ILoadRecruiterRecentJobs.usecase';

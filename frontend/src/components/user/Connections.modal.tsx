@@ -48,8 +48,7 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
 
   }, [loading])
   
-  const fetchConnections = useCallback(() => {
-    return async function (){ //middle
+  const fetchConnections = useCallback(async function (){ //middle
       setLoading(true)
       try {
         const result = await getConnections(userId, search, page, 5)
@@ -68,7 +67,6 @@ export default function ConnectionsModal({isOpen, onClose, onRemoveConnection, u
           setLoading(false)
         }, 2000);
       }
-  }
   }, [page, search, userId]) //moved to usecallback now
   // async function fetchConnections(){ //middle
   //     setLoading(true)

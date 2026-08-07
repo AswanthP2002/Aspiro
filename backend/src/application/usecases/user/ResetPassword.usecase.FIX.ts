@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import IResetPasswordUsecase from '../../interfaces/usecases/user/IResetPassword.usecase.FIX';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
-import { ResetPasswordDto } from '../../DTOs/user/resetPassword.dto.FIX';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import { ResetPasswordDto } from '../../DTOs/user/resetPassword.dto';
+import UserDTO from '../../DTOs/user/user.dto';
 import IDataHashService from '../../interfaces/services/IDataHashService';
 import { InvalidUserError } from '../../../domain/errors/AppError';
 import { verifyToken } from '../../../services/jwt';

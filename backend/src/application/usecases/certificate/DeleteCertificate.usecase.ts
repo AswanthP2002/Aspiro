@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IDeleteCertificateUsecase from '../../interfaces/usecases/certificate/IDeleteCertificate.usecase';
 import ICertificateRepo from '../../../domain/interfaces/user/ICertificateRepo';
-import { DeleteCertificateDTO } from '../../DTOs/certificate/certificate.dto.FIX';
+import { DeleteCertificateDTO } from '../../DTOs/certificate/certificate.dto';
 import deleteAssetsCloudinary from '../../../services/deleteAssetsCloudinary';
 
 @injectable()

@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IUpdateJobApplicationStatusUsecase from '../../interfaces/usecases/jobApplication/IUpdateJobApplicationStatus.usecase';
-import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto';
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
 import IEmailService from '../../interfaces/services/IEmailService';
 import generatedAutomatedEmailContent from '../../Services/automatedEmail.templates';

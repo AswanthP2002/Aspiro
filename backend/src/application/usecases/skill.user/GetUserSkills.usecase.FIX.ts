@@ -1,6 +1,6 @@
 import Skills from '../../../domain/entities/skill.user/skills.entity';
 import ISkillRepo from '../../../domain/interfaces/user/ISkillRepo';
-import { SkillDTO } from '../../DTOs/skill/skill.dto.FIX';
+import { SkillDTO } from '../../DTOs/skill/skill.dto';
 import IGetUserSkillsUsecase from '../../interfaces/usecases/skill.user/IGetUserSkills.usecase.FIX';
 import { inject, injectable } from 'tsyringe';
 import { SkillsMapper } from '../../mappers/skill.user/Skill.mapperClass';

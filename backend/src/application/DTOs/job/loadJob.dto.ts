@@ -1,6 +1,6 @@
 import { JobStatus, SalaryPeriod } from '../../../domain/entities/job/job.entity';
 import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
-import User from '../../../domain/entities/user/User.FIX';
+import User from '../../../domain/entities/user/User';
 import { JobAggregatedDTO } from './jobAggregated.dto';
 
 export interface LoadJobListForPublicDTO {

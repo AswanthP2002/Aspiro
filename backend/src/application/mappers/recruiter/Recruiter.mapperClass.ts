@@ -1,12 +1,12 @@
 import { NewRecruiter } from '../../../domain/entities/recruiter/recruiter.entity';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
-import CreateRecruiterDTO, { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import CreateRecruiterDTO, { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import RecruiterProfilelOverviewDataDTO, {
   AdminRecruiterApplicationDetailsDTO,
   AdminRecruiterApplicationsDTO,
   AdminRecruiterDetailsDTO,
   AdminRecruiterListDTO,
-} from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
+} from '../../DTOs/recruiter/recruiterProfileOverviewData.dto';
 
 export default class RecruiterMapper {
   public createRecruiterDtoToRecruiter(dto: CreateRecruiterDTO): NewRecruiter {

@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IAdminPermanentBanUserUsecase from '../../interfaces/usecases/user/IAdminPermanentBanUser.usecase';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import UserMapper from '../../mappers/user/User.mapperClass';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import UserDTO from '../../DTOs/user/user.dto';
 
 @injectable()
 export default class AdminPermanentBanUserUsecase implements IAdminPermanentBanUserUsecase {

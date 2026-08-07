@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IFavoriteJobsRepo from '../../../domain/interfaces/user/IFavoriteJobRepo';
-import IUnsaveJobUseCase from '../../interfaces/usecases/savedJobs/IUnsaveJob.usecase.FIX';
+import IUnsaveJobUseCase from '../../interfaces/usecases/savedJobs/IUnsaveJob.usecase';
 
 @injectable()
 export default class UnsaveJobUseCase implements IUnsaveJobUseCase {
