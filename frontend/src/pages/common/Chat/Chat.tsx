@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react"
 import React, { useState } from "react";
-import { BiBlock, BiCheck, BiCheckDouble, BiChevronDown, BiSearch, BiSend, BiTrash } from "react-icons/bi";
+import { BiBlock, BiCheck, BiCheckDouble, BiChevronDown, BiDownload, BiSearch, BiSend, BiTrash } from "react-icons/bi";
 import { IoCallOutline } from "react-icons/io5";
 import { BsCameraVideo, BsEmojiSmile, BsThreeDotsVertical, BsWechat } from "react-icons/bs";
 import { HiPaperClip } from "react-icons/hi2";
 import { Chat, Conversation, UserType } from "../../../types/entityTypes";
 import { useLocation } from "react-router-dom";
 import { getSocket } from "../../../socket";
-import { getConversations, getChats, deleteChat, deleteChatForMe } from "../../../services/chatServices";
+import { getConversations, getChats, deleteChat, deleteChatForMe, sendChatWithAttachments } from "../../../services/chatServices";
 import { initializeConversation } from "../../../services/userServices";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -17,6 +17,9 @@ import Swal from "sweetalert2";
 import { AxiosError } from "axios";
 import { openedUnreadChat } from "../../../redux/chatSlice";
 import BouncingLoader from "../../../components/common/Bouncing.loader";
+import EmojiPicker from 'emoji-picker-react'
+import { FiX } from "react-icons/fi";
+import { EmojiClickData } from "emoji-picker-react/dist/types/exposedTypes";
 // import { SocketContext } from "../../../context/SocketContext";
 
 interface FetchConversationsResponsePayload {
@@ -39,6 +42,7 @@ interface LoadChatsResponsePayload {
 
 export default function ChatPage() {
     const messageEndRef = useRef<HTMLDivElement | null>(null)
+    const attachmentRef = useRef<HTMLInputElement | null>(null)
     // const messageBoxRef = useRef<HTMLInputElement | null>(null)
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
@@ -53,7 +57,30 @@ export default function ChatPage() {
     const [onlineUsers, setOnlineUsers] = useState<string[]>([])
     const [typingUsers, setTypingUsers] = useState<string[]>([])
     const location = useLocation()
+    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
     const {_id, name, email, profilePicture} = location.state || {} 
+    const [files, setFiles] = useState<File | null>(null)
+
+    const openFileSelection = () => {
+      if(attachmentRef){
+        attachmentRef.current?.click()
+      }
+    }
+
+    const removeFile = () => {
+      setFiles(null)
+    }
+    const handleFileChange = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      if(!event.target.files) return
+
+      setFiles(event.target.files[0])
+    }
+
+    const handleEmojiPick = (emojiData: any) => {
+      setChatText((prv) => `${prv} ${emojiData.emoji}`)
+    }
 
     const logedUser = useSelector((state: {userAuth: {user:{_id: string, email: string, name: string, profilePicture: string}}}) => {
       return state.userAuth.user
@@ -74,14 +101,47 @@ export default function ChatPage() {
       }
     }
 
+    const moveConversationToTop = (
+      conversations: Conversation[],
+      conversationId: string,
+      updatedConversation: Conversation
+    ) => {
+      const filtered = conversations.filter((conversation) => conversation._id !== conversationId)
+      return [updatedConversation, ...filtered]
+    }
+
     const dSearch = debouncedSearch(searchConvo, 500)
 
     const dispatch = useDispatch()
 
     const tempSocket = getSocket()
     
-    const send = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const send = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
+      if(files){
+        const formData = new FormData()
+
+        formData.append('conversationId', selectedConversation?._id as string)
+        formData.append('receiverId', chatingPerson?._id as string)
+        formData.append('senderId', logedUser._id as string)
+        
+        if(chatText.trim()){
+          formData.append('text', chatText)
+        }
+
+        formData.append('attachment', files)
+
+        try {
+          await sendChatWithAttachments(formData)
+          
+        } catch (error: unknown) {
+          const err = error as AxiosError<{message: string}>
+          const msg = err.response?.data.message || err.message || 'Something went wrong'
+          toast.error(msg)
+        } finally {
+          setFiles(null)
+        }
+      }
       if(!chatText || chatText.trim() === "") return
       const socket = getSocket()
       if(!socket) return
@@ -100,6 +160,7 @@ export default function ChatPage() {
       } as UserType
       })
       setChatText('')
+      setShowEmojiPicker(false)
     }
 
     const selectAChatingPerson = async (conv: Conversation) => {
@@ -134,42 +195,45 @@ export default function ChatPage() {
       }
     }
 
+
     useEffect(() => {
       async function fetchConversations(){
         try {
           const conversationsResult: FetchConversationsResponsePayload = await getConversations(search, page, limit)
-          // console.log('-- conversations result --', conversationsResult.result)
-          const conversations = conversationsResult.result
-          setConversations(conversations)
-          
-          if (_id) {
-            const convAlreadyExist = conversations.find((conv: Conversation) => {
-              if (conv.userInfo?._id === _id) {
-                return conv;
-              }
-            });
 
-            // console.log('-- checking if conversation already exist -- ', convAlreadyExist)
-
-            if (convAlreadyExist) {
-              // console.log('-- conversation already exist -- continuing with it')
-              setSelectedConversation(convAlreadyExist);
-              
-              setChatingPerson({
-                _id,
-                name,
-                email,
-                profilePicture: { cloudinarySecureUrl: profilePicture },
-              });
-            }else{
-              // console.log('-- conversation does not exist -- creating new one')
-              const newConv: InitializeConversationResponsePayload = await initializeConversation(_id)
-              // console.log('-- checking new conversation innitialization result --', newConv)
-              // console.log('-- inspecting chating person redirected data before seting it to chating person --', _id, name, email, profilePicture)
-              setChatingPerson({_id: _id, name: name, email: email, profilePicture:{cloudinarySecureUrl: profilePicture}})
-              setSelectedConversation(newConv.result)
-            }
+          if(!conversationsResult.success){
+            return
           }
+
+          const fetchedConversations = conversationsResult.result
+
+          setConversations(fetchedConversations)
+
+          if(!_id) return
+
+          const chattingPerson = {_id, name, email, profilePicture: {cloudinarySecureUrl: profilePicture}}
+          const isExisitngConversation = fetchedConversations.find((conv: Conversation) => conv.userInfo?._id === _id)
+
+          if(isExisitngConversation){
+            setSelectedConversation(isExisitngConversation)
+            setChatingPerson(chattingPerson)
+            return
+          }
+
+          const newConv: InitializeConversationResponsePayload = await initializeConversation(_id)
+          
+          if(!newConv.success){
+            return
+          }
+
+          console.log('Checking initialized conversation result', newConv.result)
+
+          setConversations((prv) => {
+            return [newConv.result, ...prv]
+          })
+
+          setSelectedConversation(newConv.result)
+          setChatingPerson(chattingPerson)
         } catch (error: unknown) {
           console.log('-- Error occured while fetching conversations --', error)
           const err = error as AxiosError<{message: string}>
@@ -179,7 +243,7 @@ export default function ChatPage() {
       }
 
       fetchConversations()
-    }, [search, page, _id, email, name, profilePicture, limit])
+    }, [search, page, limit, _id, name, email, profilePicture])
 
     useEffect(() => {
       // const socket = getSocket()
@@ -187,72 +251,111 @@ export default function ChatPage() {
         return
       }
 
-      tempSocket.emit('JOIN_ROOM', {targetId: selectedConversation?._id})
-        
-        tempSocket.on('RECEIVE_PRIVATE_MESSAGE', (message: Chat) => {
-          //update conversations last message
-          // toast.info(`New Private message received conversatin id ${message.conversationId}`)
-          // console.log('-- inspecting message from socket --', message)
-          setConversations((conv: Conversation[]) => {
-            return conv.map((conversation: Conversation) => {
-              if(conversation._id === message.conversationId){
-                return {
-                  ...conversation,
-                  lastMessage:{
-                    text: message.text,
-                    senderId: message.senderId,
-                    sendAt: message.createdAt
-                  }
-                }
-              }else{
-                return conversation
-              }
-            })
-          })
+      const handleReceivePrivateMessage = (message: Chat) => {
+        setConversations((conversations) => {
+  const existingConversation = conversations.find(
+    (conversation) => conversation._id === message.conversationId
+  );
 
-          setSelectedConversation((conv: Conversation | null) => {
-            if(!conv) return null
-            return {
-              ...conv,
-              lastMessage: {
-                text: message.text,
-                senderId: message.senderId,
-                sendAt: message.createdAt
-              }
+  if (!existingConversation) {
+    return conversations;
+  }
+
+  const updatedConversation: Conversation = {
+    ...existingConversation,
+    lastMessage: {
+      text: message.text,
+      senderId: message.senderId,
+      sendAt: message.createdAt
+    },
+    updatedAt: message.createdAt
+  };
+
+  return moveConversationToTop(
+    conversations,
+    message.conversationId as string,
+    updatedConversation
+  );
+});
+        // setConversations((conversations) => {
+        //   return conversations.map((conversation) => {
+        //     if(conversation._id === message.conversationId) {
+        //       return {
+        //         ...conversation,
+        //         lastMessage: {
+        //           text: message.text,
+        //           senderId: message.senderId,
+        //           sendAt: message.createdAt
+        //         }
+        //       }
+        //     }
+
+        //     return conversation
+        //   })
+        // })
+
+        setSelectedConversation((conversation) => {
+          if(!conversation) return null
+
+          return {
+            ...conversation,
+            lastMessage: {
+              text: message.text,
+              senderId: message.senderId,
+              sendAt: message.createdAt
             }
-          })
-
-          seetMessages((prv: Chat[]) => {
-            return [...prv, message]
-          })
-        })
-        
-        tempSocket.on('MESSAGE_READ_UPDATE', (data: {conversationId: string, readerId: string}) => {
-          seetMessages((messages: Chat[]) => {
-            return messages.map((msg: Chat) => {
-              if(msg.conversationId === data.conversationId && msg.receiverId === data.readerId){
-                return {
-                  ...msg,
-                  isRead: true,
-                }
-              }else{
-                return msg
-              }
-            })
-          })
-          if(selectedConversation.unreadMessage && selectedConversation.unreadMessage > 0){
-            setSelectedConversation((prv: Conversation | null) => {
-              if(!prv) return null
-              return {
-                ...prv,
-                unreadMessage: 0
-              }
-            })
           }
         })
 
-      return () => tempSocket.off('JOIN_ROOM')
-    }, [selectedConversation?._id, selectedConversation?.unreadMessage, tempSocket]) //previously _id only
+        seetMessages((prv) => [...prv, message])
+      }
+
+      const handleMessageReadUpdate = (
+        data: {conversationId: string, readerId: string}
+      ) => {
+        seetMessages((messages) => {
+          return messages.map((msg) => {
+            if(msg.conversationId === data.conversationId && 
+              msg.receiverId === data.readerId
+            ) {
+              return {
+                ...msg,
+                isRead: true
+              }
+            }
+
+            return msg
+          })
+        })
+      }
+
+      tempSocket.emit('JOIN_ROOM', {
+        targetId: selectedConversation._id
+      })
+
+      tempSocket.on(
+        'RECEIVE_PRIVATE_MESSAGE',
+        handleReceivePrivateMessage
+      )
+
+      tempSocket.on(
+        'MESSAGE_READ_UPDATE',
+        handleMessageReadUpdate
+      )
+
+      return () => {
+        tempSocket.off(
+          'RECEIVE_PRIVATE_MESSAGE',
+          handleReceivePrivateMessage
+        )
+
+        tempSocket.off(
+          'MESSAGE_READ_UPDATE',
+          handleMessageReadUpdate
+        )
+      }
+
+    }, [selectedConversation?._id, tempSocket]) //previously _id only
 
     
     useEffect(() => {
@@ -296,22 +399,37 @@ export default function ChatPage() {
             (conv) => conv._id === data.message.conversationId
           );
           if (isConversationAlreadyExist) {
-            return conversations.map((conv) => {
-              if (conv._id === data.message.conversationId) {
-                return {
-                  ...conv,
-                  unreadMessage: conv.unreadMessage ? conv.unreadMessage + 1 : 0,
-                  lastMessage: {
-                    text: data.message.text,
-                    senderId: data.message.senderId,
-                    sendAt: data.message.createdAt,
-                  },
-                  updatedAt: new Date().toISOString(),
-                };
-              } else {
-                return conv;
-              }
-            });
+            const updateConversation = {
+              ...isConversationAlreadyExist,
+              lastMessage: {
+                text: data.message.text,
+                senderId: data.message.senderId,
+                sendAt: data.message.createdAt
+              },
+              updatedAt: new Date().toISOString()
+            }
+
+            return moveConversationToTop(
+              conversations,
+              data.message.conversationId as string,
+              updateConversation
+            )
+            // return conversations.map((conv) => {
+            //   if (conv._id === data.message.conversationId) {
+            //     return {
+            //       ...conv,
+            //       unreadMessage: conv.unreadMessage ? conv.unreadMessage + 1 : 0,
+            //       lastMessage: {
+            //         text: data.message.text,
+            //         senderId: data.message.senderId,
+            //         sendAt: data.message.createdAt,
+            //       },
+            //       updatedAt: new Date().toISOString(),
+            //     };
+            //   } else {
+            //     return conv;
+            //   }
+            // });
           } else {
             return [
               {
@@ -517,7 +635,7 @@ export default function ChatPage() {
         tempSocket.off('CHAT_DELETED_FOR_ALL')
       }
 
-  }, [tempSocket, onlineUsers]) //previously tempsocket only
+  }, [tempSocket, onlineUsers])
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
@@ -558,7 +676,7 @@ export default function ChatPage() {
                       <img className="w-full h-full object-cover" src={partner.profilePicture.cloudinarySecureUrl} alt="" />
                     ) : (
                       <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                        {partner?.name}
+                        {partner && partner.name && partner?.name[0]}
                       </div>
                     )}
                   </div>
@@ -576,9 +694,9 @@ export default function ChatPage() {
                     {conv?.lastMessage?.text || 'Start a conversation'}
                   </p>
                   }
-                  {/* <p>Checking {conv.unreadMessage}</p> */}
+                  {/* <p>Checking unread count {conv.unreadMessage} typeof {typeof conv.unreadMessage}</p> */}
                   <div className="flex gap-2 absolute right-0 bottom-0">
-                    {(conv.unreadMessage && conv.unreadMessage > 0) && (
+                    {(conv?.unreadMessage > 0) && (
                     <div className={`text-[.7rem] flex items-center justify-center font-semibold ${selectedConversation?._id === conv._id ? "bg-white text-blue-500" : "bg-blue-600 text-white"} rounded-full w-5 h-5`}>
                       {conv.unreadMessage}
                     </div>
@@ -623,11 +741,6 @@ export default function ChatPage() {
                 <p className="text-[11px] text-green-500 font-medium mt-1">{onlineUsers.includes(chatingPerson?._id as string) ? "Online" : null}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-gray-400">
-              <button className="hover:text-blue-600 transition-colors"><IoCallOutline size={20} /></button>
-              <button className="hover:text-blue-600 transition-colors"><BsCameraVideo size={20} /></button>
-              <button className="hover:text-gray-600 transition-colors"><BsThreeDotsVertical size={20} /></button>
-            </div>
           </div>
           
           {/* Message Area */}
@@ -652,9 +765,18 @@ export default function ChatPage() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-100">
+          <div className="p-4 relative bg-white border-t border-gray-100 relative">
+            {files && (
+              <div className="border absolute bg-white rounded-md bottom-19 border-slate-200 w-fit p-2">
+                  <div>
+                    <button onClick={removeFile} className="cursor-pointer"><FiX size={10} /></button>
+                  </div>
+                  <p className="text-xs">{`${files?.name.slice(0, 8)}...`}</p>
+                </div>
+            )}
             <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-2 pl-4 border border-gray-100 focus-within:border-blue-200 focus-within:bg-white transition-all">
-              <button className="text-gray-400 hover:text-blue-600"><HiPaperClip size={20} /></button>
+              <input onChange={handleFileChange} ref={attachmentRef} type="file" multiple className="hidden" name="" id="" />
+              <button onClick={() => openFileSelection()} className="text-gray-400 hover:text-blue-600"><HiPaperClip size={20} /></button>
               <input 
                 onFocus={userTyping}
                 onBlur={userStopedTyping}
@@ -664,7 +786,12 @@ export default function ChatPage() {
                 className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder:text-gray-400" 
                 placeholder="Type your message..." 
               />
-              <button className="text-gray-400 hover:text-yellow-500"><BsEmojiSmile size={20} /></button>
+              <button onClick={() => setShowEmojiPicker((prv) => !prv)} className="text-gray-400 hover:text-yellow-500"><BsEmojiSmile size={20} /></button>
+              {showEmojiPicker && (
+                <div className="absolute bottom-20">
+                  <EmojiPicker onEmojiClick={handleEmojiPick} />
+                </div>
+              )}
               <button 
                 onClick={(e) => send(e)} 
                 className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-all shadow-md shadow-blue-100 flex items-center justify-center active:scale-95"
@@ -714,29 +841,88 @@ function MessageBubble({message, onUnsend, onDeleteForMe}: {message: Chat, onUns
   }
 
 
-  return(
-    <div className={`flex ${isMe ? "justify-end" : "justify-start"} transition-all duration-300`}>
-                  <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-sm text-sm ${
-                    isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
-                  } relative group`}>
-                    <p className="leading-relaxed">{message.text}</p>
-                    <div className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMe ? "text-blue-100 justify-end" : "text-gray-400"}`}>
-                      {new Date(message.createdAt as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      {isMe && (message.isRead ? <BiCheckDouble size={14} /> : <BiCheck size={14} />)}
-                    </div>
-                    <button onClick={toggleChatMenuOpen} className="hidden group-hover:block absolute top-1 right-1">
-                      <BiChevronDown size={18} />
-                    </button>
-                    {isChatMenuOpened && (
-                      <div className={`absolute !z-9999 bg-white text-black border border-slate-100 p-[1px] rounded-lg shadow-xl w-40 ${isMe ? 'right-10' : 'left-10'}`}>
-                        <button onClick={() => {onDeleteForMe(); setIsChatMenuOpened(false)}} className="w-full rounded-lg flex !text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 transition-color px-4 py-2"><BiTrash size={17} /> Delete for me</button>
-                        {(isMe && !isTimeOver(message.createdAt as string)) && (
-                          <button onClick={() => {onUnsend(); setIsChatMenuOpened(false)}} className="w-full flex text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 px-4 py-2 rounded-md transition-color duration-300 "><BiBlock size={17} />Unsend</button>
-                        )}
-                    </div>
-                    )}
-                  </div>
-                </div>
-  )
+  return (
+    <div className={`flex ${isMe ? 'justify-end' : 'justify-start'} transition-all duration-300`}>
+      {message.attachments && message?.attachments[0]?.fileType?.includes('image') && 
+        <div className="relative max-w-[70%] rounded-md border-2 border-slate-200">
+          <button
+            onClick={toggleChatMenuOpen}
+            className="absolute top-1 right-1"
+          ></button>
+          <img className="w-full h-full object-fit-cover rounded-md" src={message.attachments[0].url} alt="" />
+          <a href={message.attachments[0]?.url} download={message.attachments[0].fileName} className="absolute bottom-2 right-2">
+            <BiDownload />
+          </a>
+        </div>
+      }
+
+      {message.attachments && message.attachments[0]?.fileType?.includes('pdf') && 
+        <div className="border border-slate-200 p-2 rounded-md bg-white flex gap-2 items-center">
+          <div>
+            <p className="text-xs text-medium text-slate-600">{message?.attachments[0]?.fileName}</p>
+          </div>
+          <div>
+            <a href={message.attachments[0]?.url} download={message?.attachments[0]?.fileName} className="border border-slate-300 w-7 h-7 flex items-center justify-center rounded-full">
+              <BiDownload color="gray"/>
+            </a>
+          </div>
+        </div>
+      }
+
+      {message.attachments && message.attachments.length === 0 && (
+        <div
+          className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-sm text-sm ${
+            isMe
+              ? 'bg-blue-600 text-white rounded-tr-none'
+              : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+          } relative group`}
+        >
+          <p className="leading-relaxed">{message.text}</p>
+          <div
+            className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMe ? 'text-blue-100 justify-end' : 'text-gray-400'}`}
+          >
+            {new Date(message.createdAt as string).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+            {isMe && (message.isRead ? <BiCheckDouble size={14} /> : <BiCheck size={14} />)}
+          </div>
+          <button
+            onClick={toggleChatMenuOpen}
+            className="hidden group-hover:block absolute top-1 right-1"
+          >
+            <BiChevronDown size={18} />
+          </button>
+          {isChatMenuOpened && (
+            <div
+              className={`absolute !z-9999 bg-white text-black border border-slate-100 p-[1px] rounded-lg shadow-xl w-40 ${isMe ? 'right-10' : 'left-10'}`}
+            >
+              <button
+                onClick={() => {
+                  onDeleteForMe();
+                  setIsChatMenuOpened(false);
+                }}
+                className="w-full rounded-lg flex !text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 transition-color px-4 py-2"
+              >
+                <BiTrash size={17} /> Delete for me
+              </button>
+              {isMe && !isTimeOver(message.createdAt as string) && (
+                <button
+                  onClick={() => {
+                    onUnsend();
+                    setIsChatMenuOpened(false);
+                  }}
+                  className="w-full flex text-sm font-medium text-gray-700 text-center gap-2 hover:bg-gray-200 px-4 py-2 rounded-md transition-color duration-300 "
+                >
+                  <BiBlock size={17} />
+                  Unsend
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 

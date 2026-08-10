@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import IAdminHandlePermissionRevokingUsecase from '../../interfaces/usecases/recruiter/IAdminHandlePermissionRevoking.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 
 @injectable()
 export default class AdminHandlePermissionRevoking implements IAdminHandlePermissionRevokingUsecase {

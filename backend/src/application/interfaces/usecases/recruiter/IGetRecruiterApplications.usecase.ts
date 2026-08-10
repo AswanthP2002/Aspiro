@@ -1,5 +1,5 @@
-import LoadRecruiterApplicationDTO from '../../../DTOs/recruiter/loadRecruiterApplication.dto.FIX';
-import { AdminRecruiterApplicationsDTO } from '../../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
+import LoadRecruiterApplicationDTO from '../../../DTOs/recruiter/loadRecruiterApplication.dto';
+import { AdminRecruiterApplicationsDTO } from '../../../DTOs/recruiter/recruiterProfileOverviewData.dto';
 
 export default interface IGetRecruiterApplicationsUsecase {
   execute(

@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IAdminChangeRecruiterApplicationStatusToUnderReview from '../../interfaces/usecases/recruiter/IAdminChangeRecruiterApplicationStatusToUnderReview.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 
 @injectable()
 export default class AdminChangeRecruiterApplicationStatusToUnderReview implements IAdminChangeRecruiterApplicationStatusToUnderReview {

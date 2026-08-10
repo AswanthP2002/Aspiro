@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import IBlockRecruiterUsecase from '../../interfaces/usecases/recruiter/IBlockRecruiter.usecase';
 // import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 

@@ -1,4 +1,4 @@
-import { AdminRecruiterListDTO } from './recruiterProfileOverviewData.dto.FIX';
+import { AdminRecruiterListDTO } from './recruiterProfileOverviewData.dto';
 
 export default interface RecruiterPaginatedDTO {
   recruiters: AdminRecruiterListDTO[];

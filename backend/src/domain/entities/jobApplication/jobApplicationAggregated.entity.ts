@@ -1,7 +1,7 @@
 import Company from '../company/company.entity';
 import Job from '../job/job.entity';
 import { NewRecruiter } from '../recruiter/recruiter.entity';
-import User from '../user/User.FIX';
+import User from '../user/User';
 
 export default interface JobApplicationAggregated {
   _id: string;

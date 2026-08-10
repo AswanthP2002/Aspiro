@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { ITrackMyJobApplicationDetailsUsecase } from '../../interfaces/usecases/jobApplication/ITrackMyJobApplicationDetails.usecase';
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
 import JobApplicationMapper from '../../mappers/jobApplication/JobApplication.mapperClass';
-import { JobApplicationTrackingDTO } from '../../DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationTrackingDTO } from '../../DTOs/jobApplication/jobApplication.dto';
 
 @injectable()
 export default class TrackMyJobApplicationDetailsUsecase implements ITrackMyJobApplicationDetailsUsecase {

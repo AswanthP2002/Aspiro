@@ -1,4 +1,4 @@
-import { JobApplicationDTO } from '../../../DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../../DTOs/jobApplication/jobApplication.dto';
 import UpdateJobApplicationStatusDTO from '../../../DTOs/jobApplication/UpdateJobApplicationStatus.dto';
 
 export default interface IUpdateJobApplicationStatusUsecase {

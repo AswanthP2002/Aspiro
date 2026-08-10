@@ -6,10 +6,10 @@ import {
 } from '../../../domain/errors/AppError';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import { generateCode } from '../../../utilities/generateCode';
-import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
-import UserDTO from '../../DTOs/user/user.dto.FIX';
+import { CreateUserDto } from '../../DTOs/user/createUser.dto';
+import UserDTO from '../../DTOs/user/user.dto';
 import hashPassword from '../../Services/hashPassword';
-import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase.FIX';
+import ICreateUserUseCase from '../../interfaces/usecases/user/ICreateUser.usecase';
 import IEmailService from '../../interfaces/services/IEmailService';
 import UserMapper from '../../mappers/user/User.mapperClass';
 

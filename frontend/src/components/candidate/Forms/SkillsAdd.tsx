@@ -132,7 +132,7 @@ export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddS
                   <p className="font-bold text-xl">Add Skill</p>
                 </div>
                 <div>
-                  <button className="hover:bg-slate-200 p-2 rounded-md">
+                  <button onClick={closeSkillsModal} className="hover:bg-slate-200 p-2 rounded-md">
                     <FiX />
                   </button>
                 </div>

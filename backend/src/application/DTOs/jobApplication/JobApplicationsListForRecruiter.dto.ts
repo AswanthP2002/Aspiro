@@ -1,6 +1,6 @@
 import SkillsDTO from '../skills.admin/skills.dto';
-import { EducationDTO } from '../education/education.dto.FIX';
-import { ExperienceDTO } from '../experience/experience.dto.FIX';
+import { EducationDTO } from '../education/education.dto';
+import { ExperienceDTO } from '../experience/experience.dto';
 
 export default interface JobApplicationsListForRecruiterDTO {
   _id?: string;

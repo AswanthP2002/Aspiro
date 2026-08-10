@@ -4,7 +4,7 @@ import Experience from '../experience/experience.entity';
 import { JobApplicationStatus } from './jobApplication.entity';
 import Resume from '../resume/resume.entity';
 import Skills from '../skill.user/skills.entity';
-import User from '../user/User.FIX';
+import User from '../user/User';
 import Job from '../job/job.entity';
 import Recruiter from '../recruiter/recruiter.entity';
 

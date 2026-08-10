@@ -1,5 +1,5 @@
 import Skills from '../../../domain/entities/skill.user/skills.entity';
-import { CreateSkillDTO, SkillDTO } from '../../DTOs/skill/skill.dto.FIX';
+import { CreateSkillDTO, SkillDTO } from '../../DTOs/skill/skill.dto';
 
 export class SkillsMapper {
   public createSkillsDtoToSkill(dto: CreateSkillDTO): Skills {

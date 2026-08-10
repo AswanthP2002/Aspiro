@@ -1,6 +1,7 @@
 import { AxiosError, HttpStatusCode } from "axios"
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance"
 import { FollowEndpoints } from "../constants/endPoints/follow.endpoints"
+import { toast } from "react-toastify"
 
 export const getFollowers = async (userId: string, search: string, page: number, limit: number) => {
     try {

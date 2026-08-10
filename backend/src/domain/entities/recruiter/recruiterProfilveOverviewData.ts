@@ -1,5 +1,5 @@
 import Job from '../job/job.entity';
-import User from '../user/User.FIX';
+import User from '../user/User';
 import Company from '../company/company.entity';
 
 export default interface RecruiterProfileOverviewData {

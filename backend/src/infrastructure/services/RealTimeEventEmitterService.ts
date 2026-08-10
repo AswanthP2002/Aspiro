@@ -4,6 +4,8 @@ import { inject, injectable } from 'tsyringe';
 import { ConnectionManager } from '../socketio/connectionManager';
 import Notification from '../../domain/entities/notification/notification.entity';
 import { SocketEvents } from '../socketio/events';
+import Chat from '../../domain/entities/chat/chat.entity';
+import User from '../../domain/entities/user/User';
 
 @injectable()
 export class RealTimeEventEmitterService implements IRealTimeEventEmitter {
@@ -75,5 +77,16 @@ export class RealTimeEventEmitterService implements IRealTimeEventEmitter {
         conversationId,
       });
     });
+  }
+
+  sendNewMessage(message: Chat, receiver: string, sender: User): void {
+    const getSockets = this._connectionManager.getSockets(receiver);
+    getSockets.forEach((s) => {
+      this._io.to(s).emit('NEW_MESSAGE_RECEIVED', { message: message, sender: sender });
+    });
+  }
+
+  sendMesseWithAttachments(message: Chat, conversationId: string): void {
+    this._io.to(conversationId as string).emit('RECEIVE_PRIVATE_MESSAGE', message);
   }
 }

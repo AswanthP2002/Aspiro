@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
-import IAddResumeUseCase from '../../application/interfaces/usecases/resume/IAddResume.usecase.FIX';
+import IAddResumeUseCase from '../../application/interfaces/usecases/resume/IAddResume.usecase';
 // import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import ILoadResumeUseCase from '../../application/interfaces/usecases/resume/ILoadResumes.usecase.FIX';
+import ILoadResumeUseCase from '../../application/interfaces/usecases/resume/ILoadResumes.usecase';
 import ISetResumePrimaryUsecase from '../../application/interfaces/usecases/resume/ISetResumePrimary.usecase';
-import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase.FIX';
+import IDeleteResumeUseCase from '../../application/usecases/candidate/interface/IDeleteResume.usecase';
 import IAnalyzeResumeUsecase from '../../application/interfaces/usecases/AI/IAnalyzeResume.ai.usecase';
 import IAnalyzeResumeDetailedUsecase from '../../application/interfaces/usecases/AI/IAnalyzeResumeDetailed.usecase';
 

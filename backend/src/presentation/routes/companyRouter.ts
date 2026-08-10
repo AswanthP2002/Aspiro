@@ -36,6 +36,12 @@ function createCompanyRouter() {
     authorization(['admin']),
     companyController.adminEditCompany.bind(companyController)
   );
+  companyRouter.patch(
+    CompanyAPIRoutes.COMPANY.ADMIN_DEACTIVATE_COMPANY,
+    centralizedAuthentication,
+    authorization(['admin']),
+    companyController.deactivateCompany.bind(companyController)
+  );
 
   return companyRouter;
 }

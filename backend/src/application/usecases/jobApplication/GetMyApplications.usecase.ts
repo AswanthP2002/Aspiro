@@ -1,7 +1,7 @@
 import JobApplicationAggregated from '../../../domain/entities/jobApplication/jobApplicationAggregated.entity';
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
 import { inject, injectable } from 'tsyringe';
-import IGetMyApplicationsUsecase from '../../interfaces/usecases/jobApplication/IGetMyApplications.usecase.FIX';
+import IGetMyApplicationsUsecase from '../../interfaces/usecases/jobApplication/IGetMyApplications.usecase';
 import {
   LoadMyApplicationsDTO,
   MyApplicationsListDTO,

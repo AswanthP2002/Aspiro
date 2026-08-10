@@ -8,7 +8,7 @@ import { ChatDAO } from '../database/Schemas/user/chat.schema';
 import { ConversationDAO } from '../database/DAOs/user/conversation.dao';
 import mongoose from 'mongoose';
 import { Server as HttpServer } from 'http';
-import User from '../../domain/entities/user/User.FIX';
+import User from '../../domain/entities/user/User';
 
 export const initSocket = (server: HttpServer) => {
   console.log('socket initialization called');

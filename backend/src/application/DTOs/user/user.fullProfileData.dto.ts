@@ -1,7 +1,7 @@
-import CertificateDTO from '../certificate/certificate.dto.FIX';
-import { EducationDTO } from '../education/education.dto.FIX';
-import { ExperienceDTO } from '../experience/experience.dto.FIX';
-import { SkillDTO } from '../skill/skill.dto.FIX';
+import CertificateDTO from '../certificate/certificate.dto';
+import { EducationDTO } from '../education/education.dto';
+import { ExperienceDTO } from '../experience/experience.dto';
+import { SkillDTO } from '../skill/skill.dto';
 
 export default interface UserFullProfileDataDTO {
   _id?: string;

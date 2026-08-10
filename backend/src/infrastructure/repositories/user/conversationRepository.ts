@@ -124,7 +124,7 @@ export default class ConversationRepository
       await conversation.populate('participants.userId', 'name email profilePicture');
     }
 
-    return conversation;
+    return conversation.toObject();
   }
 
   async getUnreadConversationsCount(logedUserId: string): Promise<{ _id?: string }[] | null> {

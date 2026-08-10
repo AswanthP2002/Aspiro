@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import IBulckApproveRecruiterApplicationUsecase from '../../interfaces/usecases/recruiter/IBulckApproveRecruiterApplication.usecase';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 // import Recruiter from '../../../domain/entities/recruiter/recruiter.entity';
 
 @injectable()

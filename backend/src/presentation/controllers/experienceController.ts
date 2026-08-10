@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
-import IAddUserExperienceUsecase from '../../application/interfaces/usecases/experience/IAddUserExperience.usecase.FIX';
+import IAddUserExperienceUsecase from '../../application/interfaces/usecases/experience/IAddUserExperience.usecase';
 // import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import IGetUserExperiencesUsecase from '../../application/interfaces/usecases/experience/IGetUserExperiences.usecase.FIX';
-import IEditUserExperienceUsecase from '../../application/interfaces/usecases/experience/IEditUserExperience.usecase.FIX';
-import IDeleteUserExperienceUsecase from '../../application/interfaces/usecases/experience/IDeleteUserExperience.usecase.FIX';
+import IGetUserExperiencesUsecase from '../../application/interfaces/usecases/experience/IGetUserExperiences.usecase';
+import IEditUserExperienceUsecase from '../../application/interfaces/usecases/experience/IEditUserExperience.usecase';
+import IDeleteUserExperienceUsecase from '../../application/interfaces/usecases/experience/IDeleteUserExperience.usecase';
 
 @injectable()
 export default class ExperienceController {

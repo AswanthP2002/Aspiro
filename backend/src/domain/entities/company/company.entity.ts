@@ -10,6 +10,7 @@ export default interface Company {
   description?: string;
   industry?: string;
   location?: string;
+  isDeactivated?: boolean;
   logo?: {
     cloudinaryPublicId: string;
     cloudinarySecureUrl: string;

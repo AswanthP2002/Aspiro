@@ -1,6 +1,6 @@
 import { JobType, WorkMode, SalaryPeriod, JobLevel, JobStatus } from './job.entity';
 import Recruiter from '../recruiter/recruiter.entity';
-import User from '../user/User.FIX';
+import User from '../user/User';
 
 export default interface JobAggregatedData {
   _id?: string;

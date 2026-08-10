@@ -4,7 +4,7 @@ import { UserLoginResponseDto } from '../../DTOs/user/userLogin.dto';
 import IGoogleLoginUseCase from '../../interfaces/usecases/user/IGoogleLogin.usecase';
 import { inject, injectable } from 'tsyringe';
 import IGoogleAuthService from '../../interfaces/services/IGoogleAuthService';
-import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto.FIX';
+import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto';
 import { UserBannedError, UserBlockedError } from '../../../domain/errors/AppError';
 
 @injectable()

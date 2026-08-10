@@ -11,6 +11,7 @@ import IDeleteChatForMeUsecase from '../../application/interfaces/usecases/chat/
 import IDeleteConversationUsecase from '../../application/interfaces/usecases/conversation/IDeleteConversation.usecase';
 import IGetNewUnreadConversationsCount from '../../application/interfaces/usecases/conversation/IGetNewUnreadConversationsCount.usecase';
 import ResponseHandler from '../../utilities/response.handler';
+import ISendAttachmentUsecase from '../../application/interfaces/usecases/chat/ISendAttachment.usecase';
 
 @injectable()
 export default class ChatController {
@@ -23,7 +24,8 @@ export default class ChatController {
     @inject('IDeleteChatForMeUsecase') private _deleteChatForMe: IDeleteChatForMeUsecase,
     @inject('IDeleteConversationUsecase') private _deleteConversation: IDeleteConversationUsecase,
     @inject('IGetNewUnreadConversationsCountUsecase')
-    private _getNewUnreadChatsCount: IGetNewUnreadConversationsCount
+    private _getNewUnreadChatsCount: IGetNewUnreadConversationsCount,
+    @inject('ISendAttachmentUsecase') private _sendchatWithAttachment: ISendAttachmentUsecase
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -131,6 +133,25 @@ export default class ChatController {
         result
       );
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendChatWithAttachment(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { conversationId, receiverId, text, senderId } = req.body;
+    const file = req.file as Express.Multer.File;
+
+    try {
+      const result = await this._sendchatWithAttachment.execute({
+        attachements: file,
+        conversationId,
+        receiverId,
+        senderId,
+        text,
+      });
+
+      this._responseHandler.success(res, 'Send with attachment', StatusCodes.OK, result);
+    } catch (error: unknown) {
       next(error);
     }
   }

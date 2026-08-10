@@ -1,23 +1,23 @@
 import AdminUserListDTO from '../../../domain/entities/user/AdminUserList.entity';
 import MyProfileAggregated from '../../../domain/entities/user/myProfileAggregated.entity';
 import UserCachedData from '../../../domain/entities/user/user.cachedData.entity';
-import User from '../../../domain/entities/user/User.FIX';
+import User from '../../../domain/entities/user/User';
 import UserFullProfileData from '../../../domain/entities/user/userFullProfile.entity';
 import UserProfileAggregated from '../../../domain/entities/user/userProfileAggregated';
-import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto.FIX';
-import { CreateUserDto } from '../../DTOs/user/createUser.dto.FIX';
-import FavoriteJobDTO from '../../DTOs/user/favoriteJob.dto.FIX';
+import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto';
+import { CreateUserDto } from '../../DTOs/user/createUser.dto';
+import FavoriteJobDTO from '../../DTOs/user/favoriteJob.dto';
 import ProfilePictureUPloadResponseDTO from '../../DTOs/user/profileUploadResponse.dto';
-import UpdateUserDTO from '../../DTOs/user/updateUser.dto.FIX';
+import UpdateUserDTO from '../../DTOs/user/updateUser.dto';
 import UploadCoverPhotoResponseDTO from '../../DTOs/user/uploadCoverPhotoResponse.dto';
-import UserDTO, { MyProfileDTO, SimilarSkillUserDTO } from '../../DTOs/user/user.dto.FIX';
+import UserDTO, { MyProfileDTO, SimilarSkillUserDTO } from '../../DTOs/user/user.dto';
 import UserFullProfileDataDTO from '../../DTOs/user/user.fullProfileData.dto';
-import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto.FIX';
+import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto';
 import UserOverviewForPublicDTO from '../../DTOs/user/userOverviewForPublic.dto';
 import {
   AdminUserDetailsDTO,
   UserPublicProfileDTO,
-} from '../../DTOs/user/userProfileAggregated.dto.FIX';
+} from '../../DTOs/user/userProfileAggregated.dto';
 
 export default class UserMapper {
   public dtoToUser(userDto: CreateUserDto): User {

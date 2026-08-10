@@ -5,14 +5,14 @@ import ICreateJobUseCase from '../../application/interfaces/usecases/job/ICreate
 import ILoadRecruiterProfileOverviewUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
 import IGetJobApplicationsUseCase from '../../application/interfaces/usecases/jobApplication/IGetJobApplications.usecase';
 import { inject, injectable } from 'tsyringe';
-import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase.FIX';
+import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
 import ILoadRecruiterJobsUsecase from '../../application/interfaces/usecases/job/ILoadRecruiterJobs.usecase';
 import IEditJobUsecase from '../../application/interfaces/usecases/job/IEditJob.usecase';
 import IDeleteJobUsecase from '../../application/interfaces/usecases/job/IDeleteJob.usecase';
 import IScheduleInterviewUsecase from '../../application/interfaces/usecases/interview/IScheduleInterview.usecase';
 import CreateInterviewDTO from '../../application/DTOs/interview/interview.dto';
 import IUpdateCandidateNotes from '../../application/interfaces/usecases/jobApplication/IUpdateCandidateNotes.usecase';
-import { JobApplicationDTO } from '../../application/DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../application/DTOs/jobApplication/jobApplication.dto';
 import IUpdateJobApplicationStatusUsecase from '../../application/interfaces/usecases/jobApplication/IUpdateJobApplicationStatus.usecase';
 import UpdateJobApplicationStatusDTO from '../../application/DTOs/jobApplication/UpdateJobApplicationStatus.dto';
 import ILoadRecruiterRecentJobs from '../../application/interfaces/usecases/job/ILoadRecruiterRecentJobs.usecase';
@@ -23,8 +23,8 @@ import IGetJobApplicationDetailsUseCase from '../../application/interfaces/useca
 import ILoadRecruiterJobDetailsUsecase from '../../application/interfaces/usecases/job/ILoadRecruiterJobDetails.usecase';
 import IGetRecruiterApplicationsUsecase from '../../application/interfaces/usecases/recruiter/IGetRecruiterApplications.usecase';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import IRejectRecruiterApplication from '../../application/interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase.FIX';
-import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/recruiter/IApproveRecruiterApplication.usecase.FIXED';
+import IRejectRecruiterApplication from '../../application/interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase';
+import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/recruiter/IApproveRecruiterApplication.usecase';
 import IAdminLoadRecruitersUsecase from '../../application/interfaces/usecases/recruiter/IAdminLoadRecruiters.usecase';
 import IAdminLoadRecruiterDetailsUsecase from '../../application/interfaces/usecases/recruiter/IAdminLoadRecruiterDetails.usecase';
 import IAdminRevokeRecruiterVerification from '../../application/interfaces/usecases/recruiter/IAdminRevokeRecruiterVerification.usecase';

@@ -1163,6 +1163,14 @@ export interface Message {
     updatedAt?: string | Date
 }
 
+export interface Attachment {
+  url: string;
+  key?: string;
+  fileName: string;
+  fileType: string;
+  fileSize?: number
+}
+
 export interface Chat {
    _id?: string;
   conversationId?: string;
@@ -1170,6 +1178,7 @@ export interface Chat {
   receiverId?: string;
   text: string;
   isRead?: boolean;
+  attachments?: Attachment[]
   isDeleted?: boolean;
   createdAt?: string;
   updatedAt?: string

@@ -1,4 +1,4 @@
-import User from '../user/User.FIX';
+import User from '../user/User';
 import { Plan } from './plan.entity';
 
 export default interface UserSubscription {

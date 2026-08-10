@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import IManageRecruiterPermissionsUsecase from '../../interfaces/usecases/recruiter/IManageRecruiterPermissions.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import ManageRecruiterPermssionsDTO from '../../DTOs/recruiter/manageRecruiterPermissions.dto';
-import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto.FIX';
+import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 
 @injectable()

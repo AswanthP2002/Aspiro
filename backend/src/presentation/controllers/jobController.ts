@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from '../statusCodes';
-import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase.FIX';
+import IGetJobDetailsUseCase from '../../application/usecases/interfaces/IGetJobDetails.usecase';
 import ISearchJobsFromHomeUseCase from '../../application/usecases/interfaces/ISearchJobsFromHome.usecase';
 import { inject, injectable } from 'tsyringe';
 import { StatusMessage } from '../../constants/Messages/statusMessages';

@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import IGetRecruiterApplicationsUsecase from '../../interfaces/usecases/recruiter/IGetRecruiterApplications.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
-import LoadRecruiterApplicationDTO from '../../DTOs/recruiter/loadRecruiterApplication.dto.FIX';
-import { AdminRecruiterApplicationsDTO } from '../../DTOs/recruiter/recruiterProfileOverviewData.dto.FIX';
+import LoadRecruiterApplicationDTO from '../../DTOs/recruiter/loadRecruiterApplication.dto';
+import { AdminRecruiterApplicationsDTO } from '../../DTOs/recruiter/recruiterProfileOverviewData.dto';
 import RecruiterProfileOverviewData from '../../../domain/entities/recruiter/recruiterProfilveOverviewData';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 

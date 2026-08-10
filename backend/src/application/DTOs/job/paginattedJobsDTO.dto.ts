@@ -1,4 +1,4 @@
-import { MyJobDTO } from './loadJob.dto.FIX';
+import { MyJobDTO } from './loadJob.dto';
 
 export default interface PaginatedJobsDTO {
   jobs: MyJobDTO[];

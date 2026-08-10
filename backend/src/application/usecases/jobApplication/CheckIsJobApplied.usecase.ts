@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import ICheckIsJobApplied from '../../interfaces/usecases/jobApplication/ICheckJobApplied.usecase';
 import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo';
-import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto.FIX';
+import { JobApplicationDTO } from '../../DTOs/jobApplication/jobApplication.dto';
 import JobApplicationMapper from '../../mappers/jobApplication/JobApplication.mapperClass';
 
 @injectable()
