@@ -5,7 +5,7 @@ import ICreateJobUseCase from '../../application/interfaces/usecases/job/ICreate
 import ILoadRecruiterProfileOverviewUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
 import IGetJobApplicationsUseCase from '../../application/interfaces/usecases/jobApplication/IGetJobApplications.usecase';
 import { inject, injectable } from 'tsyringe';
-import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase.FIX';
+import ICreateRecruiterUsecase from '../../application/interfaces/usecases/recruiter/ICreateRecruiter.usecase';
 import ILoadRecruiterJobsUsecase from '../../application/interfaces/usecases/job/ILoadRecruiterJobs.usecase';
 import IEditJobUsecase from '../../application/interfaces/usecases/job/IEditJob.usecase';
 import IDeleteJobUsecase from '../../application/interfaces/usecases/job/IDeleteJob.usecase';
@@ -23,8 +23,8 @@ import IGetJobApplicationDetailsUseCase from '../../application/interfaces/useca
 import ILoadRecruiterJobDetailsUsecase from '../../application/interfaces/usecases/job/ILoadRecruiterJobDetails.usecase';
 import IGetRecruiterApplicationsUsecase from '../../application/interfaces/usecases/recruiter/IGetRecruiterApplications.usecase';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import IRejectRecruiterApplication from '../../application/interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase.FIX';
-import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/recruiter/IApproveRecruiterApplication.usecase.FIXED';
+import IRejectRecruiterApplication from '../../application/interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase';
+import IApproveRecruiterApplicationUsecase from '../../application/interfaces/usecases/recruiter/IApproveRecruiterApplication.usecase';
 import IAdminLoadRecruitersUsecase from '../../application/interfaces/usecases/recruiter/IAdminLoadRecruiters.usecase';
 import IAdminLoadRecruiterDetailsUsecase from '../../application/interfaces/usecases/recruiter/IAdminLoadRecruiterDetails.usecase';
 import IAdminRevokeRecruiterVerification from '../../application/interfaces/usecases/recruiter/IAdminRevokeRecruiterVerification.usecase';

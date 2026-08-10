@@ -3,6 +3,7 @@ import ChatController from '../controllers/chatController';
 import { container } from 'tsyringe';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
 import { ChatApiRoutes } from '../../constants/Apis/chat.routes';
+import { upload } from '../../utilities/multer';
 
 function createChatRouter() {
   const chatRouter = express.Router();
@@ -44,6 +45,13 @@ function createChatRouter() {
     centralizedAuthentication,
     authorization(['user']),
     chatController.getNewUnreadConversationsCount.bind(chatController)
+  );
+  chatRouter.post(
+    ChatApiRoutes.SEND_CHAT_WITH_ATTACHMENT,
+    centralizedAuthentication,
+    authorization(['user']),
+    upload.single('attachment'),
+    chatController.sendChatWithAttachment.bind(chatController)
   );
 
   return chatRouter;

@@ -5,4 +5,5 @@ export const ChatApiRoutes = {
   DELETE_CHAT_BY_ID: '/v2/chats/:chatId/delete',
   DELETE_CHAT_FOR_ME: '/v2/chats/:chatId/delete-for-me',
   GET_NEW_UNREAD_CONVERSATIONS_COUNT: '/v2/conversations/unread/count',
+  SEND_CHAT_WITH_ATTACHMENT: '/v2/chat/send/attachment',
 } as const;

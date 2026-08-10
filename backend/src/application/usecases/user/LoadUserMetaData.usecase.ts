@@ -1,0 +1,24 @@
+import { inject, injectable } from 'tsyringe';
+import ILoadUserMetaDataUsecase from '../../interfaces/usecases/user/ILoadUserMetaData.usecase';
+import IUserRepository from '../../../domain/interfaces/IUserRepo';
+import UserMetaDataDTO from '../../DTOs/user/userMetaData.dto';
+import UserMapper from '../../mappers/user/User.mapperClass';
+
+@injectable()
+export default class LoadUserMetaDataUsecase implements ILoadUserMetaDataUsecase {
+  constructor(
+    @inject('IUserRepository') private _userRepo: IUserRepository,
+    @inject('UserMapper') private _mapper: UserMapper
+  ) {}
+
+  async execute(userId: string): Promise<UserMetaDataDTO | null> {
+    const user = await this._userRepo.getUserMetaData(userId);
+
+    if (user) {
+      const dto = this._mapper.userToUserMetaDataDTO(user);
+      return dto;
+    }
+
+    return null;
+  }
+}

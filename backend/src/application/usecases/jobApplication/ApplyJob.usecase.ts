@@ -2,7 +2,7 @@ import IJobApplicationRepo from '../../../domain/interfaces/IJobApplicationRepo'
 import CreateJobApplicationDTO, {
   JobApplicationDTO,
 } from '../../DTOs/jobApplication/jobApplication.dto';
-import IApplyJobUsecase from '../../interfaces/usecases/jobApplication/IApplyJob.usecase.FIX';
+import IApplyJobUsecase from '../../interfaces/usecases/jobApplication/IApplyJob.usecase';
 import { inject, injectable } from 'tsyringe';
 import IJobRepo from '../../../domain/interfaces/IJobRepo';
 import JobApplicationMapper from '../../mappers/jobApplication/JobApplication.mapperClass';

@@ -1,5 +1,7 @@
-import ConversationDTO from '../../../DTOs/conversation/conversation.dto';
+import ConversationDTO, {
+  InitlaizeConversationResponseDTO,
+} from '../../../DTOs/conversation/conversation.dto';
 
 export default interface IInitializeConversation {
-  execute(senderId: string, recipientId: string): Promise<ConversationDTO | null>;
+  execute(senderId: string, recipientId: string): Promise<InitlaizeConversationResponseDTO | null>;
 }

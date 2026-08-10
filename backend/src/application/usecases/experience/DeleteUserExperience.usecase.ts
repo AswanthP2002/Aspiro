@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import IExperienceRepo from '../../../domain/interfaces/user/IExperienceRepo';
-import IDeleteUserExperienceUsecase from '../../interfaces/usecases/experience/IDeleteUserExperience.usecase.FIX';
+import IDeleteUserExperienceUsecase from '../../interfaces/usecases/experience/IDeleteUserExperience.usecase';
 
 @injectable()
 export default class DeleteUserExperienceUsecase implements IDeleteUserExperienceUsecase {

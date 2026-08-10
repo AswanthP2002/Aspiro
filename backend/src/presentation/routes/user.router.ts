@@ -8,7 +8,7 @@ import { ResetPasswordSchema } from '../../application/DTOs/user/resetPassword.d
 import { loginSchema } from '../schemas/user/userLoginRequest.zod.schema';
 import { UrlSchema } from '../schemas/user/url.schema';
 import { EditProfileSchema } from '../schemas/user/editProfile.schema';
-import { CreateUserSchema } from '../schemas/user/createUserRequest.zod.schema.FIX';
+import { CreateUserSchema } from '../schemas/user/createUserRequest.zod.schema';
 import { verifyUserInputsSchema } from '../schemas/user/userVerifyRequest.zod.schema';
 import { SaveUserBasicsSchema } from '../schemas/user/saveUserBasicsRequest.zod.schema';
 import { UserApiRoutes } from '../../constants/Apis/user.routes';

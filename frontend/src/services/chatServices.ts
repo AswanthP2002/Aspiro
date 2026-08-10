@@ -78,3 +78,18 @@ export const getNewUnreadConversationsCount = async () => {
         if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
     }
 }
+
+export const sendChatWithAttachments = async (data: FormData) => {
+    try {
+        const response = await axiosInstance.post(ChatEndpoints.SEND_CHAT_WITH_ATTACHMENT, data,
+            {
+                sendAuthToken: true
+            } as AxiosRequest
+        )
+
+        return response.data
+    } catch (error: unknown) {
+        const err = error as AxiosError
+        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
+    }
+}

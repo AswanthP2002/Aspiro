@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
-import IAddUserEducationUsecase from '../../application/interfaces/usecases/education/IAddUserEducation.usecase.FIX';
+import IAddUserEducationUsecase from '../../application/interfaces/usecases/education/IAddUserEducation.usecase';
 // import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import IGetUserEducationsUsecase from '../../application/interfaces/usecases/education/IGetUserEducations.usecase.FIX';
-import IEditUserEducationUsecase from '../../application/interfaces/usecases/education/IEditUserEducation.usecase.FIX';
-import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/education/IDeleteUserEducation.usecase.FIX';
+import IGetUserEducationsUsecase from '../../application/interfaces/usecases/education/IGetUserEducations.usecase';
+import IEditUserEducationUsecase from '../../application/interfaces/usecases/education/IEditUserEducation.usecase';
+import IDeleteUserEducationUsecase from '../../application/interfaces/usecases/education/IDeleteUserEducation.usecase';
 
 @injectable()
 export default class EducationController {

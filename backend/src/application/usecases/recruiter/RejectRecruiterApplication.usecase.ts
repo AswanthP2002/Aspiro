@@ -1,9 +1,9 @@
 import { inject, injectable } from 'tsyringe';
-import IRejectRecruiterApplication from '../../interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase.FIX';
+import IRejectRecruiterApplication from '../../interfaces/usecases/recruiter/IRejectRecruiterApplication.usecase';
 import IRecruiterRepo from '../../../domain/interfaces/recruiter/IRecruiterRepo';
 import { RecruiterDTO } from '../../DTOs/recruiter/recruiter.dto';
 import IEmailService from '../../interfaces/services/IEmailService';
-import RejectRecruiterApplicationDTO from '../../DTOs/admin/rejectRecruiter.dto.FIX';
+import RejectRecruiterApplicationDTO from '../../DTOs/admin/rejectRecruiter.dto';
 import RecruiterMapper from '../../mappers/recruiter/Recruiter.mapperClass';
 
 @injectable()

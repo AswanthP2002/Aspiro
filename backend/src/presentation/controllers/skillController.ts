@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
-import IAddUsersSkillUsecase from '../../application/interfaces/usecases/skill.user/IAddUsersSkill.usecase.FIX';
+import IAddUsersSkillUsecase from '../../application/interfaces/usecases/skill.user/IAddUsersSkill.usecase';
 // import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import IGetUserSkillsUsecase from '../../application/interfaces/usecases/skill.user/IGetUserSkills.usecase.FIX';
-import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/skill.user/IDeleteUserSkill.usecase.FIX';
+import IGetUserSkillsUsecase from '../../application/interfaces/usecases/skill.user/IGetUserSkills.usecase';
+import IDeleteUserSkillUsecase from '../../application/interfaces/usecases/skill.user/IDeleteUserSkill.usecase';
 import IAdminAddSkillUsecase from '../../application/interfaces/usecases/skill.admin/IAdminAddSkill.usecase';
 import IAdminUpdateSkillUsecase from '../../application/interfaces/usecases/skill.admin/IAdminUpdateSkill.usecase';
 import IAdminDeleteSkillUsecase from '../../application/interfaces/usecases/skill.admin/IAdminDeleteSkill.usecase';

@@ -1,4 +1,6 @@
+import Chat from '../../../domain/entities/chat/chat.entity';
 import Notification from '../../../domain/entities/notification/notification.entity';
+import User from '../../../domain/entities/user/User';
 
 export default interface IRealTimeEventEmitter {
   postLiked(notification: Notification): void;
@@ -10,4 +12,6 @@ export default interface IRealTimeEventEmitter {
   removeNotification(receipient: string, notificationId: string): void;
   connectionAccepted(notification: Notification): void;
   deleteChatForAll(chatingPersonId: string, deletedChatId: string, conversationId: string): void;
+  sendMesseWithAttachments(message: Chat, conversationId: string): void;
+  sendNewMessage(message: Chat, receiver: string, sender: User): void;
 }

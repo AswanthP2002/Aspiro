@@ -1,10 +1,10 @@
 import { inject, injectable } from 'tsyringe';
-import IAddCertificateUseCase from '../../application/interfaces/usecases/certificate/IAddCertificate.usecase.FIX';
+import IAddCertificateUseCase from '../../application/interfaces/usecases/certificate/IAddCertificate.usecase';
 // import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
-import ILoadCertificateUseCase from '../../application/interfaces/usecases/certificate/IGetCeritificates.usecase.FIX';
+import ILoadCertificateUseCase from '../../application/interfaces/usecases/certificate/IGetCeritificates.usecase';
 import IDeleteCertificateUsecase from '../../application/interfaces/usecases/certificate/IDeleteCertificate.usecase';
 
 @injectable()

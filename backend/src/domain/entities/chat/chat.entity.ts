@@ -1,3 +1,10 @@
+export interface Attachment {
+  url: string;
+  key?: string;
+  fileName: string;
+  fileType: string;
+  fileSize?: number
+}
 export default interface Chat {
   _id?: string;
   conversationId?: string;
@@ -5,6 +12,7 @@ export default interface Chat {
   receiverId?: string;
   text: string;
   isRead: boolean;
+  attachments?: Attachment[]
   isDeleted: boolean;
   createdAt?: string;
   updatedAt?: string;
