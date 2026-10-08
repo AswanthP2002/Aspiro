@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import url from 'url';
-
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import IVerifyUserUseCase from '../../application/interfaces/usecases/user/IVerifyUser.usecase';
 import IEditProfileUseCase from '../../application/interfaces/usecases/user/IEditProfile.usecase';
@@ -204,7 +202,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async resendOTP(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -222,7 +220,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async userLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -306,7 +304,7 @@ export class UserController {
         // }
       }
     }
-  } //fixed
+  }
 
   async saveUsersBasics(req: Request, res: Response, next: NextFunction): Promise<void> {
     const id = req.user?.id as string;
@@ -337,7 +335,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async loadUserProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     const id = req.user?.id as string;
@@ -369,7 +367,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async withdrawApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
     const applicationId = req.params.applicationId;
@@ -382,7 +380,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async getScheduledInterviews(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req?.user?.id as string;
@@ -397,7 +395,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async loadJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
@@ -426,7 +424,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async loadUsersPublicProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { userId } = req.params;
@@ -441,7 +439,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //FIXED
+  }
 
   async loadJobDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { jobId } = req.params;
@@ -456,7 +454,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async sendResetPasswordLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email } = req.body;
@@ -470,7 +468,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -482,7 +480,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async applyJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user?.id as string;
@@ -504,7 +502,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async editMyProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     const id = req.user?.id as string;
@@ -533,7 +531,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async saveJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user?.id as string;
@@ -552,7 +550,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async checkIsJobSaved(req: Request, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user?.id as string;
@@ -568,7 +566,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async checkIsJobApplied(req: Request, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user?.id as string;
@@ -622,7 +620,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async addSocialLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id;
@@ -640,7 +638,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async deleteSocialLink(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
@@ -657,7 +655,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async uploadProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
@@ -719,7 +717,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //rfixed
+  }
 
   async removeCoverphoto(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
@@ -736,7 +734,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query?.search as string) || '';
@@ -745,8 +743,6 @@ export class UserController {
     const roleTypeFilter = (req.query.roleTypeFilter as string) || 'All';
     const experienceFilter = (req.query.experienceFilter as string) || 'All';
     const location = (req.query.location as string) || '';
-    // const sort = (req.query?.sort as string) || '';
-    // const filter = JSON.parse(req.query?.filter as string) || {};
 
     try {
       const result = await this._getUsersForPublic.execute({
@@ -765,7 +761,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked : void
+  }
 
   async getCandidateApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
     const candidateId = req.user?.id as string;
@@ -791,7 +787,7 @@ export class UserController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked : void
+  }
 
   async trackMyApplication(req: Request, res: Response, next: NextFunction): Promise<void> {
     const applicationId = req.params.applicationId;

@@ -1,5 +1,5 @@
 import { Button, FormControl, FormHelperText, Modal } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { addUserCertificate } from "../../../services/certificateServices";
 import { Controller, useForm } from "react-hook-form";
 import { CgClose } from "react-icons/cg";
@@ -8,6 +8,7 @@ import { IoCloseCircle } from "react-icons/io5";
 import { Certificates } from "../../../types/entityTypes";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import { current } from "@reduxjs/toolkit";
 
 interface AddCertificateModalProps {
     certificateModalOpen: boolean
@@ -56,6 +57,7 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
     async function addCertificate(data : Inputs) : Promise<void> {
         
         if(!certificate){
+            toast.error('Add Certificate')
             return
         }
 
@@ -98,12 +100,20 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
         return
     }
 
+    const currentDate = new Date()
+    const year = currentDate.getFullYear()
+    const monthh = String(currentDate.getMonth() + 1).padStart(2, "0")
+    const day = String(currentDate.getDate()).padStart(2,"0")
+
+    const maxDate = `${year}-${monthh}-${day}`
+
+
     return (
         <Modal className="flex items-center justify-center" open={certificateModalOpen} onClose={closeCertificateModal}>
-            <div className="bg-white p-3 rounded-md shadow-sm w-md">
+            <div className="bg-white p-5 rounded-md shadow-sm w-md">
                 <div className="header flex justify-between">
                     <div>
-                        <p>Upload Certificate</p>
+                        <p className="font-semibold text-slate-900 tracking-wide">Upload Certificate</p>
                         <p className="text-xs text-gray-700">Upload your professional certification, supported format PDF only</p>
                     </div>
                     <div>
@@ -139,15 +149,15 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
                                 }}
                                 render={({field}) => (
                                     <div>
-                                        <label htmlFor="" className="font-light">Certificate Name</label>
-                                        <input {...field} type="text" className="w-full bg-gray-100 border-3 rounded-md px-2 py-1 outline-none" placeholder="Eg : AWS Certified professional" />
+                                        <label htmlFor="" className="font-medium !text-[.850rem] !text-slate-500">Certificate Name</label>
+                                        <input {...field} type="text" className="w-full bg-gray-100 border-3 rounded-md px-3 py-2 outline-none" placeholder="Eg : AWS Certified professional" />
                                     </div>
                                 )}
                             />
                             <FormHelperText>{errors.name?.message}</FormHelperText>
                         </FormControl>
 
-                        <FormControl fullWidth className="" error={Boolean(errors.issuedOrganization)}>
+                        <FormControl fullWidth className="!mt-2" error={Boolean(errors.issuedOrganization)}>
                             <Controller
                                 control={control}
                                 name="issuedOrganization"
@@ -157,8 +167,8 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
                                 }}
                                 render={({field}) => (
                                     <div>
-                                        <label htmlFor="" className="font-light">Issued Organization</label>
-                                        <input type="text" {...field} placeholder="Eg: AWS" className="w-full bg-gray-100 border-3 px-2 py-1 rounded-md" />
+                                        <label htmlFor="" className="font-medium !text-[.850rem] !text-slate-500">Issued Organization</label>
+                                        <input type="text" {...field} placeholder="Eg: AWS" className="w-full bg-gray-100 border-3 px-3 py-2 rounded-md" />
                                     </div>
                                 )}
                             />
@@ -174,8 +184,8 @@ export default function AddCertificateForm({certificateModalOpen, closeCertifica
                                 }}
                                 render={({field}) => (
                                     <div>
-                                        <label htmlFor="" className="font-light">Issued Date</label>
-                                        <input {...field} type="date" className="w-full bg-gray-100 px-2 py-1 rounded-md border-3" />
+                                        <label htmlFor="" className="font-medium !text-[.850rem] !text-slate-500">Issued Date</label>
+                                        <input id="datePicker" max={maxDate} {...field} type="date" className="w-full bg-gray-100 px-3 py-2 rounded-md border-3" />
                                     </div>
                                 )}
                             />

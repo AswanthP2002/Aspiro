@@ -17,7 +17,6 @@ function createRecruiterRouter() {
     upload.single('document'),
     centralizedAuthentication,
     authorization(['user']),
-    // testMiddleware,
     recruiterController.createRecruiter.bind(recruiterController)
   );
   recruiterRouter.get(
@@ -198,12 +197,6 @@ function createRecruiterRouter() {
     authorization(['admin']),
     recruiterController.changeStatusToUnderReview.bind(recruiterController)
   );
-
-  // function testMiddleware(req: Request, res: Response, next: NextFunction) {
-  //   console.log('checking request body', req.body);
-
-  //   res.status(200).json({ success: true, message: 'Ok' });
-  // }
 
   return recruiterRouter;
 }

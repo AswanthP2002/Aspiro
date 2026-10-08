@@ -12,7 +12,7 @@ export const ExperienceSchema = new Schema<Experience>(
     isPresent: { type: Boolean },
     description: { type: String },
     startDate: { type: Date },
-    endDate: { type: [Date, String] },
+    endDate: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );

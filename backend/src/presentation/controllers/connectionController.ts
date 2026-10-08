@@ -5,7 +5,6 @@ import IRejectConnectionRequestUsecase from '../../application/interfaces/usecas
 import ICancelConnectionRequestUsecase from '../../application/interfaces/usecases/connection/ICancelConnectionRequest.usecase';
 import IAcceptConnectionRequestUsecase from '../../application/interfaces/usecases/connection/IAcceptConnectionRequest.usecase';
 import IGetConnectionsUsecase from '../../application/interfaces/usecases/connection/IGetConnections.usecase';
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import ResponseHandler from '../../utilities/response.handler';
@@ -48,12 +47,6 @@ export class ConnectionController {
         StatusCodes.CREATED,
         result
       );
-
-      // res.status(StatusCodes.CREATED).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Connection request'),
-      //   result,
-      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -70,11 +63,6 @@ export class ConnectionController {
         StatusCodes.OK,
         result
       );
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Connection request'),
-      //   result,
-      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -113,11 +101,6 @@ export class ConnectionController {
         StatusCodes.OK,
         result
       );
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_EDIT('Connection request status'),
-      //   result,
-      // });
     } catch (error) {
       next(error);
     }
@@ -143,11 +126,6 @@ export class ConnectionController {
         StatusCodes.OK,
         result
       );
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Connections'),
-      //   result,
-      // });
     } catch (error) {
       next(error);
     }

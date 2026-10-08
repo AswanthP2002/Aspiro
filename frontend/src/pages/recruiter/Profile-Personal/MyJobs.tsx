@@ -25,6 +25,12 @@ function debouncedSearch <T extends (...args: never[]) => void>(fn: T, delay: nu
     }
 }
 
+function isExpired(expiryDate: string){
+    const todyInMS = new Date().getMilliseconds()
+    const expiryInMS = new Date(expiryDate).getMilliseconds()
+
+    return todyInMS > expiryInMS
+}
 
 export default function MyJobs() {
 
@@ -206,7 +212,7 @@ const JobCard = ({ job, deleteJob, viewJob, editJob }: {job: MyJobData, deleteJo
     }
 
   return (
-    <div className="bg-white rounded-lg p-6 mb-4 shadow-[0_0_30px_2px_rgba(0,0,200,0.1)] hover:shadow-xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between transition-all hover:shadow-md">
+    <div className={`bg-white rounded-lg p-6 mb-4 shadow-[0_0_30px_2px_rgba(0,0,200,0.1)] hover:shadow-xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between transition-all hover:shadow-md`}>
       <div className="flex items-start space-x-4">
         <div className="bg-gray-100 p-4 rounded-lg">
           <BiBriefcase className="w-6 h-6 text-gray-400" />
@@ -223,13 +229,13 @@ const JobCard = ({ job, deleteJob, viewJob, editJob }: {job: MyJobData, deleteJo
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-400">
             <span className="flex items-center gap-1"><BiMapPin size={14} /> {job.location ? job.location : job.workMode}</span>
-            <span className="flex items-center gap-1"><BsClock size={14} /> {getReminingDays(job.expiresAt as string)} days left</span>
+            <span className="flex items-center gap-1"><BsClock size={14} /> {getReminingDays(job.expiresAt as string) > 0 ? `${getReminingDays(job.expiresAt as string)} days left` : <span className="text-red-500 italic">Expired</span>}</span>
           </div>
           <div className="mt-4 flex items-center gap-2">
             <button onClick={() => navigateToApplicantsManagePage(job._id as string)} className="border text-sm font-medium bg-gradient-to-br from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-lg shadow-[0_0_30px_2px_rgba(0,0,230,0.1)] transition-colors duration-300">
               View Applications
             </button>
-            <button onClick={editJob} className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsPencilSquare size={16} /></button>
+            {getReminingDays(job.expiresAt as string) > 0 && <button onClick={editJob} className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsPencilSquare size={16} /></button>}
             <button onClick={() => deleteJob(job._id as string)} className="p-2 border border-gray-200 rounded-md text-red-400 hover:bg-red-50"><BiTrash size={16} /></button>
             <button onClick={viewJob} className="p-2 border border-gray-200 rounded-md text-gray-400 hover:bg-gray-50"><BsEye size={16} /></button>
           </div>

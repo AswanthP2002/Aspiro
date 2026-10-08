@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'tsyringe';
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import IAdminLoginUseCase from '../../application/interfaces/usecases/admin/IAdminLogin.usecase';
 import IBlockRecruiterUsecase from '../../application/interfaces/usecases/recruiter/IBlockRecruiter.usecase';
@@ -15,8 +14,6 @@ import IAdminDeleteJobUsecase from '../../application/interfaces/usecases/job/IA
 import IGetIndividualRecruiterApplicationDetailsUsecase from '../../application/interfaces/usecases/recruiter/IGetIndividualRecruiterApplicationDetails.usecase';
 import { IAdminDeleteRecruiterDataUsecase } from '../../application/interfaces/usecases/recruiter/IAdminDeleteRecruiterData.usecase';
 import IAdminToggleFlagJobUsecase from '../../application/interfaces/usecases/job/IAdminToggleFlagJob.usecase';
-// import { BlockJobUseCase } from '../../application/usecases/job/BlockJob.usecase';
-// import { UnblockJobUseCase } from '../../application/usecases/job/UnblockJob.usecase';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
 import IBlockJobUseCase from '../../application/interfaces/usecases/job/IBlockJob.usecase';
 import IUnblockJobUseCase from '../../application/interfaces/usecases/job/IUnblockJob.usecase';
@@ -68,7 +65,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async logoutAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -84,7 +81,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async getRecruiterApplicationDetails(
     req: Request,
@@ -120,7 +117,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async deleteJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -192,7 +189,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async unblockRecruiter(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { companyId } = req.params;
@@ -208,7 +205,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async closeCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { companyId } = req.params;
@@ -224,7 +221,7 @@ export class AdminController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async deleteRecruiterData(req: Request, res: Response, next: NextFunction): Promise<void> {
     const recruiterId = req.params.recruiterId;
@@ -244,7 +241,6 @@ export class AdminController {
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
-    // const sortOption = (req.query.sort as string) || 'Newest';
     const statusFilter = (req.query.statusFilter as string) || 'all';
     const jobTypeFilter = (req.query.jobTypeFilter as string) || 'all';
     const reportsCount = parseInt(req.query.reportsCount as string) || 0;

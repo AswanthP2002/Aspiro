@@ -33,7 +33,7 @@ export default class JobController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked : void
+  }
 
   async searchJobFromHomePage(req: Request, res: Response, next: NextFunction): Promise<void> {
     const search = (req.query.search as string) || '';
@@ -47,12 +47,6 @@ export default class JobController {
         StatusCodes.OK,
         jobs
       );
-
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_FETCH('Job'),
-      //   result: jobs,
-      // });
 
       return;
     } catch (error: unknown) {

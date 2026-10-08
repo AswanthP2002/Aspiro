@@ -23,13 +23,6 @@ function createNotificationRouter() {
     notificationController.changeNotificationStatus.bind(notificationController)
   );
 
-  // notificationRouter.delete(
-  //   '/v1/notifications/:notificationId',
-  //   centralizedAuthentication,
-  //   authorization(['user']),
-  //   notificationController.softDeleteNotification.bind(notificationController)
-  // );
-
   notificationRouter.get(
     NotificationApiRoutes.GET_UNREAD_NOTIFICATIONS_COUNT,
     centralizedAuthentication,

@@ -111,7 +111,6 @@ export default function ProfilePersonal() {
 
   async function profileEditOnSubmit(data: ProfileFormState) {
     const { name, headline, city, district, state, country, summary, pincode, phone } = data;
-    toast.success('checking flow success')
     try {
       setloading(true)
       const result = await editUserProfile(

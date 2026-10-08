@@ -39,17 +39,6 @@ function createFollowRouter() {
     authorization(['user']),
     followController.removeAFollower.bind(followController)
   );
-  //   followRouter.get(
-  //     '/followers',
-  //     userAuth,
-  //     followcontroller.getFollowers.bind(followcontroller)
-  //   );
-  //   followRouter.get(
-  //     '/following',
-  //     userAuth,
-  //     followcontroller.getFollowing.bind(followcontroller)
-  //   );
-
   return followRouter;
 }
 

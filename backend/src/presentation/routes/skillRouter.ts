@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { container } from 'tsyringe';
 import { SkillController } from '../controllers/skillController';
 import { SkillApiRoutes } from '../../constants/Apis/skill.api.routes';
@@ -54,16 +54,10 @@ function CreateSkillRouter() {
     SkillApiRoutes.SKILLS.ADMIN.LOAD,
     centralizedAuthentication,
     authorization(['admin', 'user', 'recruiter']),
-    testMiddleware,
     skillController.adminGetSkills.bind(skillController)
   );
 
   return skillRouter;
-}
-
-function testMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log('-- checking is this route execute correctly --', req.query, req.url);
-  next();
 }
 
 export default CreateSkillRouter;

@@ -58,7 +58,10 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
   const {control, formState:{errors}, handleSubmit} = useForm<Inputs>({defaultValues:{name: ''}})
 
   async function addResume(data: Inputs){
-    if(!resume) return
+    if(!resume){
+      toast.error('Add resume')
+      return
+    }
 
     setLoading(true)
     const {name} = data
@@ -104,10 +107,10 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
   return (
     <>
       <Modal className="flex items-center justify-center" open={resumeModalOpen}>
-        <div className="p-3 bg-white rounded-md">
+        <div className="p-5 bg-white rounded-md">
           <div className="flex justify-between">
             <div>
-              <p>Upload Resume</p>
+              <p className='font-semibold tracking-wide text-slate-900'>Upload Resume</p>
               <p className="text-xs text-gray-700">
                 Upload your CV or Resume documents supported format PDF only
               </p>
@@ -149,8 +152,8 @@ export default function ResumeAddForm({resumeModalOpen, closeResumeModal, onResu
                     }}
                     render={({field}) => (
                         <div>
-                            <label htmlFor="" className="font-light">Document Name</label>
-                            <input {...field} type="text" className="w-full bg-gray-100 border-3 rounded-md px-2 py-1 outline-none" placeholder="Eg: Resume" />
+                            <label htmlFor="" className="font-medium text-[.8rem] text-slate-500">Document Name</label>
+                            <input {...field} type="text" className="w-full bg-gray-100 border-3 rounded-md px-3 py-2 outline-none" placeholder="Eg: Resume" />
             
                         </div>
                     )}

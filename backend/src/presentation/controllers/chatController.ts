@@ -1,4 +1,3 @@
-// import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { inject, injectable } from 'tsyringe';

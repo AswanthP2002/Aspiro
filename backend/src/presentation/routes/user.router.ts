@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { UserController } from '../controllers/userController';
 import { container } from 'tsyringe';
 import { authorization, centralizedAuthentication } from '../../middlewares/auth';
@@ -37,17 +37,13 @@ function createUserRouter() {
     userController.userLogin.bind(userController)
   );
   userRouter.post(UserApiRoutes.USERS.LOGOUT, userController.userLogout.bind(userController));
-  userRouter.get(
-    '/v1/token/refresh',
-    testMiddleware,
-    userController.reAuthenticate.bind(userController)
-  );
+  userRouter.get('/v1/token/refresh', userController.reAuthenticate.bind(userController));
   userRouter.get(
     UserApiRoutes.USER_PUBLIC.LOAD_JOBS,
     centralizedAuthentication,
     authorization(['user', 'admin', 'recruiter']),
     userController.loadJobs.bind(userController)
-  ); //no zod validation for load jobs query
+  );
 
   userRouter.get(
     UserApiRoutes.USER_PUBLIC.LOAD_JOB_DETAILS_BY_ID,
@@ -288,12 +284,6 @@ function createUserRouter() {
   );
 
   userRouter.get('/v1/infinity', userController.testInfinityScroll.bind(userController));
-
-  function testMiddleware(req: Request, res: Response, next: NextFunction) {
-    console.log('--- Refreshed / reloaded ---');
-    console.log(req.method, req.originalUrl);
-    next();
-  }
 
   return userRouter;
 }

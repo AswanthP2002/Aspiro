@@ -50,6 +50,7 @@ export default class ExperienceController {
 
   async editExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { experienceId } = req.params;
+    console.log('Checking edit experience request before proceeding', req.body)
     try {
       const result = await this._editUserExperienceUC.execute({ experienceId, ...req.body });
       res
