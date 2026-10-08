@@ -98,12 +98,15 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
 
     return(
         <Modal open={experiencemodalopen} className="flex items-center justify-center" onClose={closeModal}>
-        <div className="bg-white w-lg lg:w-md p-3 rounded-md max-h-[600px] !overflow-y-scroll">
+        <div className="bg-white w-lg p-3 rounded-md max-h-[700px] !overflow-y-scroll">
             <div className='w-full flex justify-end'>
                 <button onClick={closeModal} type="button" className=""><i className="fa-solid fa-close"></i></button>
             </div>
-          <Typography variant="h6" component="h2" sx={{textAlign:'center'}}>Add Experience</Typography>
-          <form onSubmit={handleSubmit(addExperience)}>
+          <div>
+            <p className="font-semibold text-lg tracking-wide text-gray-800">Add Experience</p>
+            <p className="text-xs text-slate-600">Showcase yoru previous work experinces to recruiters and peers</p>
+          </div>
+          <form onSubmit={handleSubmit(addExperience)} className="mt-6">
           <Box sx={{width:'100%'}}>
             <FormControl fullWidth>
               <Controller 
@@ -273,7 +276,7 @@ export default function AddExperienceForm({experiencemodalopen, closeModal, onAd
                   required:{value:true, message:'Description can not be emtpy'}
                 }}
                 render={({field}) => {
-                  return <Textarea {...field} sx={{height: '150px'}} placeholder="Write about your work experience..." />
+                  return <Textarea {...field} sx={{height: '150px'}} placeholder="Brief description about your roles and repsonsibilities..." />
                 }}
               />
               <FormHelperText>{errors.description?.message as string}</FormHelperText>

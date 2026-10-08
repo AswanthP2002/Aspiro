@@ -315,7 +315,7 @@ export default function ExperiencePage(){
                 </span>
                 <span className="flex items-center gap-1.5">
                     <CiCalendar className="text-gray-400" size={16} />
-                    {formatDate(exp.startDate as string)} — {exp.endDate && exp.endDate.length > 5 ? formatDate(exp.endDate) : 'Present'}
+                    {formatDate(exp.startDate as string)} — {exp.endDate && !exp.isPresent ? formatDate(exp.endDate) : 'Present'}
                 </span>
             </div>
 
@@ -534,12 +534,12 @@ export default function ExperiencePage(){
 
         <AddExperienceForm onAddExperience={onAddExperience} experiencemodalopen={modals.experienceAdd} closeModal={() => toggleModal("experienceAdd", false)} />
         {
-            modals.experienceEdit && selectedExperience && (<EditExperienceForm onEditExperience={onEditExperience} experience={selectedExperience} editExperienceModalOpen={modals.experienceEdit} closeExpEditModal={() => toggleModal()} />)
+            modals.experienceEdit && selectedExperience && (<EditExperienceForm onEditExperience={onEditExperience} experience={selectedExperience} editExperienceModalOpen={modals.experienceEdit} closeExpEditModal={() => toggleModal("experienceEdit", false)} />)
         }
         
         <AddEducationForm onAddEducation={onAddEducation} educationModalOpen={modals.educationAdd} closeEducationModal={() => toggleModal("educationAdd", false)} />
         {
-            modals.educationEdit && selectedEducation && (<EditEducationForm selectedEducation={selectedEducation} onEditEducation={onEditEducation} editEducationModalOpen={modals.educationEdit} closeEditEducationModal={() => toggleModal()} />)
+            modals.educationEdit && selectedEducation && (<EditEducationForm selectedEducation={selectedEducation} onEditEducation={onEditEducation} editEducationModalOpen={modals.educationEdit} closeEditEducationModal={() => toggleModal("educationEdit", false)} />)
         }
         
         <AddSkillsForm onRemoveSkill={onRemoveSkill} onAddSkill={onAddSkill} skillsModalOpen={modals.skillsAdd} closeSkillsModal={() => toggleModal("skillsAdd", false)} />

@@ -442,6 +442,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
       query;
     console.log('- checking job level filter before queriying -', jobLevelFilter);
     const skip = (page - 1) * limit;
+    const today = new Date();
     const result = await JobDAO.aggregate([
       {
         $match: {
@@ -452,6 +453,7 @@ export default class JobRepository extends BaseRepository<Job> implements IJobRe
           jobType: { $in: jobTypeFilter },
           location: { $regex: new RegExp(locationSearch, 'i') },
           isHidden: false,
+          expiresAt: { $gte: today },
         },
       },
       {

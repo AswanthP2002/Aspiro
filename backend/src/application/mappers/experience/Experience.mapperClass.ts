@@ -36,7 +36,7 @@ export class ExperienceMapper {
   }
 
   public experienceToExperienceDTO(experience: Experience): ExperienceDTO {
-    console.log('-- checking upcoming experience from the database --', experience);
+    // console.log('-- checking upcoming experience from the database --', experience);
     return {
       _id: experience._id,
       jobRole: experience.jobRole,

@@ -48,11 +48,6 @@ function createAdminRouter() {
     authorization(['admin']),
     adminController.deleteRecruiterData.bind(adminController)
   );
-  // // adminRouter.get(
-  // //   '/admin/company/details/:companyId',
-  // //   adminAuth,
-  // //   adminController.loadCompanyDetails.bind(adminController)
-  // // );
   adminRouter.patch(
     '/recruiter/block/:companyId',
     centralizedAuthentication,
@@ -97,11 +92,6 @@ function createAdminRouter() {
     authorization(['admin']),
     adminController.deleteJob.bind(adminController)
   );
-  // // adminRouter.get(
-  // //   '/admin/job/details/:jobId',
-  // //   adminAuth,
-  // //   adminController.loadJObDetails.bind(adminController)
-  // // );
   adminRouter.patch(
     AdminApiRouts.ADMIN_JOBS_MANAGE.BLOCK_A_JOB,
     centralizedAuthentication,
@@ -114,27 +104,12 @@ function createAdminRouter() {
     authorization(['admin']),
     adminController.unblockJob.bind(adminController)
   );
-  // // adminRouter.put(
-  // //   '/admin/job/reject/:jobId',
-  // //   adminAuth,
-  // //   adminController.rejectJob.bind(adminController)
-  // // );
-  // // adminRouter.put(
-  // //   '/admin/job/unreject/:jobId',
-  // //   adminAuth,
-  // //   adminController.unrejectJob.bind(adminController)
-  // // );
-
-  //adminRouter.post('/token/refresh', refreshAccessToken);
   adminRouter.post('/logout', adminController.logoutAdmin);
 
   return adminRouter;
 }
 
 function testMiddleware(req: Request, res: Response, next: NextFunction) {
-  // console.log('testing logout flow');
-  // console.log('--req url for testing--', req.url);
-  // console.log(req.body);
   next();
 }
 

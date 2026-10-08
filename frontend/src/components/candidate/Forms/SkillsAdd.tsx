@@ -51,9 +51,11 @@ export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddS
             console.log('-- checking upcoming skills from the backend -- suggestion --', result)
             if(result?.success){
                 const fetchedSkills = result?.result?.skills || [];
-                const mappedSkills = fetchedSkills.map((s: {skill: string}) => {
-                    return typeof s === 'string' ? s : s.skill // (s?.skill || s?.skills || s?.name);
+                const mappedSkills = fetchedSkills.map((s: {skills: string}) => {
+                    return typeof s === 'string' ? s : s.skills // (s?.skill || s?.skills || s?.name);
                 }).filter((s: string) => s && typeof s === 'string');
+                console.log('Mapped skills', mappedSkills)
+                console.log('Going to set options')
                 setSkillsOptions(mappedSkills);
             }
         } catch (error: unknown) {
@@ -176,24 +178,49 @@ export default function AddSkillsForm({skillsModalOpen, closeSkillsModal, onAddS
                         <Autocomplete
                             freeSolo
                             options={skillsOptions}
-                            filterOptions={(x) => x}
                             loading={skillOptionsLoading}
-                            value={value}
-                            onInputChange={(_, newInputValue, reason) => {
-                                if (reason === 'input') debounce(newInputValue);
+                            onChange={(_, newValue) => {
+                                onChange(newValue)
                             }}
-                            onChange={(_, newValue) => onChange(newValue)}
+                            // inputValue={value}
+                            value={value}
+                            onInputChange={(_, newInputValue) => {
+                                debounce(newInputValue)
+                            }}
+                            renderOption={(props, option) => (
+                                <li {...props}>
+                                    <strong>{option}</strong>
+                                </li>
+                            )}
                             renderInput={(params) => (
                                 <TextField 
-                                    {...params}
-                                    fullWidth
-                                    label="Skill"
-                                    variant="outlined"
-                                    error={Boolean(errors.skill)}
-                                    helperText={errors.skill?.message}
-                        
+                                  {...params}
+                                  value={value}
+                                  label="type skill"
+                                  error={Boolean(errors.skill)}
+                                  helperText={errors.skill?.message}
                                 />
                             )}
+                            // freeSolo
+                            // options={skillsOptions}
+                            // filterOptions={(x) => x}
+                            // loading={skillOptionsLoading}
+                            // value={value}
+                            // onInputChange={(_, newInputValue, reason) => {
+                            //     if (reason === 'input') debounce(newInputValue);
+                            // }}
+                            // onChange={(_, newValue) => onChange(newValue)}
+                            // renderInput={(params) => (
+                            //     <TextField 
+                            //         {...params}
+                            //         fullWidth
+                            //         label="Skill"
+                            //         variant="outlined"
+                            //         error={Boolean(errors.skill)}
+                            //         helperText={errors.skill?.message}
+                        
+                            //     />
+                            // )}
                         />
                     )}
                 />

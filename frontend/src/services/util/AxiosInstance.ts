@@ -55,20 +55,20 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
         const token = store.getState().userAuth.userToken
         if (token) {
             customeRequest.headers.Authorization = `Bearer ${token}`
-            console.log('Token existing before sending --', token)
+            // console.log('Token existing before sending --', token)
             // if(customeRequest.url?.includes('plans/load')){
             //     alert('Token existing...')
             // }
         }else{
             customeRequest.headers.Authorization = `Bearer ${token}`
-            console.log('Token not existing before sending --', token)
+            // console.log('Token not existing before sending --', token)
             // if(customeRequest.url?.includes('plans/load')){
             //     alert('Token not existing...')
             // }
         }
     }
     
-    console.log('Final request before sending', customeRequest.headers)
+    // console.log('Final request before sending', customeRequest.headers)
 
     return customeRequest
 })
@@ -77,7 +77,7 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const {response} = error
-        console.log('---checking response from the server --- inspect error code ---', response)
+        // console.log('---checking response from the server --- inspect error code ---', response)
         const originalRequest = error.config
 
         //If refresh method failed -> user need to login again

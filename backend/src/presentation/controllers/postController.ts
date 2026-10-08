@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { inject, injectable } from 'tsyringe';
 import ICreatePostUsecase from '../../application/interfaces/usecases/post/ICreatePost.usecase';
@@ -33,14 +32,11 @@ export default class PostController {
     @inject('IToggleSavePostUsecase') private _toggleSavePost: IToggleSavePostUsecase
   ) {}
 
-  // stoped at create post validation
-
   async createPost(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
     const media = req.file?.buffer;
 
     try {
-      // const validatedData = createPostSchema.parse({creatorId, media, ...req.body})
       const result = await this._createPost.execute({ userId, ...req.body, media });
 
       res.status(StatusCodes.CREATED).json({
@@ -70,7 +66,6 @@ export default class PostController {
     const postId = req.params.postId;
     const actorId = req.user?.id;
     const ownerId = req.body.ownerId;
-    //const creatorId = req.params.creatorId;
 
     try {
       const result = await this._likePost.execute({ postId, actorId, ownerId, ...req.body });
@@ -105,7 +100,6 @@ export default class PostController {
     }
   }
 
-  //geting all posts for feed beta implementation without any priority (geting all posts without any mutual, follow, follwoing, interested)
   async getPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
     const page = parseInt(req.query.page as string) || 1;

@@ -62,11 +62,6 @@ function createPostRouter() {
     authorization(['user']),
     postController.toggleSavePost.bind(postController)
   );
-  // postRouter.get(
-  //   '/post/user',
-  //   userAuth,
-  //   postController.getUserPosts.bind(postController)
-  // );
 
   postRouter.post(
     PostApiRoutes.COMMENT_ON_A_POST,

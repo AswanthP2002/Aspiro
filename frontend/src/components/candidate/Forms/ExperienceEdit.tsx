@@ -112,7 +112,7 @@ export default function EditExperienceForm({
             role,
             jobType,
             organization,
-            editableIsPresent,
+            currentWorkingStatus,
             formatedStartDate,
             formatedEndDate,
             location,

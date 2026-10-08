@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import IFollowUserUseCase from '../../application/interfaces/usecases/follow/IFollowUser.usecase';
 import IUnFollowUserUsercase from '../../application/usecases/interfaces/IUnFollowUser.usecase';
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import { inject, injectable } from 'tsyringe';
 import { StatusMessage } from '../../constants/Messages/statusMessages';
@@ -19,7 +18,6 @@ export default class FollowController {
     @inject('IGetFollowersUsecase') private _getFollowers: IGetFollowersUsecase,
     @inject('IGetFollowingsUsecase') private _getFollowings: IGetFollowingsUsecase,
     @inject('IRemoveAFollowerUsecase') private _removeAFollower: IRemoveAFollowerUsecase
-    //private _unfollowUseCase: IUnFollowUserUsercase,
   ) {
     this._responseHandler = new ResponseHandler();
   }
@@ -43,12 +41,6 @@ export default class FollowController {
         StatusCodes.CREATED,
         result
       );
-
-      // res.status(StatusCodes.OK).json({
-      //   success: true,
-      //   message: StatusMessage.RESOURCE_MESSAGES.RESOURCE_ADD('Follow'),
-      //   result,
-      // });
     } catch (error: unknown) {
       next(error);
     }
@@ -72,14 +64,12 @@ export default class FollowController {
         StatusMessage.RESOURCE_MESSAGES.RESOURCE_DELETE('Follow deleted'),
         StatusCodes.OK
       );
-      // res.status(StatusCodes.OK).json({ success: true, message: 'Unfollowed' });
     } catch (error: unknown) {
       next(error);
     }
   }
 
   async getFollowers(req: Request, res: Response, next: NextFunction): Promise<void> {
-    // const id = req.user?.id as string;
     const userId = req.params.userId;
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
@@ -98,7 +88,6 @@ export default class FollowController {
   }
 
   async getFollowings(req: Request, res: Response, next: NextFunction): Promise<void> {
-    // const id = req.user?.id as string;
     const userId = req.params.userId;
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;

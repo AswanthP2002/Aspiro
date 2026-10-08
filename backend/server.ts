@@ -20,7 +20,7 @@ import createUserRouter from './src/presentation/routes/user.router';
 import createRecruiterRouter from './src/presentation/routes/recruiterRouter';
 import { initSocket } from './src/infrastructure/socketio/socket';
 import createNotificationRouter from './src/presentation/routes/notificationRouter';
-// import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
+import { connectRedis } from './src/infrastructure/redis/redisClient'; //Reddis is commented now
 import createCompanyRouter from './src/presentation/routes/companyRouter';
 import CreateExperienceRouter from './src/presentation/routes/experienceRouter';
 import CreateEducationRouter from './src/presentation/routes/educationRouter';
@@ -77,7 +77,7 @@ async function main() {
   // cronMonthlyResetTest.resetSubscriptionLimit();
 
   //connect redis
-  // await connectRedis();
+  //await connectRedis(); //temporarily commented for testing at 03/10/2026
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);

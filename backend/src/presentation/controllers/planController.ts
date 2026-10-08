@@ -22,7 +22,6 @@ import ILoadUserSubscriptionDetailsUsecase from '../../application/interfaces/us
 import ResponseHandler from '../../utilities/response.handler';
 import IUserCancelSubscriptionUsecase from '../../application/interfaces/usecases/subscription/ICancelSubscription.usecase';
 import IUpgradeSubscriptionUsecase from '../../application/interfaces/usecases/subscription/IUpgradeSubscription.usecase';
-// import ILoadUserDetailsForResumeBuildingUsecase from '../../application/interfaces/usecases/user/ILoadUserDetailsForResumeBuidling.usecase';
 
 @injectable()
 export default class PlanController {
@@ -259,7 +258,6 @@ export default class PlanController {
   }
 
   async getAnalytics(req: Request, res: Response, next: NextFunction): Promise<void> {
-    // const sessionId = req.params.sessionId;
     const search = (req.query.search as string) || '';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 7;

@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
 import IAddCertificateUseCase from '../../application/interfaces/usecases/certificate/IAddCertificate.usecase';
-// import { Auth } from '../../middlewares/auth';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from '../statusCodes';
 import { StatusMessage } from '../../constants/Messages/statusMessages';

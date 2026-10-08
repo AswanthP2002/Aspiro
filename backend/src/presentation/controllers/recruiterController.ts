@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-// import { Auth } from '../../middlewares/auth';
 import { StatusCodes } from '../statusCodes';
 import ICreateJobUseCase from '../../application/interfaces/usecases/job/ICreateJob.usecase';
 import ILoadRecruiterProfileOverviewUsecase from '../../application/interfaces/usecases/recruiter/ILoadRecruiterProfileOverview.usecase';
@@ -107,7 +106,7 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async LoadRecruiterJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.user?.id as string;
@@ -135,7 +134,7 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async loadRecruiterJobDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
     const jobId = req.params.jobId;
@@ -182,7 +181,7 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //fixed
+  }
 
   async loadRecruiterProfileData(req: Request, res: Response, next: NextFunction): Promise<void> {
     const id = req.user?.id as string;
@@ -197,7 +196,7 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked
+  }
 
   async createJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     const id = req.user?.id as string;
@@ -216,7 +215,7 @@ export default class RecruiterController {
     } catch (error: unknown) {
       next(error);
     }
-  } //reworked
+  }
 
   async editJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
