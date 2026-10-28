@@ -112,26 +112,6 @@ const PricingPage = () => {
           </div>
           <p className='text-3xl font-bold bg-gradient-to-b from-blue-400 to-indigo-600 bg-clip-text text-transparent my-2'>Choose your perfect plan</p>
           <p className="text-gray-700 text-sm">Get advanced features and make your goals even faster</p>
-
-          {/* Toggle */}
-          <div className="mt-8 flex justify-center items-center">
-            <div className="relative flex bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-1 w-48 shadow-inner">
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`${billingCycle === 'monthly' ? 'bg-white text-blue-600' : 'text-white'} 
-              flex-1 py-1 text-sm font-medium rounded-full transition-all duration-200`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingCycle('annually')}
-                className={`${billingCycle === 'annually' ? 'bg-white text-blue-600' : 'text-white'} 
-              flex-1 py-1 text-sm font-medium rounded-full transition-all duration-200`}
-              >
-                Annually
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Pricing Cards */}

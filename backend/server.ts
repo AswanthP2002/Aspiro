@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import '../backend/src/config/DI.container';
+import './src/config/DI.container';
 import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -77,7 +77,7 @@ async function main() {
   // cronMonthlyResetTest.resetSubscriptionLimit();
 
   //connect redis
-  //await connectRedis(); //temporarily commented for testing at 03/10/2026
+  await connectRedis(); //temporarily commented for testing at 03/10/2026
 
   const expressServer = http.createServer(app);
   initSocket(expressServer);

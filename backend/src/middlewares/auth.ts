@@ -91,10 +91,6 @@ export const centralizedAuthentication = async (
   next: NextFunction
 ): Promise<void> => {
   const auth = req.headers.authorization;
-  // console.info('-- AUTH --> ', auth);
-  // console.log('=================');
-  // console.log(req.method, req.originalUrl);
-  // console.log('Authorization --', auth?.split(' ')[1].slice(0, 5));
   if (!auth) {
     console.log('NO authorization provided - response - No authorization : 401 - Auth :: ', auth);
     res.status(StatusCodes.UNAUTHORIZED).json({
@@ -105,8 +101,6 @@ export const centralizedAuthentication = async (
   }
 
   try {
-    // console.log('Authorization exist decoding...');
-    // console.log('before decoding ', auth.split(' '))
     const decoded = (await verifyToken(auth.split(' ')[1])) as JWTVerificationResultPayload;
     const userData = await UserDAO.findById(new mongoose.Types.ObjectId(decoded.id));
     if (userData?.isBlocked) {

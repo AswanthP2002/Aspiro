@@ -32,7 +32,7 @@ const loadInitialState = (): UserAuthState => {
       user: null, //currently not geting any data from localstorage
       userToken: null, // Always initialize token as null
       userRole: null, //currently not geting any data from localstorage
-      initialLoading: true
+      initialLoading: true //currently making this false
     };
   } catch (e) {
     console.error('Could not load state from localStorage', e);
@@ -69,15 +69,18 @@ const userAuthSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(reAuthenticateThunk.pending, (state) => {
+        console.log('Started reauthenticating')
         state.initialLoading = true;
       })
       .addCase(reAuthenticateThunk.fulfilled, (state, action: PayloadAction<ReAuthenticateResultPayload>) => {
+        console.log('Reauthentication success')
         state.userToken = action.payload.accessToken;
         state.user = action.payload.userData;
         state.userRole = action.payload.userData.role as string;
         state.initialLoading = false;
       })
       .addCase(reAuthenticateThunk.rejected, (state) => {
+        console.log('Reauthentication failed')
         state.initialLoading = false;
         state.user = null;
         state.userRole = null;

@@ -25,7 +25,7 @@ export default class ConversationMapper {
   public conversationDtoToInitalizeConvResponseDTO(
     data: Conversation & { participantsData: UserDTO[] }
   ): InitlaizeConversationResponseDTO {
-    console.log('Checking upcoming data inside mapper', data)
+    console.log('Checking upcoming data inside mapper', data);
     return {
       _id: data._id,
       type: data.type,

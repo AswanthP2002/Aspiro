@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import IDataHashService from '../../application/interfaces/services/IDataHashService';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 @injectable()
 export default class DataHashService implements IDataHashService {

@@ -1,7 +1,6 @@
-import { Modal } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import Loader from "./Loader";
+import RoundedSpinner from "../common/RoundedSpinner";
 
 interface RootState {
     userAuth: {
@@ -11,24 +10,24 @@ interface RootState {
     }
 }
 export default function AdminProtectedRoutes(){
-    // alert('Request reached under router verification')
     const logedAdmin = useSelector((state: RootState) => {
         return state.userAuth
     })
+    console.log('loged user', logedAdmin)
 
+    
     if(logedAdmin.initialLoading){
+        console.log('Checking initial loading', logedAdmin.initialLoading)
         return(
-            <Modal sx={{backgroundColor: 'white'}} open={true}>
-                <div>
-                  <Loader />
-                </div>
-              </Modal>
+            <RoundedSpinner secondaryColor="white" />
         )
     }
 
     if(logedAdmin.user && logedAdmin.userRole === 'admin'){
+        console.log('poceeding with outlet')
         return <Outlet />
     }
+    console.log('not proceeding with outlet')
 
     return <Navigate to='/admin/login' replace />
 

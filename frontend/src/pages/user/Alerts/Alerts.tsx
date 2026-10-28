@@ -9,6 +9,7 @@ import { setAlerts } from '../../../redux/alertSlice';
 import { Alerts, AlertsData } from '../../../types/entityTypes';
 import { fetchUserAlerts } from '../../../services/alertsServices';
 import { toast } from 'react-toastify';
+import handleApiError from '../../../services/util/handleAPIError';
 
 type AlertFetchingResponsePayload = {
   success: boolean;
@@ -46,11 +47,12 @@ export default function AlertsPage() {
           console.log('going to')
           dipsatch(setAlerts({alerts: result.result, unReadAlertsCount: 0}))
         }else{
-          toast.warn('Can not fetch alerts now')
+          // toast.warn('Can not fetch alerts now')
           dipsatch(setAlerts({alerts: [], unReadAlertsCount: 0}))
         }
       } catch (error: unknown) {
-        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+        // toast.error(error instanceof Error ? error.message : 'Something went wrong')
+        handleApiError(error, 'Can not fetch alerts')
       } finally {
         // setLoading(false)
       }

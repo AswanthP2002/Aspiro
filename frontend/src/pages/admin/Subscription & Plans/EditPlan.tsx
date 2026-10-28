@@ -42,7 +42,7 @@ const EditPlan = () => {
       planDescription: '',
       badgeIcon: 'Lightning',
       monthlyPrice: '',
-      yearlyPrice: '',
+      yearlyPrice: '0',
       jobPosts: '',
       directMessaging: false,
       connectionRequests: '',
@@ -238,7 +238,7 @@ const EditPlan = () => {
                   />
                   <label htmlFor="" className='!text-xs !text-red-500'>{errors.monthlyPrice?.message}</label>
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-xs font-bold mb-1.5">Yearly Price</label>
                   <input 
                     type="number"
@@ -246,7 +246,7 @@ const EditPlan = () => {
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <label htmlFor="" className='!text-xs !text-red-500'>{errors.yearlyPrice?.message}</label>
-                </div>
+                </div> */}
               </div>
             </section>
 

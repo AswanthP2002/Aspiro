@@ -1,45 +1,45 @@
 import { Button, Modal } from "@mui/material";
-import { useState } from "react";
+// import { useState } from "react";
 import { CiWarning } from "react-icons/ci";
-import { useDispatch } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { userLogout } from "../../../services/userServices";
-import { toast } from "react-toastify";
-import { AxiosError } from "axios";
+// import { useDispatch } from "react-redux";
+// import { useNavigate, useSearchParams } from "react-router-dom";
+// import { userLogout } from "../../../services/userServices";
+// import { toast } from "react-toastify";
+// import { AxiosError } from "axios";
 
 export default function TerminationPage(){
-    const [searchParams] = useSearchParams()
-    const message = searchParams.get('message') || "Access Denied"
-    const [loading, setLoading] = useState<boolean>(false)
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+    // const [searchParams] = useSearchParams()
+    // const message = searchParams.get('message') || "Access Denied"
+    // const [loading, setLoading] = useState<boolean>(false)
+    // const dispatch = useDispatch()
+    // const navigate = useNavigate()
 
-    const logoutOnButtonClick = async () => {
-        try {
-            setLoading(true)
-            await toast.promise(
-                userLogout(dispatch, navigate),
-                {
-                    pending: 'User loging out...',
-                    success: 'Logout succesful',
-                    error:{
-                        render(props) {
-                            const data = props.data as AxiosError<{message: string}>
-                            return data.message
-                        },
-                    }
-                }
-            )
-            // dispatch(logout())
-            // Notify.success('Logout done')
-        } catch (error: unknown) {
-            console.log('Error occured while logout', error instanceof Error ? error.message : 'Something went wrong')
-        } finally {
-            setLoading(false)
-            navigate('/login')
+    // const logoutOnButtonClick = async () => {
+    //     try {
+    //         setLoading(true)
+    //         await toast.promise(
+    //             userLogout(dispatch, navigate),
+    //             {
+    //                 pending: 'User loging out...',
+    //                 success: 'Logout succesful',
+    //                 error:{
+    //                     render(props) {
+    //                         const data = props.data as AxiosError<{message: string}>
+    //                         return data.message
+    //                     },
+    //                 }
+    //             }
+    //         )
+    //         // dispatch(logout())
+    //         // Notify.success('Logout done')
+    //     } catch (error: unknown) {
+    //         console.log('Error occured while logout', error instanceof Error ? error.message : 'Something went wrong')
+    //     } finally {
+    //         setLoading(false)
+    //         navigate('/login')
 
-        }
-    }
+    //     }
+    // }
 
     return(
         <div className="w-full bg-slate-50 min-h-screen flex items-center justify-center">
@@ -57,15 +57,15 @@ export default function TerminationPage(){
           Action Denied
         </h2>
         <p className="text-slate-500 leading-relaxed px-4">
-          {message || "Your account has been temporarily suspended. You won't be able to continue using this site. Please check your email for further details."}
+          {"Your account has been temporarily suspended. You won't be able to continue using this site. Please check your email for further details."}
         </p>
       </div>
 
       <div className="mt-8">
         <Button 
-          onClick={logoutOnButtonClick} 
+          // onClick={logoutOnButtonClick} 
           variant="contained" 
-          loading={loading} 
+          // loading={loading} 
           fullWidth 
           disableElevation
           sx={{

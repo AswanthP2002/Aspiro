@@ -3,7 +3,6 @@ import Swal from 'sweetalert2';
 import store from '../../redux/store';
 import { tokenRefresh, updateUserMetaData } from '../../redux/userAuthSlice';
 import { reAuthenticate } from '../commonServices';
-// import { toast } from 'react-toastify';
 
 const baseUrl = import.meta.env.VITE_SERVER_URL
 
@@ -36,7 +35,7 @@ const axiosInstance = axios.create({
     withCredentials:true,
     headers: {
         "Content-Type": "application/json"
-    } //Added a common heder for optimization: Individual headers are removable now
+    }
 });
 
 axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : InternalAxiosRequestConfig<unknown> => {
@@ -55,20 +54,10 @@ axiosInstance.interceptors.request.use((request : InternalAxiosRequestConfig) : 
         const token = store.getState().userAuth.userToken
         if (token) {
             customeRequest.headers.Authorization = `Bearer ${token}`
-            // console.log('Token existing before sending --', token)
-            // if(customeRequest.url?.includes('plans/load')){
-            //     alert('Token existing...')
-            // }
         }else{
             customeRequest.headers.Authorization = `Bearer ${token}`
-            // console.log('Token not existing before sending --', token)
-            // if(customeRequest.url?.includes('plans/load')){
-            //     alert('Token not existing...')
-            // }
         }
     }
-    
-    // console.log('Final request before sending', customeRequest.headers)
 
     return customeRequest
 })
@@ -77,10 +66,8 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const {response} = error
-        // console.log('---checking response from the server --- inspect error code ---', response)
         const originalRequest = error.config
 
-        //If refresh method failed -> user need to login again
         if(originalRequest.url.includes('/token/refresh')){
             return Promise.reject(error)
         }
@@ -112,9 +99,15 @@ axiosInstance.interceptors.response.use(
             })
         }
         else if(response && response.status === 406 && !window.location.href.includes('login')){
-            // alert(originalRequest.url)
-            // toast.warn(originalRequest.url)
-            return window.location.replace(`/action/termination?message=${response.data.message}`)
+            Swal.fire({
+                icon: 'warning',
+                title: 'Test',
+                text: response.data.message,
+                showCancelButton: false,
+                showConfirmButton: true,
+                allowEscapeKey: false,
+                allowOutsideClick: false
+            }) //need to implement logout here
        }
         else if(response && response.status === 403){
             // alert('403 response received from this...')
@@ -130,22 +123,6 @@ axiosInstance.interceptors.response.use(
                     window.location.href = '/temp/pricing'
                 }
             })
-            // window.location.href = '/temp/pricing'
-            // Swal.fire({
-            //     icon:'info',
-            //     title:'Blocked',
-            //     text:'Your account has been blocked, you will be logout shortly',
-            //     showConfirmButton:false,
-            //     showCancelButton:false,
-            //     allowOutsideClick:false,
-            //     timer:4000
-            // })//.then(async () => {
-            // //     const dispatch = store.dispatch
-            // //     await userLogout(dispatch,() => {
-            // //         window.location.replace('http://localhost:5173/login')
-            // //     })
-
-            // // })
         }else if(
             response && 
             response.status === 401 &&
@@ -171,11 +148,6 @@ axiosInstance.interceptors.response.use(
                 return Promise.reject(refreshError);
             }   //given an auth failed flag, which is for wrong password
         }
-        // else if(response && response.status === 401 && response?.data?.errors?.code !== 'AUTH_FAILED'){
-            // alert(`This one is still executing ${response.data.errors.code}`)
-            // console.log('not executed')
-            // window.location.replace('http://localhost:5173/token/expired')
-        // }
         else if(response && response.status === 404 && !window.location.href.includes('/login')){
             console.log('--checking 404 error--', response)
             //window.location.replace('http://localhost:5173/404') //only if it is not in the login page

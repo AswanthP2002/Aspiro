@@ -98,6 +98,8 @@ import UserSubscriptionManage from './pages/admin/Analytics/User.subscription.ma
 import PricingPageProtectedRoute from './components/route-components/PricingPage.protected.route';
 import PageLoader from './components/common/PageLoader';
 import SubscriptionProtectedRoute from './components/route-components/Subscription.protected.route';
+import RoundedSpinner from './components/common/RoundedSpinner';
+import AdminAlreadyLogedIn from './components/admin/AdminAlreadyLogedIn';
 
 // interface FetchAlertsPayloadResponse {
 //   success: boolean
@@ -326,10 +328,13 @@ function App() {
 
         
         {/* Admin specific routes */}
-        <Route path={AdminRoutes.ADMIN_LOGIN} element={<AdminLoginPage />} />
+        <Route path={AdminRoutes.ADMIN_LOGIN} element={<AdminAlreadyLogedIn />}>
+          <Route index element={<AdminLoginPage />} />
+        </Route>
+        <Route element={<AdminProtectedRoutes />}>
         <Route path='/admin' element={<AdminLayout />}>
-        <Route path={AdminRoutes.ADMIN_USER_DETAILS} element={<CandidateDetails />} />
-          <Route element={<AdminProtectedRoutes />}>
+          <Route path={AdminRoutes.ADMIN_USER_DETAILS} element={<CandidateDetails />} />
+          {/* <Route element={<AdminProtectedRoutes />}> */}
           <Route path={AdminRoutes.ADMIN_DASHBOARD} element={<Dashboard />} />
           <Route path={AdminRoutes.ADMIN_USERS} element={<Users />} />
           <Route path={AdminRoutes.ADMIN_RECRUITER_APPLICATIONS} element={<RecruiterApplications />} />
@@ -347,7 +352,8 @@ function App() {
           <Route path='subscription/plans/edit/:id' element={<EditPlan />} />
           <Route path='analytics/overview' element={<AdminAnalytics />} />
           <Route path='analytics/overview/subscription/details' element={<UserSubscriptionManage />} />
-          </Route>
+          {/* </Route> */}
+        </Route>
         </Route>
 
         {/* <Route path='/recruiter/introdetails' element={<IntroDetailsPageForm />} /> */}
@@ -356,7 +362,7 @@ function App() {
         <Route path='/payment-success' element={<PaymentSuccessPage />} />
         <Route path='/payment-failed' element={<PaymentFailedPage />} />
 
-        <Route path='/test' element={<PageLoader />} />
+        <Route path='/test' element={<RoundedSpinner secondaryColor='white' />} />
         <Route path='/temp/pricing' element={<PricingPageProtectedRoute />}>
           <Route index element={<PricingPage />} />
         </Route>

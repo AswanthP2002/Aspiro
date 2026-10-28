@@ -39,5 +39,4 @@ export interface JobApplicationTrackingDTO {
     _id: string;
     name: string;
   };
-
 }

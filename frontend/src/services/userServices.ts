@@ -143,8 +143,6 @@ export const saveBasicDetails = async (
     long: number,
     lat: number
 ) => {
-    try {
-        console.log('--checking lat and lon in the user services itserlf', lat, long)
         const response = await axiosInstance.patch(EndPoints.USER_ONBOARDING,
             {headline, city, district, state, country, pincode, summary, long, lat},
             {
@@ -153,16 +151,9 @@ export const saveBasicDetails = async (
         )
 
         return response.data
-
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('Error occured while saving basic details', err)
-        throw(error)
-    }
 }
 
 export const getMyProfileData = async () => {
-    try {
         const response = await axiosInstance.get(EndPoints.MY_PROFILE,
             {
                 sendAuthToken:true
@@ -170,15 +161,6 @@ export const getMyProfileData = async () => {
         )
 
         return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-
-        if(err.response && err.response.status < 500 && err.response.status !== 403) {
-            return err.response.data
-        }
-
-        console.log('Error occured while geting candidate profile data', err)
-    }
 }
 
 export const editUserProfile = async (name?: string, headline?: string, city?: string, district?: string, state?: string, country?: string, summary?: string, pincode? : string, phone?: string) => {
@@ -260,7 +242,6 @@ export const unsaveJob = async (savedId : string) => {
 }
 
 export const getSavedJobs = async (search: string, sort: string) => {
-    try {
         const response = await axiosInstance.get(EndPoints.LOAD_SAVED_JOBS,
             {
                 params:{search, sort},
@@ -269,15 +250,6 @@ export const getSavedJobs = async (search: string, sort: string) => {
         )
 
         return response.data
-    } catch (error : unknown) {
-        const err = error as AxiosError
-        console.log('--error occured while geting saved jobs--', err)
-        if(err.response && err.response.status < 500 && err.response.status !== 403) {
-            throw error
-        }
-
-        console.log('Error occured while geting the favorite jobs', err)
-    }
 }
 
 export const checkIsSaved = async (jobId : string) => {
