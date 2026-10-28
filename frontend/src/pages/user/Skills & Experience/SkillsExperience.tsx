@@ -18,6 +18,7 @@ import formatDate from "../../../services/util/formatDate";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { Skeleton } from "@mui/material";
+import handleApiError from "../../../services/util/handleAPIError";
 
 
 export default function ExperiencePage(){
@@ -223,9 +224,7 @@ export default function ExperiencePage(){
                 if (educationResult?.success) seteducation(educationResult.educations || []);
 
             } catch (error) {
-                // setLoading(false)
-                console.error("Failed to fetch candidate data:", error);
-                Notify.failure('Failed to fetch candidate data', {timeout: 2000})
+                handleApiError(error, 'Something went wrong')
             } finally {
                 setLoading(false)
             }

@@ -1,9 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import IInitializeConversation from '../../interfaces/usecases/conversation/IInitializeConversation.usecase';
 import IConversationRepo from '../../../domain/interfaces/user/IConversationRepo';
-import ConversationDTO, {
-  InitlaizeConversationResponseDTO,
-} from '../../DTOs/conversation/conversation.dto';
+import { InitlaizeConversationResponseDTO } from '../../DTOs/conversation/conversation.dto';
 import IUserRepository from '../../../domain/interfaces/IUserRepo';
 import UserDTO from '../../DTOs/user/user.dto';
 import ConversationMapper from '../../mappers/conversations/Conversation.mapperClass';

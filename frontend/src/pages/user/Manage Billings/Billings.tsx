@@ -505,8 +505,9 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
             : <>
                 <div className="body my-5">
             <div className="grid grid-cols-1 gap-2">
-              {plansData.map((plan) => (
-                <div key={plan._id} className='border-2 border-slate-200 rounded-lg p-3'>
+              {plansData.map((plan) => {
+                if(plan.monthlyPrice > 0){
+                  return <div key={plan._id} className='border-2 border-slate-200 rounded-lg p-3'>
                   <div className="flex gap-3 items-center">
                     <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
                       {plan.badgeIcon === 'Rocket' && (
@@ -557,7 +558,8 @@ const PlanListingModal = ({open, onClose}: {open: boolean, onClose: () => void})
                     </ul>
                   </div>
                 </div>
-              ))}
+                }
+                })}
             </div>
           </div>
               </>

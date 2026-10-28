@@ -1,23 +1,16 @@
-import { AxiosError, HttpStatusCode } from "axios";
 import axiosInstance, { AxiosRequest } from "./util/AxiosInstance";
 import { ChatEndpoints } from "../constants/endPoints/chat.endpoints";
 
 export const getConversations = async (search: string, page: number, limit: number) => {
-    try {
         const response = await axiosInstance.get(ChatEndpoints.LOAD_ALL_CONVERSATIONS,
             {params: {search, page, limit},
                 sendAuthToken: true} as AxiosRequest
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }
 
 export const getChats = async (conversationId: string) => {
-    try {
         const response = await axiosInstance.get(ChatEndpoints.LOAD_CHATS_BY_CONVERSATION_ID(conversationId),
             
             {   
@@ -26,14 +19,9 @@ export const getChats = async (conversationId: string) => {
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }
 
 export const deleteChat = async (chatId: string, conversationId: string, chattingPersonId: string) => {
-    try {
         const response = await axiosInstance.delete(ChatEndpoints.DELETE_CHAT_BY_ID(chatId),
             
             {   
@@ -43,14 +31,9 @@ export const deleteChat = async (chatId: string, conversationId: string, chattin
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }
 
 export const deleteChatForMe = async (chatId: string) => {
-    try {
         const response = await axiosInstance.patch(ChatEndpoints.DELETE_CHAT_FOR_ME(chatId), {},
             {   
                 sendAuthToken: true
@@ -58,14 +41,9 @@ export const deleteChatForMe = async (chatId: string) => {
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }
 
 export const getNewUnreadConversationsCount = async () => {
-    try {
         const response = await axiosInstance.get(ChatEndpoints.GET_NEW_UNREAD_CONVERSATIONS_COUNT,
             {
                 sendAuthToken: true
@@ -73,14 +51,9 @@ export const getNewUnreadConversationsCount = async () => {
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }
 
 export const sendChatWithAttachments = async (data: FormData) => {
-    try {
         const response = await axiosInstance.post(ChatEndpoints.SEND_CHAT_WITH_ATTACHMENT, data,
             {
                 sendAuthToken: true
@@ -88,8 +61,4 @@ export const sendChatWithAttachments = async (data: FormData) => {
         )
 
         return response.data
-    } catch (error: unknown) {
-        const err = error as AxiosError
-        if(err.response && err.response.status < HttpStatusCode.InternalServerError && err.response.status !== HttpStatusCode.Forbidden) throw err
-    }
 }

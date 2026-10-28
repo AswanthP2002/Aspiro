@@ -214,7 +214,7 @@ export default function CandidateDetails(){
 
                     <div className="grid grid-cols-12 gap-5 mt-5">
                         <div className="col-span-12 lg:col-span-8 space-y-5">
-                            <div className="border border-slate-100 shadow-xl rounded-lg bg-white p-5">
+                            <div className="border border-slate-100 shadow-sm rounded-lg bg-white p-5">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                                     <div className="flex gap-2">
                                         {userDetails?.profilePicture?.cloudinarySecureUrl

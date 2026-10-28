@@ -3,7 +3,7 @@ export interface Attachment {
   key?: string;
   fileName: string;
   fileType: string;
-  fileSize?: number
+  fileSize?: number;
 }
 export default interface Chat {
   _id?: string;
@@ -12,7 +12,7 @@ export default interface Chat {
   receiverId?: string;
   text: string;
   isRead: boolean;
-  attachments?: Attachment[]
+  attachments?: Attachment[];
   isDeleted: boolean;
   createdAt?: string;
   updatedAt?: string;

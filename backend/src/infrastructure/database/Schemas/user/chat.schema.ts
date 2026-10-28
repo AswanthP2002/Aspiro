@@ -1,6 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose';
 import Chat, { Attachment } from '../../../../domain/entities/chat/chat.entity';
-import { string } from 'zod';
 
 export const AttachmentSchema = new Schema<Attachment>({
   url: { type: String },

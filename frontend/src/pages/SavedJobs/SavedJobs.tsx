@@ -10,6 +10,7 @@ import { formattedDateMoment } from "../../services/util/formatDate";
 import getReminingDays from "../../helpers/DateTime.helper";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import handleApiError from "../../services/util/handleAPIError";
 
 export default function SavedJobs(){
     const [savedJobs, setSavedJobs] = useState<MySavedJobData[] | null | undefined>(null)
@@ -81,7 +82,9 @@ export default function SavedJobs(){
                 setSavedJobs(result.result.jobs)
                 setTotalPages(result.result.totalPages)
             } catch (error: unknown) {
-                Notify.failure(error instanceof Error ? error.message : 'Something went wrong', {timeout:2500})
+                console.log('Acutal error', error)
+                console.log('Error constructor: ', error instanceof Error ? error.constructor.name : typeof Error)
+                handleApiError(error, 'Something went wrong')
             }
         })()
     }, [search, sort])
